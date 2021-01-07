@@ -2,8 +2,16 @@
 rsp-squareone
 #############
 
-Squareone is the next-generation landing page for the Rubin Science Platform.
+Squareone is the next-generation landing page for the `Rubin Observatory`_ Science Platform.
 It's where you start on your journey to use the RSP's portal, notebooks, and APIs to do science with Rubin/LSST data.
+
+Technology stack
+================
+
+- The site is built with Next.js_ and React_.
+  Next.js_ allows the site to be dynamically configured for different Science Platform deployments.
+
+- Styling is done through styled-components_ (along with global CSS).
 
 Development workflow primer
 ===========================
@@ -85,5 +93,9 @@ You can serve the production build locally::
 
    yarn serve
 
+.. _Next.js: https://nextjs.org
 .. _Prettier: https://prettier.io/
 .. _pre-commit: https://pre-commit.com/
+.. _Rubin Observatory: https://www.lsst.org
+.. _React: https://reactjs.org
+.. _styled-components: https://styled-components.com
