@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"**/*.{json,css,graphql,yaml}\"",
+    "format:check": "prettier --check \"**/*.{json,css,graphql,yaml}\""
   },
   "dependencies": {
     "next": "10.0.5",
