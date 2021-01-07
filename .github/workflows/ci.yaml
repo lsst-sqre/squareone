@@ -54,3 +54,22 @@ jobs:
 
       - name: Build site
         run: yarn build
+
+  docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Define the Docker tag
+        id: vars
+        run: echo ::set-output name=tag::$(echo ${GITHUB_REF} | sed -E 's,refs/(heads|tags)/,,' | sed -E 's,/,-,g')
+
+      - name: Print the tag
+        id: print
+        run: echo ${{steps.vars.outputs.tag}}
+
+      - name: Build the runtime Docker image
+        run: |
+          docker build --target production \
+            --tag lsstsqre/rsp-squareone:${{steps.vars.outputs.tag}} .
