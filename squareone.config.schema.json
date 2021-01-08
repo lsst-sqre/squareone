@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "squareone.config.schema.json",
+  "title": "Squareone Configuration",
+  "description": "Publicly-viewable configuration for a Squareone instance.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "siteName": {
+      "type": "string",
+      "default": "Rubin Science Platform",
+      "title": "Site name",
+      "description": "Used as the basis of the HTML title tag. This should be customized for each science platform deployment."
+    }
+  }
+}

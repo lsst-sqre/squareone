@@ -73,3 +73,32 @@ jobs:
         run: |
           docker build --target production \
             --tag lsstsqre/rsp-squareone:${{steps.vars.outputs.tag}} .
+
+  docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools
+          pip install -r docs/requirements.txt
+          pip install ltd-conveyor
+
+      - name: Build documentation
+        working-directory: docs
+        run: make html
+
+      - name: Upload to LSST the Docs
+        if: ${{ github.event_name == 'push' }}
+        env:
+          LTD_USERNAME: ${{ secrets.LTD_USERNAME }}
+          LTD_PASSWORD: ${{ secrets.LTD_PASSWORD }}
+        working-directory: docs
+        run: ltd upload --product squareone --gh --dir _build/html

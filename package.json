@@ -12,6 +12,8 @@
     "format:check": "prettier --check \"**/*.{json,css,graphql,yaml}\""
   },
   "dependencies": {
+    "ajv": "^7.0.3",
+    "js-yaml": "^4.0.0",
     "next": "10.0.5",
     "prop-types": "^15.7.2",
     "react": "17.0.1",
