@@ -20,6 +20,7 @@ sys.setrecursionlimit(2000)
 # ones.
 extensions = [
     "sphinx.ext.intersphinx",
+    "sphinx-jsonschema",
     "documenteer.sphinxext",
 ]
 
