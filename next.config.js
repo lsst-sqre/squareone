@@ -4,6 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
+const Ajv = require('ajv').default;
 
 const readYamlConfig = () => {
   const configPath = path.join(
@@ -13,7 +14,20 @@ const readYamlConfig = () => {
   console.log(`Config path: ${configPath}`);
 
   try {
+    const schema = JSON.parse(
+      fs.readFileSync(
+        path.join(__dirname, 'squareone.config.schema.json'),
+        'utf8'
+      )
+    );
+    const ajv = new Ajv({ useDefaults: true, removeAdditional: true });
+    const validate = ajv.compile(schema);
+
     const data = yaml.load(fs.readFileSync(configPath, 'utf8'));
+    // Validation modifies the configuration data by adding defaults and
+    // removing additional properties.
+    validate(data);
+
     return data;
   } catch (err) {
     console.error(
@@ -31,9 +45,7 @@ module.exports = (phase, { defaultConfig }) => {
 
   const config = {
     ...defaultConfig,
-    publicRuntimeConfig: {
-      siteName: yamlConfig.siteName || 'Rubin Science Platform',
-    },
+    publicRuntimeConfig: { ...yamlConfig },
   };
   console.log(config);
   return config;
