@@ -1,3 +1,6 @@
 .next/
 node_modules/
 Dockerfile
+.pre-commit-config.yaml
+.prettierrc
+docs/
