@@ -46,6 +46,14 @@ module.exports = (phase, { defaultConfig }) => {
   const config = {
     ...defaultConfig,
     publicRuntimeConfig: { ...yamlConfig },
+    async rewrites() {
+      return [
+        {
+          source: '/auth/api/v1/user-info',
+          destination: '/api/user-info',
+        },
+      ];
+    },
   };
   console.log(config);
   return config;
