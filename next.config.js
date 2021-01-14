@@ -50,7 +50,7 @@ module.exports = (phase, { defaultConfig }) => {
       return [
         {
           source: '/auth/api/v1/user-info',
-          destination: '/api/user-info',
+          destination: '/api/dev/user-info',
         },
       ];
     },
