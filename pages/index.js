@@ -27,7 +27,12 @@ const useLogin = (url) => {
       state: apiStates.LOADING,
     });
     fetch(url)
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.status >= 200 && response.status <= 299) {
+          return response.json();
+        }
+        throw Error(response.statusText);
+      })
       .then((jsonData) => {
         setPartialData({ state: apiStates.SUCCESS, data: jsonData });
       })
