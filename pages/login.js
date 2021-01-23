@@ -2,16 +2,16 @@
 
 import PropTypes from 'prop-types';
 import { useState } from 'react';
-import { useRouter } from 'next/router';
+
 import sleep from '../utils/sleep';
 import { getDevLoginEndpoint } from '../utils/client/url';
+import { useCurrentUrl } from '../hooks/currentUrl';
 
 export default function Login({ baseUrl }) {
   const [username, setUsername] = useState('');
   const [name, setName] = useState('');
 
-  const router = useRouter();
-  const currentUrl = new URL(router.pathname, baseUrl);
+  const currentUrl = useCurrentUrl(baseUrl);
 
   const handleSubmit = (event) => {
     // prevent default behaviour which refreshes the page

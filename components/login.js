@@ -17,5 +17,5 @@ export const Login = ({ loginData, pageUrl }) => {
 
 Login.propTypes = {
   loginData: PropTypes.object,
-  pageUrl: PropTypes.string,
+  pageUrl: PropTypes.instanceOf(URL),
 };

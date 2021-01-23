@@ -22,5 +22,5 @@ export const UserMenu = ({ loginData, pageUrl }) => (
 
 UserMenu.propTypes = {
   loginData: PropTypes.object,
-  pageUrl: PropTypes.string,
+  pageUrl: PropTypes.instanceOf(URL),
 };

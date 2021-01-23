@@ -1,15 +1,15 @@
 import Head from 'next/head';
 import getConfig from 'next/config';
 import PropTypes from 'prop-types';
-import { useRouter } from 'next/router';
 
 import styles from '../styles/Home.module.css';
+
+import { useCurrentUrl } from '../hooks/currentUrl';
 
 import { Login } from '../components/login';
 
 export default function Home({ publicRuntimeConfig, loginData, baseUrl }) {
-  const router = useRouter();
-  const currentUrl = new URL(router.pathname, baseUrl);
+  const currentUrl = useCurrentUrl(baseUrl);
 
   return (
     <div className={styles.container}>

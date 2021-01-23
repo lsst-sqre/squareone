@@ -1,13 +1,12 @@
 /* Mock log out page */
 
 import PropTypes from 'prop-types';
-import { useRouter } from 'next/router';
 import sleep from '../utils/sleep';
 import { getDevLogoutEndpoint } from '../utils/client/url';
+import { useCurrentUrl } from '../hooks/currentUrl';
 
 export default function Logout({ baseUrl }) {
-  const router = useRouter();
-  const currentUrl = new URL(router.pathname, baseUrl);
+  const currentUrl = useCurrentUrl(baseUrl);
 
   const handleSubmit = (event) => {
     // prevent default behaviour which refreshes the page
