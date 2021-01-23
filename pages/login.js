@@ -1,17 +1,23 @@
 /* Mock log in page */
 
+import PropTypes from 'prop-types';
 import { useState } from 'react';
+import { useRouter } from 'next/router';
 import sleep from '../utils/sleep';
+import { getDevLoginEndpoint } from '../utils/client/url';
 
-export default function Login() {
+export default function Login({ baseUrl }) {
   const [username, setUsername] = useState('');
   const [name, setName] = useState('');
+
+  const router = useRouter();
+  const currentUrl = new URL(router.pathname, baseUrl);
 
   const handleSubmit = (event) => {
     // prevent default behaviour which refreshes the page
     event.preventDefault();
     const body = JSON.stringify({ name, username });
-    fetch('http://localhost:3001/api/dev/login', {
+    fetch(getDevLoginEndpoint(currentUrl), {
       method: 'POST',
       body,
       headers: { 'Content-Type': 'application/json' },
@@ -43,4 +49,17 @@ export default function Login() {
       <button type="submit">Submit</button>
     </form>
   );
+}
+
+Login.propTypes = {
+  baseUrl: PropTypes.string,
+};
+
+export async function getServerSideProps({ req }) {
+  const baseUrl = `http://${req.headers.host}`;
+  return {
+    props: {
+      baseUrl,
+    },
+  };
 }

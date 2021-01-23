@@ -4,7 +4,9 @@ import PropTypes from 'prop-types';
 import { Menu, MenuList, MenuButton, MenuItem } from '@reach/menu-button';
 import '@reach/menu-button/styles.css';
 
-export const UserMenu = ({ loginData }) => (
+import { getLogoutUrl } from '../utils/client/url';
+
+export const UserMenu = ({ loginData, pageUrl }) => (
   <Menu>
     <MenuButton>{loginData.data.name}</MenuButton>
     <MenuList>
@@ -12,7 +14,7 @@ export const UserMenu = ({ loginData }) => (
         <a href="/auth/tokens">Security tokens</a>
       </MenuItem>
       <MenuItem>
-        <a href="/logout">Log out</a>
+        <a href={getLogoutUrl(pageUrl)}>Log out</a>
       </MenuItem>
     </MenuList>
   </Menu>
@@ -20,4 +22,5 @@ export const UserMenu = ({ loginData }) => (
 
 UserMenu.propTypes = {
   loginData: PropTypes.object,
+  pageUrl: PropTypes.string,
 };

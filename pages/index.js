@@ -1,12 +1,16 @@
 import Head from 'next/head';
 import getConfig from 'next/config';
 import PropTypes from 'prop-types';
+import { useRouter } from 'next/router';
 
 import styles from '../styles/Home.module.css';
 
 import { Login } from '../components/login';
 
-export default function Home({ publicRuntimeConfig, loginData }) {
+export default function Home({ publicRuntimeConfig, loginData, baseUrl }) {
+  const router = useRouter();
+  const currentUrl = new URL(router.pathname, baseUrl);
+
   return (
     <div className={styles.container}>
       <Head>
@@ -17,7 +21,7 @@ export default function Home({ publicRuntimeConfig, loginData }) {
       <main className={styles.main}>
         <h1 className={styles.title}>{publicRuntimeConfig.siteName}</h1>
 
-        <Login loginData={loginData} />
+        <Login loginData={loginData} pageUrl={currentUrl} />
 
         <p className={styles.description}>
           Get started by editing{' '}
@@ -72,11 +76,17 @@ export default function Home({ publicRuntimeConfig, loginData }) {
 Home.propTypes = {
   publicRuntimeConfig: PropTypes.object,
   loginData: PropTypes.object.isRequired,
+  baseUrl: PropTypes.string,
 };
 
-export async function getServerSideProps() {
+export async function getServerSideProps({ req }) {
   const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
+  const baseUrl = `http://${req.headers.host}`;
   return {
-    props: { serverRuntimeConfig, publicRuntimeConfig },
+    props: {
+      serverRuntimeConfig,
+      publicRuntimeConfig,
+      baseUrl,
+    },
   };
 }
