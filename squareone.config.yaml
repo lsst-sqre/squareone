@@ -1,2 +1,2 @@
 siteName: 'Squareone Development Site'
-httpProtocol: 'http'
+baseUrl: 'http://localhost:3001'

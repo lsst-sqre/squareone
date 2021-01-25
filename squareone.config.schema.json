@@ -11,6 +11,12 @@
       "default": "Rubin Science Platform",
       "title": "Site name",
       "description": "Used as the basis of the HTML title tag. This should be customized for each science platform deployment."
+    },
+    "baseUrl": {
+      "type": "string",
+      "default": "http://localhost:3001",
+      "title": "Base URL for the public ingress",
+      "description": "Used for computing absolute URLs"
     }
   }
 }

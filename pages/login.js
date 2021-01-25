@@ -56,14 +56,12 @@ Login.propTypes = {
   baseUrl: PropTypes.string,
 };
 
-export async function getServerSideProps({ req }) {
+export async function getServerSideProps() {
   const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
-  const baseUrl = `${serverRuntimeConfig.httpProtocol}://${req.headers.host}`;
   return {
     props: {
       serverRuntimeConfig,
       publicRuntimeConfig,
-      baseUrl,
     },
   };
 }
