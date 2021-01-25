@@ -6,7 +6,7 @@ import { apiStates } from '../hooks/login';
 
 import { UserMenu } from './userMenu';
 
-import { getLoginUrl } from '../utils/client/url';
+import { getLoginUrl } from '../utils/url';
 
 export const Login = ({ loginData, pageUrl }) => {
   if (loginData.state === apiStates.SUCCESS) {

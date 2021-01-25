@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { Menu, MenuList, MenuButton, MenuLink } from '@reach/menu-button';
 import '@reach/menu-button/styles.css';
 
-import { getLogoutUrl } from '../utils/client/url';
+import { getLogoutUrl } from '../utils/url';
 
 export const UserMenu = ({ loginData, pageUrl }) => {
   const logoutUrl = getLogoutUrl(pageUrl);

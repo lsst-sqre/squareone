@@ -5,7 +5,7 @@ import getConfig from 'next/config';
 import { useState } from 'react';
 
 import sleep from '../utils/sleep';
-import { getDevLoginEndpoint } from '../utils/client/url';
+import { getDevLoginEndpoint } from '../utils/url';
 import { useCurrentUrl } from '../hooks/currentUrl';
 
 export default function Login({ baseUrl }) {

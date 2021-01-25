@@ -3,7 +3,7 @@
 import PropTypes from 'prop-types';
 import getConfig from 'next/config';
 import sleep from '../utils/sleep';
-import { getDevLogoutEndpoint } from '../utils/client/url';
+import { getDevLogoutEndpoint } from '../utils/url';
 import { useCurrentUrl } from '../hooks/currentUrl';
 
 export default function Logout({ baseUrl }) {
