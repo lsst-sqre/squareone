@@ -5,19 +5,5 @@
   "description": "Server-only configuration for a Squareone instance.",
   "type": "object",
   "additionalProperties": false,
-  "properties": {
-    "httpProtocol": {
-      "type": "string",
-      "enum": ["http", "https"],
-      "default": "http",
-      "title": "HTTP Protocol",
-      "description": "Used for computing absolute URLs. Set to https for production."
-    },
-    "baseUrl": {
-      "type": "string",
-      "default": "http://localhost:3001",
-      "title": "Base URL for the public ingress",
-      "description": "Used for computing absolute URLs"
-    }
-  }
+  "properties": {}
 }
