@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3001",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
@@ -12,6 +12,7 @@
     "format:check": "prettier --check \"**/*.{json,css,graphql,yaml}\""
   },
   "dependencies": {
+    "@reach/menu-button": "^0.12.1",
     "ajv": "^7.0.3",
     "js-yaml": "^4.0.0",
     "next": "10.0.5",
