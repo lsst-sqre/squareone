@@ -81,7 +81,8 @@ Home.propTypes = {
 
 export async function getServerSideProps({ req }) {
   const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
-  const baseUrl = `http://${req.headers.host}`;
+  console.log(serverRuntimeConfig);
+  const baseUrl = `${serverRuntimeConfig.httpProtocol}://${req.headers.host}`;
   return {
     props: {
       serverRuntimeConfig,

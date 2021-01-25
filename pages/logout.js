@@ -1,6 +1,7 @@
 /* Mock log out page */
 
 import PropTypes from 'prop-types';
+import getConfig from 'next/config';
 import sleep from '../utils/sleep';
 import { getDevLogoutEndpoint } from '../utils/client/url';
 import { useCurrentUrl } from '../hooks/currentUrl';
@@ -30,9 +31,12 @@ Logout.propTypes = {
 };
 
 export async function getServerSideProps({ req }) {
-  const baseUrl = `http://${req.headers.host}`;
+  const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
+  const baseUrl = `${serverRuntimeConfig.httpProtocol}://${req.headers.host}`;
   return {
     props: {
+      serverRuntimeConfig,
+      publicRuntimeConfig,
       baseUrl,
     },
   };

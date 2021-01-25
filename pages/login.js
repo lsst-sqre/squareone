@@ -1,6 +1,7 @@
 /* Mock log in page */
 
 import PropTypes from 'prop-types';
+import getConfig from 'next/config';
 import { useState } from 'react';
 
 import sleep from '../utils/sleep';
@@ -56,9 +57,12 @@ Login.propTypes = {
 };
 
 export async function getServerSideProps({ req }) {
-  const baseUrl = `http://${req.headers.host}`;
+  const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
+  const baseUrl = `${serverRuntimeConfig.httpProtocol}://${req.headers.host}`;
   return {
     props: {
+      serverRuntimeConfig,
+      publicRuntimeConfig,
       baseUrl,
     },
   };

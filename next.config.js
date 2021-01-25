@@ -6,20 +6,9 @@ const path = require('path');
 const yaml = require('js-yaml');
 const Ajv = require('ajv').default;
 
-const readYamlConfig = () => {
-  const configPath = path.join(
-    process.cwd(),
-    process.env.SQUAREONE_CONFIG_PATH || 'squareone.config.yaml'
-  );
-  console.log(`Config path: ${configPath}`);
-
+const readYamlConfig = (configPath, schemaPath) => {
   try {
-    const schema = JSON.parse(
-      fs.readFileSync(
-        path.join(__dirname, 'squareone.config.schema.json'),
-        'utf8'
-      )
-    );
+    const schema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
     const ajv = new Ajv({ useDefaults: true, removeAdditional: true });
     const validate = ajv.compile(schema);
 
@@ -30,22 +19,47 @@ const readYamlConfig = () => {
 
     return data;
   } catch (err) {
-    console.error(
-      `$SQUAREONE_CONFIG_PATH (${configPath}) could not be read`,
-      err
-    );
+    console.error(`Configuration (${configPath}) could not be read.`, err);
     process.exit(1);
   }
+};
+
+const readPublicYamlConfig = () => {
+  const configPath = path.join(
+    process.cwd(),
+    process.env.SQUAREONE_CONFIG_PATH || 'squareone.config.yaml'
+  );
+  console.log(`Public config path: ${configPath}`);
+
+  const schemaPath = path.join(__dirname, 'squareone.config.schema.json');
+
+  const data = readYamlConfig(configPath, schemaPath);
+  return data;
+};
+
+const readServerYamlConfig = () => {
+  const configPath = path.join(
+    process.cwd(),
+    process.env.SQUAREONE_CONFIG_PATH || 'squareone.serverconfig.yaml'
+  );
+  console.log(`Server config path: ${configPath}`);
+
+  const schemaPath = path.join(__dirname, 'squareone.serverconfig.schema.json');
+
+  const data = readYamlConfig(configPath, schemaPath);
+  return data;
 };
 
 module.exports = (phase, { defaultConfig }) => {
   console.log(`Read config in ${phase}`);
 
-  const yamlConfig = readYamlConfig();
+  const publicYamlConfig = readPublicYamlConfig();
+  const serverYamlConfig = readServerYamlConfig();
 
   const config = {
     ...defaultConfig,
-    publicRuntimeConfig: { ...yamlConfig },
+    publicRuntimeConfig: { ...publicYamlConfig },
+    serverRuntimeConfig: { ...serverYamlConfig },
     async rewrites() {
       return [
         {

@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "squareone.serverconfig.schema.json",
+  "title": "Squareone Configuration",
+  "description": "Server-only configuration for a Squareone instance.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "httpProtocol": {
+      "type": "string",
+      "enum": ["http", "https"],
+      "default": "http",
+      "title": "HTTP Protocol",
+      "description": "Used for computing absolute URLs. Set to https for production."
+    }
+  }
+}
