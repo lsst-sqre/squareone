@@ -8,7 +8,7 @@ export const apiStates = {
   ERROR: 'ERROR',
 };
 
-export const useLogin = (url) => {
+export const useLogin = (baseUrl) => {
   const [data, setData] = useState({
     state: apiStates.LOADING,
     error: '',
@@ -17,6 +17,8 @@ export const useLogin = (url) => {
 
   // Short cut for updating just a single key in the state
   const setPartialData = (partialData) => setData({ ...data, ...partialData });
+
+  const url = new URL('/auth/api/v1/user-info', baseUrl);
 
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
