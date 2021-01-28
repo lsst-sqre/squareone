@@ -33,7 +33,7 @@ Install locally
 
 Install the JavaScript packages::
 
-   yarn install
+   npm install
 
 Install pre-commit hooks
 ------------------------
@@ -59,22 +59,22 @@ You can also manually lint and format code.
 
 Lint JavaScript::
 
-   yarn lint
+   npm run lint
 
 Lint and auto-format JavaScript (powered by Prettier_)::
 
-   yarn lint --fix
+   npm run lint --fix
 
 Format other types of code with Prettier_::
 
-   yarn format
+   npm run format
 
 Start the development server
 ----------------------------
 
 ::
 
-   yarn dev
+   npm run dev
 
 View the site at http://localhost:3000.
 This site auto-updates when running with the development server.
@@ -89,11 +89,11 @@ Create a production build
 
 This builds the optimized application::
 
-   yarn build
+   npm run build
 
 You can serve the production build locally::
 
-   yarn serve
+   npm run serve
 
 .. _Next.js: https://nextjs.org
 .. _Prettier: https://prettier.io/

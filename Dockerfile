@@ -1,20 +1,20 @@
 # Stage 1: Build the application
-FROM mhart/alpine-node AS builder
+FROM mhart/alpine-node:14 AS builder
 
 WORKDIR /app
 
-COPY package.json yarn.lock ./
+COPY package.json package-lock.json ./
 
-RUN yarn install --frozen-lockfile
+RUN npm install
 
 COPY . .
 
-RUN yarn build
-RUN yarn install --production --frozen-lockfile
+RUN npm run build
+RUN npm install --production
 
 
 # Stage 2: Install pre-built app and deps for production
-FROM mhart/alpine-node:base as production
+FROM mhart/alpine-node:14 as production
 
 WORKDIR /app
 
