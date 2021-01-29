@@ -35,6 +35,8 @@ jobs:
         run: pre-commit run --all-files
 
   build:
+    needs: [lint]
+
     runs-on: ubuntu-latest
 
     steps:
@@ -56,6 +58,8 @@ jobs:
         run: yarn build
 
   docker:
+    needs: [lint]
+
     runs-on: ubuntu-latest
 
     steps:
@@ -75,6 +79,8 @@ jobs:
             --tag lsstsqre/rsp-squareone:${{steps.vars.outputs.tag}} .
 
   docs:
+    needs: [lint, build, docker]
+
     runs-on: ubuntu-latest
 
     steps:
