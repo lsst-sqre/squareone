@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import getConfig from 'next/config';
 
+import '@lsst-sqre/rubin-style-dictionary/dist/tokens.css';
 import '../styles/globals.css';
 import { useLogin } from '../hooks/login';
 
