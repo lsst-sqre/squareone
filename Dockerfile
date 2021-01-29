@@ -1,10 +1,16 @@
 # Stage 1: Build the application
 FROM mhart/alpine-node:14 AS builder
 
+# GitHub Personal Access token to install from GitHub Packages
+# Needs:
+# 'repo', 'write:packages', and 'read:packages'
+ARG GH_PKG_TOKEN
+
 WORKDIR /app
 
-COPY package.json package-lock.json ./
+RUN echo "//npm.pkg.github.com/:_authToken=${GH_PKG_TOKEN}" > ~/.npmrc
 
+COPY package.json package-lock.json .npmrc ./
 RUN npm install
 
 COPY . .

@@ -29,7 +29,11 @@ jobs:
           python -m pip install pre-commit
 
       - name: Install npm packages
-        run: npm install
+        run: |
+          echo "//npm.pkg.github.com/:_authToken=${NPM_PKG_TOKEN}" > ~/.npmrc
+          npm install
+        env:
+          NPM_PKG_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Lint
         run: pre-commit run --all-files
@@ -52,7 +56,11 @@ jobs:
           node-version: ${{ steps.node_version.outputs.NODE_VERSION }}
 
       - name: Install npm packages
-        run: npm install
+        run: |
+          echo "//npm.pkg.github.com/:_authToken=${NPM_PKG_TOKEN}" > ~/.npmrc
+          npm install
+        env:
+          NPM_PKG_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build site
         run: npm run build
@@ -65,10 +73,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Set up node
-        uses: actions/setup-node@v2
-        with:
-          node-version: ${{ steps.node_version.outputs.NODE_VERSION }}
+      - uses: docker/setup-buildx-action@v1
+        id: builder
 
       - name: Define the Docker tag
         id: vars
@@ -78,10 +84,14 @@ jobs:
         id: print
         run: echo ${{steps.vars.outputs.tag}}
 
-      - name: Build the runtime Docker image
-        run: |
-          docker build --target production \
-            --tag lsstsqre/rsp-squareone:${{steps.vars.outputs.tag}} .
+      - name: Build production image
+        uses: docker/build-push-action@v2
+        with:
+          builder: ${{ steps.builder.outputs.name }}
+          target: production
+          tags: lsstsqre/rsp-squareone:${{ steps.vars.outputs.tag }}
+          build-args: |
+            GH_PKG_TOKEN=${{ secrets.GITHUB_TOKEN }}
 
   docs:
     needs: [lint, build, docker]

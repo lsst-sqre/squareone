@@ -12,6 +12,7 @@
     "format:check": "prettier --check \"**/*.{json,css,graphql,yaml}\""
   },
   "dependencies": {
+    "@lsst-sqre/rubin-style-dictionary": "^0.1.0",
     "@reach/menu-button": "^0.12.1",
     "ajv": "^7.0.3",
     "js-yaml": "^4.0.0",
