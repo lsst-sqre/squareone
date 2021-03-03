@@ -33,7 +33,7 @@
     "*.js": "eslint"
   },
   "dependencies": {
-    "@lsst-sqre/rubin-style-dictionary": "^0.2.0",
+    "@lsst-sqre/rubin-style-dictionary": "^0.3.0-beta+1",
     "@reach/menu-button": "^0.12.1",
     "ajv": "^7.0.3",
     "js-yaml": "^4.0.0",
