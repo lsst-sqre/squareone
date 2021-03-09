@@ -1,5 +1,9 @@
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Link from 'next/link';
+
+import { useCurrentUrl } from '../hooks/currentUrl';
+import { Login } from './login';
 
 const StyledNav = styled.nav`
   margin: 0 0 35px 0;
@@ -20,7 +24,9 @@ const NavItem = styled.div`
 /*
  * Navigation (within the Header).
  */
-export default function HeaderNav() {
+export default function HeaderNav({ loginData }) {
+  const currentUrl = useCurrentUrl();
+
   return (
     <StyledNav>
       <NavItem>
@@ -38,6 +44,14 @@ export default function HeaderNav() {
       <NavItem>
         <Link href="/">Documentation</Link>
       </NavItem>
+
+      <NavItem>
+        <Login loginData={loginData} pageUrl={currentUrl} />
+      </NavItem>
     </StyledNav>
   );
 }
+
+HeaderNav.propTypes = {
+  loginData: PropTypes.object.isRequired,
+};

@@ -2,13 +2,7 @@ import Head from 'next/head';
 import getConfig from 'next/config';
 import PropTypes from 'prop-types';
 
-import { useCurrentUrl } from '../hooks/currentUrl';
-
-import { Login } from '../components/login';
-
-export default function Home({ publicRuntimeConfig, loginData, baseUrl }) {
-  const currentUrl = useCurrentUrl(baseUrl);
-
+export default function Home({ publicRuntimeConfig }) {
   return (
     <>
       <Head>
@@ -17,16 +11,13 @@ export default function Home({ publicRuntimeConfig, loginData, baseUrl }) {
       </Head>
 
       <h1>{publicRuntimeConfig.siteName}</h1>
-
-      <Login loginData={loginData} pageUrl={currentUrl} />
+      <p>Hello world.</p>
     </>
   );
 }
 
 Home.propTypes = {
   publicRuntimeConfig: PropTypes.object,
-  loginData: PropTypes.object.isRequired,
-  baseUrl: PropTypes.string,
 };
 
 export async function getServerSideProps() {

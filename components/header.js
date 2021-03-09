@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import HeaderNav from './headerNav';
@@ -21,11 +22,16 @@ const StyledHeader = styled.header`
 /*
  * Site header, including logo, navigation, and log-in component.
  */
-export default function Header() {
+// export default function Header() {
+export default function Header({ loginData }) {
   return (
     <StyledHeader>
       <HeaderLogo />
-      <HeaderNav />
+      <HeaderNav loginData={loginData} />
     </StyledHeader>
   );
 }
+
+Header.propTypes = {
+  loginData: PropTypes.object.isRequired,
+};

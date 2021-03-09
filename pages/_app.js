@@ -11,8 +11,8 @@ function MyApp({ Component, pageProps, baseUrl }) {
   const loginData = useLogin(baseUrl);
   /* eslint-disable react/jsx-props-no-spreading */
   return (
-    <Page>
-      <Component {...pageProps} loginData={loginData} baseUrl={baseUrl} />
+    <Page loginData={loginData} baseUrl={baseUrl}>
+      <Component {...pageProps} />
     </Page>
   );
   /* eslint-enable react/jsx-props-no-spreading */
