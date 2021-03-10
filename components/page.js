@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import Header from './header';
 import MainContent from './mainContent';
 import Footer from './footer';
+import Meta from './meta';
 
 /*
  * Layout wrapper div.
@@ -36,6 +37,7 @@ export default function Page({ children, loginData }) {
 
   return (
     <StyledLayout>
+      <Meta />
       <div className="upper-container">
         <Header loginData={loginData} />
         <MainContent>{children}</MainContent>
