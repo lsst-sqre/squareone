@@ -10,6 +10,7 @@ const StyledNav = styled.nav`
   padding: 0;
   display: flex;
   justify-self: end;
+  width: 100%;
   font-size: 1.2rem;
 `;
 
@@ -19,6 +20,10 @@ const NavItem = styled.div`
   &:hover {
     color: var(--rsd-color-primary-400);
   }
+`;
+
+const LoginNavItem = styled(NavItem)`
+  margin: 0 1em 0 auto;
 `;
 
 /*
@@ -46,8 +51,12 @@ export default function HeaderNav({ loginData }) {
       </NavItem>
 
       <NavItem>
-        <Login loginData={loginData} pageUrl={currentUrl} />
+        <a href="https://community.lsst.org">Community</a>
       </NavItem>
+
+      <LoginNavItem>
+        <Login loginData={loginData} pageUrl={currentUrl} />
+      </LoginNavItem>
     </StyledNav>
   );
 }
