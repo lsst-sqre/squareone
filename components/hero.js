@@ -31,7 +31,14 @@ const ServiceCard = styled.div`
   }
   .sticky-footer-container {
     flex-shink: 0;
+    margin-top: 2rem;
   }
+`;
+
+const StyledAspectIllustration = styled.img`
+  width: 100%;
+  height: auto;
+  padding: 1rem;
 `;
 
 /*
@@ -53,6 +60,7 @@ export default function Hero() {
               <a href="/nb">
                 <h2>Portal</h2>
                 <p>Discover data in the browser</p>
+                <StyledAspectIllustration src="/undraw_Location_search_re_ttoj.svg" />
               </a>
             </div>
             <div className="sticky-footer-container">
@@ -67,6 +75,7 @@ export default function Hero() {
                   Process and analyze LSST data with Jupyter notebooks in the
                   cloud
                 </p>
+                <StyledAspectIllustration src="/undraw_Data_re_80ws.svg" />
               </a>
             </div>
             <div className="sticky-footer-container">
@@ -80,6 +89,7 @@ export default function Hero() {
                 Learn how to programatically access data with Virtual
                 Observatory interfaces
               </p>
+              <StyledAspectIllustration src="/undraw_server_status_5pbv.svg" />
             </a>
           </ServiceCard>
         </ServiceCardContainer>
