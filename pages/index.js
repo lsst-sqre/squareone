@@ -2,6 +2,8 @@ import Head from 'next/head';
 import getConfig from 'next/config';
 import PropTypes from 'prop-types';
 
+import Hero from '../components/hero';
+
 export default function Home({ publicRuntimeConfig }) {
   return (
     <>
@@ -10,7 +12,9 @@ export default function Home({ publicRuntimeConfig }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <h1>{publicRuntimeConfig.siteName}</h1>
+      <Hero />
+
+      <h2>News</h2>
       <p>Hello world.</p>
     </>
   );
