@@ -38,7 +38,7 @@ const ServiceCard = styled.div`
 const StyledAspectIllustration = styled.img`
   width: 100%;
   height: auto;
-  padding: 1rem;
+  padding: 2rem;
 `;
 
 /*
