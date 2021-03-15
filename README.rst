@@ -33,24 +33,17 @@ Install locally
 
 Install the JavaScript packages::
 
-   yarn install
+   npm install
 
 Install pre-commit hooks
 ------------------------
 
 You can automatically lint and format code using pre-commit_ hooks.
+Squareone uses Git pre-commit hooks to automatically run eslint and prettier on staged commits.
+These hooks are managed by husky, and should be installed automatically when you install Squareone locally.
+If not, you can manually install the hooks::
 
-First, install pre-commit::
-
-   pip install pre-commit
-
-And initialize pre-commit in your clone::
-
-   pre-commit install
-
-You can run pre-commit over all files::
-
-   pre-commit run --all-files
+   husky install
 
 Manual linting and formatting
 -----------------------------
@@ -59,22 +52,22 @@ You can also manually lint and format code.
 
 Lint JavaScript::
 
-   yarn lint
+   npm run lint
 
 Lint and auto-format JavaScript (powered by Prettier_)::
 
-   yarn lint --fix
+   npm run lint --fix
 
 Format other types of code with Prettier_::
 
-   yarn format
+   npm run format
 
 Start the development server
 ----------------------------
 
 ::
 
-   yarn dev
+   npm run dev
 
 View the site at http://localhost:3000.
 This site auto-updates when running with the development server.
@@ -89,11 +82,11 @@ Create a production build
 
 This builds the optimized application::
 
-   yarn build
+   npm run build
 
 You can serve the production build locally::
 
-   yarn serve
+   npm run serve
 
 .. _Next.js: https://nextjs.org
 .. _Prettier: https://prettier.io/

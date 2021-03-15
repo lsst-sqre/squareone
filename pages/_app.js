@@ -1,16 +1,20 @@
 import PropTypes from 'prop-types';
 import getConfig from 'next/config';
 
+import 'normalize.css';
+import '@lsst-sqre/rubin-style-dictionary/dist/tokens.css';
 import '../styles/globals.css';
 import { useLogin } from '../hooks/login';
+import Page from '../components/page';
 
 function MyApp({ Component, pageProps, baseUrl }) {
-  // console.log(`pageProps: ${pageProps}`);
-  // const { baseUrl } = pageProps;
-  console.log(`MyApp baseUrl: ${baseUrl}`);
   const loginData = useLogin(baseUrl);
   /* eslint-disable react/jsx-props-no-spreading */
-  return <Component {...pageProps} loginData={loginData} baseUrl={baseUrl} />;
+  return (
+    <Page loginData={loginData} baseUrl={baseUrl}>
+      <Component {...pageProps} />
+    </Page>
+  );
   /* eslint-enable react/jsx-props-no-spreading */
 }
 

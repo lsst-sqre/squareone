@@ -12,6 +12,12 @@
       "title": "Site name",
       "description": "Used as the basis of the HTML title tag. This should be customized for each science platform deployment."
     },
+    "siteDescription": {
+      "type": "string",
+      "default": "Welcome to the Rubin Science Platform",
+      "title": "Site description",
+      "description": "Used as the default site description in the HTML meta.."
+    },
     "baseUrl": {
       "type": "string",
       "default": "http://localhost:3001",
