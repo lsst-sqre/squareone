@@ -6,7 +6,7 @@ import { useCurrentUrl } from '../hooks/currentUrl';
 import { Login } from './login';
 
 const StyledNav = styled.nav`
-  margin: 0 0 35px 0;
+  margin: 0 0 30px 0;
   padding: 0;
   display: flex;
   justify-self: end;
@@ -17,7 +17,12 @@ const StyledNav = styled.nav`
 const NavItem = styled.div`
   margin: 0 1em;
 
-  &:hover {
+  color: #ffffff;
+  a {
+    color: #ffffff;
+  }
+
+  a:hover {
     color: var(--rsd-color-primary-400);
   }
 `;

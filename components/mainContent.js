@@ -1,10 +1,16 @@
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
+import { ContentMaxWidth } from '../styles/sizes';
+
 const StyledMain = styled.main`
   margin: 0 auto;
-  max-width: 60em;
-  padding: 0 10px 0 10px;
+  max-width: ${ContentMaxWidth};
+  padding: 0 var(--size-screen-padding-min);
+
+  @media (min-width: ${ContentMaxWidth}) {
+    padding: 0;
+  }
 `;
 
 /*

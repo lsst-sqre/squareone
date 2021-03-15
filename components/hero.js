@@ -1,10 +1,26 @@
 import styled from 'styled-components';
 
 import { StyledFullBleed } from './background';
+import { ContentMaxWidth } from '../styles/sizes';
 
 const ContentContainer = styled.div`
   margin: 0 auto;
-  max-width: 60rem;
+  max-width: ${ContentMaxWidth};
+  padding: 2rem var(--size-screen-padding-min);
+
+  @media (min-width: ${ContentMaxWidth}) {
+    padding: 2rem 0;
+  }
+
+  color: var(--c-reverse-text);
+
+  .hero-title {
+    color: var(--rsd-color-gray-000);
+    margin-top: 1rem;
+    margin-bottom: 3rem;
+    text-align: center;
+    font-size: 3rem;
+  }
 `;
 
 const ServiceCardContainer = styled.div`
@@ -21,6 +37,14 @@ const ServiceCard = styled.div`
   background-color: #ffffff;
   color: #111111;
   padding: 1rem;
+
+  .title {
+    margin-top: 0.5rem;
+  }
+
+  .subtitle {
+    color: var(--rsd-component-text-color);
+  }
 
   /* Flexbox for the sticky footer */
   display: flex;
@@ -53,13 +77,13 @@ export default function Hero() {
       textColor="#ffffff"
     >
       <ContentContainer>
-        <h1>Rubin Science Platform</h1>
+        <h1 className="hero-title">Rubin Science Platform</h1>
         <ServiceCardContainer>
           <ServiceCard>
             <div className="upper-container">
               <a href="/nb">
-                <h2>Portal</h2>
-                <p>Discover data in the browser</p>
+                <h2 className="title">Portal</h2>
+                <p className="subtitle">Discover data in the browser</p>
                 <StyledAspectIllustration src="/undraw_Location_search_re_ttoj.svg" />
               </a>
             </div>
@@ -70,8 +94,8 @@ export default function Hero() {
           <ServiceCard>
             <div className="upper-container">
               <a href="/portal/app/">
-                <h2>Notebooks</h2>
-                <p>
+                <h2 className="title">Notebooks</h2>
+                <p className="subtitle">
                   Process and analyze LSST data with Jupyter notebooks in the
                   cloud
                 </p>
@@ -84,8 +108,8 @@ export default function Hero() {
           </ServiceCard>
           <ServiceCard>
             <a href="/">
-              <h2>APIs</h2>
-              <p>
+              <h2 className="title">APIs</h2>
+              <p className="subtitle">
                 Learn how to programatically access data with Virtual
                 Observatory interfaces
               </p>

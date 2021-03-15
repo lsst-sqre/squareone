@@ -20,7 +20,6 @@ const StyledFullBleed = styled.section`
   margin-left: -50vw;
   margin-right: -50vw;
   margin-top: 0;
-  padding: 2rem;
 `;
 
 export { StyledFullBleed };
