@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import getConfig from 'next/config';
+import { ThemeProvider } from 'next-themes';
 
 import 'normalize.css';
 import '@lsst-sqre/rubin-style-dictionary/dist/tokens.css';
@@ -11,9 +12,11 @@ function MyApp({ Component, pageProps, baseUrl }) {
   const loginData = useLogin(baseUrl);
   /* eslint-disable react/jsx-props-no-spreading */
   return (
-    <Page loginData={loginData} baseUrl={baseUrl}>
-      <Component {...pageProps} />
-    </Page>
+    <ThemeProvider defaultTheme="system">
+      <Page loginData={loginData} baseUrl={baseUrl}>
+        <Component {...pageProps} />
+      </Page>
+    </ThemeProvider>
   );
   /* eslint-enable react/jsx-props-no-spreading */
 }
