@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Menu, MenuList, MenuButton, MenuLink } from '@reach/menu-button';
 import '@reach/menu-button/styles.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { getLogoutUrl } from '../utils/url';
 
@@ -15,6 +16,12 @@ const StyledMenuButton = styled(MenuButton)`
   &:hover {
     color: var(--rsd-component-header-nav-text-hover-color);
   }
+`;
+
+const StyledFontAwesomeIcon = styled(FontAwesomeIcon)`
+  margin-left: 0.25em;
+  font-size: 0.8em;
+  opacity: 0.9;
 `;
 
 const StyledMenuList = styled(MenuList)`
@@ -54,7 +61,9 @@ export const UserMenu = ({ loginData, pageUrl }) => {
 
   return (
     <Menu>
-      <StyledMenuButton>{loginData.data.name}</StyledMenuButton>
+      <StyledMenuButton>
+        {loginData.data.name} <StyledFontAwesomeIcon icon="angle-down" />
+      </StyledMenuButton>
       <StyledMenuList>
         <MenuLink href="/auth/tokens">Security tokens</MenuLink>
         <MenuLink href={logoutUrl}>Log out</MenuLink>
