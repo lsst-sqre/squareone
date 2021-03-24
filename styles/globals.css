@@ -31,6 +31,12 @@ html {
   /*
    * Semantic and component colors
    */
+  --rsd-component-page-background-color: var(--rsd-color-gray-000);
+  --rsd-component-footer-background-color: var(--rsd-color-primary-100);
+  --rsd-component-text-reverse-color: var(--rsd-color-gray-100);
+  --rsd-component-link-reverse-color: var(--rsd-color-blue-500);
+  --rsd-component-image-invert: 0;
+
   --c-headline: var(--rsd-color-primary-600);
   --c-reverse-text: var(--rsd-color-gray-000);
   /*
@@ -49,6 +55,7 @@ body {
     Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
     sans-serif;
   color: var(--rsd-component-text-color);
+  background-color: var(--rsd-component-page-background-color);
 }
 
 h1,
@@ -65,6 +72,23 @@ a:hover {
   color: var(--rsd-color-blue-500);
 }
 
+/*
+ * Images that can be inverted to accomodate dark themes.
+ */
+img.u-invertable-image {
+  filter: invert(var(--rsd-component-image-invert));
+}
+
+/*
+ * Design token overrides for dark theme.
+ */
 [data-theme='dark'] body {
-  color: red;
+  --rsd-component-text-color: var(--rsd-component-text-reverse-color);
+  --rsd-component-page-background-color: var(--rsd-color-gray-900);
+  --rsd-component-footer-background-color: var(--rsd-color-primary-700);
+  --rsd-component-image-invert: 100%;
+}
+
+[data-theme='dark'] a {
+  color: var(--rsd-component-link-reverse-color);
 }
