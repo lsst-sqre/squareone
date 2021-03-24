@@ -9,8 +9,7 @@ const StyledHeader = styled.header`
   margin: 0;
   padding: 10px;
 
-  background-color: var(--rsd-color-gray-800);
-  color: var(--rsd-color-gray-100);
+  background-color: var(--rsd-component-header-background-color);
 
   display: flex;
   flex-direction: row;

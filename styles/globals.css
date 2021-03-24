@@ -38,6 +38,15 @@ html {
   --rsd-component-image-invert: 0;
   --rsd-component-service-card-background-color: var(--rsd-color-gray-000);
   --rsd-component-service-card-text-color: var(--rsd-component-text-color);
+  --rsd-component-header-background-color: var(--rsd-color-gray-800);
+  --rsd-component-header-nav-text-color: var(--rsd-color-gray-000);
+  --rsd-component-header-nav-text-hover-color: var(--rsd-color-primary-400);
+  --rsd-component-header-nav-menulist-background-color: var(
+    --rsd-color-gray-000
+  );
+  --rsd-component-header-nav-menulist-selected-background-color: var(
+    --rsd-color-primary-600
+  );
 
   --c-headline: var(--rsd-color-primary-600);
   --c-reverse-text: var(--rsd-color-gray-000);
@@ -92,6 +101,13 @@ img.u-invertable-image {
   --rsd-component-service-card-background-color: var(--rsd-color-gray-800);
   --rsd-component-service-card-text-color: var(
     --rsd-component-text-reverse-color
+  );
+  --rsd-component-header-nav-menulist-background-color: var(
+    --rsd-color-primary-600
+  );
+  --rsd-component-header-nav-menulist-text-color: var(--rsd-color-gray-000);
+  --rsd-component-header-nav-menulist-selected-background-color: var(
+    --rsd-color-primary-700
   );
 }
 

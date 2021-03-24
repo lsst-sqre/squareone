@@ -1,21 +1,64 @@
 /* Menu for a user profile and settings, built on @react/menu-button. */
 
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 import { Menu, MenuList, MenuButton, MenuLink } from '@reach/menu-button';
 import '@reach/menu-button/styles.css';
 
 import { getLogoutUrl } from '../utils/url';
+
+const StyledMenuButton = styled(MenuButton)`
+  background-color: transparent;
+  color: var(--rsd-component-header-nav-text-color);
+  border: none;
+
+  &:hover {
+    color: var(--rsd-component-header-nav-text-hover-color);
+  }
+`;
+
+const StyledMenuList = styled(MenuList)`
+  font-size: 1rem;
+  background-color: var(--rsd-component-header-nav-menulist-background-color);
+  width: 12rem;
+  border-radius: 0.5rem;
+  // Top margin is related to the triangle; see :before
+  margin-top: 10px;
+  color: var(--rsd-component-header-nav-menulist-text-color);
+  a {
+    color: var(--rsd-component-header-nav-menulist-text-color);
+  }
+
+  &:before {
+    // Make a CSS triangle on the top of the menu
+    content: '';
+    border: 8px solid transparent;
+    border-bottom: 8px solid
+      var(--rsd-component-header-nav-menulist-background-color);
+    position: absolute;
+    display: inline-block;
+    // Top is related to the border size and margin-top of menu list
+    top: -5px;
+    right: 9px;
+    left: auto;
+  }
+
+  [data-reach-menu-item][data-selected] {
+    background: var(--rsd-component-header-nav-menulist-selected-background-color);
+  }
+}
+`;
 
 export const UserMenu = ({ loginData, pageUrl }) => {
   const logoutUrl = getLogoutUrl(pageUrl);
 
   return (
     <Menu>
-      <MenuButton>{loginData.data.name}</MenuButton>
-      <MenuList>
+      <StyledMenuButton>{loginData.data.name}</StyledMenuButton>
+      <StyledMenuList>
         <MenuLink href="/auth/tokens">Security tokens</MenuLink>
         <MenuLink href={logoutUrl}>Log out</MenuLink>
-      </MenuList>
+      </StyledMenuList>
     </Menu>
   );
 };
