@@ -34,8 +34,8 @@ const ServiceCardContainer = styled.div`
 const ServiceCard = styled.div`
   min-width: 5rem;
   border-radius: 0.5rem;
-  background-color: #ffffff;
-  color: #111111;
+  background-color: var(--rsd-component-service-card-background-color);
+  color: var(--rsd-component-service-card-text-color);
   padding: 1rem;
 
   .title {
