@@ -33,11 +33,15 @@
     "*.js": "eslint"
   },
   "dependencies": {
-    "@lsst-sqre/rubin-style-dictionary": "^0.3.0-beta.3",
+    "@fortawesome/fontawesome-svg-core": "^1.2.35",
+    "@fortawesome/free-solid-svg-icons": "^5.15.3",
+    "@fortawesome/react-fontawesome": "^0.1.14",
+    "@lsst-sqre/rubin-style-dictionary": "^0.3.0-beta.5",
     "@reach/menu-button": "^0.12.1",
     "ajv": "^7.0.3",
     "js-yaml": "^4.0.0",
     "next": "10.0.5",
+    "next-themes": "^0.0.13-beta.2",
     "normalize.css": "^8.0.1",
     "prop-types": "^15.7.2",
     "react": "17.0.1",

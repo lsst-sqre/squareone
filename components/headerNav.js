@@ -17,13 +17,13 @@ const StyledNav = styled.nav`
 const NavItem = styled.div`
   margin: 0 1em;
 
-  color: #ffffff;
+  color: var(--rsd-component-header-nav-text-color);
   a {
-    color: #ffffff;
+    color: var(--rsd-component-header-nav-text-color);
   }
 
   a:hover {
-    color: var(--rsd-color-primary-400);
+    color: var(--rsd-component-header-nav-text-hover-color);
   }
 `;
 

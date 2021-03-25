@@ -14,7 +14,7 @@ const StyledFooter = styled.footer`
   margin-right: -50vw;
   margin-top: 0;
 
-  background-color: var(--rsd-color-primary-100);
+  background-color: var(--rsd-component-footer-background-color);
 
   .content {
     margin: 0 auto;
@@ -73,6 +73,7 @@ export default function Footer() {
         </FundingNotice>
         <PartnerLogoContainer>
           <Image
+            className="u-invertable-image"
             src="/construction-agencies.png"
             width="750px"
             height="119px"

@@ -12,10 +12,10 @@ const ContentContainer = styled.div`
     padding: 2rem 0;
   }
 
-  color: var(--c-reverse-text);
+  color: var(--c-component-text-reverse-color);
 
   .hero-title {
-    color: var(--rsd-color-gray-000);
+    color: var(--c-component-text-reverse-color);
     margin-top: 1rem;
     margin-bottom: 3rem;
     text-align: center;
@@ -34,8 +34,8 @@ const ServiceCardContainer = styled.div`
 const ServiceCard = styled.div`
   min-width: 5rem;
   border-radius: 0.5rem;
-  background-color: #ffffff;
-  color: #111111;
+  background-color: var(--rsd-component-service-card-background-color);
+  color: var(--rsd-component-service-card-text-color);
   padding: 1rem;
 
   .title {
