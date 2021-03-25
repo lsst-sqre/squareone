@@ -16,10 +16,6 @@ const StyledFooter = styled.footer`
 
   background-color: var(--rsd-component-footer-background-color);
 
-  a {
-    color: var(--rsd-component-link-reverse-color);
-  }
-
   .content {
     margin: 0 auto;
     max-width: ${ContentMaxWidth};

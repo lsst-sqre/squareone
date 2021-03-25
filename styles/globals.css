@@ -13,7 +13,7 @@ html {
 }
 
 /*
- * Disable artifical scaling, but let user zoom if needed.
+ * Disable artificial scaling, but let user zoom if needed.
  * Flexible Typesetting, Tim Brown, ch 2.
  */
 @viewport {
@@ -28,33 +28,7 @@ html {
    */
   font-size: 1.1rem;
 
-  /*
-   * Semantic and component colors
-   */
-  --rsd-component-page-background-color: var(--rsd-color-gray-000);
-  --rsd-component-footer-background-color: var(--rsd-color-primary-100);
-  --rsd-component-text-reverse-color: var(--rsd-color-gray-100);
-  --rsd-component-link-reverse-color: var(--rsd-color-blue-500);
   --rsd-component-image-invert: 0;
-  --rsd-component-service-card-background-color: var(--rsd-color-gray-000);
-  --rsd-component-service-card-text-color: var(--rsd-component-text-color);
-  --rsd-component-header-background-color: var(--rsd-color-gray-800);
-  --rsd-component-header-nav-text-color: var(--rsd-color-gray-000);
-  --rsd-component-header-nav-text-hover-color: var(--rsd-color-primary-400);
-  --rsd-component-header-nav-menulist-background-color: var(
-    --rsd-color-gray-000
-  );
-  --rsd-component-header-nav-menulist-selected-background-color: var(
-    --rsd-color-primary-600
-  );
-
-  --c-headline: var(--rsd-color-primary-600);
-  --c-reverse-text: var(--rsd-color-gray-000);
-  /*
-  * darker than blue-500
-  */
-  --c-link: #146685;
-
   --size-screen-padding-min: 1rem;
 }
 
@@ -71,20 +45,20 @@ body {
 
 h1,
 h2 {
-  color: var(--c-headline);
+  color: var(--rsd-component-text-headline-color);
 }
 
 a {
-  color: var(--c-link);
+  color: var(--rsd-component-text-link-color);
   text-decoration: none;
 }
 
 a:hover {
-  color: var(--rsd-color-blue-500);
+  color: var(--rsd-component-text-link-hover-color);
 }
 
 /*
- * Images that can be inverted to accomodate dark themes.
+ * Images that can be inverted to accommodate dark themes.
  */
 img.u-invertable-image {
   filter: invert(var(--rsd-component-image-invert));
@@ -94,23 +68,5 @@ img.u-invertable-image {
  * Design token overrides for dark theme.
  */
 [data-theme='dark'] body {
-  --rsd-component-text-color: var(--rsd-component-text-reverse-color);
-  --rsd-component-page-background-color: var(--rsd-color-gray-900);
-  --rsd-component-footer-background-color: var(--rsd-color-primary-700);
   --rsd-component-image-invert: 100%;
-  --rsd-component-service-card-background-color: var(--rsd-color-gray-800);
-  --rsd-component-service-card-text-color: var(
-    --rsd-component-text-reverse-color
-  );
-  --rsd-component-header-nav-menulist-background-color: var(
-    --rsd-color-primary-600
-  );
-  --rsd-component-header-nav-menulist-text-color: var(--rsd-color-gray-000);
-  --rsd-component-header-nav-menulist-selected-background-color: var(
-    --rsd-color-primary-700
-  );
-}
-
-[data-theme='dark'] a {
-  color: var(--rsd-component-link-reverse-color);
 }
