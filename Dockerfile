@@ -1,5 +1,5 @@
 # Stage 1: Build the application
-FROM mhart/alpine-node:14 AS builder
+FROM node:14-alpine AS builder
 
 # GitHub Personal Access token to install from GitHub Packages
 # Needs:
@@ -20,7 +20,7 @@ RUN npm install --production
 
 
 # Stage 2: Install pre-built app and deps for production
-FROM mhart/alpine-node:14 as production
+FROM node:14-alpine as production
 
 WORKDIR /app
 
