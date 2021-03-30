@@ -1,5 +1,8 @@
 # Stage 1: Build the application
-FROM mhart/alpine-node:14 AS builder
+FROM node:14-alpine AS builder
+
+# If necessary, add libc6-compat (e.g. for process.dlopen)
+# apk add --no-cache libc6-compat
 
 # GitHub Personal Access token to install from GitHub Packages
 # Needs:
@@ -20,13 +23,20 @@ RUN npm install --production
 
 
 # Stage 2: Install pre-built app and deps for production
-FROM mhart/alpine-node:14 as production
+FROM node:14-alpine as production
 
 WORKDIR /app
+ENV NODE_ENV production
 
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
+
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nextjs -u 1001
+RUN chown -R nextjs:nodejs /app/.next
+USER nextjs
 
 EXPOSE 3000
 
