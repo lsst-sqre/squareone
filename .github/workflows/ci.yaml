@@ -33,12 +33,25 @@ jobs:
         with:
           node-version: ${{ steps.node_version.outputs.NODE_VERSION }}
 
-      - name: Install npm packages
+      - name: Authenticate GitHub Packages
         run: |
           echo "//npm.pkg.github.com/:_authToken=${NPM_PKG_TOKEN}" > ~/.npmrc
-          npm install
         env:
           NPM_PKG_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cache downloaded Node.js modules
+        uses: actions/cache@v2
+        with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          # Caching node_modules itself isn't compatible with npm ci
+          path: ~/.npm
+          key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-node-
+            ${{ runner.OS }}-
+
+      - name: Install npm packages
+        run: npm ci
 
       - name: Lint
         run: |
