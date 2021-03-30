@@ -3,7 +3,7 @@ name: CI
 on: [push, pull_request]
 
 jobs:
-  lint:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -30,35 +30,11 @@ jobs:
           npm run lint
           npm run format:check
 
-  build:
-    needs: [lint]
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Read .nvmrc
-        id: node_version
-        run: echo ::set-output name=NODE_VERSION::$(cat .nvmrc)
-
-      - name: Set up node
-        uses: actions/setup-node@v2
-        with:
-          node-version: ${{ steps.node_version.outputs.NODE_VERSION }}
-
-      - name: Install npm packages
-        run: |
-          echo "//npm.pkg.github.com/:_authToken=${NPM_PKG_TOKEN}" > ~/.npmrc
-          npm install
-        env:
-          NPM_PKG_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Build site
         run: npm run build
 
   docker:
-    needs: [lint]
+    needs: [test]
 
     runs-on: ubuntu-latest
 
@@ -86,7 +62,7 @@ jobs:
             GH_PKG_TOKEN=${{ secrets.GITHUB_TOKEN }}
 
   docs:
-    needs: [lint, build, docker]
+    needs: [test, docker]
 
     runs-on: ubuntu-latest
 
