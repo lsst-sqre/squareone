@@ -25,10 +25,8 @@ const readYamlConfig = (configPath, schemaPath) => {
 };
 
 const readPublicYamlConfig = () => {
-  const configPath = path.join(
-    process.cwd(),
-    process.env.SQUAREONE_CONFIG_PATH || 'squareone.config.yaml'
-  );
+  const p = process.env.SQUAREONE_CONFIG_PATH || 'squareone.config.yaml';
+  const configPath = path.isAbsolute(p) ? p : path.join(process.cwd(), p);
   console.log(`Public config path: ${configPath}`);
 
   const schemaPath = path.join(__dirname, 'squareone.config.schema.json');
@@ -38,10 +36,8 @@ const readPublicYamlConfig = () => {
 };
 
 const readServerYamlConfig = () => {
-  const configPath = path.join(
-    process.cwd(),
-    process.env.SQUAREONE_CONFIG_PATH || 'squareone.serverconfig.yaml'
-  );
+  const p = process.env.SQUAREONE_CONFIG_PATH || 'squareone.serverconfig.yaml';
+  const configPath = path.isAbsolute(p) ? p : path.join(process.cwd(), p);
   console.log(`Server config path: ${configPath}`);
 
   const schemaPath = path.join(__dirname, 'squareone.serverconfig.schema.json');
