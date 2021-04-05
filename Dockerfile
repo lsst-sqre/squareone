@@ -31,6 +31,12 @@ ENV NODE_ENV production
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/devstate.js ./devstate.js
+COPY --from=builder /app/next.config.js ./next.config.js
+COPY --from=builder /app/squareone.config.schema.json ./squareone.config.schema.json
+COPY --from=builder /app/squareone.config.yaml ./squareone.config.yaml
+COPY --from=builder /app/squareone.serverconfig.schema.json ./squareone.serverconfig.schema.json
+COPY --from=builder /app/squareone.serverconfig.yaml ./squareone.serverconfig.yaml
 COPY --from=builder /app/package.json ./package.json
 
 RUN addgroup -g 1001 -S nodejs
