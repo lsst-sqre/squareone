@@ -88,7 +88,7 @@ export default function Hero() {
               </a>
             </div>
             <div className="sticky-footer-container">
-              <a href="/">Learn more about the portal.</a>
+              <a href="/portal/app/onlinehelp/">Learn more about the portal.</a>
             </div>
           </ServiceCard>
           <ServiceCard>
@@ -103,7 +103,7 @@ export default function Hero() {
               </a>
             </div>
             <div className="sticky-footer-container">
-              <a href="/">Learn more about notebooks.</a>
+              <a href="https://nb.lsst.io">Learn more about notebooks.</a>
             </div>
           </ServiceCard>
           <ServiceCard>
