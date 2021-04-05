@@ -40,11 +40,11 @@ export default function HeaderNav({ loginData }) {
   return (
     <StyledNav>
       <NavItem>
-        <Link href="/">Portal</Link>
+        <a href="/portal/app">Portal</a>
       </NavItem>
 
       <NavItem>
-        <Link href="/">Notebooks</Link>
+        <Link href="/nb">Notebooks</Link>
       </NavItem>
 
       <NavItem>
