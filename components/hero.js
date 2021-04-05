@@ -81,7 +81,7 @@ export default function Hero() {
         <ServiceCardContainer>
           <ServiceCard>
             <div className="upper-container">
-              <a href="/nb">
+              <a href="/portal/app/">
                 <h2 className="title">Portal</h2>
                 <p className="subtitle">Discover data in the browser</p>
                 <StyledAspectIllustration src="/undraw_Location_search_re_ttoj.svg" />
@@ -93,7 +93,7 @@ export default function Hero() {
           </ServiceCard>
           <ServiceCard>
             <div className="upper-container">
-              <a href="/portal/app/">
+              <a href="/nb">
                 <h2 className="title">Notebooks</h2>
                 <p className="subtitle">
                   Process and analyze LSST data with Jupyter notebooks in the
