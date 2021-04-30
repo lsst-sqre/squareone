@@ -12,6 +12,10 @@
     "format:check": "prettier --check \"**/*.{json,css,graphql,yaml}\"",
     "prepare": "husky install"
   },
+  "babel": {
+    "presets": ["next/babel"],
+    "plugins": [["styled-components", { "ssr": true }]]
+  },
   "eslintConfig": {
     "extends": [
       "wesbos"
@@ -50,6 +54,7 @@
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",
+    "babel-plugin-styled-components": "^1.12.0",
     "eslint": "^7.25.0",
     "eslint-config-airbnb": "^18.2.0",
     "eslint-config-prettier": "^7.2.0",
