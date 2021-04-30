@@ -9,7 +9,6 @@ export default function Home({ publicRuntimeConfig }) {
     <>
       <Head>
         <title>{publicRuntimeConfig.siteName}</title>
-        <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <Hero />
