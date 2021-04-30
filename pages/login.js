@@ -22,9 +22,7 @@ export default function Login({ baseUrl }) {
       method: 'POST',
       body,
       headers: { 'Content-Type': 'application/json' },
-    })
-      .then((response) => console.log(response))
-      .then(sleep(100).then(() => window.location.assign('/')));
+    }).then(sleep(100).then(() => window.location.assign('/')));
   };
 
   return (

@@ -27,10 +27,8 @@ const readYamlConfig = (configPath, schemaPath) => {
 const readPublicYamlConfig = () => {
   const p = process.env.SQUAREONE_CONFIG_PATH || 'squareone.config.yaml';
   const configPath = path.isAbsolute(p) ? p : path.join(process.cwd(), p);
-  console.log(`Public config path: ${configPath}`);
-
+  console.log(`Reading public squareone config from ${configPath}`);
   const schemaPath = path.join(__dirname, 'squareone.config.schema.json');
-
   const data = readYamlConfig(configPath, schemaPath);
   return data;
 };
@@ -38,17 +36,13 @@ const readPublicYamlConfig = () => {
 const readServerYamlConfig = () => {
   const p = process.env.SQUAREONE_CONFIG_PATH || 'squareone.serverconfig.yaml';
   const configPath = path.isAbsolute(p) ? p : path.join(process.cwd(), p);
-  console.log(`Server config path: ${configPath}`);
-
+  console.log(`Reading server-side squareone config from ${configPath}`);
   const schemaPath = path.join(__dirname, 'squareone.serverconfig.schema.json');
-
   const data = readYamlConfig(configPath, schemaPath);
   return data;
 };
 
 module.exports = (phase, { defaultConfig }) => {
-  console.log(`Read config in ${phase}`);
-
   const publicYamlConfig = readPublicYamlConfig();
   const serverYamlConfig = readServerYamlConfig();
 
@@ -65,6 +59,5 @@ module.exports = (phase, { defaultConfig }) => {
       ];
     },
   };
-  console.log(config);
   return config;
 };

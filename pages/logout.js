@@ -14,9 +14,7 @@ export default function Logout({ baseUrl }) {
     event.preventDefault();
     fetch(getDevLogoutEndpoint(currentUrl), {
       method: 'POST',
-    })
-      .then((response) => console.log(response))
-      .then(sleep(100).then(() => window.location.assign('/')));
+    }).then(sleep(100).then(() => window.location.assign('/')));
   };
 
   return (

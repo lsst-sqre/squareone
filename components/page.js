@@ -33,8 +33,6 @@ const StyledLayout = styled.div`
  * content, and footer.
  */
 export default function Page({ children, loginData }) {
-  console.log(loginData);
-
   return (
     <StyledLayout>
       <Meta />

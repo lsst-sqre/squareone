@@ -3,7 +3,6 @@
 import { getDevState } from '../../../devstate';
 
 export default function handler(req, res) {
-  console.log('user-info');
   const { loggedIn, username, name, uid } = getDevState();
   if (!loggedIn) {
     res.status(401).end('Not logged in');
