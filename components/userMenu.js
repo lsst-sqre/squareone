@@ -62,7 +62,7 @@ export const UserMenu = ({ loginData, pageUrl }) => {
   return (
     <Menu>
       <StyledMenuButton>
-        {loginData.data.name} <StyledFontAwesomeIcon icon="angle-down" />
+        {loginData.data.username} <StyledFontAwesomeIcon icon="angle-down" />
       </StyledMenuButton>
       <StyledMenuList>
         <MenuLink href="/auth/tokens">Security tokens</MenuLink>
