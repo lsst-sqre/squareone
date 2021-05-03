@@ -12,9 +12,6 @@ export default function Home({ publicRuntimeConfig }) {
       </Head>
 
       <Hero />
-
-      <h2>News</h2>
-      <p>Hello world.</p>
     </>
   );
 }
