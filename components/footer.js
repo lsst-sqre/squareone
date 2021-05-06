@@ -74,9 +74,9 @@ export default function Footer() {
         <PartnerLogoContainer>
           <Image
             className="u-invertable-image"
-            src="/construction-agencies.png"
-            width="750px"
-            height="119px"
+            src="/operations-lineup-black.png"
+            width="800px"
+            height="158px"
           />
         </PartnerLogoContainer>
       </div>
