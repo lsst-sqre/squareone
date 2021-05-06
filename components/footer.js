@@ -46,18 +46,19 @@ export default function Footer() {
       <div className="content">
         <FundingNotice>
           <p>
-            Financial support for Rubin Observatory comes from the National
-            Science Foundation (<a href="https://www.nsf.gov/">NSF</a>) through
-            Cooperative Agreement No. 1258333, the Department of Energy (
-            <a href="https://www.energy.gov">DOE</a>) Office of Science under
-            Contract No. DE-AC02-76SF00515, and private funding raised by the{' '}
-            <a href="http://www.lsstcorporation.org/">LSST Corporation</a>. The
-            NSF-funded Rubin Observatory Project Office for construction was
-            established as an operating center under management of the
-            Association of Universities for Research in Astronomy (
-            <a href="http://www.aura-astronomy.org/">AURA</a>). The DOE-funded
-            effort to build the Rubin Observatory LSST Camera (LSSTCam) is
-            managed by the SLAC National Accelerator Laboratory (
+            <a href="https://www.nsf.gov/">NSF</a> and{' '}
+            <a href="https://www.energy.gov">DOE</a> provide financial support
+            for Rubin Observatory in its operations phase to carry out the
+            Legacy Survey of Space and Time including support for scientific
+            research with the data. NSF funding is managed by the Association of
+            Universities for Research in Astronomy (
+            <a href="http://www.aura-astronomy.org/">AURA</a>) under a
+            cooperative agreement with NSF, and DOE funding is managed by SLAC
+            under contract by DOE. The operations phase of Rubin Observatory is
+            operated jointly by NSF’s National Optical-Infrared Astronomy
+            Research Laboratory (
+            <a href="https://noirlab.edu/public/">NOIRLab</a>) and SLAC National
+            Accelerator Laboratory (
             <a href="https://www6.slac.stanford.edu/">SLAC</a>).
           </p>
           <p>
@@ -65,10 +66,7 @@ export default function Footer() {
             agency created by{' '}
             <a href="https://www.nsf.gov/od/ogc/leg.jsp">Congress</a> in 1950 to
             promote the progress of science. NSF supports basic research and
-            people to create knowledge that transforms the future. NSF and DOE
-            will continue to support Rubin Observatory in its Operations phase.
-            They will also provide support for scientific research with LSST
-            data.
+            people to create knowledge that transforms the future.
           </p>
         </FundingNotice>
         <PartnerLogoContainer>
