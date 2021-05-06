@@ -2,6 +2,11 @@
 Change log
 ##########
 
+0.1.5 (2021-05-06)
+==================
+
+- Update funding agency text and logos to the operations era.
+
 0.1.4 (2021-05-03)
 ==================
 
