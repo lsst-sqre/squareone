@@ -30,7 +30,7 @@ const StyledFooter = styled.footer`
 `;
 
 const PartnerLogoContainer = styled.div`
-  margin: 2rem 0;
+  margin: 1rem 0;
 `;
 
 const FundingNotice = styled.div`
