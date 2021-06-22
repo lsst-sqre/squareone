@@ -56,6 +56,10 @@ export default function HeaderNav({ loginData }) {
       </NavItem>
 
       <NavItem>
+        <Link href="/support">Support</Link>
+      </NavItem>
+
+      <NavItem>
         <a href="https://community.lsst.org">Community</a>
       </NavItem>
 
