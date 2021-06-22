@@ -48,7 +48,7 @@ export default function HeaderNav({ loginData }) {
       </NavItem>
 
       <NavItem>
-        <Link href="/">APIs</Link>
+        <Link href="/api-aspect">APIs</Link>
       </NavItem>
 
       <NavItem>
