@@ -52,7 +52,7 @@ export default function HeaderNav({ loginData }) {
       </NavItem>
 
       <NavItem>
-        <Link href="/">Documentation</Link>
+        <Link href="https://dp0-1.lsst.io/">Documentation</Link>
       </NavItem>
 
       <NavItem>
