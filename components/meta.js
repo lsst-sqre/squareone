@@ -12,7 +12,7 @@ const Meta = () => {
         content="width=device-width, initial-scale=1"
         key="viewport"
       />
-      <meta charSet="utf-8" key="viewport" />
+      <meta charSet="utf-8" key="charset" />
       <link
         rel="icon"
         type="image/svg+xml"
