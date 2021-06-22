@@ -52,7 +52,7 @@ export default function HeaderNav({ loginData }) {
       </NavItem>
 
       <NavItem>
-        <Link href="/">Documentation</Link>
+        <Link href="/docs">Documentation</Link>
       </NavItem>
 
       <NavItem>
