@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import Image from 'next/image';
+import Link from 'next/link';
 
 import { ContentMaxWidth } from '../styles/sizes';
 
@@ -37,6 +38,10 @@ const FundingNotice = styled.div`
   font-size: 0.8rem;
 `;
 
+const FooterNav = styled.nav`
+  margin-bottom: 2rem;
+`;
+
 /*
  * Footer component (contained within a Page component).
  */
@@ -44,6 +49,9 @@ export default function Footer() {
   return (
     <StyledFooter>
       <div className="content">
+        <FooterNav>
+          <Link href="/acceptable-use-policy">Acceptable use policy</Link>
+        </FooterNav>
         <FundingNotice>
           <p>
             <a href="https://www.nsf.gov/">NSF</a> and{' '}
