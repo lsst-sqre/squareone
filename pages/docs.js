@@ -45,6 +45,53 @@ export const CardGroup = styled.div`
   gap: 1rem;
 `;
 
+const NoteContainer = styled.div`
+  margin: 1rem 0 0;
+  padding: 0.5rem;
+  border-radius: 1rem;
+  --tw-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --tw-ring-offset-shadow: 0 0 transparent;
+  --tw-ring-shadow: 0 0 transparent;
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
+    var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+  border: solid 0.5px var(--rsd-color-red-500);
+  background-color: var(--sqr-note-background-color);
+
+  .title-bubble {
+    background-color: var(--rsd-color-red-500);
+    margin: -0.5rem 0.5rem 0.5rem -0.5rem;
+    padding: 0.5rem 0.5rem;
+    float: left;
+    width: auto;
+    border-radius: 0.5rem 0 0.5rem 0;
+  }
+  .title-bubble span {
+    text-transform: uppercase;
+    font-weight: 700;
+    color: white;
+    font-size: 0.9rem;
+  }
+
+  p {
+    margin-top: 0;
+  }
+`;
+
+function Note({ children }) {
+  return (
+    <NoteContainer>
+      <div className="title-bubble">
+        <span>Note</span>
+      </div>
+      {children}
+    </NoteContainer>
+  );
+}
+
+Note.propTypes = {
+  children: PropTypes.node,
+};
+
 const pageDescription =
   'Find documentation for Rubin Observatory data, science platform services, and software.';
 
@@ -116,6 +163,21 @@ export default function DocsPage({ publicRuntimeConfig }) {
             <Card>
               <h3>LSST Science Pipelines</h3>
               <p>Description</p>
+              <Note>
+                <p>
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin
+                  facilisis pharetra neque, at semper nulla mattis auctor. Proin
+                  semper mollis enim eget interdum. Mauris eleifend eget diam
+                  vitae bibendum. Praesent ut aliquet odio, sodales imperdiet
+                  nisi. Nam interdum imperdiet tortor sed fringilla. Maecenas
+                  efficitur mi sodales nulla commodo rutrum. Ut ornare diam
+                  quam, sed commodo turpis aliquam et. In nec enim consequat,
+                  suscipit tortor sit amet, luctus ante. Integer dictum augue
+                  diam, non pulvinar massa euismod in. Morbi viverra condimentum
+                  auctor. Nullam et metus mauris. Cras risus ex, porta sit amet
+                  nibh et, dapibus auctor leo.
+                </p>
+              </Note>
             </Card>
           </a>
         </CardGroup>
