@@ -44,7 +44,7 @@ export default function HeaderNav({ loginData }) {
       </NavItem>
 
       <NavItem>
-        <Link href="/nb">Notebooks</Link>
+        <a href="/nb">Notebooks</a>
       </NavItem>
 
       <NavItem>
