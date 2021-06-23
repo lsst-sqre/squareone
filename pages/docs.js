@@ -122,7 +122,11 @@ export default function DocsPage({ publicRuntimeConfig }) {
           <a href="https://dp0-1.lsst.io/">
             <Card>
               <h3>Data Preview 0.1 (DP0.1)</h3>
-              <p>Description</p>
+              <p>
+                DP0.1 is an early opportunity to explore the Rubin Science
+                Platform with simulated LSST data. Learn about the DESC DC2 data
+                and follow data analysis tutorials.
+              </p>
             </Card>
           </a>
         </CardGroup>
@@ -135,23 +139,22 @@ export default function DocsPage({ publicRuntimeConfig }) {
           <a href="/portal/app/onlinehelp/">
             <Card>
               <h3>Portal</h3>
-              <p>Description</p>
+              <p>
+                The Portal enables you to explore LSST image and table data in
+                your browser.
+              </p>
             </Card>
           </a>
 
           <a href="https://nb.lsst.io">
             <Card>
               <h3>Notebooks</h3>
-              <p>Description</p>
+              <p>
+                The Notebook aspect is a powerful data analysis environment with
+                Jupyter Notebooks and terminals in the browser.
+              </p>
             </Card>
           </a>
-
-          <Link href="/api-aspect">
-            <Card>
-              <h3>APIs</h3>
-              <p>Description</p>
-            </Card>
-          </Link>
         </CardGroup>
       </Section>
 
@@ -162,20 +165,22 @@ export default function DocsPage({ publicRuntimeConfig }) {
           <a href="https://pipelines.lsst.io">
             <Card>
               <h3>LSST Science Pipelines</h3>
-              <p>Description</p>
+              <p>
+                The Science Pipelines include the Butler for accessing LSST data
+                and a pipeline framework for processing data. The LSST Science
+                Pipelines Python package is preinstalled in the Notebook aspect.
+              </p>
               <Note>
                 <p>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin
-                  facilisis pharetra neque, at semper nulla mattis auctor. Proin
-                  semper mollis enim eget interdum. Mauris eleifend eget diam
-                  vitae bibendum. Praesent ut aliquet odio, sodales imperdiet
-                  nisi. Nam interdum imperdiet tortor sed fringilla. Maecenas
-                  efficitur mi sodales nulla commodo rutrum. Ut ornare diam
-                  quam, sed commodo turpis aliquam et. In nec enim consequat,
-                  suscipit tortor sit amet, luctus ante. Integer dictum augue
-                  diam, non pulvinar massa euismod in. Morbi viverra condimentum
-                  auctor. Nullam et metus mauris. Cras risus ex, porta sit amet
-                  nibh et, dapibus auctor leo.
+                  The Science Pipelines now feature Generation 3 Butler and
+                  PipelineTask middleware. The “Getting Started” tutorial in the
+                  Science Pipelines documentation doesn't feature this new
+                  Generation 3 middleware yet, so we recommend following the
+                  tutorials in the{' '}
+                  <a href="https://dp0-1.lsst.io">
+                    Data Preview 0.1 documentation
+                  </a>{' '}
+                  instead to learn about the Butler and PipelineTask frameworks.{' '}
                 </p>
               </Note>
             </Card>
@@ -184,11 +189,19 @@ export default function DocsPage({ publicRuntimeConfig }) {
       </Section>
 
       <Section>
-        <h2>Still need help?</h2>
+        <h2>Have more questions?</h2>
         <p>
           <Link href="/support">
             Learn how to get support or report issues.
           </Link>
+        </p>
+
+        <p>
+          Want to dive deeper into the Rubin Observatory and Legacy Survey of
+          Space and Time?{' '}
+          <a href="https://www.lsst.io">
+            Search in our technical documentation portal.
+          </a>
         </p>
       </Section>
     </>
