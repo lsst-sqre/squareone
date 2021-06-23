@@ -30,6 +30,7 @@ html {
 
   --rsd-component-image-invert: 0;
   --size-screen-padding-min: 1rem;
+  --sqo-doc-card-background-color: var(--rsd-color-gray-000);
 }
 
 html,
@@ -69,4 +70,5 @@ img.u-invertable-image {
  */
 [data-theme='dark'] body {
   --rsd-component-image-invert: 100%;
+  --sqo-doc-card-background-color: var(--rsd-color-primary-800);
 }
