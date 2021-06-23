@@ -51,7 +51,7 @@ export default function SupportPage({ publicRuntimeConfig }) {
           href="http://community.lsst.org/new-topic?category=support/dp0
         "
         >
-          Create a science support topic in the forum.
+          Create a science support topic in the forum
         </CtaLink>
       </Section>
 
