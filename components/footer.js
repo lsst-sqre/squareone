@@ -50,7 +50,7 @@ export default function Footer() {
     <StyledFooter>
       <div className="content">
         <FooterNav>
-          <Link href="/acceptable-use-policy">Acceptable use policy</Link>
+          <Link href="/terms">Acceptable use policy</Link>
         </FooterNav>
         <FundingNotice>
           <p>
