@@ -55,9 +55,8 @@ export default function Footer() {
             <a href="http://www.aura-astronomy.org/">AURA</a>) under a
             cooperative agreement with NSF, and DOE funding is managed by SLAC
             under contract by DOE. The operations phase of Rubin Observatory is
-            operated jointly by NSF’s National Optical-Infrared Astronomy
-            Research Laboratory (
-            <a href="https://noirlab.edu/public/">NOIRLab</a>) and SLAC National
+            operated jointly by NSF’s{' '}
+            <a href="https://noirlab.edu/public/">NOIRLab</a> and SLAC National
             Accelerator Laboratory (
             <a href="https://www6.slac.stanford.edu/">SLAC</a>).
           </p>
