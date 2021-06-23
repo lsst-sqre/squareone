@@ -107,14 +107,16 @@ export default function Hero() {
             </div>
           </ServiceCard>
           <ServiceCard>
-            <a href="/">
-              <h2 className="title">APIs</h2>
-              <p className="subtitle">
-                Learn how to programatically access data with Virtual
-                Observatory interfaces
-              </p>
-              <StyledAspectIllustration src="/undraw_server_status_5pbv.svg" />
-            </a>
+            <div className="upper container">
+              <a href="/api-aspect">
+                <h2 className="title">APIs</h2>
+                <p className="subtitle">
+                  Learn how to programatically access data with Virtual
+                  Observatory interfaces
+                </p>
+                <StyledAspectIllustration src="/undraw_server_status_5pbv.svg" />
+              </a>
+            </div>
           </ServiceCard>
         </ServiceCardContainer>
       </ContentContainer>
