@@ -44,15 +44,19 @@ export default function HeaderNav({ loginData }) {
       </NavItem>
 
       <NavItem>
-        <Link href="/nb">Notebooks</Link>
+        <a href="/nb">Notebooks</a>
       </NavItem>
 
       <NavItem>
-        <Link href="/">APIs</Link>
+        <Link href="/api-aspect">APIs</Link>
       </NavItem>
 
       <NavItem>
-        <Link href="/">Documentation</Link>
+        <Link href="/docs">Documentation</Link>
+      </NavItem>
+
+      <NavItem>
+        <Link href="/support">Support</Link>
       </NavItem>
 
       <NavItem>

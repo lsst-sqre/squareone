@@ -3,7 +3,7 @@ import getConfig from 'next/config';
 
 const Meta = () => {
   const { publicRuntimeConfig } = getConfig();
-  const { siteTitle, siteDescription } = publicRuntimeConfig;
+  const { siteName, siteDescription } = publicRuntimeConfig;
 
   return (
     <Head>
@@ -12,7 +12,7 @@ const Meta = () => {
         content="width=device-width, initial-scale=1"
         key="viewport"
       />
-      <meta charSet="utf-8" key="viewport" />
+      <meta charSet="utf-8" key="charset" />
       <link
         rel="icon"
         type="image/svg+xml"
@@ -24,10 +24,10 @@ const Meta = () => {
         href="/rubin-favicon-transparent-32px.png"
         key="altfavicon"
       />
-      <title key="title">{siteTitle}</title>
+      <title key="title">{siteName}</title>
       <meta name="description" key="description" content={siteDescription} />
 
-      <meta property="og:title" key="ogtitle" content={siteTitle} />
+      <meta property="og:title" key="ogtitle" content={siteName} />
       <meta
         property="og:description"
         key="ogdescription"

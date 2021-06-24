@@ -30,6 +30,7 @@ html {
 
   --rsd-component-image-invert: 0;
   --size-screen-padding-min: 1rem;
+  --sqo-doc-card-background-color: var(--rsd-color-gray-000);
 }
 
 html,
@@ -39,6 +40,7 @@ body {
   font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, Segoe UI,
     Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
     sans-serif;
+  line-height: 1.4;
   color: var(--rsd-component-text-color);
   background-color: var(--rsd-component-page-background-color);
 }
@@ -69,4 +71,5 @@ img.u-invertable-image {
  */
 [data-theme='dark'] body {
   --rsd-component-image-invert: 100%;
+  --sqo-doc-card-background-color: var(--rsd-color-primary-800);
 }

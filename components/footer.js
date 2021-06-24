@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import Image from 'next/image';
+import Link from 'next/link';
 
 import { ContentMaxWidth } from '../styles/sizes';
 
@@ -37,6 +38,10 @@ const FundingNotice = styled.div`
   font-size: 0.8rem;
 `;
 
+const FooterNav = styled.nav`
+  margin-bottom: 2rem;
+`;
+
 /*
  * Footer component (contained within a Page component).
  */
@@ -44,6 +49,9 @@ export default function Footer() {
   return (
     <StyledFooter>
       <div className="content">
+        <FooterNav>
+          <Link href="/terms">Acceptable use policy</Link>
+        </FooterNav>
         <FundingNotice>
           <p>
             <a href="https://www.nsf.gov/">NSF</a> and{' '}
@@ -55,9 +63,8 @@ export default function Footer() {
             <a href="http://www.aura-astronomy.org/">AURA</a>) under a
             cooperative agreement with NSF, and DOE funding is managed by SLAC
             under contract by DOE. The operations phase of Rubin Observatory is
-            operated jointly by NSF’s National Optical-Infrared Astronomy
-            Research Laboratory (
-            <a href="https://noirlab.edu/public/">NOIRLab</a>) and SLAC National
+            operated jointly by NSF’s{' '}
+            <a href="https://noirlab.edu/public/">NOIRLab</a> and SLAC National
             Accelerator Laboratory (
             <a href="https://www6.slac.stanford.edu/">SLAC</a>).
           </p>
