@@ -81,7 +81,12 @@ export default function ApiAspectPage({ publicRuntimeConfig }) {
               </li>
             </ol>
           </li>
-          <li>Copy the token string and use it in any TAP client.</li>
+          <li>
+            Copy the token string and use it in any TAP client. If your client
+            has both username and password fields, enter{' '}
+            <code>x-oauth-basic</code> as the username and the token as the
+            password.
+          </li>
         </ol>
       </p>
     </>
