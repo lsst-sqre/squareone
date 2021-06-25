@@ -30,12 +30,12 @@ export default function AupPage({ publicRuntimeConfig }) {
       <p>
         We’re giving you access to Rubin Observatory systems so you can do
         science with our data products or otherwise further the mission of the
-        observatory.
+        Observatory.
       </p>
       <p>
         You can lose your access (even if you have “data rights” to our data
         products) if you misuse our resources, interfere with other users, or
-        otherwise do anything that would bring the observatory into disrepute.
+        otherwise do anything that would bring the Observatory into disrepute.
       </p>
       <p>Observatory systems staff have access to all your activity.</p>
     </>
