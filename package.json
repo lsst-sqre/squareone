@@ -40,7 +40,10 @@
           "proseWrap": "never"
         }
       ]
-    }
+    },
+    "ignorePatterns": [
+      ".next/*"
+    ]
   },
   "lint-staged": {
     "*.js": "eslint"
