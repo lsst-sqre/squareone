@@ -5,6 +5,7 @@ import Header from './header';
 import MainContent from './mainContent';
 import Footer from './footer';
 import Meta from './meta';
+import BroadcastBanner from './broadcastBanner';
 
 /*
  * Layout wrapper div.
@@ -38,6 +39,7 @@ export default function Page({ children, loginData }) {
       <Meta />
       <div className="upper-container">
         <Header loginData={loginData} />
+        <BroadcastBanner />
         <MainContent>{children}</MainContent>
       </div>
       <div className="sticky-footer-container">
