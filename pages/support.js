@@ -61,7 +61,7 @@ export default function SupportPage({ publicRuntimeConfig }) {
           For technical issues or feature requests related to the Rubin Science
           Platform itself (the Portal, Notebooks, and API services such as TAP)
           create a GitHub issue in the{' '}
-          <a href="https://github.com/rubin-dp0/Support">dp0-1/Support</a>{' '}
+          <a href="https://github.com/rubin-dp0/Support">rubin-dp0/Support</a>{' '}
           repository.
         </p>
         <CtaLink href="https://github.com/rubin-dp0/Support/issues/new/choose">
