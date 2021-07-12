@@ -2,6 +2,16 @@
 Change log
 ##########
 
+0.3.0 (2021-07-12)
+==================
+
+- Add a broadcastMarkdown configuration field to the public configuration schema.
+  If set, this content is shown in a new BroadcastBanner component on any page.
+  This is a configuration-driven way of displaying notifications to users without requiring code changes.
+  The semaphore application will add further flexibility for pushing notifications in the future.
+
+- Fix the name of the GitHub repository for support on the ``/support`` page.
+
 0.2.2 (2021-06-25)
 ==================
 
