@@ -20,16 +20,17 @@ import '../styles/globals.css';
 
 import { useLogin } from '../hooks/login';
 import Page from '../components/page';
+import gfmToHtml from '../utils/gfmToHtml';
 
 // Add icons to the global Font Awesome library
 library.add(faAngleDown);
 
-function MyApp({ Component, pageProps, baseUrl }) {
+function MyApp({ Component, pageProps, baseUrl, broadcast }) {
   const loginData = useLogin(baseUrl);
   /* eslint-disable react/jsx-props-no-spreading */
   return (
     <ThemeProvider defaultTheme="system">
-      <Page loginData={loginData} baseUrl={baseUrl}>
+      <Page loginData={loginData} baseUrl={baseUrl} broadcast={broadcast}>
         <Component {...pageProps} />
       </Page>
     </ThemeProvider>
@@ -39,14 +40,19 @@ function MyApp({ Component, pageProps, baseUrl }) {
 
 MyApp.getInitialProps = async () => {
   const { publicRuntimeConfig } = getConfig();
-  const { baseUrl } = publicRuntimeConfig;
-  return { baseUrl };
+  const { baseUrl, broadcastMarkdown } = publicRuntimeConfig;
+  const broadcast = broadcastMarkdown
+    ? await gfmToHtml(broadcastMarkdown)
+    : null;
+  console.log(`broadcast: ${broadcast}`);
+  return { baseUrl, broadcast };
 };
 
 MyApp.propTypes = {
   Component: PropTypes.elementType.isRequired,
   pageProps: PropTypes.object.isRequired,
   baseUrl: PropTypes.string.isRequired,
+  broadcast: PropTypes.string,
 };
 
 export default MyApp;

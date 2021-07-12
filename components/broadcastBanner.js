@@ -1,4 +1,4 @@
-import getConfig from 'next/config';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { ContentMaxWidth } from '../styles/sizes';
@@ -24,19 +24,21 @@ const StyledBroadcastContainer = styled.div`
 /*
  * A broadcast message banner.
  */
-export default function BroadcastBanner() {
-  const { publicRuntimeConfig } = getConfig();
-
+export default function BroadcastBanner({ broadcast }) {
   // If there isn't any broadcast content, don't show a banner
-  if (!('broadcastMarkdown' in publicRuntimeConfig)) {
+  if (!broadcast) {
     return <></>;
   }
 
-  const { broadcastMarkdown } = publicRuntimeConfig;
-
+  /* eslint-disable react/no-danger */
   return (
     <StyledBroadcastContainer>
-      <aside>{broadcastMarkdown}</aside>
+      <aside dangerouslySetInnerHTML={{ __html: broadcast }} />
     </StyledBroadcastContainer>
   );
+  /* eslint-enable react/no-danger */
 }
+
+BroadcastBanner.propTypes = {
+  broadcast: PropTypes.string,
+};

@@ -33,13 +33,13 @@ const StyledLayout = styled.div`
  * Page wapper component that provides the default layout of navigation,
  * content, and footer.
  */
-export default function Page({ children, loginData }) {
+export default function Page({ children, loginData, broadcast }) {
   return (
     <StyledLayout>
       <Meta />
       <div className="upper-container">
         <Header loginData={loginData} />
-        <BroadcastBanner />
+        <BroadcastBanner broadcast={broadcast} />
         <MainContent>{children}</MainContent>
       </div>
       <div className="sticky-footer-container">
@@ -52,4 +52,5 @@ export default function Page({ children, loginData }) {
 Page.propTypes = {
   children: PropTypes.node,
   loginData: PropTypes.object.isRequired,
+  broadcast: PropTypes.string,
 };
