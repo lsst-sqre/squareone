@@ -2,6 +2,27 @@
 Change log
 ##########
 
+0.2.2 (2021-06-25)
+==================
+
+This release revises capitalization in the Acceptable Use Policy.
+
+0.2.1 (2021-06-24)
+==================
+
+This release describes how to use the auth token with TAP clients that rely on basic authentication (username and password).
+
+0.2.0 (2021-06-24)
+==================
+
+This release includes many features in preparation for DP0.1:
+
+- New ``/docs`` page that links to data, service, and software documentation relevant to RSP users.
+- New ``/api``-aspect page that provides information about how to access the TAP API.
+- New ``/terms`` page that includes the RSP Acceptable Use Policy
+- New ``/support`` page that describes how to get support.
+- Fix open graph metadata
+
 0.1.5 (2021-05-06)
 ==================
 
