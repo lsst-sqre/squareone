@@ -19,6 +19,15 @@ const StyledBroadcastContainer = styled.div`
       padding: 0;
     }
   }
+
+  a {
+    color: white;
+    text-decoration: underline;
+  }
+
+  a:hover {
+    color: #dddddd;
+  }
 `;
 
 /*
