@@ -1,6 +1,6 @@
 {
   "name": "squareone",
-  "version": "0.1.5",
+  "version": "0.3.0",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000",
@@ -40,7 +40,10 @@
           "proseWrap": "never"
         }
       ]
-    }
+    },
+    "ignorePatterns": [
+      ".next/*"
+    ]
   },
   "lint-staged": {
     "*.js": "eslint"
@@ -54,12 +57,15 @@
     "@reach/menu-button": "^0.15.1",
     "ajv": "^8.2.0",
     "js-yaml": "^4.1.0",
-    "next": "10.2.0",
-    "next-themes": "0.0.14",
+    "next": "^11.0.1",
+    "next-themes": "^0.0.14",
     "normalize.css": "^8.0.1",
     "prop-types": "^15.7.2",
-    "react": "17.0.2",
-    "react-dom": "17.0.2",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "remark": "^13.0.0",
+    "remark-gfm": "^1.0.0",
+    "remark-html": "^13.0.1",
     "styled-components": "^5.3.0"
   },
   "devDependencies": {
@@ -67,6 +73,7 @@
     "babel-plugin-styled-components": "^1.12.0",
     "eslint": "^7.25.0",
     "eslint-config-airbnb": "^18.2.0",
+    "eslint-config-next": "^11.0.1",
     "eslint-config-prettier": "^7.2.0",
     "eslint-config-wesbos": "1.0.1",
     "eslint-plugin-html": "^6.1.2",
@@ -75,8 +82,8 @@
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-react": "^7.23.2",
     "eslint-plugin-react-hooks": "^4.1.2",
-    "husky": "^6.0.0",
-    "lint-staged": "^10.5.4",
+    "husky": "^7.0.0",
+    "lint-staged": "^11.0.0",
     "prettier": "^2.1.1",
     "pretty-quick": "^3.1.0"
   }

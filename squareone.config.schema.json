@@ -23,6 +23,11 @@
       "default": "http://localhost:3001",
       "title": "Base URL for the public ingress",
       "description": "Used for computing absolute URLs"
+    },
+    "broadcastMarkdown": {
+      "type": "string",
+      "title": "Broadcast markdown",
+      "description": "Optional content for a broadcast notification in squareone. This setting will be supersceded by the semaphore API."
     }
   }
 }
