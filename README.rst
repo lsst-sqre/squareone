@@ -1,9 +1,16 @@
-#############
-rsp-squareone
-#############
+.. image:: https://github.com/lsst-sqre/squareone/actions/workflows/ci.yaml/badge.svg
+   :target: https://github.com/lsst-sqre/sqr-060/actions/
+.. image:: https://img.shields.io/badge/squareone-lsst.io-brightgreen.svg
+   :target: https://squareone.lsst.io
+
+#########
+Squareone
+#########
 
 Squareone is the next-generation landing page for the `Rubin Observatory`_ Science Platform.
 It's where you start on your journey to use the RSP's portal, notebooks, and APIs to do science with Rubin/LSST data.
+
+Squareone is deployed with `Phalanx <https://phalanx.lsst.io>`_.
 
 **Documentation:** https://squareone.lsst.io
 
@@ -35,12 +42,11 @@ Install the JavaScript packages::
 
    npm install
 
-Install pre-commit hooks
-------------------------
+Install git hooks
+-----------------
 
-You can automatically lint and format code using pre-commit_ hooks.
-Squareone uses Git pre-commit hooks to automatically run eslint and prettier on staged commits.
-These hooks are managed by husky, and should be installed automatically when you install Squareone locally.
+Git hooks allow you to automatically lint and format code with eslint and prettier on each commit.
+These hooks are managed by `husky <https://typicode.github.io/husky/#/>`_, and should be installed automatically when you install Squareone locally.
 If not, you can manually install the hooks::
 
    husky install
@@ -90,7 +96,6 @@ You can serve the production build locally::
 
 .. _Next.js: https://nextjs.org
 .. _Prettier: https://prettier.io/
-.. _pre-commit: https://pre-commit.com/
 .. _Rubin Observatory: https://www.lsst.org
 .. _React: https://reactjs.org
 .. _styled-components: https://styled-components.com

@@ -54,26 +54,17 @@ export default function Footer() {
         </FooterNav>
         <FundingNotice>
           <p>
-            <a href="https://www.nsf.gov/">NSF</a> and{' '}
-            <a href="https://www.energy.gov">DOE</a> provide financial support
-            for Rubin Observatory in its operations phase to carry out the
-            Legacy Survey of Space and Time including support for scientific
-            research with the data. NSF funding is managed by the Association of
-            Universities for Research in Astronomy (
-            <a href="http://www.aura-astronomy.org/">AURA</a>) under a
-            cooperative agreement with NSF, and DOE funding is managed by SLAC
-            under contract by DOE. The operations phase of Rubin Observatory is
-            operated jointly by NSF’s{' '}
+            Rubin Observatory is a joint initiative of the National Science
+            Foundation (NSF) and the Department of Energy (DOE). Its primary
+            mission is to carry out the Legacy Survey of Space and Time,
+            providing an unprecedented data set for scientific research
+            supported by both agencies. Rubin is operated jointly by NSF’s{' '}
             <a href="https://noirlab.edu/public/">NOIRLab</a> and SLAC National
             Accelerator Laboratory (
-            <a href="https://www6.slac.stanford.edu/">SLAC</a>).
-          </p>
-          <p>
-            The National Science Foundation (NSF) is an independent federal
-            agency created by{' '}
-            <a href="https://www.nsf.gov/od/ogc/leg.jsp">Congress</a> in 1950 to
-            promote the progress of science. NSF supports basic research and
-            people to create knowledge that transforms the future.
+            <a href="https://www6.slac.stanford.edu/">SLAC</a>). NOIRLab is
+            managed for NSF by the Association of Universities for Research in
+            Astronomy (AURA) and SLAC is operated for DOE by Stanford
+            University.
           </p>
         </FundingNotice>
         <PartnerLogoContainer>
