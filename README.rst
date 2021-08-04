@@ -1,9 +1,16 @@
-#############
-rsp-squareone
-#############
+.. image:: https://github.com/lsst-sqre/squareone/actions/workflows/ci.yaml/badge.svg
+   :target: https://github.com/lsst-sqre/sqr-060/actions/
+.. image:: https://img.shields.io/badge/squareone-lsst.io-brightgreen.svg
+   :target: https://squareone.lsst.io
+
+#########
+Squareone
+#########
 
 Squareone is the next-generation landing page for the `Rubin Observatory`_ Science Platform.
 It's where you start on your journey to use the RSP's portal, notebooks, and APIs to do science with Rubin/LSST data.
+
+Squareone is deployed with `Phalanx <https://phalanx.lsst.io>`_.
 
 **Documentation:** https://squareone.lsst.io
 
