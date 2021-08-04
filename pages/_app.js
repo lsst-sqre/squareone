@@ -25,12 +25,18 @@ import gfmToHtml from '../utils/gfmToHtml';
 // Add icons to the global Font Awesome library
 library.add(faAngleDown);
 
-function MyApp({ Component, pageProps, baseUrl, broadcast }) {
+function MyApp({ Component, pageProps, baseUrl, broadcast, semaphoreUrl }) {
   const loginData = useLogin(baseUrl);
+
   /* eslint-disable react/jsx-props-no-spreading */
   return (
     <ThemeProvider defaultTheme="system">
-      <Page loginData={loginData} baseUrl={baseUrl} broadcast={broadcast}>
+      <Page
+        loginData={loginData}
+        baseUrl={baseUrl}
+        broadcast={broadcast}
+        semaphoreUrl={semaphoreUrl}
+      >
         <Component {...pageProps} />
       </Page>
     </ThemeProvider>
@@ -40,12 +46,12 @@ function MyApp({ Component, pageProps, baseUrl, broadcast }) {
 
 MyApp.getInitialProps = async () => {
   const { publicRuntimeConfig } = getConfig();
-  const { baseUrl, broadcastMarkdown } = publicRuntimeConfig;
+  const { baseUrl, broadcastMarkdown, semaphoreUrl } = publicRuntimeConfig;
   const broadcast = broadcastMarkdown
     ? await gfmToHtml(broadcastMarkdown)
     : null;
   console.log(`broadcast: ${broadcast}`);
-  return { baseUrl, broadcast };
+  return { baseUrl, broadcast, semaphoreUrl };
 };
 
 MyApp.propTypes = {
@@ -53,6 +59,7 @@ MyApp.propTypes = {
   pageProps: PropTypes.object.isRequired,
   baseUrl: PropTypes.string.isRequired,
   broadcast: PropTypes.string,
+  semaphoreUrl: PropTypes.string,
 };
 
 export default MyApp;

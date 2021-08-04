@@ -33,21 +33,21 @@ const StyledBroadcastContainer = styled.div`
 /*
  * A broadcast message banner.
  */
-export default function BroadcastBanner({ broadcast }) {
+export default function BroadcastBanner({ broadcastSummary }) {
   // If there isn't any broadcast content, don't show a banner
-  if (!broadcast) {
+  if (!broadcastSummary) {
     return <></>;
   }
 
   /* eslint-disable react/no-danger */
   return (
     <StyledBroadcastContainer>
-      <aside dangerouslySetInnerHTML={{ __html: broadcast }} />
+      <aside dangerouslySetInnerHTML={{ __html: broadcastSummary }} />
     </StyledBroadcastContainer>
   );
   /* eslint-enable react/no-danger */
 }
 
 BroadcastBanner.propTypes = {
-  broadcast: PropTypes.string,
+  broadcastSummary: PropTypes.string,
 };

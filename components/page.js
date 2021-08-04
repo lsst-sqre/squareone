@@ -6,6 +6,7 @@ import MainContent from './mainContent';
 import Footer from './footer';
 import Meta from './meta';
 import BroadcastBanner from './broadcastBanner';
+import { useFetch } from '../hooks/fetch';
 
 /*
  * Layout wrapper div.
@@ -33,13 +34,21 @@ const StyledLayout = styled.div`
  * Page wapper component that provides the default layout of navigation,
  * content, and footer.
  */
-export default function Page({ children, loginData, broadcast }) {
+export default function Page({ children, loginData, semaphoreUrl }) {
+  const broadcastsUrl = `${semaphoreUrl}/v1/broadcasts`;
+  const { data: broadcastData } = useFetch(broadcastsUrl);
+
   return (
     <StyledLayout>
       <Meta />
       <div className="upper-container">
         <Header loginData={loginData} />
-        <BroadcastBanner broadcast={broadcast} />
+        {broadcastData.map((broadcast) => (
+          <BroadcastBanner
+            broadcastSummary={broadcast.summary.html}
+            key={broadcast.id}
+          />
+        ))}
         <MainContent>{children}</MainContent>
       </div>
       <div className="sticky-footer-container">
@@ -52,5 +61,5 @@ export default function Page({ children, loginData, broadcast }) {
 Page.propTypes = {
   children: PropTypes.node,
   loginData: PropTypes.object.isRequired,
-  broadcast: PropTypes.string,
+  semaphoreUrl: PropTypes.string,
 };
