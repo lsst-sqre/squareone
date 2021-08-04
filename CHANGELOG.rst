@@ -2,6 +2,13 @@
 Change log
 ##########
 
+0.3.1 (2021-08-04)
+==================
+
+- Update funding text.
+
+- Refresh README with status badges and revise text on git hooks.
+
 0.3.0 (2021-07-12)
 ==================
 
