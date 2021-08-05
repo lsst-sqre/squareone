@@ -12,13 +12,43 @@ const StyledBroadcastContainer = styled.div`
   color: white;
 
   aside {
-    margin: 0 auto;
+    margin: 0.5rem auto;
     max-width: ${ContentMaxWidth};
     padding: 0 var(--size-screen-padding-min);
 
     @media (min-width: ${ContentMaxWidth}) {
       padding: 0;
     }
+  }
+
+  .summary {
+    width: 100%;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+  }
+
+  .summary p {
+    margin: 0;
+  }
+
+  .disclosure-button-area {
+    margin-left: 1.5rem;
+    align-self: flex-end;
+  }
+
+  .disclosure-button-area button {
+    font-size: 0.8rem;
+    cursor: pointer;
+    background-color: transparent;
+    color: white;
+    border: 1px solid white;
+    border-radius: 5px;
+    transition: 250ms;
+  }
+
+  .disclosure-button-area button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
   }
 
   .disclosure {
@@ -60,17 +90,23 @@ export default function BroadcastBanner({ broadcast }) {
   return (
     <StyledBroadcastContainer>
       <aside>
-        <div dangerouslySetInnerHTML={{ __html: broadcast.summary.html }} />
-        {broadcast.body && (
-          <>
-            <button type="button" {...toggleProps}>
-              {isExpanded ? 'Show less' : 'Show more'}
-            </button>
-
-            <div className="disclosure" {...contentProps}>
-              <div dangerouslySetInnerHTML={{ __html: broadcast.body.html }} />
+        <div className="summary">
+          <div
+            className="summary-content"
+            dangerouslySetInnerHTML={{ __html: broadcast.summary.html }}
+          />
+          {broadcast.body && (
+            <div className="disclosure-button-area">
+              <button type="button" {...toggleProps}>
+                {isExpanded ? 'Show less' : 'Show more'}
+              </button>
             </div>
-          </>
+          )}
+        </div>
+        {broadcast.body && (
+          <div className="disclosure" {...contentProps}>
+            <div dangerouslySetInnerHTML={{ __html: broadcast.body.html }} />
+          </div>
         )}
       </aside>
     </StyledBroadcastContainer>
