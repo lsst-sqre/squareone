@@ -44,10 +44,7 @@ export default function Page({ children, loginData, semaphoreUrl }) {
       <div className="upper-container">
         <Header loginData={loginData} />
         {broadcastData.map((broadcast) => (
-          <BroadcastBanner
-            broadcastSummary={broadcast.summary.html}
-            key={broadcast.id}
-          />
+          <BroadcastBanner broadcast={broadcast} key={broadcast.id} />
         ))}
         <MainContent>{children}</MainContent>
       </div>
