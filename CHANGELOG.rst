@@ -2,6 +2,16 @@
 Change log
 ##########
 
+0.4.0 (2021-08-11)
+==================
+
+- Broadcast messages are now sourced through `Semaphore <https://github/lsst-sqre/semaphore>`_, a service that is installed in the science platform and sources messages from GitHub.
+  With this update, messages can also have additional information that is visible if a user clicks on a "Read more" button.
+  This disclosure is powered by `react-a11y-disclosure <https://github.com/KittyGiraudel/react-a11y-disclosure>`_.
+
+- There is a new configuration field, ``semaphoreUrl``, to configure the root URL for the Semaphore API service.
+  The ``broadcastMarkdown`` field is removed.
+
 0.3.1 (2021-08-04)
 ==================
 
