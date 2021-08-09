@@ -2,6 +2,4 @@ siteName: 'Squareone Development Site'
 baseUrl: 'http://localhost:3000'
 siteDescription: |
   The site description.
-broadcastMarkdown: |
-  👋 Hello world! I'm here to tell you about something important.
 semaphoreUrl: 'https://data-dev.lsst.cloud/semaphore'
