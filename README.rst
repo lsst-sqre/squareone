@@ -1,5 +1,5 @@
 .. image:: https://github.com/lsst-sqre/squareone/actions/workflows/ci.yaml/badge.svg
-   :target: https://github.com/lsst-sqre/sqr-060/actions/
+   :target: https://github.com/lsst-sqre/squareone/actions/
 .. image:: https://img.shields.io/badge/squareone-lsst.io-brightgreen.svg
    :target: https://squareone.lsst.io
 
