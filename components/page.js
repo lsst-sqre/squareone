@@ -35,7 +35,7 @@ const StyledLayout = styled.div`
  * content, and footer.
  */
 export default function Page({ children, loginData, semaphoreUrl }) {
-  const broadcastsUrl = `${semaphoreUrl}/v1/broadcasts`;
+  const broadcastsUrl = semaphoreUrl ? `${semaphoreUrl}/v1/broadcasts` : null;
   const { data: broadcastData } = useFetch(broadcastsUrl);
 
   return (
