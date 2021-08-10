@@ -53,12 +53,20 @@ const StyledBroadcastContainer = styled.div`
 
   .disclosure {
     transition: 250ms;
+    margin-top: 0.5em;
+    max-height: 15em;
+    overflow-y: scroll;
   }
 
   .disclosure[aria-hidden='true'] {
+    height: 0;
     max-height: 0;
     opacity: 0;
+    margin-top: 0;
+    padding-top: 0;
+    padding-bottom: 0;
     visibility: hidden;
+    background-color: transparent;
   }
 
   a {
