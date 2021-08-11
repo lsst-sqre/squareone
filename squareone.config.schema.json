@@ -24,10 +24,10 @@
       "title": "Base URL for the public ingress",
       "description": "Used for computing absolute URLs"
     },
-    "broadcastMarkdown": {
+    "semaphoreUrl": {
       "type": "string",
-      "title": "Broadcast markdown",
-      "description": "Optional content for a broadcast notification in squareone. This setting will be supersceded by the semaphore API."
+      "title": "Semaphore URL",
+      "description": "URL of the Semaphore API service for obtaining notifications and broadcasts"
     }
   }
 }

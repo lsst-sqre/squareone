@@ -1,5 +1,5 @@
 .. image:: https://github.com/lsst-sqre/squareone/actions/workflows/ci.yaml/badge.svg
-   :target: https://github.com/lsst-sqre/sqr-060/actions/
+   :target: https://github.com/lsst-sqre/squareone/actions/
 .. image:: https://img.shields.io/badge/squareone-lsst.io-brightgreen.svg
    :target: https://squareone.lsst.io
 
@@ -9,8 +9,9 @@ Squareone
 
 Squareone is the next-generation landing page for the `Rubin Observatory`_ Science Platform.
 It's where you start on your journey to use the RSP's portal, notebooks, and APIs to do science with Rubin/LSST data.
+Squareone is also a visual interface for user notifications from the `Semaphore`_ service.
 
-Squareone is deployed with `Phalanx <https://phalanx.lsst.io>`_.
+Squareone is deployed with `Phalanx`_.
 
 **Documentation:** https://squareone.lsst.io
 
@@ -99,3 +100,5 @@ You can serve the production build locally::
 .. _Rubin Observatory: https://www.lsst.org
 .. _React: https://reactjs.org
 .. _styled-components: https://styled-components.com
+.. _Semaphore: https://github.com/lsst-sqre/semaphore
+.. _Phalanx: https://phalanx.lsst.io
