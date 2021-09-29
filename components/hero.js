@@ -93,7 +93,7 @@ export default function Hero() {
           </ServiceCard>
           <ServiceCard>
             <div className="upper-container">
-              <a href="/nb">
+              <a href="/nb/hub">
                 <h2 className="title">Notebooks</h2>
                 <p className="subtitle">
                   Process and analyze LSST data with Jupyter notebooks in the
