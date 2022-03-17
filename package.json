@@ -55,7 +55,7 @@
     "@fortawesome/react-fontawesome": "^0.1.14",
     "@lsst-sqre/rubin-style-dictionary": "^0.3.0",
     "@reach/menu-button": "^0.15.1",
-    "ajv": "^8.2.0",
+    "ajv": "^8.10.0",
     "js-yaml": "^4.1.0",
     "next": "^12.1.0",
     "next-themes": "^0.1.1",
