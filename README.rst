@@ -57,15 +57,15 @@ Manual linting and formatting
 
 You can also manually lint and format code.
 
-Lint JavaScript::
+Lint and format JavaScript via `next lint <>`__::
 
    npm run lint
 
-Lint and auto-format JavaScript (powered by Prettier_)::
+Check formatting other types of code with Prettier_::
 
-   npm run lint --fix
+   npm run format:check
 
-Format other types of code with Prettier_::
+Or automatically fix files::
 
    npm run format
 
