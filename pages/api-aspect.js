@@ -49,7 +49,7 @@ export default function ApiAspectPage({ publicRuntimeConfig }) {
           <li>
             Log into the Science Platform by clicking on the{' '}
             <strong>Log In</strong> button at the top-right of this page (if you
-            aren't already logged in).
+            aren’t already logged in).
           </li>
           <li>
             Click on{' '}

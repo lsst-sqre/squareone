@@ -174,7 +174,7 @@ export default function DocsPage({ publicRuntimeConfig }) {
                 <p>
                   The Science Pipelines now feature Generation 3 Butler and
                   PipelineTask middleware. The “Getting Started” tutorial in the
-                  Science Pipelines documentation doesn't feature this new
+                  Science Pipelines documentation doesn’t feature this new
                   Generation 3 middleware yet, so we recommend following the
                   tutorials in the{' '}
                   <a href="https://dp0-1.lsst.io">

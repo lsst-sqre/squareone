@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import Link from 'next/link';
 
 import { StyledFullBleed } from './background';
 import { ContentMaxWidth } from '../styles/sizes';
@@ -108,14 +109,14 @@ export default function Hero() {
           </ServiceCard>
           <ServiceCard>
             <div className="upper container">
-              <a href="/api-aspect">
+              <Link href="/api-aspect" passHref>
                 <h2 className="title">APIs</h2>
                 <p className="subtitle">
                   Learn how to programatically access data with Virtual
                   Observatory interfaces
                 </p>
                 <StyledAspectIllustration src="/undraw_server_status_5pbv.svg" />
-              </a>
+              </Link>
             </div>
           </ServiceCard>
         </ServiceCardContainer>
