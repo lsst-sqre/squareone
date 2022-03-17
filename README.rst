@@ -79,10 +79,10 @@ Start the development server
 View the site at http://localhost:3000.
 This site auto-updates when running with the development server.
 
-`API routes <https://nextjs.org/docs/api-routes/introduction>`_ are accessed on http://localhost:3000/api/hello.
-This endpoint can be edited in ``pages/api/hello.js``.
+`API routes <https://nextjs.org/docs/api-routes/introduction>`_ are accessed on http://localhost:3000/api/*.
 The ``pages/api`` directory is mapped to ``/api/*``.
 Files in this directory are treated as `API routes`_ instead of React pages.
+The purpose of the ``pages/api/dev`` endpoints are to mock external services in the RSP; see the re-writes in `next.config.js`.
 
 Create a production build
 -------------------------
