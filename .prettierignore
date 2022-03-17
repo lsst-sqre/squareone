@@ -1,2 +1,5 @@
 package.json
 yarn.lock
+package-lock.json
+.next
+docs/_build

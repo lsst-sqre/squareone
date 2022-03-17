@@ -57,15 +57,15 @@ Manual linting and formatting
 
 You can also manually lint and format code.
 
-Lint JavaScript::
+Lint and format JavaScript via `next lint <>`__::
 
    npm run lint
 
-Lint and auto-format JavaScript (powered by Prettier_)::
+Check formatting other types of code with Prettier_::
 
-   npm run lint --fix
+   npm run format:check
 
-Format other types of code with Prettier_::
+Or automatically fix files::
 
    npm run format
 
@@ -79,10 +79,10 @@ Start the development server
 View the site at http://localhost:3000.
 This site auto-updates when running with the development server.
 
-`API routes <https://nextjs.org/docs/api-routes/introduction>`_ are accessed on http://localhost:3000/api/hello.
-This endpoint can be edited in ``pages/api/hello.js``.
+`API routes <https://nextjs.org/docs/api-routes/introduction>`_ are accessed on http://localhost:3000/api/*.
 The ``pages/api`` directory is mapped to ``/api/*``.
 Files in this directory are treated as `API routes`_ instead of React pages.
+The purpose of the ``pages/api/dev`` endpoints are to mock external services in the RSP; see the re-writes in `next.config.js`.
 
 Create a production build
 -------------------------

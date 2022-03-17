@@ -2,6 +2,13 @@
 Change log
 ##########
 
+0.5.0 (unreleased)
+==================
+
+- Upgrade to Next 12 and various upgrades of dependencies and linting tools.
+- Upgrade to Node 16.
+- Squareone is cross-published on the GitHub Container Registry at ``ghcr.io/lsst-sqre/squareone``.
+
 0.4.0 (2021-08-11)
 ==================
 

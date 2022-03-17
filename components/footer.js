@@ -73,6 +73,7 @@ export default function Footer() {
             src="/operations-lineup-black.png"
             width="800px"
             height="158px"
+            alt="Logos of the NSF, NOIRLab, AURA, SLAC, and US DOE"
           />
         </PartnerLogoContainer>
       </div>
