@@ -7,11 +7,12 @@
 Squareone
 #########
 
-Squareone is the next-generation landing page for the `Rubin Observatory`_ Science Platform.
+Squareone is the home page for the `Rubin Observatory`_ Science Platform.
 It's where you start on your journey to use the RSP's portal, notebooks, and APIs to do science with Rubin/LSST data.
 Squareone is also a visual interface for user notifications from the `Semaphore`_ service.
 
 Squareone is deployed with `Phalanx`_.
+View the deployment configurations in Phalanx's `services/squareone/ <https://github.com/lsst-sqre/phalanx/tree/master/services/squareone>`__ directory.
 
 **Documentation:** https://squareone.lsst.io
 
@@ -26,10 +27,21 @@ Technology stack
 Development workflow primer
 ===========================
 
+Configure npm to use packages from @lsst-sqre
+---------------------------------------------
+
+Times Square UI uses npm packages published to the GitHub Package Registry in the ``lsst-sqre`` org.
+Although they're publicly-available, you will need a `GitHub Personal Access Token <https://github.com/settings/tokens/new>`__ with ``read:packages``.
+
+Add an `@lsst-sqre` registry entry to your `~/.npmrc` file using the token you created::
+
+    @lsst-sqre:registry=https://npm.pkg.github.com/
+    //npm.pkg.github.com/:_authToken=<...>
+
 Node version
 ------------
 
-The Node.js version used by this this project is intended to be built with a Node.js version that's encoded in the `.nvmrc <./.nvmrc>`__ file.
+The Node.js version used by this project is intended to be built with a Node.js version that's encoded in the `.nvmrc <./.nvmrc>`__ file.
 To adopt this node version, we recommend `installing and using the node version manager <https://github.com/nvm-sh/nvm>`__.
 
 Then you can use the preferred node version by running ``nvm`` from the project root::
