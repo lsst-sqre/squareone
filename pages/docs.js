@@ -170,19 +170,6 @@ export default function DocsPage({ publicRuntimeConfig }) {
                 and a pipeline framework for processing data. The LSST Science
                 Pipelines Python package is preinstalled in the Notebook aspect.
               </p>
-              <Note>
-                <p>
-                  The Science Pipelines now feature Generation 3 Butler and
-                  PipelineTask middleware. The “Getting Started” tutorial in the
-                  Science Pipelines documentation doesn’t feature this new
-                  Generation 3 middleware yet, so we recommend following the
-                  tutorials in the{' '}
-                  <a href="https://dp0-1.lsst.io">
-                    Data Preview 0.1 documentation
-                  </a>{' '}
-                  instead to learn about the Butler and PipelineTask frameworks.{' '}
-                </p>
-              </Note>
             </Card>
           </a>
         </CardGroup>
