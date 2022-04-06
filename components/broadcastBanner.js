@@ -55,7 +55,8 @@ const StyledBroadcastContainer = styled.div`
     transition: 250ms;
     margin-top: 0.5em;
     max-height: 15em;
-    overflow-y: scroll;
+    overflow-y: auto;
+    padding-right: 0.5em;
   }
 
   .disclosure[aria-hidden='true'] {
