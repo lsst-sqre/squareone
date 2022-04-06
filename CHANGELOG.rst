@@ -2,12 +2,14 @@
 Change log
 ##########
 
-0.5.0 (unreleased)
+0.5.0 (2022-04-06)
 ==================
 
 - Upgrade to Next 12 and various upgrades of dependencies and linting tools.
 - Upgrade to Node 16.
 - Squareone is cross-published on the GitHub Container Registry at ``ghcr.io/lsst-sqre/squareone``.
+- Fix minor UI issues, including unnecessary scrollbars in the broadcast message disclosures and ``Link`` usage.
+- Remove the note on the documentation page about Generation 3 middleware.
 
 0.4.0 (2021-08-11)
 ==================
