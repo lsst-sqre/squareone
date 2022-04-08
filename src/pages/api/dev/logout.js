@@ -1,6 +1,6 @@
 // Log-out endpoint for user testing
 
-import { setDevState } from '../../../devstate';
+import { setDevState } from '../../../lib/mocks/devstate';
 
 export default function handler(req, res) {
   if (req.method === 'POST') {

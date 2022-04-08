@@ -6,7 +6,7 @@ import { Menu, MenuList, MenuButton, MenuLink } from '@reach/menu-button';
 import '@reach/menu-button/styles.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { getLogoutUrl } from '../utils/url';
+import { getLogoutUrl } from '../lib/utils/url';
 
 const StyledMenuButton = styled(MenuButton)`
   background-color: transparent;

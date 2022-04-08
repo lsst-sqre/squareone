@@ -1,6 +1,6 @@
 // Mock of Gafaelfawr user-info endpoint
 
-import { getDevState } from '../../../devstate';
+import { getDevState } from '../../../lib/mocks/devstate';
 
 export default function handler(req, res) {
   const { loggedIn, username, name, uid } = getDevState();

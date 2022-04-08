@@ -28,7 +28,7 @@ FROM node:16-alpine as production
 
 WORKDIR /app
 ENV NODE_ENV production
-# Disable next.js telemtry in run-time
+# Disable next.js telemetry in run-time
 ENV NEXT_TELEMETRY_DISABLED 1
 
 RUN addgroup --system --gid 1001 nodejs
@@ -37,7 +37,6 @@ RUN adduser --system --uid 1001 nextjs
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/devstate.js ./devstate.js
 COPY --from=builder /app/next.config.js ./next.config.js
 COPY --from=builder /app/squareone.config.schema.json ./squareone.config.schema.json
 COPY --from=builder /app/squareone.config.yaml ./squareone.config.yaml

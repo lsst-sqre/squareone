@@ -4,8 +4,8 @@ import PropTypes from 'prop-types';
 import getConfig from 'next/config';
 import { useState } from 'react';
 
-import sleep from '../utils/sleep';
-import { getDevLoginEndpoint } from '../utils/url';
+import sleep from '../lib/utils/sleep';
+import { getDevLoginEndpoint } from '../lib/utils/url';
 import { useCurrentUrl } from '../hooks/currentUrl';
 
 export default function Login({ baseUrl }) {

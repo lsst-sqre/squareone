@@ -2,7 +2,7 @@
 // POST /api/dev/login
 // Optionally set username and name in the JSON post body.
 
-import { setDevState } from '../../../devstate';
+import { setDevState } from '../../../lib/mocks/devstate';
 
 export default function handler(req, res) {
   if (req.method === 'POST') {
