@@ -44,3 +44,5 @@ docs/_build
 !.yarn/sdks
 !.yarn/versions
 .pnp.*
+
+.nova
