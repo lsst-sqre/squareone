@@ -7,8 +7,8 @@
     "build": "next build",
     "start": "next start -p 3000",
     "lint": "next lint",
-    "format": "prettier --write \"**/*.{json,css,graphql,yaml}\"",
-    "format:check": "prettier --check \"**/*.{json,css,graphql,yaml}\"",
+    "format": "prettier --write \"**/*.{js,json,css,graphql,yaml}\"",
+    "format:check": "prettier --check \"**/*.{js,json,css,graphql,yaml}\"",
     "prepare": "husky install"
   },
   "babel": {
