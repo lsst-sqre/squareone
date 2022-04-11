@@ -2,20 +2,21 @@
 
 import PropTypes from 'prop-types';
 
-import { apiStates } from '../hooks/login';
+import useUserInfo from '../hooks/useUserInfo';
 
 import { UserMenu } from './userMenu';
 
 import { getLoginUrl } from '../lib/utils/url';
 
-export const Login = ({ loginData, pageUrl }) => {
-  if (loginData.state === apiStates.SUCCESS) {
-    return <UserMenu loginData={loginData} pageUrl={pageUrl} />;
+export const Login = ({ pageUrl }) => {
+  const { isLoggedIn } = useUserInfo();
+
+  if (!isLoggedIn) {
+    return <a href={getLoginUrl(pageUrl)}>Log in</a>;
   }
-  return <a href={getLoginUrl(pageUrl)}>Log in</a>;
+  return <UserMenu pageUrl={pageUrl} />;
 };
 
 Login.propTypes = {
-  loginData: PropTypes.object,
   pageUrl: PropTypes.instanceOf(URL),
 };

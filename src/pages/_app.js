@@ -18,19 +18,16 @@ import '@lsst-sqre/rubin-style-dictionary/dist/tokens.css';
 import '@lsst-sqre/rubin-style-dictionary/dist/tokens.dark.css';
 import '../styles/globals.css';
 
-import { useLogin } from '../hooks/login';
 import Page from '../components/page';
 
 // Add icons to the global Font Awesome library
 library.add(faAngleDown);
 
 function MyApp({ Component, pageProps, baseUrl, semaphoreUrl }) {
-  const loginData = useLogin(baseUrl);
-
   /* eslint-disable react/jsx-props-no-spreading */
   return (
     <ThemeProvider defaultTheme="system">
-      <Page loginData={loginData} baseUrl={baseUrl} semaphoreUrl={semaphoreUrl}>
+      <Page baseUrl={baseUrl} semaphoreUrl={semaphoreUrl}>
         <Component {...pageProps} />
       </Page>
     </ThemeProvider>

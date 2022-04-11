@@ -34,7 +34,7 @@ const LoginNavItem = styled(NavItem)`
 /*
  * Navigation (within the Header).
  */
-export default function HeaderNav({ loginData }) {
+export default function HeaderNav() {
   const currentUrl = useCurrentUrl();
 
   return (
@@ -64,12 +64,10 @@ export default function HeaderNav({ loginData }) {
       </NavItem>
 
       <LoginNavItem>
-        <Login loginData={loginData} pageUrl={currentUrl} />
+        <Login pageUrl={currentUrl} />
       </LoginNavItem>
     </StyledNav>
   );
 }
 
-HeaderNav.propTypes = {
-  loginData: PropTypes.object.isRequired,
-};
+HeaderNav.propTypes = {};

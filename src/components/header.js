@@ -21,16 +21,13 @@ const StyledHeader = styled.header`
 /*
  * Site header, including logo, navigation, and log-in component.
  */
-// export default function Header() {
-export default function Header({ loginData }) {
+export default function Header() {
   return (
     <StyledHeader>
       <HeaderLogo />
-      <HeaderNav loginData={loginData} />
+      <HeaderNav />
     </StyledHeader>
   );
 }
 
-Header.propTypes = {
-  loginData: PropTypes.object.isRequired,
-};
+Header.propTypes = {};

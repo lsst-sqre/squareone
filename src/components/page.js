@@ -31,10 +31,10 @@ const StyledLayout = styled.div`
 `;
 
 /*
- * Page wapper component that provides the default layout of navigation,
+ * Page wrapper component that provides the default layout of navigation,
  * content, and footer.
  */
-export default function Page({ children, loginData, semaphoreUrl }) {
+export default function Page({ children, semaphoreUrl }) {
   const broadcastsUrl = semaphoreUrl ? `${semaphoreUrl}/v1/broadcasts` : null;
   const { data: broadcastData } = useFetch(broadcastsUrl);
 
@@ -42,7 +42,7 @@ export default function Page({ children, loginData, semaphoreUrl }) {
     <StyledLayout>
       <Meta />
       <div className="upper-container">
-        <Header loginData={loginData} />
+        <Header />
         {broadcastData.map((broadcast) => (
           <BroadcastBanner broadcast={broadcast} key={broadcast.id} />
         ))}
@@ -57,6 +57,5 @@ export default function Page({ children, loginData, semaphoreUrl }) {
 
 Page.propTypes = {
   children: PropTypes.node,
-  loginData: PropTypes.object.isRequired,
   semaphoreUrl: PropTypes.string,
 };
