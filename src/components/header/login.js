@@ -2,11 +2,11 @@
 
 import PropTypes from 'prop-types';
 
-import useUserInfo from '../hooks/useUserInfo';
+import useUserInfo from '../../hooks/useUserInfo';
 
 import { UserMenu } from './userMenu';
 
-import { getLoginUrl } from '../lib/utils/url';
+import { getLoginUrl } from '../../lib/utils/url';
 
 export const Login = ({ pageUrl }) => {
   const { isLoggedIn } = useUserInfo();
