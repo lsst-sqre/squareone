@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import getConfig from 'next/config';
 import PropTypes from 'prop-types';
-import { Lede } from '../components/typography';
+import { Lede } from '../components/Typography';
 
 const pageDescription =
   'Integrate Rubin data into your analysis tools with APIs.';

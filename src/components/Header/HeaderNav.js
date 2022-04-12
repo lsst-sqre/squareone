@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Link from 'next/link';
 
 import useCurrentUrl from '../../hooks/useCurrentUrl';
-import { Login } from './login';
+import Login from './Login';
 
 const StyledNav = styled.nav`
   margin: 0 0 30px 0;

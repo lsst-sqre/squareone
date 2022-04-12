@@ -1,11 +1,11 @@
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import Header from './header';
-import MainContent from './mainContent';
-import Footer from './footer';
-import Meta from './meta';
-import BroadcastBannerStack from './BroadcastBannerStack';
+import Header from '../Header';
+import MainContent from '../MainContent';
+import Footer from '../Footer';
+import Meta from '../Meta';
+import BroadcastBannerStack from '../BroadcastBannerStack';
 
 /*
  * Layout wrapper div.

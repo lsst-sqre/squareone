@@ -18,7 +18,7 @@ import '@lsst-sqre/rubin-style-dictionary/dist/tokens.css';
 import '@lsst-sqre/rubin-style-dictionary/dist/tokens.dark.css';
 import '../styles/globals.css';
 
-import Page from '../components/page';
+import Page from '../components/Page';
 
 // Add icons to the global Font Awesome library
 library.add(faAngleDown);

@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Link from 'next/link';
 
-import { Lede } from '../components/typography';
+import { Lede } from '../components/Typography';
 
 const Section = styled.section`
   margin-top: 2rem;

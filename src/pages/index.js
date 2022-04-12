@@ -2,7 +2,7 @@ import Head from 'next/head';
 import getConfig from 'next/config';
 import PropTypes from 'prop-types';
 
-import Hero from '../components/hero';
+import HomepageHero from '../components/HomepageHero';
 
 export default function Home({ publicRuntimeConfig }) {
   return (
@@ -11,7 +11,7 @@ export default function Home({ publicRuntimeConfig }) {
         <title>{publicRuntimeConfig.siteName}</title>
       </Head>
 
-      <Hero />
+      <HomepageHero />
     </>
   );
 }

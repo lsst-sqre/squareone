@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import HeaderNav from './headerNav';
-import HeaderLogo from './headerLogo';
+import HeaderNav from './HeaderNav';
+import HeaderLogo from './HeaderLogo';
 
 const StyledHeader = styled.header`
   width: 100%;

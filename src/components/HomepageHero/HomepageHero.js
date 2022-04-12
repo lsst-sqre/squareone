@@ -1,8 +1,8 @@
 import styled from 'styled-components';
 import Link from 'next/link';
 
-import { StyledFullBleed } from './background';
-import { ContentMaxWidth } from '../styles/sizes';
+import FullBleedBackgroundImageSection from '../FullBleedBackgroundImageSection';
+import { ContentMaxWidth } from '../../styles/sizes';
 
 const ContentContainer = styled.div`
   margin: 0 auto;
@@ -70,9 +70,9 @@ const StyledAspectIllustration = styled.img`
  * The hero element for displaying available services (Science Platform
  * aspects) that's featured on the homepage.
  */
-export default function Hero() {
+export default function HomepageHero() {
   return (
-    <StyledFullBleed
+    <FullBleedBackgroundImageSection
       imagePath="/lsst-stills-0014.jpg"
       fallbackColor="#333333"
       textColor="#ffffff"
@@ -123,6 +123,6 @@ export default function Hero() {
           </ServiceCard>
         </ServiceCardContainer>
       </ContentContainer>
-    </StyledFullBleed>
+    </FullBleedBackgroundImageSection>
   );
 }

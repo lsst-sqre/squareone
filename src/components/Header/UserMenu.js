@@ -57,7 +57,7 @@ const StyledMenuList = styled(MenuList)`
 }
 `;
 
-export const UserMenu = ({ pageUrl }) => {
+export default function UserMenu({ pageUrl }) {
   const { userInfo } = useUserInfo();
   const logoutUrl = getLogoutUrl(pageUrl);
 
@@ -72,7 +72,7 @@ export const UserMenu = ({ pageUrl }) => {
       </StyledMenuList>
     </Menu>
   );
-};
+}
 
 UserMenu.propTypes = {
   pageUrl: PropTypes.instanceOf(URL),

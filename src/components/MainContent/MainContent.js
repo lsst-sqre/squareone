@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { ContentMaxWidth } from '../styles/sizes';
+import { ContentMaxWidth } from '../../styles/sizes';
 
 const StyledMain = styled.main`
   margin: 0 auto;
