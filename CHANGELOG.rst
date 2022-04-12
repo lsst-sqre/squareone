@@ -2,6 +2,12 @@
 Change log
 ##########
 
+Unreleased
+==========
+
+- Replaced custom fetch hook for the Semaphore broadcast message data with swr, enabling us to automatically refresh broadcast data.
+- Updated the component layout in the source code.
+
 0.5.0 (2022-04-06)
 ==================
 
