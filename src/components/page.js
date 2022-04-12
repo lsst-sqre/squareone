@@ -6,7 +6,6 @@ import MainContent from './mainContent';
 import Footer from './footer';
 import Meta from './meta';
 import BroadcastBannerStack from './BroadcastBannerStack';
-import { useFetch } from '../hooks/fetch';
 
 /*
  * Layout wrapper div.

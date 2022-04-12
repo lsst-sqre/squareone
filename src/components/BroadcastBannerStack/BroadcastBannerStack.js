@@ -1,15 +1,19 @@
 import BroadcastBanner from './BroadcastBanner';
-import { useFetch } from '../../hooks/fetch';
+import useBroadcasts from './useBroadcasts';
 
 export default function BroadcastBannerStack({ semaphoreUrl }) {
   const broadcastsUrl = semaphoreUrl ? `${semaphoreUrl}/v1/broadcasts` : null;
-  const { data: broadcastData } = useFetch(broadcastsUrl);
+  const { broadcastData, error, isLoading } = useBroadcasts(semaphoreUrl);
 
-  return (
-    <>
-      {broadcastData.map((broadcast) => (
-        <BroadcastBanner broadcast={broadcast} key={broadcast.id} />
-      ))}
-    </>
-  );
+  if (isLoading || error) {
+    return <></>;
+  } else {
+    return (
+      <>
+        {broadcastData.map((broadcast) => (
+          <BroadcastBanner broadcast={broadcast} key={broadcast.id} />
+        ))}
+      </>
+    );
+  }
 }
