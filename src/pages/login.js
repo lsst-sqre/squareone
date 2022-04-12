@@ -12,7 +12,7 @@ export default function Login({ baseUrl }) {
   const [username, setUsername] = useState('');
   const [name, setName] = useState('');
 
-  const currentUrl = useCurrentUrl(baseUrl);
+  const currentUrl = useCurrentUrl();
 
   const handleSubmit = (event) => {
     // prevent default behaviour which refreshes the page
@@ -22,7 +22,7 @@ export default function Login({ baseUrl }) {
       method: 'POST',
       body,
       headers: { 'Content-Type': 'application/json' },
-    }).then(sleep(100).then(() => window.location.assign('/')));
+    }).then(sleep(500).then(() => window.location.assign('/')));
   };
 
   return (
@@ -50,9 +50,7 @@ export default function Login({ baseUrl }) {
   );
 }
 
-Login.propTypes = {
-  baseUrl: PropTypes.string,
-};
+Login.propTypes = {};
 
 export async function getServerSideProps() {
   const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();

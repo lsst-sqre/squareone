@@ -6,15 +6,15 @@ import sleep from '../lib/utils/sleep';
 import { getDevLogoutEndpoint } from '../lib/utils/url';
 import useCurrentUrl from '../hooks/useCurrentUrl';
 
-export default function Logout({ baseUrl }) {
-  const currentUrl = useCurrentUrl(baseUrl);
+export default function Logout() {
+  const currentUrl = useCurrentUrl();
 
   const handleSubmit = (event) => {
     // prevent default behaviour which refreshes the page
     event.preventDefault();
     fetch(getDevLogoutEndpoint(currentUrl), {
       method: 'POST',
-    }).then(sleep(100).then(() => window.location.assign('/')));
+    }).then(sleep(500).then(() => window.location.assign('/')));
   };
 
   return (
@@ -24,9 +24,7 @@ export default function Logout({ baseUrl }) {
   );
 }
 
-Logout.propTypes = {
-  baseUrl: PropTypes.string,
-};
+Logout.propTypes = {};
 
 export async function getServerSideProps() {
   const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
