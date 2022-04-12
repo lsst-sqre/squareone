@@ -7,8 +7,8 @@
     "build": "next build",
     "start": "next start -p 3000",
     "lint": "next lint",
-    "format": "prettier --write \"**/*.{json,css,graphql,yaml}\"",
-    "format:check": "prettier --check \"**/*.{json,css,graphql,yaml}\"",
+    "format": "prettier --write \"**/*.{js,json,css,graphql,yaml}\"",
+    "format:check": "prettier --check \"**/*.{js,json,css,graphql,yaml}\"",
     "prepare": "husky install"
   },
   "babel": {
@@ -52,11 +52,12 @@
     "remark": "^14.0.2",
     "remark-gfm": "^3.0.1",
     "remark-html": "^15.0.1",
-    "styled-components": "^5.3.5"
+    "styled-components": "^5.3.5",
+    "swr": "^1.3.0"
   },
   "devDependencies": {
-    "babel-plugin-styled-components": "^2.0.6",
-    "eslint": "^8.12.0",
+    "babel-plugin-styled-components": "^2.0.7",
+    "eslint": "^8.13.0",
     "eslint-config-next": "^12.1.4",
     "eslint-config-prettier": "^8.5.0",
     "husky": "^7.0.4",
