@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import useDisclosure from 'react-a11y-disclosure';
 
-import { ContentMaxWidth } from '../styles/sizes';
+import { ContentMaxWidth } from '../../styles/sizes';
 
 const StyledBroadcastContainer = styled.div`
   width: 100%;

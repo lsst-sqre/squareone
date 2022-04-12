@@ -5,7 +5,7 @@ import Header from './header';
 import MainContent from './mainContent';
 import Footer from './footer';
 import Meta from './meta';
-import BroadcastBanner from './broadcastBanner';
+import BroadcastBannerStack from './BroadcastBannerStack';
 import { useFetch } from '../hooks/fetch';
 
 /*
@@ -35,17 +35,12 @@ const StyledLayout = styled.div`
  * content, and footer.
  */
 export default function Page({ children, semaphoreUrl }) {
-  const broadcastsUrl = semaphoreUrl ? `${semaphoreUrl}/v1/broadcasts` : null;
-  const { data: broadcastData } = useFetch(broadcastsUrl);
-
   return (
     <StyledLayout>
       <Meta />
       <div className="upper-container">
         <Header />
-        {broadcastData.map((broadcast) => (
-          <BroadcastBanner broadcast={broadcast} key={broadcast.id} />
-        ))}
+        <BroadcastBannerStack semaphoreUrl={semaphoreUrl} />
         <MainContent>{children}</MainContent>
       </div>
       <div className="sticky-footer-container">
