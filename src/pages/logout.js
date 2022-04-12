@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import getConfig from 'next/config';
 import sleep from '../lib/utils/sleep';
 import { getDevLogoutEndpoint } from '../lib/utils/url';
-import { useCurrentUrl } from '../hooks/currentUrl';
+import useCurrentUrl from '../hooks/useCurrentUrl';
 
 export default function Logout({ baseUrl }) {
   const currentUrl = useCurrentUrl(baseUrl);

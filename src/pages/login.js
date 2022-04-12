@@ -6,7 +6,7 @@ import { useState } from 'react';
 
 import sleep from '../lib/utils/sleep';
 import { getDevLoginEndpoint } from '../lib/utils/url';
-import { useCurrentUrl } from '../hooks/currentUrl';
+import useCurrentUrl from '../hooks/useCurrentUrl';
 
 export default function Login({ baseUrl }) {
   const [username, setUsername] = useState('');

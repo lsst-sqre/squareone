@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Link from 'next/link';
 
-import { useCurrentUrl } from '../../hooks/currentUrl';
+import useCurrentUrl from '../../hooks/useCurrentUrl';
 import { Login } from './login';
 
 const StyledNav = styled.nav`
