@@ -8,7 +8,10 @@ const StyledBroadcastContainer = styled.div`
   width: 100%;
   margin: 0;
   padding: 0.5em;
-  background-color: var(--rsd-color-red-500);
+  background-color: ${(props) =>
+    props.category === 'info'
+      ? 'var(--rsd-color-primary-600)'
+      : 'var(--rsd-color-red-500)'};
   color: white;
 
   aside {
@@ -97,7 +100,7 @@ export default function BroadcastBanner({ broadcast }) {
   /* eslint-disable react/no-danger */
   /* eslint-disable react/jsx-props-no-spreading */
   return (
-    <StyledBroadcastContainer>
+    <StyledBroadcastContainer category={broadcast.category || 'maintenance'}>
       <aside>
         <div className="summary">
           <div
