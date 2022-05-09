@@ -6,6 +6,8 @@ import sleep from '../lib/utils/sleep';
 import { getDevLogoutEndpoint } from '../lib/utils/url';
 import useCurrentUrl from '../hooks/useCurrentUrl';
 
+import MainContent from '../components/MainContent';
+
 export default function Logout() {
   const currentUrl = useCurrentUrl();
 
@@ -25,6 +27,10 @@ export default function Logout() {
 }
 
 Logout.propTypes = {};
+
+Logout.getLayout = function getLayout(page) {
+  return <MainContent>{page}</MainContent>;
+};
 
 export async function getServerSideProps() {
   const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();

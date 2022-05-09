@@ -2,6 +2,8 @@ import Head from 'next/head';
 import getConfig from 'next/config';
 import PropTypes from 'prop-types';
 
+import MainContent from '../components/MainContent';
+
 const pageDescription =
   'Learn about the Rubin Science Platform Acceptable Use Policy';
 
@@ -44,6 +46,10 @@ export default function AupPage({ publicRuntimeConfig }) {
 
 AupPage.propTypes = {
   publicRuntimeConfig: PropTypes.object,
+};
+
+AupPage.getLayout = function getLayout(page) {
+  return <MainContent>{page}</MainContent>;
 };
 
 export async function getServerSideProps() {

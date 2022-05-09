@@ -8,6 +8,8 @@ import sleep from '../lib/utils/sleep';
 import { getDevLoginEndpoint } from '../lib/utils/url';
 import useCurrentUrl from '../hooks/useCurrentUrl';
 
+import MainContent from '../components/MainContent';
+
 export default function Login({ baseUrl }) {
   const [username, setUsername] = useState('');
   const [name, setName] = useState('');
@@ -51,6 +53,10 @@ export default function Login({ baseUrl }) {
 }
 
 Login.propTypes = {};
+
+Login.getLayout = function getLayout(page) {
+  return <MainContent>{page}</MainContent>;
+};
 
 export async function getServerSideProps() {
   const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();

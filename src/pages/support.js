@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import Link from 'next/link';
 import styled from 'styled-components';
 
+import MainContent from '../components/MainContent';
 import { Lede, CtaLink } from '../components/Typography';
 
 const Section = styled.section`
@@ -74,6 +75,10 @@ export default function SupportPage({ publicRuntimeConfig }) {
 
 SupportPage.propTypes = {
   publicRuntimeConfig: PropTypes.object,
+};
+
+SupportPage.getLayout = function getLayout(page) {
+  return <MainContent>{page}</MainContent>;
 };
 
 export async function getServerSideProps() {

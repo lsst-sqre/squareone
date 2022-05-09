@@ -1,7 +1,9 @@
 import Head from 'next/head';
 import getConfig from 'next/config';
 import PropTypes from 'prop-types';
+
 import { Lede } from '../components/Typography';
+import MainContent from '../components/MainContent';
 
 const pageDescription =
   'Integrate Rubin data into your analysis tools with APIs.';
@@ -95,6 +97,10 @@ export default function ApiAspectPage({ publicRuntimeConfig }) {
 
 ApiAspectPage.propTypes = {
   publicRuntimeConfig: PropTypes.object,
+};
+
+ApiAspectPage.getLayout = function getLayout(page) {
+  return <MainContent>{page}</MainContent>;
 };
 
 export async function getServerSideProps() {

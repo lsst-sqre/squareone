@@ -40,7 +40,7 @@ export default function Page({ children, semaphoreUrl }) {
       <div className="upper-container">
         <Header />
         <BroadcastBannerStack semaphoreUrl={semaphoreUrl} />
-        <MainContent>{children}</MainContent>
+        {children}
       </div>
       <div className="sticky-footer-container">
         <Footer />

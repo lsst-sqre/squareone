@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Link from 'next/link';
 
+import MainContent from '../components/MainContent';
 import { Lede } from '../components/Typography';
 
 const Section = styled.section`
@@ -197,6 +198,10 @@ export default function DocsPage({ publicRuntimeConfig }) {
 
 DocsPage.propTypes = {
   publicRuntimeConfig: PropTypes.object,
+};
+
+DocsPage.getLayout = function getLayout(page) {
+  return <MainContent>{page}</MainContent>;
 };
 
 export async function getServerSideProps() {
