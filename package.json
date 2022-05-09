@@ -1,6 +1,6 @@
 {
   "name": "squareone",
-  "version": "0.5.0",
+  "version": "0.7.0",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000",
@@ -34,7 +34,7 @@
     "*.{js,json,css,graphql,yaml}": "prettier --write"
   },
   "dependencies": {
-    "@fontsource/source-sans-pro": "^4.5.6",
+    "@fontsource/source-sans-pro": "^4.5.9",
     "@fortawesome/fontawesome-svg-core": "^6.1.1",
     "@fortawesome/free-solid-svg-icons": "^6.1.1",
     "@fortawesome/react-fontawesome": "^0.1.18",
@@ -42,8 +42,8 @@
     "@reach/menu-button": "^0.16.2",
     "ajv": "^8.11.0",
     "js-yaml": "^4.1.0",
-    "next": "^12.1.4",
-    "next-themes": "^0.1.1",
+    "next": "^12.1.6",
+    "next-themes": "^0.2.0",
     "normalize.css": "^8.0.1",
     "prop-types": "^15.8.1",
     "react": "^17.0.2",
@@ -57,11 +57,11 @@
   },
   "devDependencies": {
     "babel-plugin-styled-components": "^2.0.7",
-    "eslint": "^8.13.0",
-    "eslint-config-next": "^12.1.4",
+    "eslint": "^8.15.0",
+    "eslint-config-next": "^12.1.6",
     "eslint-config-prettier": "^8.5.0",
-    "husky": "^7.0.4",
-    "lint-staged": "^12.3.7",
+    "husky": "^8.0.1",
+    "lint-staged": "^12.4.1",
     "prettier": "^2.6.2"
   }
 }
