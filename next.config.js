@@ -52,9 +52,27 @@ module.exports = (phase, { defaultConfig }) => {
     serverRuntimeConfig: { ...serverYamlConfig },
     async rewrites() {
       return [
+        // Mock Gafaelfawr (this is never triggered by a production ingress)
         {
           source: '/auth/api/v1/user-info',
           destination: '/api/dev/user-info',
+        },
+        // Mock Times Square (this is never triggered by a production ingress)
+        {
+          source: '/times-square/api/v1/pages',
+          destination: '/api/dev/times-square/v1/pages',
+        },
+        {
+          source: '/times-square/api/v1/pages/:page/html',
+          destination: '/api/dev/times-square/v1/pages/:page/html',
+        },
+        {
+          source: '/times-square/api/v1/pages/:page/htmlstatus',
+          destination: '/api/dev/times-square/v1/pages/:page/htmlstatus',
+        },
+        {
+          source: '/times-square/api/v1/pages/:page',
+          destination: '/api/dev/times-square/v1/pages/:page',
         },
       ];
     },
