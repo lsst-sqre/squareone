@@ -27,7 +27,12 @@
     "semaphoreUrl": {
       "type": "string",
       "title": "Semaphore URL",
-      "description": "URL of the Semaphore API service for obtaining notifications and broadcasts"
+      "description": "URL prefix of the Semaphore API service for obtaining notifications and broadcasts. Does not end in /. Omit or set as null to disable Semaphore features."
+    },
+    "timesSquareUrl": {
+      "type": "string",
+      "title": "Times Square API URL",
+      "description": "URL prefix of the Times Square API service. Does not end in /. Omit or set as null to disable the /times-square/ pages."
     }
   }
 }
