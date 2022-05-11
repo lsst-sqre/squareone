@@ -2,10 +2,15 @@
 Change log
 ##########
 
+0.7.0 (unreleased)
+==================
+
+- Add support for `Times Square <https://github.com/lsst-sqre/times-square>`__.
+
 0.6.0 (2022-04-14)
 ==================
 
-- Informational broadcast messages are now displayed ith Rubin's primary teal as the background color (see `lsst-sqre/semaphore#29 <https://github.com/lsst-sqre/semaphore/pull/29>`__ for more information).
+- Informational broadcast messages are now displayed with Rubin's primary teal as the background color (see `lsst-sqre/semaphore#29 <https://github.com/lsst-sqre/semaphore/pull/29>`__ for more information).
 - Replaced custom fetch hook for the Semaphore broadcast message data with swr, enabling us to automatically refresh broadcast data.
 - Updated the component layout in the source code.
 
