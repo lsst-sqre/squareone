@@ -49,6 +49,8 @@ function TSNotebookViewer({ nbSlug, userParameters }) {
   if (data) {
     const {
       parameters,
+      title,
+      description,
       html_url: htmlApiUrl,
       html_status_url: htmlStatusApiUrl,
     } = data;
@@ -70,10 +72,12 @@ function TSNotebookViewer({ nbSlug, userParameters }) {
     return (
       <NotebookViewLayout>
         <NotebookSettingsContainer>
-          <h1>{nbSlug}</h1>
-          <p>Notebook parameters</p>
+          <h1>{title}</h1>
+          {description && (
+            <div dangerouslySetInnerHTML={{ __html: description.html }}></div>
+          )}
+          <p>Notebook parameters:</p>
           <ul>{parameterListItems}</ul>
-          <p>Status: {status}</p>
         </NotebookSettingsContainer>
         <NotebookPageContainer>
           <TimesSquareViewer

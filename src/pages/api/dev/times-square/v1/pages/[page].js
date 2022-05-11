@@ -18,6 +18,8 @@ export default function handler(req, res) {
 
   const content = {
     name: page,
+    title: `Title for ${page}`,
+    description: '<p>This is the description.</p>',
     self_url: pageBaseUrl,
     source_url: `${pageBaseUrl}/source`,
     rendered_url: `${pageBaseUrl}/rendered`,
