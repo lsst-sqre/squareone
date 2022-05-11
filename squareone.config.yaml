@@ -3,3 +3,4 @@ baseUrl: 'http://localhost:3000'
 siteDescription: |
   The site description.
 semaphoreUrl: 'https://data-dev.lsst.cloud/semaphore'
+timesSquareUrl: 'http://localhost:3000/times-square/api'

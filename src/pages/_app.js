@@ -24,11 +24,15 @@ import Page from '../components/Page';
 library.add(faAngleDown);
 
 function MyApp({ Component, pageProps, baseUrl, semaphoreUrl }) {
+  // Use the content layout defined by the page component, if avaialble.
+  // Otherwise, the page itself is used as the content area layout container.
+  const getLayout = Component.getLayout || ((page) => page);
+
   /* eslint-disable react/jsx-props-no-spreading */
   return (
     <ThemeProvider defaultTheme="system">
       <Page baseUrl={baseUrl} semaphoreUrl={semaphoreUrl}>
-        <Component {...pageProps} />
+        {getLayout(<Component {...pageProps} />)}
       </Page>
     </ThemeProvider>
   );
