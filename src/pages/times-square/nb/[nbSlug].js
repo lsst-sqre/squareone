@@ -4,6 +4,7 @@ import getConfig from 'next/config';
 import useSWR from 'swr';
 import { useRouter } from 'next/router';
 
+import TimesSquareApp from '../../../components/TimesSquareApp';
 import TimesSquareViewer from '../../../components/TimesSquareViewer';
 import WideContentLayout from '../../../components/WideContentLayout';
 
@@ -71,26 +72,32 @@ function TSNotebookViewer({ nbSlug, userParameters }) {
     ));
 
     return (
-      <NotebookViewLayout>
-        <NotebookSettingsContainer>
-          <h1>{title}</h1>
-          {description && (
-            <div dangerouslySetInnerHTML={{ __html: description.html }}></div>
-          )}
-          <p>Notebook parameters:</p>
-          <ul>{parameterListItems}</ul>
-        </NotebookSettingsContainer>
-        <NotebookPageContainer>
-          <TimesSquareViewer
-            tsHtmlUrl={htmlApiUrl}
-            tsHtmlStatusUrl={htmlStatusApiUrl}
-            parameters={updatedParameters}
-          />
-        </NotebookPageContainer>
-      </NotebookViewLayout>
+      <TimesSquareApp>
+        <NotebookViewLayout>
+          <NotebookSettingsContainer>
+            <h1>{title}</h1>
+            {description && (
+              <div dangerouslySetInnerHTML={{ __html: description.html }}></div>
+            )}
+            <p>Notebook parameters:</p>
+            <ul>{parameterListItems}</ul>
+          </NotebookSettingsContainer>
+          <NotebookPageContainer>
+            <TimesSquareViewer
+              tsHtmlUrl={htmlApiUrl}
+              tsHtmlStatusUrl={htmlStatusApiUrl}
+              parameters={updatedParameters}
+            />
+          </NotebookPageContainer>
+        </NotebookViewLayout>
+      </TimesSquareApp>
     );
   } else if (!error) {
-    return <p>Loading...</p>;
+    return (
+      <TimesSquareApp>
+        <p>Loading...</p>
+      </TimesSquareApp>
+    );
   } else {
     return <Error statusCode={404} />;
   }

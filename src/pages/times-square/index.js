@@ -5,6 +5,7 @@ import Link from 'next/link';
 
 import useSWR from 'swr';
 
+import TimesSquareApp from '../../components/TimesSquareApp';
 import WideContentLayout from '../../components/WideContentLayout';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
@@ -17,7 +18,7 @@ export default function TimesSquareHome({ publicRuntimeConfig }) {
 
   if (pageResources) {
     return (
-      <>
+      <TimesSquareApp>
         <Head>
           <title>{publicRuntimeConfig.siteName}</title>
         </Head>
@@ -34,17 +35,17 @@ export default function TimesSquareHome({ publicRuntimeConfig }) {
             </li>
           ))}
         </ul>
-      </>
+      </TimesSquareApp>
     );
   } else {
     return (
-      <>
+      <TimesSquareApp>
         <Head>
           <title>{publicRuntimeConfig.siteName}</title>
         </Head>
         <h1>Times Square</h1>
         <p>Loading...</p>
-      </>
+      </TimesSquareApp>
     );
   }
 }
