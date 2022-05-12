@@ -5,6 +5,8 @@ import Link from 'next/link';
 
 import useSWR from 'swr';
 
+import WideContentLayout from '../../components/WideContentLayout';
+
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 export default function TimesSquareHome({ publicRuntimeConfig }) {
@@ -49,6 +51,10 @@ export default function TimesSquareHome({ publicRuntimeConfig }) {
 
 TimesSquareHome.propTypes = {
   publicRuntimeConfig: PropTypes.object,
+};
+
+TimesSquareHome.getLayout = function getLayout(page) {
+  return <WideContentLayout>{page}</WideContentLayout>;
 };
 
 export async function getServerSideProps() {

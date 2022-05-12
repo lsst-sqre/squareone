@@ -5,6 +5,7 @@ import useSWR from 'swr';
 import { useRouter } from 'next/router';
 
 import TimesSquareViewer from '../../../components/TimesSquareViewer';
+import WideContentLayout from '../../../components/WideContentLayout';
 
 const NotebookViewLayout = styled.div`
   display: flex;
@@ -107,6 +108,10 @@ export default function NotebookViewPage() {
 
   return <TSNotebookViewer nbSlug={nbSlug} userParameters={userParameters} />;
 }
+
+NotebookViewPage.getLayout = function getLayout(page) {
+  return <WideContentLayout>{page}</WideContentLayout>;
+};
 
 export async function getServerSideProps() {
   const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
