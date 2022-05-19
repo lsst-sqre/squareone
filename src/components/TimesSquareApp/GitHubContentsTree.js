@@ -43,11 +43,9 @@ export default function GitHubContentsTree({}) {
 // FIXME these mostly come from Comeau's example
 const ContentsWrapper = styled.div`
   --row-height: 1.75rem;
-  position: relative;
   display: flex;
   flex-direction: column;
   gap: 2px;
-  // overflow: auto;
   padding: 0 16px 0 12px;
   margin-top: -0.25rem;
 `;
