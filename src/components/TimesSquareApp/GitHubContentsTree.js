@@ -16,12 +16,12 @@ function generateChildren(contents, props) {
   return contents.map((item) => {
     if (item.node_type != 'page') {
       return (
-        <Directory title={item.title}>
+        <Directory title={item.title} key={item.path}>
           {generateChildren(item.contents, { ...props })}
         </Directory>
       );
     } else {
-      return <Page title={item.title} path={item.path} />;
+      return <Page title={item.title} path={item.path} key={item.path} />;
     }
   });
 }
