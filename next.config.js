@@ -78,6 +78,10 @@ module.exports = (phase, { defaultConfig }) => {
           source: '/times-square/api/v1/github',
           destination: '/api/dev/times-square/v1/github',
         },
+        {
+          source: '/times-square/api/v1/github/:tsSlug*',
+          destination: '/api/dev/times-square/v1/github/:tsSlug*',
+        },
       ];
     },
   };
