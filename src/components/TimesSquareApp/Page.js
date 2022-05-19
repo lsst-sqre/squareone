@@ -28,7 +28,6 @@ const Wrapper = styled.div`
 
 const Contents = styled.div`
   padding-left: calc(16px + 4px);
-  height: 0px;
 `;
 
 const StyledFontAwesomeIcon = styled(FontAwesomeIcon)`

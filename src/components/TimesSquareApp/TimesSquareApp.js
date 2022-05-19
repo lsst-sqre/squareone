@@ -9,21 +9,23 @@ import styled from 'styled-components';
 import Sidebar from './Sidebar';
 
 const StyledLayout = styled.div`
-  display: grid;
-  grid-template-columns: 18rem 1fr;
-  grid-template-rows: 1fr;
-  column-gap: 2rem;
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  height: 100%;
+
+  // grid-template-columns: 18rem 1fr;
+  // grid-template-rows: 1fr;
+  // column-gap: 2rem;
 
   // main content
   main {
-    grid-column: 2 / 3;
-    grid-row: 1 / 2;
+    width: calc(100% - 25rem);
   }
 
   // sidebar
   .ts-sidebar {
-    grid-column: 1 / 2;
-    grid-row: 1 / 2;
+    width: 25rem;
   }
 `;
 
