@@ -5,6 +5,7 @@
  */
 
 import styled from 'styled-components';
+import Link from 'next/link';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
@@ -12,7 +13,7 @@ function Page({ title, path }) {
   return (
     <Wrapper>
       <StyledFontAwesomeIcon icon="file" />
-      {title}
+      <Link href={`/times-square/github/${path}`}>{title}</Link>
     </Wrapper>
   );
 }

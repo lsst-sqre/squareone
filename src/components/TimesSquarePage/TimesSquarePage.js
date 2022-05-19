@@ -43,11 +43,13 @@ const NotebookPageContainer = styled.div`
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
-export default function TimesSquarePage({ name, userParameters }) {
+export default function TimesSquarePage({ name, githubSlug, userParameters }) {
   // Get data about the page itself
   const { publicRuntimeConfig } = getConfig();
   const { timesSquareUrl } = publicRuntimeConfig;
-  const pageDataUrl = `${timesSquareUrl}/v1/pages/${name}`;
+  const pageDataUrl = githubSlug
+    ? `${timesSquareUrl}/v1/github/${githubSlug}`
+    : `${timesSquareUrl}/v1/pages/${name}`;
 
   const { data, error } = useSWR(pageDataUrl, fetcher, {});
 

@@ -21,7 +21,7 @@ function generateChildren(contents, props) {
         </Directory>
       );
     } else {
-      return <Page title={item.title} />;
+      return <Page title={item.title} path={item.path} />;
     }
   });
 }
