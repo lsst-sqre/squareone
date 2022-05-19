@@ -20,7 +20,7 @@ export default function TimesSquareHome({ publicRuntimeConfig }) {
     return (
       <TimesSquareApp>
         <Head>
-          <title>{publicRuntimeConfig.siteName}</title>
+          <title>Times Square | {publicRuntimeConfig.siteName}</title>
         </Head>
         <h1>Times Square</h1>
         <p>

@@ -5,6 +5,7 @@
  */
 
 import styled from 'styled-components';
+import Head from 'next/head';
 import getConfig from 'next/config';
 import Error from 'next/error';
 import useSWR from 'swr';
@@ -78,6 +79,9 @@ export default function TimesSquarePage({ name, githubSlug, userParameters }) {
 
     return (
       <PageLayout>
+        <Head>
+          <title>{`${title} | ${publicRuntimeConfig.siteName}`}</title>
+        </Head>
         <SettingsContainer>
           <h1>{title}</h1>
           {description && (
