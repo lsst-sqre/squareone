@@ -7,8 +7,10 @@ import styled from 'styled-components';
 import GitHubContentsTree from './GitHubContentsTree';
 
 const StyledSidebar = styled.div`
-  background-color: #dddddd;
   padding: 0 var(--size-screen-padding-min);
+  border-right: 3px solid var(--rsd-color-gray-100);
+  padding-left: 0.5rem;
+  width: 18rem;
 `;
 
 export default function Sidebar() {

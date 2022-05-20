@@ -14,18 +14,9 @@ const StyledLayout = styled.div`
   gap: 2rem;
   height: 100%;
 
-  // grid-template-columns: 18rem 1fr;
-  // grid-template-rows: 1fr;
-  // column-gap: 2rem;
-
   // main content
   main {
-    width: calc(100% - 25rem);
-  }
-
-  // sidebar
-  .ts-sidebar {
-    width: 25rem;
+    width: 100%;
   }
 `;
 
