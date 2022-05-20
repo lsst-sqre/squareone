@@ -34,7 +34,11 @@ const SectionTitle = styled.p`
 export default function Sidebar({ pagePath }) {
   return (
     <StyledSidebar>
-      <AppTitle>Times Square</AppTitle>
+      <Link href="/times-square">
+        <a>
+          <AppTitle>Times Square</AppTitle>
+        </a>
+      </Link>
 
       <GitHubContentsTree pagePath={pagePath} />
     </StyledSidebar>
