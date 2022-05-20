@@ -19,7 +19,7 @@ export default function GitHubNotebookViewPage({}) {
   const githubSlug = tsSlug.join('/');
 
   return (
-    <TimesSquareApp>
+    <TimesSquareApp pagePath={githubSlug}>
       <TimesSquarePage
         githubSlug={githubSlug}
         userParameters={userParameters}

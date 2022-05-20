@@ -9,9 +9,9 @@ import Link from 'next/link';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-function Page({ title, path }) {
+function Page({ title, path, current }) {
   return (
-    <Wrapper>
+    <Wrapper current={current}>
       <StyledFontAwesomeIcon icon="file" />
       <Link href={`/times-square/github/${path}`}>{title}</Link>
     </Wrapper>
@@ -24,10 +24,7 @@ const Wrapper = styled.div`
   gap: 4px;
   height: var(--row-height);
   color: inherit;
-`;
-
-const Contents = styled.div`
-  padding-left: calc(16px + 4px);
+  font-weight: ${(props) => (props.current ? 'bold' : 'normal')};
 `;
 
 const StyledFontAwesomeIcon = styled(FontAwesomeIcon)`

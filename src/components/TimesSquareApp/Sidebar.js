@@ -31,12 +31,12 @@ const SectionTitle = styled.p`
   color: var(--rsd-component-text-headline-color);
 `;
 
-export default function Sidebar() {
+export default function Sidebar({ pagePath }) {
   return (
     <StyledSidebar>
       <AppTitle>Times Square</AppTitle>
 
-      <GitHubContentsTree />
+      <GitHubContentsTree pagePath={pagePath} />
     </StyledSidebar>
   );
 }

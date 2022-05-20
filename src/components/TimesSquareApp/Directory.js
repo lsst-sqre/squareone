@@ -10,14 +10,14 @@ import styled from 'styled-components';
 import Page from './Page';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-function Directory({ title, path, children }) {
+function Directory({ title, path, current, children }) {
   return (
     <Wrapper>
-      <Header>
+      <Header current={current}>
         <StyledFontAwesomeIcon icon="angle-down" />
         {title}
       </Header>
-      <Contents>{children}</Contents>
+      <Contents current={current}>{children}</Contents>
     </Wrapper>
   );
 }
@@ -30,6 +30,7 @@ const Header = styled.div`
   gap: 4px;
   height: var(--row-height);
   color: inherit;
+  font-weight: ${(props) => (props.current ? 'bold' : 'normal')};
 `;
 
 const Contents = styled.div`

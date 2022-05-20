@@ -7,31 +7,43 @@
 
 import styled from 'styled-components';
 import getConfig from 'next/config';
+import { useRouter } from 'next/router';
 
 import Directory from './Directory';
 import Page from './Page';
 import useGitHubContentsListing from './useGitHubContentsListing';
 
-function generateChildren(contents, props) {
+function generateChildren(contents, currentPath, props) {
   return contents.map((item) => {
     if (item.node_type != 'page') {
       return (
-        <Directory title={item.title} key={item.path}>
-          {generateChildren(item.contents, { ...props })}
+        <Directory
+          title={item.title}
+          key={item.path}
+          current={currentPath ? currentPath.startsWith(item.path) : false}
+        >
+          {generateChildren(item.contents, currentPath, { ...props })}
         </Directory>
       );
     } else {
-      return <Page title={item.title} path={item.path} key={item.path} />;
+      return (
+        <Page
+          title={item.title}
+          path={item.path}
+          key={item.path}
+          current={currentPath ? currentPath.startsWith(item.path) : false}
+        />
+      );
     }
   });
 }
 
-export default function GitHubContentsTree({}) {
+export default function GitHubContentsTree({ pagePath }) {
   const { publicRuntimeConfig } = getConfig();
   const { timesSquareUrl } = publicRuntimeConfig;
   const githubContents = useGitHubContentsListing(timesSquareUrl);
 
-  const children = generateChildren(githubContents.contents, {});
+  const children = generateChildren(githubContents.contents, pagePath, {});
 
   if (githubContents) {
     return (
