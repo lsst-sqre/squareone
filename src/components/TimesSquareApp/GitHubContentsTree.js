@@ -34,9 +34,19 @@ export default function GitHubContentsTree({}) {
   const children = generateChildren(githubContents.contents, {});
 
   if (githubContents) {
-    return <ContentsWrapper>{children}</ContentsWrapper>;
+    return (
+      <NavWrapper>
+        <SectionTitle>Rubin’s boards</SectionTitle>
+        <ContentsWrapper>{children}</ContentsWrapper>
+      </NavWrapper>
+    );
   } else {
-    return <p>Loading...</p>;
+    return (
+      <NavWrapper>
+        <SectionTitle>Rubin’s boards</SectionTitle>
+        <p>Loading...</p>
+      </NavWrapper>
+    );
   }
 }
 
@@ -48,4 +58,14 @@ const ContentsWrapper = styled.div`
   gap: 2px;
   padding: 0 16px 0 12px;
   margin-top: -0.25rem;
+`;
+
+const NavWrapper = styled.nav``;
+
+const SectionTitle = styled.p`
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: var(--rsd-component-text-headline-color);
 `;
