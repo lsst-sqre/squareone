@@ -4,7 +4,7 @@ import { ThemeProvider } from 'next-themes';
 
 // Icons from Font Awesome
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
+import { faAngleDown, faFile } from '@fortawesome/free-solid-svg-icons';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 
 // Source Sans Pro Font from Font Source
@@ -22,6 +22,7 @@ import Page from '../components/Page';
 
 // Add icons to the global Font Awesome library
 library.add(faAngleDown);
+library.add(faFile);
 
 function MyApp({ Component, pageProps, baseUrl, semaphoreUrl }) {
   // Use the content layout defined by the page component, if avaialble.

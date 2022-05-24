@@ -1,12 +1,18 @@
+/*
+ * The TimesSquarePage is a view into a single Times Square page.
+ * It consists of a column with page metadata/settings and another column with
+ * the notebook content (NotebookIframe).
+ */
+
 import styled from 'styled-components';
-import Error from 'next/error';
+import Head from 'next/head';
 import getConfig from 'next/config';
+import Error from 'next/error';
 import useSWR from 'swr';
-import { useRouter } from 'next/router';
 
-import TimesSquareViewer from '../../../components/TimesSquareViewer';
+import NotebookIframe from './NotebookIframe';
 
-const NotebookViewLayout = styled.div`
+const PageLayout = styled.div`
   display: flex;
   flex-direction: row;
   min-width: 100%;
@@ -14,7 +20,7 @@ const NotebookViewLayout = styled.div`
   height: calc(100vh - 200px);
 `;
 
-const NotebookSettingsContainer = styled.div`
+const SettingsContainer = styled.div`
   flex: 0 0 auto;
   width: 18rem;
 `;
@@ -38,11 +44,13 @@ const NotebookPageContainer = styled.div`
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
-function TSNotebookViewer({ nbSlug, userParameters }) {
+export default function TimesSquarePage({ name, githubSlug, userParameters }) {
   // Get data about the page itself
   const { publicRuntimeConfig } = getConfig();
   const { timesSquareUrl } = publicRuntimeConfig;
-  const pageDataUrl = `${timesSquareUrl}/v1/pages/${nbSlug}`;
+  const pageDataUrl = githubSlug
+    ? `${timesSquareUrl}/v1/github/${githubSlug}`
+    : `${timesSquareUrl}/v1/pages/${name}`;
 
   const { data, error } = useSWR(pageDataUrl, fetcher, {});
 
@@ -70,55 +78,30 @@ function TSNotebookViewer({ nbSlug, userParameters }) {
     ));
 
     return (
-      <NotebookViewLayout>
-        <NotebookSettingsContainer>
+      <PageLayout>
+        <Head>
+          <title>{`${title} | ${publicRuntimeConfig.siteName}`}</title>
+        </Head>
+        <SettingsContainer>
           <h1>{title}</h1>
           {description && (
             <div dangerouslySetInnerHTML={{ __html: description.html }}></div>
           )}
           <p>Notebook parameters:</p>
           <ul>{parameterListItems}</ul>
-        </NotebookSettingsContainer>
+        </SettingsContainer>
         <NotebookPageContainer>
-          <TimesSquareViewer
+          <NotebookIframe
             tsHtmlUrl={htmlApiUrl}
             tsHtmlStatusUrl={htmlStatusApiUrl}
             parameters={updatedParameters}
           />
         </NotebookPageContainer>
-      </NotebookViewLayout>
+      </PageLayout>
     );
   } else if (!error) {
     return <p>Loading...</p>;
   } else {
     return <Error statusCode={404} />;
   }
-}
-
-export default function NotebookViewPage() {
-  const router = useRouter();
-  const { nbSlug } = router.query;
-
-  const userParameters = Object.fromEntries(
-    Object.entries(router.query)
-      .filter((item) => item[0] != 'nbSlug')
-      .map((item) => item)
-  );
-
-  return <TSNotebookViewer nbSlug={nbSlug} userParameters={userParameters} />;
-}
-
-export async function getServerSideProps() {
-  const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
-
-  // Make the page return a 404 if Times Square is not configured
-  const notFound = publicRuntimeConfig.timesSquareUrl ? false : true;
-
-  return {
-    notFound,
-    props: {
-      serverRuntimeConfig,
-      publicRuntimeConfig,
-    },
-  };
 }
