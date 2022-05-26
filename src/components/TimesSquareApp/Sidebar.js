@@ -5,7 +5,7 @@
 import Link from 'next/link';
 import styled from 'styled-components';
 
-import GitHubContentsTree from './GitHubContentsTree';
+import GitHubContentsTree from '../TimesSquareGitHubNav/TimesSquareGitHubNav';
 
 const StyledSidebar = styled.div`
   padding: 0 var(--size-screen-padding-min);
@@ -31,7 +31,7 @@ const SectionTitle = styled.p`
   color: var(--rsd-component-text-headline-color);
 `;
 
-export default function Sidebar({ pagePath }) {
+export default function Sidebar({ pageNav }) {
   return (
     <StyledSidebar>
       <Link href="/times-square">
@@ -40,7 +40,7 @@ export default function Sidebar({ pagePath }) {
         </a>
       </Link>
 
-      <GitHubContentsTree pagePath={pagePath} />
+      {pageNav && pageNav}
     </StyledSidebar>
   );
 }

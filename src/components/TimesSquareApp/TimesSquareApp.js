@@ -20,11 +20,11 @@ const StyledLayout = styled.div`
   }
 `;
 
-export default function TimesSquareApp({ children, pagePath }) {
+export default function TimesSquareApp({ children, pageNav }) {
   console.log('Running TimesSquareApp');
   return (
     <StyledLayout>
-      <Sidebar pagePath={pagePath} />
+      <Sidebar pageNav={pageNav} />
       <main>{children}</main>
     </StyledLayout>
   );

@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import TimesSquareApp from '../../../components/TimesSquareApp';
 import TimesSquarePage from '../../../components/TimesSquarePage';
 import WideContentLayout from '../../../components/WideContentLayout';
+import TimesSquareGitHubNav from '../../../components/TimesSquareGitHubNav';
 
 export default function GitHubNotebookViewPage({}) {
   const router = useRouter();
@@ -18,8 +19,10 @@ export default function GitHubNotebookViewPage({}) {
 
   const githubSlug = tsSlug.join('/');
 
+  const pageNav = <TimesSquareGitHubNav pagePath={githubSlug} />;
+
   return (
-    <TimesSquareApp pagePath={githubSlug}>
+    <TimesSquareApp pageNav={pageNav}>
       <TimesSquarePage
         githubSlug={githubSlug}
         userParameters={userParameters}

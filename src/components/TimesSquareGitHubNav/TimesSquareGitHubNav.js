@@ -7,7 +7,6 @@
 
 import styled from 'styled-components';
 import getConfig from 'next/config';
-import { useRouter } from 'next/router';
 
 import Directory from './Directory';
 import Page from './Page';
@@ -38,7 +37,7 @@ function generateChildren(contents, currentPath, props) {
   });
 }
 
-export default function GitHubContentsTree({ pagePath }) {
+export default function TimesSquareGitHubNav({ pagePath }) {
   const { publicRuntimeConfig } = getConfig();
   const { timesSquareUrl } = publicRuntimeConfig;
   const githubContents = useGitHubContentsListing(timesSquareUrl);
