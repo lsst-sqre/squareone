@@ -2,7 +2,7 @@ import useSWR from 'swr';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
-function usePageData(pageUrl) {
+function useTimesSquarePage(pageUrl) {
   const { data, error } = useSWR(pageUrl, fetcher);
 
   return {
@@ -13,4 +13,4 @@ function usePageData(pageUrl) {
   };
 }
 
-export default usePageData;
+export default useTimesSquarePage;

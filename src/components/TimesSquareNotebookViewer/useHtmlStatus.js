@@ -5,6 +5,7 @@
  */
 
 import useSWR from 'swr';
+import useTimesSquarePage from '../../hooks/useTimesSquarePage';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
@@ -17,10 +18,10 @@ export function parameterizeUrl(baseUrl, parameters) {
 }
 
 function useHtmlStatus(pageUrl, parameters) {
-  const { data: pageData, error: pageError } = useSWR(pageUrl, fetcher);
+  const pageData = useTimesSquarePage(pageUrl);
 
   const { data, error } = useSWR(
-    () => parameterizeUrl(pageData.html_status_url, parameters),
+    () => parameterizeUrl(pageData.htmlStatusUrl, parameters),
     fetcher,
     {
       // ping every 1 second while browser in focus.
