@@ -31,7 +31,7 @@ const SectionTitle = styled.p`
   color: var(--rsd-component-text-headline-color);
 `;
 
-export default function Sidebar({ pageNav }) {
+export default function Sidebar({ pageNav, pagePanel }) {
   return (
     <StyledSidebar>
       <Link href="/times-square">
@@ -39,6 +39,8 @@ export default function Sidebar({ pageNav }) {
           <AppTitle>Times Square</AppTitle>
         </a>
       </Link>
+
+      {pagePanel && pagePanel}
 
       {pageNav && pageNav}
     </StyledSidebar>

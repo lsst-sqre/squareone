@@ -5,6 +5,7 @@ import TimesSquareApp from '../../../components/TimesSquareApp';
 import WideContentLayout from '../../../components/WideContentLayout';
 import TimesSquareGitHubNav from '../../../components/TimesSquareGitHubNav';
 import TimesSquareNotebookViewer from '../../../components/TimesSquareNotebookViewer';
+import TimesSquareGitHubPagePanel from '../../../components/TimesSquareGitHubPagePanel/TimesSquareGitHubPagePanel';
 
 export default function GitHubNotebookViewPage({}) {
   const { publicRuntimeConfig } = getConfig();
@@ -22,8 +23,15 @@ export default function GitHubNotebookViewPage({}) {
 
   const pageNav = <TimesSquareGitHubNav pagePath={githubSlug} />;
 
+  const pagePanel = (
+    <TimesSquareGitHubPagePanel
+      tsPageUrl={tsPageUrl}
+      userParameters={userParameters}
+    />
+  );
+
   return (
-    <TimesSquareApp pageNav={pageNav}>
+    <TimesSquareApp pageNav={pageNav} pagePanel={pagePanel}>
       <TimesSquareNotebookViewer
         tsPageUrl={tsPageUrl}
         parameters={userParameters}
