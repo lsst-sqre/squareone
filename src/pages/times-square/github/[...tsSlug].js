@@ -1,15 +1,18 @@
-import styled from 'styled-components';
 import getConfig from 'next/config';
 import { useRouter } from 'next/router';
 
 import TimesSquareApp from '../../../components/TimesSquareApp';
-import TimesSquarePage from '../../../components/TimesSquarePage';
 import WideContentLayout from '../../../components/WideContentLayout';
 import TimesSquareGitHubNav from '../../../components/TimesSquareGitHubNav';
+import TimesSquareNotebookViewer from '../../../components/TimesSquareNotebookViewer';
 
 export default function GitHubNotebookViewPage({}) {
+  const { publicRuntimeConfig } = getConfig();
+  const { timesSquareUrl } = publicRuntimeConfig;
   const router = useRouter();
   const { tsSlug } = router.query;
+  const githubSlug = tsSlug.join('/');
+  const tsPageUrl = `${timesSquareUrl}/v1/github/${githubSlug}`;
 
   const userParameters = Object.fromEntries(
     Object.entries(router.query)
@@ -17,15 +20,13 @@ export default function GitHubNotebookViewPage({}) {
       .map((item) => item)
   );
 
-  const githubSlug = tsSlug.join('/');
-
   const pageNav = <TimesSquareGitHubNav pagePath={githubSlug} />;
 
   return (
     <TimesSquareApp pageNav={pageNav}>
-      <TimesSquarePage
-        githubSlug={githubSlug}
-        userParameters={userParameters}
+      <TimesSquareNotebookViewer
+        tsPageUrl={tsPageUrl}
+        parameters={userParameters}
       />
     </TimesSquareApp>
   );

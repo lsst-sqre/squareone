@@ -8,16 +8,26 @@ import useSWR from 'swr';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
-function useHtmlStatus(htmlStatusUrl, parameters) {
-  const url = new URL(htmlStatusUrl);
-  parameters.forEach((item) => url.searchParams.set(item[0], item[1]));
-  const fullHtmlStatusUrl = url.toString();
+export function parameterizeUrl(baseUrl, parameters) {
+  const url = new URL(baseUrl);
+  Object.entries(parameters).map((item) =>
+    url.searchParams.set(item[0], item[1])
+  );
+  return url.toString();
+}
 
-  const { data, error } = useSWR(fullHtmlStatusUrl, fetcher, {
-    // ping every 1 second while browser in focus.
-    // TODO back this off once HTML is loaded?
-    refreshInterval: 1000,
-  });
+function useHtmlStatus(pageUrl, parameters) {
+  const { data: pageData, error: pageError } = useSWR(pageUrl, fetcher);
+
+  const { data, error } = useSWR(
+    () => parameterizeUrl(pageData.html_status_url, parameters),
+    fetcher,
+    {
+      // ping every 1 second while browser in focus.
+      // TODO back this off once HTML is loaded?
+      refreshInterval: 1000,
+    }
+  );
 
   return {
     error: error,

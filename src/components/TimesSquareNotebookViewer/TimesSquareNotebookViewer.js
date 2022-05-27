@@ -19,20 +19,13 @@ const StyledIframe = styled.iframe`
   height: 100%;
 `;
 
-export default function NotebookIframe({
-  tsHtmlUrl,
-  tsHtmlStatusUrl,
-  parameters,
-}) {
-  const htmlUrl = new URL(tsHtmlUrl);
-  parameters.forEach((item) => htmlUrl.searchParams.set(item[0], item[1]));
-
-  const htmlStatus = useHtmlStatus(tsHtmlStatusUrl, parameters);
+export default function TimesSquareNotebookViewer({ tsPageUrl, parameters }) {
+  const htmlStatus = useHtmlStatus(tsPageUrl, parameters);
 
   if (htmlStatus.error) {
     return (
       <div>
-        <p>Error contacting API at {`${tsHtmlStatusUrl}`}</p>
+        <p>Error contacting API at {`${tsPageUrl}`}</p>
       </div>
     );
   }
@@ -47,7 +40,7 @@ export default function NotebookIframe({
 
   return (
     <StyledIframe
-      src={htmlStatus.htmlUrl || htmlUrl.toString()}
+      src={htmlStatus.htmlUrl}
       key={htmlStatus.iframeKey}
     ></StyledIframe>
   );
