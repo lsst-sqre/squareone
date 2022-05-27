@@ -1,24 +1,36 @@
 export default function TimesSquareParameters({ pageData, userParameters }) {
   const { parameters } = pageData;
 
-  // Merge user-set parameters with defaults
-  const updatedParameters = Object.entries(parameters).map((item) => {
-    if (item[0] in userParameters) {
-      return [item[0], userParameters[item[0]]];
-    } else {
-      return [item[0], item[1].default];
-    }
+  const parameterInputs = Object.entries(parameters).map((item) => {
+    const currentValue =
+      item[0] in userParameters ? userParameters[item[0]] : item[1].default;
+
+    return (
+      <li key={item[0]}>
+        <label htmlFor={item[0]}>
+          {item[0]}{' '}
+          <input type="text" id={item[0]} name={item[0]} value={currentValue} />
+        </label>
+      </li>
+    );
   });
 
-  // List items for the parameters
-  const parameterListItems = updatedParameters.map((item) => (
-    <li key={item[0]}>{`${item[0]}: ${item[1]}`}</li>
-  ));
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const formData = Object.entries(parameters).map((item) => [
+      item[0],
+      event.target[item[0]].value,
+    ]);
+    console.log('submitted');
+    console.log(formData);
+  };
 
   return (
     <>
-      <p>Parameters:</p>
-      <ul>{parameterListItems}</ul>
+      <form onSubmit={handleSubmit}>
+        <ul>{parameterInputs}</ul>
+        <button type="submit">Update</button>
+      </form>
     </>
   );
 }
