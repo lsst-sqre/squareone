@@ -1,36 +1,56 @@
+import { useRouter } from 'next/router';
+import { Formik } from 'formik';
+
 export default function TimesSquareParameters({ pageData, userParameters }) {
+  const router = useRouter();
   const { parameters } = pageData;
 
-  const parameterInputs = Object.entries(parameters).map((item) => {
-    const currentValue =
-      item[0] in userParameters ? userParameters[item[0]] : item[1].default;
+  const handleFormSubmit = (values, { setSubmitting }) => {
+    // 1. Get an object with the existing query from the router. This gives us
+    // any existing path parameters for dynamic routing or misc query parameters
+    // unrelated to page parameters.
+    const query = Object.assign({}, router.query);
 
-    return (
-      <li key={item[0]}>
-        <label htmlFor={item[0]}>
-          {item[0]}{' '}
-          <input type="text" id={item[0]} name={item[0]} value={currentValue} />
-        </label>
-      </li>
+    // 2. Update object with form's `values`
+    Object.keys(parameters).forEach(
+      (paramName) => (query[paramName] = values[paramName])
     );
-  });
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    const formData = Object.entries(parameters).map((item) => [
-      item[0],
-      event.target[item[0]].value,
-    ]);
-    console.log('submitted');
-    console.log(formData);
+    router.push({ pathname: router.pathname, query: query }, undefined, {
+      shallow: true,
+    });
+
+    setSubmitting(false);
   };
 
   return (
-    <>
-      <form onSubmit={handleSubmit}>
-        <ul>{parameterInputs}</ul>
-        <button type="submit">Update</button>
-      </form>
-    </>
+    <Formik initialValues={userParameters} onSubmit={handleFormSubmit}>
+      {({ values, handleChange, handleSubmit, isSubmitting }) => (
+        <form onSubmit={handleSubmit}>
+          <ul>
+            {Object.entries(parameters).map((item) => {
+              const paramName = item[0];
+              return (
+                <li key={paramName}>
+                  <label htmlFor={paramName}>
+                    {paramName}{' '}
+                    <input
+                      type="text"
+                      id={paramName}
+                      name={paramName}
+                      value={values[paramName]}
+                      onChange={handleChange}
+                    />
+                  </label>
+                </li>
+              );
+            })}
+          </ul>
+          <button type="submit" disabled={isSubmitting}>
+            Update
+          </button>
+        </form>
+      )}
+    </Formik>
   );
 }
