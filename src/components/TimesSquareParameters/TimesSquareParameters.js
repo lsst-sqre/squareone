@@ -2,6 +2,29 @@ import { useRouter } from 'next/router';
 import { Formik } from 'formik';
 import Ajv from 'ajv';
 
+import StringInput from './StringInput';
+import ParameterInput from './ParameterInput';
+
+// Create input components based on the parameter's JSON schema
+function inputFactory(props) {
+  const { paramName, paramSchema, value, onChange, errors, touched } = props;
+  return (
+    <ParameterInput
+      paramName={paramName}
+      paramSchema={paramSchema}
+      touched={touched}
+      errors={errors}
+    >
+      <StringInput
+        paramName={paramName}
+        paramSchema={paramSchema}
+        value={value}
+        onChange={onChange}
+      />
+    </ParameterInput>
+  );
+}
+
 export default function TimesSquareParameters({ pageData, userParameters }) {
   const router = useRouter();
   const { parameters } = pageData;
@@ -74,25 +97,16 @@ export default function TimesSquareParameters({ pageData, userParameters }) {
       }) => (
         <form onSubmit={handleSubmit}>
           <ul>
-            {Object.entries(parameters).map((item) => {
-              const paramName = item[0];
-              return (
-                <li key={paramName}>
-                  <label htmlFor={paramName}>
-                    {paramName}{' '}
-                    <input
-                      type="text"
-                      id={paramName}
-                      name={paramName}
-                      value={values[paramName]}
-                      onChange={handleChange}
-                    />
-                    {errors[paramName] && touched[paramName] && (
-                      <div>{errors[paramName]}</div>
-                    )}
-                  </label>
-                </li>
-              );
+            {Object.entries(parameters).map(([paramName, paramSchema]) => {
+              const inputProps = {
+                paramName,
+                paramSchema,
+                value: values[paramName],
+                touched: touched[paramName],
+                onChange: handleChange,
+                errors: errors[paramName],
+              };
+              return <li key={paramName}>{inputFactory(inputProps)}</li>;
             })}
           </ul>
           <button type="submit" disabled={isSubmitting}>
