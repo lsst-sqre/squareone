@@ -1,4 +1,5 @@
 import { useRouter } from 'next/router';
+import styled from 'styled-components';
 import { Formik } from 'formik';
 import Ajv from 'ajv';
 
@@ -20,6 +21,7 @@ function inputFactory(props) {
         paramSchema={paramSchema}
         value={value}
         onChange={onChange}
+        isError={errors}
       />
     </ParameterInput>
   );
@@ -96,7 +98,7 @@ export default function TimesSquareParameters({ pageData, userParameters }) {
         isSubmitting,
       }) => (
         <form onSubmit={handleSubmit}>
-          <ul>
+          <StyledParameterList>
             {Object.entries(parameters).map(([paramName, paramSchema]) => {
               const inputProps = {
                 paramName,
@@ -108,7 +110,7 @@ export default function TimesSquareParameters({ pageData, userParameters }) {
               };
               return <li key={paramName}>{inputFactory(inputProps)}</li>;
             })}
-          </ul>
+          </StyledParameterList>
           <button type="submit" disabled={isSubmitting}>
             Update
           </button>
@@ -117,3 +119,8 @@ export default function TimesSquareParameters({ pageData, userParameters }) {
     </Formik>
   );
 }
+
+const StyledParameterList = styled.ul`
+  list-style: none;
+  padding-left: 0;
+`;
