@@ -7,6 +7,14 @@ export default function TimesSquareParameters({ pageData, userParameters }) {
   const { parameters } = pageData;
   const ajv = new Ajv({ coerceTypes: true });
 
+  // Merge userParameters with defaults
+  const initialValues = {};
+  Object.entries(parameters).forEach(([paramName, paramSchemaDef]) => {
+    initialValues[paramName] = userParameters[paramName]
+      ? userParameters[paramName]
+      : paramSchemaDef.default;
+  });
+
   // Prepare executable validators for each parameter from their
   // JSON schema definitions.
   const schemas = {};
@@ -52,7 +60,7 @@ export default function TimesSquareParameters({ pageData, userParameters }) {
 
   return (
     <Formik
-      initialValues={userParameters}
+      initialValues={initialValues}
       onSubmit={handleFormSubmit}
       validate={validate}
     >
