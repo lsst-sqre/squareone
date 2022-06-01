@@ -1,20 +1,15 @@
 import styled from 'styled-components';
 
-export default function StringInput({
-  paramName,
-  paramSchema,
-  value,
-  onChange,
-  isError,
-}) {
+export default function StringInput({ paramName, value, onChange, isError }) {
   return (
     <StyledInput
       type="text"
-      id={paramName}
-      name={paramName}
+      id={`${paramName}`}
+      name={`${paramName}`}
       value={value}
       onChange={onChange}
       isError={isError}
+      aria-describedby={`tsparam-${paramName}-error tsparam-${paramName}-description`}
     />
   );
 }

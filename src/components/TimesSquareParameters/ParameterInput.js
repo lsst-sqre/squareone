@@ -10,13 +10,17 @@ export default function ParameterInput({
 }) {
   return (
     <>
-      <label htmlFor={paramName}>
+      <label htmlFor={`${paramName}`}>
         <ParameterName>{paramName}</ParameterName>
         {children}
         {errors && touched && (
-          <ErrorMessage type="polite">{errors}</ErrorMessage>
+          <ErrorMessage id={`tsparam-${paramName}-error`} type="polite">
+            {errors}
+          </ErrorMessage>
         )}
-        <Description>{paramSchema.description}</Description>
+        <Description id={`tsparam-${paramName}-description`}>
+          {paramSchema.description}
+        </Description>
       </label>
     </>
   );
