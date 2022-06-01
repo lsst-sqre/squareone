@@ -12,7 +12,7 @@ export default function handler(req, res) {
 
   const content = {
     available: a != '2', // magic value to toggle status modes
-    html_url: `${pageBaseUrl}/html?a={a}`,
+    html_url: `${pageBaseUrl}/html?a=${a}`,
     html_hash: a != '2' ? '12345' : null,
   };
 

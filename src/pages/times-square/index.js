@@ -3,14 +3,17 @@ import getConfig from 'next/config';
 import PropTypes from 'prop-types';
 import Link from 'next/link';
 
+import TimesSquareGitHubNav from '../../components/TimesSquareGitHubNav';
 import TimesSquareApp from '../../components/TimesSquareApp';
 import WideContentLayout from '../../components/WideContentLayout';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 export default function TimesSquareHome({ publicRuntimeConfig }) {
+  const pageNav = <TimesSquareGitHubNav />;
+
   return (
-    <TimesSquareApp>
+    <TimesSquareApp pageNav={pageNav}>
       <Head>
         <title>Times Square | {publicRuntimeConfig.siteName}</title>
       </Head>
