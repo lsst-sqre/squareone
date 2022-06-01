@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Formik } from 'formik';
 import Ajv from 'ajv';
 
+import Button, { RedGhostButton } from '../Button';
 import StringInput from './StringInput';
 import ParameterInput from './ParameterInput';
 
@@ -95,9 +96,10 @@ export default function TimesSquareParameters({ pageData, userParameters }) {
         touched,
         handleChange,
         handleSubmit,
+        handleReset,
         isSubmitting,
       }) => (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} onreset={handleReset}>
           <StyledParameterList>
             {Object.entries(parameters).map(([paramName, paramSchema]) => {
               const inputProps = {
@@ -111,9 +113,18 @@ export default function TimesSquareParameters({ pageData, userParameters }) {
               return <li key={paramName}>{inputFactory(inputProps)}</li>;
             })}
           </StyledParameterList>
-          <button type="submit" disabled={isSubmitting}>
-            Update
-          </button>
+          <ButtonGroup>
+            <Button type="submit" disabled={isSubmitting}>
+              Update
+            </Button>
+            <ResetButton
+              type="reset"
+              onClick={handleReset}
+              disabled={isSubmitting}
+            >
+              Reset
+            </ResetButton>
+          </ButtonGroup>
         </form>
       )}
     </Formik>
@@ -123,4 +134,14 @@ export default function TimesSquareParameters({ pageData, userParameters }) {
 const StyledParameterList = styled.ul`
   list-style: none;
   padding-left: 0;
+`;
+
+const ButtonGroup = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+`;
+
+const ResetButton = styled(RedGhostButton)`
+  font-size: 0.8rem;
 `;
