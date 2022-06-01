@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import Alert from '@reach/alert';
 
 export default function ParameterInput({
   children,
@@ -12,7 +13,9 @@ export default function ParameterInput({
       <label htmlFor={paramName}>
         <ParameterName>{paramName}</ParameterName>
         {children}
-        {errors && touched && <ErrorMessage>{errors}</ErrorMessage>}
+        {errors && touched && (
+          <ErrorMessage type="polite">{errors}</ErrorMessage>
+        )}
         <Description>{paramSchema.description}</Description>
       </label>
     </>
@@ -26,7 +29,7 @@ const ParameterName = styled.p`
     'Courier New', monospace;
 `;
 
-const ErrorMessage = styled.p`
+const ErrorMessage = styled(Alert)`
   color: red;
   margin-top: 0.2em;
   margin-bottom: 0.2em;
