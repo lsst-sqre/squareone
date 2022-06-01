@@ -4,6 +4,7 @@
  * the notebook content (NotebookIframe).
  */
 
+import styled from 'styled-components';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import Error from 'next/error';
@@ -28,12 +29,12 @@ export default function TimesSquareGitHubPagePanel({
   const { title, description } = pageData;
 
   return (
-    <>
+    <PagePanelContainer>
       <Head>
         <title>{`${title} | ${publicRuntimeConfig.siteName}`}</title>
       </Head>
       <div>
-        <h1>{title}</h1>
+        <PageTitle>{title}</PageTitle>
         {description && (
           <div dangerouslySetInnerHTML={{ __html: description.html }}></div>
         )}
@@ -42,6 +43,20 @@ export default function TimesSquareGitHubPagePanel({
           userParameters={userParameters}
         />
       </div>
-    </>
+    </PagePanelContainer>
   );
 }
+
+const PagePanelContainer = styled.div`
+  padding: 1em;
+  margin-right: calc(-1 * var(--size-screen-padding-min));
+  border-radius: 15px 0 0 15px;
+  margin-top: 1em;
+  border: 1px solid var(--rsd-color-primary-600);
+  border-right: none;
+  box-shadow: var(--sqo-elevation-base);
+`;
+
+const PageTitle = styled.h1`
+  margin-top: 0;
+`;
