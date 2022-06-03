@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
-import { Formik } from 'formik';
+import { Formik, Field } from 'formik';
 import Ajv from 'ajv';
 
 import Button, { RedGhostButton } from '../Button';
@@ -28,7 +28,11 @@ function inputFactory(props) {
   );
 }
 
-export default function TimesSquareParameters({ pageData, userParameters }) {
+export default function TimesSquareParameters({
+  pageData,
+  userParameters,
+  displaySettings,
+}) {
   const router = useRouter();
   const { parameters } = pageData;
   const ajv = new Ajv({ coerceTypes: true });
@@ -40,6 +44,12 @@ export default function TimesSquareParameters({ pageData, userParameters }) {
       ? userParameters[paramName]
       : paramSchemaDef.default;
   });
+
+  if (displaySettings.ts_hide_code === '1') {
+    initialValues.tsHideCode = true;
+  } else {
+    initialValues.tsHideCode = false;
+  }
 
   // Prepare executable validators for each parameter from their
   // JSON schema definitions.
@@ -62,6 +72,12 @@ export default function TimesSquareParameters({ pageData, userParameters }) {
       (paramName) => (query[paramName] = values[paramName])
     );
 
+    if (values.tsHideCode) {
+      query['ts_hide_code'] = '1';
+    } else {
+      query['ts_hide_code'] = '0';
+    }
+
     router.push({ pathname: router.pathname, query: query }, undefined, {
       shallow: true,
     });
@@ -72,12 +88,10 @@ export default function TimesSquareParameters({ pageData, userParameters }) {
   // Callback function to handle  form validation.
   const validate = (values) => {
     const errors = {};
-    Object.entries(values).forEach(([paramName, value]) => {
-      const valid = schemas[paramName](value);
+    Object.entries(schemas).forEach(([paramName, schema]) => {
+      const valid = schema(values[paramName]);
       if (!valid) {
-        const error_messages = schemas[paramName].errors.map(
-          (error) => error.message
-        );
+        const error_messages = schema.errors.map((error) => error.message);
         errors[paramName] = error_messages.join('. ');
       }
     });
@@ -113,6 +127,14 @@ export default function TimesSquareParameters({ pageData, userParameters }) {
               return <li key={paramName}>{inputFactory(inputProps)}</li>;
             })}
           </StyledParameterList>
+          <StyledParameterList>
+            <li>
+              <CheckboxLabel htmlFor="tsHideCode">
+                <Field type="checkbox" name="tsHideCode" />
+                <span className="label">Hide code cells</span>
+              </CheckboxLabel>
+            </li>
+          </StyledParameterList>
           <ButtonGroup>
             <Button type="submit" disabled={isSubmitting}>
               Update
@@ -130,6 +152,13 @@ export default function TimesSquareParameters({ pageData, userParameters }) {
     </Formik>
   );
 }
+
+const CheckboxLabel = styled.label`
+  display: flex;
+  flex-direction: row;
+  gap: var(--sqo-space-xs);
+  align-items: baseline;
+`;
 
 const StyledParameterList = styled.ul`
   list-style: none;

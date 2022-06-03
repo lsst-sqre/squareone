@@ -21,12 +21,16 @@ export default function GitHubNotebookViewPage({}) {
       .map((item) => item)
   );
 
+  const { ts_hide_code = '1' } = userParameters;
+  const displaySettings = { ts_hide_code };
+
   const pageNav = <TimesSquareGitHubNav pagePath={githubSlug} />;
 
   const pagePanel = (
     <TimesSquareGitHubPagePanel
       tsPageUrl={tsPageUrl}
       userParameters={userParameters}
+      displaySettings={displaySettings}
     />
   );
 
@@ -35,6 +39,7 @@ export default function GitHubNotebookViewPage({}) {
       <TimesSquareNotebookViewer
         tsPageUrl={tsPageUrl}
         parameters={userParameters}
+        displaySettings={displaySettings}
       />
     </TimesSquareApp>
   );

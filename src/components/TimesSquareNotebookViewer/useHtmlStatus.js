@@ -9,19 +9,22 @@ import useTimesSquarePage from '../../hooks/useTimesSquarePage';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
-export function parameterizeUrl(baseUrl, parameters) {
+export function parameterizeUrl(baseUrl, parameters, displaySettings) {
   const url = new URL(baseUrl);
   Object.entries(parameters).map((item) =>
+    url.searchParams.set(item[0], item[1])
+  );
+  Object.entries(displaySettings).map((item) =>
     url.searchParams.set(item[0], item[1])
   );
   return url.toString();
 }
 
-function useHtmlStatus(pageUrl, parameters) {
+function useHtmlStatus(pageUrl, parameters, displaySettings) {
   const pageData = useTimesSquarePage(pageUrl);
 
   const { data, error } = useSWR(
-    () => parameterizeUrl(pageData.htmlStatusUrl, parameters),
+    () => parameterizeUrl(pageData.htmlStatusUrl, parameters, displaySettings),
     fetcher,
     {
       // ping every 1 second while browser in focus.

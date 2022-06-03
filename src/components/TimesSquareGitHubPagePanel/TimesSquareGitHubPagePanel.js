@@ -15,6 +15,7 @@ import TimesSquareParameters from '../TimesSquareParameters';
 export default function TimesSquareGitHubPagePanel({
   tsPageUrl,
   userParameters,
+  displaySettings,
 }) {
   const { publicRuntimeConfig } = getConfig();
   const pageData = useTimesSquarePage(tsPageUrl);
@@ -41,6 +42,7 @@ export default function TimesSquareGitHubPagePanel({
         <TimesSquareParameters
           pageData={pageData}
           userParameters={userParameters}
+          displaySettings={displaySettings}
         />
       </div>
     </PagePanelContainer>
