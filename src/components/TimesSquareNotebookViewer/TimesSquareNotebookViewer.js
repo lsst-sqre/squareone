@@ -19,8 +19,12 @@ const StyledIframe = styled.iframe`
   height: 100%;
 `;
 
-export default function TimesSquareNotebookViewer({ tsPageUrl, parameters }) {
-  const htmlStatus = useHtmlStatus(tsPageUrl, parameters);
+export default function TimesSquareNotebookViewer({
+  tsPageUrl,
+  parameters,
+  displaySettings,
+}) {
+  const htmlStatus = useHtmlStatus(tsPageUrl, parameters, displaySettings);
 
   if (htmlStatus.error) {
     return (

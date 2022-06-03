@@ -21,7 +21,6 @@ const StyledLayout = styled.div`
 `;
 
 export default function TimesSquareApp({ children, pageNav, pagePanel }) {
-  console.log('Running TimesSquareApp');
   return (
     <StyledLayout>
       <Sidebar pageNav={pageNav} pagePanel={pagePanel} />
