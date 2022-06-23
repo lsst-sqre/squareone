@@ -40,7 +40,7 @@
     "@fortawesome/react-fontawesome": "^0.1.18",
     "@lsst-sqre/rubin-style-dictionary": "^0.3.0",
     "@reach/alert": "^0.17.0",
-    "@reach/menu-button": "^0.16.2",
+    "@reach/menu-button": "^0.17.0",
     "ajv": "^8.11.0",
     "formik": "^2.2.9",
     "js-yaml": "^4.1.0",
