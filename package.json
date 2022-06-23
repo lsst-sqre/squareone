@@ -34,13 +34,13 @@
     "*.{js,json,css,graphql,yaml}": "prettier --write"
   },
   "dependencies": {
-    "@fontsource/source-sans-pro": "^4.5.9",
+    "@fontsource/source-sans-pro": "^4.5.10",
     "@fortawesome/fontawesome-svg-core": "^6.1.1",
     "@fortawesome/free-solid-svg-icons": "^6.1.1",
     "@fortawesome/react-fontawesome": "^0.1.18",
     "@lsst-sqre/rubin-style-dictionary": "^0.3.0",
     "@reach/alert": "^0.17.0",
-    "@reach/menu-button": "^0.16.2",
+    "@reach/menu-button": "^0.17.0",
     "ajv": "^8.11.0",
     "formik": "^2.2.9",
     "js-yaml": "^4.1.0",
@@ -59,11 +59,11 @@
   },
   "devDependencies": {
     "babel-plugin-styled-components": "^2.0.7",
-    "eslint": "^8.15.0",
+    "eslint": "^8.18.0",
     "eslint-config-next": "^12.1.6",
     "eslint-config-prettier": "^8.5.0",
     "husky": "^8.0.1",
-    "lint-staged": "^12.4.1",
-    "prettier": "^2.6.2"
+    "lint-staged": "^13.0.2",
+    "prettier": "^2.7.1"
   }
 }

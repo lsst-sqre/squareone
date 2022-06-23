@@ -73,7 +73,7 @@ const StyledAspectIllustration = styled.img`
 export default function HomepageHero() {
   return (
     <FullBleedBackgroundImageSection
-      imagePath="/lsst-stills-0014.jpg"
+      imagePath="/Quint-DSC1187.jpg"
       fallbackColor="#333333"
       textColor="#ffffff"
     >
