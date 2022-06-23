@@ -34,7 +34,7 @@
     "*.{js,json,css,graphql,yaml}": "prettier --write"
   },
   "dependencies": {
-    "@fontsource/source-sans-pro": "^4.5.9",
+    "@fontsource/source-sans-pro": "^4.5.10",
     "@fortawesome/fontawesome-svg-core": "^6.1.1",
     "@fortawesome/free-solid-svg-icons": "^6.1.1",
     "@fortawesome/react-fontawesome": "^0.1.18",
