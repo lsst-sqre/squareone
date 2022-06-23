@@ -2,10 +2,12 @@
 Change log
 ##########
 
-0.7.0 (unreleased)
+0.7.0 (2022-06-23)
 ==================
 
-- Add support for `Times Square <https://github.com/lsst-sqre/times-square>`__.
+- Add initial support for `Times Square <https://github.com/lsst-sqre/times-square>`__.
+- Update background image for the homepage hero component to a new image by Bruno Quint, taken September 2021.
+- Refresh dependencies.
 
 0.6.0 (2022-04-14)
 ==================
