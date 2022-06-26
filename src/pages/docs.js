@@ -134,6 +134,15 @@ export default function DocsPage({ publicRuntimeConfig }) {
               </p>
             </Card>
           </a>
+          <a href="https://dm.lsst.org/sdm_schemas/browser/dp02.html">
+            <Card>
+              <h3>DP0.2 Catalog Schema</h3>
+              <p>
+                Schema reference for the DP0.2 catalog dataset available through
+                the Table Access Protocol (TAP) service.
+              </p>
+            </Card>
+          </a>
         </CardGroup>
       </Section>
 
