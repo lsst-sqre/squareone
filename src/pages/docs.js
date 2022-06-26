@@ -120,13 +120,26 @@ export default function DocsPage({ publicRuntimeConfig }) {
         <h2>Data documentation</h2>
 
         <CardGroup>
-          <a href="https://dp0-1.lsst.io/">
+          <a href="https://dp0-2.lsst.io/">
             <Card>
-              <h3>Data Preview 0.1 (DP0.1)</h3>
+              <h3>Data Preview 0.2 (DP0.2)</h3>
               <p>
-                DP0.1 is an early opportunity to explore the Rubin Science
-                Platform with simulated LSST data. Learn about the DESC DC2 data
-                and follow data analysis tutorials.
+                DP0.2 is the second phase of the Data Preview 0 program using
+                precursor data (simulated images from the DESC DC2 data
+                challenge). For the first time, all the derived data products
+                have been generated “in-house” on an early version of the Rubin
+                processing infrastructure using version 23.0 of the LSST Science
+                Pipelines. As a result, the data model is significantly
+                different from the DP0.1 dataset.
+              </p>
+            </Card>
+          </a>
+          <a href="https://dm.lsst.org/sdm_schemas/browser/dp02.html">
+            <Card>
+              <h3>DP0.2 Catalog Schema</h3>
+              <p>
+                Schema reference for the DP0.2 catalog dataset available through
+                the Table Access Protocol (TAP) service.
               </p>
             </Card>
           </a>
