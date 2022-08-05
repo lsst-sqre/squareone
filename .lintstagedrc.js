@@ -7,5 +7,6 @@ const buildEslintCommand = (filenames) =>
 
 module.exports = {
   // Run js files through next lint
-  '*.{js,jsx,ts,tsx}': [buildEslintCommand],
+  '*.{js,jsx,ts,tsx}': ['prettier --write', buildEslintCommand],
+  '*.{yaml,yml,json}': ['prettier --write'],
 };

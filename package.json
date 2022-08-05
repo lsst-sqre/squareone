@@ -30,9 +30,6 @@
       "prettier"
     ]
   },
-  "lint-staged": {
-    "*.{js,json,css,graphql,yaml}": "prettier --write"
-  },
   "dependencies": {
     "@fontsource/source-sans-pro": "^4.5.10",
     "@fortawesome/fontawesome-svg-core": "^6.1.2",
