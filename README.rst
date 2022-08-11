@@ -69,7 +69,7 @@ Manual linting and formatting
 
 You can also manually lint and format code.
 
-Lint and format JavaScript via `next lint <>`__::
+Lint and format JavaScript via `next lint <https://nextjs.org/docs/basic-features/eslint>`__::
 
    npm run lint
 
@@ -94,7 +94,7 @@ This site auto-updates when running with the development server.
 `API routes <https://nextjs.org/docs/api-routes/introduction>`_ are accessed on http://localhost:3000/api/*.
 The ``pages/api`` directory is mapped to ``/api/*``.
 Files in this directory are treated as `API routes`_ instead of React pages.
-The purpose of the ``pages/api/dev`` endpoints are to mock external services in the RSP; see the re-writes in `next.config.js`.
+The purpose of the ``pages/api/dev`` endpoints are to mock external services in the RSP; see the re-writes in ``next.config.js``.
 
 Create a production build
 -------------------------
