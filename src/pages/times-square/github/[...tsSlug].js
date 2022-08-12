@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 
 import TimesSquareApp from '../../../components/TimesSquareApp';
 import WideContentLayout from '../../../components/WideContentLayout';
-import TimesSquareGitHubNav from '../../../components/TimesSquareGitHubNav';
+import TimesSquareMainGitHubNav from '../../../components/TimesSquareMainGitHubNav';
 import TimesSquareNotebookViewer from '../../../components/TimesSquareNotebookViewer';
 import TimesSquareGitHubPagePanel from '../../../components/TimesSquareGitHubPagePanel/TimesSquareGitHubPagePanel';
 
@@ -24,7 +24,7 @@ export default function GitHubNotebookViewPage({}) {
   const { ts_hide_code = '1' } = userParameters;
   const displaySettings = { ts_hide_code };
 
-  const pageNav = <TimesSquareGitHubNav pagePath={githubSlug} />;
+  const pageNav = <TimesSquareMainGitHubNav pagePath={githubSlug} />;
 
   const pagePanel = (
     <TimesSquareGitHubPagePanel
