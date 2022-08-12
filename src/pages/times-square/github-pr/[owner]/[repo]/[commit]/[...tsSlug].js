@@ -16,7 +16,9 @@ export default function GitHubPrNotebookViewPage({}) {
   const { timesSquareUrl } = publicRuntimeConfig;
   const router = useRouter();
   const { owner, repo, commit, tsSlug } = router.query;
-  const tsPageUrl = `${timesSquareUrl}/v1/github-pr/${owner}/${repo}/${commit}/${tsSlug}`;
+  const tsPageUrl = `${timesSquareUrl}/v1/github-pr/${owner}/${repo}/${commit}/${tsSlug.join(
+    '/'
+  )}`;
 
   const userParameters = Object.fromEntries(
     Object.entries(router.query)

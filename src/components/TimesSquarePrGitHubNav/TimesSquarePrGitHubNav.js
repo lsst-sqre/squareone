@@ -15,8 +15,6 @@ function TimesSquarePrGitHubNav({ owner, repo, commitSha }) {
     commitSha
   );
 
-  console.log(githubContents);
-
   if (githubContents) {
     return (
       <>
@@ -26,7 +24,10 @@ function TimesSquarePrGitHubNav({ owner, repo, commitSha }) {
         </p>
         <p>{commitSha.slice(0, 7)}</p>
         <h3>Repository notebooks</h3>
-        <TimesSquareGitHubNav contentNodes={githubContents.contents} />
+        <TimesSquareGitHubNav
+          contentNodes={githubContents.contents}
+          pagePathRoot="/times-square/github-pr"
+        />
       </>
     );
   }

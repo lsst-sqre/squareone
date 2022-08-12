@@ -9,13 +9,12 @@ function TimesSquareMainGitHubNav({ pagePath }) {
   const { timesSquareUrl } = publicRuntimeConfig;
   const githubContents = useGitHubContentsListing(timesSquareUrl);
 
-  console.log(githubContents);
-
   if (githubContents) {
     return (
       <TimesSquareGitHubNav
         contentNodes={githubContents.contents}
         pagePath={pagePath}
+        pagePathRoot="/times-square/github"
       />
     );
   }

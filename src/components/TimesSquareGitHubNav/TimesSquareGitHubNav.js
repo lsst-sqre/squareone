@@ -10,7 +10,7 @@ import styled from 'styled-components';
 import Directory from './Directory';
 import Page from './Page';
 
-function generateChildren(contents, currentPath, props) {
+function generateChildren(contents, currentPath, pathRoot, { ...props }) {
   return contents.map((item) => {
     if (item.node_type != 'page') {
       return (
@@ -19,14 +19,14 @@ function generateChildren(contents, currentPath, props) {
           key={item.path}
           current={currentPath ? currentPath.startsWith(item.path) : false}
         >
-          {generateChildren(item.contents, currentPath, { ...props })}
+          {generateChildren(item.contents, currentPath, pathRoot, { ...props })}
         </Directory>
       );
     } else {
       return (
         <Page
           title={item.title}
-          path={item.path}
+          path={`${pathRoot}/${item.path}`}
           key={item.path}
           current={currentPath ? currentPath.startsWith(item.path) : false}
         />
@@ -35,8 +35,12 @@ function generateChildren(contents, currentPath, props) {
   });
 }
 
-export default function TimesSquareGitHubNav({ pagePath, contentNodes }) {
-  const children = generateChildren(contentNodes, pagePath, {});
+export default function TimesSquareGitHubNav({
+  pagePath,
+  contentNodes,
+  pagePathRoot,
+}) {
+  const children = generateChildren(contentNodes, pagePath, pagePathRoot, {});
 
   return (
     <NavWrapper>
