@@ -14,6 +14,9 @@ function useGitHubPrContentsListing(timesSquareUrl, owner, repo, commitSha) {
     error: error,
     loading: !error && !data,
     contents: data ? data.contents : [],
+    pullRequests: data ? data.pull_requests : [],
+    yamlCheck: data ? data.yaml_check : {},
+    nbCheck: data ? data.nbexec_check : {},
   };
 }
 
