@@ -2,12 +2,12 @@ import PropTypes from 'prop-types';
 import getConfig from 'next/config';
 import { ThemeProvider } from 'next-themes';
 
-// Source Sans Pro Font from Font Source
+// Global CSS
+// Keep these imports in sync with .storybook/preview.js (Next can't import
+// global CSS from a separate module.)
 import '@fontsource/source-sans-pro/400.css';
 import '@fontsource/source-sans-pro/400-italic.css';
 import '@fontsource/source-sans-pro/700.css';
-
-// Global CSS
 import 'normalize.css';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import '@lsst-sqre/rubin-style-dictionary/dist/tokens.css';
