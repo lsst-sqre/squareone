@@ -2,6 +2,12 @@
 Change log
 ##########
 
+0.8.0
+=====
+
+- New pages for Times Square to preview pages in GitHub pull requests at ``/times-square/github-pr/:owner/:repo:/:commit`` paths.
+- Initial integration with Storybook for designing and documenting components within Squareone.
+
 0.7.1 (2022-06-26)
 ==================
 
