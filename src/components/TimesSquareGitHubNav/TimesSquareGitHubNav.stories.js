@@ -5,6 +5,20 @@ import TimesSquareGitHubNav from './TimesSquareGitHubNav';
 export default {
   component: TimesSquareGitHubNav,
   title: 'Components/TimesSquare/GitHubNav',
+  parameters: {
+    viewport: {
+      viewports: {
+        sidebar: {
+          name: 'Sidebar',
+          styles: {
+            width: '280px',
+            height: '900px',
+          },
+        },
+      },
+    },
+    defaultViewport: 'sidebar',
+  },
 };
 
 const Template = (args) => <TimesSquareGitHubNav {...args} />;
@@ -24,6 +38,12 @@ const exampleGitHubContents = [
             node_type: 'page',
             path: 'lsst-sqre/times-square-demo/demo',
             title: 'Sine wave',
+            contents: [],
+          },
+          {
+            node_type: 'page',
+            path: 'lsst-sqre/times-square-demo/long',
+            title: 'A page with a very long title that wraps',
             contents: [],
           },
           {
