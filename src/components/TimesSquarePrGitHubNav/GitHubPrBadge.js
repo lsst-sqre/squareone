@@ -1,6 +1,7 @@
 import React from 'react';
 
 import styled from 'styled-components';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export default function GitHubPrBadge({
   state,
@@ -32,12 +33,26 @@ const HiddenLink = styled.a`
 `;
 
 function PrStatusIcon({ state, url }) {
+  let icon;
+  if (state === 'closed') {
+    icon = <StyledFontAwesomeIcon icon="circle-xmark" />;
+  } else if (state === 'merged') {
+    icon = <StyledFontAwesomeIcon icon="code-merge" />;
+  } else {
+    icon = <StyledFontAwesomeIcon icon="code-pull-request" />;
+  }
+
   return (
     <StatusIconLink href={url} state={state}>
-      {state}
+      {icon} {state}
     </StatusIconLink>
   );
 }
+
+const StyledFontAwesomeIcon = styled(FontAwesomeIcon)`
+  margin-right: 0.2em;
+  font-size: 0.9em;
+`;
 
 /**
  * Map pull request states to their GitHub colours.
