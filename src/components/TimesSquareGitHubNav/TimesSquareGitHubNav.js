@@ -6,13 +6,11 @@
  */
 
 import styled from 'styled-components';
-import getConfig from 'next/config';
 
 import Directory from './Directory';
 import Page from './Page';
-import useGitHubContentsListing from './useGitHubContentsListing';
 
-function generateChildren(contents, currentPath, props) {
+function generateChildren(contents, currentPath, pathRoot, { ...props }) {
   return contents.map((item) => {
     if (item.node_type != 'page') {
       return (
@@ -21,14 +19,14 @@ function generateChildren(contents, currentPath, props) {
           key={item.path}
           current={currentPath ? currentPath.startsWith(item.path) : false}
         >
-          {generateChildren(item.contents, currentPath, { ...props })}
+          {generateChildren(item.contents, currentPath, pathRoot, { ...props })}
         </Directory>
       );
     } else {
       return (
         <Page
           title={item.title}
-          path={item.path}
+          path={`${pathRoot}/${item.path}`}
           key={item.path}
           current={currentPath ? currentPath.startsWith(item.path) : false}
         />
@@ -37,28 +35,18 @@ function generateChildren(contents, currentPath, props) {
   });
 }
 
-export default function TimesSquareGitHubNav({ pagePath }) {
-  const { publicRuntimeConfig } = getConfig();
-  const { timesSquareUrl } = publicRuntimeConfig;
-  const githubContents = useGitHubContentsListing(timesSquareUrl);
+export default function TimesSquareGitHubNav({
+  pagePath,
+  contentNodes,
+  pagePathRoot,
+}) {
+  const children = generateChildren(contentNodes, pagePath, pagePathRoot, {});
 
-  const children = generateChildren(githubContents.contents, pagePath, {});
-
-  if (githubContents) {
-    return (
-      <NavWrapper>
-        <SectionTitle>Rubin’s boards</SectionTitle>
-        <ContentsWrapper>{children}</ContentsWrapper>
-      </NavWrapper>
-    );
-  } else {
-    return (
-      <NavWrapper>
-        <SectionTitle>Rubin’s boards</SectionTitle>
-        <p>Loading...</p>
-      </NavWrapper>
-    );
-  }
+  return (
+    <NavWrapper>
+      <ContentsWrapper>{children}</ContentsWrapper>
+    </NavWrapper>
+  );
 }
 
 // FIXME these mostly come from Comeau's example
@@ -72,11 +60,3 @@ const ContentsWrapper = styled.div`
 `;
 
 const NavWrapper = styled.nav``;
-
-const SectionTitle = styled.p`
-  font-size: 1rem;
-  margin-bottom: 1rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  color: var(--rsd-component-text-headline-color);
-`;
