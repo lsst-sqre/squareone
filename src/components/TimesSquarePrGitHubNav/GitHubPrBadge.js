@@ -17,7 +17,7 @@ export default function GitHubPrBadge({
       <PrStatusIcon state={state} url={url} />{' '}
       <HiddenLink href={url}>{`#${number} ${title}`}</HiddenLink> by{' '}
       <HiddenLink href={authorUrl}>
-        <AvatarImage src={authorAvatarUrl} /> {authorName}
+        <AvatarImage src={authorAvatarUrl} alt="" /> {authorName}
       </HiddenLink>
     </span>
   );
