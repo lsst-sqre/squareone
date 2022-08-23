@@ -12,6 +12,7 @@ import {
   faCircleXmark,
   faCircleCheck,
   faCircleMinus,
+  faCodeCommit,
 } from '@fortawesome/free-solid-svg-icons';
 
 // Add icons to the global Font Awesome library
@@ -22,3 +23,4 @@ library.add(faCodeMerge);
 library.add(faCircleXmark);
 library.add(faCircleCheck);
 library.add(faCircleMinus);
+library.add(faCodeCommit);
