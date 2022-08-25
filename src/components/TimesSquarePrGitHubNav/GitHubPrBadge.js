@@ -16,9 +16,11 @@ export default function GitHubPrBadge({
     <span>
       <PrStatusIcon state={state} url={url} />{' '}
       <HiddenLink href={url}>{`#${number} ${title}`}</HiddenLink> by{' '}
-      <HiddenLink href={authorUrl}>
-        <AvatarImage src={authorAvatarUrl} alt="" /> {authorName}
-      </HiddenLink>
+      <AuthorSpan>
+        <HiddenLink href={authorUrl}>
+          <AvatarImage src={authorAvatarUrl} alt="" /> {authorName}
+        </HiddenLink>
+      </AuthorSpan>
     </span>
   );
 }
@@ -92,4 +94,8 @@ const AvatarImage = styled.img`
   display: inline-block;
   vertical-align: middle;
   overflow: hidden;
+`;
+
+const AuthorSpan = styled.span`
+  display: inline-block;
 `;
