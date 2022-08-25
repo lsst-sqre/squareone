@@ -12,23 +12,24 @@ const StyledSidebar = styled.div`
 `;
 
 const AppTitle = styled.p`
-  font-size: 2rem;
-  margin-bottom: 2rem;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
   margin-top: 0.67em;
   font-weight: bold;
   color: var(--rsd-component-text-headline-color);
+  text-transform: uppercase;
 `;
 
 export default function Sidebar({ pageNav, pagePanel }) {
   return (
     <StyledSidebar>
-      {pagePanel && pagePanel}
-
       <Link href="/times-square">
         <a>
           <AppTitle>Times Square</AppTitle>
         </a>
       </Link>
+
+      {pagePanel && pagePanel}
 
       {pageNav && pageNav}
     </StyledSidebar>
