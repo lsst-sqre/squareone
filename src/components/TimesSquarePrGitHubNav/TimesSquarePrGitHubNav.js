@@ -32,20 +32,23 @@ function TimesSquarePrGitHubNav({
           <>
             <GitHubPrTitle owner={owner} repo={repo} commit={commitSha} />
 
-            {githubContents.pullRequests.map((pr) => (
-              <GitHubPrBadge
-                key={`pr-${pr.number}`}
-                state={pr.state}
-                number={pr.number}
-                url={pr.conversation_url}
-                title={pr.title}
-                authorName={pr.contributor.username}
-                authorAvatarUrl={pr.contributor.avatar_url}
-                authorUrl={pr.contributor.html_url}
-              />
-            ))}
+            <ItemList>
+              {githubContents.pullRequests.map((pr) => (
+                <li key={`pr-${pr.number}`}>
+                  <GitHubPrBadge
+                    state={pr.state}
+                    number={pr.number}
+                    url={pr.conversation_url}
+                    title={pr.title}
+                    authorName={pr.contributor.username}
+                    authorAvatarUrl={pr.contributor.avatar_url}
+                    authorUrl={pr.contributor.html_url}
+                  />
+                </li>
+              ))}
+            </ItemList>
 
-            <CheckList>
+            <ItemList>
               {nbCheck && (
                 <li>
                   <GitHubCheckBadge
@@ -66,7 +69,7 @@ function TimesSquarePrGitHubNav({
                   />
                 </li>
               )}
-            </CheckList>
+            </ItemList>
           </>
         )}
 
@@ -84,7 +87,8 @@ function TimesSquarePrGitHubNav({
 
 export default TimesSquarePrGitHubNav;
 
-const CheckList = styled.ul`
+const ItemList = styled.ul`
   list-style: none;
-  margin-left: 0;
+  margin: 1rem 0 1rem;
+  padding-left: 0;
 `;
