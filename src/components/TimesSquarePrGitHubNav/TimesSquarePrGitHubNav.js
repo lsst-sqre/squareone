@@ -27,7 +27,7 @@ function TimesSquarePrGitHubNav({
     const { nbCheck, yamlCheck } = githubContents;
 
     return (
-      <section>
+      <StyledSection>
         {showPrDetails && (
           <>
             <GitHubPrTitle owner={owner} repo={repo} commit={commitSha} />
@@ -78,7 +78,7 @@ function TimesSquarePrGitHubNav({
           contentNodes={githubContents.contents}
           pagePathRoot="/times-square/github-pr"
         />
-      </section>
+      </StyledSection>
     );
   }
 
@@ -91,4 +91,8 @@ const ItemList = styled.ul`
   list-style: none;
   margin: 1rem 0 1rem;
   padding-left: 0;
+`;
+
+const StyledSection = styled.section`
+  margin-top: 2rem;
 `;
