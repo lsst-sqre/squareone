@@ -50,11 +50,13 @@ const StyledHeader = styled.header`
 
   h2 {
     line-height: 1.2;
+    font-size: 1.1rem;
   }
 
   .subtitle {
-    font-size: 1.1rem;
+    font-size: 0.8rem;
     font-weight: bold;
+    text-transform: uppercase;
   }
 `;
 
