@@ -6,10 +6,8 @@ import Link from 'next/link';
 import styled from 'styled-components';
 
 const StyledSidebar = styled.div`
-  padding: 0 var(--size-screen-padding-min);
   border-right: 1px solid var(--rsd-color-primary-600);
-  padding-left: 0.5rem;
-  padding-top: 0;
+  padding: 0 var(--size-screen-padding-min) 2rem 0.5rem;
   width: 18rem;
 `;
 
