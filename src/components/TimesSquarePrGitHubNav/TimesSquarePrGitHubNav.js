@@ -1,9 +1,12 @@
 import React from 'react';
-
+import styled from 'styled-components';
 import getConfig from 'next/config';
 
 import TimesSquareGitHubNav from '../TimesSquareGitHubNav';
 import useGitHubPrContentsListing from './useGitHubPrContentsListing';
+import GitHubPrTitle from './GitHubPrTitle';
+import GitHubPrBadge from './GitHubPrBadge';
+import GitHubCheckBadge from './GitHubCheckBadge';
 
 function TimesSquarePrGitHubNav({
   owner,
@@ -24,29 +27,49 @@ function TimesSquarePrGitHubNav({
     const { nbCheck, yamlCheck } = githubContents;
 
     return (
-      <>
+      <StyledSection>
         {showPrDetails && (
           <>
-            <h2>PR preview</h2>
-            <p>
-              <a
-                href={`https://github.com/${owner}/${repo}/`}
-              >{`${owner}/${repo}`}</a>
-            </p>
-            <p>{commitSha.slice(0, 7)}</p>
-            {githubContents.pullRequests.map((pr) => (
-              <p key={`pr-${pr.number}`}>
-                <a
-                  href={pr.conversation_url}
-                >{`PR#${pr.number} (${pr.state}) ${pr.title}`}</a>{' '}
-                by{' '}
-                <a href={pr.contributor.html_url}>{pr.contributor.username}</a>
-              </p>
-            ))}
-            <p>{`${nbCheck.name}: ${nbCheck.conclusion || nbCheck.status}`}</p>
-            <p>{`${yamlCheck.name}: ${
-              yamlCheck.conclusion || yamlCheck.status
-            }`}</p>
+            <GitHubPrTitle owner={owner} repo={repo} commit={commitSha} />
+
+            <ItemList>
+              {githubContents.pullRequests.map((pr) => (
+                <li key={`pr-${pr.number}`}>
+                  <GitHubPrBadge
+                    state={pr.state}
+                    number={pr.number}
+                    url={pr.conversation_url}
+                    title={pr.title}
+                    authorName={pr.contributor.username}
+                    authorAvatarUrl={pr.contributor.avatar_url}
+                    authorUrl={pr.contributor.html_url}
+                  />
+                </li>
+              ))}
+            </ItemList>
+
+            <ItemList>
+              {nbCheck && (
+                <li>
+                  <GitHubCheckBadge
+                    status={nbCheck.status}
+                    title={nbCheck.report_title}
+                    conclusion={nbCheck.conclusion}
+                    url={nbCheck.html_url}
+                  />
+                </li>
+              )}
+              {yamlCheck && (
+                <li>
+                  <GitHubCheckBadge
+                    status={yamlCheck.status}
+                    title={yamlCheck.report_title}
+                    conclusion={yamlCheck.conclusion}
+                    url={yamlCheck.html_url}
+                  />
+                </li>
+              )}
+            </ItemList>
           </>
         )}
 
@@ -55,7 +78,7 @@ function TimesSquarePrGitHubNav({
           contentNodes={githubContents.contents}
           pagePathRoot="/times-square/github-pr"
         />
-      </>
+      </StyledSection>
     );
   }
 
@@ -63,3 +86,13 @@ function TimesSquarePrGitHubNav({
 }
 
 export default TimesSquarePrGitHubNav;
+
+const ItemList = styled.ul`
+  list-style: none;
+  margin: 1rem 0 1rem;
+  padding-left: 0;
+`;
+
+const StyledSection = styled.section`
+  margin-top: 2rem;
+`;

@@ -28,7 +28,7 @@ const Header = styled.div`
   display: flex;
   align-items: center;
   gap: 4px;
-  height: var(--row-height);
+  min-height: var(--row-height);
   color: inherit;
   font-weight: ${(props) => (props.current ? 'bold' : 'normal')};
 `;

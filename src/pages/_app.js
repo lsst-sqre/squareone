@@ -2,27 +2,21 @@ import PropTypes from 'prop-types';
 import getConfig from 'next/config';
 import { ThemeProvider } from 'next-themes';
 
-// Icons from Font Awesome
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faAngleDown, faFile } from '@fortawesome/free-solid-svg-icons';
-import '@fortawesome/fontawesome-svg-core/styles.css';
-
-// Source Sans Pro Font from Font Source
+// Global CSS
+// Keep these imports in sync with .storybook/preview.js (Next can't import
+// global CSS from a separate module.)
 import '@fontsource/source-sans-pro/400.css';
 import '@fontsource/source-sans-pro/400-italic.css';
 import '@fontsource/source-sans-pro/700.css';
-
-// Global CSS
 import 'normalize.css';
+import '@fortawesome/fontawesome-svg-core/styles.css';
 import '@lsst-sqre/rubin-style-dictionary/dist/tokens.css';
 import '@lsst-sqre/rubin-style-dictionary/dist/tokens.dark.css';
 import '../styles/globals.css';
 
-import Page from '../components/Page';
+import '../styles/icons';
 
-// Add icons to the global Font Awesome library
-library.add(faAngleDown);
-library.add(faFile);
+import Page from '../components/Page';
 
 function MyApp({ Component, pageProps, baseUrl, semaphoreUrl }) {
   // Use the content layout defined by the page component, if avaialble.

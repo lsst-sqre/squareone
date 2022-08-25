@@ -51,12 +51,13 @@ export default function TimesSquareGitHubNav({
 
 // FIXME these mostly come from Comeau's example
 const ContentsWrapper = styled.div`
-  --row-height: 1.75rem;
+  --row-height: 1.6rem;
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: 0 16px 0 12px;
+  padding: 0;
   margin-top: -0.25rem;
+  line-height: 1.3;
 `;
 
 const NavWrapper = styled.nav``;
