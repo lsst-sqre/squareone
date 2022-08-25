@@ -2,8 +2,14 @@
 Change log
 ##########
 
-0.8.0
-=====
+0.8.1 (2022-08-25)
+==================
+
+- Improved UI for Times pull request preview pages.
+- Added additional stories and integration with Chromatic, the hosted Storybook service.
+
+0.8.0 (2022-08-18)
+==================
 
 - New pages for Times Square to preview pages in GitHub pull requests at ``/times-square/github-pr/:owner/:repo:/:commit`` paths.
 - Initial integration with Storybook for designing and documenting components within Squareone.
