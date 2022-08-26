@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -24,6 +25,37 @@ export default function GitHubPrBadge({
     </span>
   );
 }
+
+GitHubPrBadge.propTypes = {
+  /**
+   * Pull request state.
+   */
+  state: PropTypes.oneOf(['open', 'draft', 'merged', 'closed']),
+  /**
+   * GitHub repository issue/PR number.
+   */
+  number: PropTypes.number,
+  /**
+   * URL for the PR's homepage on GitHub.
+   */
+  url: PropTypes.string,
+  /**
+   * Title of the PR
+   */
+  title: PropTypes.string,
+  /**
+   * GitHub username of the PR creator.
+   */
+  authorName: PropTypes.string,
+  /**
+   * URL for the PR creator's avatar (icon).
+   */
+  authorAvatarUrl: PropTypes.string,
+  /**
+   * Profile URL for the PR creator.
+   */
+  authorUrl: PropTypes.string,
+};
 
 const HiddenLink = styled.a`
   color: inherit;
