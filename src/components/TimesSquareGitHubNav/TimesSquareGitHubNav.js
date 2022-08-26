@@ -5,6 +5,7 @@
  * https://www.joshwcomeau.com/react/file-structure/
  */
 
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import Directory from './Directory';
@@ -48,6 +49,29 @@ export default function TimesSquareGitHubNav({
     </NavWrapper>
   );
 }
+
+TimesSquareGitHubNav.propTypes = {
+  /**
+   * GitHub contents tree.
+   */
+  contentNodes: PropTypes.shape({
+    node_type: PropTypes.oneOf(['owner', 'repo', 'dir', 'page']),
+    title: PropTypes.string,
+    path: PropTypes.string,
+    contents: PropTypes.arrayOf(PropTypes.object),
+  }),
+  /**
+   * Root URL path for pages
+   */
+  pagePathRoot: PropTypes.oneOf([
+    '/times-square/github',
+    '/times-square/github-pr',
+  ]),
+  /**
+   * Path of the current page (or null if not on a page)
+   */
+  pagePath: PropTypes.string,
+};
 
 // FIXME these mostly come from Comeau's example
 const ContentsWrapper = styled.div`
