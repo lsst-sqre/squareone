@@ -2,6 +2,7 @@
 
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import getConfig from 'next/config';
 import { Menu, MenuList, MenuButton, MenuLink } from '@reach/menu-button';
 import '@reach/menu-button/styles.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -60,6 +61,8 @@ const StyledMenuList = styled(MenuList)`
 export default function UserMenu({ pageUrl }) {
   const { userInfo } = useUserInfo();
   const logoutUrl = getLogoutUrl(pageUrl);
+  const { publicRuntimeConfig } = getConfig();
+  const { coManageRegistryUrl } = publicRuntimeConfig;
 
   return (
     <Menu>
@@ -67,6 +70,9 @@ export default function UserMenu({ pageUrl }) {
         {userInfo.username} <StyledFontAwesomeIcon icon="angle-down" />
       </StyledMenuButton>
       <StyledMenuList>
+        {coManageRegistryUrl && (
+          <MenuLink href={coManageRegistryUrl}>Account settings</MenuLink>
+        )}
         <MenuLink href="/auth/tokens">Security tokens</MenuLink>
         <MenuLink href={logoutUrl}>Log out</MenuLink>
       </StyledMenuList>

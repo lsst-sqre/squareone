@@ -4,3 +4,4 @@ siteDescription: |
   The site description.
 semaphoreUrl: 'https://data-dev.lsst.cloud/semaphore'
 timesSquareUrl: 'http://localhost:3000/times-square/api'
+coManageRegistryUrl: 'https://id.lsst.cloud'
