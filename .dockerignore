@@ -4,3 +4,4 @@ Dockerfile
 .pre-commit-config.yaml
 .prettierrc
 docs/
+.venv/

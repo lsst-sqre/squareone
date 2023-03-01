@@ -35,6 +35,7 @@ yarn-error.log*
 
 # Sphinx
 docs/_build
+.venv
 
 # Yarn (not using Zero-installs)
 # https://yarnpkg.com/features/zero-installs

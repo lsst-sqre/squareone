@@ -1,3 +1,2 @@
-documenteer
-lsst_sphinx_bootstrap_theme
+documenteer[guide]
 sphinx-jsonschema
