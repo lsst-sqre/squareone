@@ -4,3 +4,4 @@ package-lock.json
 .next
 docs/_build
 .nova
+.venv
