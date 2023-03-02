@@ -2,6 +2,12 @@
 Change log
 ##########
 
+0.9.0 (2023-03-01)
+==================
+
+- Display an "Account settings" link in the user menu that goes to the COmanage Registry.
+  This registry URL, which is optional, can be configured in ``squareone.config.yaml`` with the ``coManageRegistryUrl`` field.
+
 0.8.1 (2022-08-25)
 ==================
 

@@ -33,6 +33,10 @@
       "type": "string",
       "title": "Times Square API URL",
       "description": "URL prefix of the Times Square API service. Does not end in /. Omit or set as null to disable the /times-square/ pages."
+    },
+    "coManageRegistryUrl": {
+      "type": "string",
+      "title": "COmanage registry URL (e.g. https://id.lsst.cloud). Omit or set as null for non-COmanage deployments."
     }
   }
 }
