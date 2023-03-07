@@ -53,9 +53,10 @@ const StyledMenuList = styled(MenuList)`
   }
 
   [data-reach-menu-item][data-selected] {
-    background: var(--rsd-component-header-nav-menulist-selected-background-color);
+    background: var(
+      --rsd-component-header-nav-menulist-selected-background-color
+    );
   }
-}
 `;
 
 export default function UserMenu({ pageUrl }) {
