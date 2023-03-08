@@ -47,7 +47,7 @@ SupportPage.getLayout = function getLayout(page) {
 export async function getServerSideProps() {
   const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
 
-  const mdxSource = await serialize(publicRuntimeConfig.supportMdx);
+  const mdxSource = await serialize(publicRuntimeConfig.supportPageMdx);
 
   return {
     props: {
