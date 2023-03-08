@@ -37,6 +37,10 @@
     "coManageRegistryUrl": {
       "type": "string",
       "title": "COmanage registry URL (e.g. https://id.lsst.cloud). Omit or set as null for non-COmanage deployments."
+    },
+    "supportMdx": {
+      "type": "string",
+      "title": "Support Page MDX content"
     }
   }
 }
