@@ -2,16 +2,21 @@ import Head from 'next/head';
 import getConfig from 'next/config';
 import Link from 'next/link';
 import PropTypes from 'prop-types';
+import { serialize } from 'next-mdx-remote/serialize';
+import { MDXRemote } from 'next-mdx-remote';
 
 import MainContent from '../../components/MainContent';
-import { Lede } from '../../components/Typography';
+import { commonMdxComponents } from '../../lib/utils/mdxComponents';
 
-export default function PendingApprovalPage({ publicRuntimeConfig }) {
+export default function PendingApprovalPage({
+  publicRuntimeConfig,
+  mdxSource,
+}) {
   return (
     <>
       <Head>
         <title key="title">
-          Documentation | {publicRuntimeConfig.siteName}
+          Account pending approval | {publicRuntimeConfig.siteName}
         </title>
         <meta
           name="description"
@@ -26,21 +31,7 @@ export default function PendingApprovalPage({ publicRuntimeConfig }) {
         />
       </Head>
 
-      <h1>Your account is pending approval</h1>
-
-      <Lede>Requests are typically processed within five business days.</Lede>
-
-      <p>
-        Once your account is approved, you’ll receive an email at the address
-        you registered with.
-      </p>
-
-      <p>
-        <Link href="../support">
-          <a>Contact us</a>
-        </Link>{' '}
-        if you have further questions.
-      </p>
+      <MDXRemote {...mdxSource} components={commonMdxComponents} />
     </>
   );
 }
@@ -55,9 +46,11 @@ PendingApprovalPage.getLayout = function getLayout(page) {
 
 export async function getServerSideProps() {
   const { publicRuntimeConfig } = getConfig();
+  const mdxSource = await serialize(publicRuntimeConfig.pendingApprovalPageMdx);
   return {
     props: {
       publicRuntimeConfig,
+      mdxSource,
     },
   };
 }

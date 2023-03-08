@@ -1,16 +1,18 @@
 import Head from 'next/head';
 import getConfig from 'next/config';
 import PropTypes from 'prop-types';
+import { serialize } from 'next-mdx-remote/serialize';
+import { MDXRemote } from 'next-mdx-remote';
 
 import MainContent from '../../components/MainContent';
-import { Lede } from '../../components/Typography';
+import { commonMdxComponents } from '../../lib/utils/mdxComponents';
 
-export default function VerifyEmailPage({ publicRuntimeConfig }) {
+export default function VerifyEmailPage({ publicRuntimeConfig, mdxSource }) {
   return (
     <>
       <Head>
         <title key="title">
-          Documentation | {publicRuntimeConfig.siteName}
+          Thanks for registering | {publicRuntimeConfig.siteName}
         </title>
         <meta
           name="description"
@@ -29,12 +31,7 @@ export default function VerifyEmailPage({ publicRuntimeConfig }) {
         />
       </Head>
 
-      <h1>Thanks for registering</h1>
-
-      <Lede>
-        You'll receive an email from us shortly. Click on the link in the
-        message to verify your address and continue your account set up.
-      </Lede>
+      <MDXRemote {...mdxSource} components={commonMdxComponents} />
     </>
   );
 }
@@ -49,9 +46,11 @@ VerifyEmailPage.getLayout = function getLayout(page) {
 
 export async function getServerSideProps() {
   const { publicRuntimeConfig } = getConfig();
+  const mdxSource = await serialize(publicRuntimeConfig.emailVerifiedPageMdx);
   return {
     props: {
       publicRuntimeConfig,
+      mdxSource,
     },
   };
 }

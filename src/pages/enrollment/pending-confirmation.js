@@ -1,17 +1,21 @@
 import Head from 'next/head';
 import getConfig from 'next/config';
-import Link from 'next/link';
 import PropTypes from 'prop-types';
+import { serialize } from 'next-mdx-remote/serialize';
+import { MDXRemote } from 'next-mdx-remote';
 
 import MainContent from '../../components/MainContent';
-import { Lede } from '../../components/Typography';
+import { commonMdxComponents } from '../../lib/utils/mdxComponents';
 
-export default function PendingVerificationPage({ publicRuntimeConfig }) {
+export default function PendingVerificationPage({
+  publicRuntimeConfig,
+  mdxSource,
+}) {
   return (
     <>
       <Head>
         <title key="title">
-          Documentation | {publicRuntimeConfig.siteName}
+          Please confirm your email | {publicRuntimeConfig.siteName}
         </title>
         <meta
           name="description"
@@ -30,28 +34,7 @@ export default function PendingVerificationPage({ publicRuntimeConfig }) {
         />
       </Head>
 
-      <h1>Please confirm your email</h1>
-
-      <Lede>Your email is still pending verification.</Lede>
-
-      <p>
-        To complete your enrollment please check the email you registered with
-        for a link to verify your email address. Please click on the link to
-        verify your email address.
-      </p>
-
-      <p>
-        If you have not received the confirmation email please check your SPAM
-        folder.
-      </p>
-
-      <p>
-        If you still cannot find the confirmation email please{' '}
-        <Link href="../support">
-          <a>contact us</a>
-        </Link>{' '}
-        to have the confirmation email resent.
-      </p>
+      <MDXRemote {...mdxSource} components={commonMdxComponents} />
     </>
   );
 }
@@ -66,9 +49,13 @@ PendingVerificationPage.getLayout = function getLayout(page) {
 
 export async function getServerSideProps() {
   const { publicRuntimeConfig } = getConfig();
+  const mdxSource = await serialize(
+    publicRuntimeConfig.pendingVerificationPageMdx
+  );
   return {
     props: {
       publicRuntimeConfig,
+      mdxSource,
     },
   };
 }

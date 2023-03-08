@@ -41,6 +41,22 @@
     "supportMdx": {
       "type": "string",
       "title": "Support Page MDX content"
+    },
+    "verifyEmailPageMdx": {
+      "type": "string",
+      "title": "/enrollment/thanks-for-signing-up content (MDX)."
+    },
+    "emailVerifiedPageMdx": {
+      "type": "string",
+      "title": "/enrollment/thanks-for-verifying content (MDX)."
+    },
+    "pendingApprovalPageMdx": {
+      "type": "string",
+      "title": "/enrollment/pending-approval content (MDX)."
+    },
+    "pendingVerificationPageMdx": {
+      "type": "string",
+      "title": "/enrollment/pending-confirmation content (MDX)."
     }
   }
 }
