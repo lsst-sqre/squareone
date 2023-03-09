@@ -2,12 +2,15 @@
 Squareone
 #########
 
-Squareone is the next-generation landing page for the `Rubin Observatory`_ Science Platform.
+Squareone is the homepage for the `Rubin Observatory`_ Science Platform.
 It's where you start on your journey to use the RSP's portal, notebooks, and APIs to do science with Rubin/LSST data.
 
-.. toctree::
-   :maxdepth: 1
+You can see Squareone in action at `data.lsst.cloud <https://data.lsst.cloud>`__.
 
-   config-ref
+.. toctree::
+   :hidden:
+
+   deployment/index
+   dev/index
 
 .. _Rubin Observatory: https://www.lsst.org
