@@ -12,5 +12,6 @@ You can see Squareone in action at `data.lsst.cloud <https://data.lsst.cloud>`__
 
    deployment/index
    dev/index
+   changelog
 
 .. _Rubin Observatory: https://www.lsst.org
