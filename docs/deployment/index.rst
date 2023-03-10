@@ -9,4 +9,5 @@ If you want to learn how to contribute to the Squareone codebase itself, see the
    :maxdepth: 1
    :caption: Configuration
 
+   writing-mdx
    config-ref
