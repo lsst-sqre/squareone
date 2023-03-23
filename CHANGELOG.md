@@ -1,5 +1,22 @@
 # Change log
 
+## Unreleased
+
+### New features
+
+- Add new pages for the COmanage sign-up flow. The content for these pages is configurable via [MDX](https://mdxjs.com) fields in `squareone.config.yaml`:
+
+  - `verifyEmailPageMdx` for `/enrollment/thanks-for-signing-up`
+  - `emailVerifiedPageMdx` for `/enrollment/thanks-for-verifying`
+  - `pendingApprovalPageMdx` for `/enrollment/pending-approval`
+  - `pendingVerificationPageMdx` for `/enrollment/pending-confirmation`
+
+- Other pages' content are now configurable with MDX:
+
+  - `apiAspectPageMdx` for `/api-aspect`
+  - `docsPageMdx` for `/docs`
+  - `supportPageMdx` for `/support`
+
 ## 0.9.0 (2023-03-01)
 
 ### New features
