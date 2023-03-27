@@ -10,4 +10,5 @@ If you want to learn how to contribute to the Squareone codebase itself, see the
    :caption: Configuration
 
    writing-mdx
+   comanage-landing-pages
    config-ref
