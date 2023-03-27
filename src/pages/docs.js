@@ -2,10 +2,11 @@ import Head from 'next/head';
 import getConfig from 'next/config';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import Link from 'next/link';
+import { serialize } from 'next-mdx-remote/serialize';
+import { MDXRemote } from 'next-mdx-remote';
 
 import MainContent from '../components/MainContent';
-import { Lede } from '../components/Typography';
+import { commonMdxComponents } from '../lib/utils/mdxComponents';
 
 const Section = styled.section`
   margin-top: 2rem;
@@ -93,10 +94,18 @@ Note.propTypes = {
   children: PropTypes.node,
 };
 
+const mdxComponents = {
+  ...commonMdxComponents,
+  Section,
+  Card,
+  CardGroup,
+  Note,
+};
+
 const pageDescription =
   'Find documentation for Rubin Observatory data, science platform services, and software.';
 
-export default function DocsPage({ publicRuntimeConfig }) {
+export default function DocsPage({ publicRuntimeConfig, mdxSource }) {
   return (
     <>
       <Head>
@@ -112,99 +121,7 @@ export default function DocsPage({ publicRuntimeConfig }) {
         />
       </Head>
 
-      <h1>Rubin Science Platform documentation</h1>
-
-      <Lede>{pageDescription}</Lede>
-
-      <Section>
-        <h2>Data documentation</h2>
-
-        <CardGroup>
-          <a href="https://dp0-2.lsst.io/">
-            <Card>
-              <h3>Data Preview 0.2 (DP0.2)</h3>
-              <p>
-                DP0.2 is the second phase of the Data Preview 0 program using
-                precursor data (simulated images from the DESC DC2 data
-                challenge). For the first time, all the derived data products
-                have been generated “in-house” on an early version of the Rubin
-                processing infrastructure using version 23.0 of the LSST Science
-                Pipelines. As a result, the data model is significantly
-                different from the DP0.1 dataset.
-              </p>
-            </Card>
-          </a>
-          <a href="https://dm.lsst.org/sdm_schemas/browser/dp02.html">
-            <Card>
-              <h3>DP0.2 Catalog Schema</h3>
-              <p>
-                Schema reference for the DP0.2 catalog dataset available through
-                the Table Access Protocol (TAP) service.
-              </p>
-            </Card>
-          </a>
-        </CardGroup>
-      </Section>
-
-      <Section>
-        <h2>Science platform documentation</h2>
-
-        <CardGroup>
-          <a href="/portal/app/onlinehelp/">
-            <Card>
-              <h3>Portal</h3>
-              <p>
-                The Portal enables you to explore LSST image and table data in
-                your browser.
-              </p>
-            </Card>
-          </a>
-
-          <a href="https://nb.lsst.io">
-            <Card>
-              <h3>Notebooks</h3>
-              <p>
-                The Notebook aspect is a powerful data analysis environment with
-                Jupyter Notebooks and terminals in the browser.
-              </p>
-            </Card>
-          </a>
-        </CardGroup>
-      </Section>
-
-      <Section>
-        <h2>Software documentation</h2>
-
-        <CardGroup>
-          <a href="https://pipelines.lsst.io">
-            <Card>
-              <h3>LSST Science Pipelines</h3>
-              <p>
-                The Science Pipelines include the Butler for accessing LSST data
-                and a pipeline framework for processing data. The LSST Science
-                Pipelines Python package is preinstalled in the Notebook aspect.
-              </p>
-            </Card>
-          </a>
-        </CardGroup>
-      </Section>
-
-      <Section>
-        <h2>Have more questions?</h2>
-        <p>
-          <Link href="/support">
-            Learn how to get support or report issues.
-          </Link>
-        </p>
-
-        <p>
-          Want to dive deeper into the Rubin Observatory and Legacy Survey of
-          Space and Time?{' '}
-          <a href="https://www.lsst.io">
-            Search in our technical documentation portal.
-          </a>
-        </p>
-      </Section>
+      <MDXRemote {...mdxSource} components={mdxComponents} />
     </>
   );
 }
@@ -219,10 +136,14 @@ DocsPage.getLayout = function getLayout(page) {
 
 export async function getServerSideProps() {
   const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
+
+  const mdxSource = await serialize(publicRuntimeConfig.docsPageMdx);
+
   return {
     props: {
       serverRuntimeConfig,
       publicRuntimeConfig,
+      mdxSource,
     },
   };
 }

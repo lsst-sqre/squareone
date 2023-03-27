@@ -1,0 +1,10 @@
+flowchart TD
+  thanksSigningUp(/enrollment/thanks-for-signing-up)
+  thanksVerifying(/enrollment/thanks-for-verifying)
+  pendingApproval(/enrollment/pending-approval)
+  pendingConfirmation(/enrollment/pending-confirmation)
+
+  thanksSigningUp --> thanksVerifying
+  thanksSigningUp --> pendingConfirmation
+  thanksVerifying --> pendingApproval
+  pendingConfirmation --> thanksVerifying

@@ -37,6 +37,34 @@
     "coManageRegistryUrl": {
       "type": "string",
       "title": "COmanage registry URL (e.g. https://id.lsst.cloud). Omit or set as null for non-COmanage deployments."
+    },
+    "apiAspectPageMdx": {
+      "type": "string",
+      "title": "/api-aspect Page MDX content"
+    },
+    "docsPageMdx": {
+      "type": "string",
+      "title": "/docs Page MDX content"
+    },
+    "supportPageMdx": {
+      "type": "string",
+      "title": "/support Page MDX content"
+    },
+    "verifyEmailPageMdx": {
+      "type": "string",
+      "title": "/enrollment/thanks-for-signing-up content (MDX)."
+    },
+    "emailVerifiedPageMdx": {
+      "type": "string",
+      "title": "/enrollment/thanks-for-verifying content (MDX)."
+    },
+    "pendingApprovalPageMdx": {
+      "type": "string",
+      "title": "/enrollment/pending-approval content (MDX)."
+    },
+    "pendingVerificationPageMdx": {
+      "type": "string",
+      "title": "/enrollment/pending-confirmation content (MDX)."
     }
   }
 }
