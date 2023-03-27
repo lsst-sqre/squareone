@@ -46,7 +46,7 @@ VerifyEmailPage.getLayout = function getLayout(page) {
 
 export async function getServerSideProps() {
   const { publicRuntimeConfig } = getConfig();
-  const mdxSource = await serialize(publicRuntimeConfig.emailVerifiedPageMdx);
+  const mdxSource = await serialize(publicRuntimeConfig.verifyEmailPageMdx);
   return {
     props: {
       publicRuntimeConfig,
