@@ -41,6 +41,10 @@ jobs:
         id: node_version
         run: echo ::set-output name=NODE_VERSION::$(cat .nvmrc)
 
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
       - name: Authenticate GitHub Packages
         run: |
           echo "//npm.pkg.github.com/:_authToken=${NPM_PKG_TOKEN}" > ~/.npmrc
@@ -51,18 +55,18 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ steps.node_version.outputs.NODE_VERSION }}
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install npm packages
-        run: npm ci
+        run: pnpm install
 
       - name: Lint
         run: |
-          npm run lint
-          npm run format:check
+          pnpm run lint
+          pnpm run format:check
 
       - name: Build site
-        run: npm run build
+        run: pnpm run build
 
   docker:
     needs:
@@ -109,7 +113,6 @@ jobs:
           # Only push tags or ticket branches
           push: true
           tags: |
-            lsstsqre/squareone:${{ steps.vars.outputs.tag }}
             ghcr.io/lsst-sqre/squareone:${{ steps.vars.outputs.tag }}
           target: production
           cache-from: type=gha
