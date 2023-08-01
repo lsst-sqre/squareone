@@ -1,54 +1,76 @@
-# Stage 1: Build install dependencies =========================================
-FROM node:16-alpine AS deps
+FROM node:16-alpine as base
 
-# If necessary, add libc6-compat (e.g. for process.dlopen)
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+# Stage 1. Prune dependencies
+FROM base AS builder
+
 RUN apk add --no-cache libc6-compat
+RUN apk update
+WORKDIR /app
+RUN pnpm install turbo --global
+COPY . .
+RUN turbo prune --scope=squareone --docker
+
+# Stage 2. Install and build the app
+FROM base AS installer
 
 # GitHub Personal Access token to install from GitHub Packages
 # Needs: read:packages at the least
 ARG GH_PKG_TOKEN
 
+RUN apk add --no-cache libc6-compat
+RUN apk update
+
+RUN pnpm install turbo --global
+
 WORKDIR /app
 
 RUN echo "//npm.pkg.github.com/:_authToken=${GH_PKG_TOKEN}" > ~/.npmrc
 
-COPY package.json pnpm-lock.yaml .npmrc ./
-RUN npm install -g pnpm
-RUN pnpm install
+# First install the dependencies (as they change less often)
+COPY .gitignore .gitignore
+COPY --from=builder /app/out/json/ .
 
-# Stage 2: Build application ==================================================
-FROM node:16-alpine as builder
+RUN pnpm install --prod --frozen-lockfile
 
+# Build the project
+COPY --from=builder /app/out/full/ .
+
+# Uncomment and use build args to enable remote caching
+# ARG TURBO_TEAM
+# ENV TURBO_TEAM=$TURBO_TEAM
+
+# ARG TURBO_TOKEN
+# ENV TURBO_TOKEN=$TURBO_TOKEN
+
+RUN pnpm turbo run build --filter=squareone...
+
+# Stage 3. The runtime image
+FROM base AS runner
 WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
-RUN npm install -g pnpm
-RUN pnpm run build
 
-# Stage 3: Install pre-built app and deps for production ======================
-FROM node:16-alpine as production
-
-WORKDIR /app
 ENV NODE_ENV production
-# Disable next.js telemetry in run-time
 ENV NEXT_TELEMETRY_DISABLED 1
 
+# Don't run production as root
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
-
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/next.config.js ./next.config.js
-COPY --from=builder /app/squareone.config.schema.json ./squareone.config.schema.json
-COPY --from=builder /app/squareone.config.yaml ./squareone.config.yaml
-COPY --from=builder /app/squareone.serverconfig.schema.json ./squareone.serverconfig.schema.json
-COPY --from=builder /app/squareone.serverconfig.yaml ./squareone.serverconfig.yaml
-COPY --from=builder /app/package.json ./package.json
-
 USER nextjs
 
 EXPOSE 3000
 ENV PORT 3000
 
-CMD ["node_modules/.bin/next", "start"]
+COPY --from=installer /app/apps/squareone/next.config.js .
+COPY --from=installer /app/apps/squareone/package.json .
+COPY --from=installer /app/apps/squareone/public .
+COPY --from=installer /app/apps/squareone/.next .
+COPY --from=installer /app/apps/squareone/node_modules .
+COPY --from=installer /app/apps/squareone/squareone.config.schema.json .
+COPY --from=installer /app/apps/squareone/squareone.config.yaml .
+COPY --from=installer /app/apps/squareone/squareone.serverconfig.schema.json .
+COPY --from=installer /app/apps/squareone/squareone.serverconfig.yaml .
+
+CMD ["pnpm", "start"]
