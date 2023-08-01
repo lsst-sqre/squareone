@@ -14,6 +14,13 @@
     },
     {
       "type": "npm",
+      "script": "lint",
+      "problemMatcher": [],
+      "label": "npm: lint",
+      "detail": "next lint"
+    },
+    {
+      "type": "npm",
       "script": "storybook",
       "problemMatcher": [],
       "label": "npm: storybook",

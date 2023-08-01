@@ -16,11 +16,15 @@ jobs:
         with:
           fetch-depth: 0 # get full Git history
 
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
       - name: Set up node
         uses: actions/setup-node@v3
         with:
           node-version-file: '.nvmrc'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Authenticate GitHub Packages
         run: |
@@ -29,7 +33,7 @@ jobs:
           NPM_PKG_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install npm packages
-        run: npm ci
+        run: pnpm install
 
       - name: Publish to Chromatic
         if: github.ref != 'refs/heads/main'

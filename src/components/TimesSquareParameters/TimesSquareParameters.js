@@ -113,7 +113,7 @@ export default function TimesSquareParameters({
         handleReset,
         isSubmitting,
       }) => (
-        <form onSubmit={handleSubmit} onreset={handleReset}>
+        <form onSubmit={handleSubmit} onReset={handleReset}>
           <StyledParameterList>
             {Object.entries(parameters).map(([paramName, paramSchema]) => {
               const inputProps = {

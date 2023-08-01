@@ -12,16 +12,18 @@ WORKDIR /app
 
 RUN echo "//npm.pkg.github.com/:_authToken=${GH_PKG_TOKEN}" > ~/.npmrc
 
-COPY package.json package-lock.json .npmrc ./
-RUN npm ci
+COPY package.json pnpm-lock.yaml .npmrc ./
+RUN npm install -g pnpm
+RUN pnpm install
 
 # Stage 2: Build application ==================================================
-from node:16-alpine as builder
+FROM node:16-alpine as builder
 
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN npm run build
+RUN npm install -g pnpm
+RUN pnpm run build
 
 # Stage 3: Install pre-built app and deps for production ======================
 FROM node:16-alpine as production
