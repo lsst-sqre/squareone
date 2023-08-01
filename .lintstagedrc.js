@@ -7,6 +7,8 @@ const buildEslintCommand = (filenames) =>
 
 module.exports = {
   // Run js files through next lint
-  '*.{js,jsx,ts,tsx}': ['prettier --write', buildEslintCommand],
+  // FIXME this is not working as a monorepo
+  // '*.{js,jsx,ts,tsx}': ['prettier --write', buildEslintCommand],
+  '*.{js,jsx,ts,tsx}': ['prettier --write'],
   '*.{yaml,yml,json}': ['prettier --write'],
 };
