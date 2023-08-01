@@ -1,5 +1,13 @@
 # Change log
 
+## Unreleased
+
+### Other changes
+
+- Migrated to `pnpm` from `npm` for package management.
+- Upgrade to Storybook 7.
+- Add development set up documentation to the squareone.lsst.io site.
+
 ## 0.10.0 (2023-03-27)
 
 ### New features
