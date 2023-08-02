@@ -11,8 +11,6 @@ name: CI
       - 'renovate/**'
       - 'tickets/**'
       - 'u/**'
-    tags:
-      - '*'
   pull_request: {}
 
 jobs:
