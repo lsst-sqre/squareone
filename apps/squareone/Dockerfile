@@ -28,7 +28,7 @@ WORKDIR /app
 COPY .gitignore .gitignore
 COPY --from=builder /app/out/json/ .
 
-RUN pnpm install --prod --frozen-lockfile
+RUN pnpm install
 
 # Build the project
 COPY --from=builder /app/out/full/ .
