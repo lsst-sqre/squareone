@@ -67,4 +67,4 @@ COPY --from=installer /app/apps/squareone/squareone.config.yaml .
 COPY --from=installer /app/apps/squareone/squareone.serverconfig.schema.json .
 COPY --from=installer /app/apps/squareone/squareone.serverconfig.yaml .
 
-CMD ["pnpm", "start"]
+CMD ["node_modules/.bin/next", "start"]
