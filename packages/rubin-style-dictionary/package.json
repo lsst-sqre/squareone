@@ -1,0 +1,36 @@
+{
+  "name": "@lsst-sqre/rubin-style-dictionary",
+  "version": "0.4.0",
+  "description": "A style dictionary that encodes design tokens from the Rubin Visual Identity.",
+  "main": "dist/tokens.js",
+  "files": [
+    "dist",
+    "src",
+    "assets"
+  ],
+  "devDependencies": {
+    "lodash": "^4.17.21",
+    "style-dictionary": "^3.7.1",
+    "yaml": "^2.1.3"
+  },
+  "scripts": {
+    "build": "node ./build.js",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lsst-sqre/rubin-style-dictionary.git"
+  },
+  "keywords": [
+    "rubin-observatory",
+    "design-tokens"
+  ],
+  "author": "Jonathan Sick",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lsst-sqre/rubin-style-dictionary/issues"
+  },
+  "homepage": "https://github.com/lsst-sqre/rubin-style-dictionary#readme"
+}

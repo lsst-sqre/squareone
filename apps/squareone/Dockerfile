@@ -28,8 +28,6 @@ RUN pnpm install turbo --global
 
 WORKDIR /app
 
-RUN echo "//npm.pkg.github.com/:_authToken=${GH_PKG_TOKEN}" > ~/.npmrc
-
 # First install the dependencies (as they change less often)
 COPY .gitignore .gitignore
 COPY --from=builder /app/out/json/ .

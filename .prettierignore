@@ -1,6 +1,7 @@
 package.json
 yarn.lock
 package-lock.json
+pnpm-lock.yaml
 .next
 docs/_build
 .nova

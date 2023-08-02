@@ -38,7 +38,7 @@
     "@fortawesome/fontawesome-svg-core": "^6.3.0",
     "@fortawesome/free-solid-svg-icons": "^6.3.0",
     "@fortawesome/react-fontawesome": "^0.2.0",
-    "@lsst-sqre/rubin-style-dictionary": "^0.4.0",
+    "@lsst-sqre/rubin-style-dictionary": "workspace:*",
     "@reach/alert": "^0.17.0",
     "@reach/menu-button": "^0.17.0",
     "ajv": "^8.11.0",
