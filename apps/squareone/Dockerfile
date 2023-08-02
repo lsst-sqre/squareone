@@ -17,10 +17,6 @@ RUN turbo prune --scope=squareone --docker
 # Stage 2. Install and build the app
 FROM base AS installer
 
-# GitHub Personal Access token to install from GitHub Packages
-# Needs: read:packages at the least
-ARG GH_PKG_TOKEN
-
 RUN apk add --no-cache libc6-compat
 RUN apk update
 
