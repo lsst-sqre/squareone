@@ -5,8 +5,7 @@
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{js,json,css,graphql,yaml}\"",
-    "format:check": "prettier --check \"**/*.{js,json,css,graphql,yaml}\"",
-    "prepare": "node -e \"try { require('husky').install() } catch (e) {if (e.code !== 'MODULE_NOT_FOUND') throw e}\""
+    "format:check": "prettier --check \"**/*.{js,json,css,graphql,yaml}\""
   },
   "devDependencies": {
     "@turbo/gen": "^1.10.12",
