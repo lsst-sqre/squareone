@@ -1,6 +1,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+import LogoImage from '@lsst-sqre/rubin-style-dictionary/assets/rubin-imagotype/rubin-imagotype-color-on-black.svg';
+
 /*
  * Logo (within the Header).
  */
@@ -12,7 +14,7 @@ export default function HeaderLogo() {
     <Link passhref href="/">
       <a>
         <Image
-          src="/rubin-imagotype-color-on-black.svg"
+          src={LogoImage}
           alt="Rubin Observatory Logo"
           height={logoHeightPx}
           width={logoWidthPx}
