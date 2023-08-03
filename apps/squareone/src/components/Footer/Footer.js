@@ -2,6 +2,8 @@ import styled from 'styled-components';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import AgencyLogos from '@lsst-sqre/rubin-style-dictionary/assets/partner-logos/operations-lineup-black.png';
+
 import { ContentMaxWidth } from '../../styles/sizes';
 
 const StyledFooter = styled.footer`
@@ -70,7 +72,7 @@ export default function Footer() {
         <PartnerLogoContainer>
           <Image
             className="u-invertable-image"
-            src="/operations-lineup-black.png"
+            src={AgencyLogos}
             width="800px"
             height="158px"
             alt="Logos of the NSF, NOIRLab, AURA, SLAC, and US DOE"
