@@ -7,7 +7,8 @@
     "format": "prettier --write \"**/*.{js,json,css,graphql,yaml}\"",
     "format:check": "prettier --check \"**/*.{js,json,css,graphql,yaml}\"",
     "ci:publish": "turbo run build && changeset publish",
-    "ci:version": "changeset version && pnpm install --no-frozen-lockfile"
+    "ci:version": "changeset version && pnpm install --no-frozen-lockfile",
+    "prepare": "node -e \"try { require('husky').install() } catch (e) {if (e.code !== 'MODULE_NOT_FOUND') throw e}\""
   },
   "devDependencies": {
     "@turbo/gen": "^1.10.12",

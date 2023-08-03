@@ -4,6 +4,7 @@ RUN corepack enable
 RUN apk add --no-cache libc6-compat
 RUN apk update
 RUN npm install -g turbo
+ENV CI=1
 
 FROM base AS builder
 
