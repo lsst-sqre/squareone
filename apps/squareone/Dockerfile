@@ -1,37 +1,32 @@
 FROM node:16-alpine as base
 
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
+RUN apk add --no-cache libc6-compat
+RUN apk update
+RUN npm install -g turbo
 
-# Stage 1. Prune dependencies
 FROM base AS builder
 
-RUN apk add --no-cache libc6-compat
-RUN apk update
 WORKDIR /app
-RUN pnpm install turbo --global
+
 COPY . .
+
 RUN turbo prune --scope=squareone --docker
 
-# Stage 2. Install and build the app
-FROM base AS installer
 
-RUN apk add --no-cache libc6-compat
-RUN apk update
-
-RUN pnpm install turbo --global
+FROM base as installer
 
 WORKDIR /app
 
-# First install the dependencies (as they change less often)
+# First install dependencies (as they change less often)
 COPY .gitignore .gitignore
 COPY --from=builder /app/out/json/ .
-
+COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 RUN pnpm install
 
-# Build the project
+# Build the project and its dependencies
 COPY --from=builder /app/out/full/ .
+COPY turbo.json turbo.json
 
 # Uncomment and use build args to enable remote caching
 # ARG TURBO_TEAM
@@ -40,10 +35,10 @@ COPY --from=builder /app/out/full/ .
 # ARG TURBO_TOKEN
 # ENV TURBO_TOKEN=$TURBO_TOKEN
 
-RUN pnpm turbo run build --filter=squareone...
+RUN turbo run build --filter=squareone...
 
-# Stage 3. The runtime image
 FROM base AS runner
+
 WORKDIR /app
 
 ENV NODE_ENV production
@@ -57,14 +52,7 @@ USER nextjs
 EXPOSE 3000
 ENV PORT 3000
 
-COPY --from=installer /app/apps/squareone/next.config.js .
-COPY --from=installer /app/apps/squareone/package.json .
-COPY --from=installer /app/apps/squareone/public .
-COPY --from=installer /app/apps/squareone/.next .
-COPY --from=installer /app/apps/squareone/node_modules .
-COPY --from=installer /app/apps/squareone/squareone.config.schema.json .
-COPY --from=installer /app/apps/squareone/squareone.config.yaml .
-COPY --from=installer /app/apps/squareone/squareone.serverconfig.schema.json .
-COPY --from=installer /app/apps/squareone/squareone.serverconfig.yaml .
+COPY --from=installer /app .
 
-CMD ["node_modules/.bin/next", "start"]
+# TODO: Maybe use the npm script?
+CMD pnpm --filter "squareone" run start
