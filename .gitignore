@@ -2,11 +2,15 @@
 
 # dependencies
 /node_modules
+**/node_modules
 /.pnp
 .pnp.js
 
 # testing
 /coverage
+
+# turbo
+/.turbo
 
 # next.js
 /.next/
@@ -14,6 +18,7 @@
 
 # production
 /build
+dist/
 
 # misc
 .DS_Store
@@ -36,6 +41,9 @@ yarn-error.log*
 # Sphinx
 docs/_build
 .venv
+.nox/
+.venv
+venv/
 
 # Yarn (not using Zero-installs)
 # https://yarnpkg.com/features/zero-installs

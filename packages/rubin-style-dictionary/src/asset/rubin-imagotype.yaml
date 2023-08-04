@@ -1,0 +1,46 @@
+asset:
+  image:
+    rubin-imagotype:
+      color-on-black:
+        png:
+          value: assets/rubin-imagotype/rubin-imagotype-color-on-black.png
+        svg:
+          value: assets/rubin-imagotype/rubin-imagotype-color-on-black.svg
+      color-on-white:
+        png:
+          value: assets/rubin-imagotype/rubin-imagotype-color-on-white.png
+        svg:
+          value: assets/rubin-imagotype/rubin-imagotype-color-on-white.svg
+      gray-on-black:
+        png:
+          value: assets/rubin-imagotype/rubin-imagotype-gray-on-black.png
+        svg:
+          value: assets/rubin-imagotype/rubin-imagotype-gray-on-black.svg
+      gray-on-white:
+        png:
+          value: assets/rubin-imagotype/rubin-imagotype-gray-on-white.png
+        svg:
+          value: assets/rubin-imagotype/rubin-imagotype-gray-on-white.svg
+      color-on-black-crop:
+        png:
+          value: assets/rubin-imagotype/rubin-imagotype-color-on-black-crop.png
+        svg:
+          value: assets/rubin-imagotype/rubin-imagotype-color-on-black-crop.svg
+      color-on-white-crop:
+        png:
+          value: assets/rubin-imagotype/rubin-imagotype-color-on-white-crop.png
+        svg:
+          value: assets/rubin-imagotype/rubin-imagotype-color-on-white-crop.svg
+      gray-on-black-crop:
+        png:
+          value: assets/rubin-imagotype/rubin-imagotype-gray-on-black-crop.png
+        svg:
+          value: assets/rubin-imagotype/rubin-imagotype-gray-on-black-crop.svg
+      gray-on-white-crop:
+        png:
+          value: assets/rubin-imagotype/rubin-imagotype-gray-on-white-crop.png
+        svg:
+          value: assets/rubin-imagotype/rubin-imagotype-gray-on-white-crop.svg
+      email:
+        png:
+          value: assets/rubin-imagotype/rubin-imagotype-email.png

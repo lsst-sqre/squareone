@@ -1,0 +1,40 @@
+component:
+  # Typography for body text
+  text:
+    color:
+      themed:
+        light:
+          value: '{color.gray.800.value}'
+          comment: 'Body text color'
+        dark:
+          value: '{color.gray.100.value}'
+          comment: 'Body text color in dark theme'
+    reverse:
+      color:
+        value: '{color.gray.100.value}'
+        comment: 'Body text color in reversed (light on dark) contexts.'
+    link:
+      color:
+        themed:
+          light:
+            value: '#146685' # darker than blue-500
+          dark:
+            value: '{color.blue.500.value}'
+      hover:
+        color:
+          themed:
+            light:
+              value: '{color.blue.500.value}'
+            dark:
+              value: '{component.text.link.color.themed.light.value}'
+      reverse:
+        color:
+          value: '{component.text.link.color.themed.dark.value}'
+          comment: 'Link color in reversed (light on dark) contexts.'
+    headline:
+      color:
+        themed:
+          light:
+            value: '{color.primary.600.value}'
+          dark:
+            value: '{color.primary.600.value}'

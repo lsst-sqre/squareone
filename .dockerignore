@@ -1,7 +1,9 @@
-.next/
 node_modules/
-Dockerfile
+**/node_modules
+**/Dockerfile
+**/.next/
 .pre-commit-config.yaml
 .prettierrc
 docs/
 .venv/
+.nox/

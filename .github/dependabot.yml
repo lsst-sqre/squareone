@@ -1,16 +1,24 @@
 version: 2
 updates:
-  - package-ecosystem: "github-actions"
-    directory: "/"
+  - package-ecosystem: 'github-actions'
+    directory: '/'
     schedule:
-      interval: "weekly"
-  - package-ecosystem: "npm"
-    directory: "/"
+      interval: 'weekly'
+  - package-ecosystem: 'pip'
+    directory: '/'
     schedule:
-      interval: "weekly"
+      interval: 'weekly'
+  - package-ecosystem: 'docker'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
     # Generally this means we'll get minor and patch updates, but we'll
     # manually need to roll out major version changes.
-    versioning-strategy: "lockfile-only"
+    versioning-strategy: 'lockfile-only'
     registries:
       - npm-github
 registries:

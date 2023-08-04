@@ -1,12 +1,13 @@
 name: 'Chromatic'
 
 'on':
-  push:
-    branches-ignore:
-      - 'dependabot/**'
-      - 'renovate/**'
-    tags-ignore:
-      - '*'
+  {}
+  # push:
+  #   branches-ignore:
+  #     - 'dependabot/**'
+  #     - 'renovate/**'
+  #   tags-ignore:
+  #     - '*'
 
 jobs:
   chromatic-deployment:
@@ -40,10 +41,12 @@ jobs:
         uses: chromaui/action@v1
         with:
           projectToken: ${{ secrets.CHROMATIC_TOKEN }}
+          storybookBaseDir: apps/squareone
 
       - name: Publish new baseline Chromatic
         if: github.ref == 'refs/heads/main'
         uses: chromaui/action@v1
         with:
           projectToken: ${{ secrets.CHROMATIC_TOKEN }}
+          storybookBaseDir: apps/squareone
           autoAcceptChanges: true

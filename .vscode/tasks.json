@@ -6,7 +6,7 @@
       "script": "dev",
       "problemMatcher": [],
       "label": "npm: dev",
-      "detail": "next dev -p 3000",
+      "detail": "Run dev servers for all apps",
       "group": {
         "kind": "build",
         "isDefault": true
@@ -21,18 +21,11 @@
     },
     {
       "type": "npm",
-      "script": "storybook",
-      "problemMatcher": [],
-      "label": "npm: storybook",
-      "detail": "start-storybook -p 6006"
-    },
-    {
-      "type": "npm",
       "script": "build",
       "group": "build",
       "problemMatcher": [],
       "label": "npm: build",
-      "detail": "next build"
+      "detail": "Build all apps and packages"
     }
   ]
 }
