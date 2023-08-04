@@ -13,3 +13,9 @@ If you are an admin looking to deploy and operate the Squareone app on the Rubin
    development-tasks
    build-docs
    add-changesets
+
+.. toctree::
+   :caption: Architecture
+   :maxdepth: 1
+
+   monorepo-architecture
