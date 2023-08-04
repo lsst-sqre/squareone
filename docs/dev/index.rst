@@ -15,7 +15,16 @@ If you are an admin looking to deploy and operate the Squareone app on the Rubin
    add-changesets
 
 .. toctree::
-   :caption: Architecture
+   :caption: Repo Architecture
    :maxdepth: 1
 
    monorepo-architecture
+
+.. _rsd-arch:
+
+.. toctree::
+   :caption: Rubin Style Dictionary
+   :maxdepth: 1
+
+   rsd-architecture
+   rsd-build-system

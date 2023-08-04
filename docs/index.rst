@@ -16,10 +16,16 @@ Squareone is an open source project on GitHub at https://github.com/lsst-sqre/sq
    :hidden:
 
    Applications <apps/index>
+   Packages <packages/index>
    Develop <dev/index>
    changelog
 
-.. grid:: 2
+Applications
+============
+
+*The front-end web applications developed in Squareone.*
+
+.. grid:: 1
 
    .. grid-item-card:: Deploy Squareone
       :link: apps/squareone/index
@@ -27,6 +33,24 @@ Squareone is an open source project on GitHub at https://github.com/lsst-sqre/sq
 
       Squareone — the app — is the landing page for the Rubin Science Platform.
       Learn how to configure and deploy Squareone.
+
+Packages
+========
+
+*Squareone provides npm packages that are used by applications within the monorepo, but can also be used by other projects.*
+
+.. grid:: 1
+
+   .. grid-item-card:: Rubin Style Dictionary
+      :link: packages/rubin-style-dictionary/index
+      :link-type: doc
+
+      Rubin Style Dictionary provides design tokens and assets in multiple formats based on the Rubin Observatory Visual Identity Manual.
+
+Contribute
+==========
+
+.. grid:: 1
 
    .. grid-item-card:: Develop Squareone
       :link: dev/index
