@@ -51,22 +51,6 @@ Finally, install the package:
 
    npm install @lsst-sqre/rubin-style-dictionary
 
-Using the token files
-=====================
-
-Once the package is installed, you can access token files in different formats in the :file:`dist` directory of the installed package:
-
-.. code-block:: text
-
-   node_modules/@lsst-sqre/rubin-style-dictionary/dist/
-
-For example, in a Next.js project you can directly import CSS into your app wrapper page:
-
-.. code-block:: js
-
-   import '@lsst-sqre/rubin-style-dictionary/dist/tokens.css';
-   import '@lsst-sqre/rubin-style-dictionary/dist/tokens.dark.css';
-
 Installing on GitHub Actions
 ============================
 
