@@ -32,5 +32,8 @@
   "bugs": {
     "url": "https://github.com/lsst-sqre/squareone/issues"
   },
-  "homepage": "https://squareone.lsst.io/packages/rubin-style-dictionary/"
+  "homepage": "https://squareone.lsst.io/packages/rubin-style-dictionary/",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  }
 }
