@@ -11,6 +11,8 @@
     "prepare": "node -e \"try { require('husky').install() } catch (e) {if (e.code !== 'MODULE_NOT_FOUND') throw e}\""
   },
   "devDependencies": {
+    "@changesets/changelog-github": "^0.4.8",
+    "@changesets/cli": "^2.26.2",
     "@turbo/gen": "^1.10.12",
     "eslint": "^8.46.0",
     "husky": "^8.0.3",
@@ -19,7 +21,5 @@
     "turbo": "1.10.12"
   },
   "packageManager": "pnpm@8.6.11",
-  "dependencies": {
-    "@changesets/cli": "^2.26.2"
-  }
+  "dependencies": {}
 }
