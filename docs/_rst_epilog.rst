@@ -10,7 +10,7 @@
 .. _pnpm: https://pnpm.io
 .. _Prettier: https://prettier.io/
 .. _React: https://reactjs.org
-.. _Rubin Observatory: https://www.lsst.org
+.. _Rubin Observatory: https://rubinobservatory.org
 .. _Semaphore: https://github.com/lsst-sqre/semaphore
 .. _Sphinx: https://www.sphinx-doc.org/en/master/
 .. _Squareone repository: https://github.com/lsst-sqre/squareone
