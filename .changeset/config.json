@@ -4,6 +4,10 @@
     "@changesets/changelog-github",
     { "repo": "lsst-sqre/squareone" }
   ],
+  "privatePackages": {
+    "version": true,
+    "tag": true
+  },
   "commit": false,
   "fixed": [],
   "linked": [],
