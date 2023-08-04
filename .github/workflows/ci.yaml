@@ -11,6 +11,7 @@ name: CI
       - 'renovate/**'
       - 'tickets/**'
       - 'u/**'
+      - 'changeset-release/**'
   pull_request: {}
 
 jobs:
