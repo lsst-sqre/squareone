@@ -21,7 +21,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lsst-sqre/rubin-style-dictionary.git"
+    "url": "git+https://github.com/lsst-sqre/squareone.git"
   },
   "keywords": [
     "rubin-observatory",
@@ -30,7 +30,7 @@
   "author": "Jonathan Sick",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/lsst-sqre/rubin-style-dictionary/issues"
+    "url": "https://github.com/lsst-sqre/squareone/issues"
   },
-  "homepage": "https://github.com/lsst-sqre/rubin-style-dictionary#readme"
+  "homepage": "https://squareone.lsst.io/packages/rubin-style-dictionary/"
 }
