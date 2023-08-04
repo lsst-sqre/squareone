@@ -15,14 +15,14 @@ Squareone is an open source project on GitHub at https://github.com/lsst-sqre/sq
 .. toctree::
    :hidden:
 
-   Applications <deployment/index>
+   Applications <apps/index>
    Develop <dev/index>
    changelog
 
-.. grid:: 3
+.. grid:: 2
 
    .. grid-item-card:: Deploy Squareone
-      :link: deployment/index
+      :link: apps/squareone/index
       :link-type: doc
 
       Squareone — the app — is the landing page for the Rubin Science Platform.
