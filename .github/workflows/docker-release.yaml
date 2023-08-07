@@ -1,11 +1,19 @@
 name: Docker release
 
 'on':
-  push:
-    tags:
-      - '*'
+  release:
+    types: [published]
 
 jobs:
+  hello:
+    name: Hello world
+    runs-on: ubuntu-latest
+
+    steps:
+      - run: echo "Hello world!"
+
+      - run: echo "The event that triggered this action was a ${{ github.event_name }} event, ref is ${{ github.ref }}."
+
   release-squareone:
     name: Release Squareone image
     runs-on: ubuntu-latest
