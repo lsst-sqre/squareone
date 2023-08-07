@@ -1,5 +1,11 @@
 # squareone
 
+## 0.10.3
+
+### Patch Changes
+
+- [#150](https://github.com/lsst-sqre/squareone/pull/150) [`1bcd1a4`](https://github.com/lsst-sqre/squareone/commit/1bcd1a45610f64eeb88ebd4c49572a679b0767a5) Thanks [@jonathansick](https://github.com/jonathansick)! - The squareone Docker image release is now triggered by a GitHub Release being published.
+
 ## 0.10.2
 
 ### Patch Changes
