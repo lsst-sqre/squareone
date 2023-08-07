@@ -1,0 +1,1 @@
+../../apps/squareone/CHANGELOG.md
