@@ -24,7 +24,7 @@ For example, a token with path ``color.gray.900`` is expressed as:
        "900":
          value: #000000
 
-For :ref:`global design tokens <global-design-tokens>`, these hierarchical mappings follow a "CTI" organization, which stands for Category-Type-Item.
+For :ref:`global design tokens <rsd-global-design-tokens>`, these hierarchical mappings follow a "CTI" organization, which stands for Category-Type-Item.
 
 **Category** is the token's type, which is typically color, size, time, or a text/content type.
 The category indicates to |SD| how the token value should be handled and transformed if necessary.
@@ -37,13 +37,13 @@ In the above example, the item is ``900``, which is the name we give to the dark
 A middle gray might have an item name of ``500``, and white would have an item name of ``000``.
 
 In addition to the basic CTI path, some tokens can have additional path components.
-This comes up in the context of :ref:`component-design-tokens` where an item might have variant values corresponding to a theme, a sub-item, or a state (disabled, active, base).
+This comes up in the context of :ref:`rsd-component-design-tokens` where an item might have variant values corresponding to a theme, a sub-item, or a state (disabled, active, base).
 
 .. seealso::
 
    Read about `Properties in the Style Dictionary documentation <https://amzn.github.io/style-dictionary/#/properties>`__ for more information and background.
 
-.. _global-design-tokens:
+.. _rsd-global-design-tokens:
 
 Global design tokens
 ====================
@@ -62,7 +62,7 @@ The global design tokens are defined in YAML files within a specific set of cate
 .. note::
 
    :file:`src/component` is different: that's where component design tokens are stored.
-   More about those in :ref:`component-design-tokens`
+   More about those in :ref:`rsd-component-design-tokens`
 
 .. note::
 
@@ -80,14 +80,14 @@ For example, these are the ``color.primary`` design tokens (:file:`src/color/pri
 
 .. literalinclude:: ../../packages/rubin-style-dictionary/src/color/primary.yaml
 
-.. _component-design-tokens:
+.. _rsd-component-design-tokens:
 
 Component design tokens
 =======================
 
 Components are entities in your interfaces and designs.
 Components might be hyper-specific, like a login button, or actually quite general like the default color of links.
-Thus with *component design tokens,* the abstract grid of token values specified as :ref:`global design tokens <global-design-tokens>` become semantically associated with entities in your UI.
+Thus with *component design tokens,* the abstract grid of token values specified as :ref:`global design tokens <rsd-global-design-tokens>` become semantically associated with entities in your UI.
 
 All component tokens are contained within the :file:`src/component` directory, and the top-level path is always ``component``.
 

@@ -18,7 +18,7 @@ Squareone is an open source project on GitHub at https://github.com/lsst-sqre/sq
    Applications <apps/index>
    Packages <packages/index>
    Develop <dev/index>
-   changelog
+   changelog/index
 
 Applications
 ============
