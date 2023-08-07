@@ -88,6 +88,10 @@ After a pull request is merged, Changesets_ runs within GitHub Actions to prepar
 Dependents of changed packages automatically get patch version bumps too indicating that they should be released with the new version of their dependency.
 Merging this PR triggers the release process, again in GitHub Actions, for the changed packages.
 
+.. seealso::
+
+   :doc:`github-actions-architecture` for more on the Changesets-driven release process.
+
 Further reading
 ===============
 

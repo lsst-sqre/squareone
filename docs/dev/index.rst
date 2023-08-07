@@ -19,6 +19,7 @@ If you are an admin looking to deploy and operate the Squareone app on the Rubin
    :maxdepth: 1
 
    monorepo-architecture
+   github-actions-architecture
 
 .. _rsd-arch:
 
