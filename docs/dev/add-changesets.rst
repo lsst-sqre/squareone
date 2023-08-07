@@ -55,6 +55,12 @@ Edit and commit the changeset file
 After changesets exists, you can open the file it created to edit it.
 Once you're done, make sure to commit this file to your PR branch.
 
+Next steps
+==========
+
+If you're a Squareone maintainer, you can make a release once pull requests with changesets are merged into the ``main`` branch.
+See :doc:`making-releases`.
+
 Learn more
 ==========
 

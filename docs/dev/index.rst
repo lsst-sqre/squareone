@@ -13,6 +13,7 @@ If you are an admin looking to deploy and operate the Squareone app on the Rubin
    development-tasks
    build-docs
    add-changesets
+   making-releases
 
 .. toctree::
    :caption: Repo Architecture
