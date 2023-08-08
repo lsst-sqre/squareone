@@ -34,19 +34,22 @@ jobs:
       - name: Install npm packages
         run: pnpm install
 
+      - name: Build Storybook
+        run: pnpm run build-storybook
+
       - name: Publish to Chromatic
         if: github.ref != 'refs/heads/main'
         uses: chromaui/action@v1
         with:
-          workingDir: ${{ inputs.path }}
           projectToken: ${{ secrets.token }}
           storybookBaseDir: ${{ inputs.path }}
+          storybookBuildDir: ${{ inputs.path }}/storybook-static
 
       - name: Publish new baseline Chromatic
         if: github.ref == 'refs/heads/main'
         uses: chromaui/action@v1
         with:
-          workingDir: ${{ inputs.path }}
           projectToken: ${{ secrets.token }}
           storybookBaseDir: ${{ inputs.path }}
+          storybookBuildDir: ${{ inputs.path }}/storybook-static
           autoAcceptChanges: true
