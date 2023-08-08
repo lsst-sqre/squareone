@@ -13,6 +13,9 @@
     "storybook": {
       "cache": false,
       "persistent": true
+    },
+    "build-storybook": {
+      "outputs": ["storybook-static/**"]
     }
   }
 }
