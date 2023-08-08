@@ -11,6 +11,7 @@
 
 # turbo
 /.turbo
+**/.turbo
 
 # next.js
 /.next/
