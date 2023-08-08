@@ -13,5 +13,6 @@ jobs:
     uses: ./.github/workflows/run-chromatic.yaml
     with:
       path: apps/squareone
+      workspaceFilter: squareone
     secrets:
       token: ${{ secrets.SQUAREONE_CHROMATIC_TOKEN }}

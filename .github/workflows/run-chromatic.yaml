@@ -9,6 +9,9 @@ name: 'Run Chromatic'
       path:
         required: true
         type: string
+      workspaceFilter:
+        required: true
+        type: string
     secrets:
       token:
         required: true
@@ -35,7 +38,10 @@ jobs:
         run: pnpm install
 
       - name: Build Storybook
-        run: pnpm run build-storybook
+        run: pnpm run build-storybook --filter ${{ inputs.workspaceFilter }}
+        # In this workflow we manually build the storybooks rather than have
+        # the chromatic/action do it so we can build dependencies first
+        # via turborepo.
 
       - name: Publish to Chromatic
         if: github.ref != 'refs/heads/main'

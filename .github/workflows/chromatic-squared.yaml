@@ -13,5 +13,6 @@ jobs:
     uses: ./.github/workflows/run-chromatic.yaml
     with:
       path: packages/squared
+      workspaceFilter: '@lsst-sqre/squared'
     secrets:
       token: ${{ secrets.SQUARED_CHROMATIC_TOKEN }}
