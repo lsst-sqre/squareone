@@ -14,6 +14,7 @@ Squareone is a monorepo for [Rubin Observatory](https://rubinobservatory.org) Da
 
 - `@lsst-sqre/eslint-config` is a shared ESLint configuration for Squareone applications and packages.
 - `@lsst-sqre/rubin-style-dictonary` is a design token package based on the [Rubin Observatory Visual Identity Manual](https://docushare.lsst.org/docushare/dsweb/Get/Document-37294/20210212%20Visual%20Identity%20Manual%20—V7.pdf), build with [style-dictionary](https://amzn.github.io/style-dictionary/).
+- `@lsst-sqre/squared` is a React component library for Squareone's applications. Squared implements the Rubin Observatory Visual Identity Manual via design tokens from the Rubin Style Dictionary (`@lsst-sqre/rubin-style-dictionary`).
 - `@lsst-sqre/tsconfig` is a shared TypeScript configuration for Squareone applications and packages.
 
 ## Technology stack
