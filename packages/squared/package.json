@@ -14,7 +14,9 @@
     "build": "tsup src/index.tsx --format esm,cjs --dts --external react",
     "dev": "tsup src/index.tsx --format esm,cjs --watch --dts --external react",
     "lint": "eslint \"src/**/*.ts*\"",
-    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "publishConfig": {
     "access": "public"
@@ -28,9 +30,19 @@
   "devDependencies": {
     "@lsst-sqre/eslint-config": "workspace:*",
     "@lsst-sqre/tsconfig": "workspace:*",
+    "@storybook/addon-essentials": "^7.2.1",
+    "@storybook/addon-interactions": "^7.2.1",
+    "@storybook/addon-links": "^7.2.1",
+    "@storybook/addon-onboarding": "^1.0.8",
+    "@storybook/blocks": "^7.2.1",
+    "@storybook/react": "^7.2.1",
+    "@storybook/react-vite": "^7.2.1",
+    "@storybook/testing-library": "^0.2.0",
     "@types/react": "^18.2.19",
     "@types/react-dom": "^18.2.7",
     "eslint": "^8.35.0",
+    "eslint-plugin-storybook": "^0.6.13",
+    "storybook": "^7.2.1",
     "tsup": "^7.2.0",
     "typescript": "^5.1.6"
   }
