@@ -38,6 +38,7 @@ jobs:
         if: github.ref != 'refs/heads/main'
         uses: chromaui/action@v1
         with:
+          workingDir: ${{ inputs.path }}
           projectToken: ${{ secrets.token }}
           storybookBaseDir: ${{ inputs.path }}
 
@@ -45,6 +46,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         uses: chromaui/action@v1
         with:
+          workingDir: ${{ inputs.path }}
           projectToken: ${{ secrets.token }}
           storybookBaseDir: ${{ inputs.path }}
           autoAcceptChanges: true
