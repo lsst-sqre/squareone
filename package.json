@@ -4,8 +4,8 @@
     "build": "turbo run build",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{js,json,css,graphql,yaml}\"",
-    "format:check": "prettier --check \"**/*.{js,json,css,graphql,yaml}\"",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,graphql,yaml}\"",
+    "format:check": "prettier --check \"**/*.{js,ts,tsx,json,css,graphql,yaml}\"",
     "ci:publish": "turbo run build && changeset publish",
     "ci:version": "changeset version && pnpm install --no-frozen-lockfile",
     "prepare": "node -e \"try { require('husky').install() } catch (e) {if (e.code !== 'MODULE_NOT_FOUND') throw e}\""
