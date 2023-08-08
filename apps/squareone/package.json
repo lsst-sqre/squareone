@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start -p 3000",
     "lint": "next lint",
-    "storybook": "storybook dev -p 6006",
+    "storybook": "storybook dev -p 6007",
     "build-storybook": "storybook build"
   },
   "babel": {
@@ -26,7 +26,8 @@
   "eslintConfig": {
     "extends": [
       "next/core-web-vitals",
-      "prettier"
+      "prettier",
+      "plugin:storybook/recommended"
     ],
     "rules": {
       "import/no-anonymous-default-export": "off",
@@ -75,6 +76,7 @@
     "eslint": "^8.35.0",
     "eslint-config-next": "^12.2.4",
     "eslint-config-prettier": "^8.6.0",
+    "eslint-plugin-storybook": "^0.6.13",
     "storybook": "^7.1.1"
   }
 }
