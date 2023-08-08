@@ -1,0 +1,17 @@
+name: 'Chromatic: Squared'
+
+'on':
+  push:
+    branches-ignore:
+      - 'dependabot/**'
+      - 'renovate/**'
+    tags-ignore:
+      - '*'
+
+jobs:
+  call:
+    uses: ./.github/workflows/run-chromatic.yaml
+    with:
+      path: packages/squared
+    secrets:
+      token: ${{ secrets.SQUARED_CHROMATIC_TOKEN }}

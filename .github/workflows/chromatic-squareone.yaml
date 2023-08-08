@@ -1,0 +1,17 @@
+name: 'Chromatic: Squareone'
+
+'on':
+  push:
+    branches-ignore:
+      - 'dependabot/**'
+      - 'renovate/**'
+    tags-ignore:
+      - '*'
+
+jobs:
+  call:
+    uses: ./.github/workflows/run-chromatic.yaml
+    with:
+      path: apps/squareone
+    secrets:
+      token: ${{ secrets.SQUAREONE_CHROMATIC_TOKEN }}
