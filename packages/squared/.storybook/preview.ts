@@ -1,5 +1,11 @@
 import type { Preview } from '@storybook/react';
 import { withThemeByDataAttribute } from '@storybook/addon-styling';
+import { withGlobalStyles } from './decorators';
+
+// Import font assets and stylesheets with @font-face declarations
+import '@fontsource/source-sans-pro/400.css';
+import '@fontsource/source-sans-pro/400-italic.css';
+import '@fontsource/source-sans-pro/700.css';
 
 const preview: Preview = {
   parameters: {
@@ -20,6 +26,7 @@ export default preview;
 // ThemeProvider directly; see
 // https://github.com/storybookjs/addon-styling/blob/next/docs/api.md#withthemefromjsxprovider
 export const decorators = [
+  withGlobalStyles,
   withThemeByDataAttribute({
     themes: {
       light: 'light',
