@@ -10,10 +10,12 @@ import '@fontsource/source-sans-pro/700.css';
 // Global CSS
 import 'normalize.css';
 import '@fortawesome/fontawesome-svg-core/styles.css';
-import '@lsst-sqre/rubin-style-dictionary/dist/tokens.css';
-import '@lsst-sqre/rubin-style-dictionary/dist/tokens.dark.css';
+// import '@lsst-sqre/rubin-style-dictionary/dist/tokens.css';
+// import '@lsst-sqre/rubin-style-dictionary/dist/tokens.dark.css';
 import '../src/styles/globals.css';
 import '../src/styles/icons';
+
+import { withGlobalStyles } from './decorators';
 
 export const parameters = {
   actions: { argTypesRegex: '^on[A-Z].*' },
@@ -24,3 +26,5 @@ export const parameters = {
     },
   },
 };
+
+export const decorators = [withGlobalStyles];

@@ -10,13 +10,13 @@ import '@fontsource/source-sans-pro/400-italic.css';
 import '@fontsource/source-sans-pro/700.css';
 import 'normalize.css';
 import '@fortawesome/fontawesome-svg-core/styles.css';
-import '@lsst-sqre/rubin-style-dictionary/dist/tokens.css';
-import '@lsst-sqre/rubin-style-dictionary/dist/tokens.dark.css';
+// import '@lsst-sqre/rubin-style-dictionary/dist/tokens.css';
+// import '@lsst-sqre/rubin-style-dictionary/dist/tokens.dark.css';
 import '../styles/globals.css';
-
 import '../styles/icons';
 
 import Page from '../components/Page';
+import { GlobalStyles } from '@lsst-sqre/squared';
 
 function MyApp({ Component, pageProps, baseUrl, semaphoreUrl }) {
   // Use the content layout defined by the page component, if avaialble.
@@ -26,6 +26,7 @@ function MyApp({ Component, pageProps, baseUrl, semaphoreUrl }) {
   /* eslint-disable react/jsx-props-no-spreading */
   return (
     <ThemeProvider defaultTheme="system">
+      <GlobalStyles />
       <Page baseUrl={baseUrl} semaphoreUrl={semaphoreUrl}>
         {getLayout(<Component {...pageProps} />)}
       </Page>

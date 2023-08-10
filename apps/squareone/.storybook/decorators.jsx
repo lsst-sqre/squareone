@@ -1,9 +1,9 @@
 import React from 'react';
-import { Decorator } from '@storybook/react';
-import { GlobalStyles } from '../src/styles/globalStyles';
+import { GlobalStyles } from '@lsst-sqre/squared';
 
 // Decorator that applies the styled-components global styles to all stories.
-export const withGlobalStyles: Decorator = (StoryFn) => {
+//    <GlobalStyles />
+export const withGlobalStyles = (StoryFn) => {
   return (
     <>
       <GlobalStyles />
