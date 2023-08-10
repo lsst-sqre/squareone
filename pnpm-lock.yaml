@@ -47,6 +47,9 @@ importers:
       '@fortawesome/react-fontawesome':
         specifier: ^0.2.0
         version: 0.2.0(@fortawesome/fontawesome-svg-core@6.3.0)(react@17.0.2)
+      '@lsst-sqre/global-css':
+        specifier: workspace:*
+        version: link:../../packages/global-css
       '@lsst-sqre/rubin-style-dictionary':
         specifier: workspace:*
         version: link:../../packages/rubin-style-dictionary
