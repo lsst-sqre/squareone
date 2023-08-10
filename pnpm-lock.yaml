@@ -178,6 +178,19 @@ importers:
         specifier: ^7.33.1
         version: 7.33.1(eslint@8.46.0)
 
+  packages/global-css:
+    dependencies:
+      '@lsst-sqre/rubin-style-dictionary':
+        specifier: workspace:*
+        version: link:../rubin-style-dictionary
+    devDependencies:
+      lightningcss:
+        specifier: ^1.21.5
+        version: 1.21.5
+      lightningcss-cli:
+        specifier: ^1.21.5
+        version: 1.21.5
+
   packages/rubin-style-dictionary:
     devDependencies:
       lodash:
@@ -195,6 +208,9 @@ importers:
       '@fontsource/source-sans-pro':
         specifier: ^4.5.11
         version: 4.5.11
+      '@lsst-sqre/global-css':
+        specifier: workspace:*
+        version: link:../global-css
       '@lsst-sqre/rubin-style-dictionary':
         specifier: workspace:*
         version: link:../rubin-style-dictionary
@@ -8827,7 +8843,7 @@ packages:
       postcss-modules-values: 4.0.0(postcss@8.4.27)
       postcss-value-parser: 4.2.0
       semver: 7.5.4
-      webpack: 5.88.2(esbuild@0.18.17)
+      webpack: 5.88.2(@swc/core@1.3.73)(esbuild@0.18.17)
     dev: true
 
   /css-select@4.3.0:
@@ -9099,6 +9115,12 @@ packages:
   /detect-indent@6.1.0:
     resolution: {integrity: sha512-reYkTUJAZb9gUuZ2RvVCNhVHdg62RHnJ7WJl8ftMi4diZ6NWlciOzQN88pUhSELEwflJht4oQDv0F0BMlwaYtA==}
     engines: {node: '>=8'}
+    dev: true
+
+  /detect-libc@1.0.3:
+    resolution: {integrity: sha512-pGjwhsmsp4kL2RTz08wcOlGN83otlqHeD/Z5T8GXZB+/YcpQ/dgo+lbU8ZsGxV0HIvqqxo9l7mqYwyYMD9bKDg==}
+    engines: {node: '>=0.10'}
+    hasBin: true
     dev: true
 
   /detect-node-es@1.1.0:
@@ -11741,6 +11763,184 @@ packages:
       prelude-ls: 1.2.1
       type-check: 0.4.0
 
+  /lightningcss-cli-darwin-arm64@1.21.5:
+    resolution: {integrity: sha512-ut8Ulw+gStxmgw3GXJ4LabapuyYT+oR+y8XudIvcxpEmmkh0lfrE+ZJLHXlt0HRCplaADtPgmn12CVIwaNiPQw==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [arm64]
+    os: [darwin]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /lightningcss-cli-darwin-x64@1.21.5:
+    resolution: {integrity: sha512-da/YojCmfHV3FkPt0APyAVOEUsXDgfKTYGG+XmREOfZZeFs1GEVcJpIR+LrGtUDvzlZBsU+uAFcEeyI24kNdIg==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [x64]
+    os: [darwin]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /lightningcss-cli-linux-arm-gnueabihf@1.21.5:
+    resolution: {integrity: sha512-8tmP49QKz1qlt+EyYdQYbvr/nYVcWQdZxk17wVcZP8zE3Y8pT7pHRMediianK/w1KPUWKxL+67Ga37iIKEeQ3g==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [arm]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /lightningcss-cli-linux-arm64-gnu@1.21.5:
+    resolution: {integrity: sha512-+6Rh4XV3HgXhbQcG/2uH+ojY63e7vZ1waP+AP5OEMOp0Jl1o9FknaDve+jy81yCi15HlTUtYsf6iSvuI0vCxXA==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [arm64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /lightningcss-cli-linux-arm64-musl@1.21.5:
+    resolution: {integrity: sha512-dsLn3iZUr4qe9BCdDLlCpRchtM0YAc9YeXiZJLdXNXW9gECDCA74FxcbvGN4in/SW39zv6wRA0T90X4nQmBYJw==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [arm64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /lightningcss-cli-linux-x64-gnu@1.21.5:
+    resolution: {integrity: sha512-baytCG/pMsa02Zhzki09BiwYeYD8AwDL2MxSpmMUK3UdGraNMAUKaHV/5mxoEjAbH6WPz9ATIyCr9W8X3Gkjeg==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [x64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /lightningcss-cli-linux-x64-musl@1.21.5:
+    resolution: {integrity: sha512-Fp47eHT/zNuw+Vo6cMQyDNNXUkU7vu445dnYmabeS4HufKUX/8a4gviZXon4qX/uiyTpL/v9yxmt44FFwk12UQ==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [x64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /lightningcss-cli-win32-x64-msvc@1.21.5:
+    resolution: {integrity: sha512-KCMIbe41Php9cCMTF4sbu7esheB1mTDozfaFPQXk33VJVvTwvBEPQr8me38YW18G4vq1BSUX3vJjLwQatEqsvQ==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [x64]
+    os: [win32]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /lightningcss-cli@1.21.5:
+    resolution: {integrity: sha512-/svVW9fu8asR5bjyLcpogjUbD5be/R2CJaqvkjkBxUlOOqmOUWozqE+HLeghMccw+2j3iJPybQ7PENyvpDZafQ==}
+    engines: {node: '>= 12.0.0'}
+    hasBin: true
+    requiresBuild: true
+    dependencies:
+      detect-libc: 1.0.3
+    optionalDependencies:
+      lightningcss-cli-darwin-arm64: 1.21.5
+      lightningcss-cli-darwin-x64: 1.21.5
+      lightningcss-cli-linux-arm-gnueabihf: 1.21.5
+      lightningcss-cli-linux-arm64-gnu: 1.21.5
+      lightningcss-cli-linux-arm64-musl: 1.21.5
+      lightningcss-cli-linux-x64-gnu: 1.21.5
+      lightningcss-cli-linux-x64-musl: 1.21.5
+      lightningcss-cli-win32-x64-msvc: 1.21.5
+    dev: true
+
+  /lightningcss-darwin-arm64@1.21.5:
+    resolution: {integrity: sha512-z05hyLX85WY0UfhkFUOrWEFqD69lpVAmgl3aDzMKlIZJGygbhbegqb4PV8qfUrKKNBauut/qVNPKZglhTaDDxA==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [arm64]
+    os: [darwin]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /lightningcss-darwin-x64@1.21.5:
+    resolution: {integrity: sha512-MSJhmej/U9MrdPxDk7+FWhO8+UqVoZUHG4VvKT5RQ4RJtqtANTiWiI97LvoVNMtdMnHaKs1Pkji6wHUFxjJsHQ==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [x64]
+    os: [darwin]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /lightningcss-linux-arm-gnueabihf@1.21.5:
+    resolution: {integrity: sha512-xN6+5/JsMrbZHL1lPl+MiNJ3Xza12ueBKPepiyDCFQzlhFRTj7D0LG+cfNTzPBTO8KcYQynLpl1iBB8LGp3Xtw==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [arm]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /lightningcss-linux-arm64-gnu@1.21.5:
+    resolution: {integrity: sha512-KfzFNhC4XTbmG3ma/xcTs/IhCwieW89XALIusKmnV0N618ZDXEB0XjWOYQRCXeK9mfqPdbTBpurEHV/XZtkniQ==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [arm64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /lightningcss-linux-arm64-musl@1.21.5:
+    resolution: {integrity: sha512-bc0GytQO5Mn9QM6szaZ+31fQHNdidgpM1sSCwzPItz8hg3wOvKl8039rU0veMJV3ZgC9z0ypNRceLrSHeRHmXw==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [arm64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /lightningcss-linux-x64-gnu@1.21.5:
+    resolution: {integrity: sha512-JwMbgypPQgc2kW2av3OwzZ8cbrEuIiDiXPJdXRE6aVxu67yHauJawQLqJKTGUhiAhy6iLDG8Wg0a3/ziL+m+Kw==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [x64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /lightningcss-linux-x64-musl@1.21.5:
+    resolution: {integrity: sha512-Ib8b6IQ/OR/VrPU6YBgy4T3QnuHY7DUa95O+nz+cwrTkMSN6fuHcTcIaz4t8TJ6HI5pl3uxUOZjmtls2pyQWow==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [x64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /lightningcss-win32-x64-msvc@1.21.5:
+    resolution: {integrity: sha512-A8cSi8lUpBeVmoF+DqqW7cd0FemDbCuKr490IXdjyeI+KL8adpSKUs8tcqO0OXPh1EoDqK7JNkD/dELmd4Iz5g==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [x64]
+    os: [win32]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /lightningcss@1.21.5:
+    resolution: {integrity: sha512-/pEUPeih2EwIx9n4T82aOG6CInN83tl/mWlw6B5gWLf36UplQi1L+5p3FUHsdt4fXVfOkkh9KIaM3owoq7ss8A==}
+    engines: {node: '>= 12.0.0'}
+    dependencies:
+      detect-libc: 1.0.3
+    optionalDependencies:
+      lightningcss-darwin-arm64: 1.21.5
+      lightningcss-darwin-x64: 1.21.5
+      lightningcss-linux-arm-gnueabihf: 1.21.5
+      lightningcss-linux-arm64-gnu: 1.21.5
+      lightningcss-linux-arm64-musl: 1.21.5
+      lightningcss-linux-x64-gnu: 1.21.5
+      lightningcss-linux-x64-musl: 1.21.5
+      lightningcss-win32-x64-msvc: 1.21.5
+    dev: true
+
   /lilconfig@2.1.0:
     resolution: {integrity: sha512-utWOt/GHzuUxnLKxB6dk81RoOeoNeHgbrXiuGk4yyF5qlRz+iIVWu56E2fqGHFrXz0QNUhLB/8nKqvRH66JKGQ==}
     engines: {node: '>=10'}
@@ -13658,7 +13858,7 @@ packages:
       jiti: 1.19.1
       postcss: 8.4.27
       semver: 7.5.4
-      webpack: 5.88.2(esbuild@0.18.17)
+      webpack: 5.88.2(@swc/core@1.3.73)(esbuild@0.18.17)
     dev: true
 
   /postcss-modules-extract-imports@3.0.0(postcss@8.4.27):
@@ -15337,7 +15537,7 @@ packages:
     peerDependencies:
       webpack: ^5.0.0
     dependencies:
-      webpack: 5.88.2(esbuild@0.18.17)
+      webpack: 5.88.2(@swc/core@1.3.73)(esbuild@0.18.17)
     dev: true
 
   /style-to-object@0.4.1:
