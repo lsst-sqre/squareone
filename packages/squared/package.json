@@ -2,6 +2,7 @@
   "name": "@lsst-sqre/squared",
   "description": "A React component library for Squareone / Rubin Data Management.",
   "version": "0.0.0",
+  "private": true,
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
