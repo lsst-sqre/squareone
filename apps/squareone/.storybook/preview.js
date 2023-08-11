@@ -8,7 +8,6 @@ import '@fontsource/source-sans-pro/400-italic.css';
 import '@fontsource/source-sans-pro/700.css';
 
 // Global CSS
-import 'normalize.css';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import '@lsst-sqre/global-css/dist/next.css';
 import '../src/styles/globals.css';
