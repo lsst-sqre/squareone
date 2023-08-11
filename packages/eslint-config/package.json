@@ -1,0 +1,16 @@
+{
+  "name": "@lsst-sqre/eslint-config",
+  "version": "0.0.0",
+  "private": true,
+  "main": "index.js",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "eslint-config-next": "^12.2.4",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-config-turbo": "^1.10.12",
+    "eslint-plugin-react": "^7.33.1"
+  }
+}

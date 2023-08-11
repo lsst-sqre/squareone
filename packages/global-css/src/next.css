@@ -1,0 +1,19 @@
+/*
+Base stylesheet for Squareone Next.js apps. This is intended to be imported
+from _app.js.
+*/
+/*
+@import './reset.css';
+@import '@lsst-sqre/rubin-style-dictionary/dist/tokens.css';
+@import '@lsst-sqre/rubin-style-dictionary/dist/tokens.dark.css';
+@import './base.css';
+*/
+
+@import './reset.css';
+
+/* Lightning CSS doesn't resolve imports to node_modules, so we have to
+   import the tokens.css file from the node_modules directory. */
+@import '../node_modules/@lsst-sqre/rubin-style-dictionary/dist/tokens.css';
+@import '../node_modules/@lsst-sqre/rubin-style-dictionary/dist/tokens.dark.css';
+
+@import './base.css';

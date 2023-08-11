@@ -1,0 +1,32 @@
+{
+  "name": "@lsst-sqre/global-css",
+  "description": "Global stylesheets for Squareone projects.",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./dist/next.css",
+  "license": "MIT",
+  "repository": "https://github.com/lsst-sqre/squareone",
+  "keywords": [
+    "rubin-observatory",
+    "design-tokens"
+  ],
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "dev": "chokidar 'src/*.css' -c 'pnpm run build'",
+    "build": "lightningcss --minify --bundle --targets '>= 0.25%' src/next.css -o dist/next.css",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@lsst-sqre/rubin-style-dictionary": "workspace:*"
+  },
+  "devDependencies": {
+    "chokidar-cli": "^3.0.0",
+    "lightningcss": "^1.21.5",
+    "lightningcss-cli": "^1.21.5"
+  }
+}

@@ -8,12 +8,9 @@ import { ThemeProvider } from 'next-themes';
 import '@fontsource/source-sans-pro/400.css';
 import '@fontsource/source-sans-pro/400-italic.css';
 import '@fontsource/source-sans-pro/700.css';
-import 'normalize.css';
 import '@fortawesome/fontawesome-svg-core/styles.css';
-import '@lsst-sqre/rubin-style-dictionary/dist/tokens.css';
-import '@lsst-sqre/rubin-style-dictionary/dist/tokens.dark.css';
+import '@lsst-sqre/global-css/dist/next.css';
 import '../styles/globals.css';
-
 import '../styles/icons';
 
 import Page from '../components/Page';

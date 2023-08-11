@@ -37,15 +37,16 @@ You can run a single app (e.g. Squareone) in development mode:
    Turbo Repo provides a powerful filtering syntax to let you run tasks on a subsets of app and packages, and their dependencies or dependents.
    Learn more in the `Turbo Repo --filter documentation`_.
 
-.. Start the Storybook server
-.. ==========================
+Start the Storybook server
+==========================
 
-.. Storybook_ is an environment for documenting and designing React components.
-.. .. You can start up Squareone's Storybook development site::
+Storybook_ is an environment for designing, testing, and documenting UI components.
+Applications and component packages in Squareone have their own Storybook environments.
+From the monorepo root, you can start up the Storybook server for all apps and packages:
 
-.. .. code-block:: bash
+.. code-block:: bash
 
-..    pnpm storybook
+   pnpm storybook
 
 Manual linting and formatting
 -----------------------------

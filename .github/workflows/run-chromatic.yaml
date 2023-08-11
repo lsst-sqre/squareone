@@ -1,0 +1,61 @@
+# A reusable workflow for submitting a storybook for a package or application
+# to Chromatic.
+
+name: 'Run Chromatic'
+
+'on':
+  workflow_call:
+    inputs:
+      path:
+        required: true
+        type: string
+      workspaceFilter:
+        required: true
+        type: string
+    secrets:
+      token:
+        required: true
+
+jobs:
+  chromatic:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # get full Git history
+
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Set up node
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install npm packages
+        run: pnpm install
+
+      - name: Build Storybook
+        run: pnpm run build-storybook --filter ${{ inputs.workspaceFilter }}
+        # In this workflow we manually build the storybooks rather than have
+        # the chromatic/action do it so we can build dependencies first
+        # via turborepo.
+
+      - name: Publish to Chromatic
+        if: github.ref != 'refs/heads/main'
+        uses: chromaui/action@v1
+        with:
+          projectToken: ${{ secrets.token }}
+          storybookBaseDir: ${{ inputs.path }}
+          storybookBuildDir: ${{ inputs.path }}/storybook-static
+
+      - name: Publish new baseline Chromatic
+        if: github.ref == 'refs/heads/main'
+        uses: chromaui/action@v1
+        with:
+          projectToken: ${{ secrets.token }}
+          storybookBaseDir: ${{ inputs.path }}
+          storybookBuildDir: ${{ inputs.path }}/storybook-static
+          autoAcceptChanges: true

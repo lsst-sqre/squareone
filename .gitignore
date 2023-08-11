@@ -11,10 +11,14 @@
 
 # turbo
 /.turbo
+**/.turbo
 
 # next.js
 /.next/
 /out/
+
+# storybook
+**/storybook-static
 
 # production
 /build
