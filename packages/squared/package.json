@@ -33,7 +33,7 @@
     "react-feather": "^2.0.10",
     "styled-components": "^5.3.6",
     "swr": "^2.2.1",
-    "unfetch": "^5.0.0"
+    "unfetch": "^4.2.0"
   },
   "devDependencies": {
     "@lsst-sqre/eslint-config": "workspace:*",
