@@ -13,14 +13,18 @@ export interface MenuProps {
    * The URL to use for the logout link. This is the Gafaelfawr logout endpoint.
    */
   logoutHref: string;
+  /**
+   * The username to display in the menu trigger.
+   */
+  username: string;
 }
 
-export const Menu = ({ children, logoutHref }: MenuProps) => {
+export const Menu = ({ children, logoutHref, username }: MenuProps) => {
   return (
     <RadixDropdownMenu.Root>
       <RadixDropdownMenu.Trigger asChild>
         <MenuTriggerButton>
-          username <ChevronDown />
+          {username} <ChevronDown />
         </MenuTriggerButton>
       </RadixDropdownMenu.Trigger>
 

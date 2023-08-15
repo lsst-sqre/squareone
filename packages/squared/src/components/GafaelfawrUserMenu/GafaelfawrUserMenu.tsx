@@ -4,16 +4,11 @@ import styled from 'styled-components';
 
 import Menu from './Menu';
 import Separator from './Separator';
-
 import MenuItem from './MenuItem';
+import useGafaelfawrUser from '../../hooks/useGafaelfawrUser';
 
 export interface GafaelfawrUserMenuProps {
   children: React.ReactNode;
-  /**
-   * Whether the user is logged in. This is a temporary shim until we have a
-   * proper useGafaelfawrUser hook.
-   */
-  loggedIn: boolean; // temp shim for useGafaelfawrUser
   /**
    * The URL to which the user should be redirected to log in.
    */
@@ -26,12 +21,16 @@ export interface GafaelfawrUserMenuProps {
 
 export const GafaelfawrUserMenu = ({
   children,
-  loggedIn,
   loginHref = '/login',
   logoutHref = '/logout',
 }: GafaelfawrUserMenuProps) => {
-  if (loggedIn) {
-    return <Menu logoutHref={logoutHref}>{children}</Menu>;
+  const { user, isLoggedIn } = useGafaelfawrUser();
+  if (isLoggedIn && user) {
+    return (
+      <Menu logoutHref={logoutHref} username={user.username}>
+        {children}
+      </Menu>
+    );
   } else {
     return <SiteNavLink href={loginHref}>Log in / Sign up</SiteNavLink>;
   }
