@@ -1,5 +1,7 @@
 import React from 'react';
 
+import Menu from './Menu';
+
 export interface GafaelfawrUserMenuProps {
   children: React.ReactNode;
   /**
@@ -11,15 +13,20 @@ export interface GafaelfawrUserMenuProps {
    * The URL to which the user should be redirected to log in.
    */
   loginHref: string;
+  /**
+   * The URL to use for the logout link. This is the Gafaelfawr logout endpoint.
+   */
+  logoutHref: string;
 }
 
 export const GafaelfawrUserMenu = ({
   children,
   loggedIn,
-  loginHref,
+  loginHref = '/login',
+  logoutHref = '/logout',
 }: GafaelfawrUserMenuProps) => {
   if (loggedIn) {
-    return <p>Log out</p>;
+    return <Menu logoutHref={logoutHref} />;
   } else {
     return <a href={loginHref}>Log in / Sign up</a>;
   }

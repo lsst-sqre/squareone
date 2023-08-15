@@ -11,7 +11,12 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  args: { children: 'User Menu', loggedIn: true, loginHref: '/login' },
+  args: {
+    children: 'User Menu',
+    loggedIn: true,
+    loginHref: '/login',
+    logoutHref: '/logout',
+  },
 };
 
 export const LoggedOut: Story = {
