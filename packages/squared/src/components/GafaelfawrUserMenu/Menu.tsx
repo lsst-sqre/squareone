@@ -1,10 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import * as RadixDropdownMenu from '@radix-ui/react-dropdown-menu';
 import { ChevronDown } from 'react-feather';
 
 import MenuItem from './MenuItem';
+import Separator from './Separator';
 
 export interface MenuProps {
   children: React.ReactNode;
@@ -16,14 +17,14 @@ export interface MenuProps {
 
 export const Menu = ({ children, logoutHref }: MenuProps) => {
   return (
-    <DropdownMenu.Root>
-      <DropdownMenu.Trigger asChild>
+    <RadixDropdownMenu.Root>
+      <RadixDropdownMenu.Trigger asChild>
         <MenuTriggerButton>
           username <ChevronDown />
         </MenuTriggerButton>
-      </DropdownMenu.Trigger>
+      </RadixDropdownMenu.Trigger>
 
-      <DropdownMenu.Portal>
+      <RadixDropdownMenu.Portal>
         <StyledContent align="end" sideOffset={5}>
           {children}
           <Separator />
@@ -31,10 +32,10 @@ export const Menu = ({ children, logoutHref }: MenuProps) => {
             <a href={logoutHref}>Logout</a>
           </MenuItem>
 
-          <DropdownMenu.Arrow className="DropdownMenuArrow" />
+          <RadixDropdownMenu.Arrow className="DropdownMenuArrow" />
         </StyledContent>
-      </DropdownMenu.Portal>
-    </DropdownMenu.Root>
+      </RadixDropdownMenu.Portal>
+    </RadixDropdownMenu.Root>
   );
 };
 
@@ -72,7 +73,7 @@ const MenuTriggerButton = styled.button`
 /**
  * The menu content container, used in a `DropdownMenu.Portal`.
  */
-const StyledContent = styled(DropdownMenu.Content)`
+const StyledContent = styled(RadixDropdownMenu.Content)`
   font-size: 1rem;
   background-color: var(--rsd-component-header-nav-menulist-background-color);
   min-width: 12rem;
@@ -92,12 +93,6 @@ const StyledContent = styled(DropdownMenu.Content)`
   .DropdownMenuArrow {
     fill: var(--rsd-component-header-nav-menulist-background-color);
   }
-`;
-
-const Separator = styled(DropdownMenu.Separator)`
-  margin: 1rem -1rem;
-  margin: 0 -1rem 1rem;
-  border: 1px solid var(--rsd-color-primary-700);
 `;
 
 export default Menu;

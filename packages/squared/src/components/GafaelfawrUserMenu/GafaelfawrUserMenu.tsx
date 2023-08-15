@@ -3,6 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 import Menu from './Menu';
+import Separator from './Separator';
 
 import MenuItem from './MenuItem';
 
@@ -44,6 +45,8 @@ const SiteNavLink = styled.a`
   }
 `;
 
-GafaelfawrUserMenu.MenuItem = MenuItem;
+// Associate child components with the parent for easier imports.
+GafaelfawrUserMenu.Item = MenuItem;
+GafaelfawrUserMenu.Separator = Separator;
 
 export default GafaelfawrUserMenu;

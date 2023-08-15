@@ -19,12 +19,12 @@ export const Default: Story = {
 
   render: (args) => (
     <GafaelfawrUserMenu {...args}>
-      <GafaelfawrUserMenu.MenuItem>
+      <GafaelfawrUserMenu.Item>
         <a href="#">Account Settings</a>
-      </GafaelfawrUserMenu.MenuItem>
-      <GafaelfawrUserMenu.MenuItem>
+      </GafaelfawrUserMenu.Item>
+      <GafaelfawrUserMenu.Item>
         <a href="#">Security tokens</a>
-      </GafaelfawrUserMenu.MenuItem>
+      </GafaelfawrUserMenu.Item>
     </GafaelfawrUserMenu>
   ),
 };
