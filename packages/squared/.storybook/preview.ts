@@ -1,11 +1,15 @@
 import type { Preview } from '@storybook/react';
 import { withThemeByDataAttribute } from '@storybook/addon-styling';
+import { initialize, mswLoader } from 'msw-storybook-addon';
 
 // Import font assets and stylesheets with @font-face declarations
 import '@fontsource/source-sans-pro/400.css';
 import '@fontsource/source-sans-pro/400-italic.css';
 import '@fontsource/source-sans-pro/700.css';
 import '@lsst-sqre/global-css/dist/next.css';
+
+// Initialize MSW
+initialize();
 
 const preview: Preview = {
   parameters: {
@@ -17,6 +21,8 @@ const preview: Preview = {
       },
     },
   },
+  // Provide the MSW addon loader globally
+  loaders: [mswLoader],
 };
 
 export default preview;
