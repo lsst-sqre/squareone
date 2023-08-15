@@ -4,6 +4,8 @@ import styled from 'styled-components';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { ChevronDown } from 'react-feather';
 
+import MenuItem from './MenuItem';
+
 export interface MenuProps {
   children: React.ReactNode;
   /**
@@ -23,19 +25,16 @@ export const Menu = ({ children, logoutHref }: MenuProps) => {
 
       <DropdownMenu.Portal>
         <StyledContent align="end" sideOffset={5}>
-          <DropdownMenu.Item>
-            New Tab <div className="RightSlot">⌘+T</div>
-          </DropdownMenu.Item>
-          <DropdownMenu.Item className="DropdownMenuItem">
-            New Window <div className="RightSlot">⌘+N</div>
-          </DropdownMenu.Item>
-          <DropdownMenu.Item className="DropdownMenuItem" disabled>
-            New Private Window <div className="RightSlot">⇧+⌘+N</div>
-          </DropdownMenu.Item>
-          <DropdownMenu.Separator />
-          <DropdownMenu.Item asChild>
+          <MenuItem>
+            <a href="#">Account settings</a>
+          </MenuItem>
+          <MenuItem>
+            <a href="#">Security tokens</a>
+          </MenuItem>
+          <Separator />
+          <MenuItem>
             <a href={logoutHref}>Logout</a>
-          </DropdownMenu.Item>
+          </MenuItem>
 
           <DropdownMenu.Arrow className="DropdownMenuArrow" />
         </StyledContent>
@@ -50,7 +49,12 @@ export const Menu = ({ children, logoutHref }: MenuProps) => {
 const MenuTriggerButton = styled.button`
   background-color: transparent;
   color: var(--rsd-component-header-nav-text-color);
-  border: none;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+
+  &:focus {
+    outline: 1px solid var(--rsd-color-primary-500);
+  }
 
   &:hover {
     color: var(--rsd-component-header-nav-text-hover-color);
@@ -91,8 +95,14 @@ const StyledContent = styled(DropdownMenu.Content)`
   }
 
   .DropdownMenuArrow {
-    fill: white;
+    fill: var(--rsd-component-header-nav-menulist-background-color);
   }
+`;
+
+const Separator = styled(DropdownMenu.Separator)`
+  margin: 1rem -1rem;
+  margin: 0 -1rem 1rem;
+  border: 1px solid var(--rsd-color-primary-700);
 `;
 
 export default Menu;
