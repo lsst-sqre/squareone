@@ -25,12 +25,7 @@ export const Menu = ({ children, logoutHref }: MenuProps) => {
 
       <DropdownMenu.Portal>
         <StyledContent align="end" sideOffset={5}>
-          <MenuItem>
-            <a href="#">Account settings</a>
-          </MenuItem>
-          <MenuItem>
-            <a href="#">Security tokens</a>
-          </MenuItem>
+          {children}
           <Separator />
           <MenuItem>
             <a href={logoutHref}>Logout</a>

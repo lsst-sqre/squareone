@@ -4,6 +4,8 @@ import styled from 'styled-components';
 
 import Menu from './Menu';
 
+import MenuItem from './MenuItem';
+
 export interface GafaelfawrUserMenuProps {
   children: React.ReactNode;
   /**
@@ -28,7 +30,7 @@ export const GafaelfawrUserMenu = ({
   logoutHref = '/logout',
 }: GafaelfawrUserMenuProps) => {
   if (loggedIn) {
-    return <Menu logoutHref={logoutHref} />;
+    return <Menu logoutHref={logoutHref}>{children}</Menu>;
   } else {
     return <SiteNavLink href={loginHref}>Log in / Sign up</SiteNavLink>;
   }
@@ -41,5 +43,7 @@ const SiteNavLink = styled.a`
     color: var(--rsd-component-header-nav-text-hover-color);
   }
 `;
+
+GafaelfawrUserMenu.MenuItem = MenuItem;
 
 export default GafaelfawrUserMenu;
