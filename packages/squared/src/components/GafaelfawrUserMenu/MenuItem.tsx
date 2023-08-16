@@ -15,7 +15,6 @@ MenuItem.displayName = 'MenuItem';
 
 const StyledDropdownMenuItem = styled(DropdownMenuItem)`
   color: var(--rsd-component-header-nav-menulist-text-color);
-  border: 1px solid transparent;
   border-radius: 0.5rem;
   padding: 0.5rem;
   margin: -0.5rem;
@@ -27,16 +26,17 @@ const StyledDropdownMenuItem = styled(DropdownMenuItem)`
   outline: none;
 
   &:focus {
-    background-color: var(--rsd-color-primary-500);
+    background-color: var(
+      --rsd-component-header-nav-menulist-selected-background-color
+    );
     color: white;
-    border-color: var(--rsd-color-primary-600);
   }
 
   a {
     color: inherit;
   }
   a:focus {
-    color: inherit;
+    color: white;
   }
 `;
 
