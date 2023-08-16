@@ -16,9 +16,10 @@ MenuItem.displayName = 'MenuItem';
 const StyledDropdownMenuItem = styled(DropdownMenuItem)`
   color: var(--rsd-component-header-nav-menulist-text-color);
   border-radius: 0.5rem;
-  padding: 0.5rem;
-  margin: -0.5rem;
-  margin-bottom: 0.5rem;
+  padding: calc(var(--gafaelfawr-user-menu-padding) / 2)
+    var(--gafaelfawr-user-menu-padding);
+  margin: calc(var(--gafaelfawr-user-menu-padding) / -2);
+  margin-bottom: calc(var(--gafaelfawr-user-menu-padding) / 2);
   &:last-of-type {
     margin-bottom: 0;
   }
@@ -30,13 +31,10 @@ const StyledDropdownMenuItem = styled(DropdownMenuItem)`
       --rsd-component-header-nav-menulist-selected-background-color
     );
     color: white;
-  }
 
-  a {
-    color: inherit;
-  }
-  a:focus {
-    color: white;
+    a {
+      color: white;
+    }
   }
 `;
 

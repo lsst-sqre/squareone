@@ -78,11 +78,16 @@ const MenuTriggerButton = styled.button`
  * The menu content container, used in a `DropdownMenu.Portal`.
  */
 const StyledContent = styled(RadixDropdownMenu.Content)`
+  /* This unit for the padding is also the basis for the spacing and
+   * sizing of the menu items.
+  */
+  --gafaelfawr-user-menu-padding: 0.5rem;
+
   font-size: 1rem;
   background-color: var(--rsd-component-header-nav-menulist-background-color);
   min-width: 12rem;
   border-radius: 0.5rem;
-  padding: 1rem;
+  padding: var(--gafaelfawr-user-menu-padding);
   color: var(--rsd-component-header-nav-menulist-text-color);
   box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35),
     0px 10px 20px -15px rgba(22, 23, 24, 0.2);
