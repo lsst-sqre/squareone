@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { rest } from 'msw';
 import { SWRConfig } from 'swr';
-import { within, userEvent } from '@storybook/testing-library';
+import { within, userEvent, screen } from '@storybook/testing-library';
 import { expect } from '@storybook/jest';
 
 import GafaelfawrUserMenu from './GafaelfawrUserMenu';
@@ -109,10 +109,13 @@ export const OpenedMenu: Story = {
 
     const canvas = within(canvasElement);
     await userEvent.click(canvas.getByRole('button'));
-    // FIXME the canvas doesn't contain the menu.
-    // I think that's because radix adds the dropdown outside the
-    // story root.
-    // await expect(canvas.getByText('Log out')).toBeInTheDocument();
+    // Using screen rather than canvas because Radix renders the dropdown
+    // outside the scope of the storybook canvas.
+    await expect(screen.getByText('Log out')).toBeInTheDocument();
+    await expect(screen.getByText('Log out')).toHaveAttribute(
+      'href',
+      'http://localhost:6006/logout?rd=http%3A%2F%2Flocalhost%3A6006%2F'
+    );
   },
 
   render: (args) => (
