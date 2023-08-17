@@ -18,6 +18,7 @@
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
+    "test-storybook": "test-storybook",
     "new-component": "new-component"
   },
   "publishConfig": {
@@ -46,6 +47,7 @@
     "@storybook/blocks": "^7.2.1",
     "@storybook/react": "^7.2.1",
     "@storybook/react-vite": "^7.2.1",
+    "@storybook/test-runner": "^0.13.0",
     "@storybook/testing-library": "^0.2.0",
     "@types/react": "^18.2.19",
     "@types/react-dom": "^18.2.7",
@@ -61,10 +63,13 @@
     "typescript": "^5.1.6",
     "typescript-plugin-css-modules": "^5.0.1"
   },
+  "peerDependencies": {
+    "next": "12"
+  },
   "msw": {
     "workerDirectory": "public"
   },
-  "peerDependencies": {
-    "next": "12"
+  "jest": {
+    "roots": ["src"]
   }
 }
