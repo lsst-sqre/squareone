@@ -5,34 +5,35 @@ import styled from 'styled-components';
 import Menu from './Menu';
 import Separator from './Separator';
 import MenuItem from './MenuItem';
+import { getLoginUrl, getLogoutUrl } from './authUrls';
 import useGafaelfawrUser from '../../hooks/useGafaelfawrUser';
 
 export interface GafaelfawrUserMenuProps {
   children: React.ReactNode;
   /**
-   * The URL to which the user should be redirected to log in.
+   * The URL of the current page. Used to construct the login and logout URLs
+   * with appropriate redirects.
    */
-  loginHref: string;
-  /**
-   * The URL to use for the logout link. This is the Gafaelfawr logout endpoint.
-   */
-  logoutHref: string;
+  currentUrl: string;
 }
 
 export const GafaelfawrUserMenu = ({
   children,
-  loginHref = '/login',
-  logoutHref = '/logout',
+  currentUrl,
 }: GafaelfawrUserMenuProps) => {
   const { user, isLoggedIn } = useGafaelfawrUser();
+  // TODO: it'd be nice to integrate the useCurrentUrl hook into
+  // this component so the user doesn't have to pass this prop.
+  const logoutUrl = getLogoutUrl(currentUrl);
+  const loginUrl = getLoginUrl(currentUrl);
   if (isLoggedIn && user) {
     return (
-      <Menu logoutHref={logoutHref} username={user.username}>
+      <Menu logoutHref={logoutUrl} username={user.username}>
         {children}
       </Menu>
     );
   } else {
-    return <SiteNavLink href={loginHref}>Log in / Sign up</SiteNavLink>;
+    return <SiteNavLink href={loginUrl}>Log in / Sign up</SiteNavLink>;
   }
 };
 

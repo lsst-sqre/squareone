@@ -25,8 +25,7 @@ type Story = StoryObj<typeof GafaelfawrUserMenu>;
 
 export const Default: Story = {
   args: {
-    loginHref: '/login',
-    logoutHref: '/logout',
+    currentUrl: 'http://localhost:6006/somepage',
   },
 
   parameters: {
