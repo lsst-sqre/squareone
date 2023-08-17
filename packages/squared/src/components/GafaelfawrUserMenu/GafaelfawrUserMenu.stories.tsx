@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { rest } from 'msw';
 import { SWRConfig } from 'swr';
+import { within, userEvent } from '@storybook/testing-library';
+import { expect } from '@storybook/jest';
 
 import GafaelfawrUserMenu from './GafaelfawrUserMenu';
 
@@ -23,6 +25,39 @@ const meta: Meta<typeof GafaelfawrUserMenu> = {
 export default meta;
 type Story = StoryObj<typeof GafaelfawrUserMenu>;
 
+const loggedInAuthHandlers = [
+  rest.get('/auth/api/v1/user-info', (req, res, ctx) => {
+    return res(
+      ctx.json({
+        username: 'someuser',
+        name: 'Alice Example',
+        email: 'alice@example.com',
+        uid: 4123,
+        gid: 4123,
+        groups: [
+          {
+            name: 'g_special_users',
+            id: 123181,
+          },
+        ],
+        quota: {
+          api: {},
+          notebook: {
+            cpu: 4,
+            memory: 16,
+          },
+        },
+      })
+    );
+  }),
+];
+
+const loggedOutAuthHandlers = [
+  rest.get('/auth/api/v1/user-info', (req, res, ctx) => {
+    return res(ctx.status(401));
+  }),
+];
+
 export const Default: Story = {
   args: {
     currentUrl: 'http://localhost:6006/somepage',
@@ -31,32 +66,7 @@ export const Default: Story = {
   parameters: {
     msw: {
       handlers: {
-        auth: [
-          rest.get('/auth/api/v1/user-info', (req, res, ctx) => {
-            return res(
-              ctx.json({
-                username: 'someuser',
-                name: 'Alice Example',
-                email: 'alice@example.com',
-                uid: 4123,
-                gid: 4123,
-                groups: [
-                  {
-                    name: 'g_special_users',
-                    id: 123181,
-                  },
-                ],
-                quota: {
-                  api: {},
-                  notebook: {
-                    cpu: 4,
-                    memory: 16,
-                  },
-                },
-              })
-            );
-          }),
-        ],
+        auth: loggedInAuthHandlers,
       },
     },
   },
@@ -81,12 +91,40 @@ export const LoggedOut: Story = {
   parameters: {
     msw: {
       handlers: {
-        auth: [
-          rest.get('/auth/api/v1/user-info', (req, res, ctx) => {
-            return res(ctx.status(401));
-          }),
-        ],
+        auth: loggedOutAuthHandlers,
       },
     },
   },
+};
+
+export const OpenedMenu: Story = {
+  args: { ...Default.args },
+
+  parameters: { ...Default.parameters },
+
+  play: async ({ canvasElement }) => {
+    // Delay so msw can load
+    const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
+    await delay(1000);
+
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('button'));
+    // FIXME the canvas doesn't contain the menu.
+    // I think that's because radix adds the dropdown outside the
+    // story root.
+    // await expect(canvas.getByText('Log out')).toBeInTheDocument();
+  },
+
+  render: (args) => (
+    <SWRConfig value={{ provider: () => new Map() }}>
+      <GafaelfawrUserMenu {...args}>
+        <GafaelfawrUserMenu.Item>
+          <a href="#">Account Settings</a>
+        </GafaelfawrUserMenu.Item>
+        <GafaelfawrUserMenu.Item>
+          <a href="#">Security tokens</a>
+        </GafaelfawrUserMenu.Item>
+      </GafaelfawrUserMenu>
+    </SWRConfig>
+  ),
 };

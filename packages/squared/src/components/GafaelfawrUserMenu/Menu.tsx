@@ -33,7 +33,7 @@ export const Menu = ({ children, logoutHref, username }: MenuProps) => {
           {children}
           <Separator />
           <MenuItem>
-            <a href={logoutHref}>Logout</a>
+            <a href={logoutHref}>Log out</a>
           </MenuItem>
 
           <RadixDropdownMenu.Arrow className="DropdownMenuArrow" />
