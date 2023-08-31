@@ -53,14 +53,12 @@ For public npm packages, changesets publishes the new version to the npm registr
 Squareone uses GitHub Packages for its npm registry.
 
 This workflow does not handle Docker images; see :file:`docker-release.yaml` for that.
+However, ``release.yaml`` does effectively trigger the Docker release workflows by creating a new GitHub release.
 
 .. note::
 
-   Each application has its own release job in ``release.yaml``.
-   Remember to add a new job when you add an application to Squareone.
-   The changesets action in :file:`release.yaml` uses a Personal Access Token rather than the default GitHub Actions token, ``GITHUB_TOKEN``.
+   The changesets action in :file:`release.yaml` uses a GitHub App, `Squareone CI <https://github.com/organizations/lsst-sqre/settings/apps/squareone-ci>`__ to issue a GitHub token rather than the default GitHub Actions token, ``GITHUB_TOKEN``.
    This is because Git commits made via that default token don't trigger further GitHub Actions workflows.
-   In order for merges from the :file:`release.yaml` workflow to trigger the :file:`ci.yaml` workflow, we need to use a PAT.
 
 Releasing docker images — docker-release.yaml
 =============================================
