@@ -11,4 +11,7 @@ nitpick_ignore = [["py:class", "pybtex.style.formatting.plain.Style"]]
 extensions = ["sphinx-jsonschema"]
 
 [sphinx.linkcheck]
-ignore = ["https://jira.lsstcorp.org/browse/"]
+ignore = [
+    "https://jira.lsstcorp.org/browse/",
+    "https://github.com/organizations/lsst-sqre/settings/apps/squareone-ci"
+]
