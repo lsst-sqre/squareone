@@ -69,7 +69,7 @@ In the specific case of a GitHub Actions workflow, you can use the built-in ``$G
       runs-on: ubuntu-latest
 
        steps:
-         - uses: actions/checkout@v3
+         - uses: actions/checkout@v4
 
          - name: Set up node
            uses: actions/setup-node@v3
