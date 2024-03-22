@@ -1,5 +1,19 @@
 # squareone
 
+## 0.11.0
+
+### Minor Changes
+
+- [#153](https://github.com/lsst-sqre/squareone/pull/153) [`3561d09`](https://github.com/lsst-sqre/squareone/commit/3561d097d0c5cbe508f140f2bcd9041a540832a0) Thanks [@jonathansick](https://github.com/jonathansick)! - Squareone uses a base stylesheet from the @lsst-sqre/global-css package. This reduces the amount of global CSS managed in Squareone itself, and offloads configuring the Rubin Style Dictionary tokens into base CSS elements.
+
+- [#153](https://github.com/lsst-sqre/squareone/pull/153) [`1240924`](https://github.com/lsst-sqre/squareone/commit/124092414c191eb16866304eafd9b6c4d428e2f6) Thanks [@jonathansick](https://github.com/jonathansick)! - Drop the use of normalize.css and instead rely on the base CSS from the global-css package.
+
+### Patch Changes
+
+- Updated dependencies [[`b765732`](https://github.com/lsst-sqre/squareone/commit/b765732db52e354026294fce7b5ef7c32d32e553), [`5ee421b`](https://github.com/lsst-sqre/squareone/commit/5ee421bdd8f1c6f922913028ad48284f941189f1), [`9abbebb`](https://github.com/lsst-sqre/squareone/commit/9abbebba02fc1bc27fe2097fbbdb97110a9c93d9), [`30928a5`](https://github.com/lsst-sqre/squareone/commit/30928a5caa5392d7927fd3a2f017d48d77b68c1a), [`30928a5`](https://github.com/lsst-sqre/squareone/commit/30928a5caa5392d7927fd3a2f017d48d77b68c1a)]:
+  - @lsst-sqre/squared@0.1.0
+  - @lsst-sqre/global-css@0.1.0
+
 ## 0.10.3
 
 ### Patch Changes
