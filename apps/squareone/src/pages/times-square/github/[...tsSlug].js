@@ -17,10 +17,7 @@ export default function GitHubNotebookViewPage({}) {
 
   return (
     <TimesSquareParametersProvider>
-      <TimesSquareApp
-        pageNav={pageNav}
-        pagePanel={<TimesSquareGitHubPagePanel />}
-      >
+      <TimesSquareApp pageNav={pageNav}>
         <TimesSquareNotebookViewer />
       </TimesSquareApp>
     </TimesSquareParametersProvider>
