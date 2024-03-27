@@ -20,6 +20,7 @@ export default function TimesSquareParametersProvider({ children }) {
 
   // Get components out of the URL path
   const { tsSlug, owner = '', repo = '', commit = '' } = router.query;
+  console.log('tsSlug: ', tsSlug);
 
   // Since the page's path is a [...tsSlug], we need to join the parts of the
   // path to get the full slug. This combines the owner, repo, directory, and
@@ -31,6 +32,7 @@ export default function TimesSquareParametersProvider({ children }) {
   const tsPageUrl = router.pathname.startsWith('/times-square/github-pr')
     ? `${timesSquareUrl}/v1/github-pr/${owner}/${repo}/${commit}/${githubSlug}`
     : `${timesSquareUrl}/v1/github/${githubSlug}`;
+  console.log('tsPageUrl: ', tsPageUrl);
 
   // Get the user query parameters from the URL. In next 13 we can use the
   // useSearchParams hook (https://nextjs.org/docs/app/api-reference/functions/use-search-params)
@@ -48,6 +50,9 @@ export default function TimesSquareParametersProvider({ children }) {
   // the notebook parameters.
   const { ts_hide_code = '1', ...notebookParameters } = userParameters;
   const displaySettings = { ts_hide_code };
+
+  console.log('displaySettings: ', displaySettings);
+  console.log('notebookParameters: ', notebookParameters);
 
   return (
     <TimesSquareParametersContext.Provider
