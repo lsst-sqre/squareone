@@ -4,6 +4,7 @@
  * page, usually the page viewer, or a markdown view of the GitHub repository.
  */
 
+import React from 'react';
 import styled from 'styled-components';
 
 import Sidebar from './Sidebar';
