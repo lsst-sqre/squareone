@@ -4,6 +4,9 @@
  * the notebook content (NotebookIframe).
  */
 
+'use client';
+
+import React from 'react';
 import styled from 'styled-components';
 import getConfig from 'next/config';
 import Head from 'next/head';
@@ -12,13 +15,10 @@ import Error from 'next/error';
 import useTimesSquarePage from '../../hooks/useTimesSquarePage';
 import TimesSquareParameters from '../TimesSquareParameters';
 
-export default function TimesSquareGitHubPagePanel({
-  tsPageUrl,
-  userParameters,
-  displaySettings,
-}) {
+export default function TimesSquareGitHubPagePanel({}) {
   const { publicRuntimeConfig } = getConfig();
-  const pageData = useTimesSquarePage(tsPageUrl);
+
+  const pageData = useTimesSquarePage();
 
   if (pageData.loading) {
     return <p>Loading...</p>;
@@ -39,11 +39,7 @@ export default function TimesSquareGitHubPagePanel({
         {description && (
           <div dangerouslySetInnerHTML={{ __html: description.html }}></div>
         )}
-        <TimesSquareParameters
-          pageData={pageData}
-          userParameters={userParameters}
-          displaySettings={displaySettings}
-        />
+        <TimesSquareParameters />
       </div>
     </PagePanelContainer>
   );

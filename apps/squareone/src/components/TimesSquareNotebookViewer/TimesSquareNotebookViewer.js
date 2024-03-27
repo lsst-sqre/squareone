@@ -3,9 +3,11 @@
  * from Times Square with a notebook render.
  */
 
+import React from 'react';
 import styled from 'styled-components';
 
 import useHtmlStatus from './useHtmlStatus';
+import { TimesSquareUrlParametersContext } from '../TimesSquareUrlParametersProvider';
 
 const StyledIframe = styled.iframe`
   /* --shadow-color: 0deg 0% 74%;
@@ -19,12 +21,9 @@ const StyledIframe = styled.iframe`
   height: 100%;
 `;
 
-export default function TimesSquareNotebookViewer({
-  tsPageUrl,
-  parameters,
-  displaySettings,
-}) {
-  const htmlStatus = useHtmlStatus(tsPageUrl, parameters, displaySettings);
+export default function TimesSquareNotebookViewer({}) {
+  const { tsPageUrl } = React.useContext(TimesSquareUrlParametersContext);
+  const htmlStatus = useHtmlStatus();
 
   if (htmlStatus.error) {
     return (
