@@ -4,6 +4,7 @@
  * the notebook content (NotebookIframe).
  */
 
+import React from 'react';
 import styled from 'styled-components';
 import getConfig from 'next/config';
 import Head from 'next/head';
