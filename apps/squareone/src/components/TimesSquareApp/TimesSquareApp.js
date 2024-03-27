@@ -7,6 +7,7 @@
 import styled from 'styled-components';
 
 import Sidebar from './Sidebar';
+import { TimesSquareParametersContext } from '../TimesSquareParametersProvider';
 
 const StyledLayout = styled.div`
   display: flex;
@@ -21,6 +22,8 @@ const StyledLayout = styled.div`
 `;
 
 export default function TimesSquareApp({ children, pageNav, pagePanel }) {
+  const paramsContext = React.useContext(TimesSquareParametersContext);
+  console.log('paramsContext in TimesSquareApp:', paramsContext);
   return (
     <StyledLayout>
       <Sidebar pageNav={pageNav} pagePanel={pagePanel} />
