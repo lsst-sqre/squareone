@@ -15,11 +15,12 @@ export default function GitHubNotebookViewPage({}) {
 
   const pageNav = <TimesSquareMainGitHubNav pagePath={githubSlug} />;
 
-  const pagePanel = <TimesSquareGitHubPagePanel />;
-
   return (
     <TimesSquareParametersProvider>
-      <TimesSquareApp pageNav={pageNav} pagePanel={pagePanel}>
+      <TimesSquareApp
+        pageNav={pageNav}
+        pagePanel={<TimesSquareGitHubPagePanel />}
+      >
         <TimesSquareNotebookViewer />
       </TimesSquareApp>
     </TimesSquareParametersProvider>
