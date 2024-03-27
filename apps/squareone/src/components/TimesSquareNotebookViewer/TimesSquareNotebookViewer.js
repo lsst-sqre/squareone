@@ -22,8 +22,14 @@ const StyledIframe = styled.iframe`
 `;
 
 export default function TimesSquareNotebookViewer({}) {
-  const { tsPageUrl } = React.useContext(TimesSquareParametersContext);
-  const htmlStatus = useHtmlStatus(tsPageUrl, parameters, displaySettings);
+  const { tsPageUrl, notebookParameters, displaySettings } = React.useContext(
+    TimesSquareParametersContext
+  );
+  const htmlStatus = useHtmlStatus(
+    tsPageUrl,
+    notebookParameters,
+    displaySettings
+  );
 
   if (htmlStatus.error) {
     return (
