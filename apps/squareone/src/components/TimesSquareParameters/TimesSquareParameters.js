@@ -7,6 +7,9 @@ import Button, { RedGhostButton } from '../Button';
 import StringInput from './StringInput';
 import ParameterInput from './ParameterInput';
 
+import { TimesSquareParametersContext } from '../TimesSquareParametersProvider';
+import useTimesSquarePage from '../../hooks/useTimesSquarePage';
+
 // Create input components based on the parameter's JSON schema
 function inputFactory(props) {
   const { paramName, paramSchema, value, onChange, errors, touched } = props;
@@ -28,13 +31,16 @@ function inputFactory(props) {
   );
 }
 
-export default function TimesSquareParameters({
-  pageData,
-  userParameters,
-  displaySettings,
-}) {
+export default function TimesSquareParameters({}) {
   const router = useRouter();
-  const { parameters } = pageData;
+
+  const {
+    tsPageUrl,
+    displaySettings,
+    notebookParameters: userParameters,
+  } = React.useContext(TimesSquareParametersContext);
+  const { parameters } = useTimesSquarePage(tsPageUrl);
+
   const ajv = new Ajv({ coerceTypes: true });
 
   // Merge userParameters with defaults

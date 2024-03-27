@@ -11,13 +11,11 @@ import Error from 'next/error';
 
 import useTimesSquarePage from '../../hooks/useTimesSquarePage';
 import TimesSquareParameters from '../TimesSquareParameters';
+import TimesSquareParametersContext from '../TimesSquareParametersProvider';
 
-export default function TimesSquareGitHubPagePanel({
-  tsPageUrl,
-  userParameters,
-  displaySettings,
-}) {
+export default function TimesSquareGitHubPagePanel({}) {
   const { publicRuntimeConfig } = getConfig();
+  const { tsPageUrl } = React.useContext(TimesSquareParametersContext);
   const pageData = useTimesSquarePage(tsPageUrl);
 
   if (pageData.loading) {
@@ -39,11 +37,7 @@ export default function TimesSquareGitHubPagePanel({
         {description && (
           <div dangerouslySetInnerHTML={{ __html: description.html }}></div>
         )}
-        <TimesSquareParameters
-          pageData={pageData}
-          userParameters={userParameters}
-          displaySettings={displaySettings}
-        />
+        <TimesSquareParameters />
       </div>
     </PagePanelContainer>
   );

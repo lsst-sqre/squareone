@@ -6,42 +6,23 @@ import WideContentLayout from '../../../components/WideContentLayout';
 import TimesSquareMainGitHubNav from '../../../components/TimesSquareMainGitHubNav';
 import TimesSquareNotebookViewer from '../../../components/TimesSquareNotebookViewer';
 import TimesSquareGitHubPagePanel from '../../../components/TimesSquareGitHubPagePanel/TimesSquareGitHubPagePanel';
+import TimesSquareParametersProvider from '../../../components/TimesSquareParametersProvider';
 
 export default function GitHubNotebookViewPage({}) {
-  const { publicRuntimeConfig } = getConfig();
-  const { timesSquareUrl } = publicRuntimeConfig;
   const router = useRouter();
   const { tsSlug } = router.query;
   const githubSlug = tsSlug.join('/');
-  const tsPageUrl = `${timesSquareUrl}/v1/github/${githubSlug}`;
-
-  const userParameters = Object.fromEntries(
-    Object.entries(router.query)
-      .filter((item) => item[0] != 'tsSlug')
-      .map((item) => item)
-  );
-
-  const { ts_hide_code = '1' } = userParameters;
-  const displaySettings = { ts_hide_code };
 
   const pageNav = <TimesSquareMainGitHubNav pagePath={githubSlug} />;
 
-  const pagePanel = (
-    <TimesSquareGitHubPagePanel
-      tsPageUrl={tsPageUrl}
-      userParameters={userParameters}
-      displaySettings={displaySettings}
-    />
-  );
+  const pagePanel = <TimesSquareGitHubPagePanel />;
 
   return (
-    <TimesSquareApp pageNav={pageNav} pagePanel={pagePanel}>
-      <TimesSquareNotebookViewer
-        tsPageUrl={tsPageUrl}
-        parameters={userParameters}
-        displaySettings={displaySettings}
-      />
-    </TimesSquareApp>
+    <TimesSquareParametersProvider>
+      <TimesSquareApp pageNav={pageNav} pagePanel={pagePanel}>
+        <TimesSquareNotebookViewer />
+      </TimesSquareApp>
+    </TimesSquareParametersProvider>
   );
 }
 
