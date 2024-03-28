@@ -24,7 +24,7 @@ export default function TimesSquareUrlParametersProvider({ children }) {
   // path to get the full slug. This combines the owner, repo, directory, and
   // notebook name for regular /github/ pages, or just the directory and
   // notebook name for /github-pr/ pages.
-  const githubSlug = tsSlug.join('/');
+  const githubSlug = tsSlug ? tsSlug.join('/') : null;
 
   // Construct the URL for the Times Square API endpoint that gives information
   // about the page. GitHub PR pages (github-pr) have different API URLs than
