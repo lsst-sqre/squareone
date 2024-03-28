@@ -19,7 +19,7 @@ import TimesSquareUrlParametersContext from '../TimesSquareUrlParametersProvider
 
 export default function TimesSquareGitHubPagePanel({}) {
   const { publicRuntimeConfig } = getConfig();
-  router = useRouter();
+  const router = useRouter();
   const { tsPageUrl } = React.useContext(TimesSquareUrlParametersContext);
   const pageData = useTimesSquarePage(tsPageUrl);
 
