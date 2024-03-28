@@ -11,6 +11,7 @@ import styled from 'styled-components';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import Error from 'next/error';
+import { useRouter } from 'next/router';
 
 import useTimesSquarePage from '../../hooks/useTimesSquarePage';
 import TimesSquareParameters from '../TimesSquareParameters';
@@ -18,6 +19,7 @@ import TimesSquareUrlParametersContext from '../TimesSquareUrlParametersProvider
 
 export default function TimesSquareGitHubPagePanel({}) {
   const { publicRuntimeConfig } = getConfig();
+  router = useRouter();
   const { tsPageUrl } = React.useContext(TimesSquareUrlParametersContext);
   const pageData = useTimesSquarePage(tsPageUrl);
 
