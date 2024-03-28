@@ -4,6 +4,8 @@
  * the notebook content (NotebookIframe).
  */
 
+'use client';
+
 import React from 'react';
 import styled from 'styled-components';
 import getConfig from 'next/config';
