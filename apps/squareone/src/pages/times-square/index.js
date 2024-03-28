@@ -9,7 +9,7 @@ import TimesSquareUrlParametersProvider from '../../components/TimesSquareUrlPar
 export default function TimesSquareHome({ publicRuntimeConfig }) {
   return (
     <TimesSquareUrlParametersProvider>
-      <TimesSquareApp pageNav={pageNav}>
+      <TimesSquareApp>
         <Head>
           <title>Times Square | {publicRuntimeConfig.siteName}</title>
         </Head>
