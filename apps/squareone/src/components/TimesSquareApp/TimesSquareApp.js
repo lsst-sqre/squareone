@@ -36,11 +36,12 @@ export default function TimesSquareApp({ children }) {
     <TimesSquareMainGitHubNav pagePath={githubSlug} />
   );
 
-  const pagePanel = tsSlug ? <TimesSquareGitHubPagePanel /> : null;
-
   return (
     <StyledLayout>
-      <Sidebar pageNav={pageNav} pagePanel={pagePanel} />
+      <Sidebar
+        pageNav={pageNav}
+        pagePanel={tsSlug ? <TimesSquareGitHubPagePanel /> : null}
+      />
       <main>{children}</main>
     </StyledLayout>
   );
