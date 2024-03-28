@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 import TimesSquareApp from '../../components/TimesSquareApp';
 import WideContentLayout from '../../components/WideContentLayout';
-import TimesSquareUrlParametersProvider from '../../../components/TimesSquareUrlParametersProvider';
+import TimesSquareUrlParametersProvider from '../../components/TimesSquareUrlParametersProvider';
 
 export default function TimesSquareHome({ publicRuntimeConfig }) {
   return (
