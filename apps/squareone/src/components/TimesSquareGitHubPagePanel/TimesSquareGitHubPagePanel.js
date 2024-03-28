@@ -12,11 +12,11 @@ import Error from 'next/error';
 
 import useTimesSquarePage from '../../hooks/useTimesSquarePage';
 import TimesSquareParameters from '../TimesSquareParameters';
-import TimesSquareParametersContext from '../TimesSquareParametersProvider';
+import TimesSquareUrlParametersContext from '../TimesSquareUrlParametersProvider';
 
 export default function TimesSquareGitHubPagePanel({}) {
   const { publicRuntimeConfig } = getConfig();
-  const { tsPageUrl } = React.useContext(TimesSquareParametersContext);
+  const { tsPageUrl } = React.useContext(TimesSquareUrlParametersContext);
   const pageData = useTimesSquarePage(tsPageUrl);
 
   if (pageData.loading) {

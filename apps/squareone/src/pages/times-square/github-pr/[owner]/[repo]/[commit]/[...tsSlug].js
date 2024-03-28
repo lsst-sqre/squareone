@@ -1,29 +1,17 @@
 import getConfig from 'next/config';
-import { useRouter } from 'next/router';
 
 import TimesSquareApp from '../../../../../../components/TimesSquareApp';
 import WideContentLayout from '../../../../../../components/WideContentLayout';
-import TimesSquarePrGitHubNav from '../../../../../../components/TimesSquarePrGitHubNav';
 import TimesSquareNotebookViewer from '../../../../../../components/TimesSquareNotebookViewer';
-import TimesSquareGitHubPagePanel from '../../../../../../components/TimesSquareGitHubPagePanel/TimesSquareGitHubPagePanel';
-import TimesSquareParametersProvider from '../../../../../../components/TimesSquareParametersProvider';
+import TimesSquareUrlParametersProvider from '../../../../../../components/TimesSquareUrlParametersProvider';
 
 export default function GitHubPrNotebookViewPage({}) {
-  const router = useRouter();
-  const { owner, repo, commit } = router.query;
-
-  const pageNav = (
-    <TimesSquarePrGitHubNav owner={owner} repo={repo} commitSha={commit} />
-  );
-
-  const pagePanel = <TimesSquareGitHubPagePanel />;
-
   return (
-    <TimesSquareParametersProvider>
-      <TimesSquareApp pageNav={pageNav} pagePanel={pagePanel}>
+    <TimesSquareUrlParametersProvider>
+      <TimesSquareApp>
         <TimesSquareNotebookViewer />
       </TimesSquareApp>
-    </TimesSquareParametersProvider>
+    </TimesSquareUrlParametersProvider>
   );
 }
 

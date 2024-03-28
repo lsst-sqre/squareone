@@ -1,25 +1,23 @@
 /*
- * Context provider for the current page's notebook and display parameters.
+ * Context provider for the current page's notebook and display parameters
+ * that come from the URL path and query parameters.
  */
 
 import React from 'react';
 import getConfig from 'next/config';
 import { useRouter } from 'next/router';
 
-export const TimesSquareParametersContext = React.createContext();
+export const TimesSquareUrlParametersContext = React.createContext();
 
-export default function TimesSquareParametersProvider({ children }) {
-  // const [displayParameters, setDisplayParameters] = React.useState({
-  //   ts_hide_code: '1',
-  // });
-  // const [notebookParameters, setNotebookParameters] = React.useState({});
-
+export default function TimesSquareUrlParametersProvider({ children }) {
   const { publicRuntimeConfig } = getConfig();
   const { timesSquareUrl } = publicRuntimeConfig;
   const router = useRouter();
 
-  // Get components out of the URL path
-  const { tsSlug, owner = '', repo = '', commit = '' } = router.query;
+  // Get components out of the URL path. Only /github-pr/ pages have owner,
+  // repo, and commit components in the path. In /github/ pages the owner
+  // and repo are part of tsSlug.
+  const { tsSlug, owner = null, repo = null, commit = null } = router.query;
   console.log('tsSlug: ', tsSlug);
 
   // Since the page's path is a [...tsSlug], we need to join the parts of the
@@ -28,7 +26,9 @@ export default function TimesSquareParametersProvider({ children }) {
   // notebook name for /github-pr/ pages.
   const githubSlug = tsSlug.join('/');
 
-  // Construct the URL for the Times Square API endpoint
+  // Construct the URL for the Times Square API endpoint that gives information
+  // about the page. GitHub PR pages (github-pr) have different API URLs than
+  // regular GitHub pages.
   const tsPageUrl = router.pathname.startsWith('/times-square/github-pr')
     ? `${timesSquareUrl}/v1/github-pr/${owner}/${repo}/${commit}/${githubSlug}`
     : `${timesSquareUrl}/v1/github/${githubSlug}`;
@@ -55,10 +55,19 @@ export default function TimesSquareParametersProvider({ children }) {
   console.log('notebookParameters: ', notebookParameters);
 
   return (
-    <TimesSquareParametersContext.Provider
-      value={{ tsPageUrl, displaySettings, notebookParameters }}
+    <TimesSquareUrlParametersContext.Provider
+      value={{
+        tsPageUrl,
+        displaySettings,
+        notebookParameters,
+        owner,
+        repo,
+        commit,
+        tsSlug,
+        githubSlug,
+      }}
     >
       {children}
-    </TimesSquareParametersContext.Provider>
+    </TimesSquareUrlParametersContext.Provider>
   );
 }

@@ -7,7 +7,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 import useHtmlStatus from './useHtmlStatus';
-import { TimesSquareParametersContext } from '../TimesSquareParametersProvider';
+import { TimesSquareUrlParametersContext } from '../TimesSquareUrlParametersProvider';
 
 const StyledIframe = styled.iframe`
   /* --shadow-color: 0deg 0% 74%;
@@ -23,7 +23,7 @@ const StyledIframe = styled.iframe`
 
 export default function TimesSquareNotebookViewer({}) {
   const { tsPageUrl, notebookParameters, displaySettings } = React.useContext(
-    TimesSquareParametersContext
+    TimesSquareUrlParametersContext
   );
   const htmlStatus = useHtmlStatus(
     tsPageUrl,
