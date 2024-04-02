@@ -17,6 +17,7 @@ function useTimesSquarePage() {
     description: data ? data.description : null,
     htmlUrl: data ? data.html_url : null,
     htmlStatusUrl: data ? data.html_status_url : null,
+    htmlEventsUrl: data ? data.html_events_url : null,
   };
 }
 
