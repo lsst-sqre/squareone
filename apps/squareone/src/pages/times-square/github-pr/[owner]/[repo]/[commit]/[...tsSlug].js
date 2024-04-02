@@ -4,13 +4,16 @@ import TimesSquareApp from '../../../../../../components/TimesSquareApp';
 import WideContentLayout from '../../../../../../components/WideContentLayout';
 import TimesSquareNotebookViewer from '../../../../../../components/TimesSquareNotebookViewer';
 import TimesSquareUrlParametersProvider from '../../../../../../components/TimesSquareUrlParametersProvider';
+import TimesSquareHtmlEventsProvider from '../../../../../../components/TimesSquareHtmlEventsProvider/TimesSquareHtmlEventsProvider';
 
 export default function GitHubPrNotebookViewPage({}) {
   return (
     <TimesSquareUrlParametersProvider>
-      <TimesSquareApp>
-        <TimesSquareNotebookViewer />
-      </TimesSquareApp>
+      <TimesSquareHtmlEventsProvider>
+        <TimesSquareApp>
+          <TimesSquareNotebookViewer />
+        </TimesSquareApp>
+      </TimesSquareHtmlEventsProvider>
     </TimesSquareUrlParametersProvider>
   );
 }

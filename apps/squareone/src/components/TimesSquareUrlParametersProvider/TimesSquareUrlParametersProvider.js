@@ -44,6 +44,8 @@ export default function TimesSquareUrlParametersProvider({ children }) {
       .map((item) => item)
   );
 
+  const queryString = new URLSearchParams(userParameters).toString();
+
   // pop display settings from the user parameters and to also separate out
   // the notebook parameters.
   const { ts_hide_code = '1', ...notebookParameters } = userParameters;
@@ -60,6 +62,7 @@ export default function TimesSquareUrlParametersProvider({ children }) {
         commit,
         tsSlug,
         githubSlug,
+        urlQueryString: queryString,
       }}
     >
       {children}

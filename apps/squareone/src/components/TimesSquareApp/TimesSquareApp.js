@@ -26,9 +26,8 @@ const StyledLayout = styled.div`
 `;
 
 export default function TimesSquareApp({ children }) {
-  const { tsSlug, owner, repo, commit, githubSlug } = React.useContext(
-    TimesSquareUrlParametersContext
-  );
+  const { tsSlug, owner, repo, commit, githubSlug, urlQueryString } =
+    React.useContext(TimesSquareUrlParametersContext);
 
   const pageNav = commit ? (
     <TimesSquarePrGitHubNav owner={owner} repo={repo} commitSha={commit} />
