@@ -104,6 +104,7 @@ export default function TimesSquareParameters({}) {
 
   return (
     <Formik
+      enableReinitialize
       initialValues={initialValues}
       onSubmit={handleFormSubmit}
       validate={validate}
