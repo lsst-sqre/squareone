@@ -16,6 +16,9 @@ const Button = styled.button`
   &:active {
     background-color: var(--sqo-primary-button-background-color-active);
   }
+  &:disabled {
+    cursor: not-allowed;
+  }
 `;
 
 export default Button;

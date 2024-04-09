@@ -142,7 +142,7 @@ export default function TimesSquareParameters({}) {
             </li>
           </StyledParameterList>
           <ButtonGroup>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" disabled={isSubmitting || !dirty}>
               Update
             </Button>
             <ResetButton
