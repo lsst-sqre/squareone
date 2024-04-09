@@ -117,6 +117,7 @@ export default function TimesSquareParameters({}) {
         handleSubmit,
         handleReset,
         isSubmitting,
+        dirty,
       }) => (
         <form onSubmit={handleSubmit} onReset={handleReset}>
           <StyledParameterList>
@@ -147,7 +148,7 @@ export default function TimesSquareParameters({}) {
             <ResetButton
               type="reset"
               onClick={handleReset}
-              disabled={isSubmitting}
+              disabled={isSubmitting || !dirty}
             >
               Reset
             </ResetButton>
