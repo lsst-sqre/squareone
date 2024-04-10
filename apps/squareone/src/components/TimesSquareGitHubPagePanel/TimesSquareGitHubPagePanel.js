@@ -12,13 +12,11 @@ import Error from 'next/error';
 
 import useTimesSquarePage from '../../hooks/useTimesSquarePage';
 import TimesSquareParameters from '../TimesSquareParameters';
-import { TimesSquareHtmlEventsContext } from '../TimesSquareHtmlEventsProvider';
+import ExecStats from './ExecStats';
 
 export default function TimesSquareGitHubPagePanel({}) {
   const { publicRuntimeConfig } = getConfig();
   const pageData = useTimesSquarePage();
-
-  const htmlEvent = React.useContext(TimesSquareHtmlEventsContext);
 
   if (pageData.loading) {
     return <p>Loading...</p>;
@@ -40,15 +38,8 @@ export default function TimesSquareGitHubPagePanel({}) {
           <div dangerouslySetInnerHTML={{ __html: description.html }}></div>
         )}
         <TimesSquareParameters />
-        {htmlEvent.executionStatus != 'complete' && (
-          <p>{htmlEvent.executionStatus}</p>
-        )}
-        {htmlEvent.executionStatus == 'complete' && (
-          <>
-            <p>Computed {htmlEvent.dateFinished}</p>
-            <p>Executed in {htmlEvent.executionDuration} seconds</p>
-          </>
-        )}
+
+        <ExecStats />
       </div>
     </PagePanelContainer>
   );
