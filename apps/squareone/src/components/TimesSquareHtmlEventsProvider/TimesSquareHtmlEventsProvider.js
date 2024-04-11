@@ -27,37 +27,20 @@ export default function TimesSquareHtmlEventsProvider({ children }) {
 
     async function runEffect() {
       if (htmlEventsUrl) {
-        console.log(`Running fetchEventSource ${fullHtmlEventsUrl}`);
         await fetchEventSource(fullHtmlEventsUrl, {
           method: 'GET',
           signal: abortController.signal,
           onopen(res) {
-            if (res.ok && res.status === 200) {
-              console.log(`Connection made to ${fullHtmlEventsUrl}`, res);
-            } else if (
-              res.status >= 400 &&
-              res.status < 500 &&
-              res.status !== 429
-            ) {
+            if (res.status >= 400 && res.status < 500 && res.status !== 429) {
               console.log(`Client side error ${fullHtmlEventsUrl}`, res);
             }
           },
           onmessage(event) {
-            // console.log(event.data);
             const parsedData = JSON.parse(event.data);
             setHtmlEvent(parsedData);
           },
-          onclose() {
-            console.log(
-              `Connection closed by the server to ${fullHtmlEventsUrl}`
-            );
-          },
-          onerror(err) {
-            console.log(
-              `There was an error from server for ${fullHtmlEventsUrl}`,
-              err
-            );
-          },
+          onclose() {},
+          onerror(err) {},
         });
       }
     }
@@ -65,9 +48,7 @@ export default function TimesSquareHtmlEventsProvider({ children }) {
 
     return () => {
       // Clean up: close the event source connection
-      console.log(`❌ CLOSING CONNECTION TO ${fullHtmlEventsUrl}`);
       abortController.abort();
-      console.log(`Aborted connection to ${fullHtmlEventsUrl}`);
     };
   }, [fullHtmlEventsUrl, htmlEventsUrl]);
 
