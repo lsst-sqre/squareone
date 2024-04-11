@@ -13,6 +13,7 @@ import Error from 'next/error';
 import useTimesSquarePage from '../../hooks/useTimesSquarePage';
 import TimesSquareParameters from '../TimesSquareParameters';
 import ExecStats from './ExecStats';
+import GitHubEditLink from './GitHubEditLink';
 
 export default function TimesSquareGitHubPagePanel({}) {
   const { publicRuntimeConfig } = getConfig();
@@ -37,6 +38,12 @@ export default function TimesSquareGitHubPagePanel({}) {
         {description && (
           <div dangerouslySetInnerHTML={{ __html: description.html }}></div>
         )}
+        <GitHubEditLink
+          owner={pageData.github.owner}
+          repository={pageData.github.repository}
+          sourcePath={pageData.github.sourcePath}
+        />
+
         <TimesSquareParameters />
 
         <ExecStats />
