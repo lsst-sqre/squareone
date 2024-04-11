@@ -37,6 +37,7 @@
   "dependencies": {
     "@fontsource/source-sans-pro": "^4.5.11",
     "@fortawesome/fontawesome-svg-core": "^6.3.0",
+    "@fortawesome/free-brands-svg-icons": "^6.5.2",
     "@fortawesome/free-solid-svg-icons": "^6.3.0",
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@lsst-sqre/global-css": "workspace:*",
