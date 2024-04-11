@@ -1,3 +1,4 @@
+import React from 'react';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { Formik, Field } from 'formik';
@@ -6,6 +7,9 @@ import Ajv from 'ajv';
 import Button, { RedGhostButton } from '../Button';
 import StringInput from './StringInput';
 import ParameterInput from './ParameterInput';
+
+import { TimesSquareUrlParametersContext } from '../TimesSquareUrlParametersProvider';
+import useTimesSquarePage from '../../hooks/useTimesSquarePage';
 
 // Create input components based on the parameter's JSON schema
 function inputFactory(props) {
@@ -28,13 +32,13 @@ function inputFactory(props) {
   );
 }
 
-export default function TimesSquareParameters({
-  pageData,
-  userParameters,
-  displaySettings,
-}) {
+export default function TimesSquareParameters({}) {
   const router = useRouter();
-  const { parameters } = pageData;
+
+  const { displaySettings, notebookParameters: userParameters } =
+    React.useContext(TimesSquareUrlParametersContext);
+  const { parameters } = useTimesSquarePage();
+
   const ajv = new Ajv({ coerceTypes: true });
 
   // Merge userParameters with defaults
@@ -100,6 +104,7 @@ export default function TimesSquareParameters({
 
   return (
     <Formik
+      enableReinitialize
       initialValues={initialValues}
       onSubmit={handleFormSubmit}
       validate={validate}
@@ -112,6 +117,7 @@ export default function TimesSquareParameters({
         handleSubmit,
         handleReset,
         isSubmitting,
+        dirty,
       }) => (
         <form onSubmit={handleSubmit} onReset={handleReset}>
           <StyledParameterList>
@@ -136,13 +142,13 @@ export default function TimesSquareParameters({
             </li>
           </StyledParameterList>
           <ButtonGroup>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" disabled={isSubmitting || !dirty}>
               Update
             </Button>
             <ResetButton
               type="reset"
               onClick={handleReset}
-              disabled={isSubmitting}
+              disabled={isSubmitting || !dirty}
             >
               Reset
             </ResetButton>

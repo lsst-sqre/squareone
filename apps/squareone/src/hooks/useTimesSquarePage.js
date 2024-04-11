@@ -1,9 +1,13 @@
+import React from 'react';
 import useSWR from 'swr';
+
+import { TimesSquareUrlParametersContext } from '../components/TimesSquareUrlParametersProvider';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
-function useTimesSquarePage(pageUrl) {
-  const { data, error } = useSWR(pageUrl, fetcher);
+function useTimesSquarePage() {
+  const { tsPageUrl } = React.useContext(TimesSquareUrlParametersContext);
+  const { data, error } = useSWR(tsPageUrl, fetcher);
 
   return {
     error: error,
@@ -13,6 +17,7 @@ function useTimesSquarePage(pageUrl) {
     description: data ? data.description : null,
     htmlUrl: data ? data.html_url : null,
     htmlStatusUrl: data ? data.html_status_url : null,
+    htmlEventsUrl: data ? data.html_events_url : null,
   };
 }
 

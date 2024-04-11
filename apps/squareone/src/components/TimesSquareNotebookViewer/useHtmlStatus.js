@@ -4,8 +4,10 @@
  * dynamic refreshing of data about a page's HTML rendering.
  */
 
+import React from 'react';
 import useSWR from 'swr';
 import useTimesSquarePage from '../../hooks/useTimesSquarePage';
+import { TimesSquareUrlParametersContext } from '../TimesSquareUrlParametersProvider';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
@@ -20,8 +22,11 @@ export function parameterizeUrl(baseUrl, parameters, displaySettings) {
   return url.toString();
 }
 
-function useHtmlStatus(pageUrl, parameters, displaySettings) {
-  const pageData = useTimesSquarePage(pageUrl);
+function useHtmlStatus() {
+  const { notebookParameters: parameters, displaySettings } = React.useContext(
+    TimesSquareUrlParametersContext
+  );
+  const pageData = useTimesSquarePage();
 
   const { data, error } = useSWR(
     () => parameterizeUrl(pageData.htmlStatusUrl, parameters, displaySettings),

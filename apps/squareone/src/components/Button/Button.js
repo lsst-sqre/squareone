@@ -16,6 +16,9 @@ const Button = styled.button`
   &:active {
     background-color: var(--sqo-primary-button-background-color-active);
   }
+  &:disabled {
+    cursor: not-allowed;
+  }
 `;
 
 export default Button;
@@ -36,4 +39,12 @@ export const GhostButton = styled.button`
 
 export const RedGhostButton = styled(GhostButton)`
   --ghost-button-color: var(--rsd-color-red-500);
+
+  &:disabled {
+    // instead of setting opacity it'd be better to have a lighter red color
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: transparent;
+    color: #000;
+  }
 `;
