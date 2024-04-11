@@ -1,5 +1,27 @@
 # squareone
 
+## 0.11.0
+
+### Minor Changes
+
+- [#153](https://github.com/lsst-sqre/squareone/pull/153) [`3561d09`](https://github.com/lsst-sqre/squareone/commit/3561d097d0c5cbe508f140f2bcd9041a540832a0) Thanks [@jonathansick](https://github.com/jonathansick)! - Squareone uses a base stylesheet from the @lsst-sqre/global-css package. This reduces the amount of global CSS managed in Squareone itself, and offloads configuring the Rubin Style Dictionary tokens into base CSS elements.
+
+- [#163](https://github.com/lsst-sqre/squareone/pull/163) [`72dd989`](https://github.com/lsst-sqre/squareone/commit/72dd989ad963612204fa92a484a56abfbed4df8a) Thanks [@jonathansick](https://github.com/jonathansick)! - Implement background recomputation for cached Times Square pages. The "Recompute" button submits a request to Times Square's `DELETE /v1/pages/:page/html?{params}` endpoint, which causes a background recomputation of the notebook and re-rendering of the cached HTML.
+
+  The new `TimesSquareHtmlEventsProvider` is a React context provider that provides real-time updates from Times Square about the status of an HTML rendering for a given set of parameters using Times Square's `/v1/pages/:page/html/events/{params}` endpoint. Squareone uses `@microsoft/fetch-event-source` to subscribe to this server-sent events (SSE) endpoint. Using this provider, the UI is able to show new data to the user, including the status of the computation, and once the computation is complete, the date/age of computation and the execution time.
+
+- [#163](https://github.com/lsst-sqre/squareone/pull/163) [`72dd989`](https://github.com/lsst-sqre/squareone/commit/72dd989ad963612204fa92a484a56abfbed4df8a) Thanks [@jonathansick](https://github.com/jonathansick)! - The Times Square "Update" and "Reset" buttons are now disabled when appropriate. The Update button is disabled when the parameter inputs have not been changed relative to their current state. Likewise, the Reset button is disabled when the parameters are unchanged from the current state.
+
+- [#153](https://github.com/lsst-sqre/squareone/pull/153) [`1240924`](https://github.com/lsst-sqre/squareone/commit/124092414c191eb16866304eafd9b6c4d428e2f6) Thanks [@jonathansick](https://github.com/jonathansick)! - Drop the use of normalize.css and instead rely on the base CSS from the global-css package.
+
+- [#163](https://github.com/lsst-sqre/squareone/pull/163) [`72dd989`](https://github.com/lsst-sqre/squareone/commit/72dd989ad963612204fa92a484a56abfbed4df8a) Thanks [@jonathansick](https://github.com/jonathansick)! - New `TimesSquareUrlParametersProvider` component. This React context provides the URL-based state to Times Square components, such as the page being viewed, its notebook parameters values, and the display settings. This change simplifies the structure of the React pages by refactoring all of the URL parsing into a common component. As well, this context eliminates "prop drilling" to provide this URL-based state to all components in the Times Square application.
+
+### Patch Changes
+
+- Updated dependencies [[`b765732`](https://github.com/lsst-sqre/squareone/commit/b765732db52e354026294fce7b5ef7c32d32e553), [`5ee421b`](https://github.com/lsst-sqre/squareone/commit/5ee421bdd8f1c6f922913028ad48284f941189f1), [`9abbebb`](https://github.com/lsst-sqre/squareone/commit/9abbebba02fc1bc27fe2097fbbdb97110a9c93d9), [`30928a5`](https://github.com/lsst-sqre/squareone/commit/30928a5caa5392d7927fd3a2f017d48d77b68c1a), [`30928a5`](https://github.com/lsst-sqre/squareone/commit/30928a5caa5392d7927fd3a2f017d48d77b68c1a)]:
+  - @lsst-sqre/squared@0.1.0
+  - @lsst-sqre/global-css@0.1.0
+
 ## 0.10.3
 
 ### Patch Changes
