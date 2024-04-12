@@ -11,12 +11,15 @@ import Head from 'next/head';
 import Error from 'next/error';
 
 import useTimesSquarePage from '../../hooks/useTimesSquarePage';
+import { TimesSquareUrlParametersContext } from '../TimesSquareUrlParametersProvider';
 import TimesSquareParameters from '../TimesSquareParameters';
 import ExecStats from './ExecStats';
 import GitHubEditLink from './GitHubEditLink';
+import IpynbDownloadLink from './IpynbDownloadLink';
 
 export default function TimesSquareGitHubPagePanel({}) {
   const { publicRuntimeConfig } = getConfig();
+  const { urlQueryString } = React.useContext(TimesSquareUrlParametersContext);
   const pageData = useTimesSquarePage();
 
   if (pageData.loading) {
@@ -27,6 +30,8 @@ export default function TimesSquareGitHubPagePanel({}) {
   }
 
   const { title, description } = pageData;
+
+  const ipynbDownloadUrl = `${pageData.renderedIpynbUrl}?${urlQueryString}`;
 
   return (
     <PagePanelContainer>
@@ -45,6 +50,11 @@ export default function TimesSquareGitHubPagePanel({}) {
         />
 
         <TimesSquareParameters />
+
+        <IpynbDownloadLink
+          url={ipynbDownloadUrl}
+          sourcePath={pageData.github.sourcePath}
+        />
 
         <ExecStats />
       </div>
