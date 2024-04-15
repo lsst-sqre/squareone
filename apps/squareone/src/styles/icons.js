@@ -13,7 +13,9 @@ import {
   faCircleCheck,
   faCircleMinus,
   faCodeCommit,
+  faDownload,
 } from '@fortawesome/free-solid-svg-icons';
+import { faGithub } from '@fortawesome/free-brands-svg-icons';
 
 // Add icons to the global Font Awesome library
 library.add(faAngleDown);
@@ -24,3 +26,5 @@ library.add(faCircleXmark);
 library.add(faCircleCheck);
 library.add(faCircleMinus);
 library.add(faCodeCommit);
+library.add(faDownload);
+library.add(faGithub);

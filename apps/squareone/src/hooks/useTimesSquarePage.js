@@ -9,6 +9,15 @@ function useTimesSquarePage() {
   const { tsPageUrl } = React.useContext(TimesSquareUrlParametersContext);
   const { data, error } = useSWR(tsPageUrl, fetcher);
 
+  const githubInfo = data
+    ? {
+        owner: data.github.owner ? data.github.owner : null,
+        repository: data.github.repository ? data.github.repository : null,
+        sourcePath: data.github.source_path ? data.github.source_path : null,
+        sidecarPath: data.github.sidecar_path ? data.github.sidecar_path : null,
+      }
+    : { owner: null, repository: null, sourcePath: null, sidecarPath: null };
+
   return {
     error: error,
     loading: !error && !data,
@@ -18,6 +27,8 @@ function useTimesSquarePage() {
     htmlUrl: data ? data.html_url : null,
     htmlStatusUrl: data ? data.html_status_url : null,
     htmlEventsUrl: data ? data.html_events_url : null,
+    renderedIpynbUrl: data ? data.rendered_url : null,
+    github: githubInfo,
   };
 }
 
