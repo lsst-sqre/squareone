@@ -1,5 +1,13 @@
 # squareone
 
+## 0.12.0
+
+### Minor Changes
+
+- [#164](https://github.com/lsst-sqre/squareone/pull/164) [`0574c00`](https://github.com/lsst-sqre/squareone/commit/0574c00b63b49418a35b95379f05e291848d667e) Thanks [@jonathansick](https://github.com/jonathansick)! - Users can now download the Jupyter Notebook (ipynb) file that they are viewing, with the current parameters filled in. This enables further interactive exploration.
+
+- [#164](https://github.com/lsst-sqre/squareone/pull/164) [`2adb0af`](https://github.com/lsst-sqre/squareone/commit/2adb0af63bb1a69e59f68a33a1a31bdf30899bb2) Thanks [@jonathansick](https://github.com/jonathansick)! - Times Square notebook pages show a link to the source notebook on GitHub.
+
 ## 0.11.0
 
 ### Minor Changes
