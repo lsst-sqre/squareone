@@ -4,6 +4,10 @@ export {
   default as GafaelfawrUserDropdown,
   type GafaelfawrUserDropdownProps,
 } from './components/GafaelfawrUserDropdown';
+export {
+  default as GafaelfawrUserMenu,
+  type GafaelfawrUserMenuProps,
+} from './components/GafaelfawrUserMenu';
 
 /* Hooks */
 export { default as useCurrentUrl } from './hooks/useCurrentUrl';
