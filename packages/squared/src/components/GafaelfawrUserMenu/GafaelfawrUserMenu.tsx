@@ -2,8 +2,9 @@ import React from 'react';
 
 import styled from 'styled-components';
 
-import { getLoginUrl, getLogoutUrl } from './authUrls';
 import useGafaelfawrUser from '../../hooks/useGafaelfawrUser';
+import { getLoginUrl, getLogoutUrl } from './authUrls';
+import Menu, { MenuLink } from './Menu';
 
 export interface GafaelfawrUserMenuProps {
   children: React.ReactNode;
@@ -24,7 +25,11 @@ export const GafaelfawrUserMenu = ({
   const logoutUrl = getLogoutUrl(currentUrl);
   const loginUrl = getLoginUrl(currentUrl);
   if (isLoggedIn && user) {
-    return <div>{children}</div>;
+    return (
+      <Menu logoutHref={logoutUrl} username={user.username}>
+        {children}
+      </Menu>
+    );
   } else {
     return <SiteNavLink href={loginUrl}>Log in / Sign up</SiteNavLink>;
   }
@@ -37,5 +42,8 @@ const SiteNavLink = styled.a`
     color: var(--rsd-component-header-nav-text-hover-color);
   }
 `;
+
+// Associate child components with the parent for easier imports.
+GafaelfawrUserMenu.Link = MenuLink;
 
 export default GafaelfawrUserMenu;

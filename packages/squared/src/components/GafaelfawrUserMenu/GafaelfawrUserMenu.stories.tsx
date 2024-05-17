@@ -72,7 +72,12 @@ export const Default: Story = {
   render: (args) => (
     <SWRConfig value={{ provider: () => new Map() }}>
       <GafaelfawrUserMenu {...args}>
-        <p>Hello world</p>
+        <GafaelfawrUserMenu.Link href="#">
+          Account Settings
+        </GafaelfawrUserMenu.Link>
+        <GafaelfawrUserMenu.Link href="#">
+          Security tokens
+        </GafaelfawrUserMenu.Link>
       </GafaelfawrUserMenu>
     </SWRConfig>
   ),
