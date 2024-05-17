@@ -30,6 +30,9 @@ export const Menu = ({ children, logoutHref, username }: MenuProps) => {
           </MenuContent>
         </RadixNavigationMenu.Item>
       </MenuList>
+      <ViewportContainer>
+        <ContentViewport />
+      </ViewportContainer>
     </MenuRoot>
   );
 };
@@ -119,6 +122,29 @@ export const MenuLink = styled(RadixNavigationMenu.Link)`
       color: white;
     }
   }
+`;
+
+const ContentViewport = styled(RadixNavigationMenu.Viewport)`
+  // position: relative;
+  // transform-origin: top center;
+  // margin-top: 10px;
+  // width: 100%;
+  // background-color: white;
+  // border-radius: 6px;
+  // overflow: hidden;
+  // box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
+  //   hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
+  // height: var(--radix-navigation-menu-viewport-height);
+`;
+
+const ViewportContainer = styled.div`
+  position: absolute;
+  // display: flex;
+  // justify-content: center;
+  // width: 100%;
+  // top: 100%;
+  // left: 0;
+  // perspective: 2000px;
 `;
 
 export default Menu;
