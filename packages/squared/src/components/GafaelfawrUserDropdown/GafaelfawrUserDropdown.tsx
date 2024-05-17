@@ -8,7 +8,7 @@ import MenuItem from './MenuItem';
 import { getLoginUrl, getLogoutUrl } from './authUrls';
 import useGafaelfawrUser from '../../hooks/useGafaelfawrUser';
 
-export interface GafaelfawrUserMenuProps {
+export interface GafaelfawrUserDropdownProps {
   children: React.ReactNode;
   /**
    * The URL of the current page. Used to construct the login and logout URLs
@@ -17,10 +17,10 @@ export interface GafaelfawrUserMenuProps {
   currentUrl: string;
 }
 
-export const GafaelfawrUserMenu = ({
+export const GafaelfawrUserDropdown = ({
   children,
   currentUrl,
-}: GafaelfawrUserMenuProps) => {
+}: GafaelfawrUserDropdownProps) => {
   const { user, isLoggedIn } = useGafaelfawrUser();
   // TODO: it'd be nice to integrate the useCurrentUrl hook into
   // this component so the user doesn't have to pass this prop.
@@ -46,7 +46,7 @@ const SiteNavLink = styled.a`
 `;
 
 // Associate child components with the parent for easier imports.
-GafaelfawrUserMenu.Item = MenuItem;
-GafaelfawrUserMenu.Separator = Separator;
+GafaelfawrUserDropdown.Item = MenuItem;
+GafaelfawrUserDropdown.Separator = Separator;
 
-export default GafaelfawrUserMenu;
+export default GafaelfawrUserDropdown;

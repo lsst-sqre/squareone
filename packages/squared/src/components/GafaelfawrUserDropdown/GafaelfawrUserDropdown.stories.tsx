@@ -4,11 +4,11 @@ import { SWRConfig } from 'swr';
 import { within, userEvent, screen } from '@storybook/testing-library';
 import { expect } from '@storybook/jest';
 
-import GafaelfawrUserMenu from './GafaelfawrUserMenu';
+import GafaelfawrUserDropdown from './GafaelfawrUserDropdown';
 
-const meta: Meta<typeof GafaelfawrUserMenu> = {
-  title: 'Components/GafaelfawrUserMenu',
-  component: GafaelfawrUserMenu,
+const meta: Meta<typeof GafaelfawrUserDropdown> = {
+  title: 'Components/GafaelfawrUserDropdown',
+  component: GafaelfawrUserDropdown,
   parameters: {
     // Optional parameter to center the component in the Canvas. More info: https://storybook.js.org/docs/react/configure/story-layout
     layout: 'centered',
@@ -23,7 +23,7 @@ const meta: Meta<typeof GafaelfawrUserMenu> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof GafaelfawrUserMenu>;
+type Story = StoryObj<typeof GafaelfawrUserDropdown>;
 
 const loggedInAuthHandlers = [
   rest.get('/auth/api/v1/user-info', (req, res, ctx) => {
@@ -73,14 +73,14 @@ export const Default: Story = {
 
   render: (args) => (
     <SWRConfig value={{ provider: () => new Map() }}>
-      <GafaelfawrUserMenu {...args}>
-        <GafaelfawrUserMenu.Item>
+      <GafaelfawrUserDropdown {...args}>
+        <GafaelfawrUserDropdown.Item>
           <a href="#">Account Settings</a>
-        </GafaelfawrUserMenu.Item>
-        <GafaelfawrUserMenu.Item>
+        </GafaelfawrUserDropdown.Item>
+        <GafaelfawrUserDropdown.Item>
           <a href="#">Security tokens</a>
-        </GafaelfawrUserMenu.Item>
-      </GafaelfawrUserMenu>
+        </GafaelfawrUserDropdown.Item>
+      </GafaelfawrUserDropdown>
     </SWRConfig>
   ),
 };
@@ -120,14 +120,14 @@ export const OpenedMenu: Story = {
 
   render: (args) => (
     <SWRConfig value={{ provider: () => new Map() }}>
-      <GafaelfawrUserMenu {...args}>
-        <GafaelfawrUserMenu.Item>
+      <GafaelfawrUserDropdown {...args}>
+        <GafaelfawrUserDropdown.Item>
           <a href="#">Account Settings</a>
-        </GafaelfawrUserMenu.Item>
-        <GafaelfawrUserMenu.Item>
+        </GafaelfawrUserDropdown.Item>
+        <GafaelfawrUserDropdown.Item>
           <a href="#">Security tokens</a>
-        </GafaelfawrUserMenu.Item>
-      </GafaelfawrUserMenu>
+        </GafaelfawrUserDropdown.Item>
+      </GafaelfawrUserDropdown>
     </SWRConfig>
   ),
 };

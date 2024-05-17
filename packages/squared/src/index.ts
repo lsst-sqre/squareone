@@ -1,9 +1,9 @@
 /* Components */
 export { Button, type ButtonProps } from './Button';
 export {
-  default as GafaelfawrUserMenu,
-  type GafaelfawrUserMenuProps,
-} from './components/GafaelfawrUserMenu';
+  default as GafaelfawrUserDropdown,
+  type GafaelfawrUserDropdownProps,
+} from './components/GafaelfawrUserDropdown';
 
 /* Hooks */
 export { default as useCurrentUrl } from './hooks/useCurrentUrl';
