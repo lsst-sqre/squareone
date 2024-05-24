@@ -128,6 +128,7 @@ const ContentViewport = styled(RadixNavigationMenu.Viewport)`
      position the menu more accurately?
   */
   position: relative;
+  top: 0.5rem;
   right: 40%;
   height: var(--radix-navigation-menu-viewport-height);
   width: var(--radix-navigation-menu-viewport-width);
