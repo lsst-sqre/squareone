@@ -41,6 +41,7 @@ const MenuRoot = styled(RadixNavigationMenu.Root)``;
 
 const MenuList = styled(RadixNavigationMenu.List)`
   list-style: none;
+  margin-bottom: 0;
 `;
 
 const MenuTrigger = styled(RadixNavigationMenu.Trigger)`
