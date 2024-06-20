@@ -1,6 +1,10 @@
 /* Components */
 export { Button, type ButtonProps } from './Button';
 export {
+  default as GafaelfawrUserDropdown,
+  type GafaelfawrUserDropdownProps,
+} from './components/GafaelfawrUserDropdown';
+export {
   default as GafaelfawrUserMenu,
   type GafaelfawrUserMenuProps,
 } from './components/GafaelfawrUserMenu';

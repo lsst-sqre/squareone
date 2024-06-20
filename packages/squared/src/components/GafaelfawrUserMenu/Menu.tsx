@@ -1,11 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-
-import * as RadixDropdownMenu from '@radix-ui/react-dropdown-menu';
 import { ChevronDown } from 'react-feather';
 
-import MenuItem from './MenuItem';
-import Separator from './Separator';
+import * as RadixNavigationMenu from '@radix-ui/react-navigation-menu';
 
 export interface MenuProps {
   children: React.ReactNode;
@@ -21,32 +18,33 @@ export interface MenuProps {
 
 export const Menu = ({ children, logoutHref, username }: MenuProps) => {
   return (
-    <RadixDropdownMenu.Root>
-      <RadixDropdownMenu.Trigger asChild>
-        <MenuTriggerButton>
-          {username} <ChevronDown />
-        </MenuTriggerButton>
-      </RadixDropdownMenu.Trigger>
-
-      <RadixDropdownMenu.Portal>
-        <StyledContent align="end" sideOffset={5}>
-          {children}
-          <Separator />
-          <MenuItem>
-            <a href={logoutHref}>Log out</a>
-          </MenuItem>
-
-          <RadixDropdownMenu.Arrow className="DropdownMenuArrow" />
-        </StyledContent>
-      </RadixDropdownMenu.Portal>
-    </RadixDropdownMenu.Root>
+    <MenuRoot>
+      <MenuList>
+        <RadixNavigationMenu.Item>
+          <MenuTrigger>
+            {username} <ChevronDown />
+          </MenuTrigger>
+          <MenuContent>
+            {children}
+            <MenuLink href={logoutHref}>Log out</MenuLink>
+          </MenuContent>
+        </RadixNavigationMenu.Item>
+      </MenuList>
+      <ViewportContainer>
+        <ContentViewport />
+      </ViewportContainer>
+    </MenuRoot>
   );
 };
 
-/**
- * The button that triggers the menu, used in a `DropdownMenu.Trigger`.
- */
-const MenuTriggerButton = styled.button`
+const MenuRoot = styled(RadixNavigationMenu.Root)``;
+
+const MenuList = styled(RadixNavigationMenu.List)`
+  list-style: none;
+  margin-bottom: 0;
+`;
+
+const MenuTrigger = styled(RadixNavigationMenu.Trigger)`
   background-color: transparent;
   color: var(--rsd-component-header-nav-text-color);
   border: 1px solid transparent;
@@ -74,34 +72,71 @@ const MenuTriggerButton = styled.button`
   }
 `;
 
-/**
- * The menu content container, used in a `DropdownMenu.Portal`.
- */
-const StyledContent = styled(RadixDropdownMenu.Content)`
+const MenuContent = styled(RadixNavigationMenu.Content)`
   /* This unit for the padding is also the basis for the spacing and
    * sizing of the menu items.
   */
   --gafaelfawr-user-menu-padding: 0.5rem;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(0.25rem);
 
   font-size: 1rem;
   background-color: var(--rsd-component-header-nav-menulist-background-color);
   min-width: 12rem;
   border-radius: 0.5rem;
   padding: var(--gafaelfawr-user-menu-padding);
-  color: var(--rsd-component-header-nav-menulist-text-color);
   box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35),
     0px 10px 20px -15px rgba(22, 23, 24, 0.2);
   animation-duration: 400ms;
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform, opacity;
+`;
 
-  a {
-    color: var(--rsd-component-header-nav-menulist-text-color);
+export const MenuLink = styled(RadixNavigationMenu.Link)`
+  /* The styling on the menu triggers is overriding this colour. Need to re-address. */
+  color: var(--rsd-component-header-nav-menulist-text-color) !important;
+  border-radius: 0.5rem;
+  padding: calc(var(--gafaelfawr-user-menu-padding) / 2)
+    var(--gafaelfawr-user-menu-padding);
+  margin: calc(var(--gafaelfawr-user-menu-padding) / -2);
+  margin-bottom: calc(var(--gafaelfawr-user-menu-padding) / 2);
+
+  &:last-of-type {
+    margin-bottom: 0;
   }
 
-  .DropdownMenuArrow {
-    fill: var(--rsd-component-header-nav-menulist-background-color);
+  outline: 1px solid transparent;
+
+  &:focus {
+    outline: 1px solid
+      var(--rsd-component-header-nav-menulist-selected-background-color);
   }
+
+  &:hover {
+    background-color: var(
+      --rsd-component-header-nav-menulist-selected-background-color
+    );
+    color: white !important;
+  }
+`;
+
+const ContentViewport = styled(RadixNavigationMenu.Viewport)`
+  /* This pushes the menu leftward to stay on the page.
+     It's a magic number. Perhaps we can use the pushover API to
+     position the menu more accurately?
+  */
+  position: relative;
+  top: 0.5rem;
+  right: 40%;
+  height: var(--radix-navigation-menu-viewport-height);
+  width: var(--radix-navigation-menu-viewport-width);
+`;
+
+const ViewportContainer = styled.div`
+  position: absolute;
+  z-index: 1000;
 `;
 
 export default Menu;

@@ -3,7 +3,7 @@
 // the POST /api/dev/logout method.
 
 let DEV_STATE = {
-  loggedIn: false,
+  loggedIn: true,
   username: 'vera',
   name: 'Vera Rubin',
   uid: 1234,

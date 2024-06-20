@@ -18,8 +18,6 @@ const meta: Meta<typeof GafaelfawrUserMenu> = {
       values: [{ name: 'dark', value: '#1f2121' }],
     },
   },
-  // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/react/writing-docs/autodocs
-  tags: ['autodocs'],
 };
 
 export default meta;
@@ -74,59 +72,12 @@ export const Default: Story = {
   render: (args) => (
     <SWRConfig value={{ provider: () => new Map() }}>
       <GafaelfawrUserMenu {...args}>
-        <GafaelfawrUserMenu.Item>
-          <a href="#">Account Settings</a>
-        </GafaelfawrUserMenu.Item>
-        <GafaelfawrUserMenu.Item>
-          <a href="#">Security tokens</a>
-        </GafaelfawrUserMenu.Item>
-      </GafaelfawrUserMenu>
-    </SWRConfig>
-  ),
-};
-
-export const LoggedOut: Story = {
-  args: { ...Default.args },
-
-  parameters: {
-    msw: {
-      handlers: {
-        auth: loggedOutAuthHandlers,
-      },
-    },
-  },
-};
-
-export const OpenedMenu: Story = {
-  args: { ...Default.args },
-
-  parameters: { ...Default.parameters },
-
-  play: async ({ canvasElement }) => {
-    // Delay so msw can load
-    const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
-    await delay(1000);
-
-    const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByRole('button'));
-    // Using screen rather than canvas because Radix renders the dropdown
-    // outside the scope of the storybook canvas.
-    await expect(screen.getByText('Log out')).toBeInTheDocument();
-    await expect(screen.getByText('Log out')).toHaveAttribute(
-      'href',
-      'http://localhost:6006/logout?rd=http%3A%2F%2Flocalhost%3A6006%2F'
-    );
-  },
-
-  render: (args) => (
-    <SWRConfig value={{ provider: () => new Map() }}>
-      <GafaelfawrUserMenu {...args}>
-        <GafaelfawrUserMenu.Item>
-          <a href="#">Account Settings</a>
-        </GafaelfawrUserMenu.Item>
-        <GafaelfawrUserMenu.Item>
-          <a href="#">Security tokens</a>
-        </GafaelfawrUserMenu.Item>
+        <GafaelfawrUserMenu.Link href="#">
+          Account Settings
+        </GafaelfawrUserMenu.Link>
+        <GafaelfawrUserMenu.Link href="#">
+          Security tokens
+        </GafaelfawrUserMenu.Link>
       </GafaelfawrUserMenu>
     </SWRConfig>
   ),

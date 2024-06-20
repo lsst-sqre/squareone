@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import Alert from '@reach/alert';
 
 export default function ParameterInput({
   children,
@@ -33,7 +32,7 @@ const ParameterName = styled.p`
     'Courier New', monospace;
 `;
 
-const ErrorMessage = styled(Alert)`
+const ErrorMessage = styled.p`
   color: red;
   margin-top: 0.2em;
   margin-bottom: 0.2em;
