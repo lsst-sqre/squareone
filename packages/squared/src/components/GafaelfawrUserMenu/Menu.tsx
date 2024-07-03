@@ -21,17 +21,28 @@ export const Menu = ({ children, logoutHref, username }: MenuProps) => {
     <MenuRoot>
       <MenuList>
         <RadixNavigationMenu.Item>
-          <MenuTrigger>
+          <MenuTrigger
+            onPointerMove={(event) => event.preventDefault()}
+            onPointerEnter={(event) => event.preventDefault()}
+            onPointerLeave={(event) => event.preventDefault()}
+          >
             {username} <ChevronDown />
           </MenuTrigger>
-          <MenuContent>
+          <MenuContent
+            onPointerMove={(event) => event.preventDefault()}
+            onPointerEnter={(event) => event.preventDefault()}
+            onPointerLeave={(event) => event.preventDefault()}
+          >
             {children}
             <MenuLink href={logoutHref}>Log out</MenuLink>
           </MenuContent>
         </RadixNavigationMenu.Item>
       </MenuList>
       <ViewportContainer>
-        <ContentViewport />
+        <ContentViewport
+          onPointerEnter={(event) => event.preventDefault()}
+          onPointerLeave={(event) => event.preventDefault()}
+        />
       </ViewportContainer>
     </MenuRoot>
   );
