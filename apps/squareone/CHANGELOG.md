@@ -1,5 +1,16 @@
 # squareone
 
+## 0.13.0
+
+### Minor Changes
+
+- [#166](https://github.com/lsst-sqre/squareone/pull/166) [`157d03d`](https://github.com/lsst-sqre/squareone/commit/157d03db4fe3e559dc0071c1a1567200d376e1be) Thanks [@jonathansick](https://github.com/jonathansick)! - Usage of Reach UI is now removed and replaced with Radix UI. The user menu now uses `GafaelfawrUserMenu` from `@lsst-sqre/squared` and is based on Radix UI's Navigation Menu component. It is customized here to work with the Gafaelawr API to show a log in button for the logged out state, and to show the user's menu with a default log out button for the logged in state. Previously we also used Reach UI for showing an accessible validation alert in the Times Square page parameters UI. For now we've dropped this functionality.
+
+### Patch Changes
+
+- Updated dependencies [[`157d03d`](https://github.com/lsst-sqre/squareone/commit/157d03db4fe3e559dc0071c1a1567200d376e1be), [`f403ffd`](https://github.com/lsst-sqre/squareone/commit/f403ffd461983a579614d1ae4aa2c4b42537c294)]:
+  - @lsst-sqre/squared@0.2.0
+
 ## 0.12.0
 
 ### Minor Changes
