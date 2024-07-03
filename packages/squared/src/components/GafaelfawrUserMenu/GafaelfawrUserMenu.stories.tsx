@@ -73,7 +73,7 @@ export const Default: Story = {
     <SWRConfig value={{ provider: () => new Map() }}>
       <GafaelfawrUserMenu {...args}>
         <GafaelfawrUserMenu.Link href="#">
-          Account Settings
+          Account settings
         </GafaelfawrUserMenu.Link>
         <GafaelfawrUserMenu.Link href="#">
           Security tokens
