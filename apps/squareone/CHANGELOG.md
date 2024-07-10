@@ -1,5 +1,11 @@
 # squareone
 
+## 0.13.1
+
+### Patch Changes
+
+- [#169](https://github.com/lsst-sqre/squareone/pull/169) [`c4eeb75`](https://github.com/lsst-sqre/squareone/commit/c4eeb75c85f290165313c2f9a7bc4cd814710a6c) Thanks [@jonathansick](https://github.com/jonathansick)! - Change "Account settings" menu item to title case.
+
 ## 0.13.0
 
 ### Minor Changes
