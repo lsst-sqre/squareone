@@ -12,7 +12,7 @@ export default function UserMenu({ pageUrl }) {
     <GafaelfawrUserMenu currentUrl={pageUrl}>
       {coManageRegistryUrl && (
         <GafaelfawrUserMenu.Link href={coManageRegistryUrl}>
-          Account Settings
+          Account settings
         </GafaelfawrUserMenu.Link>
       )}
       <GafaelfawrUserMenu.Link href="/auth/tokens">
