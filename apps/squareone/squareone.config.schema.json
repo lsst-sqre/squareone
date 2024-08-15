@@ -38,6 +38,11 @@
       "type": "string",
       "title": "COmanage registry URL (e.g. https://id.lsst.cloud). Omit or set as null for non-COmanage deployments."
     },
+    "plausibleDomain": {
+      "type": "string",
+      "title": "Plausible tracking domain",
+      "description": "Domain (e.g. data.lsst.cloud) for Plausible tracking. Omit to disable Plausible."
+    },
     "apiAspectPageMdx": {
       "type": "string",
       "title": "/api-aspect Page MDX content"
