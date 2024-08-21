@@ -1,5 +1,13 @@
 # squareone
 
+## 0.14.0
+
+### Minor Changes
+
+- [#171](https://github.com/lsst-sqre/squareone/pull/171) [`55ff9ab`](https://github.com/lsst-sqre/squareone/commit/55ff9ab52dc86c3b47f5ac4ca2fb5fc84d9ff15b) Thanks [@jonathansick](https://github.com/jonathansick)! - Add support for Plausible.io analytics
+
+  In Squareone, set the `plausibleDomain` configuration to the Plausible tracking domain. E.g. data.lsst.cloud for the RSP. To disable Plausible tracking where it isn't supported, set this configuration to `null`.
+
 ## 0.13.1
 
 ### Patch Changes
