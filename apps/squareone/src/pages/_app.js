@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import getConfig from 'next/config';
 import { ThemeProvider } from 'next-themes';
+import PlausibleProvider from 'next-plausible';
 
 // Global CSS
 // Keep these imports in sync with .storybook/preview.js (Next can't import
@@ -15,13 +16,19 @@ import '../styles/icons';
 
 import Page from '../components/Page';
 
-function MyApp({ Component, pageProps, baseUrl, semaphoreUrl }) {
+function MyApp({
+  Component,
+  pageProps,
+  baseUrl,
+  semaphoreUrl,
+  plausibleDomain,
+}) {
   // Use the content layout defined by the page component, if avaialble.
   // Otherwise, the page itself is used as the content area layout container.
   const getLayout = Component.getLayout || ((page) => page);
 
   /* eslint-disable react/jsx-props-no-spreading */
-  return (
+  const coreApp = (
     <ThemeProvider defaultTheme="system">
       <Page baseUrl={baseUrl} semaphoreUrl={semaphoreUrl}>
         {getLayout(<Component {...pageProps} />)}
@@ -29,12 +36,18 @@ function MyApp({ Component, pageProps, baseUrl, semaphoreUrl }) {
     </ThemeProvider>
   );
   /* eslint-enable react/jsx-props-no-spreading */
+  if (!plausibleDomain) {
+    return coreApp;
+  }
+  return (
+    <PlausibleProvider domain={plausibleDomain}>{coreApp}</PlausibleProvider>
+  );
 }
 
 MyApp.getInitialProps = async () => {
   const { publicRuntimeConfig } = getConfig();
-  const { baseUrl, semaphoreUrl } = publicRuntimeConfig;
-  return { baseUrl, semaphoreUrl };
+  const { baseUrl, semaphoreUrl, plausibleDomain } = publicRuntimeConfig;
+  return { baseUrl, semaphoreUrl, plausibleDomain };
 };
 
 MyApp.propTypes = {
@@ -42,6 +55,7 @@ MyApp.propTypes = {
   pageProps: PropTypes.object.isRequired,
   baseUrl: PropTypes.string.isRequired,
   semaphoreUrl: PropTypes.string,
+  plausibleDomain: PropTypes.string,
 };
 
 export default MyApp;
