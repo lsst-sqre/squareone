@@ -5,6 +5,8 @@
 import Link from 'next/link';
 import styled from 'styled-components';
 
+import { getDocsUrl } from '../../lib/utils/docsUrls';
+
 const StyledSidebar = styled.div`
   border-right: 1px solid var(--rsd-color-primary-600);
   padding: 0 var(--size-screen-padding-min) 2rem 0.5rem;
@@ -21,6 +23,8 @@ const AppTitle = styled.p`
 `;
 
 export default function Sidebar({ pageNav, pagePanel }) {
+  const docsUrl = getDocsUrl('/guides/times-square/index.html');
+
   return (
     <StyledSidebar>
       <Link href="/times-square">
@@ -28,6 +32,8 @@ export default function Sidebar({ pageNav, pagePanel }) {
           <AppTitle>Times Square</AppTitle>
         </a>
       </Link>
+
+      <a href={docsUrl}>Documentation</a>
 
       {pagePanel && pagePanel}
 
