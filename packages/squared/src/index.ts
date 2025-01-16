@@ -8,6 +8,7 @@ export {
   default as GafaelfawrUserMenu,
   type GafaelfawrUserMenuProps,
 } from './components/GafaelfawrUserMenu';
+export { default as IconPill, type IconPillProps } from './components/IconPill';
 
 /* Hooks */
 export { default as useCurrentUrl } from './hooks/useCurrentUrl';
