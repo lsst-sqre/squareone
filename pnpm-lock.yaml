@@ -217,6 +217,15 @@ importers:
       '@fontsource/source-sans-pro':
         specifier: ^4.5.11
         version: 4.5.11
+      '@fortawesome/fontawesome-svg-core':
+        specifier: ^6.3.0
+        version: 6.3.0
+      '@fortawesome/free-solid-svg-icons':
+        specifier: ^6.3.0
+        version: 6.3.0
+      '@fortawesome/react-fontawesome':
+        specifier: ^0.2.2
+        version: 0.2.2(@fortawesome/fontawesome-svg-core@6.3.0)(react@17.0.2)
       '@lsst-sqre/global-css':
         specifier: workspace:*
         version: link:../global-css
@@ -3640,6 +3649,17 @@ packages:
 
   /@fortawesome/react-fontawesome@0.2.0(@fortawesome/fontawesome-svg-core@6.3.0)(react@17.0.2):
     resolution: {integrity: sha512-uHg75Rb/XORTtVt7OS9WoK8uM276Ufi7gCzshVWkUJbHhh3svsUUeqXerrM96Wm7fRiDzfKRwSoahhMIkGAYHw==}
+    peerDependencies:
+      '@fortawesome/fontawesome-svg-core': ~1 || ~6
+      react: '>=16.3'
+    dependencies:
+      '@fortawesome/fontawesome-svg-core': 6.3.0
+      prop-types: 15.8.1
+      react: 17.0.2
+    dev: false
+
+  /@fortawesome/react-fontawesome@0.2.2(@fortawesome/fontawesome-svg-core@6.3.0)(react@17.0.2):
+    resolution: {integrity: sha512-EnkrprPNqI6SXJl//m29hpaNzOp1bruISWaOiRtkMi/xSvHJlzc2j2JAYS7egxt/EbjSNV/k6Xy0AQI6vB2+1g==}
     peerDependencies:
       '@fortawesome/fontawesome-svg-core': ~1 || ~6
       react: '>=16.3'
@@ -11110,6 +11130,7 @@ packages:
   /eslint@8.47.0:
     resolution: {integrity: sha512-spUQWrdPt+pRVP1TTJLmfRNJJHHZryFmptzcafwSvHsceV81djHOdnEeDmkdotZyLNjDhrOasNK8nikkoG1O8Q==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
+    deprecated: This version is no longer supported. Please see https://eslint.org/version-support for other options.
     hasBin: true
     dependencies:
       '@eslint-community/eslint-utils': 4.4.0(eslint@8.47.0)
