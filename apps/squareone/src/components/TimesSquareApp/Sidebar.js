@@ -5,6 +5,8 @@
 import Link from 'next/link';
 import styled from 'styled-components';
 
+import { IconPill } from '@lsst-sqre/squared';
+
 import { getDocsUrl } from '../../lib/utils/docsUrls';
 
 const StyledSidebar = styled.div`
@@ -33,7 +35,13 @@ export default function Sidebar({ pageNav, pagePanel }) {
         </a>
       </Link>
 
-      <a href={docsUrl}>Documentation</a>
+      <IconPill
+        icon={['fas', 'book']}
+        text="Documentation"
+        url={docsUrl}
+        textColor="#ffffff"
+        backgroundColor="var(--rsd-color-primary-600)"
+      />
 
       {pagePanel && pagePanel}
 

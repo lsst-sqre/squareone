@@ -14,6 +14,7 @@ import {
   faCircleMinus,
   faCodeCommit,
   faDownload,
+  faBook,
 } from '@fortawesome/free-solid-svg-icons';
 import { faGithub } from '@fortawesome/free-brands-svg-icons';
 
@@ -27,4 +28,5 @@ library.add(faCircleCheck);
 library.add(faCircleMinus);
 library.add(faCodeCommit);
 library.add(faDownload);
+library.add(faBook);
 library.add(faGithub);
