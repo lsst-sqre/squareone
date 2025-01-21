@@ -26,10 +26,18 @@ export const Default: Story = {
     text: 'Documentation',
     url: '#',
     textColor: '#ffffff',
-    backgroundColor: '#000000',
+    backgroundColor: 'var(--sqo-primary-button-background-color)',
+    hoverBackgroundColor: 'var(--sqo-primary-button-background-color-hover)',
   },
 
-  render: ({ icon, text, url, textColor, backgroundColor }) => {
+  render: ({
+    icon,
+    text,
+    url,
+    textColor,
+    backgroundColor,
+    hoverBackgroundColor,
+  }) => {
     return (
       <IconPill
         icon={icon}
@@ -37,6 +45,7 @@ export const Default: Story = {
         url={url}
         textColor={textColor}
         backgroundColor={backgroundColor}
+        hoverBackgroundColor={hoverBackgroundColor}
       />
     );
   },
