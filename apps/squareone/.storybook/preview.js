@@ -10,7 +10,6 @@ import '@fontsource/source-sans-pro/700.css';
 // Global CSS
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import '@lsst-sqre/global-css/dist/next.css';
-import '../src/styles/globals.css';
 import '../src/styles/icons';
 
 export const parameters = {

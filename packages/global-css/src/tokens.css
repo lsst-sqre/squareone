@@ -1,3 +1,9 @@
+/*
+ * Custom properties that implement design tokens.
+ *
+ * These tokens build upon base properties from the `@lsst-sqre/rubin-style-dictionary`.
+ */
+
 :root {
   --rsd-component-image-invert: 0;
   --size-screen-padding-min: 1rem;
