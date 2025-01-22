@@ -11,7 +11,6 @@ import '@fontsource/source-sans-pro/400-italic.css';
 import '@fontsource/source-sans-pro/700.css';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import '@lsst-sqre/global-css/dist/next.css';
-import '../styles/globals.css';
 import '../styles/icons';
 
 import Page from '../components/Page';
