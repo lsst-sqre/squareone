@@ -36,7 +36,12 @@ export default function TimesSquareHtmlEventsProvider({ children }) {
             }
           },
           onmessage(event) {
-            const parsedData = JSON.parse(event.data);
+            let parsedData;
+            try {
+              parsedData = JSON.parse(event.data);
+            } catch (error) {
+              return;
+            }
             setHtmlEvent(parsedData);
           },
           onclose() {},
