@@ -36,7 +36,7 @@ COPY turbo.json turbo.json
 # ARG TURBO_TOKEN
 # ENV TURBO_TOKEN=$TURBO_TOKEN
 
-RUN turbo run build --filter=squareone...
+RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN,env=SENTRY_AUTH_TOKEN turbo run build --filter=squareone...
 
 FROM base AS runner
 

@@ -24,6 +24,12 @@
       "title": "Base URL for the public ingress",
       "description": "Used for computing absolute URLs"
     },
+    "environmentName": {
+      "type": "string",
+      "default": "development",
+      "title": "Phalanx environment name",
+      "description": "Used in telemetry"
+    },
     "docsBaseUrl": {
       "type": "string",
       "default": "https://rsp.lsst.io",
@@ -76,6 +82,29 @@
     "pendingVerificationPageMdx": {
       "type": "string",
       "title": "/enrollment/pending-confirmation content (MDX)."
+    },
+    "sentryTracesSampleRate": {
+      "type": "number",
+      "title": "Sentry traces sample rate",
+      "description": "The percentage of traces to send to sentry. A number between 0 and 1 inclusive, where zero means don't send any traces, and 1 means send all traces."
+    },
+    "sentryReplaysSessionSampleRate": {
+      "type": "number",
+      "title": "Sentry replay session sample rate",
+      "description": "The percentage of replay sessions to send to Sentry. A number between 0 and 1 inclusive, where zero means don't send any sessions, and 1 means send all sessions.",
+      "default": 0.0
+    },
+    "sentryReplaysOnErrorSampleRate": {
+      "type": "number",
+      "title": "Sentry error replay session sample rate",
+      "description": "The percentage of replay sessions to send to Sentry when an error occurs. A number between 0 and 1 inclusive, where zero means don't send any sessions, and 1 means send all sessions.",
+      "default": 1.0
+    },
+    "sentryDebug": {
+      "type": "boolean",
+      "title": "Sentry debug",
+      "description": "Setting this option to true will print useful information to the console while you're setting up Sentry.",
+      "default": false
     }
   }
 }

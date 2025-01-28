@@ -78,6 +78,8 @@ jobs:
           image: lsst-sqre/squareone
           github_token: ${{ secrets.GITHUB_TOKEN }}
           dockerfile: apps/squareone/Dockerfile
+          secrets: |
+            SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
 
   docs:
     needs: [changes]
