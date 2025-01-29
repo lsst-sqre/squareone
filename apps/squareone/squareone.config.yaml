@@ -1,5 +1,6 @@
 siteName: 'Squareone Development Site'
 baseUrl: 'http://localhost:3000'
+environmentName: 'development'
 siteDescription: |
   The site description.
 docsBaseUrl: 'https://rsp.lsst.io'
@@ -168,6 +169,11 @@ pendingVerificationPageMdx: |
 
   If you have not received the confirmation email please check your SPAM folder.
 
-  If you still cannot find the confirmation email please 
+  If you still cannot find the confirmation email please
   <Link href="../support"><a>contact us</a></Link> to have the confirmation
   email resent.
+
+sentryTracesSampleRate: 0
+sentryReplaysSessionSampleRate: 0
+sentryReplaysOnErrorSampleRate: 1.0
+sentryDebug: false
