@@ -1,5 +1,11 @@
 # squareone
 
+## 0.17.0
+
+### Minor Changes
+
+- [#175](https://github.com/lsst-sqre/squareone/pull/175) [`9cadf35`](https://github.com/lsst-sqre/squareone/commit/9cadf358e89410e475222e8a76a9e20056cf6119) Thanks [@jonathansick](https://github.com/jonathansick)! - The Times Square UI now closes its connection to the `/times-square/pages/:page/html/events?<qs>` SSE endpoint once the page instance's execution status is "complete" and the HTML hash is computed. With this change, the Times Square UI reduces its ongoing load on the API and also reduces network usage. The HTML page will still update to the latest version because the iframe component pings the Times Square `pages/:page/htmlstatus?<qs>` endpoint. We may back this off or convert the page update to an opt-in future in the future to further reduce network and API load from the front-end.
+
 ## 0.16.0
 
 ### Minor Changes
