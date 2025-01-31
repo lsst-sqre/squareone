@@ -1,0 +1,61 @@
+import type { Meta, StoryObj } from '@storybook/react';
+import { within, userEvent, screen } from '@storybook/testing-library';
+import { expect } from '@storybook/jest';
+
+import { ChevronDown } from 'react-feather';
+
+import { PrimaryNavigation } from './PrimaryNavigation';
+
+const meta: Meta<typeof PrimaryNavigation> = {
+  title: 'Components/PrimaryNavigation',
+  component: PrimaryNavigation,
+  parameters: {
+    layout: 'centered',
+    backgrounds: {
+      default: 'dark',
+      values: [{ name: 'dark', value: '#1f2121' }],
+    },
+  },
+};
+
+export default meta;
+type Story = StoryObj<typeof PrimaryNavigation>;
+
+export const Default: Story = {
+  args: {},
+  render: (args) => (
+    <PrimaryNavigation {...args}>
+      <PrimaryNavigation.Item>
+        <PrimaryNavigation.TriggerLink href="#">
+          Portal
+        </PrimaryNavigation.TriggerLink>
+      </PrimaryNavigation.Item>
+
+      <PrimaryNavigation.Item>
+        <PrimaryNavigation.TriggerLink href="/nb">
+          Notebooks
+        </PrimaryNavigation.TriggerLink>
+      </PrimaryNavigation.Item>
+
+      <PrimaryNavigation.Item>
+        <PrimaryNavigation.TriggerLink href="/docs">
+          Documentation
+        </PrimaryNavigation.TriggerLink>
+      </PrimaryNavigation.Item>
+
+      <PrimaryNavigation.Item>
+        <PrimaryNavigation.Trigger>
+          Account <ChevronDown />
+        </PrimaryNavigation.Trigger>
+        <PrimaryNavigation.Content>
+          <PrimaryNavigation.ContentItem>
+            <PrimaryNavigation.Link href="#">Settings</PrimaryNavigation.Link>
+          </PrimaryNavigation.ContentItem>
+          <PrimaryNavigation.ContentItem>
+            <PrimaryNavigation.Link href="#">Logout</PrimaryNavigation.Link>
+          </PrimaryNavigation.ContentItem>
+        </PrimaryNavigation.Content>
+      </PrimaryNavigation.Item>
+    </PrimaryNavigation>
+  ),
+};
