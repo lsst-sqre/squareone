@@ -32,15 +32,32 @@ export default function TimesSquareHtmlEventsProvider({ children }) {
           signal: abortController.signal,
           onopen(res) {
             if (res.status >= 400 && res.status < 500 && res.status !== 429) {
-              console.log(`Client side error ${fullHtmlEventsUrl}`, res);
+              console.error(`Client side error ${fullHtmlEventsUrl}`, res);
             }
           },
           onmessage(event) {
-            const parsedData = JSON.parse(event.data);
+            let parsedData;
+            try {
+              parsedData = JSON.parse(event.data);
+            } catch (error) {
+              return;
+            }
             setHtmlEvent(parsedData);
+
+            if (
+              parsedData.execution_status == 'complete' &&
+              parsedData.html_hash
+            ) {
+              abortController.abort();
+            }
           },
           onclose() {},
-          onerror(err) {},
+          onerror(err) {
+            console.error(
+              `Error fetching Times Square events SSE ${fullHtmlEventsUrl}`,
+              err
+            );
+          },
         });
       }
     }
