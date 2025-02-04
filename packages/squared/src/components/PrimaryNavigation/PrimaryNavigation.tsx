@@ -90,7 +90,23 @@ const TriggerLink = styled(RadixNavigationMenu.Link)`
  * The trigger for a `PrimaryNavigation.Item` that is displays a `Content`
  * dropdown when activated.
  */
-const Trigger = styled(RadixNavigationMenu.Trigger)`
+const Trigger = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <StyledTrigger
+      onPointerMove={(event) => event.preventDefault()}
+      onPointerEnter={(event) => event.preventDefault()}
+      onPointerLeave={(event) => event.preventDefault()}
+    >
+      {children}
+    </StyledTrigger>
+  );
+};
+
+/**
+ * A styled version of the `RadixNavigationMenu.Trigger` component that is
+ * used by the `PrimaryNavigation.Trigger` component.
+ */
+const StyledTrigger = styled(RadixNavigationMenu.Trigger)`
   color: var(--rsd-component-header-nav-text-color);
   padding: 2px 4px;
   /* padding: 0; */
@@ -126,7 +142,23 @@ const Trigger = styled(RadixNavigationMenu.Trigger)`
  * The content of a `PrimaryNavigation.Item` that is displayed as a dropdown
  * when the item is activated.
  */
-const Content = styled(RadixNavigationMenu.Content)`
+const Content = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <StyledContent
+      onPointerMove={(event) => event.preventDefault()}
+      onPointerEnter={(event) => event.preventDefault()}
+      onPointerLeave={(event) => event.preventDefault()}
+    >
+      {children}
+    </StyledContent>
+  );
+};
+
+/**
+ * A styled version of the `RadixNavigationMenu.Content` component that is
+ * used by the `PrimaryNavigation.Content` component.
+ */
+const StyledContent = styled(RadixNavigationMenu.Content)`
   /* This unit for the padding is also the basis for the spacing and
    * sizing of the menu items.
   */

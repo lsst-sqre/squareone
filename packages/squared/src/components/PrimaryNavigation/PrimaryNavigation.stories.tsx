@@ -69,9 +69,10 @@ export const OpenedMenu: Story = {
 
     const accountTrigger = canvas.getByText('Account');
 
-    await userEvent.hover(accountTrigger);
+    await userEvent.click(accountTrigger);
 
-    await delay(200);
+    // Delay so menu can open
+    await delay(250);
     await expect(screen.getByText('Settings')).toBeInTheDocument();
   },
 
