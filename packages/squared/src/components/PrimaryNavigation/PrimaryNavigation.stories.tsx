@@ -59,3 +59,55 @@ export const Default: Story = {
     </PrimaryNavigation>
   ),
 };
+
+export const OpenedMenu: Story = {
+  args: {},
+
+  play: async ({ canvasElement }) => {
+    const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
+    const canvas = within(canvasElement);
+
+    const accountTrigger = canvas.getByText('Account');
+
+    await userEvent.hover(accountTrigger);
+
+    await delay(200);
+    await expect(screen.getByText('Settings')).toBeInTheDocument();
+  },
+
+  render: (args) => (
+    <PrimaryNavigation {...args}>
+      <PrimaryNavigation.Item>
+        <PrimaryNavigation.TriggerLink href="#">
+          Portal
+        </PrimaryNavigation.TriggerLink>
+      </PrimaryNavigation.Item>
+
+      <PrimaryNavigation.Item>
+        <PrimaryNavigation.TriggerLink href="/nb">
+          Notebooks
+        </PrimaryNavigation.TriggerLink>
+      </PrimaryNavigation.Item>
+
+      <PrimaryNavigation.Item>
+        <PrimaryNavigation.TriggerLink href="/docs">
+          Documentation
+        </PrimaryNavigation.TriggerLink>
+      </PrimaryNavigation.Item>
+
+      <PrimaryNavigation.Item>
+        <PrimaryNavigation.Trigger>
+          Account <ChevronDown />
+        </PrimaryNavigation.Trigger>
+        <PrimaryNavigation.Content>
+          <PrimaryNavigation.ContentItem>
+            <PrimaryNavigation.Link href="#">Settings</PrimaryNavigation.Link>
+          </PrimaryNavigation.ContentItem>
+          <PrimaryNavigation.ContentItem>
+            <PrimaryNavigation.Link href="#">Logout</PrimaryNavigation.Link>
+          </PrimaryNavigation.ContentItem>
+        </PrimaryNavigation.Content>
+      </PrimaryNavigation.Item>
+    </PrimaryNavigation>
+  ),
+};
