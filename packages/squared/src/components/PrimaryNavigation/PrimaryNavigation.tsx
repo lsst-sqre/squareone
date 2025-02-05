@@ -1,33 +1,99 @@
 import React from 'react';
+import { forwardRef, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
 import * as RadixNavigationMenu from '@radix-ui/react-navigation-menu';
 
-export interface PrimaryNavigationProps {
-  children: React.ReactNode;
-}
+import { mergeReferences } from './utils';
+
+export type PrimaryNavigationType = React.ForwardRefExoticComponent<
+  React.ComponentPropsWithoutRef<typeof RadixNavigationMenu.Root> &
+    React.RefAttributes<React.ElementRef<typeof RadixNavigationMenu.Root>>
+> & {
+  Item: typeof Item;
+  Trigger: typeof Trigger;
+  TriggerLink: typeof TriggerLink;
+  Content: typeof Content;
+  ContentItem: typeof ContentItem;
+  Link: typeof Link;
+};
 
 /**
  * Primary navigation component that provides a layout for navigation items and a viewport.
- *
- * @component
- * @param {PrimaryNavigationProps} props - The component props
- * @param {ReactNode} props.children - The navigation items to be rendered within the ItemList
- * @returns {JSX.Element} A navigation component with items and a viewport container
  */
-export const PrimaryNavigation = ({ children }: PrimaryNavigationProps) => {
-  return (
-    <Root>
-      <ItemList>{children}</ItemList>
-      <ViewportContainer>
-        <ContentViewport
-          onPointerEnter={(event) => event.preventDefault()}
-          onPointerLeave={(event) => event.preventDefault()}
-        />
-      </ViewportContainer>
-    </Root>
-  );
-};
+export const PrimaryNavigation = forwardRef(
+  ({ className, children, ...props }, reference) => {
+    // Radix Navigation Menu doesn't position the menu content under the trigger by default.
+    // This solution is based on the following issue comment:
+    // https://github.com/radix-ui/primitives/issues/1462#issuecomment-2275683692
+    // Essentially it uses a MutationObserver to update the position of the menu content.
+    const containerReference = useRef<HTMLElement>(null);
+
+    useEffect(() => {
+      const container = containerReference.current;
+
+      if (!container) return;
+
+      const updatePosition = (item: HTMLElement) => {
+        const menuItemRect = item.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+
+        const position = {
+          top: menuItemRect.top - containerRect.top,
+          left: menuItemRect.left - containerRect.left,
+        };
+
+        container.style.setProperty(
+          '--radix-navigation-menu-item-active-top',
+          `${position.top}px`
+        );
+        container.style.setProperty(
+          '--radix-navigation-menu-item-active-left',
+          `${position.left}px`
+        );
+      };
+
+      const mutationCallback = (mutationsList: MutationRecord[]) => {
+        for (const mutation of mutationsList) {
+          if (
+            mutation.type === 'attributes' &&
+            mutation.attributeName === 'data-state' &&
+            mutation.target instanceof HTMLElement &&
+            mutation.target.hasAttribute('aria-expanded') &&
+            mutation.target.dataset.state === 'open'
+          ) {
+            updatePosition(mutation.target);
+          }
+        }
+      };
+
+      const observer = new MutationObserver(mutationCallback);
+
+      observer.observe(container, {
+        childList: true,
+        attributes: true,
+        subtree: true,
+      });
+
+      return () => {
+        observer.disconnect();
+      };
+    }, []);
+
+    return (
+      <Root
+        ref={mergeReferences([reference, containerReference])}
+        {...props}
+        className={className}
+      >
+        <ItemList>{children}</ItemList>
+        <NavigationMenuViewport />
+      </Root>
+    );
+  }
+) as PrimaryNavigationType;
+
+PrimaryNavigation.displayName = 'PrimaryNavigation';
 
 /**
  * The root component for the primary navigation.
@@ -225,26 +291,78 @@ export const Link = styled(RadixNavigationMenu.Link)`
   }
 `;
 
-const ViewportContainer = styled.div`
+export const NavigationMenuViewport = forwardRef<
+  React.ElementRef<typeof RadixNavigationMenu.Viewport>,
+  React.ComponentPropsWithoutRef<typeof RadixNavigationMenu.Viewport>
+>(({ className, ...props }, reference) => (
+  <NavigationMenuViewportContainer>
+    <NavigationMenuStyledViewport
+      className={className}
+      ref={reference}
+      onPointerEnter={(event) => event.preventDefault()}
+      onPointerLeave={(event) => event.preventDefault()}
+      {...props}
+    />
+  </NavigationMenuViewportContainer>
+));
+NavigationMenuViewport.displayName = RadixNavigationMenu.Viewport.displayName;
+
+const NavigationMenuViewportContainer = styled.div`
   position: absolute;
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  top: 100%;
   left: 0;
-  perspective: 2000px;
+  top: 100%;
+  display: flex;
+  transform: translateX(var(--radix-navigation-menu-item-active-left));
+  justify-content: center;
+  transition: transform 100ms;
 `;
 
-const ContentViewport = styled(RadixNavigationMenu.Viewport)`
+const NavigationMenuStyledViewport = styled(RadixNavigationMenu.Viewport)`
   position: relative;
+  margin-top: 0.375rem;
   transform-origin: top center;
-  margin-top: 10px;
-  width: 100%;
-  background-color: white;
-  border-radius: 6px;
-  overflow: hidden;
   height: var(--radix-navigation-menu-viewport-height);
-  width: var(--radix-navigation-menu-viewport-width);
+  width: 100%;
+  overflow: hidden;
+  border-radius: 0.375rem;
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  background-color: white;
+  color: black;
+
+  @media (min-width: 768px) {
+    width: var(--radix-navigation-menu-viewport-width);
+  }
+
+  &[data-state='open'] {
+    animation: menuIn 200ms ease;
+  }
+
+  &[data-state='closed'] {
+    animation: menuOut 200ms ease;
+  }
+
+  @keyframes menuIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes menuOut {
+    from {
+      opacity: 1;
+      transform: scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+  }
 `;
 
 // Associate child components with the parent for easier imports.

@@ -11,7 +11,7 @@ export {
 export { default as IconPill, type IconPillProps } from './components/IconPill';
 export {
   default as PrimaryNavigation,
-  type PrimaryNavigationProps,
+  type PrimaryNavigationType as PrimaryNavigationComponent,
 } from './components/PrimaryNavigation';
 
 /* Hooks */
