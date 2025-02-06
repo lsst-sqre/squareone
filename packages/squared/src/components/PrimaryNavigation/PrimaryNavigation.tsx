@@ -309,6 +309,7 @@ NavigationMenuViewport.displayName = RadixNavigationMenu.Viewport.displayName;
 
 const NavigationMenuViewportContainer = styled.div`
   position: absolute;
+  z-index: 1000; // Ensure the menu is above other content
   left: 0;
   top: 100%;
   display: flex;
