@@ -30,27 +30,45 @@ export const PrimaryNavigation = forwardRef(
     const containerReference = useRef<HTMLElement>(null);
 
     useEffect(() => {
+      // Constainer is the <nav> element (essentially Root)
       const container = containerReference.current;
 
       if (!container) return;
 
       const updatePosition = (item: HTMLElement) => {
+        // item is the trigger element
         const menuItemRect = item.getBoundingClientRect();
         const containerRect = container.getBoundingClientRect();
 
-        const position = {
-          top: menuItemRect.top - containerRect.top,
-          left: menuItemRect.left - containerRect.left,
-        };
-
+        const topOffset = menuItemRect.top - containerRect.top;
         container.style.setProperty(
           '--radix-navigation-menu-item-active-top',
-          `${position.top}px`
+          `${topOffset}px`
         );
-        container.style.setProperty(
-          '--radix-navigation-menu-item-active-left',
-          `${position.left}px`
-        );
+
+        if (containerRect.right - menuItemRect.right < 150) {
+          // Near the right edge, so position the menu content under the trigger
+          // right-aligned with the trigger
+          container.style.setProperty(
+            '--radix-navigation-menu-item-active-left',
+            'unset'
+          );
+          container.style.setProperty(
+            '--radix-navigation-menu-item-active-right',
+            '0px'
+          );
+        } else {
+          // Not near the right edge, so position the menu content under the trigger
+          // left-aligned with the trigger
+          container.style.setProperty(
+            '--radix-navigation-menu-item-active-left',
+            `${menuItemRect.left - containerRect.left}px`
+          );
+          container.style.setProperty(
+            '--radix-navigation-menu-item-active-right',
+            'unset'
+          );
+        }
       };
 
       const mutationCallback = (mutationsList: MutationRecord[]) => {
@@ -310,10 +328,11 @@ NavigationMenuViewport.displayName = RadixNavigationMenu.Viewport.displayName;
 const NavigationMenuViewportContainer = styled.div`
   position: absolute;
   z-index: 1000; // Ensure the menu is above other content
-  left: 0;
+  left: var(--radix-navigation-menu-item-active-left);
+  right: var(--radix-navigation-menu-item-active-right);
   top: 100%;
   display: flex;
-  transform: translateX(var(--radix-navigation-menu-item-active-left));
+  /* transform: translateX(var(--radix-navigation-menu-item-active-left)); */
   justify-content: center;
   transition: transform 100ms;
 `;
