@@ -1,7 +1,5 @@
-import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import getConfig from 'next/config';
-import styled from 'styled-components';
 
 import { ChevronDown } from 'react-feather';
 import { PrimaryNavigation } from '@lsst-sqre/squared';
@@ -28,7 +26,7 @@ export default function AppsMenu({}) {
   );
 }
 
-const Link = ({ href, ...props }) => {
+const Link = ({ href, internal, ...props }) => {
   const router = useRouter();
   const isActive = href === router.pathname;
 
@@ -40,9 +38,19 @@ const Link = ({ href, ...props }) => {
   //   was set.
   // However, this current implementation is not ideal because it doesn't
   // pass through the NavigationMenu's keyboard navigation.
+  if (internal) {
+    return (
+      <PrimaryNavigation.Link active={isActive}>
+        <span onClick={() => router.push(href)}>{props.children}</span>
+      </PrimaryNavigation.Link>
+    );
+  }
+
+  // External links are handled by the PrimaryNavigation.Link component, which
+  // becomes an <a> tag without any Next onClick handlers.
   return (
-    <PrimaryNavigation.Link active={isActive}>
-      <span onClick={() => router.push(href)}>{props.children}</span>
+    <PrimaryNavigation.Link active={isActive} href={href}>
+      {props.children}
     </PrimaryNavigation.Link>
   );
 };
