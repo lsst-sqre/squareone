@@ -206,6 +206,7 @@ const StyledTrigger = styled(RadixNavigationMenu.Trigger)`
 
   &:hover {
     color: var(--rsd-component-header-nav-text-hover-color);
+    cursor: pointer;
   }
 
   svg {
