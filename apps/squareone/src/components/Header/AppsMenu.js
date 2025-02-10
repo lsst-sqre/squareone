@@ -41,7 +41,9 @@ const Link = ({ href, internal, ...props }) => {
   if (internal) {
     return (
       <PrimaryNavigation.Link active={isActive}>
-        <span onClick={() => router.push(href)}>{props.children}</span>
+        <span style={{ cursor: 'pointer' }} onClick={() => router.push(href)}>
+          {props.children}
+        </span>
       </PrimaryNavigation.Link>
     );
   }
