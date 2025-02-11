@@ -1,17 +1,20 @@
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import getConfig from 'next/config';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { PrimaryNavigation } from '@lsst-sqre/squared';
 
 import useCurrentUrl from '../../hooks/useCurrentUrl';
 import Login from './Login';
+import AppsMenu from './AppsMenu';
 
 /*
  * Navigation (within the Header).
  */
 export default function HeaderNav() {
   const currentUrl = useCurrentUrl();
+  const { publicRuntimeConfig } = getConfig();
 
   return (
     <StyledNav>
@@ -30,6 +33,12 @@ export default function HeaderNav() {
       <NavItem>
         <InternalTriggerLink href="/api-aspect">APIs</InternalTriggerLink>
       </NavItem>
+
+      {publicRuntimeConfig.enableAppsMenu && (
+        <NavItem>
+          <AppsMenu />
+        </NavItem>
+      )}
 
       <NavItem>
         <InternalTriggerLink href="/docs">Documentation</InternalTriggerLink>
