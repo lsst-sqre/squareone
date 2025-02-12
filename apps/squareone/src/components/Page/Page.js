@@ -25,7 +25,7 @@ const StyledLayout = styled.div`
     flex: 1 0 auto;
   }
   .sticky-footer-container {
-    flex-shink: 0;
+    flex-shrink: 0;
   }
 `;
 

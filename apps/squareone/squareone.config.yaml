@@ -7,6 +7,14 @@ docsBaseUrl: 'https://rsp.lsst.io'
 semaphoreUrl: 'https://data-dev.lsst.cloud/semaphore'
 timesSquareUrl: 'http://localhost:3000/times-square/api'
 coManageRegistryUrl: 'https://id.lsst.cloud'
+enableAppsMenu: true
+appLinks:
+  - label: 'Times Square'
+    href: '/times-square/'
+    internal: true
+  - label: 'Argo CD'
+    href: '/argo-cd/'
+    internal: false
 apiAspectPageMdx: |
   # Rubin Science Platform APIs
 

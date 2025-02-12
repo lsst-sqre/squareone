@@ -3,7 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 import useGafaelfawrUser from '../../hooks/useGafaelfawrUser';
-import { getLoginUrl, getLogoutUrl } from './authUrls';
+import { getLoginUrl, getLogoutUrl } from '../../lib/authUrls';
 import Menu, { MenuLink } from './Menu';
 
 export interface GafaelfawrUserMenuProps {
