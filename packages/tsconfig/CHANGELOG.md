@@ -1,5 +1,11 @@
 # @lsst-sqre/tsconfig
 
+## 0.2.0
+
+### Minor Changes
+
+- [#179](https://github.com/lsst-sqre/squareone/pull/179) [`9b19301`](https://github.com/lsst-sqre/squareone/commit/9b19301c93dee43d9d014692cb4c053ce2c76303) Thanks [@jonathansick](https://github.com/jonathansick)! - Add DOM to lib options. This makes types available for DOM APIs, which we do use in react libraries like Squared.
+
 ## 0.1.0
 
 ### Minor Changes
