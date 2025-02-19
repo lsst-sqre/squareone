@@ -105,6 +105,36 @@
       "title": "Sentry debug",
       "description": "Setting this option to true will print useful information to the console while you're setting up Sentry.",
       "default": false
+    },
+    "enableAppsMenu": {
+      "type": "boolean",
+      "title": "Enable the Apps menu",
+      "description": "Setting this option to true will enable the Apps menu in the header.",
+      "default": false
+    },
+    "appLinks": {
+      "type": "array",
+      "title": "Application links",
+      "description": "Links to be displayed in the Apps menu",
+      "items": {
+        "type": "object",
+        "required": ["label", "href", "internal"],
+        "properties": {
+          "label": {
+            "type": "string",
+            "description": "Display label for the link"
+          },
+          "href": {
+            "type": "string",
+            "description": "URL or path for the link"
+          },
+          "internal": {
+            "type": "boolean",
+            "description": "Whether this is an internal route or external URL"
+          }
+        }
+      },
+      "default": []
     }
   }
 }
