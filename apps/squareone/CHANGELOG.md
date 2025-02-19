@@ -1,5 +1,20 @@
 # squareone
 
+## 0.18.0
+
+### Minor Changes
+
+- [#179](https://github.com/lsst-sqre/squareone/pull/179) [`92ecf5f`](https://github.com/lsst-sqre/squareone/commit/92ecf5f1b3d4e509552e1cb724cfb8dfd63efa45) Thanks [@jonathansick](https://github.com/jonathansick)! - Add a configurable Apps menu to the header navigation. This menu is for linking for non-aspect applications within the RSP, such as Times Square.
+
+- [#179](https://github.com/lsst-sqre/squareone/pull/179) [`b4b2fdb`](https://github.com/lsst-sqre/squareone/commit/b4b2fdb72ea42adf3142ee53bdb463e9bfebe441) Thanks [@jonathansick](https://github.com/jonathansick)! - Moved auth URLs into Squared as a library. The `getLoginUrl` and `getLogout` URL functions compute the full URLs to the RSP's login and logout endpoints and include the `?rd` query strings to return the user to current and home URL respectively.
+
+- [#179](https://github.com/lsst-sqre/squareone/pull/179) [`6be6b1c`](https://github.com/lsst-sqre/squareone/commit/6be6b1c5229444e293d0d1e84a263c499202934d) Thanks [@jonathansick](https://github.com/jonathansick)! - Reimplement `HeaderNav` using the `PrimaryNavigation` component from Squared. Although the menu looks the same visually, it is now entirely powered by the Radix `NavigationMenu` primitive so that any menu item can be a trigger for a menu rather than a link to another page. The Login / user menu is reimplemented as a menu item rather than with the special GafaelfawrUserMenu component.
+
+### Patch Changes
+
+- Updated dependencies [[`b4b2fdb`](https://github.com/lsst-sqre/squareone/commit/b4b2fdb72ea42adf3142ee53bdb463e9bfebe441), [`77274e7`](https://github.com/lsst-sqre/squareone/commit/77274e7a144158ac267f4b38a1e7dc48cb10f2de)]:
+  - @lsst-sqre/squared@0.4.0
+
 ## 0.17.0
 
 ### Minor Changes
