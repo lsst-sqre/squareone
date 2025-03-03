@@ -46,6 +46,7 @@
     "@microsoft/fetch-event-source": "^2.0.1",
     "@sentry/nextjs": "^8",
     "ajv": "^8.11.0",
+    "ajv-formats": "^3.0.1",
     "date-fns": "^3.6.0",
     "formik": "^2.2.9",
     "js-yaml": "^4.1.0",
