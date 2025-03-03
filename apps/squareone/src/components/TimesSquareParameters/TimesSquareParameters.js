@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { Formik, Field } from 'formik';
 import Ajv from 'ajv';
+import addFormats from 'ajv-formats';
 
 import Button, { RedGhostButton } from '../Button';
 import StringInput from './StringInput';
@@ -40,6 +41,7 @@ export default function TimesSquareParameters({}) {
   const { parameters } = useTimesSquarePage();
 
   const ajv = new Ajv({ coerceTypes: true });
+  addFormats(ajv);
 
   // Merge userParameters with defaults
   const initialValues = {};
