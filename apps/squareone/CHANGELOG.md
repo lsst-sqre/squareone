@@ -1,5 +1,11 @@
 # squareone
 
+## 0.19.0
+
+### Minor Changes
+
+- [#183](https://github.com/lsst-sqre/squareone/pull/183) [`a1a6cbe`](https://github.com/lsst-sqre/squareone/commit/a1a6cbeb77af55cc5c7a2c9c09310a565f4db290) Thanks [@jonathansick](https://github.com/jonathansick)! - Times Square now supports date and date-time parameter types.
+
 ## 0.18.0
 
 ### Minor Changes
