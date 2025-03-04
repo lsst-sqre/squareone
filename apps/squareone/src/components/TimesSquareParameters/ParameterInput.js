@@ -12,7 +12,7 @@ export default function ParameterInput({
       <label htmlFor={`${paramName}`}>
         <ParameterName>{paramName}</ParameterName>
         {children}
-        {errors && touched && (
+        {errors && (
           <ErrorMessage id={`tsparam-${paramName}-error`} type="polite">
             {errors}
           </ErrorMessage>
