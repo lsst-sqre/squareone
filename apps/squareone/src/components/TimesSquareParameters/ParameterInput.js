@@ -7,14 +7,15 @@ export default function ParameterInput({
   touched,
   errors,
 }) {
+  const errorMessage = computeErrorMessage(errors, paramSchema);
   return (
     <>
       <label htmlFor={`${paramName}`}>
         <ParameterName>{paramName}</ParameterName>
         {children}
-        {errors && touched && (
+        {errorMessage && (
           <ErrorMessage id={`tsparam-${paramName}-error`} type="polite">
-            {errors}
+            {errorMessage}
           </ErrorMessage>
         )}
         <Description id={`tsparam-${paramName}-description`}>
@@ -23,6 +24,21 @@ export default function ParameterInput({
       </label>
     </>
   );
+}
+
+function computeErrorMessage(errors, paramSchema) {
+  if (errors) {
+    if (paramSchema.type === 'string' && paramSchema.format === 'date') {
+      return 'Expecting YYYY-MM-DD';
+    } else if (
+      paramSchema.type === 'string' &&
+      paramSchema.format === 'date-time'
+    ) {
+      return 'Expecting YYYY-MM-DDTHH:MM:SS-HH:MM';
+    }
+    return errors;
+  }
+  return null;
 }
 
 const ParameterName = styled.p`
