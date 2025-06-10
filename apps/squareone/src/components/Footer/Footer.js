@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import AgencyLogos from '@lsst-sqre/rubin-style-dictionary/assets/partner-logos/operations-lineup-black.png';
+import AgencyLogos from '@lsst-sqre/rubin-style-dictionary/assets/partner-logos/rubin-partners.png';
 
 import { ContentMaxWidth } from '../../styles/sizes';
 
@@ -73,9 +73,7 @@ export default function Footer() {
           <Image
             className="u-invertable-image"
             src={AgencyLogos}
-            width="800px"
-            height="158px"
-            alt="Logos of the NSF, NOIRLab, AURA, SLAC, and US DOE"
+            alt="Logos of the Vera C. Rubin Observatory, NSF, US DOE, NOIRLab, AURA, and SLAC."
           />
         </PartnerLogoContainer>
       </div>

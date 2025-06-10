@@ -6,5 +6,5 @@ asset:
         comment: Construction funding agency logo lineup (black on transparent).
     operations-agencies:
       png:
-        value: assets/partner-logos/operations-lineup-black.png
-        comment: Operations funding agency logo lineup (black on transparent).
+        value: assets/partner-logos/rubin-partners.png
+        comment: Rubin Operations funding agency logo lineup (black on transparent).
