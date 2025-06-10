@@ -1,3 +1,14 @@
 packages:
-  - 'packages/*'
-  - 'apps/*'
+  - packages/*
+  - apps/*
+
+onlyBuiltDependencies:
+  - '@parcel/watcher'
+  - '@sentry/cli'
+  - '@swc/core'
+  - core-js-pure
+  - esbuild
+  - lightningcss-cli
+  - msw
+  - sharp
+  - turbo
