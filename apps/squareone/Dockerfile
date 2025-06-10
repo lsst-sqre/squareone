@@ -1,4 +1,4 @@
-FROM node:16-alpine as base
+FROM node:22.16.0-alpine as base
 
 RUN corepack enable
 RUN apk add --no-cache libc6-compat
