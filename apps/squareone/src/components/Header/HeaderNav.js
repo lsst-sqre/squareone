@@ -62,16 +62,18 @@ export default function HeaderNav() {
 }
 
 const StyledNav = styled(PrimaryNavigation)`
-  margin: 0 0 30px 0;
+  margin: 0;
   padding: 0;
-  /* display: flex; */
-  justify-self: end;
   width: 100%;
   font-size: 1.2rem;
 `;
 
 const NavItem = styled(PrimaryNavigation.Item)`
   margin: 0 1em;
+
+  &:first-of-type {
+    margin-left: 0;
+  }
 
   color: var(--rsd-component-header-nav-text-color);
   a {
@@ -84,7 +86,7 @@ const NavItem = styled(PrimaryNavigation.Item)`
 `;
 
 const LoginNavItem = styled(NavItem)`
-  margin: 0 1em 0 auto;
+  margin: 0 0 0 auto;
 `;
 
 const InternalTriggerLink = ({ href, ...props }) => {
