@@ -107,7 +107,8 @@ const StyledAspectIllustration = styled.img`
  */
 export default function HomepageHero() {
   const { publicRuntimeConfig } = getConfig();
-  const { showPreview, previewLink, docsBaseUrl } = publicRuntimeConfig;
+  const { showPreview, previewLink, docsBaseUrl, siteName } =
+    publicRuntimeConfig;
 
   return (
     <FullBleedBackgroundImageSection
@@ -117,7 +118,7 @@ export default function HomepageHero() {
     >
       <ContentContainer>
         <TitleContainer>
-          <h1 className="hero-title">Rubin Science Platform</h1>
+          <h1 className="hero-title">{siteName}</h1>
           {showPreview && (
             <PreviewBadge
               href={previewLink}
