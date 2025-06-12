@@ -1,5 +1,32 @@
 # squareone
 
+## 0.20.0
+
+### Minor Changes
+
+- [#186](https://github.com/lsst-sqre/squareone/pull/186) [`1dc078011cb6a1e87fbde6480ebbdf534c5ea9ee`](https://github.com/lsst-sqre/squareone/commit/1dc078011cb6a1e87fbde6480ebbdf534c5ea9ee) Thanks [@jonathansick](https://github.com/jonathansick)! - Adopt horizontal triad logo in header.
+
+- [#186](https://github.com/lsst-sqre/squareone/pull/186) [`55df20028a802a7dcd33b14d599266517c05021a`](https://github.com/lsst-sqre/squareone/commit/55df20028a802a7dcd33b14d599266517c05021a) Thanks [@jonathansick](https://github.com/jonathansick)! - Update pnpm to 10.12.
+
+- [#186](https://github.com/lsst-sqre/squareone/pull/186) [`c1bc9f3e517c5273588b21dd0368411575c6684d`](https://github.com/lsst-sqre/squareone/commit/c1bc9f3e517c5273588b21dd0368411575c6684d) Thanks [@jonathansick](https://github.com/jonathansick)! - Update funding notice text.
+
+- [#186](https://github.com/lsst-sqre/squareone/pull/186) [`755428a010d4355994436b02dfb9a55801438ab7`](https://github.com/lsst-sqre/squareone/commit/755428a010d4355994436b02dfb9a55801438ab7) Thanks [@jonathansick](https://github.com/jonathansick)! - Use configured site name for homepage title.
+
+- [#186](https://github.com/lsst-sqre/squareone/pull/186) [`10153b02ea62674a75b8c33acdff88351e8d2511`](https://github.com/lsst-sqre/squareone/commit/10153b02ea62674a75b8c33acdff88351e8d2511) Thanks [@jonathansick](https://github.com/jonathansick)! - Add a configurable preview badge that links to the roadmap doc.
+
+  The preview badge appears on the homepage below the title. It's presence is configurable with the "showPreview" configuration. The link it follows is also configurable with "previewLink".
+
+- [#186](https://github.com/lsst-sqre/squareone/pull/186) [`13e1fdce47cafe848413d5aa78e51cc767fda365`](https://github.com/lsst-sqre/squareone/commit/13e1fdce47cafe848413d5aa78e51cc767fda365) Thanks [@jonathansick](https://github.com/jonathansick)! - Update to Node 22.16 (current LTS).
+
+### Patch Changes
+
+- [#186](https://github.com/lsst-sqre/squareone/pull/186) [`9b717643a038f3936f520c2f85dfaa2d7ad2b0d3`](https://github.com/lsst-sqre/squareone/commit/9b717643a038f3936f520c2f85dfaa2d7ad2b0d3) Thanks [@jonathansick](https://github.com/jonathansick)! - Update partner logo lineup.
+
+- Updated dependencies [[`9b717643a038f3936f520c2f85dfaa2d7ad2b0d3`](https://github.com/lsst-sqre/squareone/commit/9b717643a038f3936f520c2f85dfaa2d7ad2b0d3), [`1323de7a7e4deb3ada11ebbf650883c70221958f`](https://github.com/lsst-sqre/squareone/commit/1323de7a7e4deb3ada11ebbf650883c70221958f)]:
+  - @lsst-sqre/rubin-style-dictionary@0.5.0
+  - @lsst-sqre/global-css@0.2.1
+  - @lsst-sqre/squared@0.4.1
+
 ## 0.19.0
 
 ### Minor Changes
