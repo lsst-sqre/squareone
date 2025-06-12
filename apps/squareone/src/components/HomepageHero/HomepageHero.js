@@ -44,12 +44,13 @@ const PreviewBadge = styled.a`
     var(--rsd-color-primary-600) 20%,
     transparent
   );
+  backdrop-filter: blur(1px);
   text-decoration: none;
   font-size: 0.875rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.2s ease, backdrop-filter 0.2s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
 
   &:hover {
