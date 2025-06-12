@@ -106,7 +106,7 @@ const StyledAspectIllustration = styled.img`
  */
 export default function HomepageHero() {
   const { publicRuntimeConfig } = getConfig();
-  const { showPreview, previewLink } = publicRuntimeConfig;
+  const { showPreview, previewLink, docsBaseUrl } = publicRuntimeConfig;
 
   return (
     <FullBleedBackgroundImageSection
@@ -153,11 +153,13 @@ export default function HomepageHero() {
               </a>
             </div>
             <div className="sticky-footer-container">
-              <a href="https://nb.lsst.io">Learn more about notebooks.</a>
+              <a href={`${docsBaseUrl}/guides/notebooks/index.html`}>
+                Learn more about notebooks.
+              </a>
             </div>
           </ServiceCard>
           <ServiceCard>
-            <div className="upper container">
+            <div className="upper-container">
               <Link href="/api-aspect">
                 <a>
                   <h2 className="title">APIs</h2>
