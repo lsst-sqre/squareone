@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import AgencyLogos from '@lsst-sqre/rubin-style-dictionary/assets/partner-logos/operations-lineup-black.png';
+import AgencyLogos from '@lsst-sqre/rubin-style-dictionary/assets/partner-logos/rubin-partners.png';
 
 import { ContentMaxWidth } from '../../styles/sizes';
 
@@ -56,26 +56,36 @@ export default function Footer() {
         </FooterNav>
         <FundingNotice>
           <p>
-            Rubin Observatory is a joint initiative of the National Science
-            Foundation (NSF) and the Department of Energy (DOE). Its primary
-            mission is to carry out the Legacy Survey of Space and Time,
-            providing an unprecedented data set for scientific research
-            supported by both agencies. Rubin is operated jointly by NSF’s{' '}
-            <a href="https://noirlab.edu/public/">NOIRLab</a> and SLAC National
-            Accelerator Laboratory (
-            <a href="https://www6.slac.stanford.edu/">SLAC</a>). NOIRLab is
-            managed for NSF by the Association of Universities for Research in
-            Astronomy (AURA) and SLAC is operated for DOE by Stanford
-            University.
+            The U.S. National Science Foundation (
+            <a href="https://www.nsf.gov/">NSF</a>) and the U.S. Department of
+            Energy (<a href="https://www.energy.gov/">DOE</a>) Office of Science
+            will support Rubin Observatory in its operations phase to carry out
+            the Legacy Survey of Space and Time. They will also provide support
+            for scientific research with the data. During operations, NSF
+            funding is managed by the Association of Universities for Research
+            in Astronomy (<a href="https://www.aura-astronomy.org/">AURA</a>)
+            under a cooperative agreement with NSF, and DOE funding is managed
+            by SLAC National Accelerator Laboratory (
+            <a href="https://www6.slac.stanford.edu/">SLAC</a>), under contract
+            by DOE. Rubin Observatory is operated by{' '}
+            <a href="https://noirlab.edu/public/">NSF NOIRLab</a> and SLAC.
+          </p>
+          <p>
+            NSF is an independent federal agency created by Congress in 1950 to
+            promote the progress of science. NSF supports basic research and
+            people to create knowledge that transforms the future.
+          </p>
+          <p>
+            The DOE Office of Science is the single largest supporter of basic
+            research in the physical sciences in the United States and is
+            working to address some of the most pressing challenges of our time.
           </p>
         </FundingNotice>
         <PartnerLogoContainer>
           <Image
             className="u-invertable-image"
             src={AgencyLogos}
-            width="800px"
-            height="158px"
-            alt="Logos of the NSF, NOIRLab, AURA, SLAC, and US DOE"
+            alt="Logos of the Vera C. Rubin Observatory, NSF, US DOE, NOIRLab, AURA, and SLAC."
           />
         </PartnerLogoContainer>
       </div>

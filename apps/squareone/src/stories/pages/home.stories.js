@@ -9,5 +9,7 @@ const Template = (args) => <Home {...args} />;
 
 export const Homepage = Template.bind();
 Homepage.args = {
-  publicRuntimeConfig: { siteName: 'Rubin Science Platform' },
+  publicRuntimeConfig: {
+    siteName: 'Rubin Science Platform',
+  },
 };

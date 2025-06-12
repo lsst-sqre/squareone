@@ -6,6 +6,7 @@
     "storybook": "turbo run storybook",
     "build-storybook": "turbo run build-storybook",
     "lint": "turbo run lint",
+    "type-check": "turbo run type-check",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,graphql,yaml}\"",
     "format:check": "prettier --check \"**/*.{js,ts,tsx,json,css,graphql,yaml}\"",
     "ci:publish": "turbo run build && changeset publish",
@@ -22,6 +23,6 @@
     "prettier": "^2.8.8",
     "turbo": "1.10.12"
   },
-  "packageManager": "pnpm@8.6.11",
+  "packageManager": "pnpm@10.12.1+sha512.f0dda8580f0ee9481c5c79a1d927b9164f2c478e90992ad268bbb2465a736984391d6333d2c327913578b2804af33474ca554ba29c04a8b13060a717675ae3ac",
   "dependencies": {}
 }

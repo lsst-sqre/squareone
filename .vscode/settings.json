@@ -1,0 +1,8 @@
+{
+  // Solve "Parsing error: Cannot find module 'next/babel'"
+  "eslint.workingDirectories": [
+    "./apps/squareone",
+    "./packages/squared",
+    "./packages/rubin-style-dictionary"
+  ]
+}

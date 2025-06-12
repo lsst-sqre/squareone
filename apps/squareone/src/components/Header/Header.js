@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import HeaderNav from './HeaderNav';
-import HeaderLogo from './HeaderLogo';
+import PreHeader from './PreHeader';
 
 const StyledHeader = styled.header`
   width: 100%;
@@ -12,7 +12,7 @@ const StyledHeader = styled.header`
   background-color: var(--rsd-component-header-background-color);
 
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   flex-wrap: nowrap;
   justify-content: flex-start;
   align-items: flex-end;
@@ -24,7 +24,7 @@ const StyledHeader = styled.header`
 export default function Header() {
   return (
     <StyledHeader>
-      <HeaderLogo />
+      <PreHeader />
       <HeaderNav />
     </StyledHeader>
   );
