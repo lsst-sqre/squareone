@@ -1,3 +1,6 @@
+// For adding publicRuntimeConfig to Storybook
+import { setConfig } from 'next/config';
+
 // Load global CSS and icons; same as how _app.js loads these resources.
 // Next can't load global CSS from anywhere _but_ _app.js, so there isn't a way
 // to single-source these imports.
@@ -21,3 +24,21 @@ export const parameters = {
     },
   },
 };
+
+// Set the Next.js public runtime configuration that's used by storybook stories.
+// This should match the publicRuntimeConfig in next.config.js.
+setConfig({
+  publicRuntimeConfig: {
+    siteName: 'Rubin Science Platform',
+    siteDescription:
+      'The Rubin Science Platform (RSP) provides web-based data access and analysis tools.',
+    showPreview: true,
+    previewLink: 'https://rsp.lsst.io/roadmap.html',
+    docsBaseUrl: 'https://rsp.lsst.io',
+    enableAppsMenu: false,
+    appLinks: [],
+    baseUrl: 'http://localhost:3000',
+    coManageRegistryUrl: null,
+    timesSquareUrl: null,
+  },
+});
