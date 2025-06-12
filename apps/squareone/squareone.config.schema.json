@@ -135,6 +135,18 @@
         }
       },
       "default": []
+    },
+    "showPreview": {
+      "type": "boolean",
+      "title": "Show preview badge",
+      "description": "Whether to show the preview badge on the homepage hero",
+      "default": false
+    },
+    "previewLink": {
+      "type": "string",
+      "title": "Preview badge link URL",
+      "description": "URL for the preview badge link",
+      "default": "https://rsp.lsst.io/roadmap.html"
     }
   }
 }

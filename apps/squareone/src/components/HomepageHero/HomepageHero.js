@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import Link from 'next/link';
+import getConfig from 'next/config';
 
 import FullBleedBackgroundImageSection from '../FullBleedBackgroundImageSection';
 import { ContentMaxWidth } from '../../styles/sizes';
@@ -17,10 +18,43 @@ const ContentContainer = styled.div`
 
   .hero-title {
     color: var(--c-component-text-reverse-color);
-    margin-top: 1rem;
-    margin-bottom: 3rem;
     text-align: center;
     font-size: 3rem;
+    margin: 0;
+  }
+`;
+
+const TitleContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+`;
+
+const PreviewBadge = styled.a`
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--rsd-color-primary-600);
+  border-radius: 0.5rem;
+  color: var(--c-component-text-reverse-color);
+  background-color: color-mix(
+    in srgb,
+    var(--rsd-color-primary-600) 20%,
+    transparent
+  );
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  transition: background-color 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+
+  &:hover {
+    background-color: var(--rsd-color-primary-600);
+    color: var(--rsd-component-text-color);
   }
 `;
 
@@ -71,6 +105,9 @@ const StyledAspectIllustration = styled.img`
  * aspects) that's featured on the homepage.
  */
 export default function HomepageHero() {
+  const { publicRuntimeConfig } = getConfig();
+  const { showPreview, previewLink } = publicRuntimeConfig;
+
   return (
     <FullBleedBackgroundImageSection
       imagePath="/Quint-DSC1187.jpg"
@@ -78,7 +115,19 @@ export default function HomepageHero() {
       textColor="#ffffff"
     >
       <ContentContainer>
-        <h1 className="hero-title">Rubin Science Platform</h1>
+        <TitleContainer>
+          <h1 className="hero-title">Rubin Science Platform</h1>
+          {showPreview && (
+            <PreviewBadge
+              href={previewLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Learn about our development roadmap."
+            >
+              Preview
+            </PreviewBadge>
+          )}
+        </TitleContainer>
         <ServiceCardContainer>
           <ServiceCard>
             <div className="upper-container">
