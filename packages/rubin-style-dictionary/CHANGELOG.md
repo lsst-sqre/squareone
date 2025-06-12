@@ -1,5 +1,15 @@
 # @lsst-sqre/rubin-style-dictionary
 
+## 0.5.0
+
+### Minor Changes
+
+- [#186](https://github.com/lsst-sqre/squareone/pull/186) [`1323de7a7e4deb3ada11ebbf650883c70221958f`](https://github.com/lsst-sqre/squareone/commit/1323de7a7e4deb3ada11ebbf650883c70221958f) Thanks [@jonathansick](https://github.com/jonathansick)! - Add triad logos (Rubin+NSF+DOE).
+
+### Patch Changes
+
+- [#186](https://github.com/lsst-sqre/squareone/pull/186) [`9b717643a038f3936f520c2f85dfaa2d7ad2b0d3`](https://github.com/lsst-sqre/squareone/commit/9b717643a038f3936f520c2f85dfaa2d7ad2b0d3) Thanks [@jonathansick](https://github.com/jonathansick)! - Update partner logo lineup.
+
 ## 0.4.2
 
 ### Patch Changes
