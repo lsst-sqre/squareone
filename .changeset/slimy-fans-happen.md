@@ -2,4 +2,4 @@
 'squareone': minor
 ---
 
-Update funding notice text
+Update funding notice text.
