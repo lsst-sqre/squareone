@@ -8,10 +8,13 @@ const StyledBroadcastContainer = styled.div`
   width: 100%;
   margin: 0;
   padding: 0.5em;
-  background-color: ${(props) =>
-    props.category === 'info'
-      ? 'var(--rsd-color-primary-600)'
-      : 'var(--rsd-color-red-500)'};
+  background-color: ${(props) => {
+    if (props.category === 'info') return 'var(--rsd-color-primary-600)';
+    if (props.category === 'outage') return 'var(--rsd-color-red-500)';
+    if (props.category === 'notice' || props.category === 'maintenance')
+      return 'var(--rsd-color-orange-500)';
+    return 'var(--rsd-color-gray-500)'; // default fallback
+  }};
   color: white;
 
   aside {
@@ -100,7 +103,7 @@ export default function BroadcastBanner({ broadcast }) {
   /* eslint-disable react/no-danger */
   /* eslint-disable react/jsx-props-no-spreading */
   return (
-    <StyledBroadcastContainer category={broadcast.category || 'maintenance'}>
+    <StyledBroadcastContainer category={broadcast.category || 'notice'}>
       <aside>
         <div className="summary">
           <div

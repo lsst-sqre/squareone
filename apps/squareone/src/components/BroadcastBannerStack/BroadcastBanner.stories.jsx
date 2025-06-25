@@ -18,9 +18,27 @@ const broadcastData = {
   active: true,
   enabled: true,
   stale: false,
-  category: 'maintenance',
+  category: 'other',
 };
 
 export const Default = {
   render: () => <BroadcastBanner broadcast={broadcastData} />,
+};
+
+export const Info = {
+  render: () => (
+    <BroadcastBanner broadcast={{ ...broadcastData, category: 'info' }} />
+  ),
+};
+
+export const Outage = {
+  render: () => (
+    <BroadcastBanner broadcast={{ ...broadcastData, category: 'outage' }} />
+  ),
+};
+
+export const Notice = {
+  render: () => (
+    <BroadcastBanner broadcast={{ ...broadcastData, category: 'notice' }} />
+  ),
 };
