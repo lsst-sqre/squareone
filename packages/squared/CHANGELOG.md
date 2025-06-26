@@ -1,5 +1,13 @@
 # @lsst-sqre/squared
 
+## 0.4.2
+
+### Patch Changes
+
+- Updated dependencies [[`7a41984e02439cd16a2786196330492197f5c465`](https://github.com/lsst-sqre/squareone/commit/7a41984e02439cd16a2786196330492197f5c465)]:
+  - @lsst-sqre/rubin-style-dictionary@0.5.1
+  - @lsst-sqre/global-css@0.2.2
+
 ## 0.4.1
 
 ### Patch Changes
