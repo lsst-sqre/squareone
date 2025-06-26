@@ -24,9 +24,7 @@ jobs:
         with:
           fetch-depth: 0 # get full Git history
 
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 8
+      - uses: pnpm/action-setup@v4
 
       - name: Set up node
         uses: actions/setup-node@v3
