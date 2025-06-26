@@ -1,5 +1,18 @@
 # squareone
 
+## 0.21.0
+
+### Minor Changes
+
+- [#188](https://github.com/lsst-sqre/squareone/pull/188) [`d24e59837c7c8057b03ea8d42d625e64e6fc5d0e`](https://github.com/lsst-sqre/squareone/commit/d24e59837c7c8057b03ea8d42d625e64e6fc5d0e) Thanks [@jonathansick](https://github.com/jonathansick)! - Add new "notice" and "outage" broadcast banners. This notice category replaces the earlier default ("maintenance") and is orange. Another new category, "outage", takes the red colour. This change is driven by Semaphore at https://github.com/lsst-sqre/semaphore/pull/109
+
+### Patch Changes
+
+- Updated dependencies [[`7a41984e02439cd16a2786196330492197f5c465`](https://github.com/lsst-sqre/squareone/commit/7a41984e02439cd16a2786196330492197f5c465)]:
+  - @lsst-sqre/rubin-style-dictionary@0.5.1
+  - @lsst-sqre/global-css@0.2.2
+  - @lsst-sqre/squared@0.4.2
+
 ## 0.20.0
 
 ### Minor Changes

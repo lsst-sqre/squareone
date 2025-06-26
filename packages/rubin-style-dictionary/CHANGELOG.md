@@ -1,5 +1,11 @@
 # @lsst-sqre/rubin-style-dictionary
 
+## 0.5.1
+
+### Patch Changes
+
+- [#188](https://github.com/lsst-sqre/squareone/pull/188) [`7a41984e02439cd16a2786196330492197f5c465`](https://github.com/lsst-sqre/squareone/commit/7a41984e02439cd16a2786196330492197f5c465) Thanks [@jonathansick](https://github.com/jonathansick)! - Use the project orange accent for color-orange-500 (was accidentally red before).
+
 ## 0.5.0
 
 ### Minor Changes
