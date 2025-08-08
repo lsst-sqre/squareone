@@ -4,4 +4,4 @@
  * Use these for media queries, where CSS variables can't be used.
  */
 
-export const ContentMaxWidth = '60rem';
+export const ContentMaxWidth: string = '60rem';

@@ -5,7 +5,7 @@ import getConfig from 'next/config';
  * @param path The path to the documentation page, starting with "/"
  * @returns The full URL to the documentation page
  */
-export function getDocsUrl(path) {
+export function getDocsUrl(path: string): string {
   const { publicRuntimeConfig } = getConfig();
   return `${publicRuntimeConfig.docsBaseUrl}${path}`;
 }
