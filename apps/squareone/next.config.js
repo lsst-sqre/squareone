@@ -93,7 +93,7 @@ module.exports = (phase, { defaultConfig }) => {
 
 const { withSentryConfig } = require('@sentry/nextjs');
 
-module.exports = withSentryConfig(module.exports, {
+const sentryWrappedConfig = withSentryConfig(module.exports, {
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options
 
@@ -132,3 +132,33 @@ module.exports = withSentryConfig(module.exports, {
   // https://vercel.com/docs/cron-jobs
   automaticVercelMonitors: false,
 });
+
+// Filter out properties that are not valid in Next.js 12.3.5
+// These are added by Sentry SDK but not recognized by Next.js 12.3.5
+module.exports = (phase, options) => {
+  const config = sentryWrappedConfig(phase, options);
+
+  // Remove deprecated properties
+  delete config.webpackDevMiddleware;
+  delete config.configOrigin;
+  delete config.target;
+  delete config.webpack5;
+
+  // Fix empty string validation issues
+  if (config.amp && config.amp.canonicalBase === '') {
+    delete config.amp.canonicalBase;
+  }
+  if (config.assetPrefix === '') {
+    delete config.assetPrefix;
+  }
+  if (config.experimental && config.experimental.outputFileTracingRoot === '') {
+    delete config.experimental.outputFileTracingRoot;
+  }
+
+  // Remove null i18n
+  if (config.i18n === null) {
+    delete config.i18n;
+  }
+
+  return config;
+};
