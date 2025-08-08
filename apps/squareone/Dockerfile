@@ -1,4 +1,4 @@
-FROM node:22.16.0-alpine as base
+FROM node:22.16.0-alpine AS base
 
 RUN corepack enable
 RUN apk add --no-cache libc6-compat
@@ -15,7 +15,7 @@ COPY . .
 RUN turbo prune --scope=squareone --docker
 
 
-FROM base as installer
+FROM base AS installer
 
 WORKDIR /app
 
@@ -42,8 +42,8 @@ FROM base AS runner
 
 WORKDIR /app
 
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 
 # Don't run production as root
 RUN addgroup --system --gid 1001 nodejs
@@ -51,9 +51,9 @@ RUN adduser --system --uid 1001 nextjs
 USER nextjs
 
 EXPOSE 3000
-ENV PORT 3000
+ENV PORT=3000
 
 COPY --from=installer /app .
 
 # TODO: Maybe use the npm script?
-CMD pnpm --filter "squareone" run start
+CMD ["pnpm", "--filter", "squareone", "run", "start"]
