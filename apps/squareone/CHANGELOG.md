@@ -1,5 +1,15 @@
 # squareone
 
+## 0.21.1
+
+### Patch Changes
+
+- [#190](https://github.com/lsst-sqre/squareone/pull/190) [`72971e97efef450f755238803ae125876f2021b9`](https://github.com/lsst-sqre/squareone/commit/72971e97efef450f755238803ae125876f2021b9) Thanks [@jonathansick](https://github.com/jonathansick)! - Update Next to 12.3.5
+
+- [#190](https://github.com/lsst-sqre/squareone/pull/190) [`19087e3c5c18d243c0bf7a10da02c3f60127c99e`](https://github.com/lsst-sqre/squareone/commit/19087e3c5c18d243c0bf7a10da02c3f60127c99e) Thanks [@jonathansick](https://github.com/jonathansick)! - Downgraded Sentry SDK from v8 to v7 for compatibility with Next.js 12.3.5.
+
+- [#190](https://github.com/lsst-sqre/squareone/pull/190) [`19087e3c5c18d243c0bf7a10da02c3f60127c99e`](https://github.com/lsst-sqre/squareone/commit/19087e3c5c18d243c0bf7a10da02c3f60127c99e) Thanks [@jonathansick](https://github.com/jonathansick)! - Added filtering in next.config.js to remove deprecated configuration properties that Sentry SDK adds but Next.js 12.3.5 doesn't recognize.
+
 ## 0.21.0
 
 ### Minor Changes
