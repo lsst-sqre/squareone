@@ -44,3 +44,5 @@ jobs:
             ghcr.io/lsst-sqre/squareone:${{ env.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          secrets: |
+            SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
