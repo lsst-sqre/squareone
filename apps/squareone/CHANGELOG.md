@@ -1,5 +1,24 @@
 # squareone
 
+## 0.22.0
+
+### Minor Changes
+
+- [#192](https://github.com/lsst-sqre/squareone/pull/192) [`50d8d1f6cfef0318cb6c2767ba4feda8e120e348`](https://github.com/lsst-sqre/squareone/commit/50d8d1f6cfef0318cb6c2767ba4feda8e120e348) Thanks [@jonathansick](https://github.com/jonathansick)! - Migrate to React 18.3.1
+
+  - Updated React from 17.0.2 to 18.3.1 across all packages
+  - Updated React DOM to 18.3.1 for improved hydration and performance
+  - Updated TypeScript types for React 18 compatibility
+  - Updated styled-components to v5.3.11 for React 18 support
+  - Updated Storybook React dependencies for compatibility
+
+### Patch Changes
+
+- [#192](https://github.com/lsst-sqre/squareone/pull/192) [`4d6a727f17ce694b75cdfae1318cb77d78e40dc7`](https://github.com/lsst-sqre/squareone/commit/4d6a727f17ce694b75cdfae1318cb77d78e40dc7) Thanks [@jonathansick](https://github.com/jonathansick)! - Modernize Dockerfile syntax
+
+- Updated dependencies [[`50d8d1f6cfef0318cb6c2767ba4feda8e120e348`](https://github.com/lsst-sqre/squareone/commit/50d8d1f6cfef0318cb6c2767ba4feda8e120e348)]:
+  - @lsst-sqre/squared@0.5.0
+
 ## 0.21.1
 
 ### Patch Changes
