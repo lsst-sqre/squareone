@@ -42,13 +42,12 @@ const readServerYamlConfig = () => {
   return data;
 };
 
-module.exports = (phase, { defaultConfig }) => {
+const baseConfigFunc = (phase, { defaultConfig }) => {
   const publicYamlConfig = readPublicYamlConfig();
   const serverYamlConfig = readServerYamlConfig();
   const sentryDsn = process.env.SENTRY_DSN || null;
 
   const config = {
-    ...defaultConfig,
     publicRuntimeConfig: { sentryDsn, ...publicYamlConfig },
     serverRuntimeConfig: { sentryDsn, ...serverYamlConfig },
     async rewrites() {
@@ -90,10 +89,9 @@ module.exports = (phase, { defaultConfig }) => {
 };
 
 // Injected content via Sentry wizard below
-
 const { withSentryConfig } = require('@sentry/nextjs');
 
-const sentryWrappedConfig = withSentryConfig(module.exports, {
+const sentryWrappedConfig = withSentryConfig(baseConfigFunc, {
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options
 
@@ -131,6 +129,10 @@ const sentryWrappedConfig = withSentryConfig(module.exports, {
   // https://docs.sentry.io/product/crons/
   // https://vercel.com/docs/cron-jobs
   automaticVercelMonitors: false,
+
+  // Disable automatic instrumentation that might trigger edge runtime detection
+  autoInstrumentServerFunctions: false,
+  autoInstrumentMiddleware: false,
 });
 
 // Filter out properties that are not valid in Next.js 12.3.5
