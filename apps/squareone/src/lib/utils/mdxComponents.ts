@@ -4,5 +4,10 @@
 
 import Link from 'next/link';
 import { Lede, CtaLink } from '../../components/Typography';
+import { ComponentType } from 'react';
 
-export const commonMdxComponents = { Link, Lede, CtaLink };
+export const commonMdxComponents: Record<string, ComponentType<any>> = {
+  Link,
+  Lede,
+  CtaLink,
+};
