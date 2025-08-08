@@ -64,7 +64,7 @@ importers:
         version: 2.0.1
       '@sentry/nextjs':
         specifier: ^8
-        version: 8.55.0(@opentelemetry/context-async-hooks@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.57.2(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(next@12.3.7(@babel/core@7.27.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.89.2))(react@17.0.2)(webpack@5.99.9(@swc/core@1.12.7)(esbuild@0.18.20))
+        version: 8.55.0(@opentelemetry/context-async-hooks@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.57.2(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(next@12.3.5(@babel/core@7.27.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.89.2))(react@17.0.2)(webpack@5.99.9(@swc/core@1.12.7)(esbuild@0.18.20))
       ajv:
         specifier: ^8.11.0
         version: 8.17.1
@@ -81,17 +81,17 @@ importers:
         specifier: ^4.1.0
         version: 4.1.0
       next:
-        specifier: ^12.2.4
-        version: 12.3.7(@babel/core@7.27.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.89.2)
+        specifier: ^12.3.5
+        version: 12.3.5(@babel/core@7.27.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.89.2)
       next-mdx-remote:
         specifier: ^4.4.1
         version: 4.4.1(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       next-plausible:
         specifier: ^3.12.1
-        version: 3.12.4(next@12.3.7(@babel/core@7.27.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.89.2))(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
+        version: 3.12.4(next@12.3.5(@babel/core@7.27.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.89.2))(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       next-themes:
         specifier: ^0.2.0
-        version: 0.2.1(next@12.3.7(@babel/core@7.27.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.89.2))(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
+        version: 0.2.1(next@12.3.5(@babel/core@7.27.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.89.2))(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       prop-types:
         specifier: ^15.8.1
         version: 15.8.1
@@ -146,7 +146,7 @@ importers:
         version: 7.6.20
       '@storybook/nextjs':
         specifier: ^7.1.1
-        version: 7.6.20(@swc/core@1.12.7)(esbuild@0.18.20)(next@12.3.7(@babel/core@7.27.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.89.2))(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.89.2)(type-fest@2.19.0)(typescript@5.8.3)(webpack-hot-middleware@2.26.1)(webpack@5.99.9(@swc/core@1.12.7)(esbuild@0.18.20))
+        version: 7.6.20(@swc/core@1.12.7)(esbuild@0.18.20)(next@12.3.5(@babel/core@7.27.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.89.2))(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.89.2)(type-fest@2.19.0)(typescript@5.8.3)(webpack-hot-middleware@2.26.1)(webpack@5.99.9(@swc/core@1.12.7)(esbuild@0.18.20))
       '@storybook/react':
         specifier: ^7.1.1
         version: 7.6.20(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(typescript@5.8.3)
@@ -1657,6 +1657,9 @@ packages:
   '@ndelangen/get-tarball@3.0.9':
     resolution: {integrity: sha512-9JKTEik4vq+yGosHYhZ1tiH/3WpUS0Nh0kej4Agndhox8pAdWhEx5knFVRcb/ya9knCRCs1rPxNrSXTDdfVqpA==}
 
+  '@next/env@12.3.5':
+    resolution: {integrity: sha512-OdUAOzbOFA4N170bpn3vLXEmQyFW+PHWuz6ic9v8C/BveS1YfmTE7pa07nBOgS9780t2tdnsMBcRycvWcQyPBw==}
+
   '@next/env@12.3.7':
     resolution: {integrity: sha512-gCw4sTeHoNr0EUO+Nk9Ll21OzF3PnmM0GlHaKgsY2AWQSqQlMgECvB0YI4k21M9iGy+tQ5RMyXQuoIMpzhtxww==}
 
@@ -1681,6 +1684,12 @@ packages:
     cpu: [arm64]
     os: [darwin]
 
+  '@next/swc-darwin-arm64@12.3.5':
+    resolution: {integrity: sha512-820++QiPnadIBPsV0CDLWxMe3BDXpHpSDqHy9wm1T0dHiG4O7tjgILrDJZ8LbeYXHNPr9S/7USKm93H3CWvbKw==}
+    engines: {node: '>= 10'}
+    cpu: [arm64]
+    os: [darwin]
+
   '@next/swc-darwin-x64@12.3.4':
     resolution: {integrity: sha512-PPF7tbWD4k0dJ2EcUSnOsaOJ5rhT3rlEt/3LhZUGiYNL8KvoqczFrETlUx0cUYaXe11dRA3F80Hpt727QIwByQ==}
     engines: {node: '>= 10'}
@@ -1695,6 +1704,12 @@ packages:
 
   '@next/swc-linux-arm-gnueabihf@12.3.4':
     resolution: {integrity: sha512-3zqD3pO+z5CZyxtKDTnOJ2XgFFRUBciOox6EWkoZvJfc9zcidNAQxuwonUeNts6Xbm8Wtm5YGIRC0x+12YH7kw==}
+    engines: {node: '>= 10'}
+    cpu: [arm]
+    os: [linux]
+
+  '@next/swc-linux-arm-gnueabihf@12.3.5':
+    resolution: {integrity: sha512-QXMAObv8ISC+H0vKtPsyUwDtaSwZaI/2n7iWCl/C7GL/+dsGCXG4lMwzxsZ48Mx35rmAw8ksdUcLwpEzGoIA9A==}
     engines: {node: '>= 10'}
     cpu: [arm]
     os: [linux]
@@ -1717,8 +1732,20 @@ packages:
     cpu: [x64]
     os: [linux]
 
+  '@next/swc-linux-x64-gnu@12.3.5':
+    resolution: {integrity: sha512-cYyp3yzJL/iYqUhJl4WKTBI0hOLfBsdkm01QomVVoWmy0TTT6zjn1wnxI5tEgyDjXK8pjDVUiivSY1TVLaP2+A==}
+    engines: {node: '>= 10'}
+    cpu: [x64]
+    os: [linux]
+
   '@next/swc-linux-x64-musl@12.3.4':
     resolution: {integrity: sha512-YeBmI+63Ro75SUiL/QXEVXQ19T++58aI/IINOyhpsRL1LKdyfK/35iilraZEFz9bLQrwy1LYAR5lK200A9Gjbg==}
+    engines: {node: '>= 10'}
+    cpu: [x64]
+    os: [linux]
+
+  '@next/swc-linux-x64-musl@12.3.5':
+    resolution: {integrity: sha512-2M9tFsg330+gqaHSBPwTpA9YW9FAxE0nuat1rwfx6hix5sVi9u8liRW4+9lHuGensmz8V3/VdLoRVsBCQyzx2Q==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
@@ -1729,14 +1756,32 @@ packages:
     cpu: [arm64]
     os: [win32]
 
+  '@next/swc-win32-arm64-msvc@12.3.5':
+    resolution: {integrity: sha512-yZHzSBRhsiFv2moJ44d7bApJC+Sirbar/ZyKzCPNck0mqSMVgO3dvHQJme9X+kDydpIeLezxV70xoXpdEPgUvg==}
+    engines: {node: '>= 10'}
+    cpu: [arm64]
+    os: [win32]
+
   '@next/swc-win32-ia32-msvc@12.3.4':
     resolution: {integrity: sha512-rt/vv/vg/ZGGkrkKcuJ0LyliRdbskQU+91bje+PgoYmxTZf/tYs6IfbmgudBJk6gH3QnjHWbkphDdRQrseRefQ==}
     engines: {node: '>= 10'}
     cpu: [ia32]
     os: [win32]
 
+  '@next/swc-win32-ia32-msvc@12.3.5':
+    resolution: {integrity: sha512-TE75XiG60YwPh/ADJ5oQ11bDbfEoFYGczaP6AucopPraLedpMtu9TokC9mAGq+tfNFxktIEPubDCwZZALlKm1w==}
+    engines: {node: '>= 10'}
+    cpu: [ia32]
+    os: [win32]
+
   '@next/swc-win32-x64-msvc@12.3.4':
     resolution: {integrity: sha512-DQ20JEfTBZAgF8QCjYfJhv2/279M6onxFjdG/+5B0Cyj00/EdBxiWb2eGGFgQhrBbNv/lsvzFbbi0Ptf8Vw/bg==}
+    engines: {node: '>= 10'}
+    cpu: [x64]
+    os: [win32]
+
+  '@next/swc-win32-x64-msvc@12.3.5':
+    resolution: {integrity: sha512-wX0Q9dzQkL5v2+ypGHgrPtE7G1hiXSSv9nLCbl1ni7InDqnNAJk40VgmkToapcrjXASd9F1CAJmhg9G+I+RT/w==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [win32]
@@ -4292,6 +4337,9 @@ packages:
 
   caniuse-lite@1.0.30001726:
     resolution: {integrity: sha512-VQAUIUzBiZ/UnlM28fSp2CRF3ivUn1BWEvxMcVTNwpw91Py1pGbPIyIKtd+tzct9C3ouceCVdGAXxZOpZAsgdw==}
+
+  caniuse-lite@1.0.30001733:
+    resolution: {integrity: sha512-e4QKw/O2Kavj2VQTKZWrwzkt3IxOmIlU6ajRb6LP64LHpBo1J67k2Hi4Vu/TgJWsNtynurfS0uK3MaUTCPfu5Q==}
 
   capital-case@1.0.4:
     resolution: {integrity: sha512-ds37W8CytHgwnhGGTi88pcPyR15qoNkOpYwmMMfnWqqWgESapLqvDx6huFjQ5vqWSn2Z06173XNA7LtMOeUh1A==}
@@ -7296,6 +7344,24 @@ packages:
       next: '*'
       react: '*'
       react-dom: '*'
+
+  next@12.3.5:
+    resolution: {integrity: sha512-hrr2xzsSOVQ7XYrY09KjT9u4DQS3fdOJ89ng44r3+Kufxf4a9b9ngALJQYcQpreWiGvdiNRB5YlG8wq04ECeBw==}
+    engines: {node: '>=12.22.0'}
+    hasBin: true
+    peerDependencies:
+      fibers: '>= 3.1.0'
+      node-sass: ^6.0.0 || ^7.0.0
+      react: ^17.0.2 || ^18.0.0-0
+      react-dom: ^17.0.2 || ^18.0.0-0
+      sass: ^1.3.0
+    peerDependenciesMeta:
+      fibers:
+        optional: true
+      node-sass:
+        optional: true
+      sass:
+        optional: true
 
   next@12.3.7:
     resolution: {integrity: sha512-3PDn+u77s5WpbkUrslBP6SKLMeUj9cSx251LOt+yP9fgnqXV/ydny81xQsclz9R6RzCLONMCtwK2RvDdLa/mJQ==}
@@ -11274,6 +11340,8 @@ snapshots:
       pump: 3.0.3
       tar-fs: 2.1.3
 
+  '@next/env@12.3.5': {}
+
   '@next/env@12.3.7': {}
 
   '@next/eslint-plugin-next@12.3.7':
@@ -11289,6 +11357,9 @@ snapshots:
   '@next/swc-darwin-arm64@12.3.4':
     optional: true
 
+  '@next/swc-darwin-arm64@12.3.5':
+    optional: true
+
   '@next/swc-darwin-x64@12.3.4':
     optional: true
 
@@ -11296,6 +11367,9 @@ snapshots:
     optional: true
 
   '@next/swc-linux-arm-gnueabihf@12.3.4':
+    optional: true
+
+  '@next/swc-linux-arm-gnueabihf@12.3.5':
     optional: true
 
   '@next/swc-linux-arm64-gnu@12.3.4':
@@ -11307,16 +11381,31 @@ snapshots:
   '@next/swc-linux-x64-gnu@12.3.4':
     optional: true
 
+  '@next/swc-linux-x64-gnu@12.3.5':
+    optional: true
+
   '@next/swc-linux-x64-musl@12.3.4':
+    optional: true
+
+  '@next/swc-linux-x64-musl@12.3.5':
     optional: true
 
   '@next/swc-win32-arm64-msvc@12.3.4':
     optional: true
 
+  '@next/swc-win32-arm64-msvc@12.3.5':
+    optional: true
+
   '@next/swc-win32-ia32-msvc@12.3.4':
     optional: true
 
+  '@next/swc-win32-ia32-msvc@12.3.5':
+    optional: true
+
   '@next/swc-win32-x64-msvc@12.3.4':
+    optional: true
+
+  '@next/swc-win32-x64-msvc@12.3.5':
     optional: true
 
   '@nodelib/fs.scandir@2.1.5':
@@ -12453,7 +12542,7 @@ snapshots:
 
   '@sentry/core@8.55.0': {}
 
-  '@sentry/nextjs@8.55.0(@opentelemetry/context-async-hooks@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.57.2(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(next@12.3.7(@babel/core@7.27.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.89.2))(react@17.0.2)(webpack@5.99.9(@swc/core@1.12.7)(esbuild@0.18.20))':
+  '@sentry/nextjs@8.55.0(@opentelemetry/context-async-hooks@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.57.2(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(next@12.3.5(@babel/core@7.27.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.89.2))(react@17.0.2)(webpack@5.99.9(@swc/core@1.12.7)(esbuild@0.18.20))':
     dependencies:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/semantic-conventions': 1.34.0
@@ -12466,7 +12555,7 @@ snapshots:
       '@sentry/vercel-edge': 8.55.0
       '@sentry/webpack-plugin': 2.22.7(webpack@5.99.9(@swc/core@1.12.7)(esbuild@0.18.20))
       chalk: 3.0.0
-      next: 12.3.7(@babel/core@7.27.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.89.2)
+      next: 12.3.5(@babel/core@7.27.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.89.2)
       resolve: 1.22.8
       rollup: 3.29.5
       stacktrace-parser: 0.1.11
@@ -13202,7 +13291,7 @@ snapshots:
 
   '@storybook/mdx2-csf@1.1.0': {}
 
-  '@storybook/nextjs@7.6.20(@swc/core@1.12.7)(esbuild@0.18.20)(next@12.3.7(@babel/core@7.27.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.89.2))(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.89.2)(type-fest@2.19.0)(typescript@5.8.3)(webpack-hot-middleware@2.26.1)(webpack@5.99.9(@swc/core@1.12.7)(esbuild@0.18.20))':
+  '@storybook/nextjs@7.6.20(@swc/core@1.12.7)(esbuild@0.18.20)(next@12.3.5(@babel/core@7.27.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.89.2))(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.89.2)(type-fest@2.19.0)(typescript@5.8.3)(webpack-hot-middleware@2.26.1)(webpack@5.99.9(@swc/core@1.12.7)(esbuild@0.18.20))':
     dependencies:
       '@babel/core': 7.27.7
       '@babel/plugin-syntax-bigint': 7.8.3(@babel/core@7.27.7)
@@ -13232,7 +13321,7 @@ snapshots:
       fs-extra: 11.3.0
       image-size: 1.2.1
       loader-utils: 3.3.1
-      next: 12.3.7(@babel/core@7.27.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.89.2)
+      next: 12.3.5(@babel/core@7.27.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.89.2)
       node-polyfill-webpack-plugin: 2.0.1(webpack@5.99.9(@swc/core@1.12.7)(esbuild@0.18.20))
       pnp-webpack-plugin: 1.7.0(typescript@5.8.3)
       postcss: 8.5.6
@@ -14610,7 +14699,7 @@ snapshots:
 
   browserslist@4.25.1:
     dependencies:
-      caniuse-lite: 1.0.30001726
+      caniuse-lite: 1.0.30001733
       electron-to-chromium: 1.5.176
       node-releases: 2.0.19
       update-browserslist-db: 1.1.3(browserslist@4.25.1)
@@ -14691,6 +14780,8 @@ snapshots:
   can-bind-to-host@1.1.2: {}
 
   caniuse-lite@1.0.30001726: {}
+
+  caniuse-lite@1.0.30001733: {}
 
   capital-case@1.0.4:
     dependencies:
@@ -18579,17 +18670,40 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  next-plausible@3.12.4(next@12.3.7(@babel/core@7.27.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.89.2))(react-dom@17.0.2(react@17.0.2))(react@17.0.2):
+  next-plausible@3.12.4(next@12.3.5(@babel/core@7.27.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.89.2))(react-dom@17.0.2(react@17.0.2))(react@17.0.2):
     dependencies:
-      next: 12.3.7(@babel/core@7.27.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.89.2)
+      next: 12.3.5(@babel/core@7.27.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.89.2)
       react: 17.0.2
       react-dom: 17.0.2(react@17.0.2)
 
-  next-themes@0.2.1(next@12.3.7(@babel/core@7.27.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.89.2))(react-dom@17.0.2(react@17.0.2))(react@17.0.2):
+  next-themes@0.2.1(next@12.3.5(@babel/core@7.27.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.89.2))(react-dom@17.0.2(react@17.0.2))(react@17.0.2):
     dependencies:
-      next: 12.3.7(@babel/core@7.27.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.89.2)
+      next: 12.3.5(@babel/core@7.27.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.89.2)
       react: 17.0.2
       react-dom: 17.0.2(react@17.0.2)
+
+  next@12.3.5(@babel/core@7.27.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.89.2):
+    dependencies:
+      '@next/env': 12.3.5
+      '@swc/helpers': 0.4.11
+      caniuse-lite: 1.0.30001733
+      postcss: 8.4.14
+      react: 17.0.2
+      react-dom: 17.0.2(react@17.0.2)
+      styled-jsx: 5.0.7(@babel/core@7.27.7)(react@17.0.2)
+      use-sync-external-store: 1.2.0(react@17.0.2)
+    optionalDependencies:
+      '@next/swc-darwin-arm64': 12.3.5
+      '@next/swc-linux-arm-gnueabihf': 12.3.5
+      '@next/swc-linux-x64-gnu': 12.3.5
+      '@next/swc-linux-x64-musl': 12.3.5
+      '@next/swc-win32-arm64-msvc': 12.3.5
+      '@next/swc-win32-ia32-msvc': 12.3.5
+      '@next/swc-win32-x64-msvc': 12.3.5
+      sass: 1.89.2
+    transitivePeerDependencies:
+      - '@babel/core'
+      - babel-plugin-macros
 
   next@12.3.7(@babel/core@7.27.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.89.2):
     dependencies:
