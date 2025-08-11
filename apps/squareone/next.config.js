@@ -49,6 +49,9 @@ module.exports = (phase, { defaultConfig }) => {
 
   const config = {
     ...defaultConfig,
+    experimental: {
+      instrumentationHook: true,
+    },
     publicRuntimeConfig: { sentryDsn, ...publicYamlConfig },
     serverRuntimeConfig: { sentryDsn, ...serverYamlConfig },
     async rewrites() {
