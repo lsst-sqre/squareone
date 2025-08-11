@@ -28,7 +28,9 @@ export const Card = styled.article`
   color: var(--rsd-component-text-color);
   background-color: var(--sqo-doc-card-background-color);
 
-  :hover {
+  /* Apply hover styles when inside a Link */
+  a:hover &,
+  a:focus & {
     border: solid 1px var(--rsd-color-primary-600);
   }
 
