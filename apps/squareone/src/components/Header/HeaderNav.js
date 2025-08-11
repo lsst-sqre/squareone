@@ -95,7 +95,12 @@ const InternalTriggerLink = ({ href, ...props }) => {
 
   return (
     <PrimaryNavigation.Trigger asChild active={isActive}>
-      <NextLink href={href} className="NavigationMenuLink" {...props} />
+      <NextLink
+        href={href}
+        className="NavigationMenuLink"
+        {...props}
+        legacyBehavior
+      />
     </PrimaryNavigation.Trigger>
   );
 };

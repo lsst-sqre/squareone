@@ -13,7 +13,9 @@ function Page({ title, path, current }) {
   return (
     <Wrapper current={current}>
       <StyledFontAwesomeIcon icon="file" />
-      <Link href={path}>{title}</Link>
+      <Link href={path} legacyBehavior>
+        {title}
+      </Link>
     </Wrapper>
   );
 }

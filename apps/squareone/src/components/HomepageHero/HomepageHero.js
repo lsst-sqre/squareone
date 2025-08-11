@@ -163,14 +163,12 @@ export default function HomepageHero() {
           <ServiceCard>
             <div className="upper-container">
               <Link href="/api-aspect">
-                <a>
-                  <h2 className="title">APIs</h2>
-                  <p className="subtitle">
-                    Learn how to programatically access data with Virtual
-                    Observatory interfaces
-                  </p>
-                  <StyledAspectIllustration src="/undraw_server_status_5pbv.svg" />
-                </a>
+                <h2 className="title">APIs</h2>
+                <p className="subtitle">
+                  Learn how to programatically access data with Virtual
+                  Observatory interfaces
+                </p>
+                <StyledAspectIllustration src="/undraw_server_status_5pbv.svg" />
               </Link>
             </div>
           </ServiceCard>

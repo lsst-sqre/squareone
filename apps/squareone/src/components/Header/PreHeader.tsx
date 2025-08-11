@@ -18,15 +18,13 @@ const PreLogo = ({}: PreLogoProps) => {
 
   return (
     <PreLogoContainer>
-      <Link href="/">
-        <a aria-label="Homepage of Rubin Science Platform">
-          <Image
-            src={LogoImage}
-            height={logoHeight}
-            width={logoWidth}
-            alt="Rubin Observatory Logo"
-          />
-        </a>
+      <Link href="/" aria-label="Homepage of Rubin Science Platform">
+        <Image
+          src={LogoImage}
+          height={logoHeight}
+          width={logoWidth}
+          alt="Rubin Observatory Logo"
+        />
       </Link>
     </PreLogoContainer>
   );
