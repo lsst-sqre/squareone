@@ -13,14 +13,14 @@ export default function GitHubCheckBadge({ title, status, conclusion, url }) {
       icon = (
         <StyledFontAwesomeIcon
           icon="circle-check"
-          color="var(--rsd-color-green-500)"
+          $color="var(--rsd-color-green-500)"
         />
       );
     } else if (conclusion === 'failure') {
       icon = (
         <StyledFontAwesomeIcon
           icon="circle-xmark"
-          color="var(--rsd-color-red-500)"
+          $color="var(--rsd-color-red-500)"
         />
       );
     } else {
@@ -28,7 +28,7 @@ export default function GitHubCheckBadge({ title, status, conclusion, url }) {
       icon = (
         <StyledFontAwesomeIcon
           icon="circle-minus"
-          color="var(--rsd-color-yellow-500)"
+          $color="var(--rsd-color-yellow-500)"
         />
       );
     }
@@ -37,7 +37,7 @@ export default function GitHubCheckBadge({ title, status, conclusion, url }) {
     icon = (
       <StyledFontAwesomeIcon
         icon="circle-minus"
-        color="var(--rsd-color-gray-500)"
+        $color="var(--rsd-color-gray-500)"
       />
     );
   }
