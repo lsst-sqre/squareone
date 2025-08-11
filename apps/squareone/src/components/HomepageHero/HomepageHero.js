@@ -112,9 +112,9 @@ export default function HomepageHero() {
 
   return (
     <FullBleedBackgroundImageSection
-      imagePath="/Quint-DSC1187.jpg"
-      fallbackColor="#333333"
-      textColor="#ffffff"
+      $imagePath="/Quint-DSC1187.jpg"
+      $fallbackcolor="#333333"
+      $textColor="#ffffff"
     >
       <ContentContainer>
         <TitleContainer>

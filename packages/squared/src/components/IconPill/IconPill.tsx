@@ -13,16 +13,16 @@ export interface IconPillProps {
 }
 
 const PillContainer = styled.span<{
-  backgroundColor: string;
-  hoverBackgroundColor: string;
-  textColor: string;
+  $backgroundColor: string;
+  $hoverBackgroundColor: string;
+  $textColor: string;
 }>`
   display: inline-block;
   padding: var(--sqo-space-xxxs) var(--sqo-space-unit);
   border: 1px solid transparent;
   border-radius: var(--sqo-border-radius-2);
-  color: ${(props) => props.textColor};
-  background-color: ${(props) => props.backgroundColor};
+  color: ${(props) => props.$textColor};
+  background-color: ${(props) => props.$backgroundColor};
   font-size: 0.9rem;
   font-weight: 700;
   transition: var(--sqo-transition-basic);
@@ -34,7 +34,7 @@ const PillContainer = styled.span<{
   }
 
   &:hover {
-    background-color: ${(props) => props.hoverBackgroundColor};
+    background-color: ${(props) => props.$hoverBackgroundColor};
     box-shadow: var(--sqo-elevation-lg);
   }
 `;
@@ -68,9 +68,9 @@ export const IconPill: React.FC<IconPillProps> = ({
 }) => {
   return (
     <PillContainer
-      textColor={textColor}
-      backgroundColor={backgroundColor}
-      hoverBackgroundColor={hoverBackgroundColor}
+      $textColor={textColor}
+      $backgroundColor={backgroundColor}
+      $hoverBackgroundColor={hoverBackgroundColor}
     >
       <a href={url}>
         <StyledFontAwesomeIcon icon={icon} />
