@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 import LogoImage from '@lsst-sqre/rubin-style-dictionary/assets/triad-horizontal/triad-horizontal-color-dark.png';
 
-interface PreLogoProps {}
+type PreLogoProps = {};
 
 const PreLogo = ({}: PreLogoProps) => {
   /*
