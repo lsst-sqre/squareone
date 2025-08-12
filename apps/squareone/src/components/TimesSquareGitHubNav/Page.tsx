@@ -1,40 +1,39 @@
-/*
- * A "directory" filesystem tree item, which holds contents.
+/* A "Page" filesystem tree item, which links to a single page.
  *
  * This is based on a Josh Comeau blog post:
  * https://www.joshwcomeau.com/react/file-structure/
  */
 
+import React from 'react';
 import styled from 'styled-components';
+import Link from 'next/link';
 
-import Page from './Page';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-function Directory({ title, path, current, children }) {
+type PageProps = {
+  title: string;
+  path: string;
+  current: boolean;
+};
+
+function Page({ title, path, current }: PageProps) {
   return (
-    <Wrapper>
-      <Header $current={current}>
-        <StyledFontAwesomeIcon icon="angle-down" />
+    <Wrapper $current={current}>
+      <StyledFontAwesomeIcon icon="file" />
+      <Link href={path} legacyBehavior>
         {title}
-      </Header>
-      <Contents $current={current}>{children}</Contents>
+      </Link>
     </Wrapper>
   );
 }
 
-const Wrapper = styled.div``;
-
-const Header = styled.div`
+const Wrapper = styled.div<{ $current: boolean }>`
   display: flex;
   align-items: center;
   gap: 4px;
   min-height: var(--row-height);
   color: inherit;
   font-weight: ${(props) => (props.$current ? 'bold' : 'normal')};
-`;
-
-const Contents = styled.div`
-  padding-left: calc(16px + 4px);
 `;
 
 const StyledFontAwesomeIcon = styled(FontAwesomeIcon)`
@@ -44,4 +43,4 @@ const StyledFontAwesomeIcon = styled(FontAwesomeIcon)`
   display: block;
 `;
 
-export default Directory;
+export default Page;

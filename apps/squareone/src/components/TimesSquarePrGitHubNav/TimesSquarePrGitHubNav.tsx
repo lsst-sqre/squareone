@@ -84,6 +84,7 @@ function TimesSquarePrGitHubNav({
         <TimesSquareGitHubNav
           contentNodes={githubContents.contents}
           pagePathRoot="/times-square/github-pr"
+          pagePath={null}
         />
       </StyledSection>
     );

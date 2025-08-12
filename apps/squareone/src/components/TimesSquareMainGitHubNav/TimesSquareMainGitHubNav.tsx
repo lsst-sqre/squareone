@@ -5,7 +5,11 @@ import styled from 'styled-components';
 import TimesSquareGitHubNav from '../TimesSquareGitHubNav';
 import useGitHubContentsListing from './useGitHubContentsListing';
 
-function TimesSquareMainGitHubNav({ pagePath }) {
+type TimesSquareMainGitHubNavProps = {
+  pagePath: string;
+};
+
+function TimesSquareMainGitHubNav({ pagePath }: TimesSquareMainGitHubNavProps) {
   const { publicRuntimeConfig } = getConfig();
   const { timesSquareUrl } = publicRuntimeConfig;
   const githubContents = useGitHubContentsListing(timesSquareUrl);
