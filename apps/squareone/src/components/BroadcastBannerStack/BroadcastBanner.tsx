@@ -1,10 +1,30 @@
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import useDisclosure from 'react-a11y-disclosure';
 
 import { ContentMaxWidth } from '../../styles/sizes';
 
-const StyledBroadcastContainer = styled.div`
+type BroadcastCategory = 'info' | 'outage' | 'notice' | 'maintenance' | 'other';
+
+type BroadcastContent = {
+  gfm: string;
+  html: string;
+};
+
+type Broadcast = {
+  id: string;
+  summary: BroadcastContent;
+  body?: BroadcastContent;
+  active: boolean;
+  enabled: boolean;
+  stale: boolean;
+  category: BroadcastCategory;
+};
+
+type BroadcastBannerProps = {
+  broadcast?: Broadcast;
+};
+
+const StyledBroadcastContainer = styled.div<{ $category: BroadcastCategory }>`
   width: 100%;
   margin: 0;
   padding: 0.5em;
@@ -89,9 +109,9 @@ const StyledBroadcastContainer = styled.div`
 /*
  * A broadcast message banner.
  */
-export default function BroadcastBanner({ broadcast }) {
+export default function BroadcastBanner({ broadcast }: BroadcastBannerProps) {
   const { toggleProps, contentProps, isExpanded } = useDisclosure({
-    id: `broadcast-${broadcast.id}`,
+    id: `broadcast-${broadcast?.id}`,
     isExpanded: false,
   });
 
@@ -103,7 +123,7 @@ export default function BroadcastBanner({ broadcast }) {
   /* eslint-disable react/no-danger */
   /* eslint-disable react/jsx-props-no-spreading */
   return (
-    <StyledBroadcastContainer $category={broadcast.category || 'notice'}>
+    <StyledBroadcastContainer $category={broadcast.category || 'other'}>
       <aside>
         <div className="summary">
           <div
@@ -129,7 +149,3 @@ export default function BroadcastBanner({ broadcast }) {
   /* eslint-enable react/no-danger */
   /* eslint-enable react/jsx-props-no-spreading */
 }
-
-BroadcastBanner.propTypes = {
-  broadcast: PropTypes.object,
-};
