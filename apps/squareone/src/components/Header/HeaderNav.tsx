@@ -93,10 +93,8 @@ const InternalTriggerLink = ({ href, children }: InternalTriggerLinkProps) => {
   const isActive = href === router.pathname;
 
   return (
-    <NextLink href={href} legacyBehavior>
-      <PrimaryNavigation.TriggerLink className="NavigationMenuLink">
-        {children}
-      </PrimaryNavigation.TriggerLink>
+    <NextLink href={href} passHref legacyBehavior>
+      <PrimaryNavigation.TriggerLink>{children}</PrimaryNavigation.TriggerLink>
     </NextLink>
   );
 };
