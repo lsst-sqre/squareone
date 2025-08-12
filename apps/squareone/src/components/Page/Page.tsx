@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import { ReactNode } from 'react';
 import styled from 'styled-components';
 
 import Header from '../Header';
@@ -6,6 +6,11 @@ import MainContent from '../MainContent';
 import Footer from '../Footer';
 import Meta from '../Meta';
 import BroadcastBannerStack from '../BroadcastBannerStack';
+
+type PageProps = {
+  children?: ReactNode;
+  semaphoreUrl?: string;
+};
 
 /*
  * Layout wrapper div.
@@ -33,7 +38,7 @@ const StyledLayout = styled.div`
  * Page wrapper component that provides the default layout of navigation,
  * content, and footer.
  */
-export default function Page({ children, semaphoreUrl }) {
+export default function Page({ children, semaphoreUrl }: PageProps) {
   return (
     <StyledLayout>
       <Meta />
@@ -48,8 +53,3 @@ export default function Page({ children, semaphoreUrl }) {
     </StyledLayout>
   );
 }
-
-Page.propTypes = {
-  children: PropTypes.node,
-  semaphoreUrl: PropTypes.string,
-};
