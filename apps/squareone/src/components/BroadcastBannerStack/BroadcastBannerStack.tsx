@@ -1,7 +1,13 @@
 import BroadcastBanner from './BroadcastBanner';
 import useBroadcasts from './useBroadcasts';
 
-export default function BroadcastBannerStack({ semaphoreUrl }) {
+type BroadcastBannerStackProps = {
+  semaphoreUrl?: string;
+};
+
+export default function BroadcastBannerStack({
+  semaphoreUrl,
+}: BroadcastBannerStackProps) {
   const broadcastsUrl = semaphoreUrl ? `${semaphoreUrl}/v1/broadcasts` : null;
   const { broadcastData, error, isLoading } = useBroadcasts(semaphoreUrl);
 
@@ -10,7 +16,7 @@ export default function BroadcastBannerStack({ semaphoreUrl }) {
   } else {
     return (
       <>
-        {broadcastData.map((broadcast) => (
+        {broadcastData?.map((broadcast) => (
           <BroadcastBanner broadcast={broadcast} key={broadcast.id} />
         ))}
       </>

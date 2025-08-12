@@ -18,7 +18,7 @@ const broadcastData = {
   active: true,
   enabled: true,
   stale: false,
-  category: 'other',
+  category: 'other' as const,
 };
 
 export const Default = {
