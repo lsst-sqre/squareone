@@ -1,10 +1,16 @@
 /*
- * Mock Times Square API endpoint: /times-square/v1/pages/:page
+ * Mock Times Square API endpoint: /times-square/v1/github/:slug
  */
+
+import type { NextApiRequest, NextApiResponse } from 'next';
 import getConfig from 'next/config';
 
-export default function handler(req, res) {
-  const { page } = req.query;
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
+  const { tsSlug } = req.query;
+  const page =
+    Array.isArray(tsSlug) && tsSlug.length > 0
+      ? tsSlug[tsSlug.length - 1]
+      : 'demo';
   const { publicRuntimeConfig } = getConfig();
   const { timesSquareUrl } = publicRuntimeConfig;
   const pageBaseUrl = `${timesSquareUrl}/v1/pages/${page}`;

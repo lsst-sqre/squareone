@@ -2,6 +2,8 @@
  * Mock Times Square API endpoint: /times-square/v1/pages/[page]/html
  */
 
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 const htmlContent = `
 <!doctype html>
 <html class="no-js" lang="">
@@ -18,7 +20,7 @@ const htmlContent = `
 </html>
 `;
 
-export default function handler(req, res) {
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
   const { page } = req.query;
   console.log(req.url);
 

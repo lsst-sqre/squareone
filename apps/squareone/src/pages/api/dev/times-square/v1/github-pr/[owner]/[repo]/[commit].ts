@@ -3,7 +3,9 @@
  * /times-square/v1/github-pr/:owner/:repo/:commit
  */
 
-export default function handler(req, res) {
+import type { NextApiRequest, NextApiResponse } from 'next';
+
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
   // const { owner, repo, commit, tsSlug } = req.query;
 
   const data = {

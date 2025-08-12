@@ -3,9 +3,10 @@
  * /times-square/v1/github-pr/:owner/:repo/:commit/:slug
  */
 
+import type { NextApiRequest, NextApiResponse } from 'next';
 import getConfig from 'next/config';
 
-export default function handler(req, res) {
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
   const { tsSlug } = req.query;
   const page = 'demo';
   const { publicRuntimeConfig } = getConfig();
