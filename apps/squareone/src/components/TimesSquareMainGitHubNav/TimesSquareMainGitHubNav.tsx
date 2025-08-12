@@ -14,17 +14,19 @@ function TimesSquareMainGitHubNav({ pagePath }: TimesSquareMainGitHubNavProps) {
   const { timesSquareUrl } = publicRuntimeConfig;
   const githubContents = useGitHubContentsListing(timesSquareUrl);
 
-  if (githubContents) {
-    return (
-      <StyledContainer>
-        <TimesSquareGitHubNav
-          contentNodes={githubContents.contents}
-          pagePath={pagePath}
-          pagePathRoot="/times-square/github"
-        />
-      </StyledContainer>
-    );
+  if (!githubContents) {
+    return null;
   }
+
+  return (
+    <StyledContainer>
+      <TimesSquareGitHubNav
+        contentNodes={githubContents.contents}
+        pagePath={pagePath}
+        pagePathRoot="/times-square/github"
+      />
+    </StyledContainer>
+  );
 }
 
 export default TimesSquareMainGitHubNav;

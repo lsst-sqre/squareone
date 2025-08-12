@@ -19,7 +19,7 @@ type LinkProps = {
 
 export default function AppsMenu() {
   const { publicRuntimeConfig } = getConfig();
-  const appLinks: AppLink[] = publicRuntimeConfig.appLinks || [];
+  const appLinks: AppLink[] = publicRuntimeConfig?.appLinks || [];
 
   return (
     <>
