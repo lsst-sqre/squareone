@@ -1,31 +1,40 @@
 import Head from 'next/head';
 import getConfig from 'next/config';
-import PropTypes from 'prop-types';
+import type { GetServerSideProps } from 'next';
+import type { ReactElement, ReactNode } from 'react';
 import { serialize } from 'next-mdx-remote/serialize';
 import { MDXRemote } from 'next-mdx-remote';
 
 import MainContent from '../../components/MainContent';
 import { commonMdxComponents } from '../../lib/utils/mdxComponents';
 
-export default function EmailVerifiedPage({ publicRuntimeConfig, mdxSource }) {
+type VerifyEmailPageProps = {
+  publicRuntimeConfig: any;
+  mdxSource: any;
+};
+
+export default function VerifyEmailPage({
+  publicRuntimeConfig,
+  mdxSource,
+}: VerifyEmailPageProps) {
   return (
     <>
       <Head>
-        <title key="title">{`Your email is verified | ${publicRuntimeConfig.siteName}`}</title>
+        <title key="title">{`Thanks for registering | ${publicRuntimeConfig.siteName}`}</title>
         <meta
           name="description"
           key="description"
-          content="Your email is verified"
+          content="Thanks for registering"
         />
         <meta
           property="og:title"
           key="ogtitle"
-          content="Your email is verified"
+          content="Thanks for registering"
         />
         <meta
           property="og:description"
           key="ogdescription"
-          content="Your email is verified"
+          content="Thanks for registering"
         />
       </Head>
 
@@ -34,21 +43,19 @@ export default function EmailVerifiedPage({ publicRuntimeConfig, mdxSource }) {
   );
 }
 
-EmailVerifiedPage.propTypes = {
-  publicRuntimeConfig: PropTypes.object,
-};
-
-EmailVerifiedPage.getLayout = function getLayout(page) {
+VerifyEmailPage.getLayout = function getLayout(page: ReactElement): ReactNode {
   return <MainContent>{page}</MainContent>;
 };
 
-export async function getServerSideProps() {
+export const getServerSideProps: GetServerSideProps<
+  VerifyEmailPageProps
+> = async () => {
   const { publicRuntimeConfig } = getConfig();
-  const mdxSource = await serialize(publicRuntimeConfig.emailVerifiedPageMdx);
+  const mdxSource = await serialize(publicRuntimeConfig.verifyEmailPageMdx);
   return {
     props: {
       publicRuntimeConfig,
       mdxSource,
     },
   };
-}
+};

@@ -9,6 +9,7 @@ import BroadcastBannerStack from '../BroadcastBannerStack';
 
 type PageProps = {
   children?: ReactNode;
+  baseUrl?: string;
   semaphoreUrl?: string;
 };
 
@@ -38,7 +39,7 @@ const StyledLayout = styled.div`
  * Page wrapper component that provides the default layout of navigation,
  * content, and footer.
  */
-export default function Page({ children, semaphoreUrl }: PageProps) {
+export default function Page({ children, baseUrl, semaphoreUrl }: PageProps) {
   return (
     <StyledLayout>
       <Meta />

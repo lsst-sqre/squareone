@@ -3,6 +3,8 @@ import styled from 'styled-components';
 import Head from 'next/head';
 import getConfig from 'next/config';
 import { useRouter } from 'next/router';
+import type { GetServerSideProps } from 'next';
+import type { ReactElement, ReactNode } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import TimesSquareApp from '../../../../../components/TimesSquareApp';
@@ -12,7 +14,7 @@ import useGitHubPrContentsListing from '../../../../../components/TimesSquarePrG
 import GitHubCheckBadge from '../../../../../components/TimesSquarePrGitHubNav/GitHubCheckBadge';
 import GitHubPrBadge from '../../../../../components/TimesSquarePrGitHubNav/GitHubPrBadge';
 
-export default function GitHubPrLandingPage({}) {
+export default function GitHubPrLandingPage() {
   const { publicRuntimeConfig } = getConfig();
   const { timesSquareUrl } = publicRuntimeConfig;
   const router = useRouter();
@@ -20,16 +22,16 @@ export default function GitHubPrLandingPage({}) {
 
   const githubContents = useGitHubPrContentsListing(
     timesSquareUrl,
-    owner,
-    repo,
-    commit
+    Array.isArray(owner) ? owner[0] : owner,
+    Array.isArray(repo) ? repo[0] : repo,
+    Array.isArray(commit) ? commit[0] : commit
   );
 
   const pageNav = (
     <TimesSquarePrGitHubNav
-      owner={owner}
-      repo={repo}
-      commitSha={commit}
+      owner={Array.isArray(owner) ? owner[0] : owner}
+      repo={Array.isArray(repo) ? repo[0] : repo}
+      commitSha={Array.isArray(commit) ? commit[0] : commit}
       showPrDetails={false}
     />
   );
@@ -95,9 +97,12 @@ export default function GitHubPrLandingPage({}) {
       <StyledHeader>
         <p className="subtitle">Pull Request Preview</p>
         <h1>
-          {`${owner}/${repo}`}{' '}
+          {`${Array.isArray(owner) ? owner[0] : owner}/${
+            Array.isArray(repo) ? repo[0] : repo
+          }`}{' '}
           <CommitSpan>
-            <FontAwesomeIcon icon="code-commit" /> {commit.slice(0, 7)}
+            <FontAwesomeIcon icon="code-commit" />{' '}
+            {(Array.isArray(commit) ? commit[0] : commit || '').slice(0, 7)}
           </CommitSpan>
         </h1>
       </StyledHeader>
@@ -107,11 +112,13 @@ export default function GitHubPrLandingPage({}) {
   );
 }
 
-GitHubPrLandingPage.getLayout = function getLayout(page) {
+GitHubPrLandingPage.getLayout = function getLayout(
+  page: ReactElement
+): ReactNode {
   return <WideContentLayout>{page}</WideContentLayout>;
 };
 
-export async function getServerSideProps() {
+export const getServerSideProps: GetServerSideProps = async () => {
   const { publicRuntimeConfig } = getConfig();
 
   // Make the page return a 404 if Times Square is not configured
@@ -121,7 +128,7 @@ export async function getServerSideProps() {
     notFound,
     props: {},
   };
-}
+};
 
 const StyledHeader = styled.header`
   .subtitle {

@@ -1,11 +1,16 @@
 import Head from 'next/head';
 import getConfig from 'next/config';
-import PropTypes from 'prop-types';
+import type { GetServerSideProps } from 'next';
+import type { ReactElement, ReactNode } from 'react';
 
 import MainContent from '../components/MainContent';
 import HomepageHero from '../components/HomepageHero';
 
-export default function Home({ publicRuntimeConfig }) {
+type HomeProps = {
+  publicRuntimeConfig: any;
+};
+
+export default function Home({ publicRuntimeConfig }: HomeProps) {
   return (
     <>
       <Head>
@@ -17,15 +22,11 @@ export default function Home({ publicRuntimeConfig }) {
   );
 }
 
-Home.propTypes = {
-  publicRuntimeConfig: PropTypes.object,
-};
-
-Home.getLayout = function getLayout(page) {
+Home.getLayout = function getLayout(page: ReactElement): ReactNode {
   return <MainContent>{page}</MainContent>;
 };
 
-export async function getServerSideProps() {
+export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
   const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
   return {
     props: {
@@ -33,4 +34,4 @@ export async function getServerSideProps() {
       publicRuntimeConfig,
     },
   };
-}
+};

@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import getConfig from 'next/config';
-import PropTypes from 'prop-types';
+import type { GetServerSideProps } from 'next';
+import type { ReactElement, ReactNode } from 'react';
 import styled from 'styled-components';
 import { serialize } from 'next-mdx-remote/serialize';
 import { MDXRemote } from 'next-mdx-remote';
@@ -81,7 +82,11 @@ const NoteContainer = styled.div`
   }
 `;
 
-function Note({ children }) {
+type NoteProps = {
+  children?: ReactNode;
+};
+
+function Note({ children }: NoteProps) {
   return (
     <NoteContainer>
       <div className="title-bubble">
@@ -91,10 +96,6 @@ function Note({ children }) {
     </NoteContainer>
   );
 }
-
-Note.propTypes = {
-  children: PropTypes.node,
-};
 
 const mdxComponents = {
   ...commonMdxComponents,
@@ -107,7 +108,15 @@ const mdxComponents = {
 const pageDescription =
   'Find documentation for Rubin Observatory data, science platform services, and software.';
 
-export default function DocsPage({ publicRuntimeConfig, mdxSource }) {
+type DocsPageProps = {
+  publicRuntimeConfig: any;
+  mdxSource: any;
+};
+
+export default function DocsPage({
+  publicRuntimeConfig,
+  mdxSource,
+}: DocsPageProps) {
   return (
     <>
       <Head>
@@ -126,15 +135,13 @@ export default function DocsPage({ publicRuntimeConfig, mdxSource }) {
   );
 }
 
-DocsPage.propTypes = {
-  publicRuntimeConfig: PropTypes.object,
-};
-
-DocsPage.getLayout = function getLayout(page) {
+DocsPage.getLayout = function getLayout(page: ReactElement): ReactNode {
   return <MainContent>{page}</MainContent>;
 };
 
-export async function getServerSideProps() {
+export const getServerSideProps: GetServerSideProps<
+  DocsPageProps
+> = async () => {
   const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
 
   const mdxSource = await serialize(publicRuntimeConfig.docsPageMdx);
@@ -146,4 +153,4 @@ export async function getServerSideProps() {
       mdxSource,
     },
   };
-}
+};
