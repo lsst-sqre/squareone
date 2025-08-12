@@ -1,7 +1,11 @@
-import PropTypes from 'prop-types';
+import React from 'react';
 import styled from 'styled-components';
 
 import { ContentMaxWidth } from '../../styles/sizes';
+
+type MainContentProps = {
+  children?: React.ReactNode;
+};
 
 const StyledMain = styled.main`
   margin: 0 auto;
@@ -16,10 +20,6 @@ const StyledMain = styled.main`
 /*
  * Main content wrapper (contained within a Page component).
  */
-export default function MainContent({ children }) {
+export default function MainContent({ children }: MainContentProps) {
   return <StyledMain>{children}</StyledMain>;
 }
-
-MainContent.propTypes = {
-  children: PropTypes.node,
-};
