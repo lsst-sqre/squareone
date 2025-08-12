@@ -1,5 +1,24 @@
 # squareone
 
+## 0.23.0
+
+### Minor Changes
+
+- [`b41e337e5517caa3332ad78d5ee62fc96d1f13fc`](https://github.com/lsst-sqre/squareone/commit/b41e337e5517caa3332ad78d5ee62fc96d1f13fc) Thanks [@jonathansick](https://github.com/jonathansick)! - Update to Next 13.5
+
+- [`4129cd39404ff5d14cd3716fbd526839f851b50e`](https://github.com/lsst-sqre/squareone/commit/4129cd39404ff5d14cd3716fbd526839f851b50e) Thanks [@jonathansick](https://github.com/jonathansick)! - Migrate components to use transitive props for styled-components.
+
+- [`1d320df1a52dabda5b29f36715a4ab9d5eb92d1f`](https://github.com/lsst-sqre/squareone/commit/1d320df1a52dabda5b29f36715a4ab9d5eb92d1f) Thanks [@jonathansick](https://github.com/jonathansick)! - Update Sentry SDK to v10 and adopt instrumentation.ts configuration.
+
+- [`a833b03b174e7d3e3c07b9bd86fe14fc80d25bcf`](https://github.com/lsst-sqre/squareone/commit/a833b03b174e7d3e3c07b9bd86fe14fc80d25bcf) Thanks [@jonathansick](https://github.com/jonathansick)! - Downgrade to Node 18.18.0 for better compatiblity with Next 12 and 13.
+
+### Patch Changes
+
+- [`fbcd10ea21883f1652dd0839a0573bc235e4edf4`](https://github.com/lsst-sqre/squareone/commit/fbcd10ea21883f1652dd0839a0573bc235e4edf4) Thanks [@jonathansick](https://github.com/jonathansick)! - Fixed the storybook build.
+
+- Updated dependencies [[`b41e337e5517caa3332ad78d5ee62fc96d1f13fc`](https://github.com/lsst-sqre/squareone/commit/b41e337e5517caa3332ad78d5ee62fc96d1f13fc), [`4129cd39404ff5d14cd3716fbd526839f851b50e`](https://github.com/lsst-sqre/squareone/commit/4129cd39404ff5d14cd3716fbd526839f851b50e)]:
+  - @lsst-sqre/squared@0.6.0
+
 ## 0.22.0
 
 ### Minor Changes
