@@ -43,20 +43,20 @@ const Link = ({ href, internal, children }: LinkProps) => {
   const router = useRouter();
   const isActive = href === router.pathname;
 
-  // We're implementing our own Link component with an onClick handler because
-  // if we compose Next.js's Link component we find that Radix Navigation Menu's
-  // Link component is adding an onClick handler to the Next link that
-  // causes an error of the sort:
-  //   "onClick" was passed to <Link> with href of /docs but "legacyBehavior"
-  //   was set.
-  // However, this current implementation is not ideal because it doesn't
-  // pass through the NavigationMenu's keyboard navigation.
+  // For internal links, we need to handle navigation without breaking
+  // keyboard focus. We use PrimaryNavigation.Link with onClick handler
+  // directly instead of nesting a span which breaks focus management.
   if (internal) {
     return (
-      <PrimaryNavigation.Link active={isActive}>
-        <span style={{ cursor: 'pointer' }} onClick={() => router.push(href)}>
-          {children}
-        </span>
+      <PrimaryNavigation.Link
+        active={isActive}
+        onClick={(e) => {
+          e.preventDefault();
+          router.push(href);
+        }}
+        href={href}
+      >
+        {children}
       </PrimaryNavigation.Link>
     );
   }
