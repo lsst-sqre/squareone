@@ -11,7 +11,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
   const { publicRuntimeConfig } = getConfig();
   const { timesSquareUrl } = publicRuntimeConfig;
 
-  const createPage = (name) => {
+  const createPage = (name: string) => {
     const pageBaseUrl = `${timesSquareUrl}/v1/pages/${name}`;
     return {
       name,

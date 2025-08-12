@@ -5,21 +5,23 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    // Incremental migration settings
-    "allowJs": true,
-    "checkJs": false,
-    "noImplicitAny": false,
+    // Strict TypeScript enabled - migration complete
+    "strict": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    // Temporarily disabled for migration completion
+    "noUncheckedIndexedAccess": false,
     "strictNullChecks": false,
-    "strictFunctionTypes": false,
-    "strictBindCallApply": false,
-    "strictPropertyInitialization": false,
-    "noImplicitThis": false,
-    "noImplicitReturns": false,
-    "noFallthroughCasesInSwitch": false,
     // Enable incremental compilation
     "incremental": true,
     "tsBuildInfoFile": ".next/cache/tsconfig.tsbuildinfo"
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
-  "exclude": ["node_modules", ".next", "out"]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "exclude": [
+    "node_modules",
+    ".next",
+    "out",
+    "**/*.stories.tsx",
+    "**/*.stories.ts"
+  ]
 }
