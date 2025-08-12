@@ -6,14 +6,14 @@ import useGafaelfawrUser from '../../hooks/useGafaelfawrUser';
 import { getLoginUrl, getLogoutUrl } from '../../lib/authUrls';
 import Menu, { MenuLink } from './Menu';
 
-export interface GafaelfawrUserMenuProps {
+export type GafaelfawrUserMenuProps = {
   children: React.ReactNode;
   /**
    * The URL of the current page. Used to construct the login and logout URLs
    * with appropriate redirects.
    */
   currentUrl: string;
-}
+};
 
 export const GafaelfawrUserMenu = ({
   children,
