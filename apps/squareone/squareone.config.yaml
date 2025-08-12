@@ -57,7 +57,7 @@ docsPageMdx: |
           DP0.2 is the second phase of the Data Preview 0 program using
           precursor data (simulated images from the DESC DC2 data
           challenge). For the first time, all the derived data products
-          have been generated “in-house” on an early version of the Rubin
+          have been generated "in-house" on an early version of the Rubin
           processing infrastructure using version 23.0 of the LSST Science
           Pipelines. As a result, the data model is significantly
           different from the DP0.1 dataset.

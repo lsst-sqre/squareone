@@ -21,5 +21,5 @@ const StyledP = styled.p`
 const StyledFontAwesomeIcon = styled(FontAwesomeIcon)`
   margin-right: 0.2em;
   font-size: 1em;
-  color: ${(props) => props.color || 'inherit'};
+  color: ${(props) => props.$color || 'inherit'};
 `;

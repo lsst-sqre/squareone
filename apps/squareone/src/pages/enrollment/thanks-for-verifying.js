@@ -11,9 +11,7 @@ export default function EmailVerifiedPage({ publicRuntimeConfig, mdxSource }) {
   return (
     <>
       <Head>
-        <title key="title">
-          Your email is verified | {publicRuntimeConfig.siteName}
-        </title>
+        <title key="title">{`Your email is verified | ${publicRuntimeConfig.siteName}`}</title>
         <meta
           name="description"
           key="description"

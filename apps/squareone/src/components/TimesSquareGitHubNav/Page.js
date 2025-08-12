@@ -11,9 +11,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 function Page({ title, path, current }) {
   return (
-    <Wrapper current={current}>
+    <Wrapper $current={current}>
       <StyledFontAwesomeIcon icon="file" />
-      <Link href={path}>{title}</Link>
+      <Link href={path} legacyBehavior>
+        {title}
+      </Link>
     </Wrapper>
   );
 }
@@ -24,7 +26,7 @@ const Wrapper = styled.div`
   gap: 4px;
   min-height: var(--row-height);
   color: inherit;
-  font-weight: ${(props) => (props.current ? 'bold' : 'normal')};
+  font-weight: ${(props) => (props.$current ? 'bold' : 'normal')};
 `;
 
 const StyledFontAwesomeIcon = styled(FontAwesomeIcon)`

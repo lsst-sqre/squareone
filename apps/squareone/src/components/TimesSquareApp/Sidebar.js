@@ -30,11 +30,8 @@ export default function Sidebar({ pageNav, pagePanel }) {
   return (
     <StyledSidebar>
       <Link href="/times-square">
-        <a>
-          <AppTitle>Times Square</AppTitle>
-        </a>
+        <AppTitle>Times Square</AppTitle>
       </Link>
-
       <IconPill
         icon={['fas', 'book']}
         text="Documentation"
@@ -42,9 +39,7 @@ export default function Sidebar({ pageNav, pagePanel }) {
         textColor="#ffffff"
         backgroundColor="var(--rsd-color-primary-600)"
       />
-
       {pagePanel && pagePanel}
-
       {pageNav && pageNav}
     </StyledSidebar>
   );

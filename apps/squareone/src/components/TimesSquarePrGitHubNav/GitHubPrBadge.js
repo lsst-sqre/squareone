@@ -77,7 +77,7 @@ function PrStatusIcon({ state, url }) {
   }
 
   return (
-    <StatusIconLink href={url} state={state}>
+    <StatusIconLink href={url} $state={state}>
       {icon} {state}
     </StatusIconLink>
   );
@@ -109,7 +109,7 @@ function getStateColour(state) {
 const StatusIconLink = styled.a`
   padding: 2px 10px;
   color: #fff;
-  background-color: ${(props) => getStateColour(props.state)};
+  background-color: ${(props) => getStateColour(props.$state)};
   border-radius: 0.5em;
   text-transform: capitalize;
 

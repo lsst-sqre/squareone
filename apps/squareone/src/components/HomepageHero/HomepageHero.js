@@ -112,9 +112,9 @@ export default function HomepageHero() {
 
   return (
     <FullBleedBackgroundImageSection
-      imagePath="/Quint-DSC1187.jpg"
-      fallbackColor="#333333"
-      textColor="#ffffff"
+      $imagePath="/Quint-DSC1187.jpg"
+      $fallbackcolor="#333333"
+      $textColor="#ffffff"
     >
       <ContentContainer>
         <TitleContainer>
@@ -163,14 +163,12 @@ export default function HomepageHero() {
           <ServiceCard>
             <div className="upper-container">
               <Link href="/api-aspect">
-                <a>
-                  <h2 className="title">APIs</h2>
-                  <p className="subtitle">
-                    Learn how to programatically access data with Virtual
-                    Observatory interfaces
-                  </p>
-                  <StyledAspectIllustration src="/undraw_server_status_5pbv.svg" />
-                </a>
+                <h2 className="title">APIs</h2>
+                <p className="subtitle">
+                  Learn how to programatically access data with Virtual
+                  Observatory interfaces
+                </p>
+                <StyledAspectIllustration src="/undraw_server_status_5pbv.svg" />
               </Link>
             </div>
           </ServiceCard>

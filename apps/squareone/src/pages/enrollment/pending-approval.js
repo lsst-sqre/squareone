@@ -15,9 +15,7 @@ export default function PendingApprovalPage({
   return (
     <>
       <Head>
-        <title key="title">
-          Account pending approval | {publicRuntimeConfig.siteName}
-        </title>
+        <title key="title">{`Account pending approval | ${publicRuntimeConfig.siteName}`}</title>
         <meta
           name="description"
           key="description"

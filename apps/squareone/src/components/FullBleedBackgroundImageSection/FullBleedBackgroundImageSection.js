@@ -4,10 +4,10 @@ import styled from 'styled-components';
  * Section with a full-bleed background image for content areas.
  */
 const FullBleedBackgroundImageSection = styled.section`
-  color: ${(props) => props.textColor || '#ffffff'};
-  background-color: ${(props) => props.fallbackColor || '#333333'};
+  color: ${(props) => props.$textColor || '#ffffff'};
+  background-color: ${(props) => props.$fallbackcolor || '#333333'};
   background-image: url(${(props) =>
-    props.imagePath || '/lsst-stills-0014.jpg'});
+    props.$imagePath || '/lsst-stills-0014.jpg'});
   background-size: cover;
 
   // Full-width in a constrained parent

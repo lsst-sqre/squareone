@@ -13,11 +13,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 function Directory({ title, path, current, children }) {
   return (
     <Wrapper>
-      <Header current={current}>
+      <Header $current={current}>
         <StyledFontAwesomeIcon icon="angle-down" />
         {title}
       </Header>
-      <Contents current={current}>{children}</Contents>
+      <Contents $current={current}>{children}</Contents>
     </Wrapper>
   );
 }
@@ -30,7 +30,7 @@ const Header = styled.div`
   gap: 4px;
   min-height: var(--row-height);
   color: inherit;
-  font-weight: ${(props) => (props.current ? 'bold' : 'normal')};
+  font-weight: ${(props) => (props.$current ? 'bold' : 'normal')};
 `;
 
 const Contents = styled.div`
