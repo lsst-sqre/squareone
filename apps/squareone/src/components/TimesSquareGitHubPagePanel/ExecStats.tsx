@@ -11,13 +11,15 @@ import { parseISO, formatDistanceToNow } from 'date-fns';
 import { TimesSquareHtmlEventsContext } from '../TimesSquareHtmlEventsProvider';
 import { GhostButton } from '../Button';
 
-export default function ExecStats({}) {
-  const htmlEvent = React.useContext(TimesSquareHtmlEventsContext);
+export default function ExecStats() {
+  const htmlEvent = React.useContext(TimesSquareHtmlEventsContext)!;
 
-  const handleRecompute = async (event) => {
+  const handleRecompute = async (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
     event.preventDefault();
 
-    await fetch(htmlEvent.htmlUrl, {
+    await fetch(htmlEvent.htmlUrl!, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -25,16 +27,16 @@ export default function ExecStats({}) {
     });
   };
 
-  if (htmlEvent.executionStatus == 'complete') {
-    const dateFinished = parseISO(htmlEvent.dateFinished);
+  if (htmlEvent.executionStatus === 'complete') {
+    const dateFinished = parseISO(htmlEvent.dateFinished!);
     const formattedDuration = Number(htmlEvent.executionDuration).toFixed(1);
     return (
       <StyledContainer>
         <StyledContent>
           Computed{' '}
           <time
-            dateTime={htmlEvent.dateFinished}
-            title={htmlEvent.dateFinished}
+            dateTime={htmlEvent.dateFinished!}
+            title={htmlEvent.dateFinished!}
           >
             {formatDistanceToNow(dateFinished, { addSuffix: true })}
           </time>{' '}
@@ -45,7 +47,7 @@ export default function ExecStats({}) {
     );
   }
 
-  if (htmlEvent.executionStatus == 'in_progress') {
+  if (htmlEvent.executionStatus === 'in_progress') {
     return (
       <StyledContainer>
         <p>Computing…</p>
