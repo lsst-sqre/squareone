@@ -1,9 +1,17 @@
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-export default function IpynbDownloadLink({ url, sourcePath }) {
+type IpynbDownloadLinkProps = {
+  url: string;
+  sourcePath: string | null;
+};
+
+export default function IpynbDownloadLink({
+  url,
+  sourcePath,
+}: IpynbDownloadLinkProps) {
   // get the filename from the sourcePath
-  const filename = sourcePath.split('/').pop();
+  const filename = sourcePath ? sourcePath.split('/').pop() : undefined;
 
   return (
     <StyledP>
@@ -21,5 +29,4 @@ const StyledP = styled.p`
 const StyledFontAwesomeIcon = styled(FontAwesomeIcon)`
   margin-right: 0.2em;
   font-size: 1em;
-  color: ${(props) => props.$color || 'inherit'};
 `;

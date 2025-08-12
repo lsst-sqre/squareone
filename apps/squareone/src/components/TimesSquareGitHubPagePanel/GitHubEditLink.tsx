@@ -1,7 +1,17 @@
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-export default function GitHubEditLink({ owner, repository, sourcePath }) {
+type GitHubEditLinkProps = {
+  owner: string | null;
+  repository: string | null;
+  sourcePath: string | null;
+};
+
+export default function GitHubEditLink({
+  owner,
+  repository,
+  sourcePath,
+}: GitHubEditLinkProps) {
   if (!owner || !repository || !sourcePath) {
     return null;
   }
@@ -11,7 +21,7 @@ export default function GitHubEditLink({ owner, repository, sourcePath }) {
   return (
     <p>
       <a href={editUrl}>
-        <StyledFontAwesomeIcon icon="fa-brands fa-github" />
+        <StyledFontAwesomeIcon icon={['fab', 'github']} />
         {owner}/{repository}
       </a>
     </p>
@@ -21,5 +31,4 @@ export default function GitHubEditLink({ owner, repository, sourcePath }) {
 const StyledFontAwesomeIcon = styled(FontAwesomeIcon)`
   margin-right: 0.2em;
   font-size: 1em;
-  color: ${(props) => props.$color || 'inherit'};
 `;

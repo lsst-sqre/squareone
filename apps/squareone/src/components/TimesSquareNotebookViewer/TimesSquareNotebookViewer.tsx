@@ -21,8 +21,8 @@ const StyledIframe = styled.iframe`
   height: 100%;
 `;
 
-export default function TimesSquareNotebookViewer({}) {
-  const { tsPageUrl } = React.useContext(TimesSquareUrlParametersContext);
+export default function TimesSquareNotebookViewer() {
+  const { tsPageUrl } = React.useContext(TimesSquareUrlParametersContext)!;
   const htmlStatus = useHtmlStatus();
 
   if (htmlStatus.error) {

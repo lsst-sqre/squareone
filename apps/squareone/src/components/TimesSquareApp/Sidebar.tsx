@@ -2,12 +2,18 @@
  * The navigational sidebar for Times Square.
  */
 
+import { ReactNode } from 'react';
 import Link from 'next/link';
 import styled from 'styled-components';
 
 import { IconPill } from '@lsst-sqre/squared';
 
 import { getDocsUrl } from '../../lib/utils/docsUrls';
+
+type SidebarProps = {
+  pageNav?: ReactNode;
+  pagePanel?: ReactNode;
+};
 
 const StyledSidebar = styled.div`
   border-right: 1px solid var(--rsd-color-primary-600);
@@ -24,7 +30,7 @@ const AppTitle = styled.p`
   text-transform: uppercase;
 `;
 
-export default function Sidebar({ pageNav, pagePanel }) {
+export default function Sidebar({ pageNav, pagePanel }: SidebarProps) {
   const docsUrl = getDocsUrl('/guides/times-square/index.html');
 
   return (

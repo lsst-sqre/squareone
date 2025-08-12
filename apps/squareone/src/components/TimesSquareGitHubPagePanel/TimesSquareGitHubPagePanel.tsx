@@ -17,9 +17,9 @@ import ExecStats from './ExecStats';
 import GitHubEditLink from './GitHubEditLink';
 import IpynbDownloadLink from './IpynbDownloadLink';
 
-export default function TimesSquareGitHubPagePanel({}) {
+export default function TimesSquareGitHubPagePanel() {
   const { publicRuntimeConfig } = getConfig();
-  const { urlQueryString } = React.useContext(TimesSquareUrlParametersContext);
+  const { urlQueryString } = React.useContext(TimesSquareUrlParametersContext)!;
   const pageData = useTimesSquarePage();
 
   if (pageData.loading) {
@@ -41,7 +41,7 @@ export default function TimesSquareGitHubPagePanel({}) {
       <div>
         <PageTitle>{title}</PageTitle>
         {description && (
-          <div dangerouslySetInnerHTML={{ __html: description.html }}></div>
+          <div dangerouslySetInnerHTML={{ __html: description }}></div>
         )}
         <GitHubEditLink
           owner={pageData.github.owner}

@@ -1,4 +1,5 @@
 import React from 'react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 import GitHubEditLink from './GitHubEditLink';
 
@@ -19,9 +20,11 @@ export default {
     },
     defaultViewport: 'sidebar',
   },
-};
+} as Meta<typeof GitHubEditLink>;
 
-const Template = (args) => <GitHubEditLink {...args} />;
+const Template: StoryFn<typeof GitHubEditLink> = (args) => (
+  <GitHubEditLink {...args} />
+);
 
 export const Default = Template.bind({});
 Default.args = {
