@@ -1,12 +1,14 @@
 /* Login component */
 
-import PropTypes from 'prop-types';
-
 import useUserInfo from '../../hooks/useUserInfo';
 import UserMenu from './UserMenu';
 import { PrimaryNavigation, getLoginUrl } from '@lsst-sqre/squared';
 
-export default function Login({ pageUrl }) {
+type LoginProps = {
+  pageUrl: URL;
+};
+
+export default function Login({ pageUrl }: LoginProps) {
   const { isLoggedIn } = useUserInfo();
 
   if (isLoggedIn === true) {
@@ -14,12 +16,8 @@ export default function Login({ pageUrl }) {
   }
 
   return (
-    <PrimaryNavigation.TriggerLink href={getLoginUrl(pageUrl)}>
+    <PrimaryNavigation.TriggerLink href={getLoginUrl(pageUrl.toString())}>
       Log in
     </PrimaryNavigation.TriggerLink>
   );
 }
-
-Login.propTypes = {
-  pageUrl: PropTypes.instanceOf(URL),
-};

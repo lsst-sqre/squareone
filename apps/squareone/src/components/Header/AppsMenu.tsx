@@ -1,12 +1,25 @@
+import React from 'react';
 import { useRouter } from 'next/router';
 import getConfig from 'next/config';
 
 import { ChevronDown } from 'react-feather';
 import { PrimaryNavigation } from '@lsst-sqre/squared';
 
-export default function AppsMenu({}) {
+type AppLink = {
+  href: string;
+  label: string;
+  internal?: boolean;
+};
+
+type LinkProps = {
+  href: string;
+  internal?: boolean;
+  children: React.ReactNode;
+};
+
+export default function AppsMenu() {
   const { publicRuntimeConfig } = getConfig();
-  const appLinks = publicRuntimeConfig.appLinks || [];
+  const appLinks: AppLink[] = publicRuntimeConfig.appLinks || [];
 
   return (
     <>
@@ -26,7 +39,7 @@ export default function AppsMenu({}) {
   );
 }
 
-const Link = ({ href, internal, ...props }) => {
+const Link = ({ href, internal, children }: LinkProps) => {
   const router = useRouter();
   const isActive = href === router.pathname;
 
@@ -42,7 +55,7 @@ const Link = ({ href, internal, ...props }) => {
     return (
       <PrimaryNavigation.Link active={isActive}>
         <span style={{ cursor: 'pointer' }} onClick={() => router.push(href)}>
-          {props.children}
+          {children}
         </span>
       </PrimaryNavigation.Link>
     );
@@ -52,7 +65,7 @@ const Link = ({ href, internal, ...props }) => {
   // becomes an <a> tag without any Next onClick handlers.
   return (
     <PrimaryNavigation.Link active={isActive} href={href}>
-      {props.children}
+      {children}
     </PrimaryNavigation.Link>
   );
 };
