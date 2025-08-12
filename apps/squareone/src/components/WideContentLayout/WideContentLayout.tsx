@@ -1,5 +1,9 @@
-import PropTypes from 'prop-types';
+import React from 'react';
 import styled from 'styled-components';
+
+type WideContentLayoutProps = {
+  children?: React.ReactNode;
+};
 
 const StyledContainer = styled.div`
   margin: 0 auto 0 0;
@@ -10,10 +14,8 @@ const StyledContainer = styled.div`
  * A <main> content layout wrapper that provides a wide layout for apps like
  * Times Square.
  */
-export default function WideContentLayout({ children }) {
+export default function WideContentLayout({
+  children,
+}: WideContentLayoutProps) {
   return <StyledContainer>{children}</StyledContainer>;
 }
-
-WideContentLayout.propTypes = {
-  children: PropTypes.node,
-};
