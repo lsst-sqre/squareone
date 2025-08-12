@@ -7,11 +7,11 @@ export default {
   title: 'Components/TimesSquare/GitHubPrBadge',
 };
 
-const Template = (args) => <GitHubPrBadge {...args} />;
+const Template = (args: any) => <GitHubPrBadge {...args} />;
 
 export const OpenPr = Template.bind({});
 OpenPr.args = {
-  state: 'open',
+  state: 'open' as const,
   number: 93,
   url: 'https://github.com/lsst-sqre/squareone/pull/93',
   title: 'DM-35954: Develop Times Square UI with storybook',
@@ -22,7 +22,7 @@ OpenPr.args = {
 
 export const DraftPr = Template.bind({});
 DraftPr.args = {
-  state: 'draft',
+  state: 'draft' as const,
   number: 93,
   url: 'https://github.com/lsst-sqre/squareone/pull/93',
   title: 'DM-35954: Develop Times Square UI with storybook',
@@ -33,7 +33,7 @@ DraftPr.args = {
 
 export const MergedPr = Template.bind({});
 MergedPr.args = {
-  state: 'merged',
+  state: 'merged' as const,
   number: 93,
   url: 'https://github.com/lsst-sqre/squareone/pull/93',
   title: 'DM-35954: Develop Times Square UI with storybook',
@@ -44,7 +44,7 @@ MergedPr.args = {
 
 export const ClosedPr = Template.bind({});
 ClosedPr.args = {
-  state: 'closed',
+  state: 'closed' as const,
   number: 93,
   url: 'https://github.com/lsst-sqre/squareone/pull/93',
   title: 'DM-35954: Develop Times Square UI with storybook',

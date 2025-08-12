@@ -1,12 +1,30 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
+type GitHubPrTitleProps = {
+  /**
+   * Owner of the GitHub repository.
+   */
+  owner?: string;
+  /**
+   * Name of the GitHub repository.
+   */
+  repo?: string;
+  /**
+   * The commit SHA corresponding to the GitHub check run.
+   */
+  commit?: string;
+};
 
 /**
  * Header component for the `TimesSquarePrGitHubNav` panel.
  */
-export default function GitHubPrTitle({ owner, repo, commit }) {
+export default function GitHubPrTitle({
+  owner,
+  repo,
+  commit,
+}: GitHubPrTitleProps) {
   return (
     <StyledHeader>
       <p className="subtitle">PR Preview</p>
@@ -17,26 +35,11 @@ export default function GitHubPrTitle({ owner, repo, commit }) {
         >{`${owner}/${repo}`}</HiddenLink>
       </h2>
       <p>
-        <StyledFontAwesomeIcon icon="code-commit" /> {commit.slice(0, 7)}
+        <StyledFontAwesomeIcon icon="code-commit" /> {commit?.slice(0, 7)}
       </p>
     </StyledHeader>
   );
 }
-
-GitHubPrTitle.propTypes = {
-  /**
-   * Owner of the GitHub repository.
-   */
-  owner: PropTypes.string,
-  /**
-   * Name of the GitHub repository.
-   */
-  repo: PropTypes.string,
-  /**
-   * The commit SHA corresponding to the GitHub check run.
-   */
-  commit: PropTypes.string,
-};
 
 const StyledHeader = styled.header`
   display: flex;

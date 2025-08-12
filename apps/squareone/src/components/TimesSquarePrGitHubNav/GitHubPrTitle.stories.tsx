@@ -7,7 +7,7 @@ export default {
   title: 'Components/TimesSquare/GitHubPrTitle',
 };
 
-const Template = (args) => <GitHubPrTitle {...args} />;
+const Template = (args: any) => <GitHubPrTitle {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {

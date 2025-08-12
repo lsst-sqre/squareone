@@ -1,8 +1,44 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
+type GitHubPrState = 'open' | 'draft' | 'merged' | 'closed';
+
+type GitHubPrBadgeProps = {
+  /**
+   * Pull request state.
+   */
+  state?: GitHubPrState;
+  /**
+   * GitHub repository issue/PR number.
+   */
+  number?: number;
+  /**
+   * URL for the PR's homepage on GitHub.
+   */
+  url?: string;
+  /**
+   * Title of the PR
+   */
+  title?: string;
+  /**
+   * GitHub username of the PR creator.
+   */
+  authorName?: string;
+  /**
+   * URL for the PR creator's avatar (icon).
+   */
+  authorAvatarUrl?: string;
+  /**
+   * Profile URL for the PR creator.
+   */
+  authorUrl?: string;
+};
+
+type PrStatusIconProps = {
+  state?: GitHubPrState;
+  url?: string;
+};
 
 export default function GitHubPrBadge({
   state,
@@ -12,7 +48,7 @@ export default function GitHubPrBadge({
   authorName,
   authorAvatarUrl,
   authorUrl,
-}) {
+}: GitHubPrBadgeProps) {
   return (
     <span>
       <PrStatusIcon state={state} url={url} />{' '}
@@ -26,37 +62,6 @@ export default function GitHubPrBadge({
   );
 }
 
-GitHubPrBadge.propTypes = {
-  /**
-   * Pull request state.
-   */
-  state: PropTypes.oneOf(['open', 'draft', 'merged', 'closed']),
-  /**
-   * GitHub repository issue/PR number.
-   */
-  number: PropTypes.number,
-  /**
-   * URL for the PR's homepage on GitHub.
-   */
-  url: PropTypes.string,
-  /**
-   * Title of the PR
-   */
-  title: PropTypes.string,
-  /**
-   * GitHub username of the PR creator.
-   */
-  authorName: PropTypes.string,
-  /**
-   * URL for the PR creator's avatar (icon).
-   */
-  authorAvatarUrl: PropTypes.string,
-  /**
-   * Profile URL for the PR creator.
-   */
-  authorUrl: PropTypes.string,
-};
-
 const HiddenLink = styled.a`
   color: inherit;
   text-decoration: none;
@@ -66,7 +71,7 @@ const HiddenLink = styled.a`
   }
 `;
 
-function PrStatusIcon({ state, url }) {
+function PrStatusIcon({ state, url }: PrStatusIconProps) {
   let icon;
   if (state === 'closed') {
     icon = <StyledFontAwesomeIcon icon="circle-xmark" />;
@@ -90,11 +95,8 @@ const StyledFontAwesomeIcon = styled(FontAwesomeIcon)`
 
 /**
  * Map pull request states to their GitHub colours.
- *
- * @param {String} state
- * @returns A CSS colour.
  */
-function getStateColour(state) {
+function getStateColour(state?: GitHubPrState): string {
   if (state === 'closed') {
     return 'rgb(207, 34, 46)';
   } else if (state === 'merged') {
@@ -106,7 +108,7 @@ function getStateColour(state) {
   return 'rgb(45, 164, 78)';
 }
 
-const StatusIconLink = styled.a`
+const StatusIconLink = styled.a<{ $state?: GitHubPrState }>`
   padding: 2px 10px;
   color: #fff;
   background-color: ${(props) => getStateColour(props.$state)};

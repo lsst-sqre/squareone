@@ -8,12 +8,19 @@ import GitHubPrTitle from './GitHubPrTitle';
 import GitHubPrBadge from './GitHubPrBadge';
 import GitHubCheckBadge from './GitHubCheckBadge';
 
+type TimesSquarePrGitHubNavProps = {
+  owner: string;
+  repo: string;
+  commitSha: string;
+  showPrDetails?: boolean;
+};
+
 function TimesSquarePrGitHubNav({
   owner,
   repo,
   commitSha,
   showPrDetails = true,
-}) {
+}: TimesSquarePrGitHubNavProps) {
   const { publicRuntimeConfig } = getConfig();
   const { timesSquareUrl } = publicRuntimeConfig;
   const githubContents = useGitHubPrContentsListing(
