@@ -1,9 +1,10 @@
 /*
  * Mock Times Square API endpoint: /times-square/api/v1/pages/:page/htmlstatus
  */
+import type { NextApiRequest, NextApiResponse } from 'next';
 import getConfig from 'next/config';
 
-export default function handler(req, res) {
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
   const { page, a } = req.query;
   const { publicRuntimeConfig } = getConfig();
   const { timesSquareUrl } = publicRuntimeConfig;

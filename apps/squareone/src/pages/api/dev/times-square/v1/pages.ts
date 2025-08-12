@@ -4,9 +4,10 @@
  * This endpoint lists available pages.
  */
 
+import type { NextApiRequest, NextApiResponse } from 'next';
 import getConfig from 'next/config';
 
-export default function handler(req, res) {
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
   const { publicRuntimeConfig } = getConfig();
   const { timesSquareUrl } = publicRuntimeConfig;
 
