@@ -14,9 +14,7 @@ export default function PendingVerificationPage({
   return (
     <>
       <Head>
-        <title key="title">
-          Please confirm your email | {publicRuntimeConfig.siteName}
-        </title>
+        <title key="title">{`Please confirm your email | ${publicRuntimeConfig.siteName}`}</title>
         <meta
           name="description"
           key="description"

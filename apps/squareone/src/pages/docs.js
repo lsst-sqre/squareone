@@ -111,9 +111,7 @@ export default function DocsPage({ publicRuntimeConfig, mdxSource }) {
   return (
     <>
       <Head>
-        <title key="title">
-          Documentation | {publicRuntimeConfig.siteName}
-        </title>
+        <title key="title">{`Documentation | ${publicRuntimeConfig.siteName}`}</title>
         <meta name="description" key="description" content={pageDescription} />
         <meta property="og:title" key="ogtitle" content="Documentation" />
         <meta

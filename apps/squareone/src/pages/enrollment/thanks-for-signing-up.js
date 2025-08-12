@@ -11,9 +11,7 @@ export default function VerifyEmailPage({ publicRuntimeConfig, mdxSource }) {
   return (
     <>
       <Head>
-        <title key="title">
-          Thanks for registering | {publicRuntimeConfig.siteName}
-        </title>
+        <title key="title">{`Thanks for registering | ${publicRuntimeConfig.siteName}`}</title>
         <meta
           name="description"
           key="description"

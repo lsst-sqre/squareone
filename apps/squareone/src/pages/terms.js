@@ -11,9 +11,7 @@ export default function AupPage({ publicRuntimeConfig }) {
   return (
     <>
       <Head>
-        <title key="title">
-          Acceptable Use Policy | {publicRuntimeConfig.siteName}
-        </title>
+        <title key="title">{`Acceptable Use Policy | ${publicRuntimeConfig.siteName}`}</title>
         <meta name="description" key="description" content={pageDescription} />
         <meta
           property="og:title"
