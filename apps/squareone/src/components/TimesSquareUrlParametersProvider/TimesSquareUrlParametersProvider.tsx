@@ -7,9 +7,33 @@ import React from 'react';
 import getConfig from 'next/config';
 import { useRouter } from 'next/router';
 
-export const TimesSquareUrlParametersContext = React.createContext();
+type DisplaySettings = {
+  ts_hide_code: string;
+};
 
-export default function TimesSquareUrlParametersProvider({ children }) {
+type TimesSquareUrlParametersContextValue = {
+  tsPageUrl: string;
+  displaySettings: DisplaySettings;
+  notebookParameters: Record<string, any>;
+  owner: string | null;
+  repo: string | null;
+  commit: string | null;
+  tsSlug: string[] | null;
+  githubSlug: string | null;
+  urlQueryString: string;
+};
+
+type TimesSquareUrlParametersProviderProps = {
+  children: React.ReactNode;
+};
+
+export const TimesSquareUrlParametersContext = React.createContext<
+  TimesSquareUrlParametersContextValue | undefined
+>(undefined);
+
+export default function TimesSquareUrlParametersProvider({
+  children,
+}: TimesSquareUrlParametersProviderProps) {
   const { publicRuntimeConfig } = getConfig();
   const { timesSquareUrl } = publicRuntimeConfig;
   const router = useRouter();
@@ -23,7 +47,7 @@ export default function TimesSquareUrlParametersProvider({ children }) {
   // path to get the full slug. This combines the owner, repo, directory, and
   // notebook name for regular /github/ pages, or just the directory and
   // notebook name for /github-pr/ pages.
-  const githubSlug = tsSlug ? tsSlug.join('/') : null;
+  const githubSlug = tsSlug ? (tsSlug as string[]).join('/') : null;
 
   // Construct the URL for the Times Square API endpoint that gives information
   // about the page. GitHub PR pages (github-pr) have different API URLs than
@@ -44,27 +68,31 @@ export default function TimesSquareUrlParametersProvider({ children }) {
       .map((item) => item)
   );
 
-  const queryString = new URLSearchParams(userParameters).toString();
+  const queryString = new URLSearchParams(
+    userParameters as Record<string, string>
+  ).toString();
 
   // pop display settings from the user parameters and to also separate out
   // the notebook parameters.
   const { ts_hide_code = '1', ...notebookParameters } = userParameters;
-  const displaySettings = { ts_hide_code };
+  const displaySettings: DisplaySettings = {
+    ts_hide_code: ts_hide_code as string,
+  };
+
+  const contextValue: TimesSquareUrlParametersContextValue = {
+    tsPageUrl,
+    displaySettings,
+    notebookParameters,
+    owner: owner as string | null,
+    repo: repo as string | null,
+    commit: commit as string | null,
+    tsSlug: tsSlug as string[] | null,
+    githubSlug,
+    urlQueryString: queryString,
+  };
 
   return (
-    <TimesSquareUrlParametersContext.Provider
-      value={{
-        tsPageUrl,
-        displaySettings,
-        notebookParameters,
-        owner,
-        repo,
-        commit,
-        tsSlug,
-        githubSlug,
-        urlQueryString: queryString,
-      }}
-    >
+    <TimesSquareUrlParametersContext.Provider value={contextValue}>
       {children}
     </TimesSquareUrlParametersContext.Provider>
   );
