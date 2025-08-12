@@ -7,35 +7,35 @@ export default {
   title: 'Components/TimesSquare/GitHubCheckBadge',
 };
 
-const Template = (args) => <GitHubCheckBadge {...args} />;
+const Template = (args: any) => <GitHubCheckBadge {...args} />;
 
 export const Success = Template.bind({});
 Success.args = {
-  status: 'completed',
+  status: 'completed' as const,
   title: 'Notebook execution',
-  conclusion: 'success',
+  conclusion: 'success' as const,
   url: '#',
 };
 
 export const Failure = Template.bind({});
 Failure.args = {
-  status: 'completed',
+  status: 'completed' as const,
   title: 'Notebook execution',
-  conclusion: 'failure',
+  conclusion: 'failure' as const,
   url: '#',
 };
 
 export const Cancelled = Template.bind({});
 Cancelled.args = {
-  status: 'completed',
+  status: 'completed' as const,
   title: 'Notebook execution',
-  conclusion: 'cancelled',
+  conclusion: 'cancelled' as const,
   url: '#',
 };
 
 export const InProgress = Template.bind({});
 InProgress.args = {
-  status: 'in_progress',
+  status: 'in_progress' as const,
   title: 'Notebook execution',
   conclusion: null,
   url: '#',
