@@ -1,4 +1,19 @@
+import { ReactNode } from 'react';
 import styled from 'styled-components';
+
+type ParameterSchema = {
+  type: string;
+  format?: string;
+  description: string;
+};
+
+type ParameterInputProps = {
+  children: ReactNode;
+  paramName: string;
+  paramSchema: ParameterSchema;
+  touched?: boolean;
+  errors?: string;
+};
 
 export default function ParameterInput({
   children,
@@ -6,7 +21,7 @@ export default function ParameterInput({
   paramSchema,
   touched,
   errors,
-}) {
+}: ParameterInputProps) {
   const errorMessage = computeErrorMessage(errors, paramSchema);
   return (
     <>
@@ -14,7 +29,7 @@ export default function ParameterInput({
         <ParameterName>{paramName}</ParameterName>
         {children}
         {errorMessage && (
-          <ErrorMessage id={`tsparam-${paramName}-error`} type="polite">
+          <ErrorMessage id={`tsparam-${paramName}-error`} aria-live="polite">
             {errorMessage}
           </ErrorMessage>
         )}
@@ -26,13 +41,13 @@ export default function ParameterInput({
   );
 }
 
-function computeErrorMessage(errors, paramSchema) {
+function computeErrorMessage(errors?: string, paramSchema?: ParameterSchema) {
   if (errors) {
-    if (paramSchema.type === 'string' && paramSchema.format === 'date') {
+    if (paramSchema?.type === 'string' && paramSchema?.format === 'date') {
       return 'Expecting YYYY-MM-DD';
     } else if (
-      paramSchema.type === 'string' &&
-      paramSchema.format === 'date-time'
+      paramSchema?.type === 'string' &&
+      paramSchema?.format === 'date-time'
     ) {
       return 'Expecting YYYY-MM-DDTHH:MM:SS-HH:MM';
     }
