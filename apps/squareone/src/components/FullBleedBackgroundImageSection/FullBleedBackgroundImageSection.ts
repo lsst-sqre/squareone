@@ -1,9 +1,15 @@
 import styled from 'styled-components';
 
+type FullBleedBackgroundImageSectionProps = {
+  $textColor?: string;
+  $fallbackcolor?: string;
+  $imagePath?: string;
+};
+
 /*
  * Section with a full-bleed background image for content areas.
  */
-const FullBleedBackgroundImageSection = styled.section`
+const FullBleedBackgroundImageSection = styled.section<FullBleedBackgroundImageSectionProps>`
   color: ${(props) => props.$textColor || '#ffffff'};
   background-color: ${(props) => props.$fallbackcolor || '#333333'};
   background-image: url(${(props) =>
