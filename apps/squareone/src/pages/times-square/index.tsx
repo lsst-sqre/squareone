@@ -1,12 +1,19 @@
 import Head from 'next/head';
 import getConfig from 'next/config';
-import PropTypes from 'prop-types';
+import type { GetServerSideProps } from 'next';
+import type { ReactElement, ReactNode } from 'react';
 
 import TimesSquareApp from '../../components/TimesSquareApp';
 import WideContentLayout from '../../components/WideContentLayout';
 import TimesSquareUrlParametersProvider from '../../components/TimesSquareUrlParametersProvider';
 
-export default function TimesSquareHome({ publicRuntimeConfig }) {
+type TimesSquareHomeProps = {
+  publicRuntimeConfig: any;
+};
+
+export default function TimesSquareHome({
+  publicRuntimeConfig,
+}: TimesSquareHomeProps) {
   return (
     <TimesSquareUrlParametersProvider>
       <TimesSquareApp>
@@ -109,15 +116,13 @@ export default function TimesSquareHome({ publicRuntimeConfig }) {
   );
 }
 
-TimesSquareHome.propTypes = {
-  publicRuntimeConfig: PropTypes.object,
-};
-
-TimesSquareHome.getLayout = function getLayout(page) {
+TimesSquareHome.getLayout = function getLayout(page: ReactElement): ReactNode {
   return <WideContentLayout>{page}</WideContentLayout>;
 };
 
-export async function getServerSideProps() {
+export const getServerSideProps: GetServerSideProps<
+  TimesSquareHomeProps
+> = async () => {
   const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
 
   // Make the page return a 404 if Times Square is not configured
@@ -130,4 +135,4 @@ export async function getServerSideProps() {
       publicRuntimeConfig,
     },
   };
-}
+};

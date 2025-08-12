@@ -1,4 +1,6 @@
-import PropTypes from 'prop-types';
+import type { AppProps } from 'next/app';
+import type { ReactElement, ReactNode } from 'react';
+import type { NextPage } from 'next';
 import getConfig from 'next/config';
 import { ThemeProvider } from 'next-themes';
 import PlausibleProvider from 'next-plausible';
@@ -15,13 +17,24 @@ import '../styles/icons';
 
 import Page from '../components/Page';
 
+type NextPageWithLayout = NextPage & {
+  getLayout?: (page: ReactElement) => ReactNode;
+};
+
+type AppPropsWithLayout = AppProps & {
+  Component: NextPageWithLayout;
+  baseUrl: string;
+  semaphoreUrl?: string;
+  plausibleDomain?: string;
+};
+
 function MyApp({
   Component,
   pageProps,
   baseUrl,
   semaphoreUrl,
   plausibleDomain,
-}) {
+}: AppPropsWithLayout) {
   // Use the content layout defined by the page component, if avaialble.
   // Otherwise, the page itself is used as the content area layout container.
   const getLayout = Component.getLayout || ((page) => page);
@@ -47,14 +60,6 @@ MyApp.getInitialProps = async () => {
   const { publicRuntimeConfig } = getConfig();
   const { baseUrl, semaphoreUrl, plausibleDomain } = publicRuntimeConfig;
   return { baseUrl, semaphoreUrl, plausibleDomain };
-};
-
-MyApp.propTypes = {
-  Component: PropTypes.elementType.isRequired,
-  pageProps: PropTypes.object.isRequired,
-  baseUrl: PropTypes.string.isRequired,
-  semaphoreUrl: PropTypes.string,
-  plausibleDomain: PropTypes.string,
 };
 
 export default MyApp;

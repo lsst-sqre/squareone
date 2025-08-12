@@ -1,17 +1,23 @@
 import Head from 'next/head';
 import getConfig from 'next/config';
 import Link from 'next/link';
-import PropTypes from 'prop-types';
+import type { GetServerSideProps } from 'next';
+import type { ReactElement, ReactNode } from 'react';
 import { serialize } from 'next-mdx-remote/serialize';
 import { MDXRemote } from 'next-mdx-remote';
 
 import MainContent from '../../components/MainContent';
 import { commonMdxComponents } from '../../lib/utils/mdxComponents';
 
+type PendingApprovalPageProps = {
+  publicRuntimeConfig: any;
+  mdxSource: any;
+};
+
 export default function PendingApprovalPage({
   publicRuntimeConfig,
   mdxSource,
-}) {
+}: PendingApprovalPageProps) {
   return (
     <>
       <Head>
@@ -34,15 +40,15 @@ export default function PendingApprovalPage({
   );
 }
 
-PendingApprovalPage.propTypes = {
-  publicRuntimeConfig: PropTypes.object,
-};
-
-PendingApprovalPage.getLayout = function getLayout(page) {
+PendingApprovalPage.getLayout = function getLayout(
+  page: ReactElement
+): ReactNode {
   return <MainContent>{page}</MainContent>;
 };
 
-export async function getServerSideProps() {
+export const getServerSideProps: GetServerSideProps<
+  PendingApprovalPageProps
+> = async () => {
   const { publicRuntimeConfig } = getConfig();
   const mdxSource = await serialize(publicRuntimeConfig.pendingApprovalPageMdx);
   return {
@@ -51,4 +57,4 @@ export async function getServerSideProps() {
       mdxSource,
     },
   };
-}
+};

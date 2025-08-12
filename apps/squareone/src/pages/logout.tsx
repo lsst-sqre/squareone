@@ -1,7 +1,8 @@
 /* Mock log out page */
 
-import PropTypes from 'prop-types';
 import getConfig from 'next/config';
+import type { GetServerSideProps } from 'next';
+import type { ReactElement, ReactNode, FormEvent } from 'react';
 import sleep from '../lib/utils/sleep';
 import { getDevLogoutEndpoint } from '../lib/utils/url';
 import useCurrentUrl from '../hooks/useCurrentUrl';
@@ -11,12 +12,12 @@ import MainContent from '../components/MainContent';
 export default function Logout() {
   const currentUrl = useCurrentUrl();
 
-  const handleSubmit = (event) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     // prevent default behaviour which refreshes the page
     event.preventDefault();
     fetch(getDevLogoutEndpoint(currentUrl), {
       method: 'POST',
-    }).then(sleep(500).then(() => window.location.assign('/')));
+    }).then(() => sleep(500).then(() => window.location.assign('/')));
   };
 
   return (
@@ -26,13 +27,11 @@ export default function Logout() {
   );
 }
 
-Logout.propTypes = {};
-
-Logout.getLayout = function getLayout(page) {
+Logout.getLayout = function getLayout(page: ReactElement): ReactNode {
   return <MainContent>{page}</MainContent>;
 };
 
-export async function getServerSideProps() {
+export const getServerSideProps: GetServerSideProps = async () => {
   const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
   return {
     props: {
@@ -40,4 +39,4 @@ export async function getServerSideProps() {
       publicRuntimeConfig,
     },
   };
-}
+};

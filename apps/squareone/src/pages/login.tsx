@@ -1,8 +1,9 @@
 /* Mock log in page */
 
-import PropTypes from 'prop-types';
 import getConfig from 'next/config';
-import { useState } from 'react';
+import { useState, FormEvent } from 'react';
+import type { GetServerSideProps } from 'next';
+import type { ReactElement, ReactNode, ChangeEvent } from 'react';
 
 import sleep from '../lib/utils/sleep';
 import { getDevLoginEndpoint } from '../lib/utils/url';
@@ -10,13 +11,13 @@ import useCurrentUrl from '../hooks/useCurrentUrl';
 
 import MainContent from '../components/MainContent';
 
-export default function Login({ baseUrl }) {
+export default function Login() {
   const [username, setUsername] = useState('');
   const [name, setName] = useState('');
 
   const currentUrl = useCurrentUrl();
 
-  const handleSubmit = (event) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     // prevent default behaviour which refreshes the page
     event.preventDefault();
     const body = JSON.stringify({ name, username });
@@ -24,7 +25,7 @@ export default function Login({ baseUrl }) {
       method: 'POST',
       body,
       headers: { 'Content-Type': 'application/json' },
-    }).then(sleep(500).then(() => window.location.assign('/')));
+    }).then(() => sleep(500).then(() => window.location.assign('/')));
   };
 
   return (
@@ -35,7 +36,9 @@ export default function Login({ baseUrl }) {
           type="text"
           id="name"
           value={name}
-          onChange={(event) => setName(event.target.value)}
+          onChange={(event: ChangeEvent<HTMLInputElement>) =>
+            setName(event.target.value)
+          }
         />
       </label>
       <label htmlFor="username">
@@ -44,7 +47,9 @@ export default function Login({ baseUrl }) {
           type="text"
           id="username"
           value={username}
-          onChange={(event) => setUsername(event.target.value)}
+          onChange={(event: ChangeEvent<HTMLInputElement>) =>
+            setUsername(event.target.value)
+          }
         />
       </label>
       <button type="submit">Submit</button>
@@ -52,13 +57,11 @@ export default function Login({ baseUrl }) {
   );
 }
 
-Login.propTypes = {};
-
-Login.getLayout = function getLayout(page) {
+Login.getLayout = function getLayout(page: ReactElement): ReactNode {
   return <MainContent>{page}</MainContent>;
 };
 
-export async function getServerSideProps() {
+export const getServerSideProps: GetServerSideProps = async () => {
   const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
   return {
     props: {
@@ -66,4 +69,4 @@ export async function getServerSideProps() {
       publicRuntimeConfig,
     },
   };
-}
+};

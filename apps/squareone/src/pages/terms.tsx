@@ -1,13 +1,18 @@
 import Head from 'next/head';
 import getConfig from 'next/config';
-import PropTypes from 'prop-types';
+import type { GetServerSideProps } from 'next';
+import type { ReactElement, ReactNode } from 'react';
 
 import MainContent from '../components/MainContent';
 
 const pageDescription =
   'Learn about the Rubin Science Platform Acceptable Use Policy';
 
-export default function AupPage({ publicRuntimeConfig }) {
+type AupPageProps = {
+  publicRuntimeConfig: any;
+};
+
+export default function AupPage({ publicRuntimeConfig }: AupPageProps) {
   return (
     <>
       <Head>
@@ -42,15 +47,13 @@ export default function AupPage({ publicRuntimeConfig }) {
   );
 }
 
-AupPage.propTypes = {
-  publicRuntimeConfig: PropTypes.object,
-};
-
-AupPage.getLayout = function getLayout(page) {
+AupPage.getLayout = function getLayout(page: ReactElement): ReactNode {
   return <MainContent>{page}</MainContent>;
 };
 
-export async function getServerSideProps() {
+export const getServerSideProps: GetServerSideProps<
+  AupPageProps
+> = async () => {
   const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
   return {
     props: {
@@ -58,4 +61,4 @@ export async function getServerSideProps() {
       publicRuntimeConfig,
     },
   };
-}
+};

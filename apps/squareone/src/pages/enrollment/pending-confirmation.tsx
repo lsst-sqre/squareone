@@ -1,16 +1,22 @@
 import Head from 'next/head';
 import getConfig from 'next/config';
-import PropTypes from 'prop-types';
+import type { GetServerSideProps } from 'next';
+import type { ReactElement, ReactNode } from 'react';
 import { serialize } from 'next-mdx-remote/serialize';
 import { MDXRemote } from 'next-mdx-remote';
 
 import MainContent from '../../components/MainContent';
 import { commonMdxComponents } from '../../lib/utils/mdxComponents';
 
+type PendingVerificationPageProps = {
+  publicRuntimeConfig: any;
+  mdxSource: any;
+};
+
 export default function PendingVerificationPage({
   publicRuntimeConfig,
   mdxSource,
-}) {
+}: PendingVerificationPageProps) {
   return (
     <>
       <Head>
@@ -37,15 +43,15 @@ export default function PendingVerificationPage({
   );
 }
 
-PendingVerificationPage.propTypes = {
-  publicRuntimeConfig: PropTypes.object,
-};
-
-PendingVerificationPage.getLayout = function getLayout(page) {
+PendingVerificationPage.getLayout = function getLayout(
+  page: ReactElement
+): ReactNode {
   return <MainContent>{page}</MainContent>;
 };
 
-export async function getServerSideProps() {
+export const getServerSideProps: GetServerSideProps<
+  PendingVerificationPageProps
+> = async () => {
   const { publicRuntimeConfig } = getConfig();
   const mdxSource = await serialize(
     publicRuntimeConfig.pendingVerificationPageMdx
@@ -56,4 +62,4 @@ export async function getServerSideProps() {
       mdxSource,
     },
   };
-}
+};

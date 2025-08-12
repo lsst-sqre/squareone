@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import getConfig from 'next/config';
-import PropTypes from 'prop-types';
+import type { GetServerSideProps } from 'next';
+import type { ReactElement, ReactNode } from 'react';
 import { serialize } from 'next-mdx-remote/serialize';
 import { MDXRemote } from 'next-mdx-remote';
 
@@ -12,7 +13,15 @@ const mdxComponents = { ...commonMdxComponents };
 const pageDescription =
   'Integrate Rubin data into your analysis tools with APIs.';
 
-export default function ApiAspectPage({ publicRuntimeConfig, mdxSource }) {
+type ApiAspectPageProps = {
+  publicRuntimeConfig: any;
+  mdxSource: any;
+};
+
+export default function ApiAspectPage({
+  publicRuntimeConfig,
+  mdxSource,
+}: ApiAspectPageProps) {
   return (
     <>
       <Head>
@@ -35,15 +44,13 @@ export default function ApiAspectPage({ publicRuntimeConfig, mdxSource }) {
   );
 }
 
-ApiAspectPage.propTypes = {
-  publicRuntimeConfig: PropTypes.object,
-};
-
-ApiAspectPage.getLayout = function getLayout(page) {
+ApiAspectPage.getLayout = function getLayout(page: ReactElement): ReactNode {
   return <MainContent>{page}</MainContent>;
 };
 
-export async function getServerSideProps() {
+export const getServerSideProps: GetServerSideProps<
+  ApiAspectPageProps
+> = async () => {
   const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
   const mdxSource = await serialize(publicRuntimeConfig.apiAspectPageMdx);
   return {
@@ -53,4 +60,4 @@ export async function getServerSideProps() {
       mdxSource,
     },
   };
-}
+};

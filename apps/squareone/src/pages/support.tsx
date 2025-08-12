@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import getConfig from 'next/config';
-import PropTypes from 'prop-types';
+import type { GetServerSideProps } from 'next';
+import type { ReactElement, ReactNode } from 'react';
 import styled from 'styled-components';
 import { serialize } from 'next-mdx-remote/serialize';
 import { MDXRemote } from 'next-mdx-remote';
@@ -17,7 +18,15 @@ const mdxComponents = { ...commonMdxComponents, Section };
 const pageDescription =
   'Get help with the Rubin Science Platform, data, and software.';
 
-export default function SupportPage({ publicRuntimeConfig, mdxSource }) {
+type SupportPageProps = {
+  publicRuntimeConfig: any;
+  mdxSource: any;
+};
+
+export default function SupportPage({
+  publicRuntimeConfig,
+  mdxSource,
+}: SupportPageProps) {
   return (
     <>
       <Head>
@@ -36,15 +45,13 @@ export default function SupportPage({ publicRuntimeConfig, mdxSource }) {
   );
 }
 
-SupportPage.propTypes = {
-  publicRuntimeConfig: PropTypes.object,
-};
-
-SupportPage.getLayout = function getLayout(page) {
+SupportPage.getLayout = function getLayout(page: ReactElement): ReactNode {
   return <MainContent>{page}</MainContent>;
 };
 
-export async function getServerSideProps() {
+export const getServerSideProps: GetServerSideProps<
+  SupportPageProps
+> = async () => {
   const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
 
   const mdxSource = await serialize(publicRuntimeConfig.supportPageMdx);
@@ -56,4 +63,4 @@ export async function getServerSideProps() {
       mdxSource,
     },
   };
-}
+};

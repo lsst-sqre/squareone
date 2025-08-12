@@ -15,6 +15,7 @@ import TimesSquareGitHubPagePanel from '../TimesSquareGitHubPagePanel/TimesSquar
 
 type TimesSquareAppProps = {
   children: ReactNode;
+  pageNav?: ReactNode;
 };
 
 const StyledLayout = styled.div`
@@ -29,15 +30,20 @@ const StyledLayout = styled.div`
   }
 `;
 
-export default function TimesSquareApp({ children }: TimesSquareAppProps) {
+export default function TimesSquareApp({
+  children,
+  pageNav: providedPageNav,
+}: TimesSquareAppProps) {
   const { tsSlug, owner, repo, commit, githubSlug, urlQueryString } =
     React.useContext(TimesSquareUrlParametersContext);
 
-  const pageNav = commit ? (
+  const defaultPageNav = commit ? (
     <TimesSquarePrGitHubNav owner={owner} repo={repo} commitSha={commit} />
   ) : (
     <TimesSquareMainGitHubNav pagePath={githubSlug} />
   );
+
+  const pageNav = providedPageNav || defaultPageNav;
 
   return (
     <StyledLayout>
