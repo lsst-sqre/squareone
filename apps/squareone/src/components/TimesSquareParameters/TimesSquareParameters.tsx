@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
-import { Formik, Field } from 'formik';
-import Ajv from 'ajv';
+import { Formik, Field, FormikHelpers } from 'formik';
+import Ajv, { ValidateFunction } from 'ajv';
 import addFormats from 'ajv-formats';
 
 import Button, { RedGhostButton } from '../Button';
@@ -12,8 +12,33 @@ import ParameterInput from './ParameterInput';
 import { TimesSquareUrlParametersContext } from '../TimesSquareUrlParametersProvider';
 import useTimesSquarePage from '../../hooks/useTimesSquarePage';
 
+type ParameterSchema = {
+  type: string;
+  format?: string;
+  description: string;
+  default?: any;
+};
+
+type Parameters = {
+  [key: string]: ParameterSchema;
+} | null;
+
+type FormValues = {
+  [key: string]: any;
+  tsHideCode: boolean;
+};
+
+type InputFactoryProps = {
+  paramName: string;
+  paramSchema: ParameterSchema;
+  value: any;
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  errors?: string;
+  touched?: boolean;
+};
+
 // Create input components based on the parameter's JSON schema
-function inputFactory(props) {
+function inputFactory(props: InputFactoryProps) {
   const { paramName, paramSchema, value, onChange, errors, touched } = props;
   return (
     <ParameterInput
@@ -24,16 +49,15 @@ function inputFactory(props) {
     >
       <StringInput
         paramName={paramName}
-        paramSchema={paramSchema}
         value={value}
         onChange={onChange}
-        isError={errors}
+        isError={!!errors}
       />
     </ParameterInput>
   );
 }
 
-export default function TimesSquareParameters({}) {
+export default function TimesSquareParameters() {
   const router = useRouter();
 
   const { displaySettings, notebookParameters: userParameters } =
@@ -44,12 +68,14 @@ export default function TimesSquareParameters({}) {
   addFormats(ajv);
 
   // Merge userParameters with defaults
-  const initialValues = {};
-  Object.entries(parameters).forEach(([paramName, paramSchemaDef]) => {
-    initialValues[paramName] = userParameters[paramName]
-      ? userParameters[paramName]
-      : paramSchemaDef.default;
-  });
+  const initialValues: FormValues = { tsHideCode: false };
+  if (parameters) {
+    Object.entries(parameters).forEach(([paramName, paramSchemaDef]) => {
+      initialValues[paramName] = userParameters[paramName]
+        ? userParameters[paramName]
+        : (paramSchemaDef as any)?.default;
+    });
+  }
 
   if (displaySettings.ts_hide_code === '1') {
     initialValues.tsHideCode = true;
@@ -59,24 +85,31 @@ export default function TimesSquareParameters({}) {
 
   // Prepare executable validators for each parameter from their
   // JSON schema definitions.
-  const schemas = {};
-  Object.entries(parameters).forEach(
-    ([paramName, paramSchemaDef]) =>
-      (schemas[paramName] = ajv.compile(paramSchemaDef))
-  );
+  const schemas: { [key: string]: ValidateFunction } = {};
+  if (parameters) {
+    Object.entries(parameters).forEach(
+      ([paramName, paramSchemaDef]) =>
+        (schemas[paramName] = ajv.compile(paramSchemaDef))
+    );
+  }
 
   // Callback function to handle form submission by "navigating"
   // to a new set of query parameters.
-  const handleFormSubmit = (values, { setSubmitting }) => {
+  const handleFormSubmit = (
+    values: FormValues,
+    { setSubmitting }: FormikHelpers<FormValues>
+  ) => {
     // 1. Get an object with the existing query from the router. This gives us
     // any existing path parameters for dynamic routing or misc query parameters
     // unrelated to page parameters.
     const query = Object.assign({}, router.query);
 
     // 2. Update object with form's `values`
-    Object.keys(parameters).forEach(
-      (paramName) => (query[paramName] = values[paramName])
-    );
+    if (parameters) {
+      Object.keys(parameters).forEach(
+        (paramName) => (query[paramName] = values[paramName])
+      );
+    }
 
     if (values.tsHideCode) {
       query['ts_hide_code'] = '1';
@@ -92,12 +125,13 @@ export default function TimesSquareParameters({}) {
   };
 
   // Callback function to handle  form validation.
-  const validate = (values) => {
-    const errors = {};
+  const validate = (values: FormValues) => {
+    const errors: { [key: string]: string } = {};
     Object.entries(schemas).forEach(([paramName, schema]) => {
       const valid = schema(values[paramName]);
       if (!valid) {
-        const error_messages = schema.errors.map((error) => error.message);
+        const error_messages =
+          schema.errors?.map((error) => error.message) || [];
         errors[paramName] = error_messages.join('. ');
       }
     });
@@ -123,17 +157,21 @@ export default function TimesSquareParameters({}) {
       }) => (
         <form onSubmit={handleSubmit} onReset={handleReset}>
           <StyledParameterList>
-            {Object.entries(parameters).map(([paramName, paramSchema]) => {
-              const inputProps = {
-                paramName,
-                paramSchema,
-                value: values[paramName],
-                touched: touched[paramName],
-                onChange: handleChange,
-                errors: errors[paramName],
-              };
-              return <li key={paramName}>{inputFactory(inputProps)}</li>;
-            })}
+            {parameters &&
+              Object.entries(parameters).map(([paramName, paramSchema]) => {
+                const inputProps: InputFactoryProps = {
+                  paramName,
+                  paramSchema: paramSchema as ParameterSchema,
+                  value: values[paramName],
+                  touched: !!touched[paramName],
+                  onChange: handleChange,
+                  errors:
+                    typeof errors[paramName] === 'string'
+                      ? errors[paramName]
+                      : undefined,
+                };
+                return <li key={paramName}>{inputFactory(inputProps)}</li>;
+              })}
           </StyledParameterList>
           <StyledParameterList>
             <li>

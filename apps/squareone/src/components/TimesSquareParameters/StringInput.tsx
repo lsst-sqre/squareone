@@ -1,6 +1,19 @@
+import { ChangeEvent } from 'react';
 import styled from 'styled-components';
 
-export default function StringInput({ paramName, value, onChange, isError }) {
+type StringInputProps = {
+  paramName: string;
+  value: string;
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  isError?: boolean;
+};
+
+export default function StringInput({
+  paramName,
+  value,
+  onChange,
+  isError,
+}: StringInputProps) {
   return (
     <StyledInput
       type="text"
@@ -14,7 +27,7 @@ export default function StringInput({ paramName, value, onChange, isError }) {
   );
 }
 
-const StyledInput = styled.input`
+const StyledInput = styled.input<{ $isError?: boolean }>`
   border-width: 2px;
   border-style: solid;
   border-color: ${(props) =>
