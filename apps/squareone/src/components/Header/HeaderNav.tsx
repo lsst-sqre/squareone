@@ -39,11 +39,7 @@ export default function HeaderNav() {
         <InternalTriggerLink href="/api-aspect">APIs</InternalTriggerLink>
       </NavItem>
 
-      {publicRuntimeConfig.enableAppsMenu && (
-        <NavItem>
-          <AppsMenu />
-        </NavItem>
-      )}
+      {publicRuntimeConfig.enableAppsMenu && <AppsMenu />}
 
       <NavItem>
         <InternalTriggerLink href="/docs">Documentation</InternalTriggerLink>
@@ -59,9 +55,7 @@ export default function HeaderNav() {
         </PrimaryNavigation.TriggerLink>
       </NavItem>
 
-      <LoginNavItem>
-        <Login pageUrl={currentUrl} />
-      </LoginNavItem>
+      <Login pageUrl={currentUrl} />
     </StyledNav>
   );
 }
@@ -88,10 +82,6 @@ const NavItem = styled(PrimaryNavigation.Item)`
   a:hover {
     color: var(--rsd-component-header-nav-text-hover-color);
   }
-`;
-
-const LoginNavItem = styled(NavItem)`
-  margin: 0 0 0 auto;
 `;
 
 const InternalTriggerLink = ({ href, children }: InternalTriggerLinkProps) => {

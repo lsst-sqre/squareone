@@ -22,7 +22,7 @@ export default function AppsMenu() {
   const appLinks: AppLink[] = publicRuntimeConfig?.appLinks || [];
 
   return (
-    <>
+    <PrimaryNavigation.Item>
       <PrimaryNavigation.Trigger>
         Apps <ChevronDown />
       </PrimaryNavigation.Trigger>
@@ -35,7 +35,7 @@ export default function AppsMenu() {
           </PrimaryNavigation.ContentItem>
         ))}
       </PrimaryNavigation.Content>
-    </>
+    </PrimaryNavigation.Item>
   );
 }
 
