@@ -39,7 +39,11 @@ export default function HeaderNav() {
         <InternalTriggerLink href="/api-aspect">APIs</InternalTriggerLink>
       </NavItem>
 
-      {publicRuntimeConfig.enableAppsMenu && <AppsMenu />}
+      {publicRuntimeConfig.enableAppsMenu && (
+        <NavItem>
+          <AppsMenu />
+        </NavItem>
+      )}
 
       <NavItem>
         <InternalTriggerLink href="/docs">Documentation</InternalTriggerLink>

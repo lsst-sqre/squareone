@@ -271,7 +271,7 @@ const StyledContent = styled(RadixNavigationMenu.Content)`
 /**
  * A content item within a `PrimaryNavigation.Content`.
  */
-const ContentItem = styled(RadixNavigationMenu.Item)`
+const ContentItem = styled.div`
   display: flex;
 `;
 
