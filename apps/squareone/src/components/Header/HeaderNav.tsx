@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import React from 'react';
 import styled from 'styled-components';
 import getConfig from 'next/config';
 import NextLink from 'next/link';
@@ -8,6 +8,11 @@ import { PrimaryNavigation } from '@lsst-sqre/squared';
 import useCurrentUrl from '../../hooks/useCurrentUrl';
 import Login from './Login';
 import AppsMenu from './AppsMenu';
+
+type InternalTriggerLinkProps = {
+  href: string;
+  children: React.ReactNode;
+};
 
 /*
  * Navigation (within the Header).
@@ -89,20 +94,15 @@ const LoginNavItem = styled(NavItem)`
   margin: 0 0 0 auto;
 `;
 
-const InternalTriggerLink = ({ href, ...props }) => {
+const InternalTriggerLink = ({ href, children }: InternalTriggerLinkProps) => {
   const router = useRouter();
   const isActive = href === router.pathname;
 
   return (
-    <PrimaryNavigation.Trigger asChild active={isActive}>
-      <NextLink
-        href={href}
-        className="NavigationMenuLink"
-        {...props}
-        legacyBehavior
-      />
-    </PrimaryNavigation.Trigger>
+    <NextLink href={href} legacyBehavior>
+      <PrimaryNavigation.TriggerLink className="NavigationMenuLink">
+        {children}
+      </PrimaryNavigation.TriggerLink>
+    </NextLink>
   );
 };
-
-HeaderNav.propTypes = {};

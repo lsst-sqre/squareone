@@ -1,17 +1,20 @@
 /* Menu for a user profile and settings. */
 
-import PropTypes from 'prop-types';
 import getConfig from 'next/config';
 import { ChevronDown } from 'react-feather';
 import { PrimaryNavigation } from '@lsst-sqre/squared';
 import { useGafaelfawrUser } from '@lsst-sqre/squared';
 import { getLogoutUrl } from '@lsst-sqre/squared';
 
-export default function UserMenu({ pageUrl }) {
+type UserMenuProps = {
+  pageUrl: URL;
+};
+
+export default function UserMenu({ pageUrl }: UserMenuProps) {
   const { publicRuntimeConfig } = getConfig();
   const { coManageRegistryUrl } = publicRuntimeConfig;
   const { user } = useGafaelfawrUser();
-  const logoutUrl = getLogoutUrl(pageUrl);
+  const logoutUrl = getLogoutUrl(pageUrl.toString());
 
   if (!user) {
     return <></>;
@@ -44,7 +47,3 @@ export default function UserMenu({ pageUrl }) {
     </>
   );
 }
-
-UserMenu.propTypes = {
-  pageUrl: PropTypes.instanceOf(URL),
-};

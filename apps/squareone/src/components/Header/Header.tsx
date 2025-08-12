@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import HeaderNav from './HeaderNav';
@@ -29,5 +28,3 @@ export default function Header() {
     </StyledHeader>
   );
 }
-
-Header.propTypes = {};
