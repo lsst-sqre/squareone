@@ -234,7 +234,7 @@ const Content = ({ children }: { children: React.ReactNode }) => {
       onPointerEnter={(event) => event.preventDefault()}
       onPointerLeave={(event) => event.preventDefault()}
     >
-      {children}
+      <ContentList>{children}</ContentList>
     </StyledContent>
   );
 };
@@ -244,23 +244,10 @@ const Content = ({ children }: { children: React.ReactNode }) => {
  * used by the `PrimaryNavigation.Content` component.
  */
 const StyledContent = styled(RadixNavigationMenu.Content)`
-  /* This unit for the padding is also the basis for the spacing and
-   * sizing of the menu items.
-  */
-  --gafaelfawr-user-menu-padding: 0.5rem;
-
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-
-  list-style: none;
-
   font-size: 1rem;
   background-color: var(--rsd-component-header-nav-menulist-background-color);
   min-width: 12rem;
   border-radius: 0.5rem;
-  padding: var(--gafaelfawr-user-menu-padding);
-  padding-right: 0; // to avoid double padding on the right side with MenuLink
   box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35),
     0px 10px 20px -15px rgba(22, 23, 24, 0.2);
   animation-duration: 400ms;
@@ -269,9 +256,27 @@ const StyledContent = styled(RadixNavigationMenu.Content)`
 `;
 
 /**
+ * A list container for dropdown content items.
+ */
+const ContentList = styled.ul`
+  /* This unit for the padding is also the basis for the spacing and
+   * sizing of the menu items.
+  */
+  --gafaelfawr-user-menu-padding: 0.5rem;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  list-style: none;
+  margin: 0;
+  padding: var(--gafaelfawr-user-menu-padding);
+  padding-right: 0; // to avoid double padding on the right side with MenuLink
+`;
+
+/**
  * A content item within a `PrimaryNavigation.Content`.
  */
-const ContentItem = styled.div`
+const ContentItem = styled.li`
   display: flex;
 `;
 
