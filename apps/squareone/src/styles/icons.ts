@@ -30,3 +30,5 @@ library.add(faCodeCommit);
 library.add(faDownload);
 library.add(faBook);
 library.add(faGithub);
+
+export {}; // This module doesn't export anything; side-effects only
