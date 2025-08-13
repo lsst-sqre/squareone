@@ -55,6 +55,25 @@ module.exports = (phase, { defaultConfig }) => {
     },
     publicRuntimeConfig: { sentryDsn, ...publicYamlConfig },
     serverRuntimeConfig: { sentryDsn, ...serverYamlConfig },
+    webpack: (config, { isServer }) => {
+      // Prevent async chunk loading for server builds to fix SSR issues
+      if (isServer) {
+        config.optimization.splitChunks = false;
+        config.optimization.minimize = false;
+
+        // Ensure useUserInfo and other hooks are not treated as async chunks
+        config.resolve.alias = {
+          ...config.resolve.alias,
+          // Force synchronous loading for specific modules that cause SSR issues
+          '@/hooks/useUserInfo': path.resolve(
+            __dirname,
+            'src/hooks/useUserInfo.ts'
+          ),
+        };
+      }
+
+      return config;
+    },
     async rewrites() {
       return [
         // Mock Gafaelfawr (this is never triggered by a production ingress)
