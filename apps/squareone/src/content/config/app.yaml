@@ -1,0 +1,25 @@
+siteName: 'Squareone Development Site'
+baseUrl: 'http://localhost:3000'
+environmentName: 'development'
+siteDescription: |
+  The site description.
+docsBaseUrl: 'https://rsp.lsst.io'
+semaphoreUrl: 'https://data-dev.lsst.cloud/semaphore'
+timesSquareUrl: 'http://localhost:3000/times-square/api'
+coManageRegistryUrl: 'https://id.lsst.cloud'
+enableAppsMenu: true
+appLinks:
+  - label: 'Times Square'
+    href: '/times-square/'
+    internal: true
+  - label: 'Argo CD'
+    href: '/argo-cd/'
+    internal: false
+showPreview: true
+previewLink: 'https://rsp.lsst.io/roadmap.html'
+# New configuration for filesystem-based MDX content
+mdxDir: 'src/content/pages'
+sentryTracesSampleRate: 0
+sentryReplaysSessionSampleRate: 0
+sentryReplaysOnErrorSampleRate: 1.0
+sentryDebug: false
