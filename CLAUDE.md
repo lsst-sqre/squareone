@@ -55,7 +55,9 @@ This is a **monorepo** for Rubin Observatory front-end applications managed with
 - Functional components with hooks
 - Component directories with index files for clean exports
 - Styled-components for styling with design tokens from rubin-style-dictionary
-- PropTypes for JavaScript components, TypeScript interfaces for TypeScript components
+- PropTypes for JavaScript components, TypeScript types for TypeScript components
+- **Prefer `type` over `interface` for component props and simple object types**
+- **Avoid using `React.FC` - type props directly in function parameters**
 - Storybook for component documentation and testing
 
 ### Times Square Integration

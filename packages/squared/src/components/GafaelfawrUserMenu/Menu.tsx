@@ -4,7 +4,7 @@ import { ChevronDown } from 'react-feather';
 
 import * as RadixNavigationMenu from '@radix-ui/react-navigation-menu';
 
-export interface MenuProps {
+export type MenuProps = {
   children: React.ReactNode;
   /**
    * The URL to use for the logout link. This is the Gafaelfawr logout endpoint.
@@ -14,7 +14,7 @@ export interface MenuProps {
    * The username to display in the menu trigger.
    */
   username: string;
-}
+};
 
 export const Menu = ({ children, logoutHref, username }: MenuProps) => {
   return (

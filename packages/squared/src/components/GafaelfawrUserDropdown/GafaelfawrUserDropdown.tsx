@@ -8,14 +8,14 @@ import MenuItem from './MenuItem';
 import { getLoginUrl, getLogoutUrl } from './authUrls';
 import useGafaelfawrUser from '../../hooks/useGafaelfawrUser';
 
-export interface GafaelfawrUserDropdownProps {
+export type GafaelfawrUserDropdownProps = {
   children: React.ReactNode;
   /**
    * The URL of the current page. Used to construct the login and logout URLs
    * with appropriate redirects.
    */
   currentUrl: string;
-}
+};
 
 export const GafaelfawrUserDropdown = ({
   children,

@@ -51,9 +51,13 @@ module.exports = (phase, { defaultConfig }) => {
     ...defaultConfig,
     experimental: {
       instrumentationHook: true,
+      esmExternals: 'loose',
     },
     publicRuntimeConfig: { sentryDsn, ...publicYamlConfig },
     serverRuntimeConfig: { sentryDsn, ...serverYamlConfig },
+    webpack: (config, { isServer }) => {
+      return config;
+    },
     async rewrites() {
       return [
         // Mock Gafaelfawr (this is never triggered by a production ingress)
