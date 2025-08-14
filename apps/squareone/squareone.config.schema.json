@@ -55,33 +55,11 @@
       "title": "Plausible tracking domain",
       "description": "Domain (e.g. data.lsst.cloud) for Plausible tracking. Omit to disable Plausible."
     },
-    "apiAspectPageMdx": {
+    "mdxDir": {
       "type": "string",
-      "title": "/api-aspect Page MDX content"
-    },
-    "docsPageMdx": {
-      "type": "string",
-      "title": "/docs Page MDX content"
-    },
-    "supportPageMdx": {
-      "type": "string",
-      "title": "/support Page MDX content"
-    },
-    "verifyEmailPageMdx": {
-      "type": "string",
-      "title": "/enrollment/thanks-for-signing-up content (MDX)."
-    },
-    "emailVerifiedPageMdx": {
-      "type": "string",
-      "title": "/enrollment/thanks-for-verifying content (MDX)."
-    },
-    "pendingApprovalPageMdx": {
-      "type": "string",
-      "title": "/enrollment/pending-approval content (MDX)."
-    },
-    "pendingVerificationPageMdx": {
-      "type": "string",
-      "title": "/enrollment/pending-confirmation content (MDX)."
+      "title": "MDX content directory",
+      "description": "Directory path where MDX content files are located. Can be relative (development) or absolute (production with ConfigMap).",
+      "default": "src/content/pages"
     },
     "sentryTracesSampleRate": {
       "type": "number",
