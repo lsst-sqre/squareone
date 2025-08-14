@@ -29,12 +29,15 @@ const fetcher = (...args: Parameters<typeof fetch>) =>
 /*
  * A React hook for getting data from the Semaphore `/v1/broadcasts` endpoint.
  *
- * This hook uses swr to continuously refresh the broadcast data.
+ * Uses SWR with SWRConfig fallback data to ensure SSR compatibility while
+ * continuously refreshing the broadcast data every 60 seconds.
  */
 function useBroadcasts(semaphoreUrl?: string): UseBroadcastsReturn {
   const broadcastsUrl = semaphoreUrl ? `${semaphoreUrl}/v1/broadcasts` : null;
   const { data, error } = useSWR<Broadcast[]>(broadcastsUrl, fetcher, {
-    refreshInterval: 60000,
+    refreshInterval: 60000, // 60 seconds refresh interval
+    revalidateOnFocus: true, // Keep background refresh behavior
+    revalidateOnReconnect: true, // Refresh when network reconnects
   });
 
   const isLoading = !error && !data;

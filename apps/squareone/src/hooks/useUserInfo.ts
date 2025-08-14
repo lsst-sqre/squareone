@@ -18,25 +18,14 @@ const fetcher = (...args: Parameters<typeof fetch>) =>
 /*
  * A React hook for getting data from the `/auth/user-info` endpoint and
  * establishing in general whether the user is logged in.
+ *
+ * Uses SWR with SWRConfig fallback data to ensure SSR compatibility.
  */
 export default function useUserInfo(): UseUserInfoReturn {
-  const isServer = typeof window === 'undefined';
-
-  // Always call useSWR but pass null as key on server to disable it
-  const { data, error } = useSWR(
-    isServer ? null : '/auth/api/v1/user-info',
-    fetcher
-  );
-
-  // Return safe defaults on server side
-  if (isServer) {
-    return {
-      userInfo: undefined,
-      error: null,
-      isLoading: false,
-      isLoggedIn: false,
-    };
-  }
+  const { data, error } = useSWR('/auth/api/v1/user-info', fetcher, {
+    revalidateOnFocus: true, // Keep background refresh behavior
+    revalidateOnReconnect: true, // Refresh when network reconnects
+  });
 
   const isLoading = !error && !data;
   const isLoggedIn = !error && data && data.hasOwnProperty('username');
