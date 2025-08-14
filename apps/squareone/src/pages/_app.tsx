@@ -4,6 +4,7 @@ import type { NextPage } from 'next';
 import getConfig from 'next/config';
 import { ThemeProvider } from 'next-themes';
 import PlausibleProvider from 'next-plausible';
+import { SWRConfig } from 'swr';
 
 // Global CSS
 // Keep these imports in sync with .storybook/preview.js (Next can't import
@@ -35,17 +36,32 @@ function MyApp({
   semaphoreUrl,
   plausibleDomain,
 }: AppPropsWithLayout) {
-  // Use the content layout defined by the page component, if avaialble.
+  // Use the content layout defined by the page component, if available.
   // Otherwise, the page itself is used as the content area layout container.
   const getLayout = Component.getLayout || ((page) => page);
 
+  // SWR fallback data to ensure SSR compatibility
+  const swrFallback: Record<string, any> = {
+    '/auth/api/v1/user-info': null, // Fallback for unauthenticated state
+    [`${semaphoreUrl}/v1/broadcasts`]: [], // Fallback for empty broadcasts
+  };
+
   /* eslint-disable react/jsx-props-no-spreading */
   const coreApp = (
-    <ThemeProvider defaultTheme="system">
-      <Page baseUrl={baseUrl} semaphoreUrl={semaphoreUrl}>
-        {getLayout(<Component {...pageProps} />)}
-      </Page>
-    </ThemeProvider>
+    <SWRConfig
+      value={{
+        fallback: swrFallback,
+        revalidateOnFocus: true, // Keep background refresh behavior
+        revalidateOnReconnect: true, // Refresh when network reconnects
+        dedupingInterval: 2000, // Dedupe requests within 2 seconds
+      }}
+    >
+      <ThemeProvider defaultTheme="system">
+        <Page baseUrl={baseUrl} semaphoreUrl={semaphoreUrl}>
+          {getLayout(<Component {...pageProps} />)}
+        </Page>
+      </ThemeProvider>
+    </SWRConfig>
   );
   /* eslint-enable react/jsx-props-no-spreading */
   if (!plausibleDomain) {
