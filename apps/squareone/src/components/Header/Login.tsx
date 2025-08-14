@@ -1,32 +1,27 @@
-/* Login component */
+/* Login component with dynamic import to prevent SSR issues */
 
+import dynamic from 'next/dynamic';
 import styled from 'styled-components';
-import useUserInfo from '../../hooks/useUserInfo';
-import UserMenu from './UserMenu';
-import { PrimaryNavigation, getLoginUrl } from '@lsst-sqre/squared';
+import { PrimaryNavigation } from '@lsst-sqre/squared';
 
 type LoginProps = {
   pageUrl: URL;
 };
 
-export default function Login({ pageUrl }: LoginProps) {
-  const { isLoggedIn } = useUserInfo();
-
-  if (isLoggedIn === true) {
-    return (
-      <LoginNavItem>
-        <UserMenu pageUrl={pageUrl} />
-      </LoginNavItem>
-    );
-  }
-
-  return (
+// Dynamic import with SSR disabled to prevent SWR hook issues
+const LoginClient = dynamic(() => import('./LoginClient'), {
+  ssr: false,
+  loading: () => (
     <LoginNavItem>
-      <PrimaryNavigation.TriggerLink href={getLoginUrl(pageUrl.toString())}>
+      <PrimaryNavigation.TriggerLink href="/login">
         Log in
       </PrimaryNavigation.TriggerLink>
     </LoginNavItem>
-  );
+  ),
+});
+
+export default function Login({ pageUrl }: LoginProps) {
+  return <LoginClient pageUrl={pageUrl} />;
 }
 
 const LoginNavItem = styled(PrimaryNavigation.Item)`
