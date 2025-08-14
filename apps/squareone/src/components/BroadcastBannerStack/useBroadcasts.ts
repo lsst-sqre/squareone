@@ -29,7 +29,7 @@ const fetcher = (...args: Parameters<typeof fetch>) =>
 /*
  * A React hook for getting data from the Semaphore `/v1/broadcasts` endpoint.
  *
- * Uses SWR with SWRConfig fallback data to ensure SSR compatibility while
+ * Uses SWR with webpack configuration to prevent externalization during SSR while
  * continuously refreshing the broadcast data every 60 seconds.
  */
 function useBroadcasts(semaphoreUrl?: string): UseBroadcastsReturn {

@@ -1,25 +1,20 @@
-import BroadcastBanner from './BroadcastBanner';
-import useBroadcasts from './useBroadcasts';
+import dynamic from 'next/dynamic';
 
 type BroadcastBannerStackProps = {
   semaphoreUrl?: string;
 };
 
+// Dynamic import with SSR disabled to prevent SWR hook issues
+const BroadcastBannerStackClient = dynamic(
+  () => import('./BroadcastBannerStackClient'),
+  {
+    ssr: false,
+    loading: () => <></>, // No loading state needed for broadcasts
+  }
+);
+
 export default function BroadcastBannerStack({
   semaphoreUrl,
 }: BroadcastBannerStackProps) {
-  const broadcastsUrl = semaphoreUrl ? `${semaphoreUrl}/v1/broadcasts` : null;
-  const { broadcastData, error, isLoading } = useBroadcasts(semaphoreUrl);
-
-  if (isLoading || error) {
-    return <></>;
-  } else {
-    return (
-      <>
-        {broadcastData?.map((broadcast) => (
-          <BroadcastBanner broadcast={broadcast} key={broadcast.id} />
-        ))}
-      </>
-    );
-  }
+  return <BroadcastBannerStackClient semaphoreUrl={semaphoreUrl} />;
 }
