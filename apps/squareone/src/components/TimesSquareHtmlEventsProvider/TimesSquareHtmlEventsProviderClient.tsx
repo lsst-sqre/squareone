@@ -58,11 +58,11 @@ export default function TimesSquareHtmlEventsProviderClient({
 
   React.useEffect(() => {
     // Don't run SSE on server side
-    if (!isClient) return;
+    if (!isClient) return () => {};
 
     const abortController = new AbortController();
 
-    async function runEffect() {
+    async function runEffect(): Promise<void> {
       if (htmlEventsUrl && fullHtmlEventsUrl) {
         await fetchEventSource(fullHtmlEventsUrl, {
           method: 'GET',
