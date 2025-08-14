@@ -30,7 +30,7 @@ const TimesSquareHtmlEventsProviderClient = dynamic(
   () => import('./TimesSquareHtmlEventsProviderClient'),
   {
     ssr: false,
-    loading: ({ children }: { children: React.ReactNode }) => {
+    loading: () => {
       // Provide default context values during loading
       const defaultContextValue: TimesSquareHtmlEventsContextValue = {
         dateSubmitted: null,
@@ -41,9 +41,10 @@ const TimesSquareHtmlEventsProviderClient = dynamic(
         htmlHash: null,
         htmlUrl: null,
       };
+      // Return a provider that will be used by parent component with children
       return (
         <TimesSquareHtmlEventsContext.Provider value={defaultContextValue}>
-          {children}
+          <div>Loading...</div>
         </TimesSquareHtmlEventsContext.Provider>
       );
     },
