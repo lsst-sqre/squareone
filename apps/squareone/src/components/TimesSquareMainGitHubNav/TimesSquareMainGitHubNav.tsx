@@ -1,36 +1,25 @@
-import React from 'react';
-import getConfig from 'next/config';
-import styled from 'styled-components';
+/*
+ * TimesSquareMainGitHubNav with dynamic import to prevent SSR issues
+ * Uses client-only component to handle SWR hooks safely.
+ */
 
-import TimesSquareGitHubNav from '../TimesSquareGitHubNav';
-import useGitHubContentsListing from './useGitHubContentsListing';
+import dynamic from 'next/dynamic';
 
 type TimesSquareMainGitHubNavProps = {
   pagePath: string;
 };
 
-function TimesSquareMainGitHubNav({ pagePath }: TimesSquareMainGitHubNavProps) {
-  const { publicRuntimeConfig } = getConfig();
-  const { timesSquareUrl } = publicRuntimeConfig;
-  const githubContents = useGitHubContentsListing(timesSquareUrl);
-
-  if (!githubContents) {
-    return null;
+// Dynamic import with SSR disabled to prevent SWR hook issues
+const TimesSquareMainGitHubNavClient = dynamic(
+  () => import('./TimesSquareMainGitHubNavClient'),
+  {
+    ssr: false,
+    loading: () => null, // No loading state needed for navigation
   }
+);
 
-  return (
-    <StyledContainer>
-      <TimesSquareGitHubNav
-        contentNodes={githubContents.contents}
-        pagePath={pagePath}
-        pagePathRoot="/times-square/github"
-      />
-    </StyledContainer>
-  );
+function TimesSquareMainGitHubNav({ pagePath }: TimesSquareMainGitHubNavProps) {
+  return <TimesSquareMainGitHubNavClient pagePath={pagePath} />;
 }
 
 export default TimesSquareMainGitHubNav;
-
-const StyledContainer = styled.div`
-  margin-top: 2rem;
-`;
