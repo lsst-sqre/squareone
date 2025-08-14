@@ -1,7 +1,6 @@
 import type { AppProps } from 'next/app';
 import type { ReactElement, ReactNode } from 'react';
 import type { NextPage } from 'next';
-import getConfig from 'next/config';
 import { ThemeProvider } from 'next-themes';
 import PlausibleProvider from 'next-plausible';
 
@@ -16,6 +15,10 @@ import '@lsst-sqre/global-css/dist/next.css';
 import '../styles/icons';
 
 import Page from '../components/Page';
+import {
+  AppConfigProvider,
+  AppConfigContextValue,
+} from '../contexts/AppConfigContext';
 
 type NextPageWithLayout = NextPage & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -23,43 +26,57 @@ type NextPageWithLayout = NextPage & {
 
 type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
-  baseUrl: string;
-  semaphoreUrl?: string;
-  plausibleDomain?: string;
+  pageProps: {
+    appConfig?: AppConfigContextValue;
+    [key: string]: any;
+  };
 };
 
-function MyApp({
-  Component,
-  pageProps,
-  baseUrl,
-  semaphoreUrl,
-  plausibleDomain,
-}: AppPropsWithLayout) {
+function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   // Use the content layout defined by the page component, if available.
   // Otherwise, the page itself is used as the content area layout container.
   const getLayout = Component.getLayout || ((page) => page);
 
+  // Extract appConfig from pageProps (provided by getServerSideProps)
+  const { appConfig, ...otherPageProps } = pageProps;
+
+  // If no appConfig is provided (e.g., API routes, error pages), provide a minimal fallback
+  const fallbackConfig: AppConfigContextValue = {
+    siteName: 'Rubin Science Platform',
+    baseUrl: 'http://localhost:3000',
+    environmentName: 'development',
+    siteDescription: 'Welcome to the Rubin Science Platform',
+    docsBaseUrl: 'https://rsp.lsst.io',
+    timesSquareUrl: '',
+    coManageRegistryUrl: '',
+    enableAppsMenu: false,
+    appLinks: [],
+    showPreview: false,
+    mdxDir: 'src/content/pages',
+  };
+
+  const config = appConfig || fallbackConfig;
+
   /* eslint-disable react/jsx-props-no-spreading */
   const coreApp = (
-    <ThemeProvider defaultTheme="system">
-      <Page baseUrl={baseUrl} semaphoreUrl={semaphoreUrl}>
-        {getLayout(<Component {...pageProps} />)}
-      </Page>
-    </ThemeProvider>
+    <AppConfigProvider config={config}>
+      <ThemeProvider defaultTheme="system">
+        <Page>{getLayout(<Component {...otherPageProps} />)}</Page>
+      </ThemeProvider>
+    </AppConfigProvider>
   );
   /* eslint-enable react/jsx-props-no-spreading */
-  if (!plausibleDomain) {
+
+  if (!config.plausibleDomain) {
     return coreApp;
   }
   return (
-    <PlausibleProvider domain={plausibleDomain}>{coreApp}</PlausibleProvider>
+    <PlausibleProvider domain={config.plausibleDomain}>
+      {coreApp}
+    </PlausibleProvider>
   );
 }
 
-MyApp.getInitialProps = async () => {
-  const { publicRuntimeConfig } = getConfig();
-  const { baseUrl, semaphoreUrl, plausibleDomain } = publicRuntimeConfig;
-  return { baseUrl, semaphoreUrl, plausibleDomain };
-};
-
+// No getInitialProps! Configuration is now loaded per-page in getServerSideProps
+// and provided via AppConfigProvider context, eliminating SSR issues.
 export default MyApp;
