@@ -6,11 +6,10 @@ import MainContent from '../MainContent';
 import Footer from '../Footer';
 import Meta from '../Meta';
 import BroadcastBannerStack from '../BroadcastBannerStack';
+import { useAppConfig } from '../../contexts/AppConfigContext';
 
 type PageProps = {
   children?: ReactNode;
-  baseUrl?: string;
-  semaphoreUrl?: string;
 };
 
 /*
@@ -39,13 +38,15 @@ const StyledLayout = styled.div`
  * Page wrapper component that provides the default layout of navigation,
  * content, and footer.
  */
-export default function Page({ children, baseUrl, semaphoreUrl }: PageProps) {
+export default function Page({ children }: PageProps) {
+  const config = useAppConfig();
+
   return (
     <StyledLayout>
       <Meta />
       <div className="upper-container">
         <Header />
-        <BroadcastBannerStack semaphoreUrl={semaphoreUrl} />
+        <BroadcastBannerStack semaphoreUrl={config.semaphoreUrl} />
         {children}
       </div>
       <div className="sticky-footer-container">
