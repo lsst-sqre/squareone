@@ -1,65 +1,26 @@
 /*
- * The TimesSquarePage is a view into a single Times Square page.
- * It consists of a column with page metadata/settings and another column with
- * the notebook content (NotebookIframe).
+ * TimesSquareGitHubPagePanel with dynamic import to prevent SSR issues
+ * Uses client-only component to handle SWR hooks safely.
  */
 
-import React from 'react';
+import dynamic from 'next/dynamic';
 import styled from 'styled-components';
-import getConfig from 'next/config';
-import Head from 'next/head';
-import Error from 'next/error';
 
-import useTimesSquarePage from '../../hooks/useTimesSquarePage';
-import { TimesSquareUrlParametersContext } from '../TimesSquareUrlParametersProvider';
-import TimesSquareParameters from '../TimesSquareParameters';
-import ExecStats from './ExecStats';
-import GitHubEditLink from './GitHubEditLink';
-import IpynbDownloadLink from './IpynbDownloadLink';
+// Dynamic import with SSR disabled to prevent SWR hook issues
+const TimesSquareGitHubPagePanelClient = dynamic(
+  () => import('./TimesSquareGitHubPagePanelClient'),
+  {
+    ssr: false,
+    loading: () => (
+      <PagePanelContainer>
+        <p>Loading...</p>
+      </PagePanelContainer>
+    ),
+  }
+);
 
 export default function TimesSquareGitHubPagePanel() {
-  const { publicRuntimeConfig } = getConfig();
-  const { urlQueryString } = React.useContext(TimesSquareUrlParametersContext)!;
-  const pageData = useTimesSquarePage();
-
-  if (pageData.loading) {
-    return <p>Loading...</p>;
-  }
-  if (pageData.error) {
-    return <Error statusCode={404} />;
-  }
-
-  const { title, description } = pageData;
-
-  const ipynbDownloadUrl = `${pageData.renderedIpynbUrl}?${urlQueryString}`;
-
-  return (
-    <PagePanelContainer>
-      <Head>
-        <title>{`${title} | ${publicRuntimeConfig.siteName}`}</title>
-      </Head>
-      <div>
-        <PageTitle>{title}</PageTitle>
-        {description && (
-          <div dangerouslySetInnerHTML={{ __html: description }}></div>
-        )}
-        <GitHubEditLink
-          owner={pageData.github.owner}
-          repository={pageData.github.repository}
-          sourcePath={pageData.github.sourcePath}
-        />
-
-        <TimesSquareParameters />
-
-        <IpynbDownloadLink
-          url={ipynbDownloadUrl}
-          sourcePath={pageData.github.sourcePath}
-        />
-
-        <ExecStats />
-      </div>
-    </PagePanelContainer>
-  );
+  return <TimesSquareGitHubPagePanelClient />;
 }
 
 const PagePanelContainer = styled.div`
@@ -70,8 +31,4 @@ const PagePanelContainer = styled.div`
   border: 1px solid var(--rsd-color-primary-600);
   border-right: none;
   box-shadow: var(--sqo-elevation-base);
-`;
-
-const PageTitle = styled.h1`
-  margin-top: 0;
 `;
