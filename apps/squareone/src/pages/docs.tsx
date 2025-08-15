@@ -1,13 +1,13 @@
 import Head from 'next/head';
-import getConfig from 'next/config';
 import type { GetServerSideProps } from 'next';
 import type { ReactElement, ReactNode } from 'react';
 import styled from 'styled-components';
-import { serialize } from 'next-mdx-remote/serialize';
 import { MDXRemote } from 'next-mdx-remote';
 
 import MainContent from '../components/MainContent';
 import { commonMdxComponents } from '../lib/utils/mdxComponents';
+import { loadConfigAndMdx } from '../lib/config/loader';
+import { useAppConfig } from '../contexts/AppConfigContext';
 
 const Section = styled.section`
   margin-top: 2rem;
@@ -109,18 +109,16 @@ const pageDescription =
   'Find documentation for Rubin Observatory data, science platform services, and software.';
 
 type DocsPageProps = {
-  publicRuntimeConfig: any;
   mdxSource: any;
 };
 
-export default function DocsPage({
-  publicRuntimeConfig,
-  mdxSource,
-}: DocsPageProps) {
+export default function DocsPage({ mdxSource }: DocsPageProps) {
+  const appConfig = useAppConfig();
+
   return (
     <>
       <Head>
-        <title key="title">{`Documentation | ${publicRuntimeConfig.siteName}`}</title>
+        <title key="title">{`Documentation | ${appConfig.siteName}`}</title>
         <meta name="description" key="description" content={pageDescription} />
         <meta property="og:title" key="ogtitle" content="Documentation" />
         <meta
@@ -142,15 +140,33 @@ DocsPage.getLayout = function getLayout(page: ReactElement): ReactNode {
 export const getServerSideProps: GetServerSideProps<
   DocsPageProps
 > = async () => {
-  const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
+  try {
+    // Load both config and MDX content using configurable mdxDir
+    const { config: appConfig, mdxSource } = await loadConfigAndMdx('docs.mdx');
 
-  const mdxSource = await serialize(publicRuntimeConfig.docsPageMdx);
+    return {
+      props: {
+        appConfig, // Still needed for _app.tsx to extract into context
+        mdxSource,
+      },
+    };
+  } catch (error) {
+    console.error('Failed to load docs page content:', error);
 
-  return {
-    props: {
-      serverRuntimeConfig,
-      publicRuntimeConfig,
-      mdxSource,
-    },
-  };
+    // Fallback: load config only and provide default content
+    const { loadAppConfig } = await import('../lib/config/loader');
+    const { serialize } = await import('next-mdx-remote/serialize');
+
+    const appConfig = await loadAppConfig();
+    const fallbackMdx = await serialize(
+      '# Documentation\n\nContent temporarily unavailable.'
+    );
+
+    return {
+      props: {
+        appConfig, // Still needed for _app.tsx to extract into context
+        mdxSource: fallbackMdx,
+      },
+    };
+  }
 };
