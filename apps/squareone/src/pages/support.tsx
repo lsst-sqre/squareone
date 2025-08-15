@@ -1,13 +1,13 @@
 import Head from 'next/head';
-import getConfig from 'next/config';
 import type { GetServerSideProps } from 'next';
 import type { ReactElement, ReactNode } from 'react';
 import styled from 'styled-components';
-import { serialize } from 'next-mdx-remote/serialize';
 import { MDXRemote } from 'next-mdx-remote';
 
 import MainContent from '../components/MainContent';
 import { commonMdxComponents } from '../lib/utils/mdxComponents';
+import { loadConfigAndMdx } from '../lib/config/loader';
+import { useAppConfig } from '../contexts/AppConfigContext';
 
 const Section = styled.section`
   margin-bottom: 2rem;
@@ -19,18 +19,16 @@ const pageDescription =
   'Get help with the Rubin Science Platform, data, and software.';
 
 type SupportPageProps = {
-  publicRuntimeConfig: any;
   mdxSource: any;
 };
 
-export default function SupportPage({
-  publicRuntimeConfig,
-  mdxSource,
-}: SupportPageProps) {
+export default function SupportPage({ mdxSource }: SupportPageProps) {
+  const appConfig = useAppConfig();
+
   return (
     <>
       <Head>
-        <title key="title">Get help | {publicRuntimeConfig.siteName}</title>
+        <title key="title">Get help | {appConfig.siteName}</title>
         <meta name="description" key="description" content={pageDescription} />
         <meta property="og:title" key="ogtitle" content="Get help" />
         <meta
@@ -52,15 +50,35 @@ SupportPage.getLayout = function getLayout(page: ReactElement): ReactNode {
 export const getServerSideProps: GetServerSideProps<
   SupportPageProps
 > = async () => {
-  const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
+  try {
+    // Load both config and MDX content using configurable mdxDir
+    const { config: appConfig, mdxSource } = await loadConfigAndMdx(
+      'support.mdx'
+    );
 
-  const mdxSource = await serialize(publicRuntimeConfig.supportPageMdx);
+    return {
+      props: {
+        appConfig, // Still needed for _app.tsx to extract into context
+        mdxSource,
+      },
+    };
+  } catch (error) {
+    console.error('Failed to load support page content:', error);
 
-  return {
-    props: {
-      serverRuntimeConfig,
-      publicRuntimeConfig,
-      mdxSource,
-    },
-  };
+    // Fallback: load config only and provide default content
+    const { loadAppConfig } = await import('../lib/config/loader');
+    const { serialize } = await import('next-mdx-remote/serialize');
+
+    const appConfig = await loadAppConfig();
+    const fallbackMdx = await serialize(
+      '# Get help with the Rubin Science Platform\\n\\nContent temporarily unavailable.'
+    );
+
+    return {
+      props: {
+        appConfig, // Still needed for _app.tsx to extract into context
+        mdxSource: fallbackMdx,
+      },
+    };
+  }
 };
