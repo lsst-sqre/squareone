@@ -2,6 +2,7 @@
  * ExecStats provides a summary of the execution status and timing of the
  * notebook execution. It also provides a button to request the recomputation
  * of the already-executed notebook.
+ * Updated to handle undefined context gracefully.
  */
 
 import React from 'react';
@@ -12,7 +13,12 @@ import { TimesSquareHtmlEventsContext } from '../TimesSquareHtmlEventsProvider';
 import { GhostButton } from '../Button';
 
 export default function ExecStats() {
-  const htmlEvent = React.useContext(TimesSquareHtmlEventsContext)!;
+  const htmlEvent = React.useContext(TimesSquareHtmlEventsContext);
+
+  // Return null if context is not available yet
+  if (!htmlEvent) {
+    return null;
+  }
 
   const handleRecompute = async (
     event: React.MouseEvent<HTMLButtonElement>

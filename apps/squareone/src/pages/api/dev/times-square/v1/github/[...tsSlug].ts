@@ -1,5 +1,7 @@
 /*
  * Mock Times Square API endpoint: /times-square/v1/github/:slug
+ * Updated to include github field for Times Square page data
+ * Fixed URLs to use mock API endpoints
  */
 
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -35,6 +37,7 @@ export default async function handler(
       rendered_url: `${pageBaseUrl}/rendered`,
       html_url: `${pageBaseUrl}/html`,
       html_status_url: `${pageBaseUrl}/htmlstatus`,
+      html_events_url: `${pageBaseUrl}/htmlevents`,
       parameters: {
         a: {
           type: 'number',
