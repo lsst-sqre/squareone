@@ -80,14 +80,20 @@ function readServerYamlConfig(): any {
 export async function loadAppConfig(): Promise<AppConfig> {
   const publicConfig = readPublicYamlConfig();
   const serverConfig = readServerYamlConfig();
-  const sentryDsn = process.env.SENTRY_DSN || undefined;
+  const sentryDsn = process.env.SENTRY_DSN;
 
   // Merge configurations (similar to next.config.js logic)
-  return {
-    sentryDsn,
+  const config = {
     ...publicConfig,
     ...serverConfig,
   } as AppConfig;
+
+  // Only add sentryDsn if it's defined (avoid Next.js serialization issues with undefined)
+  if (sentryDsn) {
+    config.sentryDsn = sentryDsn;
+  }
+
+  return config;
 }
 
 export async function loadMdxContent(
