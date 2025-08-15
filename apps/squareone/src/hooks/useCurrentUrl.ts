@@ -1,11 +1,9 @@
-import getConfig from 'next/config';
 import { useRouter } from 'next/router';
-
-const { publicRuntimeConfig } = getConfig();
+import { useAppConfig } from '../contexts/AppConfigContext';
 
 /* Hook to get the current URL. */
 function useCurrentUrl(): URL {
-  const { baseUrl } = publicRuntimeConfig;
+  const { baseUrl } = useAppConfig();
   const router = useRouter();
   return new URL(router.pathname, baseUrl);
 }
