@@ -19,6 +19,7 @@ import {
   AppConfigProvider,
   AppConfigContextValue,
 } from '../contexts/AppConfigContext';
+import { SentryProvider } from '../components/SentryProvider';
 
 type NextPageWithLayout = NextPage & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -53,6 +54,11 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     appLinks: [],
     showPreview: false,
     mdxDir: 'src/content/pages',
+    sentryDsn: undefined,
+    sentryTracesSampleRate: 0,
+    sentryReplaysSessionSampleRate: 0,
+    sentryReplaysOnErrorSampleRate: 1.0,
+    sentryDebug: false,
   };
 
   const config = appConfig || fallbackConfig;
@@ -60,9 +66,11 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   /* eslint-disable react/jsx-props-no-spreading */
   const coreApp = (
     <AppConfigProvider config={config}>
-      <ThemeProvider defaultTheme="system">
-        <Page>{getLayout(<Component {...otherPageProps} />)}</Page>
-      </ThemeProvider>
+      <SentryProvider>
+        <ThemeProvider defaultTheme="system">
+          <Page>{getLayout(<Component {...otherPageProps} />)}</Page>
+        </ThemeProvider>
+      </SentryProvider>
     </AppConfigProvider>
   );
   /* eslint-enable react/jsx-props-no-spreading */
