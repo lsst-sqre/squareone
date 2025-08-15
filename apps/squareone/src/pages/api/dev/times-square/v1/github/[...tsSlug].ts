@@ -47,6 +47,12 @@ export default async function handler(
           description: 'A string.',
         },
       },
+      github: {
+        owner: 'lsst-sqre',
+        repository: 'times-square-demo',
+        source_path: `${page}.ipynb`,
+        sidecar_path: `${page}.yaml`,
+      },
     };
 
     res.statusCode = 200;
