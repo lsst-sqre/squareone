@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import getConfig from 'next/config';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { PrimaryNavigation } from '@lsst-sqre/squared';
@@ -8,6 +7,7 @@ import { PrimaryNavigation } from '@lsst-sqre/squared';
 import useCurrentUrl from '../../hooks/useCurrentUrl';
 import Login from './Login';
 import AppsMenu from './AppsMenu';
+import { useAppConfig } from '../../contexts/AppConfigContext';
 
 type InternalTriggerLinkProps = {
   href: string;
@@ -19,7 +19,7 @@ type InternalTriggerLinkProps = {
  */
 export default function HeaderNav() {
   const currentUrl = useCurrentUrl();
-  const { publicRuntimeConfig } = getConfig();
+  const { enableAppsMenu } = useAppConfig();
 
   return (
     <StyledNav>
@@ -39,7 +39,7 @@ export default function HeaderNav() {
         <InternalTriggerLink href="/api-aspect">APIs</InternalTriggerLink>
       </NavItem>
 
-      {publicRuntimeConfig.enableAppsMenu && (
+      {enableAppsMenu && (
         <NavItem>
           <AppsMenu />
         </NavItem>

@@ -1,18 +1,17 @@
 /* Menu for a user profile and settings. */
 
-import getConfig from 'next/config';
 import { ChevronDown } from 'react-feather';
 import { PrimaryNavigation } from '@lsst-sqre/squared';
 import { useGafaelfawrUser } from '@lsst-sqre/squared';
 import { getLogoutUrl } from '@lsst-sqre/squared';
+import { useAppConfig } from '../../contexts/AppConfigContext';
 
 type UserMenuProps = {
   pageUrl: URL;
 };
 
 export default function UserMenu({ pageUrl }: UserMenuProps) {
-  const { publicRuntimeConfig } = getConfig();
-  const { coManageRegistryUrl } = publicRuntimeConfig;
+  const { coManageRegistryUrl } = useAppConfig();
   const { user } = useGafaelfawrUser();
   const logoutUrl = getLogoutUrl(pageUrl.toString());
 

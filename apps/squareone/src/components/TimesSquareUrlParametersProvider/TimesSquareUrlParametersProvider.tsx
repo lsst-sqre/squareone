@@ -4,8 +4,8 @@
  */
 
 import React from 'react';
-import getConfig from 'next/config';
 import { useRouter } from 'next/router';
+import { useAppConfig } from '../../contexts/AppConfigContext';
 
 type DisplaySettings = {
   ts_hide_code: string;
@@ -34,8 +34,7 @@ export const TimesSquareUrlParametersContext = React.createContext<
 export default function TimesSquareUrlParametersProvider({
   children,
 }: TimesSquareUrlParametersProviderProps) {
-  const { publicRuntimeConfig } = getConfig();
-  const { timesSquareUrl } = publicRuntimeConfig;
+  const { timesSquareUrl } = useAppConfig();
   const router = useRouter();
 
   // Get components out of the URL path. Only /github-pr/ pages have owner,

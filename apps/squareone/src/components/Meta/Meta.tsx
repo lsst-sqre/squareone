@@ -1,9 +1,8 @@
 import Head from 'next/head';
-import getConfig from 'next/config';
+import { useAppConfig } from '../../contexts/AppConfigContext';
 
 const Meta = () => {
-  const { publicRuntimeConfig } = getConfig();
-  const { siteName, siteDescription } = publicRuntimeConfig;
+  const { siteName, siteDescription } = useAppConfig();
 
   return (
     <Head>
