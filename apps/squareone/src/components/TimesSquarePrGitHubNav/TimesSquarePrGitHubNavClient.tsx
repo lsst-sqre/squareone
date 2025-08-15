@@ -5,13 +5,13 @@
 
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import getConfig from 'next/config';
 
 import TimesSquareGitHubNav from '../TimesSquareGitHubNav';
 import useGitHubPrContentsListing from './useGitHubPrContentsListing';
 import GitHubPrTitle from './GitHubPrTitle';
 import GitHubPrBadge from './GitHubPrBadge';
 import GitHubCheckBadge from './GitHubCheckBadge';
+import { useAppConfig } from '../../contexts/AppConfigContext';
 
 type TimesSquarePrGitHubNavClientProps = {
   owner: string;
@@ -32,8 +32,7 @@ function TimesSquarePrGitHubNavClient({
     setIsClient(true);
   }, []);
 
-  const { publicRuntimeConfig } = getConfig();
-  const { timesSquareUrl } = publicRuntimeConfig;
+  const { timesSquareUrl } = useAppConfig();
   const githubContents = useGitHubPrContentsListing(
     timesSquareUrl,
     owner,

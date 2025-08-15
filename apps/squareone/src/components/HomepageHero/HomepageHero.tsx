@@ -1,9 +1,9 @@
 import styled from 'styled-components';
 import Link from 'next/link';
-import getConfig from 'next/config';
 
 import FullBleedBackgroundImageSection from '../FullBleedBackgroundImageSection';
 import { ContentMaxWidth } from '../../styles/sizes';
+import { useAppConfig } from '../../contexts/AppConfigContext';
 
 const ContentContainer = styled.div`
   margin: 0 auto;
@@ -106,9 +106,7 @@ const StyledAspectIllustration = styled.img`
  * aspects) that's featured on the homepage.
  */
 export default function HomepageHero() {
-  const { publicRuntimeConfig } = getConfig();
-  const { showPreview, previewLink, docsBaseUrl, siteName } =
-    publicRuntimeConfig;
+  const { showPreview, previewLink, docsBaseUrl, siteName } = useAppConfig();
 
   return (
     <FullBleedBackgroundImageSection

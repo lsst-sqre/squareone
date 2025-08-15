@@ -1,9 +1,9 @@
 import React from 'react';
 import { useRouter } from 'next/router';
-import getConfig from 'next/config';
 
 import { ChevronDown } from 'react-feather';
 import { PrimaryNavigation } from '@lsst-sqre/squared';
+import { useAppConfig } from '../../contexts/AppConfigContext';
 
 type AppLink = {
   href: string;
@@ -18,8 +18,7 @@ type LinkProps = {
 };
 
 export default function AppsMenu() {
-  const { publicRuntimeConfig } = getConfig();
-  const appLinks: AppLink[] = publicRuntimeConfig?.appLinks || [];
+  const { appLinks } = useAppConfig();
 
   return (
     <>

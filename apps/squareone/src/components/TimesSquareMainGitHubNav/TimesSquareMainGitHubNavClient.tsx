@@ -4,11 +4,11 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import getConfig from 'next/config';
 import styled from 'styled-components';
 
 import TimesSquareGitHubNav from '../TimesSquareGitHubNav';
 import useGitHubContentsListing from './useGitHubContentsListing';
+import { useAppConfig } from '../../contexts/AppConfigContext';
 
 type TimesSquareMainGitHubNavClientProps = {
   pagePath: string;
@@ -23,8 +23,7 @@ function TimesSquareMainGitHubNavClient({
     setIsClient(true);
   }, []);
 
-  const { publicRuntimeConfig } = getConfig();
-  const { timesSquareUrl } = publicRuntimeConfig;
+  const { timesSquareUrl } = useAppConfig();
   const githubContents = useGitHubContentsListing(timesSquareUrl);
 
   // Don't render anything until client-side hydration

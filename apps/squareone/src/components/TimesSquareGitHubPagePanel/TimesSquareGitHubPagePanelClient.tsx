@@ -5,7 +5,6 @@
 
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import getConfig from 'next/config';
 import Head from 'next/head';
 import Error from 'next/error';
 
@@ -15,6 +14,7 @@ import TimesSquareParameters from '../TimesSquareParameters';
 import ExecStats from './ExecStats';
 import GitHubEditLink from './GitHubEditLink';
 import IpynbDownloadLink from './IpynbDownloadLink';
+import { useAppConfig } from '../../contexts/AppConfigContext';
 
 export default function TimesSquareGitHubPagePanelClient() {
   const [isClient, setIsClient] = useState(false);
@@ -23,7 +23,7 @@ export default function TimesSquareGitHubPagePanelClient() {
     setIsClient(true);
   }, []);
 
-  const { publicRuntimeConfig } = getConfig();
+  const { siteName } = useAppConfig();
   const { urlQueryString } = React.useContext(TimesSquareUrlParametersContext)!;
   const pageData = useTimesSquarePage();
 
@@ -54,7 +54,7 @@ export default function TimesSquareGitHubPagePanelClient() {
   return (
     <PagePanelContainer>
       <Head>
-        <title>{`${title} | ${publicRuntimeConfig.siteName}`}</title>
+        <title>{`${title} | ${siteName}`}</title>
       </Head>
       <div>
         <PageTitle>{title}</PageTitle>
