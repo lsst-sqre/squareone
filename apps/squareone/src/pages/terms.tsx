@@ -1,22 +1,23 @@
 import Head from 'next/head';
-import getConfig from 'next/config';
 import type { GetServerSideProps } from 'next';
 import type { ReactElement, ReactNode } from 'react';
 
 import MainContent from '../components/MainContent';
+import { loadAppConfig } from '../lib/config/loader';
+import { useAppConfig } from '../contexts/AppConfigContext';
 
 const pageDescription =
   'Learn about the Rubin Science Platform Acceptable Use Policy';
 
-type AupPageProps = {
-  publicRuntimeConfig: any;
-};
+type AupPageProps = {};
 
-export default function AupPage({ publicRuntimeConfig }: AupPageProps) {
+export default function AupPage({}: AupPageProps) {
+  const appConfig = useAppConfig();
+
   return (
     <>
       <Head>
-        <title key="title">{`Acceptable Use Policy | ${publicRuntimeConfig.siteName}`}</title>
+        <title key="title">{`Acceptable Use Policy | ${appConfig.siteName}`}</title>
         <meta name="description" key="description" content={pageDescription} />
         <meta
           property="og:title"
@@ -33,12 +34,12 @@ export default function AupPage({ publicRuntimeConfig }: AupPageProps) {
       <h1>Acceptable Use Policy</h1>
 
       <p>
-        We’re giving you access to Rubin Observatory systems so you can do
+        We're giving you access to Rubin Observatory systems so you can do
         science with our data products or otherwise further the mission of the
         Observatory.
       </p>
       <p>
-        You can lose your access (even if you have “data rights” to our data
+        You can lose your access (even if you have "data rights" to our data
         products) if you misuse our resources, interfere with other users, or
         otherwise do anything that would bring the Observatory into disrepute.
       </p>
@@ -54,11 +55,19 @@ AupPage.getLayout = function getLayout(page: ReactElement): ReactNode {
 export const getServerSideProps: GetServerSideProps<
   AupPageProps
 > = async () => {
-  const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
-  return {
-    props: {
-      serverRuntimeConfig,
-      publicRuntimeConfig,
-    },
-  };
+  try {
+    // Load app configuration for context
+    const appConfig = await loadAppConfig();
+
+    return {
+      props: {
+        appConfig, // Still needed for _app.tsx to extract into context
+      },
+    };
+  } catch (error) {
+    console.error('Failed to load terms page configuration:', error);
+
+    // This should not happen in normal operation, but provide basic fallback
+    throw error;
+  }
 };
