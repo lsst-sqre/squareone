@@ -1,26 +1,24 @@
 import Head from 'next/head';
-import getConfig from 'next/config';
 import type { GetServerSideProps } from 'next';
 import type { ReactElement, ReactNode } from 'react';
-import { serialize } from 'next-mdx-remote/serialize';
 import { MDXRemote } from 'next-mdx-remote';
 
 import MainContent from '../../components/MainContent';
 import { commonMdxComponents } from '../../lib/utils/mdxComponents';
+import { loadConfigAndMdx } from '../../lib/config/loader';
+import { useAppConfig } from '../../contexts/AppConfigContext';
 
 type VerifyEmailPageProps = {
-  publicRuntimeConfig: any;
   mdxSource: any;
 };
 
-export default function VerifyEmailPage({
-  publicRuntimeConfig,
-  mdxSource,
-}: VerifyEmailPageProps) {
+export default function VerifyEmailPage({ mdxSource }: VerifyEmailPageProps) {
+  const appConfig = useAppConfig();
+
   return (
     <>
       <Head>
-        <title key="title">{`Thanks for registering | ${publicRuntimeConfig.siteName}`}</title>
+        <title key="title">{`Thanks for registering | ${appConfig.siteName}`}</title>
         <meta
           name="description"
           key="description"
@@ -50,12 +48,35 @@ VerifyEmailPage.getLayout = function getLayout(page: ReactElement): ReactNode {
 export const getServerSideProps: GetServerSideProps<
   VerifyEmailPageProps
 > = async () => {
-  const { publicRuntimeConfig } = getConfig();
-  const mdxSource = await serialize(publicRuntimeConfig.verifyEmailPageMdx);
-  return {
-    props: {
-      publicRuntimeConfig,
-      mdxSource,
-    },
-  };
+  try {
+    // Load both config and MDX content using configurable mdxDir
+    const { config: appConfig, mdxSource } = await loadConfigAndMdx(
+      'enrollment/thanks-for-signing-up.mdx'
+    );
+
+    return {
+      props: {
+        appConfig, // Still needed for _app.tsx to extract into context
+        mdxSource,
+      },
+    };
+  } catch (error) {
+    console.error('Failed to load thanks for signing up page content:', error);
+
+    // Fallback: load config only and provide default content
+    const { loadAppConfig } = await import('../../lib/config/loader');
+    const { serialize } = await import('next-mdx-remote/serialize');
+
+    const appConfig = await loadAppConfig();
+    const fallbackMdx = await serialize(
+      '# Thanks for registering\\n\\nContent temporarily unavailable.'
+    );
+
+    return {
+      props: {
+        appConfig, // Still needed for _app.tsx to extract into context
+        mdxSource: fallbackMdx,
+      },
+    };
+  }
 };
