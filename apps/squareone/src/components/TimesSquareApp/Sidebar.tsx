@@ -9,6 +9,7 @@ import styled from 'styled-components';
 import { IconPill } from '@lsst-sqre/squared';
 
 import { getDocsUrl } from '../../lib/utils/docsUrls';
+import { useAppConfig } from '../../contexts/AppConfigContext';
 
 type SidebarProps = {
   pageNav?: ReactNode;
@@ -31,7 +32,8 @@ const AppTitle = styled.p`
 `;
 
 export default function Sidebar({ pageNav, pagePanel }: SidebarProps) {
-  const docsUrl = getDocsUrl('/guides/times-square/index.html');
+  const { docsBaseUrl } = useAppConfig();
+  const docsUrl = getDocsUrl(docsBaseUrl, '/guides/times-square/index.html');
 
   return (
     <StyledSidebar>
