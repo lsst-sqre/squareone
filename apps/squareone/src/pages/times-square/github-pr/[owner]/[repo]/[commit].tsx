@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import Head from 'next/head';
-import getConfig from 'next/config';
 import { useRouter } from 'next/router';
 import type { GetServerSideProps } from 'next';
 import type { ReactElement, ReactNode } from 'react';
@@ -13,10 +12,17 @@ import WideContentLayout from '../../../../../components/WideContentLayout';
 import useGitHubPrContentsListing from '../../../../../components/TimesSquarePrGitHubNav/useGitHubPrContentsListing';
 import GitHubCheckBadge from '../../../../../components/TimesSquarePrGitHubNav/GitHubCheckBadge';
 import GitHubPrBadge from '../../../../../components/TimesSquarePrGitHubNav/GitHubPrBadge';
+import { loadAppConfig } from '../../../../../lib/config/loader';
+import { useAppConfig } from '../../../../../contexts/AppConfigContext';
+import type { AppConfigContextValue } from '../../../../../contexts/AppConfigContext';
 
-export default function GitHubPrLandingPage() {
-  const { publicRuntimeConfig } = getConfig();
-  const { timesSquareUrl } = publicRuntimeConfig;
+type GitHubPrLandingPageProps = {
+  appConfig: AppConfigContextValue;
+};
+
+export default function GitHubPrLandingPage({}: GitHubPrLandingPageProps) {
+  const appConfig = useAppConfig();
+  const { timesSquareUrl } = appConfig;
   const router = useRouter();
   const { owner, repo, commit } = router.query;
 
@@ -90,7 +96,7 @@ export default function GitHubPrLandingPage() {
       <Head>
         <title>
           Pull Request Preview{' '}
-          {`${owner}/${repo} ${commit} | ${publicRuntimeConfig.siteName}`}
+          {`${owner}/${repo} ${commit} | ${appConfig.siteName}`}
         </title>
       </Head>
 
@@ -118,16 +124,32 @@ GitHubPrLandingPage.getLayout = function getLayout(
   return <WideContentLayout>{page}</WideContentLayout>;
 };
 
-export const getServerSideProps: GetServerSideProps = async () => {
-  const { publicRuntimeConfig } = getConfig();
+export const getServerSideProps: GetServerSideProps<
+  GitHubPrLandingPageProps
+> = async () => {
+  try {
+    const appConfig = await loadAppConfig();
 
-  // Make the page return a 404 if Times Square is not configured
-  const notFound = publicRuntimeConfig.timesSquareUrl ? false : true;
+    // Make the page return a 404 if Times Square is not configured
+    const notFound = appConfig.timesSquareUrl ? false : true;
 
-  return {
-    notFound,
-    props: {},
-  };
+    return {
+      notFound,
+      props: {
+        appConfig,
+      },
+    };
+  } catch (error) {
+    console.error(
+      'Failed to load configuration for Times Square GitHub PR landing page:',
+      error
+    );
+
+    // Return 404 if configuration loading fails
+    return {
+      notFound: true,
+    };
+  }
 };
 
 const StyledHeader = styled.header`
