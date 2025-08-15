@@ -12,7 +12,14 @@ import { ServerStyleSheet } from 'styled-components';
  * Custom document, which provides access to the head and body, and is also
  * needed for integrating styled-components.
  *
+ * IMPORTANT: This file intentionally uses getInitialProps, which is the correct
+ * and required pattern for _document.tsx in Next.js. The getInitialProps method
+ * in _document.tsx is specifically designed for SSR and is not subject to the
+ * same restrictions as other pages. This is required for styled-components
+ * server-side rendering and style extraction.
+ *
  * See https://github.com/vercel/next.js/blob/canary/examples/with-styled-components/pages/_document.js
+ * See https://nextjs.org/docs/advanced-features/custom-document
  */
 export default class MyDocument extends Document {
   static async getInitialProps(
