@@ -3,17 +3,14 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from '@sentry/nextjs';
-import getConfig from 'next/config';
-
-const { publicRuntimeConfig } = getConfig();
 
 Sentry.init({
-  dsn: publicRuntimeConfig.sentryDsn,
+  dsn: process.env.SENTRY_DSN,
 
-  environment: publicRuntimeConfig.environmentName,
+  environment: process.env.SQUAREONE_ENVIRONMENT_NAME || 'development',
 
   // Define how likely traces are sampled.
-  tracesSampleRate: publicRuntimeConfig.sentryTracesSampleRate,
+  tracesSampleRate: parseFloat(process.env.SENTRY_TRACES_SAMPLE_RATE || '0'),
 
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,

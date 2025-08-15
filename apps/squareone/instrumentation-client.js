@@ -3,14 +3,19 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from '@sentry/nextjs';
-import getConfig from 'next/config';
 
-const { publicRuntimeConfig } = getConfig();
+// Note: Client-side code cannot access process.env directly in the browser.
+// These values need to be exposed via Next.js env configuration in next.config.js
+// or passed through app configuration context. For now, using direct env access
+// which works for server-side rendered components.
+const sentryDsn = process.env.NEXT_PUBLIC_SENTRY_DSN || process.env.SENTRY_DSN;
+const environment = process.env.NEXT_PUBLIC_ENVIRONMENT_NAME || 'development';
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
 Sentry.init({
-  dsn: publicRuntimeConfig.sentryDsn,
+  dsn: sentryDsn,
 
-  environment: publicRuntimeConfig.environmentName,
+  environment: environment,
 
   // Add optional integrations for additional features
   integrations: [Sentry.replayIntegration()],
@@ -20,17 +25,23 @@ Sentry.init({
   // start with '/' have trace headers added. Many of our requests to external
   // services use the fully qualified URL.
   // https://docs.sentry.io/platforms/javascript/tracing/instrumentation/automatic-instrumentation/#tracepropagationtargets
-  tracePropagationTargets: [publicRuntimeConfig.baseUrl],
+  tracePropagationTargets: [baseUrl],
 
   // Define how likely traces are sampled. Adjust this value in production, or
   // use tracesSampler for greater control.
-  tracesSampleRate: publicRuntimeConfig.sentryTracesSampleRate,
+  tracesSampleRate: parseFloat(
+    process.env.NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE || '0'
+  ),
 
   // Define how likely Replay events are sampled.
-  replaysSessionSampleRate: publicRuntimeConfig.sentryReplaysSessionSampleRate,
+  replaysSessionSampleRate: parseFloat(
+    process.env.NEXT_PUBLIC_SENTRY_REPLAYS_SESSION_SAMPLE_RATE || '0'
+  ),
 
   // Define how likely Replay events are sampled when an error occurs.
-  replaysOnErrorSampleRate: publicRuntimeConfig.sentryReplaysOnErrorSampleRate,
+  replaysOnErrorSampleRate: parseFloat(
+    process.env.NEXT_PUBLIC_SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE || '1.0'
+  ),
 
   // Setting this option to true will print useful information to the console
   // while you're setting up Sentry.

@@ -15,23 +15,3 @@ declare module 'js-yaml' {
   export function load(str: string, options?: any): any;
   export function dump(obj: any, options?: any): string;
 }
-
-// Next.js runtime config types
-declare module 'next/config' {
-  export interface PublicRuntimeConfig {
-    sentryDsn?: string | null;
-    [key: string]: any;
-  }
-
-  export interface ServerRuntimeConfig {
-    sentryDsn?: string | null;
-    [key: string]: any;
-  }
-
-  export interface NextConfig {
-    publicRuntimeConfig?: PublicRuntimeConfig;
-    serverRuntimeConfig?: ServerRuntimeConfig;
-  }
-
-  export default function getConfig(): NextConfig;
-}
