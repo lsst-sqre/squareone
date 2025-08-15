@@ -1,24 +1,25 @@
 import Head from 'next/head';
-import getConfig from 'next/config';
 import type { GetServerSideProps } from 'next';
 import type { ReactElement, ReactNode } from 'react';
 
 import TimesSquareApp from '../../components/TimesSquareApp';
 import WideContentLayout from '../../components/WideContentLayout';
 import TimesSquareUrlParametersProvider from '../../components/TimesSquareUrlParametersProvider';
+import { loadAppConfig } from '../../lib/config/loader';
+import { useAppConfig } from '../../contexts/AppConfigContext';
+import type { AppConfigContextValue } from '../../contexts/AppConfigContext';
 
 type TimesSquareHomeProps = {
-  publicRuntimeConfig: any;
+  appConfig: AppConfigContextValue;
 };
 
-export default function TimesSquareHome({
-  publicRuntimeConfig,
-}: TimesSquareHomeProps) {
+export default function TimesSquareHome({}: TimesSquareHomeProps) {
+  const appConfig = useAppConfig();
   return (
     <TimesSquareUrlParametersProvider>
       <TimesSquareApp>
         <Head>
-          <title>Times Square | {publicRuntimeConfig.siteName}</title>
+          <title>Times Square | {appConfig.siteName}</title>
         </Head>
         <h1>Easily share Jupyter Notebooks on the Rubin Science Platform</h1>
         <p>
@@ -123,16 +124,24 @@ TimesSquareHome.getLayout = function getLayout(page: ReactElement): ReactNode {
 export const getServerSideProps: GetServerSideProps<
   TimesSquareHomeProps
 > = async () => {
-  const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
+  try {
+    const appConfig = await loadAppConfig();
 
-  // Make the page return a 404 if Times Square is not configured
-  const notFound = publicRuntimeConfig.timesSquareUrl ? false : true;
+    // Make the page return a 404 if Times Square is not configured
+    const notFound = appConfig.timesSquareUrl ? false : true;
 
-  return {
-    notFound,
-    props: {
-      serverRuntimeConfig,
-      publicRuntimeConfig,
-    },
-  };
+    return {
+      notFound,
+      props: {
+        appConfig,
+      },
+    };
+  } catch (error) {
+    console.error('Failed to load configuration for Times Square home:', error);
+
+    // Return 404 if configuration loading fails
+    return {
+      notFound: true,
+    };
+  }
 };

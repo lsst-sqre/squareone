@@ -1,4 +1,3 @@
-import getConfig from 'next/config';
 import type { GetServerSideProps } from 'next';
 import type { ReactElement, ReactNode } from 'react';
 
@@ -7,8 +6,14 @@ import WideContentLayout from '../../../../../../components/WideContentLayout';
 import TimesSquareNotebookViewer from '../../../../../../components/TimesSquareNotebookViewer';
 import TimesSquareUrlParametersProvider from '../../../../../../components/TimesSquareUrlParametersProvider';
 import TimesSquareHtmlEventsProvider from '../../../../../../components/TimesSquareHtmlEventsProvider/TimesSquareHtmlEventsProvider';
+import { loadAppConfig } from '../../../../../../lib/config/loader';
+import type { AppConfigContextValue } from '../../../../../../contexts/AppConfigContext';
 
-export default function GitHubPrNotebookViewPage() {
+type GitHubPrNotebookViewPageProps = {
+  appConfig: AppConfigContextValue;
+};
+
+export default function GitHubPrNotebookViewPage({}: GitHubPrNotebookViewPageProps) {
   return (
     <TimesSquareUrlParametersProvider>
       <TimesSquareHtmlEventsProvider>
@@ -26,13 +31,30 @@ GitHubPrNotebookViewPage.getLayout = function getLayout(
   return <WideContentLayout>{page}</WideContentLayout>;
 };
 
-export const getServerSideProps: GetServerSideProps = async () => {
-  // Make the page return a 404 if Times Square is not configured
-  const { publicRuntimeConfig } = getConfig();
-  const notFound = publicRuntimeConfig.timesSquareUrl ? false : true;
+export const getServerSideProps: GetServerSideProps<
+  GitHubPrNotebookViewPageProps
+> = async () => {
+  try {
+    const appConfig = await loadAppConfig();
 
-  return {
-    notFound,
-    props: {},
-  };
+    // Make the page return a 404 if Times Square is not configured
+    const notFound = appConfig.timesSquareUrl ? false : true;
+
+    return {
+      notFound,
+      props: {
+        appConfig,
+      },
+    };
+  } catch (error) {
+    console.error(
+      'Failed to load configuration for Times Square GitHub PR page:',
+      error
+    );
+
+    // Return 404 if configuration loading fails
+    return {
+      notFound: true,
+    };
+  }
 };
