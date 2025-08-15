@@ -150,12 +150,9 @@ importers:
       '@storybook/testing-library':
         specifier: ^0.2.0
         version: 0.2.2
-<<<<<<< HEAD
-=======
       '@types/js-yaml':
         specifier: ^4.0.9
         version: 4.0.9
->>>>>>> a4d9cc5 (fixup Update pnpm-lock.yaml)
       '@types/node':
         specifier: ^24.0.1
         version: 24.0.4
@@ -15882,11 +15879,7 @@ snapshots:
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
       eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0(eslint@8.57.1))(eslint@8.57.1)
-<<<<<<< HEAD
-      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
-=======
       eslint-plugin-import: 2.32.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-typescript@3.10.1)(eslint@8.57.1)
->>>>>>> a4d9cc5 (fixup Update pnpm-lock.yaml)
       eslint-plugin-jsx-a11y: 6.10.2(eslint@8.57.1)
       eslint-plugin-react: 7.37.5(eslint@8.57.1)
       eslint-plugin-react-hooks: 4.6.2(eslint@8.57.1)
@@ -15937,11 +15930,7 @@ snapshots:
       tinyglobby: 0.2.14
       unrs-resolver: 1.11.1
     optionalDependencies:
-<<<<<<< HEAD
-      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
-=======
       eslint-plugin-import: 2.32.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-typescript@3.10.1)(eslint@8.57.1)
->>>>>>> a4d9cc5 (fixup Update pnpm-lock.yaml)
     transitivePeerDependencies:
       - supports-color
 
@@ -15956,11 +15945,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-<<<<<<< HEAD
-  eslint-plugin-import@2.32.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1):
-=======
   eslint-plugin-import@2.32.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-typescript@3.10.1)(eslint@8.57.1):
->>>>>>> a4d9cc5 (fixup Update pnpm-lock.yaml)
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.9
