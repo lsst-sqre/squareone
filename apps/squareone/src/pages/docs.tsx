@@ -3,6 +3,7 @@ import type { GetServerSideProps } from 'next';
 import type { ReactElement, ReactNode } from 'react';
 import styled from 'styled-components';
 import { MDXRemote } from 'next-mdx-remote';
+import { serialize } from 'next-mdx-remote/serialize';
 
 import MainContent from '../components/MainContent';
 import { commonMdxComponents } from '../lib/utils/mdxComponents';
@@ -163,12 +164,21 @@ export const getServerSideProps: GetServerSideProps<
     console.log('Environment:', process.env.NODE_ENV);
     console.log('Loading config and MDX...');
 
-    // Load both config and MDX content using configurable mdxDir
-    const { config: appConfig, mdxSource } = await loadConfigAndMdx('docs.mdx');
+    // Load config and raw MDX content
+    const { config: appConfig, mdxContent } = await loadConfigAndMdx(
+      'docs.mdx'
+    );
 
     console.log('Config loaded successfully:', !!appConfig);
     console.log('Config siteName:', appConfig?.siteName);
-    console.log('MDX source loaded:', !!mdxSource);
+    console.log('Raw MDX content loaded:', !!mdxContent);
+    console.log('MDX content length:', mdxContent.length);
+
+    // Serialize MDX content directly in getServerSideProps using ES import
+    console.log('Serializing MDX content...');
+    const mdxSource = await serialize(mdxContent);
+
+    console.log('MDX source serialized:', !!mdxSource);
     console.log('MDX source type:', typeof mdxSource);
     console.log('MDX source keys:', Object.keys(mdxSource || {}));
     console.log(
@@ -189,7 +199,6 @@ export const getServerSideProps: GetServerSideProps<
 
     // Fallback: load config only and provide default content
     const { loadAppConfig } = await import('../lib/config/loader');
-    const { serialize } = await import('next-mdx-remote/serialize');
 
     const appConfig = await loadAppConfig();
     const fallbackMdx = await serialize(

@@ -4,8 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
 const Ajv = require('ajv');
-// Dynamic import for ES module
-let serialize: any;
+// Removed serialize - now handled in individual page getServerSideProps
 
 export interface AppConfig {
   siteName: string;
@@ -101,7 +100,7 @@ export async function loadAppConfig(): Promise<AppConfig> {
 export async function loadMdxContent(
   contentPath: string,
   config?: AppConfig
-): Promise<any> {
+): Promise<string> {
   // Load config if not provided
   if (!config) {
     config = await loadAppConfig();
@@ -125,31 +124,19 @@ export async function loadMdxContent(
   console.log('MDX file path:', fullPath);
   console.log('File contents length:', fileContents.length);
   console.log('File contents preview:', fileContents.substring(0, 200) + '...');
-
-  // Dynamic import for ES module
-  if (!serialize) {
-    console.log('Loading serialize function dynamically...');
-    const mdxRemote = await import('next-mdx-remote/serialize');
-    serialize = mdxRemote.serialize;
-    console.log('Serialize function loaded:', typeof serialize);
-  }
-
-  console.log('Calling serialize...');
-  const result = await serialize(fileContents);
-  console.log('Serialize result type:', typeof result);
-  console.log('Serialize result keys:', Object.keys(result || {}));
   console.log('=== END MDX LOADER DEBUG ===');
 
-  return result;
+  // Return raw MDX content - serialization will be done in getServerSideProps
+  return fileContents;
 }
 
-// Convenience function to load both config and MDX content
+// Convenience function to load both config and raw MDX content
 export async function loadConfigAndMdx(contentPath: string): Promise<{
   config: AppConfig;
-  mdxSource: any;
+  mdxContent: string;
 }> {
   const config = await loadAppConfig();
-  const mdxSource = await loadMdxContent(contentPath, config);
+  const mdxContent = await loadMdxContent(contentPath, config);
 
-  return { config, mdxSource };
+  return { config, mdxContent };
 }
