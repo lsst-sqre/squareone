@@ -1,9 +1,10 @@
 // Server-side configuration loader with Ajv validation (migrated from next.config.js)
-import fs from 'fs';
-import path from 'path';
-import yaml from 'js-yaml';
-import Ajv from 'ajv';
-import { serialize } from 'next-mdx-remote/serialize';
+// Using require() for server-side modules to avoid dynamic import issues in production builds
+const fs = require('fs');
+const path = require('path');
+const yaml = require('js-yaml');
+const Ajv = require('ajv');
+// Removed serialize - now handled in individual page getServerSideProps
 
 export interface AppConfig {
   siteName: string;
@@ -99,7 +100,7 @@ export async function loadAppConfig(): Promise<AppConfig> {
 export async function loadMdxContent(
   contentPath: string,
   config?: AppConfig
-): Promise<any> {
+): Promise<string> {
   // Load config if not provided
   if (!config) {
     config = await loadAppConfig();
@@ -118,16 +119,24 @@ export async function loadMdxContent(
   }
 
   const fileContents = fs.readFileSync(fullPath, 'utf8');
-  return await serialize(fileContents);
+
+  console.log('=== MDX LOADER DEBUG ===');
+  console.log('MDX file path:', fullPath);
+  console.log('File contents length:', fileContents.length);
+  console.log('File contents preview:', fileContents.substring(0, 200) + '...');
+  console.log('=== END MDX LOADER DEBUG ===');
+
+  // Return raw MDX content - serialization will be done in getServerSideProps
+  return fileContents;
 }
 
-// Convenience function to load both config and MDX content
+// Convenience function to load both config and raw MDX content
 export async function loadConfigAndMdx(contentPath: string): Promise<{
   config: AppConfig;
-  mdxSource: any;
+  mdxContent: string;
 }> {
   const config = await loadAppConfig();
-  const mdxSource = await loadMdxContent(contentPath, config);
+  const mdxContent = await loadMdxContent(contentPath, config);
 
-  return { config, mdxSource };
+  return { config, mdxContent };
 }

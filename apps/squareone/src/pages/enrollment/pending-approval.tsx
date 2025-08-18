@@ -3,6 +3,7 @@ import Link from 'next/link';
 import type { GetServerSideProps } from 'next';
 import type { ReactElement, ReactNode } from 'react';
 import { MDXRemote } from 'next-mdx-remote';
+import { serialize } from 'next-mdx-remote/serialize';
 
 import MainContent from '../../components/MainContent';
 import { commonMdxComponents } from '../../lib/utils/mdxComponents';
@@ -50,10 +51,13 @@ export const getServerSideProps: GetServerSideProps<
   PendingApprovalPageProps
 > = async () => {
   try {
-    // Load both config and MDX content using configurable mdxDir
-    const { config: appConfig, mdxSource } = await loadConfigAndMdx(
+    // Load config and raw MDX content
+    const { config: appConfig, mdxContent } = await loadConfigAndMdx(
       'enrollment/pending-approval.mdx'
     );
+
+    // Serialize MDX content directly in getServerSideProps using ES import
+    const mdxSource = await serialize(mdxContent);
 
     return {
       props: {
@@ -66,7 +70,6 @@ export const getServerSideProps: GetServerSideProps<
 
     // Fallback: load config only and provide default content
     const { loadAppConfig } = await import('../../lib/config/loader');
-    const { serialize } = await import('next-mdx-remote/serialize');
 
     const appConfig = await loadAppConfig();
     const fallbackMdx = await serialize(
