@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
 const Ajv = require('ajv');
-// Import serialize dynamically since it's an ES module
+// Dynamic import for ES module
 let serialize: any;
 
 export interface AppConfig {
