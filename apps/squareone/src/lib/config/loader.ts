@@ -4,8 +4,8 @@ const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
 const Ajv = require('ajv');
-const mdxRemote = require('next-mdx-remote/serialize');
-const serialize = mdxRemote.serialize;
+// Import serialize dynamically since it's an ES module
+let serialize: any;
 
 export interface AppConfig {
   siteName: string;
@@ -120,6 +120,13 @@ export async function loadMdxContent(
   }
 
   const fileContents = fs.readFileSync(fullPath, 'utf8');
+
+  // Dynamic import for ES module
+  if (!serialize) {
+    const mdxRemote = await import('next-mdx-remote/serialize');
+    serialize = mdxRemote.serialize;
+  }
+
   return await serialize(fileContents);
 }
 
