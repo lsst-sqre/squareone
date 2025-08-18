@@ -115,6 +115,24 @@ type DocsPageProps = {
 export default function DocsPage({ mdxSource }: DocsPageProps) {
   const appConfig = useAppConfig();
 
+  console.log('=== DOCS COMPONENT RENDER ===');
+  console.log('MDX source received:', !!mdxSource);
+  console.log('MDX components available:', Object.keys(mdxComponents));
+  console.log('App config available:', !!appConfig);
+
+  // Check for specific components that might be undefined
+  const problematicComponents = Object.entries(mdxComponents).filter(
+    ([key, comp]) => !comp
+  );
+  if (problematicComponents.length > 0) {
+    console.error(
+      'Undefined components:',
+      problematicComponents.map(([key]) => key)
+    );
+  }
+
+  console.log('=== END DOCS COMPONENT DEBUG ===');
+
   return (
     <>
       <Head>
@@ -141,8 +159,24 @@ export const getServerSideProps: GetServerSideProps<
   DocsPageProps
 > = async () => {
   try {
+    console.log('=== DOCS PAGE DEBUG (Production) ===');
+    console.log('Environment:', process.env.NODE_ENV);
+    console.log('Loading config and MDX...');
+
     // Load both config and MDX content using configurable mdxDir
     const { config: appConfig, mdxSource } = await loadConfigAndMdx('docs.mdx');
+
+    console.log('Config loaded successfully:', !!appConfig);
+    console.log('Config siteName:', appConfig?.siteName);
+    console.log('MDX source loaded:', !!mdxSource);
+    console.log('MDX source type:', typeof mdxSource);
+    console.log('MDX source keys:', Object.keys(mdxSource || {}));
+    console.log(
+      'MDX compiledSource length:',
+      mdxSource?.compiledSource?.length || 0
+    );
+    console.log('MDX scope keys:', Object.keys(mdxSource?.scope || {}));
+    console.log('=== END DOCS DEBUG ===');
 
     return {
       props: {

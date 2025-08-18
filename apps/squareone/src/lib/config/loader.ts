@@ -121,13 +121,26 @@ export async function loadMdxContent(
 
   const fileContents = fs.readFileSync(fullPath, 'utf8');
 
+  console.log('=== MDX LOADER DEBUG ===');
+  console.log('MDX file path:', fullPath);
+  console.log('File contents length:', fileContents.length);
+  console.log('File contents preview:', fileContents.substring(0, 200) + '...');
+
   // Dynamic import for ES module
   if (!serialize) {
+    console.log('Loading serialize function dynamically...');
     const mdxRemote = await import('next-mdx-remote/serialize');
     serialize = mdxRemote.serialize;
+    console.log('Serialize function loaded:', typeof serialize);
   }
 
-  return await serialize(fileContents);
+  console.log('Calling serialize...');
+  const result = await serialize(fileContents);
+  console.log('Serialize result type:', typeof result);
+  console.log('Serialize result keys:', Object.keys(result || {}));
+  console.log('=== END MDX LOADER DEBUG ===');
+
+  return result;
 }
 
 // Convenience function to load both config and MDX content
