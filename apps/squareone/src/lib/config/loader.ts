@@ -1,9 +1,11 @@
 // Server-side configuration loader with Ajv validation (migrated from next.config.js)
-import fs from 'fs';
-import path from 'path';
-import yaml from 'js-yaml';
-import Ajv from 'ajv';
-import { serialize } from 'next-mdx-remote/serialize';
+// Using require() for server-side modules to avoid dynamic import issues in production builds
+const fs = require('fs');
+const path = require('path');
+const yaml = require('js-yaml');
+const Ajv = require('ajv');
+const mdxRemote = require('next-mdx-remote/serialize');
+const serialize = mdxRemote.serialize;
 
 export interface AppConfig {
   siteName: string;
