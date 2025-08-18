@@ -5,7 +5,6 @@ import { MDXRemote } from 'next-mdx-remote';
 
 import MainContent from '../components/MainContent';
 import { commonMdxComponents } from '../lib/utils/mdxComponents';
-import { loadAppConfig } from '../lib/config/loader';
 import { useAppConfig } from '../contexts/AppConfigContext';
 
 type TestMdxPageProps = {
@@ -42,29 +41,66 @@ export const getServerSideProps: GetServerSideProps<
   try {
     console.log('=== TEST MDX SERVER SIDE ===');
 
-    // Test with pre-serialized mock data first to isolate serialization vs rendering issue
-    console.log('Creating minimal mock MDX source...');
-    const appConfig = await loadAppConfig();
+    // Test serialize function with simple static content
+    console.log('Testing serialize with static MDX content...');
+    // const appConfig = await loadAppConfig();
 
-    // Create a minimal mock MDX source that bypasses serialization entirely
-    const mockMdxSource = {
-      compiledSource:
-        'const { Fragment, jsx, jsxs } = _jsx_runtime;\nfunction _createMdxContent(props) {\n  const _components = {\n    h1: "h1",\n    p: "p",\n    ...props.components\n  };\n  return jsxs(Fragment, {\n    children: [jsx(_components.h1, {\n      children: "Test Heading"\n    }), "\\n", jsx(_components.p, {\n      children: "This is a test paragraph."\n    }), "\\n"]\n  });\n}\nexport default _createMdxContent;',
-      scope: {},
-      frontmatter: {},
-    };
+    // Simple static MDX content for testing
+    const testMdxContent = `# Hello World
 
-    console.log('Mock MDX source created successfully');
+This is a **test** of the MDX serialization function.
+
+- First item
+- Second item
+
+\`\`\`javascript
+console.log('Hello from code block');
+\`\`\`
+`;
+
+    console.log('Static MDX content created');
+    console.log('Content length:', testMdxContent.length);
+
+    // Try to serialize the static content
+    console.log('Attempting to serialize...');
+    const { serialize } = await import('next-mdx-remote/serialize');
+    console.log('Serialize function imported:', typeof serialize);
+
+    const mdxSource = await serialize(testMdxContent);
+    console.log('Serialization successful!');
+    console.log('MDX source type:', typeof mdxSource);
+    console.log('MDX source keys:', Object.keys(mdxSource || {}));
     console.log('=== END TEST MDX SERVER DEBUG ===');
 
     return {
       props: {
-        appConfig,
-        mdxSource: mockMdxSource,
+        mdxSource,
       },
     };
   } catch (error) {
     console.error('Test MDX error:', error);
-    throw error;
+    console.error(
+      'Error details:',
+      error instanceof Error ? error.message : String(error)
+    );
+    console.error(
+      'Error stack:',
+      error instanceof Error ? error.stack : 'No stack trace'
+    );
+
+    // Fallback to avoid page crash
+    // const appConfig = await loadAppConfig();
+    const fallbackMdxSource = {
+      compiledSource:
+        'const { jsx } = _jsx_runtime;\nfunction _createMdxContent() { return jsx("div", { children: "Serialization failed" }); }\nexport default _createMdxContent;',
+      scope: {},
+      frontmatter: {},
+    };
+
+    return {
+      props: {
+        mdxSource: fallbackMdxSource,
+      },
+    };
   }
 };
