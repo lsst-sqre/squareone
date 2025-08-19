@@ -55,8 +55,8 @@ module.exports = (phase, { defaultConfig }) => {
     },
     publicRuntimeConfig: { sentryDsn, ...publicYamlConfig },
     serverRuntimeConfig: { sentryDsn, ...serverYamlConfig },
-    webpack: (config, { isServer }) => {
-      return config;
+    compiler: {
+      styledComponents: true,
     },
     async rewrites() {
       return [
