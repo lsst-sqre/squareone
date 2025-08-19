@@ -2,10 +2,18 @@ import Head from 'next/head';
 import type { GetServerSideProps } from 'next';
 import type { ReactElement, ReactNode } from 'react';
 import { MDXRemote } from 'next-mdx-remote';
+import Link from 'next/link';
 
 import MainContent from '../components/MainContent';
-import { commonMdxComponents } from '../lib/utils/mdxComponents';
+import { Lede, CtaLink } from '../components/Typography';
 import { useAppConfig } from '../contexts/AppConfigContext';
+
+// Local copy of commonMdxComponents to avoid external dependencies
+const localMdxComponents = {
+  Link,
+  Lede,
+  CtaLink,
+};
 
 type TestMdxPageProps = {
   mdxSource: any;
@@ -16,7 +24,7 @@ export default function TestMdxPage({ mdxSource }: TestMdxPageProps) {
 
   console.log('=== TEST MDX COMPONENT RENDER ===');
   console.log('MDX source received:', !!mdxSource);
-  console.log('Common MDX components:', Object.keys(commonMdxComponents));
+  console.log('Local MDX components:', Object.keys(localMdxComponents));
   console.log('=== END TEST MDX DEBUG ===');
 
   return (
@@ -26,7 +34,7 @@ export default function TestMdxPage({ mdxSource }: TestMdxPageProps) {
       </Head>
 
       <h1>Test MDX Page</h1>
-      <MDXRemote {...mdxSource} components={commonMdxComponents} />
+      <MDXRemote {...mdxSource} components={localMdxComponents} />
     </>
   );
 }
