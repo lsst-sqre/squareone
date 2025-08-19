@@ -14,6 +14,11 @@ export function SentryProvider({ children }: SentryProviderProps) {
   const config = useAppConfig();
 
   useEffect(() => {
+    // Check if Sentry is already initialized to prevent multiple instances
+    if (Sentry.getClient()) {
+      return;
+    }
+
     // Initialize Sentry with configuration from AppConfig
     Sentry.init({
       dsn: config.sentryDsn,
