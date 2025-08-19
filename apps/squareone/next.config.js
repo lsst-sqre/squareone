@@ -51,7 +51,6 @@ module.exports = (phase, { defaultConfig }) => {
     ...defaultConfig,
     experimental: {
       instrumentationHook: true,
-      // esmExternals: 'loose',
     },
     publicRuntimeConfig: { sentryDsn, ...publicYamlConfig },
     serverRuntimeConfig: { sentryDsn, ...serverYamlConfig },
