@@ -13,7 +13,14 @@
   },
   "babel": {
     "presets": [
-      "next/babel"
+      [
+        "next/babel",
+        {
+          "preset-env": {
+            "modules": false
+          }
+        }
+      ]
     ],
     "plugins": [
       [
