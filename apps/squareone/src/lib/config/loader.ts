@@ -6,6 +6,17 @@ const yaml = require('js-yaml');
 const Ajv = require('ajv');
 // Removed serialize - now handled in individual page getServerSideProps
 
+// Caching for production optimization
+// In production, config and content files are read once and cached
+// In development, caching can be disabled for easier content editing
+const ENABLE_CACHING =
+  process.env.NODE_ENV === 'production' ||
+  process.env.SQUAREONE_ENABLE_CACHING === 'true';
+
+// Module-level caches
+let cachedAppConfig: AppConfig | null = null;
+const mdxContentCache = new Map<string, string>();
+
 export interface AppConfig {
   siteName: string;
   baseUrl: string;
@@ -79,6 +90,12 @@ function readServerYamlConfig(): any {
 }
 
 export async function loadAppConfig(): Promise<AppConfig> {
+  // Return cached config if available and caching is enabled
+  if (ENABLE_CACHING && cachedAppConfig) {
+    return cachedAppConfig;
+  }
+
+  console.log('Loading app configuration from filesystem...');
   const publicConfig = readPublicYamlConfig();
   const serverConfig = readServerYamlConfig();
   const sentryDsn = process.env.SENTRY_DSN;
@@ -92,6 +109,12 @@ export async function loadAppConfig(): Promise<AppConfig> {
   // Only add sentryDsn if it's defined (avoid Next.js serialization issues with undefined)
   if (sentryDsn) {
     config.sentryDsn = sentryDsn;
+  }
+
+  // Cache the config if caching is enabled
+  if (ENABLE_CACHING) {
+    cachedAppConfig = config;
+    console.log('App configuration cached for subsequent requests');
   }
 
   return config;
@@ -113,11 +136,20 @@ export async function loadMdxContent(
 
   const fullPath = path.join(mdxDir, contentPath);
 
+  // Create cache key based on the full path
+  const cacheKey = fullPath;
+
+  // Return cached content if available and caching is enabled
+  if (ENABLE_CACHING && mdxContentCache.has(cacheKey)) {
+    return mdxContentCache.get(cacheKey)!;
+  }
+
   // Validate file exists before reading
   if (!fs.existsSync(fullPath)) {
     throw new Error(`MDX file not found: ${fullPath}`);
   }
 
+  console.log('Loading MDX content from filesystem:', fullPath);
   const fileContents = fs.readFileSync(fullPath, 'utf8');
 
   console.log('=== MDX LOADER DEBUG ===');
@@ -125,6 +157,12 @@ export async function loadMdxContent(
   console.log('File contents length:', fileContents.length);
   console.log('File contents preview:', fileContents.substring(0, 200) + '...');
   console.log('=== END MDX LOADER DEBUG ===');
+
+  // Cache the content if caching is enabled
+  if (ENABLE_CACHING) {
+    mdxContentCache.set(cacheKey, fileContents);
+    console.log('MDX content cached for subsequent requests:', contentPath);
+  }
 
   // Return raw MDX content - serialization will be done in getServerSideProps
   return fileContents;
