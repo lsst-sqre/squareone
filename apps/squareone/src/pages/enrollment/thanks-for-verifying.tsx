@@ -56,7 +56,7 @@ export const getServerSideProps: GetServerSideProps<
   try {
     // Load config and raw MDX content
     const { config: appConfig, mdxContent } = await loadConfigAndMdx(
-      'enrollment/thanks-for-verifying.mdx'
+      'enrollment__thanks-for-verifying.mdx'
     );
 
     // Serialize MDX content directly in getServerSideProps using ES import
