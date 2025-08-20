@@ -1,4 +1,5 @@
 // Storybook configuration for component testing
+import React from 'react';
 import type { Preview } from '@storybook/react';
 import { AppConfigProvider } from '../src/contexts/AppConfigContext';
 
