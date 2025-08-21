@@ -2,4 +2,4 @@
 '@lsst-sqre/squared': minor
 ---
 
-Fixed PrimaryNavigation structure due to Next 13 migration with the legacy link component.
+Fixed PrimaryNavigation DOM structure for Next.js 13+ compatibility and improved accessibility.
