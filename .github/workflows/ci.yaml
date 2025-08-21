@@ -87,18 +87,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+        with:
+          fetch-depth: 0 # full depth for sitemap timestamps
+      - uses: astral-sh/setup-uv@v6
         with:
           python-version: '3.13'
 
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip nox
-
       - name: Build documentation
-        run: nox -s docs
+        run: uv run noxfile.py -s docs
 
       - name: Upload documentation
         uses: lsst-sqre/ltd-upload@v1
