@@ -6,7 +6,10 @@ import { TimesSquareUrlParametersContext } from '../components/TimesSquareUrlPar
 type TimesSquarePageData = {
   title: string;
   parameters: any;
-  description: string;
+  description: {
+    html: string;
+    gfm: string;
+  };
   html_url: string;
   html_status_url: string;
   html_events_url: string;
@@ -31,7 +34,10 @@ type UseTimesSquarePageReturn = {
   loading: boolean;
   title: string | null;
   parameters: any | null;
-  description: string | null;
+  description: {
+    html: string;
+    gfm: string;
+  } | null;
   htmlUrl: string | null;
   htmlStatusUrl: string | null;
   htmlEventsUrl: string | null;

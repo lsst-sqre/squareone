@@ -59,7 +59,7 @@ export default function TimesSquareGitHubPagePanelClient() {
       <div>
         <PageTitle>{title}</PageTitle>
         {description && (
-          <div dangerouslySetInnerHTML={{ __html: description }}></div>
+          <div dangerouslySetInnerHTML={{ __html: description.html }}></div>
         )}
         <GitHubEditLink
           owner={pageData.github.owner}
