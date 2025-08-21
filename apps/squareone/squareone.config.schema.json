@@ -34,7 +34,7 @@
       "type": "string",
       "default": "https://rsp.lsst.io",
       "title": "Base URL for the user documentation site.",
-      "description": "Used for computing URLs for user documentation pages for this RSP instance. The default is for the public RSP. For USDF, use `https://rsp.lsst.io/v/usdfprod`. Does not end in /."
+      "description": "Used for computing URLs for user documentation pages for this RSP instance. The default is for the public RSP. For USDF, use ``https://rsp.lsst.io/v/usdfprod``. Does not end in /."
     },
     "semaphoreUrl": {
       "type": "string",
