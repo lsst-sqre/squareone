@@ -6,23 +6,23 @@ Squareone supports COmanage Registry by providing pages that can be configured a
 
 .. mermaid:: comanage-flow.mmd
 
-The content for each page is configurable through :doc:`squareone.config.yaml <config-ref>`, and is :doc:`written as MDX <writing-mdx>`.
+The content for each page is :doc:`written as MDX <writing-mdx>` and loaded from MDX files at paths relative to the ``mdxDir`` configuration (defaults to ``src/content/pages`` in development).
 
 .. list-table::
    :header-rows: 1
 
    * - URL
-     - Content config
+     - MDX file path
      - Purpose
    * - ``/enrollment/thanks-for-signing-up``
-     - ``verifyEmailPageMdx``
+     - ``enrollment__thanks-for-signing-up.mdx``
      - Direct user to verify email receipt
    * - ``/enrollment/thanks-for-verifying``
-     - ``emailVerifiedPageMdx``
+     - ``enrollment__thanks-for-verifying.mdx``
      - Email verified, approval pending.
    * - ``/enrollment/pending-confirmation``
-     - ``pendingVerificationPageMdx``
+     - ``enrollment__pending-confirmation.mdx``
      - Email still pending verification.
    * - ``/enrollment/pending-approval``
-     - ``pendingApprovalPageMdx``
+     - ``enrollment__pending-approval.mdx``
      - Email verified, approval still pending.
