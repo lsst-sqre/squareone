@@ -8,6 +8,10 @@ import { fetchEventSource } from '@microsoft/fetch-event-source';
 
 import useTimesSquarePage from '../../hooks/useTimesSquarePage';
 import { TimesSquareUrlParametersContext } from '../TimesSquareUrlParametersProvider';
+import {
+  TimesSquareHtmlEventsContext,
+  type TimesSquareHtmlEventsContextValue,
+} from './TimesSquareHtmlEventsProvider';
 
 type HtmlEvent = {
   date_submitted: string;
@@ -19,23 +23,9 @@ type HtmlEvent = {
   html_url: string;
 };
 
-type TimesSquareHtmlEventsContextValue = {
-  dateSubmitted: string | null;
-  dateStarted: string | null;
-  dateFinished: string | null;
-  executionStatus: string | null;
-  executionDuration: number | null;
-  htmlHash: string | null;
-  htmlUrl: string | null;
-};
-
 type TimesSquareHtmlEventsProviderClientProps = {
   children: React.ReactNode;
 };
-
-export const TimesSquareHtmlEventsContext = React.createContext<
-  TimesSquareHtmlEventsContextValue | undefined
->(undefined);
 
 export default function TimesSquareHtmlEventsProviderClient({
   children,
@@ -106,15 +96,18 @@ export default function TimesSquareHtmlEventsProviderClient({
     };
   }, [fullHtmlEventsUrl, htmlEventsUrl, isClient]);
 
-  const contextValue: TimesSquareHtmlEventsContextValue = {
-    dateSubmitted: htmlEvent ? htmlEvent.date_submitted : null,
-    dateStarted: htmlEvent ? htmlEvent.date_started : null,
-    dateFinished: htmlEvent ? htmlEvent.date_finished : null,
-    executionStatus: htmlEvent ? htmlEvent.execution_status : null,
-    executionDuration: htmlEvent ? htmlEvent.execution_duration : null,
-    htmlHash: htmlEvent ? htmlEvent.html_hash : null,
-    htmlUrl: htmlEvent ? htmlEvent.html_url : null,
-  };
+  const contextValue = React.useMemo(
+    (): TimesSquareHtmlEventsContextValue => ({
+      dateSubmitted: htmlEvent ? htmlEvent.date_submitted : null,
+      dateStarted: htmlEvent ? htmlEvent.date_started : null,
+      dateFinished: htmlEvent ? htmlEvent.date_finished : null,
+      executionStatus: htmlEvent ? htmlEvent.execution_status : null,
+      executionDuration: htmlEvent ? htmlEvent.execution_duration : null,
+      htmlHash: htmlEvent ? htmlEvent.html_hash : null,
+      htmlUrl: htmlEvent ? htmlEvent.html_url : null,
+    }),
+    [htmlEvent]
+  );
 
   return (
     <TimesSquareHtmlEventsContext.Provider value={contextValue}>

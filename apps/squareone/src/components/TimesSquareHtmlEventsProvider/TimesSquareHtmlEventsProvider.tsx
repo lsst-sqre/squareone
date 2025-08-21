@@ -11,7 +11,7 @@ type TimesSquareHtmlEventsProviderProps = {
 };
 
 // Create a default context for SSR fallback
-type TimesSquareHtmlEventsContextValue = {
+export type TimesSquareHtmlEventsContextValue = {
   dateSubmitted: string | null;
   dateStarted: string | null;
   dateFinished: string | null;
