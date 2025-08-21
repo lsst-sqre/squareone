@@ -114,7 +114,7 @@ export async function loadAppConfig(): Promise<AppConfig> {
   // Cache the config if caching is enabled
   if (ENABLE_CACHING) {
     cachedAppConfig = config;
-    console.log('App configuration cached for subsequent requests');
+    console.log('App configuration cached');
   }
 
   return config;
@@ -152,16 +152,10 @@ export async function loadMdxContent(
   console.log('Loading MDX content from filesystem:', fullPath);
   const fileContents = fs.readFileSync(fullPath, 'utf8');
 
-  console.log('=== MDX LOADER DEBUG ===');
-  console.log('MDX file path:', fullPath);
-  console.log('File contents length:', fileContents.length);
-  console.log('File contents preview:', fileContents.substring(0, 200) + '...');
-  console.log('=== END MDX LOADER DEBUG ===');
-
   // Cache the content if caching is enabled
   if (ENABLE_CACHING) {
     mdxContentCache.set(cacheKey, fileContents);
-    console.log('MDX content cached for subsequent requests:', contentPath);
+    console.log('MDX content cached', contentPath);
   }
 
   // Return raw MDX content - serialization will be done in getServerSideProps
