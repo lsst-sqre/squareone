@@ -46,8 +46,6 @@ export const getServerSideProps: GetServerSideProps<LogoutProps> = async () => {
       },
     };
   } catch (error) {
-    console.error('Failed to load configuration for logout page:', error);
-
     // Return a fallback config if loading fails
     const fallbackConfig: AppConfigContextValue = {
       siteName: 'Rubin Science Platform',

@@ -66,8 +66,6 @@ export const getServerSideProps: GetServerSideProps<
       },
     };
   } catch (error) {
-    console.error('Failed to load API aspect page content:', error);
-
     // Fallback: load config only and provide default content
     const { loadAppConfig } = await import('../lib/config/loader');
 

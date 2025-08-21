@@ -65,9 +65,6 @@ export const getServerSideProps: GetServerSideProps<
       },
     };
   } catch (error) {
-    console.error('Failed to load terms page configuration:', error);
-
-    // This should not happen in normal operation, but provide basic fallback
     throw error;
   }
 };

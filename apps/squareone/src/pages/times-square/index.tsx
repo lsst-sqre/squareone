@@ -137,8 +137,6 @@ export const getServerSideProps: GetServerSideProps<
       },
     };
   } catch (error) {
-    console.error('Failed to load configuration for Times Square home:', error);
-
     // Return 404 if configuration loading fails
     return {
       notFound: true,

@@ -38,9 +38,6 @@ export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
       },
     };
   } catch (error) {
-    console.error('Failed to load home page configuration:', error);
-
-    // This should not happen in normal operation, but provide basic fallback
     throw error;
   }
 };

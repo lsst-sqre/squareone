@@ -116,11 +116,6 @@ type DocsPageProps = {
 export default function DocsPage({ mdxSource }: DocsPageProps) {
   const appConfig = useAppConfig();
 
-  console.log('=== DOCS COMPONENT RENDER ===');
-  console.log('MDX source received:', !!mdxSource);
-  console.log('MDX components available:', Object.keys(mdxComponents));
-  console.log('App config available:', !!appConfig);
-
   // Check for specific components that might be undefined
   const problematicComponents = Object.entries(mdxComponents).filter(
     ([key, comp]) => !comp
@@ -131,8 +126,6 @@ export default function DocsPage({ mdxSource }: DocsPageProps) {
       problematicComponents.map(([key]) => key)
     );
   }
-
-  console.log('=== END DOCS COMPONENT DEBUG ===');
 
   return (
     <>
@@ -160,33 +153,13 @@ export const getServerSideProps: GetServerSideProps<
   DocsPageProps
 > = async () => {
   try {
-    console.log('=== DOCS PAGE DEBUG (Production) ===');
-    console.log('Environment:', process.env.NODE_ENV);
-    console.log('Loading config and MDX...');
-
     // Load config and raw MDX content
     const { config: appConfig, mdxContent } = await loadConfigAndMdx(
       'docs.mdx'
     );
 
-    console.log('Config loaded successfully:', !!appConfig);
-    console.log('Config siteName:', appConfig?.siteName);
-    console.log('Raw MDX content loaded:', !!mdxContent);
-    console.log('MDX content length:', mdxContent.length);
-
     // Serialize MDX content directly in getServerSideProps using ES import
-    console.log('Serializing MDX content...');
     const mdxSource = await serialize(mdxContent);
-
-    console.log('MDX source serialized:', !!mdxSource);
-    console.log('MDX source type:', typeof mdxSource);
-    console.log('MDX source keys:', Object.keys(mdxSource || {}));
-    console.log(
-      'MDX compiledSource length:',
-      mdxSource?.compiledSource?.length || 0
-    );
-    console.log('MDX scope keys:', Object.keys(mdxSource?.scope || {}));
-    console.log('=== END DOCS DEBUG ===');
 
     return {
       props: {
@@ -195,8 +168,6 @@ export const getServerSideProps: GetServerSideProps<
       },
     };
   } catch (error) {
-    console.error('Failed to load docs page content:', error);
-
     // Fallback: load config only and provide default content
     const { loadAppConfig } = await import('../lib/config/loader');
 

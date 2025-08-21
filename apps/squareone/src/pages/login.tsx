@@ -76,8 +76,6 @@ export const getServerSideProps: GetServerSideProps<LoginProps> = async () => {
       },
     };
   } catch (error) {
-    console.error('Failed to load configuration for login page:', error);
-
     // Return a fallback config if loading fails
     const fallbackConfig: AppConfigContextValue = {
       siteName: 'Rubin Science Platform',
