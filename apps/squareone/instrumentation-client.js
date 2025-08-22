@@ -1,15 +1,19 @@
 // This file configures client-side instrumentation for Next.js.
-// Use public enviornment variables for this configuration since AppConfig
-// isn't available in this instrumentation hook context.
+// Since Sentry DSN is only available at runtime on the server (from Kubernetes
+// ConfigMaps), we can't use NEXT_PUBLIC_ environment variables which are set
+// at build time. Instead, _document.tsx loads the server configuration and
+// injects it into the browser as window.__SENTRY_CONFIG__ for client-side use.
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from '@sentry/nextjs';
 
-Sentry.init({
-  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+// Get configuration injected by _document.tsx from server-side AppConfig
+const config = typeof window !== 'undefined' ? window.__SENTRY_CONFIG__ : {};
 
-  environment:
-    process.env.NEXT_PUBLIC_SQUAREONE_ENVIRONMENT_NAME || 'development',
+Sentry.init({
+  dsn: config.dsn || undefined,
+
+  environment: config.environment || 'development',
 
   // Add optional integrations for additional features
   integrations: [Sentry.replayIntegration()],
@@ -18,23 +22,17 @@ Sentry.init({
   // environment. By default, only requests to 'localhost' and requests that
   // start with '/' have trace headers added. Many of our requests to external
   // services use the fully qualified URL.
-  tracePropagationTargets: [process.env.NEXT_PUBLIC_SQUAREONE_BASE_URL || ''],
+  tracePropagationTargets: [config.baseUrl || ''],
 
   // Define how likely traces are sampled. Adjust this value in production, or
   // use tracesSampler for greater control.
-  tracesSampleRate: parseFloat(
-    process.env.NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE || '0'
-  ),
+  tracesSampleRate: config.tracesSampleRate || 0,
 
   // Define how likely Replay events are sampled.
-  replaysSessionSampleRate: parseFloat(
-    process.env.NEXT_PUBLIC_SENTRY_REPLAYS_SESSION_SAMPLE_RATE || '0'
-  ),
+  replaysSessionSampleRate: config.replaysSessionSampleRate || 0,
 
   // Define how likely Replay events are sampled when an error occurs.
-  replaysOnErrorSampleRate: parseFloat(
-    process.env.NEXT_PUBLIC_SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE || '1.0'
-  ),
+  replaysOnErrorSampleRate: config.replaysOnErrorSampleRate || 1.0,
 
   // Setting this option to true will print useful information to the console
   // while you're setting up Sentry.
