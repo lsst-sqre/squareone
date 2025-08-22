@@ -62,3 +62,6 @@ venv/
 
 # Typescript
 *.tsbuildinfo
+
+# Per project env settings for development
+apps/squareone/.env
