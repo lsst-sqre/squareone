@@ -1,5 +1,11 @@
 # @lsst-sqre/tsconfig
 
+## 0.3.0
+
+### Minor Changes
+
+- [#197](https://github.com/lsst-sqre/squareone/pull/197) [`410c0329d2915b61763937977dd9e3a5c7a5e60c`](https://github.com/lsst-sqre/squareone/commit/410c0329d2915b61763937977dd9e3a5c7a5e60c) Thanks [@jonathansick](https://github.com/jonathansick)! - Updated TypeScript target from ES5 to ES2017 for compatibility with React 18 and Next.js 14+.
+
 ## 0.2.0
 
 ### Minor Changes

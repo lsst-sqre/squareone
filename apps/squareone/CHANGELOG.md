@@ -1,5 +1,32 @@
 # squareone
 
+## 0.24.0
+
+### Minor Changes
+
+- [#197](https://github.com/lsst-sqre/squareone/pull/197) [`410c0329d2915b61763937977dd9e3a5c7a5e60c`](https://github.com/lsst-sqre/squareone/commit/410c0329d2915b61763937977dd9e3a5c7a5e60c) Thanks [@jonathansick](https://github.com/jonathansick)! - MDX content is now sourced from individual files, rather than as keys in the app configuration. The files are named after the page they correspond to. The MDX content directory is flat, with `__` standing in for a path separator. The directory that MDX is sourced from is configured via the mdxDir field in the configuration YAML.
+
+- [#197](https://github.com/lsst-sqre/squareone/pull/197) [`410c0329d2915b61763937977dd9e3a5c7a5e60c`](https://github.com/lsst-sqre/squareone/commit/410c0329d2915b61763937977dd9e3a5c7a5e60c) Thanks [@jonathansick](https://github.com/jonathansick)! - Replaced next/config and getInitialProps with AppConfigContext that is loaded from getServerSideProps. Individual components can now access configuration from the useAppConfig hook.
+
+  - Moved the client-side Sentry configuration to `_app.tsx` so that it can use the AppConfigContext. Previously it was loaded directly in the `instrumentation-client.js` hook that didn't have access to the app configuration.
+
+- [#197](https://github.com/lsst-sqre/squareone/pull/197) [`c92f852908b16a8b429d9b616dfdcbb759de99ce`](https://github.com/lsst-sqre/squareone/commit/c92f852908b16a8b429d9b616dfdcbb759de99ce) Thanks [@jonathansick](https://github.com/jonathansick)! - Migrated Squareone to Typescript and Next.js 14!
+
+  - Adopted the SWC compiler, replacing Babel, for improved performance and compatibility. This change preserves ES modules.
+  - Updated TypeScript target to ES2017 and enabled strict type checking.
+  - Updated SWR to v2.3.6.
+  - Updated next-mdx-remote to v5.
+
+- [#197](https://github.com/lsst-sqre/squareone/pull/197) [`410c0329d2915b61763937977dd9e3a5c7a5e60c`](https://github.com/lsst-sqre/squareone/commit/410c0329d2915b61763937977dd9e3a5c7a5e60c) Thanks [@jonathansick](https://github.com/jonathansick)! - Resolved server-side rendering (SSR) issues that were exposed by the TypeScript migration and new tree shaking:
+
+  - Improved next-mdx-remote usage by ensuring that the `serialize` function is called from `getServerSideProps`.
+  - Improved swr usage by segreagating it into client-side components that are dynamically imported.
+
+### Patch Changes
+
+- Updated dependencies [[`2b7c98f0bd660714e7f0c50635277664723f4fd5`](https://github.com/lsst-sqre/squareone/commit/2b7c98f0bd660714e7f0c50635277664723f4fd5), [`2b7c98f0bd660714e7f0c50635277664723f4fd5`](https://github.com/lsst-sqre/squareone/commit/2b7c98f0bd660714e7f0c50635277664723f4fd5)]:
+  - @lsst-sqre/squared@0.7.0
+
 ## 0.23.0
 
 ### Minor Changes
