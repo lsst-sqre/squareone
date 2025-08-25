@@ -3,14 +3,14 @@ import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { IconPrefix, IconName } from '@fortawesome/fontawesome-svg-core';
 
-export interface IconPillProps {
+export type IconPillProps = {
   text: string;
   url: string;
   icon: [IconPrefix, IconName];
   backgroundColor?: string;
   hoverBackgroundColor?: string;
   textColor?: string;
-}
+};
 
 const PillContainer = styled.span<{
   $backgroundColor: string;
@@ -58,14 +58,14 @@ const StyledFontAwesomeIcon = styled(FontAwesomeIcon)`
  * @param {string} [props.textColor='#ffffff'] - The color of the text and icon
  * @returns {JSX.Element} A pill-shaped button containing an icon and text that links to a URL
  */
-export const IconPill: React.FC<IconPillProps> = ({
+export const IconPill = ({
   icon,
   text,
   url,
   backgroundColor = 'var(--sqo-primary-button-background-color)',
   hoverBackgroundColor = 'var(--sqo-primary-button-background-color-hover)',
   textColor = '#ffffff',
-}) => {
+}: IconPillProps) => {
   return (
     <PillContainer
       $textColor={textColor}

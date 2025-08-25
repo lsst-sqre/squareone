@@ -11,19 +11,6 @@
     "storybook": "storybook dev -p 6007",
     "build-storybook": "storybook build"
   },
-  "babel": {
-    "presets": [
-      "next/babel"
-    ],
-    "plugins": [
-      [
-        "styled-components",
-        {
-          "ssr": true
-        }
-      ]
-    ]
-  },
   "eslintConfig": {
     "extends": [
       "next/core-web-vitals",
@@ -32,7 +19,8 @@
     ],
     "rules": {
       "import/no-anonymous-default-export": "off",
-      "react/no-unescaped-entities": "off"
+      "react/no-unescaped-entities": "off",
+      "react/prop-types": "off"
     }
   },
   "dependencies": {
@@ -51,11 +39,10 @@
     "date-fns": "^3.6.0",
     "formik": "^2.2.9",
     "js-yaml": "^4.1.0",
-    "next": "^13.5.11",
-    "next-mdx-remote": "^4.4.1",
+    "next": "^14.2.31",
+    "next-mdx-remote": "^5.0.0",
     "next-plausible": "^3.12.1",
     "next-themes": "^0.2.0",
-    "prop-types": "^15.8.1",
     "react": "^18.3.1",
     "react-a11y-disclosure": "^0.2.0",
     "react-dom": "^18.3.1",
@@ -63,10 +50,9 @@
     "remark-gfm": "^3.0.1",
     "remark-html": "^15.0.1",
     "styled-components": "^6.1.19",
-    "swr": "^1.3.0"
+    "swr": "^2.3.6"
   },
   "devDependencies": {
-    "@babel/core": "^7.22.0",
     "@lsst-sqre/tsconfig": "workspace:*",
     "@storybook/addon-a11y": "^7.1.1",
     "@storybook/addon-actions": "^7.1.1",
@@ -77,15 +63,15 @@
     "@storybook/nextjs": "^7.1.1",
     "@storybook/react": "^7.6.20",
     "@storybook/testing-library": "^0.2.0",
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^24.0.1",
     "@types/react": "^18.3.23",
     "@types/react-dom": "^18.3.7",
     "@types/styled-components": "^5.1.34",
     "babel-loader": "^9.1.2",
-    "babel-plugin-styled-components": "^2.0.7",
     "chromatic": "^6.17.1",
     "eslint": "^8.35.0",
-    "eslint-config-next": "^13.5.11",
+    "eslint-config-next": "^14.2.31",
     "eslint-config-prettier": "^8.6.0",
     "eslint-plugin-storybook": "^0.6.13",
     "storybook": "^7.1.1",

@@ -1,16 +1,19 @@
-// This file configures the initialization of Sentry on the client.
-// The config you add here will be used whenever a users loads a page in their browser.
+// This file configures client-side instrumentation for Next.js.
+// Since Sentry DSN is only available at runtime on the server (from Kubernetes
+// ConfigMaps), we can't use NEXT_PUBLIC_ environment variables which are set
+// at build time. Instead, _document.tsx loads the server configuration and
+// injects it into the browser as window.__SENTRY_CONFIG__ for client-side use.
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from '@sentry/nextjs';
-import getConfig from 'next/config';
 
-const { publicRuntimeConfig } = getConfig();
+// Get configuration injected by _document.tsx from server-side AppConfig
+const config = typeof window !== 'undefined' ? window.__SENTRY_CONFIG__ : {};
 
 Sentry.init({
-  dsn: publicRuntimeConfig.sentryDsn,
+  dsn: config.dsn || undefined,
 
-  environment: publicRuntimeConfig.environmentName,
+  environment: config.environment || 'development',
 
   // Add optional integrations for additional features
   integrations: [Sentry.replayIntegration()],
@@ -19,18 +22,17 @@ Sentry.init({
   // environment. By default, only requests to 'localhost' and requests that
   // start with '/' have trace headers added. Many of our requests to external
   // services use the fully qualified URL.
-  // https://docs.sentry.io/platforms/javascript/tracing/instrumentation/automatic-instrumentation/#tracepropagationtargets
-  tracePropagationTargets: [publicRuntimeConfig.baseUrl],
+  tracePropagationTargets: [config.baseUrl || ''],
 
   // Define how likely traces are sampled. Adjust this value in production, or
   // use tracesSampler for greater control.
-  tracesSampleRate: publicRuntimeConfig.sentryTracesSampleRate,
+  tracesSampleRate: config.tracesSampleRate || 0,
 
   // Define how likely Replay events are sampled.
-  replaysSessionSampleRate: publicRuntimeConfig.sentryReplaysSessionSampleRate,
+  replaysSessionSampleRate: config.replaysSessionSampleRate || 0,
 
   // Define how likely Replay events are sampled when an error occurs.
-  replaysOnErrorSampleRate: publicRuntimeConfig.sentryReplaysOnErrorSampleRate,
+  replaysOnErrorSampleRate: config.replaysOnErrorSampleRate || 1.0,
 
   // Setting this option to true will print useful information to the console
   // while you're setting up Sentry.

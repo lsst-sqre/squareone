@@ -2,43 +2,43 @@
 Writing content in MDX
 ######################
 
-Content on Squareone's pages can be customized through :file:`squareone.config.yaml` (via Kubernetes ConfigMap and Helm values).
-This content is primarily written in MDX_, which is a Markdown that's enriched with React components.
+Content on Squareone's pages is written in MDX_ files, which are Markdown files enriched with React components.
 This page explains how to write MDX_ and what components you can use in your page content.
 
-.. tip::
+MDX files
+=========
 
-   In the ``squareone.config.yaml`` configuration file, any field that ends with ``Mdx`` can be written in MDX.
-   See :doc:`config-ref` for a listing of fields in the :file:`squareone.config.yaml` file.
+Path structure
+--------------
+
+The MDX files are located in a directory specified by the ``mdxDir`` configuration key (defaults to ``src/content/pages`` in development).
+
+MDX files are named after the page path, using ``__`` as a directory separator.
+For example, the page at ``/enrollment/pending-approval`` corresponds to the MDX file ``enrollment__pending-approval.mdx``.
 
 An example
-==========
+----------
 
-Here's an example of a typical MDX-formatted configuration field, ``pendingVerificationPageMdx``:
+Here's an example of a typical MDX file, ``enrollment__pending-confirmation.mdx``:
 
-.. code-block:: yaml
-   :caption: squareone.config.yaml
+.. code-block:: markdown
+   :caption: enrollment__pending-confirmation.mdx
 
-   pendingVerificationPageMdx: |
-     # Please confirm your email
-   
-     <Lede>Your email is still pending verification.</Lede>
-   
-     To complete your enrollment please check the email you registered with
-     for a link to verify your email address. Please click on the link to
-     verify your email address.
-   
-     If you have not received the confirmation email please check your SPAM folder.
-   
-     If you still cannot find the confirmation email please 
-     <Link href="../support"><a>contact us</a></Link> to have the confirmation
-     email resent.
+   # Please confirm your email
 
-Here are some things to notice:
+   <Lede>Your email is still pending verification.</Lede>
 
-- When writing multi-line markdown in YAML (either directly in :file:`squareone.conf.yaml` or in a Helm values file), it's convenient to use the ``|`` syntax to include a text block while preserving line breaks.
-- Standard Markdown syntax is permitted and you're encouraged to use it for headings, links, lists, and so on.
-- You can wrap content in React components to for specialized typography and interactivity.
+   To complete your enrollment please check the email you registered with
+   for a link to verify your email address. Please click on the link to
+   verify your email address.
+
+   If you have not received the confirmation email please check your SPAM folder.
+
+   If you still cannot find the confirmation email please
+   <Link href="../support">contact us</Link> to have the confirmation
+   email resent.
+
+The sections below describe the Markdown syntax and React components you can use in MDX files.
 
 Markdown syntax
 ===============
