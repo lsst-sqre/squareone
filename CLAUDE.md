@@ -61,7 +61,7 @@ This is a **monorepo** for Rubin Observatory front-end applications managed with
 - **MDX content** loaded from filesystem (`src/content/pages/` in development, configurable via `mdxDir`)
 - Server-side rendering with styled-components
 - Gafaelfawr integration for authentication
-- Sentry integration for error tracking
+- Sentry integration for error tracking (see Sentry Configuration section below)
 - Plausible analytics integration
 
 ### React Component Architecture
@@ -99,6 +99,11 @@ The squareone app uses a filesystem-based configuration system that replaces `ne
 - **Client-side**: Use `useAppConfig()` hook from `src/contexts/AppConfigContext.tsx`
 - **Configuration files**: `squareone.config.yaml` (public) and `squareone.serverconfig.yaml` (server-only)
 - **Schema validation**: Ajv-based validation with default values and property removal
+
+#### Sentry configuration loading
+
+- **Server-side** (`sentry.server.config.js`): Sentry configuration is loaded from environment variables and injected into the AppConfig
+- **Client-side** (`instrumentation-client.js`): Sentry configuration is injected into the browser via `window.__SENTRY_CONFIG__` in `_document.tsx`. This requires that pages implement `getServerSideProps` to enable configuration injection. Statically rendered pages get the default configuration which disables client-side Sentry reporting.
 
 #### Page Pattern
 
@@ -180,7 +185,6 @@ function MyComponent() {
 ### General Development
 
 - Use TypeScript for new components in the squared package
-- JavaScript is acceptable for Next.js pages in the squareone app (existing pattern)
 - Follow existing import patterns: external libraries first, internal packages, then relative imports
 - Always check existing components for patterns before creating new ones
 - MDX content is loaded from filesystem, configured via `mdxDir` setting
