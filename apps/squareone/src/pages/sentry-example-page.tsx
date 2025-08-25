@@ -1,6 +1,9 @@
 import Head from 'next/head';
 import * as Sentry from '@sentry/nextjs';
 import type { MouseEvent } from 'react';
+import type { GetServerSideProps } from 'next';
+import { loadAppConfig } from '../lib/config/loader';
+import type { AppConfigContextValue } from '../contexts/AppConfigContext';
 
 export default function Page() {
   return (
@@ -82,3 +85,12 @@ export default function Page() {
     </div>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const appConfig = await loadAppConfig();
+  return {
+    props: {
+      appConfig,
+    },
+  };
+};
