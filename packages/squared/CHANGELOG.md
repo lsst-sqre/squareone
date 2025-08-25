@@ -1,5 +1,13 @@
 # @lsst-sqre/squared
 
+## 0.7.0
+
+### Minor Changes
+
+- [#197](https://github.com/lsst-sqre/squareone/pull/197) [`2b7c98f0bd660714e7f0c50635277664723f4fd5`](https://github.com/lsst-sqre/squareone/commit/2b7c98f0bd660714e7f0c50635277664723f4fd5) Thanks [@jonathansick](https://github.com/jonathansick)! - Fixed PrimaryNavigation DOM structure for Next.js 13+ compatibility and improved accessibility.
+
+- [#197](https://github.com/lsst-sqre/squareone/pull/197) [`2b7c98f0bd660714e7f0c50635277664723f4fd5`](https://github.com/lsst-sqre/squareone/commit/2b7c98f0bd660714e7f0c50635277664723f4fd5) Thanks [@jonathansick](https://github.com/jonathansick)! - Changed typing style to use `type` rather than `interface` for consistency.
+
 ## 0.6.0
 
 ### Minor Changes
