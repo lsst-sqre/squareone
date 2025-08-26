@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { rest } from 'msw';
 import { SWRConfig } from 'swr';
 import { within, userEvent, screen } from '@storybook/testing-library';

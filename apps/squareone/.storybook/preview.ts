@@ -1,6 +1,6 @@
 // Storybook configuration for component testing
 import React from 'react';
-import type { Preview } from '@storybook/react';
+import type { Preview } from '@storybook/nextjs';
 import { AppConfigProvider } from '../src/contexts/AppConfigContext';
 
 // Load global CSS and icons; same as how _app.js loads these resources.
@@ -46,6 +46,7 @@ const preview: Preview = {
       },
     },
   },
+
   decorators: [
     (Story) => (
       <AppConfigProvider config={mockAppConfig}>
@@ -53,6 +54,8 @@ const preview: Preview = {
       </AppConfigProvider>
     ),
   ],
+
+  tags: ['autodocs'],
 };
 
 export default preview;
