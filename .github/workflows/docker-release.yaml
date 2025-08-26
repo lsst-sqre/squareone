@@ -6,6 +6,7 @@ name: Docker release
 
 jobs:
   release-squareone:
+    timeout-minutes: 25
     name: Release Squareone image
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/squareone')

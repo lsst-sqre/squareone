@@ -61,7 +61,7 @@ jobs:
   build-squareone:
     needs:
       - test
-    timeout-minutes: 15
+    timeout-minutes: 25
     if: >
       startsWith(github.ref, 'refs/tags/') || startsWith(github.head_ref, 'tickets/')
 
