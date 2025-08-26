@@ -4,9 +4,6 @@
 module.exports = (phase, { defaultConfig }) => {
   const config = {
     ...defaultConfig,
-    experimental: {
-      instrumentationHook: true,
-    },
     compiler: {
       styledComponents: true,
     },
