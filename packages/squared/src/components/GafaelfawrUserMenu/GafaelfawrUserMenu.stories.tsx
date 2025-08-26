@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { rest } from 'msw';
+import { http, HttpResponse } from 'msw';
 import { SWRConfig } from 'swr';
-import { within, userEvent, screen } from '@storybook/testing-library';
-import { expect } from '@storybook/jest';
+import { within, userEvent, screen, expect } from '@storybook/test';
 
 import GafaelfawrUserMenu from './GafaelfawrUserMenu';
 
@@ -24,35 +23,33 @@ export default meta;
 type Story = StoryObj<typeof GafaelfawrUserMenu>;
 
 const loggedInAuthHandlers = [
-  rest.get('/auth/api/v1/user-info', (req, res, ctx) => {
-    return res(
-      ctx.json({
-        username: 'someuser',
-        name: 'Alice Example',
-        email: 'alice@example.com',
-        uid: 4123,
-        gid: 4123,
-        groups: [
-          {
-            name: 'g_special_users',
-            id: 123181,
-          },
-        ],
-        quota: {
-          api: {},
-          notebook: {
-            cpu: 4,
-            memory: 16,
-          },
+  http.get('/auth/api/v1/user-info', () => {
+    return HttpResponse.json({
+      username: 'someuser',
+      name: 'Alice Example',
+      email: 'alice@example.com',
+      uid: 4123,
+      gid: 4123,
+      groups: [
+        {
+          name: 'g_special_users',
+          id: 123181,
         },
-      })
-    );
+      ],
+      quota: {
+        api: {},
+        notebook: {
+          cpu: 4,
+          memory: 16,
+        },
+      },
+    });
   }),
 ];
 
 const loggedOutAuthHandlers = [
-  rest.get('/auth/api/v1/user-info', (req, res, ctx) => {
-    return res(ctx.status(401));
+  http.get('/auth/api/v1/user-info', () => {
+    return new HttpResponse(null, { status: 401 });
   }),
 ];
 

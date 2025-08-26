@@ -1,5 +1,5 @@
 import type { Preview } from '@storybook/react-vite';
-import { withThemeByDataAttribute } from '@storybook/addon-styling';
+import { withThemeByDataAttribute } from '@storybook/addon-themes';
 import { initialize, mswLoader } from 'msw-storybook-addon';
 
 // Import font assets and stylesheets with @font-face declarations
