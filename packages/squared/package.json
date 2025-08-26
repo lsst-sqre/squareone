@@ -45,7 +45,6 @@
     "@lsst-sqre/tsconfig": "workspace:*",
     "@storybook/addon-links": "9.1.3",
     "@storybook/addon-onboarding": "9.1.3",
-    "@storybook/addon-styling": "^1.3.5",
     "@storybook/jest": "^0.2.3",
     "@storybook/react-vite": "9.1.3",
     "@storybook/test-runner": "^0.23.0",

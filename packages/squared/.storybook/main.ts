@@ -10,7 +10,6 @@ const config: StorybookConfig = {
 
   addons: [
     getAbsolutePath('@storybook/addon-links'),
-    getAbsolutePath('@storybook/addon-styling'),
     getAbsolutePath('@storybook/addon-onboarding'),
     getAbsolutePath('@storybook/addon-docs'),
   ],
