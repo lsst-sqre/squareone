@@ -1,5 +1,6 @@
 FROM node:22.13.0-alpine AS base
 
+RUN npm install -g corepack@latest  # Ensure latest corepack
 RUN corepack enable
 RUN apk add --no-cache libc6-compat
 RUN apk update
