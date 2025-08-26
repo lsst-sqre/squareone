@@ -54,8 +54,8 @@
     "@storybook/react-vite": "^7.2.1",
     "@storybook/test-runner": "^0.13.0",
     "@storybook/testing-library": "^0.2.0",
-    "@types/react": "^18.3.23",
-    "@types/react-dom": "^18.2.7",
+    "@types/react": "^18.3.24",
+    "@types/react-dom": "^18.3.7",
     "@types/styled-components": "^5.1.26",
     "eslint": "^8.35.0",
     "eslint-plugin-storybook": "^0.6.13",
@@ -64,8 +64,8 @@
     "new-component": "^5.0.2",
     "next": "^13.5.11",
     "storybook": "^7.2.1",
-    "tsup": "^7.2.0",
-    "typescript": "^5.1.6",
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.2",
     "typescript-plugin-css-modules": "^5.0.1"
   },
   "peerDependencies": {
