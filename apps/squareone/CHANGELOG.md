@@ -1,5 +1,67 @@
 # squareone
 
+## 0.25.0
+
+### Minor Changes
+
+- [#200](https://github.com/lsst-sqre/squareone/pull/200) [`279dbcb6352839f434a729cccdd9d12f74cf7eac`](https://github.com/lsst-sqre/squareone/commit/279dbcb6352839f434a729cccdd9d12f74cf7eac) Thanks [@jonathansick](https://github.com/jonathansick)! - Upgrade Next.js to version 15.5.0
+
+  This is a major version upgrade from Next.js 14.x to 15.5.0, which includes:
+
+  - New App Router improvements and features (although Squareone remains on the pages router)
+  - Breaking changes in build system and runtime behavior (turbopack)
+  - Updated instrumentation configuration
+  - Performance improvements
+
+  This upgrade may require configuration updates in consuming applications.
+
+- [#200](https://github.com/lsst-sqre/squareone/pull/200) [`279dbcb6352839f434a729cccdd9d12f74cf7eac`](https://github.com/lsst-sqre/squareone/commit/279dbcb6352839f434a729cccdd9d12f74cf7eac) Thanks [@jonathansick](https://github.com/jonathansick)! - Upgrade Node.js to version 22.13.0 LTS
+
+  Updated the Node.js runtime requirement from 18.x to 22.x LTS, which includes:
+
+  - Latest LTS stability and security improvements
+  - Updated build toolchain and CI environment
+  - Improved performance and new language features
+
+  This change updates the development environment and deployment requirements.
+
+- [#200](https://github.com/lsst-sqre/squareone/pull/200) [`279dbcb6352839f434a729cccdd9d12f74cf7eac`](https://github.com/lsst-sqre/squareone/commit/279dbcb6352839f434a729cccdd9d12f74cf7eac) Thanks [@jonathansick](https://github.com/jonathansick)! - Upgrade React to version 19.1.1
+
+  This is a major version upgrade from React 18.x to React 19.1.1, which includes:
+
+  - New React 19 features and improvements
+  - Updated TypeScript types for React 19
+  - Breaking changes that may affect consumers
+
+  This upgrade requires peer dependency updates in consuming applications.
+
+- [#200](https://github.com/lsst-sqre/squareone/pull/200) [`279dbcb6352839f434a729cccdd9d12f74cf7eac`](https://github.com/lsst-sqre/squareone/commit/279dbcb6352839f434a729cccdd9d12f74cf7eac) Thanks [@jonathansick](https://github.com/jonathansick)! - Upgrade Storybook to version 9.1.3
+
+  This is a major version upgrade from Storybook 7.x to 9.1.3, which includes:
+
+  - New Storybook 9 features and testing capabilities
+  - Updated addon ecosystem and configuration
+  - Breaking changes in story format and testing utilities
+  - Improved performance and build system
+  - Migration from deprecated addons to new alternatives
+
+  This upgrade includes configuration changes and may require story updates in consuming projects.
+
+### Patch Changes
+
+- [#200](https://github.com/lsst-sqre/squareone/pull/200) [`279dbcb6352839f434a729cccdd9d12f74cf7eac`](https://github.com/lsst-sqre/squareone/commit/279dbcb6352839f434a729cccdd9d12f74cf7eac) Thanks [@jonathansick](https://github.com/jonathansick)! - Fix build system and Storybook compatibility issues
+
+  - Fix Turbo build outputs configuration for better caching
+  - Add explicit React imports to Storybook files for CI compatibility
+  - Fix ESLint compatibility with Turbo 2.5.6
+  - Resolve Docker build corepack signature errors
+  - Update build timeouts and pass required environment variables
+
+  These changes improve build reliability and resolve compatibility issues in CI environments.
+
+- Updated dependencies [[`279dbcb6352839f434a729cccdd9d12f74cf7eac`](https://github.com/lsst-sqre/squareone/commit/279dbcb6352839f434a729cccdd9d12f74cf7eac), [`279dbcb6352839f434a729cccdd9d12f74cf7eac`](https://github.com/lsst-sqre/squareone/commit/279dbcb6352839f434a729cccdd9d12f74cf7eac), [`279dbcb6352839f434a729cccdd9d12f74cf7eac`](https://github.com/lsst-sqre/squareone/commit/279dbcb6352839f434a729cccdd9d12f74cf7eac), [`279dbcb6352839f434a729cccdd9d12f74cf7eac`](https://github.com/lsst-sqre/squareone/commit/279dbcb6352839f434a729cccdd9d12f74cf7eac), [`279dbcb6352839f434a729cccdd9d12f74cf7eac`](https://github.com/lsst-sqre/squareone/commit/279dbcb6352839f434a729cccdd9d12f74cf7eac), [`279dbcb6352839f434a729cccdd9d12f74cf7eac`](https://github.com/lsst-sqre/squareone/commit/279dbcb6352839f434a729cccdd9d12f74cf7eac)]:
+  - @lsst-sqre/squared@0.8.0
+
 ## 0.24.0
 
 ### Minor Changes
