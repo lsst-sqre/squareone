@@ -1,3 +1,4 @@
+import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { within, userEvent, screen, expect } from '@storybook/test';
 
