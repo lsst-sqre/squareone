@@ -43,7 +43,7 @@ jobs:
 
       - name: Publish to Chromatic
         if: github.ref != 'refs/heads/main'
-        uses: chromaui/action@v1
+        uses: chromaui/action@latest
         with:
           projectToken: ${{ secrets.token }}
           storybookBaseDir: ${{ inputs.path }}
@@ -51,7 +51,7 @@ jobs:
 
       - name: Publish new baseline Chromatic
         if: github.ref == 'refs/heads/main'
-        uses: chromaui/action@v1
+        uses: chromaui/action@latest
         with:
           projectToken: ${{ secrets.token }}
           storybookBaseDir: ${{ inputs.path }}
