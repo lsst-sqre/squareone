@@ -11,10 +11,9 @@ const meta: Meta<typeof PrimaryNavigation> = {
   component: PrimaryNavigation,
   parameters: {
     layout: 'centered',
-    backgrounds: {
-      default: 'dark',
-      values: [{ name: 'dark', value: '#1f2121' }],
-    },
+  },
+  globals: {
+    backgrounds: { value: 'dark' },
   },
 };
 
