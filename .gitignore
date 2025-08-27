@@ -65,3 +65,6 @@ venv/
 
 # Per project env settings for development
 apps/squareone/.env
+
+# Playwright MCP screenshots
+.playwright-mcp/

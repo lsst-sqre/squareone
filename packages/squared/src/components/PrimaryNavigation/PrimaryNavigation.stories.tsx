@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { within, userEvent, screen } from '@storybook/testing-library';
-import { expect } from '@storybook/jest';
+import React from 'react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { within, userEvent, screen, expect } from '@storybook/test';
 
 import { ChevronDown } from 'react-feather';
 
@@ -11,10 +11,9 @@ const meta: Meta<typeof PrimaryNavigation> = {
   component: PrimaryNavigation,
   parameters: {
     layout: 'centered',
-    backgrounds: {
-      default: 'dark',
-      values: [{ name: 'dark', value: '#1f2121' }],
-    },
+  },
+  globals: {
+    backgrounds: { value: 'dark' },
   },
 };
 
