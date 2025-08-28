@@ -2,4 +2,4 @@
 '@lsst-sqre/squared': minor
 ---
 
-Drop GafaelfawrUserDropdown component (replaced by PrimaryNavigation)
+Drop GafaelfawrUserDropdown and GafaelfawrUserMenu components (replaced by PrimaryNavigation)
