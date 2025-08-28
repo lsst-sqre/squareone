@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Meta, StoryFn } from '@storybook/nextjs';
+import type { Meta, StoryFn } from '@storybook/nextjs-vite';
 
 import { TimesSquareHtmlEventsContext } from '../TimesSquareHtmlEventsProvider';
 import ExecStats from './ExecStats';

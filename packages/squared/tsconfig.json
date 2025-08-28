@@ -1,5 +1,8 @@
 {
   "extends": "@lsst-sqre/tsconfig/react-library.json",
+  "compilerOptions": {
+    "types": ["vitest/globals"]
+  },
   "include": ["."],
   "exclude": ["dist", "build", "node_modules"]
 }

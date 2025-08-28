@@ -30,6 +30,7 @@ export const Default: Story = {
     backgroundColor: 'var(--sqo-primary-button-background-color)',
     hoverBackgroundColor: 'var(--sqo-primary-button-background-color-hover)',
   },
+  tags: ['test'],
 
   render: ({
     icon,
