@@ -13,6 +13,7 @@ const config: StorybookConfig = {
     getAbsolutePath('@storybook/addon-onboarding'),
     getAbsolutePath('@storybook/addon-docs'),
     getAbsolutePath('@storybook/addon-themes'),
+    getAbsolutePath('@storybook/addon-vitest'),
   ],
 
   framework: {

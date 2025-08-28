@@ -1,6 +1,8 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { within, userEvent, screen, expect } from '@storybook/test';
+import userEvent from '@testing-library/user-event';
+import { screen, within } from '@testing-library/react';
+import { expect } from 'vitest';
 
 import { ChevronDown } from 'react-feather';
 
