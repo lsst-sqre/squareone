@@ -6,6 +6,10 @@
       "outputs": [".next/**", "!.next/cache/**", "dist/**"],
       "passThroughEnv": ["SENTRY_AUTH_TOKEN"]
     },
+    "test": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
     "lint": {},
     "type-check": {
       "dependsOn": ["^build"]
@@ -20,6 +24,14 @@
       "persistent": true
     },
     "build-storybook": {
+      "dependsOn": ["^build"],
+      "outputs": ["storybook-static/**"]
+    },
+    "test-storybook": {
+      "dependsOn": ["^build"],
+      "outputs": ["storybook-static/**"]
+    },
+    "test-storybook:watch": {
       "dependsOn": ["^build"],
       "outputs": ["storybook-static/**"]
     }
