@@ -58,6 +58,32 @@ jobs:
       - name: Build
         run: pnpm run build
 
+  test-storybook:
+    runs-on: ubuntu-latest
+    container:
+      # Make sure to grab the latest version of the Playwright image
+      # https://playwright.dev/docs/docker#pull-the-image
+      image: mcr.microsoft.com/playwright:v1.55.0-noble
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # partial depth for Turbo Repo
+
+      - uses: pnpm/action-setup@v4
+
+      - name: Set up node
+        uses: actions/setup-node@v4
+        with:
+          cache: 'pnpm'
+          node-version-file: '.nvmrc'
+
+      - name: Install npm packages
+        run: pnpm install
+
+      - name: Run Storybook tests
+        run: pnpm run test-storybook
+
   build-squareone:
     needs:
       - test
