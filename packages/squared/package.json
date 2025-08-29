@@ -14,11 +14,13 @@
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts --external react",
     "dev": "tsup src/index.ts --format esm,cjs --watch --dts --external react",
+    "test": "vitest run",
     "lint": "eslint \"src/**/*.ts*\"",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "test-storybook": "vitest --project=storybook",
+    "test-storybook": "vitest run --project=storybook",
+    "test-storybook:watch": "vitest watch --project=storybook",
     "new-component": "new-component"
   },
   "publishConfig": {

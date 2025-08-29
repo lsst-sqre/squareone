@@ -5,12 +5,14 @@
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "next build",
+    "test": "vitest run",
     "start": "next start -p 3000",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "storybook": "storybook dev -p 6007",
     "build-storybook": "storybook build",
-    "test-storybook": "vitest --project=storybook"
+    "test-storybook": "vitest run --project=storybook",
+    "test-storybook:watch": "vitest watch --project=storybook"
   },
   "eslintConfig": {
     "extends": [
