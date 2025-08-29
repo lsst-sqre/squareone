@@ -13,11 +13,28 @@ const config: StorybookConfig = {
     getAbsolutePath('@storybook/addon-onboarding'),
     getAbsolutePath('@storybook/addon-docs'),
     getAbsolutePath('@storybook/addon-themes'),
+    getAbsolutePath('@storybook/addon-vitest'),
   ],
 
   framework: {
     name: getAbsolutePath('@storybook/react-vite'),
     options: {},
+  },
+
+  async viteFinal(config) {
+    // Ensure we exclude the NextJS-specific imports that cause conflicts
+    config.optimizeDeps = config.optimizeDeps || {};
+    config.optimizeDeps.exclude = [
+      ...(config.optimizeDeps.exclude || []),
+      'sb-original/image-context',
+      '@storybook/nextjs-vite',
+    ];
+
+    // Ensure we're using the React framework, not NextJS
+    config.define = config.define || {};
+    config.define['process.env.STORYBOOK_FRAMEWORK'] = '"react-vite"';
+
+    return config;
   },
 };
 export default config;

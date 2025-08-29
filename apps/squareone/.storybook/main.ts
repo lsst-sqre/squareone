@@ -1,21 +1,19 @@
-import { createRequire } from 'node:module';
-import { dirname, join } from 'node:path';
-import type { StorybookConfig } from '@storybook/nextjs';
-
-const require = createRequire(import.meta.url);
+import path from 'node:path';
+import type { StorybookConfig } from '@storybook/nextjs-vite';
 
 const config: StorybookConfig = {
   stories: ['../src/**/*.stories.mdx', '../src/**/*.stories.@(js|jsx|ts|tsx)'],
   addons: [
-    getAbsolutePath('@storybook/addon-links'),
-    getAbsolutePath('@storybook/addon-a11y'),
-    getAbsolutePath('@storybook/addon-docs'),
+    '@storybook/addon-links',
+    '@storybook/addon-a11y',
+    '@storybook/addon-docs',
+    '@storybook/addon-vitest',
   ],
 
   framework: {
-    name: getAbsolutePath('@storybook/nextjs'),
+    name: '@storybook/nextjs-vite',
     options: {
-      nextConfigPath: '../next.config.js',
+      nextConfigPath: path.resolve(__dirname, '../next.config.js'),
     },
   },
 
@@ -29,33 +27,29 @@ const config: StorybookConfig = {
     },
   },
 
-  babel: async (options) => {
-    return {
-      ...options,
-      presets: [
-        [
-          '@babel/preset-env',
-          {
-            targets: { browsers: ['defaults'] },
-            modules: false,
-          },
-        ],
-        ['@babel/preset-typescript', { isTSX: true, allExtensions: true }],
-        [
-          '@babel/preset-react',
-          {
-            runtime: 'automatic', // Use the new JSX transform
-          },
-        ],
-      ],
-    };
-  },
-
   staticDirs: ['../public'],
+
+  async viteFinal(config) {
+    // Configure Vite to resolve monorepo packages correctly
+    config.resolve = config.resolve || {};
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@lsst-sqre/rubin-style-dictionary': path.resolve(
+        __dirname,
+        '../../../packages/rubin-style-dictionary'
+      ),
+      '@lsst-sqre/squared': path.resolve(
+        __dirname,
+        '../../../packages/squared'
+      ),
+      '@lsst-sqre/global-css': path.resolve(
+        __dirname,
+        '../../../packages/global-css'
+      ),
+    };
+
+    return config;
+  },
 };
 
 export default config;
-
-function getAbsolutePath(value: string): any {
-  return dirname(require.resolve(join(value, 'package.json')));
-}
