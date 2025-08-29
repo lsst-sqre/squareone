@@ -22,8 +22,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Testing commands
 
-- `pnpm test-storybook --filter squared` - Run Storybook tests for squared package
-- No Jest or other test frameworks are currently configured in most packages
+- `pnpm test` - Run vitest tests across all packages
+- `pnpm test-storybook` - Run Storybook tests using vitest across all packages
+- `pnpm test-storybook:watch` - Run Storybook tests in watch mode
+- `pnpm test-storybook --filter @lsst-sqre/squared` - Run Storybook tests for squared package only
+- Uses vitest as the test runner with Storybook addon-vitest for testing stories
 
 ### Version management
 
@@ -72,7 +75,7 @@ This is a **monorepo** for Rubin Observatory front-end applications managed with
 - PropTypes for JavaScript components, TypeScript types for TypeScript components
 - **Prefer `type` over `interface` for component props and simple object types**
 - **Avoid using `React.FC` - type props directly in function parameters**
-- Storybook for component documentation and testing
+- Storybook for component documentation and testing with vitest via addon-vitest
 
 ### Times Square Integration
 
