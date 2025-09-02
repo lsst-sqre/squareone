@@ -8,7 +8,11 @@
     },
     "test": {
       "dependsOn": ["^build"],
-      "outputs": []
+      "outputs": [],
+      "passThroughEnv": [
+        "PLAYWRIGHT_BROWSERS_PATH",
+        "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD"
+      ]
     },
     "lint": {},
     "type-check": {
@@ -29,7 +33,11 @@
     },
     "test-storybook": {
       "dependsOn": ["^build"],
-      "outputs": []
+      "outputs": [],
+      "passThroughEnv": [
+        "PLAYWRIGHT_BROWSERS_PATH",
+        "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD"
+      ]
     },
     "test-storybook:watch": {
       "dependsOn": ["^build"],
