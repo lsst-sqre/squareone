@@ -3,8 +3,11 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
+    "test": "turbo run test",
     "storybook": "turbo run storybook",
     "build-storybook": "turbo run build-storybook",
+    "test-storybook": "turbo run test-storybook",
+    "test-storybook:watch": "turbo run test-storybook:watch",
     "lint": "turbo run lint",
     "type-check": "turbo run type-check",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,graphql,yaml}\"",

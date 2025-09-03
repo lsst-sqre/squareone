@@ -6,6 +6,14 @@
       "outputs": [".next/**", "!.next/cache/**", "dist/**"],
       "passThroughEnv": ["SENTRY_AUTH_TOKEN"]
     },
+    "test": {
+      "dependsOn": ["^build"],
+      "outputs": [],
+      "passThroughEnv": [
+        "PLAYWRIGHT_BROWSERS_PATH",
+        "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD"
+      ]
+    },
     "lint": {},
     "type-check": {
       "dependsOn": ["^build"]
@@ -22,6 +30,18 @@
     "build-storybook": {
       "dependsOn": ["^build"],
       "outputs": ["storybook-static/**"]
+    },
+    "test-storybook": {
+      "dependsOn": ["^build"],
+      "outputs": [],
+      "passThroughEnv": [
+        "PLAYWRIGHT_BROWSERS_PATH",
+        "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD"
+      ]
+    },
+    "test-storybook:watch": {
+      "dependsOn": ["^build"],
+      "outputs": []
     }
   }
 }

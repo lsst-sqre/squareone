@@ -32,6 +32,10 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    container:
+      # https://playwright.dev/docs/docker#pull-the-image
+      image: mcr.microsoft.com/playwright:v1.55.0-noble
+      options: --user 1001
 
     steps:
       - uses: actions/checkout@v4
@@ -47,7 +51,7 @@ jobs:
           node-version-file: '.nvmrc'
 
       - name: Install npm packages
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: Check formatting
         run: pnpm run format:check
@@ -57,6 +61,16 @@ jobs:
 
       - name: Build
         run: pnpm run build
+
+      - name: Test
+        run: pnpm run test
+        env:
+          # Ensure any environment variables are configured in turbo.json
+          # to pass-through
+          CI: true
+          # Use browsers from Playwright container
+          PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
 
   build-squareone:
     needs:

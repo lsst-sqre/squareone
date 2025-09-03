@@ -14,7 +14,8 @@
     "strictNullChecks": false,
     // Enable incremental compilation
     "incremental": true,
-    "tsBuildInfoFile": ".next/cache/tsconfig.tsbuildinfo"
+    "tsBuildInfoFile": ".next/cache/tsconfig.tsbuildinfo",
+    "types": ["vitest/globals"]
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": [
@@ -22,6 +23,7 @@
     ".next",
     "out",
     "**/*.stories.tsx",
-    "**/*.stories.ts"
+    "**/*.stories.ts",
+    "vitest.config.ts"
   ]
 }
