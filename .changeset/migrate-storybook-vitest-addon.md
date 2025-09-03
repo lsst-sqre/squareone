@@ -1,6 +1,6 @@
 ---
 '@lsst-sqre/squared': minor
-'@lsst-sqre/squareone': minor
+'squareone': minor
 ---
 
 Adopted @storybook/addon-vitest for improved testing performance and browser-based testing
