@@ -1,5 +1,17 @@
 # @lsst-sqre/squared
 
+## 0.9.0
+
+### Minor Changes
+
+- [#205](https://github.com/lsst-sqre/squareone/pull/205) [`362b05ea70a859f982c01fd129328d126816dfba`](https://github.com/lsst-sqre/squareone/commit/362b05ea70a859f982c01fd129328d126816dfba) Thanks [@jonathansick](https://github.com/jonathansick)! - Adopted @storybook/addon-vitest for improved testing performance and browser-based testing
+
+  - Run `pnpm test-storybook` to execute Storybook tests using Vitest
+
+- [#205](https://github.com/lsst-sqre/squareone/pull/205) [`3396e84b11d375679f9e93e12367e9b32c865cfd`](https://github.com/lsst-sqre/squareone/commit/3396e84b11d375679f9e93e12367e9b32c865cfd) Thanks [@jonathansick](https://github.com/jonathansick)! - Drop GafaelfawrUserDropdown and GafaelfawrUserMenu components (replaced by PrimaryNavigation)
+
+- [#205](https://github.com/lsst-sqre/squareone/pull/205) [`a9e269c52e9259afd8657ca0c784b1aa966f0b27`](https://github.com/lsst-sqre/squareone/commit/a9e269c52e9259afd8657ca0c784b1aa966f0b27) Thanks [@jonathansick](https://github.com/jonathansick)! - Deleted the "Button" example component
+
 ## 0.8.0
 
 ### Minor Changes
