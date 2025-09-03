@@ -21,7 +21,7 @@ jobs:
     outputs:
       docs: ${{ steps.filter.outputs.docs }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: dorny/paths-filter@v3
         id: filter
@@ -38,7 +38,7 @@ jobs:
       options: --user 1001
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 2 # partial depth for Turbo Repo
 
@@ -82,7 +82,7 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: lsst-sqre/build-and-push-to-ghcr@v1
         id: build
@@ -100,7 +100,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0 # full depth for sitemap timestamps
       - uses: astral-sh/setup-uv@v6
