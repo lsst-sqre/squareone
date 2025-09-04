@@ -128,10 +128,8 @@ export const MobileLayout: Story = {
       </div>
     ),
   },
-  parameters: {
-    viewport: {
-      defaultViewport: 'mobile1',
-    },
+  globals: {
+    viewport: { value: 'iphone14' },
   },
 };
 
@@ -173,9 +171,7 @@ export const MobileLayoutLongContent: Story = {
       </div>
     ),
   },
-  parameters: {
-    viewport: {
-      defaultViewport: 'mobile2',
-    },
+  globals: {
+    viewport: { value: 'iphone14' },
   },
 };
