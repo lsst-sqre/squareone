@@ -333,8 +333,9 @@ export function getSettingsNavigation(config: AppConfig) {
    - Tab order: navigation items first, then main content
    - All navigation items focusable via Tab key
    - Escape key closes mobile menu
-   - Focus management when menu opens/closes
+   - Focus management: when menu closes after navigation, focus moves to main content heading
    - Enter/Space activates navigation links
+   - Page navigation scrolls to top for consistent UX
 
 3. **Screen Reader Support**
    - Semantic HTML structure (`<nav>`, `<aside>`)
@@ -597,22 +598,6 @@ The architecture described in this document (getLayout with required getServerSi
 - Enables dynamic content through context hooks
 - Avoids hydration issues with server-side data loading
 - Follows Next.js best practices
-
-## Remaining Questions for Implementation
-
-1. **Error Handling**
-
-   - How should the layout behave if useGafaelfawrUser hook fails?
-   - Should there be fallback behavior for missing navigation items?
-
-2. **Performance Considerations**
-
-   - Should navigation sections with many items be rendered lazily?
-   - How should we handle rapid navigation between pages?
-
-3. **Focus Management**
-   - Where should focus go when mobile menu closes after navigation?
-   - Should we scroll to top when navigating between settings pages?
 
 ## Future Work
 
