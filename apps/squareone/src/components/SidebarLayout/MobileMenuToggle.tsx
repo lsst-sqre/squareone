@@ -52,12 +52,13 @@ const ToggleButton = styled.button`
  * Renders a hamburger icon button using FontAwesome that's only visible
  * on mobile viewports. Includes proper ARIA attributes and focus states.
  */
-export default function MobileMenuToggle({
-  isOpen,
-  onClick,
-}: MobileMenuToggleProps) {
+const MobileMenuToggle = React.forwardRef<
+  HTMLButtonElement,
+  MobileMenuToggleProps
+>(function MobileMenuToggle({ isOpen, onClick }, ref) {
   return (
     <ToggleButton
+      ref={ref}
       type="button"
       onClick={onClick}
       aria-expanded={isOpen}
@@ -67,4 +68,6 @@ export default function MobileMenuToggle({
       <FontAwesomeIcon icon="bars" />
     </ToggleButton>
   );
-}
+});
+
+export default MobileMenuToggle;

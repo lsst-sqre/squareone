@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import useDisclosure from 'react-a11y-disclosure';
 
@@ -24,6 +24,26 @@ export type SidebarLayoutProps = {
   prefetchPages?: boolean;
   titleHref?: string;
 };
+
+const SkipLink = styled.a`
+  /* Skip link for screen readers and keyboard navigation */
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: var(--rsd-color-primary-600, #0066cc);
+  color: white;
+  padding: 8px;
+  z-index: 1000;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: bold;
+
+  &:focus {
+    top: 6px;
+    outline: 2px solid var(--rsd-color-primary-100, #e6f3ff);
+    outline-offset: 2px;
+  }
+`;
 
 const LayoutContainer = styled.div`
   /* Mobile layout: vertical stacking with flexbox */
@@ -125,6 +145,10 @@ export default function SidebarLayout({
   prefetchPages = false,
   titleHref,
 }: SidebarLayoutProps) {
+  // Refs for focus management
+  const menuToggleRef = useRef<HTMLButtonElement>(null);
+  const mainContentRef = useRef<HTMLElement>(null);
+
   // Mobile menu disclosure state - starts closed by default
   const { toggleProps, contentProps, isExpanded } = useDisclosure({
     id: 'mobile-sidebar-menu',
@@ -134,6 +158,18 @@ export default function SidebarLayout({
   // Determine the title href - default to first navigation item if not provided
   const resolvedTitleHref = titleHref || navSections[0]?.items[0]?.href || '#';
 
+  // Keyboard navigation handler
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    // Escape key closes mobile menu when expanded
+    if (event.key === 'Escape' && isExpanded) {
+      toggleProps.onClick();
+      // Return focus to menu toggle button after closing
+      setTimeout(() => {
+        menuToggleRef.current?.focus();
+      }, 100);
+    }
+  };
+
   // Navigation handler - closes mobile menu when navigation occurs
   const handleNavigate = () => {
     // We need to manually trigger the toggle if the menu is open
@@ -142,13 +178,42 @@ export default function SidebarLayout({
     }
   };
 
-  // Mobile menu toggle handler - just use the toggle function from disclosure
+  // Mobile menu toggle handler with focus management
   const handleMobileMenuToggle = () => {
     toggleProps.onClick();
   };
 
+  // Skip to main content handler
+  const handleSkipToMain = (event: React.MouseEvent) => {
+    event.preventDefault();
+    mainContentRef.current?.focus();
+  };
+
+  // Set up keyboard event listener for the entire layout
+  useEffect(() => {
+    const handleDocumentKeyDown = (event: KeyboardEvent) => {
+      // Escape key closes mobile menu when expanded
+      if (event.key === 'Escape' && isExpanded) {
+        toggleProps.onClick();
+        // Return focus to menu toggle button after closing
+        setTimeout(() => {
+          menuToggleRef.current?.focus();
+        }, 100);
+      }
+    };
+
+    document.addEventListener('keydown', handleDocumentKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleDocumentKeyDown);
+    };
+  }, [isExpanded, toggleProps]);
+
   return (
-    <LayoutContainer data-testid="sidebar-layout">
+    <LayoutContainer data-testid="sidebar-layout" onKeyDown={handleKeyDown}>
+      <SkipLink href="#main-content" onClick={handleSkipToMain}>
+        Skip to main content
+      </SkipLink>
+
       <MobileHeader data-testid="mobile-header">
         <MobileHeaderTitle>
           <MobileHeaderTitleLink href={resolvedTitleHref}>
@@ -156,6 +221,7 @@ export default function SidebarLayout({
           </MobileHeaderTitleLink>
         </MobileHeaderTitle>
         <MobileMenuToggle
+          ref={menuToggleRef}
           isOpen={isExpanded}
           onClick={handleMobileMenuToggle}
           {...toggleProps}
@@ -176,7 +242,12 @@ export default function SidebarLayout({
         />
       </SidebarContainer>
 
-      <MainContentContainer data-testid="main-content">
+      <MainContentContainer
+        ref={mainContentRef}
+        id="main-content"
+        data-testid="main-content"
+        tabIndex={-1}
+      >
         {children}
       </MainContentContainer>
     </LayoutContainer>

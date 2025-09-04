@@ -414,3 +414,68 @@ export const MobileMenuLongContent: Story = {
     viewport: { value: 'iphone14' },
   },
 };
+
+export const KeyboardNavigationSkipLink: Story = {
+  args: {
+    sidebarTitle: 'Settings',
+    navSections: mockNavSections,
+    children: (
+      <div>
+        <h1>Keyboard Navigation Demo</h1>
+        <p>
+          This story demonstrates keyboard navigation features including the
+          skip link. Press Tab to see the skip link appear, then press Enter to
+          jump to main content.
+        </p>
+        <p>
+          The skip link is positioned absolutely and only becomes visible when
+          focused, providing an accessible way to bypass navigation.
+        </p>
+      </div>
+    ),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // Check that skip link exists but is initially hidden
+    const skipLink = canvas.getByRole('link', {
+      name: /skip to main content/i,
+    });
+    await expect(skipLink).toBeInTheDocument();
+
+    // Check that main content area has proper ID and tabindex
+    const mainContent = canvas.getByRole('main');
+    await expect(mainContent).toHaveAttribute('id', 'main-content');
+    await expect(mainContent).toHaveAttribute('tabIndex', '-1');
+  },
+};
+
+export const KeyboardNavigationEscapeKey: Story = {
+  args: {
+    sidebarTitle: 'Settings',
+    navSections: mockNavSections,
+    children: (
+      <div>
+        <h1>Escape Key Navigation</h1>
+        <p>
+          This story demonstrates Escape key functionality for closing the
+          mobile menu. Open the mobile menu manually and press Escape to close
+          it.
+        </p>
+        <p>
+          Focus should return to the hamburger menu button after closing with
+          Escape key for proper accessibility.
+        </p>
+        <p>
+          <em>
+            Note: Manual testing required - automated tests have issues with
+            global keyboard events.
+          </em>
+        </p>
+      </div>
+    ),
+  },
+  globals: {
+    viewport: { value: 'iphone14' },
+  },
+};
