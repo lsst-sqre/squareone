@@ -479,3 +479,81 @@ export const KeyboardNavigationEscapeKey: Story = {
     viewport: { value: 'iphone14' },
   },
 };
+
+export const NavigationVisualStates: Story = {
+  args: {
+    sidebarTitle: 'Settings',
+    navSections: mockNavSections,
+    currentPath: '/settings/profile',
+    children: (
+      <div>
+        <h1>Navigation Visual States</h1>
+        <p>
+          This story demonstrates the visual states of navigation items. The
+          "Profile" item is marked as active/current with bold text and a left
+          border.
+        </p>
+        <p>
+          Hover over navigation items to see the hover state with primary-100
+          background color. Focus navigation items with Tab key to see focus
+          outline.
+        </p>
+        <p>
+          All visual states work consistently across desktop and mobile
+          viewports.
+        </p>
+      </div>
+    ),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // Find the active navigation item
+    const activeLink = canvas.getByRole('link', { name: /profile/i });
+
+    // Check that active item has proper ARIA attribute
+    await expect(activeLink).toHaveAttribute('aria-current', 'page');
+
+    // Test hover interaction on a non-active item
+    const nonActiveLink = canvas.getByRole('link', { name: /access tokens/i });
+    await userEvent.hover(nonActiveLink);
+  },
+};
+
+export const MobileNavigationVisualStates: Story = {
+  args: {
+    sidebarTitle: 'Settings',
+    navSections: mockNavSections,
+    currentPath: '/settings/access-tokens',
+    children: (
+      <div>
+        <h1>Mobile Navigation Visual States</h1>
+        <p>
+          This demonstrates navigation visual states on mobile. The "Access
+          Tokens" item is active. Visual states are consistent between desktop
+          and mobile.
+        </p>
+        <p>
+          Open the mobile menu to see the navigation items with proper visual
+          states.
+        </p>
+      </div>
+    ),
+  },
+  globals: {
+    viewport: { value: 'iphone14' },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // Open the mobile menu first
+    const menuToggle = canvas.getByRole('button', { name: /navigation menu/i });
+    await userEvent.click(menuToggle);
+
+    // Find the active navigation item (now visible)
+    const activeLink = canvas.getByRole('link', { name: /access tokens/i });
+
+    // Check that active item has proper ARIA attribute
+    await expect(activeLink).toHaveAttribute('aria-current', 'page');
+  },
+};

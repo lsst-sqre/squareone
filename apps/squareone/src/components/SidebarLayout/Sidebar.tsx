@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 import { ContentMaxWidth } from '../../styles/sizes';
 import type { NavSection } from './SidebarLayout';
+import SidebarNavItem from './SidebarNavItem';
 
 export type SidebarProps = {
   title: string;
@@ -85,34 +86,6 @@ const NavigationItem = styled.li`
   margin-bottom: 0.25rem;
 `;
 
-const NavigationLink = styled.a`
-  display: block;
-  padding: 0.5rem 0.75rem;
-  color: inherit;
-  text-decoration: none;
-  border-radius: 0.375rem;
-  transition: background-color 0.2s ease, color 0.2s ease;
-
-  &:hover {
-    background-color: var(--rsd-color-primary-100, #e6f3ff);
-    text-decoration: none;
-  }
-
-  &:focus {
-    outline: 2px solid var(--rsd-color-primary-600, #0066cc);
-    outline-offset: -2px;
-  }
-
-  /* Active/current state will be handled later with currentPath prop */
-  &[aria-current='page'] {
-    font-weight: bold;
-    border-left: 4px solid var(--rsd-color-primary-600, #0066cc);
-    padding-left: calc(
-      0.75rem - 4px
-    ); /* Adjust padding to account for border */
-  }
-`;
-
 /*
  * Sidebar component that renders the navigation structure.
  * Displays title as a clickable heading and renders navigation sections
@@ -141,15 +114,11 @@ export default function Sidebar({
             <NavigationList>
               {section.items.map((item, itemIndex) => (
                 <NavigationItem key={`${sectionIndex}-${itemIndex}`}>
-                  <NavigationLink
-                    href={item.href}
-                    onClick={onNavigate}
-                    aria-current={
-                      currentPath === item.href ? 'page' : undefined
-                    }
-                  >
-                    {item.label}
-                  </NavigationLink>
+                  <SidebarNavItem
+                    item={item}
+                    isActive={currentPath === item.href}
+                    onNavigate={onNavigate}
+                  />
                 </NavigationItem>
               ))}
             </NavigationList>
