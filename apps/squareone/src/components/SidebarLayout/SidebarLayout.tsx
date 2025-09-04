@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { ContentMaxWidth } from '../../styles/sizes';
+import Sidebar from './Sidebar';
 
 export type NavItem = {
   href: string;
@@ -64,30 +65,28 @@ export default function SidebarLayout({
   children,
   sidebarTitle,
   navSections,
-  currentPath,
+  currentPath = '',
   prefetchPages = false,
   titleHref,
 }: SidebarLayoutProps) {
+  // Determine the title href - default to first navigation item if not provided
+  const resolvedTitleHref = titleHref || navSections[0]?.items[0]?.href || '#';
+
+  // Placeholder onNavigate function - will be enhanced in mobile menu commits
+  const handleNavigate = () => {
+    // This will be used to close mobile menu when navigation occurs
+  };
+
   return (
     <LayoutContainer data-testid="sidebar-layout">
       <SidebarContainer data-testid="sidebar-container">
-        <h2 data-testid="sidebar-title">{sidebarTitle}</h2>
-        {/* Navigation sections will be rendered here */}
-        {navSections.map((section, index) => (
-          <div key={index} data-testid={`nav-section-${index}`}>
-            {section.label && (
-              <div data-testid={`section-label-${index}`}>{section.label}</div>
-            )}
-            {section.items.map((item, itemIndex) => (
-              <div
-                key={itemIndex}
-                data-testid={`nav-item-${index}-${itemIndex}`}
-              >
-                {item.label}
-              </div>
-            ))}
-          </div>
-        ))}
+        <Sidebar
+          title={sidebarTitle}
+          titleHref={resolvedTitleHref}
+          navSections={navSections}
+          currentPath={currentPath}
+          onNavigate={handleNavigate}
+        />
       </SidebarContainer>
       <MainContentContainer data-testid="main-content">
         {children}
