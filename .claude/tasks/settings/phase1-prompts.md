@@ -6,13 +6,12 @@ This document contains atomic implementation prompts for creating the generic Si
 ## Commit 1: Create SidebarLayout component structure
 
 **Prompt:**
-Create the initial SidebarLayout component structure with TypeScript types and basic layout container. The component should accept children, sidebarTitle, and navSections props. Create the component file structure including index.ts for exports, SidebarLayout.tsx for the main component, and SidebarLayout.stories.tsx with a basic story showing static navigation. Include unit tests that verify the component renders and accepts props correctly.
+Create the initial SidebarLayout component structure with TypeScript types and basic layout container. The component should accept children, sidebarTitle, and navSections props. Create the component file structure including index.ts for exports, SidebarLayout.tsx for the main component, and SidebarLayout.stories.tsx with a basic story showing static navigation. Include interaction testing within Storybook stories that verify the component renders and accepts props correctly.
 
 **Expected files:**
 - `apps/squareone/src/components/SidebarLayout/index.ts`
 - `apps/squareone/src/components/SidebarLayout/SidebarLayout.tsx`
 - `apps/squareone/src/components/SidebarLayout/SidebarLayout.stories.tsx`
-- `apps/squareone/src/components/SidebarLayout/SidebarLayout.test.tsx`
 
 **Commit message:**
 ```
@@ -20,7 +19,7 @@ Add initial SidebarLayout component structure
 
 Create the base SidebarLayout component with TypeScript types for
 props including children, sidebarTitle, and navSections. Includes
-basic Storybook story and unit tests for initial rendering.
+basic Storybook story with interaction testing for initial rendering.
 ```
 
 ## Commit 2: Implement desktop CSS Grid layout
@@ -31,7 +30,7 @@ Implement the desktop layout for SidebarLayout using CSS Grid with styled-compon
 **Expected changes:**
 - Update `SidebarLayout.tsx` with styled-components
 - Add desktop layout story to `SidebarLayout.stories.tsx`
-- Add layout dimension tests to `SidebarLayout.test.tsx`
+- Add layout dimension interaction tests to stories
 
 **Commit message:**
 ```
@@ -50,7 +49,7 @@ Add mobile responsive layout to SidebarLayout that activates below 60rem viewpor
 **Expected changes:**
 - Update `SidebarLayout.tsx` with mobile styles
 - Add mobile viewport stories to `SidebarLayout.stories.tsx`
-- Add responsive behavior tests
+- Add responsive behavior interaction tests to stories
 
 **Commit message:**
 ```
@@ -68,7 +67,6 @@ Create the Sidebar component that renders inside SidebarLayout. It should displa
 
 **Expected files:**
 - `apps/squareone/src/components/SidebarLayout/Sidebar.tsx`
-- `apps/squareone/src/components/SidebarLayout/Sidebar.test.tsx`
 
 **Expected changes:**
 - Update `SidebarLayout.tsx` to use Sidebar component
@@ -80,7 +78,7 @@ Create Sidebar component with navigation structure
 
 Add Sidebar component that renders title and navigation sections
 with optional labels. Uses semantic HTML structure with proper
-heading hierarchy. Includes tests and stories for various configs.
+heading hierarchy. Includes interaction tests and stories for various configs.
 ```
 
 ## Commit 5: Implement sticky sidebar positioning
@@ -91,7 +89,7 @@ Implement sticky positioning for the sidebar on desktop viewports. The sidebar s
 **Expected changes:**
 - Update Sidebar styles in `Sidebar.tsx`
 - Add scrolling stories to `SidebarLayout.stories.tsx`
-- Add scroll behavior tests
+- Add scroll behavior interaction tests to stories
 
 **Commit message:**
 ```
@@ -109,7 +107,7 @@ Create the MobileMenuToggle component that renders a hamburger icon button using
 
 **Expected files:**
 - `apps/squareone/src/components/SidebarLayout/MobileMenuToggle.tsx`
-- `apps/squareone/src/components/SidebarLayout/MobileMenuToggle.test.tsx`
+- `apps/squareone/src/components/SidebarLayout/MobileMenuToggle.stories.tsx`
 
 **Commit message:**
 ```
@@ -117,7 +115,7 @@ Add MobileMenuToggle component with hamburger icon
 
 Create accessible hamburger menu button using FontAwesome icon.
 Includes ARIA attributes and responsive visibility. Only shown
-on mobile viewports. Includes a11y tests and state stories.
+on mobile viewports. Includes a11y interaction tests and state stories.
 ```
 
 ## Commit 7: Implement mobile header with title and toggle
@@ -128,7 +126,7 @@ Implement the mobile header that contains the sidebar title on the left and hamb
 **Expected changes:**
 - Update `SidebarLayout.tsx` with mobile header
 - Add mobile header stories to `SidebarLayout.stories.tsx`
-- Add mobile header layout tests
+- Add mobile header layout interaction tests to stories
 
 **Commit message:**
 ```
@@ -147,7 +145,7 @@ Integrate react-a11y-disclosure to manage mobile menu show/hide behavior. The me
 **Expected changes:**
 - Update `SidebarLayout.tsx` with useDisclosure hook
 - Update `Sidebar.tsx` for disclosure compatibility
-- Add disclosure stories and tests
+- Add disclosure stories with interaction tests
 
 **Commit message:**
 ```
@@ -155,7 +153,7 @@ Integrate react-a11y-disclosure for mobile menu
 
 Add accessible disclosure pattern for mobile navigation menu using
 react-a11y-disclosure. Menu slides down/up with smooth animation.
-Includes stories showing menu states and accessibility tests.
+Includes stories showing menu states and accessibility interaction tests.
 ```
 
 ## Commit 9: Add keyboard navigation support
@@ -166,7 +164,7 @@ Implement keyboard navigation support including: Tab order with navigation items
 **Expected changes:**
 - Update `SidebarLayout.tsx` with keyboard handlers
 - Add skip link implementation
-- Add keyboard navigation tests
+- Add keyboard navigation interaction tests to stories
 
 **Commit message:**
 ```
@@ -174,7 +172,7 @@ Add keyboard navigation and skip link support
 
 Implement keyboard navigation with proper tab order and Escape key
 handling for mobile menu. Add skip link for accessibility. Focus
-management ensures proper flow. Includes keyboard tests.
+management ensures proper flow. Includes keyboard interaction tests.
 ```
 
 ## Commit 10: Add visual states for navigation items
@@ -185,7 +183,7 @@ Implement visual states for navigation items including: hover state with muted p
 **Expected changes:**
 - Create `SidebarNavItem.tsx` component
 - Update `Sidebar.tsx` to use SidebarNavItem
-- Add visual state stories and tests
+- Add visual state stories with interaction tests
 
 **Commit message:**
 ```
@@ -203,7 +201,7 @@ Implement styling for optional section labels in the navigation including: small
 
 **Expected files:**
 - `apps/squareone/src/components/SidebarLayout/SidebarNavSection.tsx`
-- `apps/squareone/src/components/SidebarLayout/SidebarNavSection.test.tsx`
+- `apps/squareone/src/components/SidebarLayout/SidebarNavSection.stories.tsx`
 
 **Commit message:**
 ```
@@ -211,26 +209,54 @@ Add section labels with proper styling
 
 Create SidebarNavSection component for navigation grouping with
 optional labels. Labels use smaller, bold, muted text. Sections
-without labels render items directly. Includes conditional tests.
+without labels render items directly. Includes conditional interaction tests.
 ```
 
-## Commit 12: Add comprehensive test coverage
+## Commit 12: Set up vitest unit testing framework
 
 **Prompt:**
-Add comprehensive test coverage for the complete SidebarLayout system including: responsive breakpoint behavior, accessibility compliance (ARIA attributes, keyboard navigation), mobile menu state management, visual regression tests for all states, and integration tests for the full component. Ensure all components have > 80% test coverage. Add any missing edge case tests.
+Set up vitest unit testing framework alongside existing Storybook interaction tests to provide traditional unit test coverage. Create vitest configuration, add unit test files for each component (.test.tsx), and implement tests covering component props, state management, edge cases, and error boundaries. This complements the existing Storybook interaction tests with focused unit testing for logic validation.
+
+**Expected files:**
+- `apps/squareone/src/components/SidebarLayout/SidebarLayout.test.tsx`
+- `apps/squareone/src/components/SidebarLayout/Sidebar.test.tsx`
+- `apps/squareone/src/components/SidebarLayout/MobileMenuToggle.test.tsx`
+- `apps/squareone/src/components/SidebarLayout/SidebarNavItem.test.tsx`
+- `apps/squareone/src/components/SidebarLayout/SidebarNavSection.test.tsx`
 
 **Expected changes:**
-- Update all test files with comprehensive coverage
-- Add integration test file
-- Add visual regression test setup
+- Add vitest configuration if needed
+- Create unit tests for all components focusing on props, state, and logic
+- Test edge cases and error conditions not covered in Storybook
+- Add test utilities for common testing patterns
+
+**Commit message:**
+```
+Add vitest unit testing framework for SidebarLayout
+
+Set up comprehensive unit testing with vitest alongside Storybook
+interaction tests. Unit tests focus on component logic, props
+validation, and edge cases. Provides dual testing approach.
+```
+
+## Commit 13: Add comprehensive test coverage
+
+**Prompt:**
+Add comprehensive test coverage for the complete SidebarLayout system including: responsive breakpoint behavior, accessibility compliance (ARIA attributes, keyboard navigation), mobile menu state management, visual regression tests for all states, and integration tests for the full component. Ensure all components have > 80% test coverage combining both unit tests and interaction tests. Add any missing edge case tests.
+
+**Expected changes:**
+- Update all story files with comprehensive interaction tests
+- Add integration stories covering full component workflows
+- Enhance existing stories with accessibility and visual regression testing
+- Complete unit test coverage for remaining edge cases
 
 **Commit message:**
 ```
 Add comprehensive test coverage for SidebarLayout
 
-Complete test suite covering responsive behavior, accessibility,
-state management, and visual regression. All components exceed
-80% coverage. Includes edge cases and integration tests.
+Complete dual test suite covering responsive behavior, accessibility,
+state management, and visual regression. Combines unit tests and
+Storybook interaction tests. Includes edge cases and integration tests.
 ```
 
 ## Phase 1 Completion Checklist
@@ -246,8 +272,9 @@ After all commits, verify:
 - [ ] Section labels render conditionally
 - [ ] Skip link for accessibility
 - [ ] All components have Storybook stories
-- [ ] All components have unit tests
-- [ ] Test coverage > 80%
+- [ ] All components have interaction tests in stories
+- [ ] All components have unit tests with vitest
+- [ ] Test coverage > 80% via dual testing approach (stories + unit tests)
 
 ## Notes for Implementation
 
@@ -270,8 +297,54 @@ For each commit, run the following commands in order:
 
 ### Testing Workflow
 1. Write component code
-2. Add unit tests
-3. Create Storybook stories
-4. Run quality checks above
-5. Test manually in browser
-6. Commit only when all checks pass
+2. Create Storybook stories with interaction testing
+3. Run quality checks above
+4. Test manually in browser
+5. Commit only when all checks pass
+
+### Testing Approach
+This project uses a **dual testing approach** combining both Storybook interaction tests and traditional vitest unit tests:
+
+**Storybook Interaction Testing:**
+- **Story-based testing**: Tests are written as interactions within Storybook stories
+- **Interaction testing**: Use `@storybook/test` utilities (userEvent, expect, within) for component behavior testing
+- **Addon-vitest integration**: Stories are automatically picked up by vitest through the addon
+- **Browser testing**: All tests run in real browser environment through Storybook
+- **Documentation**: https://storybook.js.org/docs/writing-tests/interaction-testing
+
+**Vitest Unit Testing:**
+- **Logic-focused testing**: Traditional unit tests for component logic, props, and state management
+- **Edge case coverage**: Test error conditions and boundary cases not easily covered in stories
+- **Fast feedback**: Quick test runs for development workflow
+- **Isolation**: Test components in isolation without browser environment overhead
+
+### Test Writing Patterns
+
+**Storybook Interaction Test Pattern:**
+```tsx
+import { userEvent, within, expect } from '@storybook/test';
+
+export const Interactive: Story = {
+  args: { ... },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole('button');
+    await userEvent.click(button);
+    await expect(button).toHaveAttribute('aria-expanded', 'true');
+  }
+};
+```
+
+**Vitest Unit Test Pattern:**
+```tsx
+import { render, screen } from '@testing-library/react';
+import { expect, test, vi } from 'vitest';
+import MyComponent from './MyComponent';
+
+test('renders with correct props', () => {
+  const mockOnClick = vi.fn();
+  render(<MyComponent onClick={mockOnClick} />);
+  const button = screen.getByRole('button');
+  expect(button).toBeInTheDocument();
+});
+```
