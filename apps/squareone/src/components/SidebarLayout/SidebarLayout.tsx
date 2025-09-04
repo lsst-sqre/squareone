@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 
 import { ContentMaxWidth } from '../../styles/sizes';
 import Sidebar from './Sidebar';
+import MobileMenuToggle from './MobileMenuToggle';
 
 export type NavItem = {
   href: string;
@@ -52,6 +53,46 @@ const SidebarContainer = styled.div`
   }
 `;
 
+const MobileHeader = styled.header`
+  /* Mobile: sticky header with title and toggle */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem var(--size-screen-padding-min);
+  background: white;
+  border-bottom: 1px solid var(--rsd-color-gray-200, #e5e7eb);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+
+  /* Desktop: completely hidden */
+  @media (min-width: ${ContentMaxWidth}) {
+    display: none;
+  }
+`;
+
+const MobileHeaderTitle = styled.h1`
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: bold;
+  color: inherit;
+`;
+
+const MobileHeaderTitleLink = styled.a`
+  color: inherit;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:focus {
+    outline: 2px solid var(--rsd-color-primary-600, #0066cc);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+`;
+
 const MainContentContainer = styled.main`
   /* Full-width content areas with appropriate structure for mobile/desktop */
 `;
@@ -69,16 +110,36 @@ export default function SidebarLayout({
   prefetchPages = false,
   titleHref,
 }: SidebarLayoutProps) {
+  // Mobile menu state
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   // Determine the title href - default to first navigation item if not provided
   const resolvedTitleHref = titleHref || navSections[0]?.items[0]?.href || '#';
 
-  // Placeholder onNavigate function - will be enhanced in mobile menu commits
+  // Navigation handler - closes mobile menu when navigation occurs
   const handleNavigate = () => {
-    // This will be used to close mobile menu when navigation occurs
+    setIsMobileMenuOpen(false);
+  };
+
+  // Mobile menu toggle handler
+  const handleMobileMenuToggle = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
   return (
     <LayoutContainer data-testid="sidebar-layout">
+      <MobileHeader data-testid="mobile-header">
+        <MobileHeaderTitle>
+          <MobileHeaderTitleLink href={resolvedTitleHref}>
+            {sidebarTitle}
+          </MobileHeaderTitleLink>
+        </MobileHeaderTitle>
+        <MobileMenuToggle
+          isOpen={isMobileMenuOpen}
+          onClick={handleMobileMenuToggle}
+        />
+      </MobileHeader>
+
       <SidebarContainer data-testid="sidebar-container">
         <Sidebar
           title={sidebarTitle}
@@ -88,6 +149,7 @@ export default function SidebarLayout({
           onNavigate={handleNavigate}
         />
       </SidebarContainer>
+
       <MainContentContainer data-testid="main-content">
         {children}
       </MainContentContainer>
