@@ -1,6 +1,7 @@
 // Storybook configuration for component testing
 import React from 'react';
 import type { Preview } from '@storybook/nextjs-vite';
+import { INITIAL_VIEWPORTS } from 'storybook/viewport';
 import { AppConfigProvider } from '../src/contexts/AppConfigContext';
 
 // Load global CSS and icons; same as how _app.js loads these resources.
@@ -34,6 +35,7 @@ const mockAppConfig = {
   sentryDsn: null,
   semaphoreUrl: null,
   plausibleDomain: null,
+  mdxDir: '/mock/mdx',
 };
 
 const preview: Preview = {
@@ -53,6 +55,14 @@ const preview: Preview = {
       // 'off' - skip a11y checks entirely
       test: 'todo',
     },
+
+    viewport: {
+      options: INITIAL_VIEWPORTS,
+    },
+  },
+
+  initialGlobals: {
+    viewport: { value: 'responsive' },
   },
 
   decorators: [
