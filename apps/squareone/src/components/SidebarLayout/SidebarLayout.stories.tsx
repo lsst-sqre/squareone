@@ -175,3 +175,120 @@ export const MobileLayoutLongContent: Story = {
     viewport: { value: 'iphone14' },
   },
 };
+
+export const StickyScrollingDesktop: Story = {
+  args: {
+    sidebarTitle: 'Long Navigation',
+    navSections: [
+      {
+        label: 'Getting Started',
+        items: [
+          { href: '/docs/installation', label: 'Installation' },
+          { href: '/docs/quickstart', label: 'Quick Start' },
+          { href: '/docs/configuration', label: 'Configuration' },
+        ],
+      },
+      {
+        label: 'Components',
+        items: [
+          { href: '/docs/buttons', label: 'Buttons' },
+          { href: '/docs/forms', label: 'Forms' },
+          { href: '/docs/navigation', label: 'Navigation' },
+          { href: '/docs/layout', label: 'Layout' },
+          { href: '/docs/typography', label: 'Typography' },
+          { href: '/docs/colors', label: 'Colors' },
+          { href: '/docs/icons', label: 'Icons' },
+          { href: '/docs/tables', label: 'Tables' },
+          { href: '/docs/modals', label: 'Modals' },
+          { href: '/docs/tooltips', label: 'Tooltips' },
+        ],
+      },
+      {
+        label: 'Advanced',
+        items: [
+          { href: '/docs/theming', label: 'Theming' },
+          { href: '/docs/customization', label: 'Customization' },
+          { href: '/docs/performance', label: 'Performance' },
+          { href: '/docs/accessibility', label: 'Accessibility' },
+          { href: '/docs/testing', label: 'Testing' },
+          { href: '/docs/deployment', label: 'Deployment' },
+          { href: '/docs/migration', label: 'Migration Guide' },
+          { href: '/docs/troubleshooting', label: 'Troubleshooting' },
+        ],
+      },
+    ],
+    children: (
+      <div>
+        <h1>Sticky Sidebar Demo</h1>
+        <p>
+          This demonstrates the sticky sidebar behavior on desktop viewports.
+          The sidebar stays fixed while this main content scrolls independently.
+        </p>
+        {Array.from({ length: 20 }, (_, i) => (
+          <div key={i} style={{ marginBottom: '2rem' }}>
+            <h2>Content Section {i + 1}</h2>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+              enim ad minim veniam, quis nostrud exercitation ullamco laboris
+              nisi ut aliquip ex ea commodo consequat.
+            </p>
+            <p>
+              Duis aute irure dolor in reprehenderit in voluptate velit esse
+              cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
+              cupidatat non proident, sunt in culpa qui officia deserunt mollit
+              anim id est laborum.
+            </p>
+          </div>
+        ))}
+      </div>
+    ),
+  },
+};
+
+export const LongSidebarContent: Story = {
+  args: {
+    sidebarTitle: 'Extensive Documentation',
+    navSections: [
+      {
+        label: 'API Reference',
+        items: Array.from({ length: 15 }, (_, i) => ({
+          href: `/api/method-${i + 1}`,
+          label: `API Method ${i + 1}`,
+        })),
+      },
+      {
+        label: 'Components',
+        items: Array.from({ length: 20 }, (_, i) => ({
+          href: `/components/component-${i + 1}`,
+          label: `Component ${i + 1}`,
+        })),
+      },
+      {
+        label: 'Utilities',
+        items: Array.from({ length: 12 }, (_, i) => ({
+          href: `/utils/utility-${i + 1}`,
+          label: `Utility ${i + 1}`,
+        })),
+      },
+    ],
+    children: (
+      <div>
+        <h1>Long Sidebar Navigation Demo</h1>
+        <p>
+          This story demonstrates sidebar scrolling when navigation content
+          exceeds the viewport height. The sidebar should be independently
+          scrollable on desktop while remaining sticky.
+        </p>
+        <div
+          style={{
+            height: '200vh',
+            background: 'linear-gradient(to bottom, #f0f0f0, #e0e0e0)',
+          }}
+        >
+          <p>Main content area - scroll to test sticky behavior</p>
+        </div>
+      </div>
+    ),
+  },
+};

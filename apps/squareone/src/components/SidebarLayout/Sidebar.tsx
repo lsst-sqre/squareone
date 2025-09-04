@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
+import { ContentMaxWidth } from '../../styles/sizes';
 import type { NavSection } from './SidebarLayout';
 
 export type SidebarProps = {
@@ -12,7 +13,16 @@ export type SidebarProps = {
 };
 
 const SidebarRoot = styled.aside`
-  /* Sidebar root container for semantic HTML structure */
+  /* Mobile: default behavior, no sticky positioning */
+
+  /* Desktop: sticky positioning with full viewport height and overflow */
+  @media (min-width: ${ContentMaxWidth}) {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    padding-right: 1rem; /* Space for scrollbar */
+  }
 `;
 
 const SidebarTitle = styled.h2`
