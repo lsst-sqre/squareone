@@ -23,19 +23,36 @@ export type SidebarLayoutProps = {
 };
 
 const LayoutContainer = styled.div`
-  display: grid;
-  grid-template-columns: 18rem 1fr;
-  gap: 2rem;
-  max-width: ${ContentMaxWidth};
-  margin: 0 auto;
+  /* Mobile layout: vertical stacking with flexbox */
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--size-screen-padding-min);
+
+  /* Desktop layout: CSS Grid with sidebar and content columns */
+  @media (min-width: ${ContentMaxWidth}) {
+    display: grid;
+    grid-template-columns: 18rem 1fr;
+    gap: 2rem;
+    max-width: ${ContentMaxWidth};
+    margin: 0 auto;
+    padding: 0;
+  }
 `;
 
 const SidebarContainer = styled.div`
-  /* Placeholder for sidebar styling */
+  /* Mobile: navigation hidden by default, will be shown via disclosure pattern */
+  @media (max-width: calc(${ContentMaxWidth} - 0.001rem)) {
+    /* Navigation will be hidden by default, shown via disclosure */
+  }
+
+  /* Desktop: sidebar styling */
+  @media (min-width: ${ContentMaxWidth}) {
+    /* Desktop sidebar styling will be added in sticky positioning commit */
+  }
 `;
 
 const MainContentContainer = styled.main`
-  /* Main content area */
+  /* Full-width content areas with appropriate structure for mobile/desktop */
 `;
 
 /*

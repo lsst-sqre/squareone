@@ -112,3 +112,70 @@ export const DesktopLayoutVariousWidths: Story = {
     ),
   },
 };
+
+export const MobileLayout: Story = {
+  args: {
+    sidebarTitle: 'Settings',
+    navSections: mockNavSections,
+    children: (
+      <div>
+        <h1>Mobile Layout</h1>
+        <p>
+          This demonstrates the mobile layout with vertical stacking below 60rem
+          viewport width.
+        </p>
+        <p>The sidebar navigation is prepared for disclosure pattern.</p>
+      </div>
+    ),
+  },
+  parameters: {
+    viewport: {
+      defaultViewport: 'mobile1',
+    },
+  },
+};
+
+export const MobileLayoutLongContent: Story = {
+  args: {
+    sidebarTitle: 'Documentation',
+    navSections: [
+      {
+        items: [
+          { href: '/docs/getting-started', label: 'Getting Started' },
+          { href: '/docs/api-reference', label: 'API Reference' },
+          { href: '/docs/examples', label: 'Examples' },
+          { href: '/docs/deployment', label: 'Deployment' },
+        ],
+      },
+      {
+        label: 'Advanced',
+        items: [
+          { href: '/docs/configuration', label: 'Configuration' },
+          { href: '/docs/customization', label: 'Customization' },
+          { href: '/docs/troubleshooting', label: 'Troubleshooting' },
+        ],
+      },
+    ],
+    children: (
+      <div>
+        <h1>Mobile with Long Content</h1>
+        <p>Testing mobile layout with extensive navigation and content.</p>
+        {Array.from({ length: 5 }, (_, i) => (
+          <div key={i}>
+            <h2>Mobile Section {i + 1}</h2>
+            <p>
+              This content demonstrates how the mobile layout handles longer
+              content with vertical stacking. The sidebar navigation will be
+              hidden by default and shown via disclosure pattern.
+            </p>
+          </div>
+        ))}
+      </div>
+    ),
+  },
+  parameters: {
+    viewport: {
+      defaultViewport: 'mobile2',
+    },
+  },
+};
