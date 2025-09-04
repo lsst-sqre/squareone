@@ -292,3 +292,26 @@ export const LongSidebarContent: Story = {
     ),
   },
 };
+
+export const MobileHeaderWithToggle: Story = {
+  args: {
+    sidebarTitle: 'Settings',
+    navSections: mockNavSections,
+    children: (
+      <div>
+        <h1>Mobile Header Demo</h1>
+        <p>
+          This story demonstrates the mobile header with sticky positioning at
+          the top of the mobile viewport. The header contains the sidebar title
+          on the left and hamburger menu toggle on the right.
+        </p>
+        <div style={{ height: '150vh' }}>
+          <p>Scroll to test sticky header behavior on mobile.</p>
+        </div>
+      </div>
+    ),
+  },
+  globals: {
+    viewport: { value: 'iphone14' },
+  },
+};
