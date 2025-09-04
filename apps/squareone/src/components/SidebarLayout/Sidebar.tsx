@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 import { ContentMaxWidth } from '../../styles/sizes';
 import type { NavSection } from './SidebarLayout';
-import SidebarNavItem from './SidebarNavItem';
+import SidebarNavSection from './SidebarNavSection';
 
 export type SidebarProps = {
   title: string;
@@ -55,37 +55,6 @@ const NavigationContainer = styled.nav`
   /* Navigation container for semantic structure */
 `;
 
-const NavigationSection = styled.div`
-  margin-bottom: 2rem;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-`;
-
-const SectionLabel = styled.h3`
-  margin: 1rem 0 0.5rem 0;
-  font-size: 0.875rem;
-  font-weight: bold;
-  color: var(--rsd-color-gray-600, #6b7280);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-
-  &:first-child {
-    margin-top: 0;
-  }
-`;
-
-const NavigationList = styled.ul`
-  list-style: none;
-  margin: 0;
-  padding: 0;
-`;
-
-const NavigationItem = styled.li`
-  margin-bottom: 0.25rem;
-`;
-
 /*
  * Sidebar component that renders the navigation structure.
  * Displays title as a clickable heading and renders navigation sections
@@ -108,21 +77,13 @@ export default function Sidebar({
 
       <NavigationContainer>
         {navSections.map((section, sectionIndex) => (
-          <NavigationSection key={sectionIndex}>
-            {section.label && <SectionLabel>{section.label}</SectionLabel>}
-
-            <NavigationList>
-              {section.items.map((item, itemIndex) => (
-                <NavigationItem key={`${sectionIndex}-${itemIndex}`}>
-                  <SidebarNavItem
-                    item={item}
-                    isActive={currentPath === item.href}
-                    onNavigate={onNavigate}
-                  />
-                </NavigationItem>
-              ))}
-            </NavigationList>
-          </NavigationSection>
+          <SidebarNavSection
+            key={sectionIndex}
+            section={section}
+            sectionIndex={sectionIndex}
+            currentPath={currentPath}
+            onNavigate={onNavigate}
+          />
         ))}
       </NavigationContainer>
     </SidebarRoot>
