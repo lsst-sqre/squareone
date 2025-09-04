@@ -3,6 +3,7 @@
 ## Executive Summary
 
 This document describes a two-tier component architecture for sidebar-based layouts:
+
 - **SidebarLayout**: A generic, reusable component for any sidebar + content layout
 - **SettingsLayout**: A specialized implementation using SidebarLayout with dynamic content based on app configuration and user context
 
@@ -11,7 +12,9 @@ The architecture leverages Next.js's `getLayout` pattern for smooth page transit
 ## Requirements
 
 ### Layout Structure
+
 1. **Desktop Layout (≥60rem viewport)**
+
    - Fixed-width sidebar (18rem) on the left
    - Main content area on the right (ContentMaxWidth - 18rem = 42rem)
    - Entire layout centered horizontally
@@ -27,7 +30,9 @@ The architecture leverages Next.js's `getLayout` pattern for smooth page transit
    - Auto-close menu on navigation
 
 ### Sidebar Navigation
+
 1. **Components**
+
    - Heading/title for the section (e.g., "Settings") - links to first navigation item
    - List of navigation items (page titles)
    - Optional section groupings with labels
@@ -44,7 +49,9 @@ The architecture leverages Next.js's `getLayout` pattern for smooth page transit
    - Internal navigation only (using Next.js Link)
 
 ### Technical Requirements
+
 1. **Dependencies**
+
    - styled-components for styling
    - `@fortawesome/fontawesome-svg-core` for hamburger icon
    - `react-a11y-disclosure` for accessible menu behavior
@@ -83,28 +90,30 @@ SettingsLayout/                       # Settings-specific layout
 ### Implementation Details
 
 #### 1. SidebarLayout Component (Generic)
+
 ```typescript
 type SidebarLayoutProps = {
-  children: React.ReactNode;          // Main content
-  sidebarTitle: string;              // e.g., "Settings"
-  navSections: NavSection[];          // Navigation sections
-  currentPath?: string;               // Current active path (auto-detected if not provided)
-  prefetchPages?: boolean;            // Optional: prefetch linked pages (default: false)
-  titleHref?: string;                // Optional: override for title link (defaults to first nav item)
+  children: React.ReactNode; // Main content
+  sidebarTitle: string; // e.g., "Settings"
+  navSections: NavSection[]; // Navigation sections
+  currentPath?: string; // Current active path (auto-detected if not provided)
+  prefetchPages?: boolean; // Optional: prefetch linked pages (default: false)
+  titleHref?: string; // Optional: override for title link (defaults to first nav item)
 };
 
 type NavSection = {
-  label?: string;                     // Optional section label
-  items: NavItem[];                   // Navigation items in this section
+  label?: string; // Optional section label
+  items: NavItem[]; // Navigation items in this section
 };
 
 type NavItem = {
-  href: string;                       // Internal path
-  label: string;                      // Display text
+  href: string; // Internal path
+  label: string; // Display text
 };
 ```
 
 **Responsibilities:**
+
 - Generic container for any sidebar + content layout
 - Manages responsive breakpoint behavior
 - Controls mobile menu state via react-a11y-disclosure
@@ -112,25 +121,30 @@ type NavItem = {
 - Auto-detects current path from Next.js router
 - Optional page prefetching for performance
 - Reusable across different sections of the app
+- No page-specific data passed through layout
+- Layout focuses solely on navigation and responsive behavior
 
 **Styling approach:**
+
 - CSS Grid for desktop layout with two columns and 2rem gap
 - Flexbox for mobile vertical stacking
 - CSS custom properties for consistent spacing
 - Sticky positioning for sidebar on desktop
 
 #### 2. Sidebar Component
+
 ```typescript
 type SidebarProps = {
   title: string;
-  titleHref: string;            // Link destination for title (first nav item)
+  titleHref: string; // Link destination for title (first nav item)
   navSections: NavSection[];
   currentPath: string;
-  onNavigate: () => void;      // Called when navigation occurs (for mobile menu close)
+  onNavigate: () => void; // Called when navigation occurs (for mobile menu close)
 };
 ```
 
 **Responsibilities:**
+
 - Renders sidebar heading as link to first navigation item
 - Contains navigation sections and items
 - Handles scrollable content if needed
@@ -138,6 +152,7 @@ type SidebarProps = {
 - Manages mobile menu visibility
 
 #### 3. MobileMenuToggle Component
+
 ```typescript
 type MobileMenuToggleProps = {
   isOpen: boolean;
@@ -147,12 +162,14 @@ type MobileMenuToggleProps = {
 ```
 
 **Responsibilities:**
+
 - Renders hamburger icon (FontAwesome bars icon)
 - Toggles mobile menu visibility
 - Provides accessible button with proper ARIA attributes
 - Only visible on mobile viewports
 
 #### 4. SettingsLayout Component (Specialized with Dynamic Content)
+
 ```typescript
 // SettingsLayout/SettingsLayout.tsx
 import { ReactElement, useMemo } from 'react';
@@ -168,22 +185,20 @@ type SettingsLayoutProps = {
 export default function SettingsLayout({ children }: SettingsLayoutProps) {
   const config = useAppConfig();
   const { data: user } = useGafaelfawrUser();
-  
+
   // Dynamically filter navigation based on config
-  const navSections = useMemo(() => 
-    getSettingsNavigation(config), [config]
-  );
-  
-  // Dynamic title with username if available
-  const sidebarTitle = user?.username 
-    ? `${user.username} Settings` 
+  const navSections = useMemo(() => getSettingsNavigation(config), [config]);
+
+  // Simple title with username if available
+  const sidebarTitle = user?.username
+    ? `${user.username} Settings`
     : 'Settings';
-  
+
   return (
     <SidebarLayout
       sidebarTitle={sidebarTitle}
       navSections={navSections}
-      prefetchPages={true}  // Prefetch settings pages for faster navigation
+      prefetchPages={true} // Prefetch settings pages for faster navigation
     >
       {children}
     </SidebarLayout>
@@ -204,33 +219,43 @@ export function getSettingsNavigation(config: AppConfig) {
       items: [
         { href: '/settings/profile', label: 'Profile' },
         { href: '/settings/access-tokens', label: 'Access Tokens' },
-      ]
+      ],
     },
     {
       label: 'Security',
-      items: [
-        { href: '/settings/sessions', label: 'Sessions' },
-      ]
-    }
+      items: [{ href: '/settings/sessions', label: 'Sessions' }],
+    },
   ];
-  
-  // Only show Files section if file server is configured
+
+  // Only include Files section if file server is configured
+  // Items and sections are omitted entirely from DOM tree
   if (config.fileServerUrl) {
     navigation.push({
       label: 'Storage',
-      items: [
-        { href: '/settings/files', label: 'Files' },
-      ]
+      items: [{ href: '/settings/files', label: 'Files' }],
     });
   }
-  
+
   return navigation;
 }
 ```
 
+##### Navigation Item Visibility
+
+- **Items and sections are omitted entirely** from the DOM tree when conditions are not met
+- No grayed out or disabled states - items are either present or absent
+- If all items in a section are omitted, the section header is also omitted
+
+##### User Data Integration
+
+- **Simple username display**: Show "Settings" when username is unknown, "{{username}} Settings" when available
+- No complex loading states - graceful degradation from generic to personalized title
+- Navigation remains fully interactive regardless of user data loading state
+
 ### Responsive Strategy
 
 #### Desktop (≥60rem)
+
 ```css
 .layout-container {
   display: grid;
@@ -249,6 +274,7 @@ export function getSettingsNavigation(config: AppConfig) {
 ```
 
 #### Mobile (<60rem)
+
 ```css
 .layout-container {
   display: flex;
@@ -281,19 +307,29 @@ export function getSettingsNavigation(config: AppConfig) {
 }
 ```
 
+##### Mobile Menu Behavior
+
+- **Auto-close menu on navigation** to new page
+- Menu state resets on each page navigation
+- Swipe gestures deferred to Future Work
+
 ### State Management
+
 - Use `react-a11y-disclosure` hook for mobile menu toggle
 - Use Next.js `useRouter` to get current path
 - Auto-close menu on route change using useEffect
 
 ### Accessibility Considerations
+
 1. **ARIA Attributes**
+
    - `aria-expanded` on hamburger button
    - `aria-current="page"` for active navigation item
    - Proper heading hierarchy with sidebar title
    - `aria-label` for navigation sections
 
 2. **Keyboard Navigation**
+
    - Tab order: navigation items first, then main content
    - All navigation items focusable via Tab key
    - Escape key closes mobile menu
@@ -309,17 +345,20 @@ export function getSettingsNavigation(config: AppConfig) {
 ## Visual Design Specifications
 
 ### Active State
+
 - Bold font weight
 - Thick left border (4px) in primary color
 - Background: transparent
 
 ### Hover State
+
 - Background: muted primary color (e.g., `var(--rsd-color-primary-100)`)
 - Border radius: 0.5rem
 - Transition: background-color 0.2s ease
 - Full width within sidebar (not just text width)
 
 ### Section Labels
+
 - Font size: smaller (0.875rem)
 - Font weight: bold
 - Color: muted neutral (e.g., `var(--rsd-color-gray-600)`)
@@ -327,26 +366,48 @@ export function getSettingsNavigation(config: AppConfig) {
 
 ## Usage Examples
 
-### Using Next.js getLayout Pattern
+### Critical Requirement: Data Loading
+
+**IMPORTANT**: Every page using SettingsLayout MUST implement `getServerSideProps` to load the AppConfig. This ensures the layout has access to configuration data for dynamic navigation filtering.
+
+### Using Next.js getLayout Pattern with Required Data Loading
 
 ```typescript
 // pages/settings/profile.tsx
 import type { ReactElement } from 'react';
+import type { GetServerSideProps } from 'next';
 import type { NextPageWithLayout } from '../_app';
 import { getLayout } from '../../components/SettingsLayout';
+import { loadAppConfig } from '../../lib/config/loader';
 
-const ProfilePage: NextPageWithLayout = () => {
+type ProfilePageProps = {
+  // Add any page-specific props here
+};
+
+const ProfilePage: NextPageWithLayout<ProfilePageProps> = () => {
   return (
     <>
       <h1>Profile Settings</h1>
-      <form>
-        {/* Profile form fields */}
-      </form>
+      <form>{/* Profile form fields */}</form>
     </>
   );
 };
 
 ProfilePage.getLayout = getLayout;
+
+// REQUIRED: Load appConfig for the layout to access
+export const getServerSideProps: GetServerSideProps<
+  ProfilePageProps
+> = async () => {
+  const appConfig = await loadAppConfig();
+
+  return {
+    props: {
+      appConfig, // Required for AppConfigProvider in _app.tsx
+      // Add any page-specific data here
+    },
+  };
+};
 
 export default ProfilePage;
 ```
@@ -354,10 +415,16 @@ export default ProfilePage;
 ```typescript
 // pages/settings/access-tokens.tsx
 import type { ReactElement } from 'react';
+import type { GetServerSideProps } from 'next';
 import type { NextPageWithLayout } from '../_app';
 import { getLayout } from '../../components/SettingsLayout';
+import { loadAppConfig } from '../../lib/config/loader';
 
-const AccessTokensPage: NextPageWithLayout = () => {
+type AccessTokensPageProps = {
+  // Add any page-specific props here
+};
+
+const AccessTokensPage: NextPageWithLayout<AccessTokensPageProps> = () => {
   return (
     <>
       <h1>Access Tokens</h1>
@@ -368,10 +435,27 @@ const AccessTokensPage: NextPageWithLayout = () => {
 
 AccessTokensPage.getLayout = getLayout;
 
+// REQUIRED: Load appConfig for the layout to access
+export const getServerSideProps: GetServerSideProps<
+  AccessTokensPageProps
+> = async () => {
+  const appConfig = await loadAppConfig();
+
+  // Can also load page-specific data
+  // const tokens = await fetchUserTokens();
+
+  return {
+    props: {
+      appConfig, // Required for AppConfigProvider in _app.tsx
+      // tokens,
+    },
+  };
+};
+
 export default AccessTokensPage;
 ```
 
-### App Configuration (_app.tsx)
+### App Configuration (\_app.tsx)
 
 ```typescript
 // pages/_app.tsx
@@ -406,26 +490,36 @@ export type { SidebarLayoutProps, NavSection, NavItem } from './SidebarLayout';
 export { default as SettingsLayout, getLayout } from './SettingsLayout';
 ```
 
-## Layout Composition
+## Layout Composition & Data Flow
 
 The SettingsLayout component works within the existing app architecture:
 
 ```
 MyApp (_app.tsx)
-└── AppConfigProvider
+├── Extract appConfig from pageProps (from getServerSideProps)
+└── AppConfigProvider (provides appConfig via context)
     └── ThemeProvider
         └── Page (Header/Footer)
             └── getLayout(Component)
-                └── SettingsLayout (via getLayout)
+                └── SettingsLayout (via getLayout, can use useAppConfig)
                     └── SidebarLayout
                         └── Page content
 ```
 
+### Data Flow Architecture
+
+1. **Page Level**: Each settings page MUST implement `getServerSideProps` to load `appConfig`
+2. **App Level**: `_app.tsx` extracts `appConfig` from pageProps and provides it via `AppConfigProvider`
+3. **Layout Level**: `SettingsLayout` (called via getLayout) can access config via `useAppConfig()` hook
+4. **Result**: Dynamic navigation filtering works because the layout executes within the context provider tree
+
 This ensures:
+
 - SettingsLayout has access to AppConfig and user context via hooks
 - The layout is wrapped by Page component (with Header/Footer)
 - Smooth page transitions with persistent sidebar
 - Dynamic content updates based on configuration
+- No hydration issues since config is loaded server-side
 
 ## Benefits of This Architecture
 
@@ -437,58 +531,187 @@ This ensures:
 6. **Dynamic Content**: Navigation and title adapt based on configuration and user context
 7. **Accessibility**: Proper keyboard navigation and ARIA attributes
 
-## Design Decisions Requiring Clarification
+## Alternative Approaches Considered
 
-1. **Navigation Item Visibility**
-   - Should we support conditional visibility per item (not just sections)?
-   - Should disabled items be shown but grayed out, or hidden entirely?
+### 1. Instantiating SettingsLayout in Each Page (Not Recommended)
 
-2. **Loading States**
-   - How should the sidebar handle loading states for user data?
-   - Should navigation be interactive before user data loads?
+Instead of using getLayout, we could instantiate SettingsLayout directly in each page component:
 
-3. **Mobile Menu Behavior**
-   - Should the menu remember its open/closed state across page navigation?
-   - Should we add swipe gestures for opening/closing the menu?
+```typescript
+// NOT RECOMMENDED - loses smooth transitions
+export default function ProfilePage() {
+  return (
+    <SettingsLayout>
+      <h1>Profile Settings</h1>
+    </SettingsLayout>
+  );
+}
+```
 
-4. **Sidebar Content Extension**
-   - Should we support additional sidebar content below navigation (e.g., user info, logout button)?
-   - Should there be a footer area in the sidebar for version info or links?
+**Drawbacks**:
 
-5. **Data Loading with getServerSideProps**
-   - How should settings pages handle getServerSideProps with the layout pattern?
-   - Should we pass page-specific data through the layout somehow?
+- Layout re-renders on every navigation
+- Loss of smooth page transitions
+- More boilerplate in each page
+
+### 2. Client-Side Data Loading in Layout (Not Recommended)
+
+We could fetch configuration in the layout using SWR or useEffect:
+
+```typescript
+// NOT RECOMMENDED - causes hydration issues
+function SettingsLayout({ children }) {
+  const { data: config } = useSWR('/api/config', fetcher);
+  // ...filter navigation based on config
+}
+```
+
+**Drawbacks**:
+
+- Flash of incorrect navigation on initial load
+- Additional API call overhead
+- Potential hydration mismatches
+
+### 3. Static Navigation Configuration (Limited)
+
+We could define all navigation statically without dynamic filtering:
+
+```typescript
+// LIMITED - no dynamic content
+const staticNavigation = [
+  /* all items always visible */
+];
+```
+
+**Drawbacks**:
+
+- Cannot hide/show items based on configuration
+- Cannot personalize with user data
+- Less flexible for different deployments
+
+## Recommended Approach
+
+The architecture described in this document (getLayout with required getServerSideProps) is recommended because:
+
+- Maintains smooth page transitions via persistent layouts
+- Enables dynamic content through context hooks
+- Avoids hydration issues with server-side data loading
+- Follows Next.js best practices
+
+## Remaining Questions for Implementation
+
+1. **Error Handling**
+
+   - How should the layout behave if useGafaelfawrUser hook fails?
+   - Should there be fallback behavior for missing navigation items?
+
+2. **Performance Considerations**
+
+   - Should navigation sections with many items be rendered lazily?
+   - How should we handle rapid navigation between pages?
+
+3. **Focus Management**
+   - Where should focus go when mobile menu closes after navigation?
+   - Should we scroll to top when navigating between settings pages?
 
 ## Future Work
 
 The following features are deferred for future implementation:
 
 ### 1. Breadcrumb Navigation
+
 - Add breadcrumb navigation for better context
 - Consider integration with sidebar navigation structure
 - Useful for deep navigation hierarchies
 
 ### 2. Performance Optimization
+
 - Implement React.memo for sidebar components
 - Measure and optimize re-render behavior
 - Consider virtualization for very long navigation lists
 
 ### 3. Advanced Keyboard Navigation
+
 - Add keyboard shortcuts (e.g., `/` to focus search)
 - Arrow key navigation between menu items
 - Quick jump to sections with number keys
 
 ### 4. Enhanced Mobile Experience
+
 - Swipe gestures for menu open/close
 - Improved touch targets for mobile devices
 - Consider bottom sheet pattern for mobile menu
 
 ### 5. Theming Support
+
 - Dark mode support for sidebar
 - Custom color schemes per section
 - User-configurable sidebar width
 
 ### 6. Analytics Integration
+
 - Track navigation usage patterns
 - Monitor page transition performance
 - User journey analysis through settings
+
+### 7. Sidebar Content Extensions
+
+- Additional content below navigation (user info, logout button)
+- Footer area in sidebar for version info or links
+- User preferences or quick actions
+
+**Extensibility Analysis**: The current architecture supports future content extensions well:
+
+- `SidebarLayout` could accept an optional `sidebarFooter` prop for additional content
+- `SettingsLayout` could compose user info components and pass them through
+- The sticky positioning and scrollable design accommodates variable content height
+- CSS Grid layout can easily add additional rows for footer content
+
+## Implementation Recommendations
+
+### Phase 1: Core Implementation
+
+1. **Start with SidebarLayout**: Implement the generic component first for maximum reusability
+2. **Focus on responsive design**: Ensure mobile-first approach with proper breakpoints
+3. **Implement accessibility**: Include ARIA attributes and keyboard navigation from the start
+4. **Test with static navigation**: Verify layout behavior before adding dynamic features
+
+### Phase 2: Settings Integration
+
+1. **Create SettingsLayout**: Build the specialized wrapper with basic navigation
+2. **Add AppConfig integration**: Implement dynamic navigation filtering
+3. **Integrate user context**: Add username display with graceful fallback
+4. **Test page transitions**: Ensure smooth navigation between settings pages
+
+### Phase 3: Polish and Optimization
+
+1. **Add prefetching**: Implement optional page prefetching for performance
+2. **Refine animations**: Perfect mobile menu transitions and hover states
+3. **Add error boundaries**: Handle edge cases gracefully
+4. **Performance testing**: Measure and optimize re-render behavior
+
+### Development Guidelines
+
+- **Follow existing patterns**: Use the same TypeScript, styling, and component patterns as MainContent and WideContentLayout
+- **Test across viewports**: Verify behavior at the 60rem breakpoint and various screen sizes
+- **Validate accessibility**: Test with screen readers and keyboard navigation
+- **Consider edge cases**: Empty navigation sections, very long page titles, slow user data loading
+
+### Testing Strategy
+
+- **Unit tests**: Test navigation filtering logic and responsive breakpoints
+- **Integration tests**: Verify context integration and page transitions
+- **E2E tests**: Test mobile menu behavior and keyboard navigation
+- **Visual regression**: Ensure consistent styling across different states
+
+## Conclusion
+
+This architecture provides a robust foundation for settings-style layouts while balancing several competing requirements:
+
+- **Reusability**: The generic SidebarLayout can be used for docs, admin panels, and other sections
+- **Performance**: Leverages Next.js getLayout pattern for smooth page transitions
+- **Flexibility**: Dynamic navigation based on configuration and user context
+- **Accessibility**: Built-in keyboard navigation and screen reader support
+- **Maintainability**: Clear separation between generic layout and settings-specific logic
+
+The two-tier approach (generic + specialized components) with the getLayout pattern ensures both immediate utility for the settings section and long-term architectural benefits for the entire application.
