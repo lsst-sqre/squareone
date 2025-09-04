@@ -53,20 +53,26 @@
 ### Component Hierarchy
 
 ```
-SidebarLayout/
-├── index.ts                  # Re-export main component
-├── SidebarLayout.tsx         # Main layout component
-├── Sidebar.tsx              # Sidebar component with navigation
-├── SidebarNav.tsx           # Navigation list component
-├── SidebarNavItem.tsx       # Individual navigation item
-├── SidebarNavSection.tsx    # Optional section grouping
-├── MobileMenuToggle.tsx     # Hamburger button for mobile
-└── SidebarLayout.stories.tsx # Storybook documentation
+SidebarLayout/                        # Generic sidebar layout component
+├── index.ts                         # Re-export main component
+├── SidebarLayout.tsx                # Generic layout component
+├── Sidebar.tsx                      # Sidebar component with navigation
+├── SidebarNav.tsx                   # Navigation list component
+├── SidebarNavItem.tsx               # Individual navigation item
+├── SidebarNavSection.tsx            # Optional section grouping
+├── MobileMenuToggle.tsx             # Hamburger button for mobile
+└── SidebarLayout.stories.tsx        # Storybook documentation
+
+SettingsLayout/                       # Settings-specific layout
+├── index.ts                         # Re-export
+├── SettingsLayout.tsx               # Settings layout using SidebarLayout
+├── settingsNavigation.ts            # Settings navigation configuration
+└── SettingsLayout.stories.tsx       # Storybook documentation
 ```
 
 ### Implementation Details
 
-#### 1. SidebarLayout Component
+#### 1. SidebarLayout Component (Generic)
 ```typescript
 type SidebarLayoutProps = {
   children: React.ReactNode;          // Main content
@@ -87,11 +93,12 @@ type NavItem = {
 ```
 
 **Responsibilities:**
-- Container for the entire layout
+- Generic container for any sidebar + content layout
 - Manages responsive breakpoint behavior
 - Controls mobile menu state via react-a11y-disclosure
 - Applies ContentMaxWidth constraint
 - Auto-detects current path from Next.js router
+- Reusable across different sections of the app
 
 **Styling approach:**
 - CSS Grid for desktop layout with two columns and 2rem gap
@@ -129,6 +136,56 @@ type MobileMenuToggleProps = {
 - Toggles mobile menu visibility
 - Provides accessible button with proper ARIA attributes
 - Only visible on mobile viewports
+
+#### 4. SettingsLayout Component (Specialized)
+```typescript
+// SettingsLayout/SettingsLayout.tsx
+import { ReactElement } from 'react';
+import { SidebarLayout } from '../SidebarLayout';
+import { settingsNavigation } from './settingsNavigation';
+
+type SettingsLayoutProps = {
+  children: React.ReactNode;
+};
+
+export default function SettingsLayout({ children }: SettingsLayoutProps) {
+  return (
+    <SidebarLayout
+      sidebarTitle="Settings"
+      navSections={settingsNavigation}
+    >
+      {children}
+    </SidebarLayout>
+  );
+}
+
+// For Next.js getLayout pattern
+export function getLayout(page: ReactElement) {
+  return <SettingsLayout>{page}</SettingsLayout>;
+}
+
+// SettingsLayout/settingsNavigation.ts
+export const settingsNavigation = [
+  {
+    items: [
+      { href: '/settings/profile', label: 'Profile' },
+      { href: '/settings/access-tokens', label: 'Access Tokens' },
+    ]
+  },
+  {
+    label: 'Security',
+    items: [
+      { href: '/settings/sessions', label: 'Sessions' },
+    ]
+  },
+  {
+    label: 'Storage',
+    items: [
+      { href: '/settings/files', label: 'Files' },
+    ]
+  }
+];
+```
 
 ### Responsive Strategy
 
@@ -204,67 +261,103 @@ type MobileMenuToggleProps = {
 - Color: muted neutral (e.g., `var(--rsd-color-gray-600)`)
 - Margin: 1rem 0 0.5rem 0
 
-## Usage Example
+## Usage Examples
+
+### Using Next.js getLayout Pattern
 
 ```typescript
 // pages/settings/profile.tsx
-import { SidebarLayout } from '../../components/SidebarLayout';
+import type { ReactElement } from 'react';
+import type { NextPageWithLayout } from '../_app';
+import { getLayout } from '../../components/SettingsLayout';
 
-const settingsNavigation = [
-  {
-    // First section without label
-    items: [
-      { href: '/settings/profile', label: 'Profile' },
-      { href: '/settings/access-tokens', label: 'Access Tokens' },
-    ]
-  },
-  {
-    label: 'Security',
-    items: [
-      { href: '/settings/sessions', label: 'Sessions' },
-    ]
-  },
-  {
-    label: 'Storage',
-    items: [
-      { href: '/settings/files', label: 'Files' },
-    ]
-  }
-];
-
-export default function ProfilePage() {
+const ProfilePage: NextPageWithLayout = () => {
   return (
-    <SidebarLayout 
-      sidebarTitle="Settings"
-      navSections={settingsNavigation}
-    >
+    <>
       <h1>Profile Settings</h1>
-      {/* Page content */}
-    </SidebarLayout>
+      <form>
+        {/* Profile form fields */}
+      </form>
+    </>
   );
-}
+};
 
-// Repeated pattern for other settings pages...
+ProfilePage.getLayout = getLayout;
+
+export default ProfilePage;
+```
+
+```typescript
+// pages/settings/access-tokens.tsx
+import type { ReactElement } from 'react';
+import type { NextPageWithLayout } from '../_app';
+import { getLayout } from '../../components/SettingsLayout';
+
+const AccessTokensPage: NextPageWithLayout = () => {
+  return (
+    <>
+      <h1>Access Tokens</h1>
+      {/* Access tokens management UI */}
+    </>
+  );
+};
+
+AccessTokensPage.getLayout = getLayout;
+
+export default AccessTokensPage;
+```
+
+### App Configuration (_app.tsx)
+
+```typescript
+// pages/_app.tsx
+import type { ReactElement, ReactNode } from 'react';
+import type { NextPage } from 'next';
+import type { AppProps } from 'next/app';
+
+export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
+  getLayout?: (page: ReactElement) => ReactNode;
+};
+
+type AppPropsWithLayout = AppProps & {
+  Component: NextPageWithLayout;
+};
+
+export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
+  // Use the layout defined at the page level, if available
+  const getLayout = Component.getLayout ?? ((page) => page);
+
+  return getLayout(<Component {...pageProps} />);
+}
 ```
 
 ## Export Strategy
 
-Based on the usage pattern, only the main `SidebarLayout` component needs to be exported. The navigation configuration is passed as props, making it easy to share across multiple pages by defining the navigation structure once and importing it.
-
 ```typescript
-// index.ts
+// SidebarLayout/index.ts
 export { default as SidebarLayout } from './SidebarLayout';
 export type { SidebarLayoutProps, NavSection, NavItem } from './SidebarLayout';
+
+// SettingsLayout/index.ts
+export { default as SettingsLayout, getLayout } from './SettingsLayout';
 ```
+
+## Benefits of This Architecture
+
+1. **Separation of Concerns**: Generic `SidebarLayout` can be reused for other sections (docs, admin, etc.)
+2. **Consistent Navigation**: Settings navigation defined once, shared across all settings pages
+3. **Next.js Integration**: Leverages getLayout pattern for persistent layouts
+4. **Performance**: Layout doesn't re-render on navigation between settings pages
+5. **Type Safety**: Full TypeScript support with proper typing for pages with layouts
 
 ## Design Decisions Requiring Clarification
 
-1. **Navigation Configuration Management**
-   - Should the navigation configuration be defined in each page file or in a shared configuration file?
-   - How should we handle active state detection - automatic based on URL or explicit?
+1. **Layout Composition**
+   - Should SettingsLayout wrap the Page component (Header/Footer) or be wrapped by it?
+   - How does SidebarLayout interact with the existing Page component?
 
 2. **Sidebar Header**
-   - Should the sidebar title be a link back to a main settings page?
+   - Should the sidebar title be a link back to a main settings page (e.g., `/settings`)?
    - Should there be an optional subtitle or description under the title?
 
 3. **Mobile Menu Toggle Position**
@@ -273,12 +366,16 @@ export type { SidebarLayoutProps, NavSection, NavItem } from './SidebarLayout';
 
 4. **Accessibility Features**
    - Should we add breadcrumb navigation for better context?
-   - Should keyboard shortcuts be supported (e.g., / to focus search, arrow keys for navigation)?
+   - Should keyboard shortcuts be supported (e.g., `/` to focus search, arrow keys for navigation)?
 
 5. **Performance Optimization**
    - Should the sidebar component be memoized to prevent re-renders?
-   - Should navigation items lazy-load their target pages?
+   - Should navigation items prefetch their target pages using Next.js prefetch?
 
 6. **Error Handling**
    - How should invalid/broken navigation links be handled?
-   - Should there be a fallback for missing active state detection?
+   - Should there be a 404 fallback within the settings section?
+
+7. **Data Loading**
+   - How should settings pages handle getServerSideProps with the layout pattern?
+   - Should the layout support passing data to the sidebar (e.g., user info, dynamic nav items)?
