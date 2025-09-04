@@ -1,4 +1,7 @@
 import React from 'react';
+import styled from 'styled-components';
+
+import { ContentMaxWidth } from '../../styles/sizes';
 
 export type NavItem = {
   href: string;
@@ -19,6 +22,22 @@ export type SidebarLayoutProps = {
   titleHref?: string;
 };
 
+const LayoutContainer = styled.div`
+  display: grid;
+  grid-template-columns: 18rem 1fr;
+  gap: 2rem;
+  max-width: ${ContentMaxWidth};
+  margin: 0 auto;
+`;
+
+const SidebarContainer = styled.div`
+  /* Placeholder for sidebar styling */
+`;
+
+const MainContentContainer = styled.main`
+  /* Main content area */
+`;
+
 /*
  * Generic sidebar layout component for any sidebar + content layout.
  * Manages responsive breakpoint behavior and provides a reusable
@@ -32,11 +51,9 @@ export default function SidebarLayout({
   prefetchPages = false,
   titleHref,
 }: SidebarLayoutProps) {
-  // For now, render a basic container structure
-  // Desktop layout and responsive behavior will be added in subsequent commits
   return (
-    <div data-testid="sidebar-layout">
-      <div data-testid="sidebar-container">
+    <LayoutContainer data-testid="sidebar-layout">
+      <SidebarContainer data-testid="sidebar-container">
         <h2 data-testid="sidebar-title">{sidebarTitle}</h2>
         {/* Navigation sections will be rendered here */}
         {navSections.map((section, index) => (
@@ -54,8 +71,10 @@ export default function SidebarLayout({
             ))}
           </div>
         ))}
-      </div>
-      <main data-testid="main-content">{children}</main>
-    </div>
+      </SidebarContainer>
+      <MainContentContainer data-testid="main-content">
+        {children}
+      </MainContentContainer>
+    </LayoutContainer>
   );
 }
