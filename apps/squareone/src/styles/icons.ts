@@ -6,6 +6,7 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faAngleDown,
+  faBars,
   faFile,
   faCodePullRequest,
   faCodeMerge,
@@ -20,6 +21,7 @@ import { faGithub } from '@fortawesome/free-brands-svg-icons';
 
 // Add icons to the global Font Awesome library
 library.add(faAngleDown);
+library.add(faBars);
 library.add(faFile);
 library.add(faCodePullRequest);
 library.add(faCodeMerge);
