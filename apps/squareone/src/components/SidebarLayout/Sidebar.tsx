@@ -13,7 +13,10 @@ export type SidebarProps = {
 };
 
 const SidebarRoot = styled.aside`
-  /* Mobile: default behavior, no sticky positioning */
+  /* Mobile: add padding for better spacing inside disclosure container */
+  @media (max-width: calc(${ContentMaxWidth} - 0.001rem)) {
+    padding: 1rem var(--size-screen-padding-min);
+  }
 
   /* Desktop: sticky positioning with full viewport height and overflow */
   @media (min-width: ${ContentMaxWidth}) {

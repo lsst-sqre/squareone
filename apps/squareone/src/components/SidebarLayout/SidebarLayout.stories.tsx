@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { userEvent, within, expect } from 'storybook/test';
 import SidebarLayout from './SidebarLayout';
 
 const meta: Meta<typeof SidebarLayout> = {
@@ -308,6 +309,104 @@ export const MobileHeaderWithToggle: Story = {
         <div style={{ height: '150vh' }}>
           <p>Scroll to test sticky header behavior on mobile.</p>
         </div>
+      </div>
+    ),
+  },
+  globals: {
+    viewport: { value: 'iphone14' },
+  },
+};
+
+export const MobileMenuDisclosure: Story = {
+  args: {
+    sidebarTitle: 'Settings',
+    navSections: mockNavSections,
+    children: (
+      <div>
+        <h1>Mobile Menu Disclosure</h1>
+        <p>
+          This story demonstrates the mobile menu disclosure pattern. Click the
+          hamburger button to see the navigation slide down/up with smooth
+          animation. The menu pushes content down rather than overlaying it.
+        </p>
+        <div style={{ padding: '2rem 0' }}>
+          <h2>Main Content</h2>
+          <p>
+            This content gets pushed down when the mobile menu is open. The
+            disclosure pattern maintains accessibility with proper ARIA states.
+          </p>
+        </div>
+      </div>
+    ),
+  },
+  globals: {
+    viewport: { value: 'iphone14' },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // Find the hamburger menu toggle button
+    const menuToggle = canvas.getByRole('button', { name: /navigation menu/i });
+
+    // Initially, menu should be closed (aria-expanded="false")
+    await expect(menuToggle).toHaveAttribute('aria-expanded', 'false');
+
+    // Click to open the menu
+    await userEvent.click(menuToggle);
+
+    // Menu should now be open (aria-expanded="true")
+    await expect(menuToggle).toHaveAttribute('aria-expanded', 'true');
+
+    // Navigation should be visible
+    const navigation = canvas.getByRole('navigation');
+    await expect(navigation).toBeVisible();
+
+    // Click again to close the menu
+    await userEvent.click(menuToggle);
+
+    // Menu should be closed again
+    await expect(menuToggle).toHaveAttribute('aria-expanded', 'false');
+  },
+};
+
+export const MobileMenuLongContent: Story = {
+  args: {
+    sidebarTitle: 'Documentation',
+    navSections: [
+      {
+        items: [
+          { href: '/docs/getting-started', label: 'Getting Started' },
+          { href: '/docs/api-reference', label: 'API Reference' },
+          { href: '/docs/examples', label: 'Examples' },
+          { href: '/docs/deployment', label: 'Deployment' },
+        ],
+      },
+      {
+        label: 'Advanced Topics',
+        items: [
+          { href: '/docs/configuration', label: 'Configuration' },
+          { href: '/docs/customization', label: 'Customization' },
+          { href: '/docs/troubleshooting', label: 'Troubleshooting' },
+        ],
+      },
+    ],
+    children: (
+      <div>
+        <h1>Long Navigation Menu</h1>
+        <p>
+          This demonstrates the disclosure pattern with longer navigation
+          content. The menu animation handles varying content heights smoothly.
+        </p>
+        {Array.from({ length: 5 }, (_, i) => (
+          <div key={i} style={{ marginBottom: '2rem' }}>
+            <h2>Section {i + 1}</h2>
+            <p>
+              Content that gets pushed down when the mobile navigation menu is
+              expanded. The disclosure animation maintains proper flow and
+              accessibility.
+            </p>
+          </div>
+        ))}
       </div>
     ),
   },

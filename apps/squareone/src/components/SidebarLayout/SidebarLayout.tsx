@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
+import useDisclosure from 'react-a11y-disclosure';
 
 import { ContentMaxWidth } from '../../styles/sizes';
 import Sidebar from './Sidebar';
@@ -41,15 +42,29 @@ const LayoutContainer = styled.div`
   }
 `;
 
-const SidebarContainer = styled.div`
-  /* Mobile: navigation hidden by default, will be shown via disclosure pattern */
+const SidebarContainer = styled.div<{ $isOpen: boolean }>`
+  /* Mobile: navigation with disclosure animation */
   @media (max-width: calc(${ContentMaxWidth} - 0.001rem)) {
-    /* Navigation will be hidden by default, shown via disclosure */
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    max-height: ${({ $isOpen }) => ($isOpen ? '100vh' : '0')};
+
+    /* When content is hidden via aria, ensure it's also visually hidden */
+    &[hidden] {
+      max-height: 0;
+    }
   }
 
-  /* Desktop: sidebar styling */
+  /* Desktop: sidebar styling - always visible */
   @media (min-width: ${ContentMaxWidth}) {
-    /* Desktop sidebar styling will be added in sticky positioning commit */
+    max-height: none;
+    overflow: visible;
+
+    /* Ensure desktop sidebar is never hidden */
+    &[hidden] {
+      display: block;
+      max-height: none;
+    }
   }
 `;
 
@@ -110,20 +125,26 @@ export default function SidebarLayout({
   prefetchPages = false,
   titleHref,
 }: SidebarLayoutProps) {
-  // Mobile menu state
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  // Mobile menu disclosure state - starts closed by default
+  const { toggleProps, contentProps, isExpanded } = useDisclosure({
+    id: 'mobile-sidebar-menu',
+    isExpanded: false,
+  });
 
   // Determine the title href - default to first navigation item if not provided
   const resolvedTitleHref = titleHref || navSections[0]?.items[0]?.href || '#';
 
   // Navigation handler - closes mobile menu when navigation occurs
   const handleNavigate = () => {
-    setIsMobileMenuOpen(false);
+    // We need to manually trigger the toggle if the menu is open
+    if (isExpanded) {
+      toggleProps.onClick();
+    }
   };
 
-  // Mobile menu toggle handler
+  // Mobile menu toggle handler - just use the toggle function from disclosure
   const handleMobileMenuToggle = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
+    toggleProps.onClick();
   };
 
   return (
@@ -135,12 +156,17 @@ export default function SidebarLayout({
           </MobileHeaderTitleLink>
         </MobileHeaderTitle>
         <MobileMenuToggle
-          isOpen={isMobileMenuOpen}
+          isOpen={isExpanded}
           onClick={handleMobileMenuToggle}
+          {...toggleProps}
         />
       </MobileHeader>
 
-      <SidebarContainer data-testid="sidebar-container">
+      <SidebarContainer
+        data-testid="sidebar-container"
+        $isOpen={isExpanded}
+        {...contentProps}
+      >
         <Sidebar
           title={sidebarTitle}
           titleHref={resolvedTitleHref}
