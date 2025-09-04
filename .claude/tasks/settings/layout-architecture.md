@@ -8,30 +8,37 @@
    - Main content area on the right (ContentMaxWidth - 18rem = 42rem)
    - Entire layout centered horizontally
    - ContentMaxWidth constraint (60rem total)
+   - 2rem gap between sidebar and content
+   - Sticky sidebar that scrolls independently if needed
 
 2. **Mobile Layout (<60rem viewport)**
    - Vertical stacking: sidebar content above main content
    - Hamburger menu button to toggle sidebar navigation visibility
+   - Menu pushes content down (not overlay)
    - Full-width content areas with appropriate padding
+   - Auto-close menu on navigation
 
 ### Sidebar Navigation
 1. **Components**
    - Heading/title for the section (e.g., "Settings")
    - List of navigation items (page titles)
-   - Active/current page highlighting
-   - Smooth transitions for mobile menu open/close
+   - Optional section groupings with labels
+   - Active/current page highlighting (bold with thick left border)
+   - Hover states with muted primary background
 
 2. **Behavior**
-   - Desktop: Always visible
-   - Mobile: Hidden by default, toggleable via hamburger menu
+   - Desktop: Always visible, sticky positioning
+   - Mobile: Hidden by default, slide down/up animation (0.3s ease)
    - Current page indication with visual highlight
    - Accessible keyboard navigation
+   - Internal navigation only (using Next.js Link)
 
 ### Technical Requirements
 1. **Dependencies**
    - styled-components for styling
    - `@fortawesome/fontawesome-svg-core` for hamburger icon
-   - Consider radix-ui components for interactive elements (following existing patterns)
+   - `react-a11y-disclosure` for accessible menu behavior
+   - Next.js Link for internal navigation
    - TypeScript for type safety
 
 2. **Integration**
@@ -39,6 +46,7 @@
    - Follow existing component patterns from WideContentLayout and MainContent
    - Use design tokens from rubin-style-dictionary
    - Responsive using CSS media queries
+   - Support for shared navigation across multiple pages
 
 ## Architectural Proposal
 
@@ -46,11 +54,12 @@
 
 ```
 SidebarLayout/
-├── index.ts                  # Re-export
+├── index.ts                  # Re-export main component
 ├── SidebarLayout.tsx         # Main layout component
 ├── Sidebar.tsx              # Sidebar component with navigation
 ├── SidebarNav.tsx           # Navigation list component
 ├── SidebarNavItem.tsx       # Individual navigation item
+├── SidebarNavSection.tsx    # Optional section grouping
 ├── MobileMenuToggle.tsx     # Hamburger button for mobile
 └── SidebarLayout.stories.tsx # Storybook documentation
 ```
@@ -62,43 +71,49 @@ SidebarLayout/
 type SidebarLayoutProps = {
   children: React.ReactNode;          // Main content
   sidebarTitle: string;              // e.g., "Settings"
-  navItems: NavItem[];                // Navigation items
-  currentPath?: string;               // Current active path
+  navSections: NavSection[];          // Navigation sections
+  currentPath?: string;               // Current active path (auto-detected if not provided)
+};
+
+type NavSection = {
+  label?: string;                     // Optional section label
+  items: NavItem[];                   // Navigation items in this section
 };
 
 type NavItem = {
-  href: string;
-  label: string;
-  isActive?: boolean;
+  href: string;                       // Internal path
+  label: string;                      // Display text
 };
 ```
 
 **Responsibilities:**
 - Container for the entire layout
 - Manages responsive breakpoint behavior
-- Controls mobile menu state
+- Controls mobile menu state via react-a11y-disclosure
 - Applies ContentMaxWidth constraint
+- Auto-detects current path from Next.js router
 
 **Styling approach:**
-- CSS Grid for desktop layout with two columns
+- CSS Grid for desktop layout with two columns and 2rem gap
 - Flexbox for mobile vertical stacking
 - CSS custom properties for consistent spacing
+- Sticky positioning for sidebar on desktop
 
 #### 2. Sidebar Component
 ```typescript
 type SidebarProps = {
   title: string;
-  navItems: NavItem[];
-  isOpen: boolean;              // Mobile menu state
-  onClose: () => void;          // Mobile menu close handler
+  navSections: NavSection[];
+  currentPath: string;
+  onNavigate: () => void;      // Called when navigation occurs (for mobile menu close)
 };
 ```
 
 **Responsibilities:**
 - Renders sidebar heading
-- Contains navigation list
-- Handles mobile menu visibility
-- Manages focus trap when mobile menu is open
+- Contains navigation sections and items
+- Handles scrollable content if needed
+- Applies hover and active states
 
 #### 3. MobileMenuToggle Component
 ```typescript
@@ -122,8 +137,16 @@ type MobileMenuToggleProps = {
 .layout-container {
   display: grid;
   grid-template-columns: 18rem 1fr;
+  gap: 2rem;
   max-width: 60rem;
   margin: 0 auto;
+}
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
 }
 ```
 
@@ -135,21 +158,16 @@ type MobileMenuToggleProps = {
   padding: 0 var(--size-screen-padding-min);
 }
 
-.sidebar {
-  position: fixed;
-  transform: translateX(-100%);
-  transition: transform 0.3s ease;
-}
-
-.sidebar.open {
-  transform: translateX(0);
+/* Using react-a11y-disclosure for show/hide behavior */
+.sidebar-nav {
+  transition: max-height 0.3s ease, opacity 0.3s ease;
 }
 ```
 
 ### State Management
-- Use React `useState` for mobile menu open/closed state
-- Pass current route from Next.js `useRouter` for active page highlighting
-- Consider using `react-a11y-disclosure` for accessible menu behavior (already in dependencies)
+- Use `react-a11y-disclosure` hook for mobile menu toggle
+- Use Next.js `useRouter` to get current path
+- Auto-close menu on route change using useEffect
 
 ### Accessibility Considerations
 1. **ARIA Attributes**
@@ -167,38 +185,100 @@ type MobileMenuToggleProps = {
    - Descriptive labels for interactive elements
    - Announce menu state changes
 
+## Visual Design Specifications
+
+### Active State
+- Bold font weight
+- Thick left border (4px) in primary color
+- Background: transparent
+
+### Hover State
+- Background: muted primary color (e.g., `var(--rsd-color-primary-100)`)
+- Border radius: 0.5rem
+- Transition: background-color 0.2s ease
+- Full width within sidebar (not just text width)
+
+### Section Labels
+- Font size: smaller (0.875rem)
+- Font weight: bold
+- Color: muted neutral (e.g., `var(--rsd-color-gray-600)`)
+- Margin: 1rem 0 0.5rem 0
+
+## Usage Example
+
+```typescript
+// pages/settings/profile.tsx
+import { SidebarLayout } from '../../components/SidebarLayout';
+
+const settingsNavigation = [
+  {
+    // First section without label
+    items: [
+      { href: '/settings/profile', label: 'Profile' },
+      { href: '/settings/access-tokens', label: 'Access Tokens' },
+    ]
+  },
+  {
+    label: 'Security',
+    items: [
+      { href: '/settings/sessions', label: 'Sessions' },
+    ]
+  },
+  {
+    label: 'Storage',
+    items: [
+      { href: '/settings/files', label: 'Files' },
+    ]
+  }
+];
+
+export default function ProfilePage() {
+  return (
+    <SidebarLayout 
+      sidebarTitle="Settings"
+      navSections={settingsNavigation}
+    >
+      <h1>Profile Settings</h1>
+      {/* Page content */}
+    </SidebarLayout>
+  );
+}
+
+// Repeated pattern for other settings pages...
+```
+
+## Export Strategy
+
+Based on the usage pattern, only the main `SidebarLayout` component needs to be exported. The navigation configuration is passed as props, making it easy to share across multiple pages by defining the navigation structure once and importing it.
+
+```typescript
+// index.ts
+export { default as SidebarLayout } from './SidebarLayout';
+export type { SidebarLayoutProps, NavSection, NavItem } from './SidebarLayout';
+```
+
 ## Design Decisions Requiring Clarification
 
-1. **Mobile Menu Behavior**
-   - Should the mobile menu overlay the content or push it down?
-   - Should clicking outside the menu close it?
-   - What should happen when navigating to a new page - auto-close menu?
+1. **Navigation Configuration Management**
+   - Should the navigation configuration be defined in each page file or in a shared configuration file?
+   - How should we handle active state detection - automatic based on URL or explicit?
 
-2. **Sidebar Styling**
-   - Should the sidebar have a background color or border?
-   - How should the active page indicator look (bold, underline, background, left border)?
-   - Should there be hover states for navigation items?
+2. **Sidebar Header**
+   - Should the sidebar title be a link back to a main settings page?
+   - Should there be an optional subtitle or description under the title?
 
-3. **Navigation Structure**
-   - Should navigation items support nested/hierarchical structure?
-   - Should icons be supported alongside navigation labels?
-   - Should there be support for external links vs internal navigation?
+3. **Mobile Menu Toggle Position**
+   - Where should the hamburger button be positioned - top left, integrated with page header, or floating?
+   - Should it remain visible when scrolling on mobile?
 
-4. **Animation and Transitions**
-   - What duration/easing for mobile menu slide animation?
-   - Should there be a backdrop/overlay when mobile menu is open?
-   - Should page transitions be animated when navigating?
+4. **Accessibility Features**
+   - Should we add breadcrumb navigation for better context?
+   - Should keyboard shortcuts be supported (e.g., / to focus search, arrow keys for navigation)?
 
-5. **Component Library Integration**
-   - Should we use existing Radix UI NavigationMenu primitive or build custom?
-   - Would Radix UI Dialog be appropriate for mobile menu overlay?
-   - Should we create a compound component pattern like PrimaryNavigation?
+5. **Performance Optimization**
+   - Should the sidebar component be memoized to prevent re-renders?
+   - Should navigation items lazy-load their target pages?
 
-6. **Scroll Behavior**
-   - Should the sidebar be sticky/fixed on desktop when main content scrolls?
-   - How should long navigation lists be handled (scrollable sidebar)?
-   - Should there be a scroll-to-top behavior when navigating?
-
-7. **TypeScript Patterns**
-   - Follow the pattern of using `type` instead of `interface` for props?
-   - Should we export individual component types or keep them internal?
+6. **Error Handling**
+   - How should invalid/broken navigation links be handled?
+   - Should there be a fallback for missing active state detection?
