@@ -25,6 +25,7 @@ export interface AppConfigContextValue {
   sentryReplaysSessionSampleRate?: number;
   sentryReplaysOnErrorSampleRate?: number;
   sentryDebug?: boolean;
+  settingsSessionsVisible?: boolean;
 }
 
 const AppConfigContext = createContext<AppConfigContextValue | null>(null);
