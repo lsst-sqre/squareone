@@ -152,8 +152,13 @@ test('renders custom titleHref when provided', () => {
     </SidebarLayout>
   );
 
-  const titleLink = screen.getByRole('link', { name: /settings/i });
-  expect(titleLink).toHaveAttribute('href', '/custom-settings');
+  const titleLinks = screen.getAllByRole('link', { name: /settings/i });
+  // Should be exactly 2 links: mobile header and sidebar title
+  expect(titleLinks).toHaveLength(2);
+  // Both should have the custom href
+  titleLinks.forEach((link) => {
+    expect(link).toHaveAttribute('href', '/custom-settings');
+  });
 });
 
 test('uses default titleHref when not provided', () => {
@@ -168,6 +173,11 @@ test('uses default titleHref when not provided', () => {
   );
 
   // The titleHref defaults to the first navigation item's href
-  const titleLink = screen.getByRole('link', { name: /settings/i });
-  expect(titleLink).toHaveAttribute('href', '/settings/profile');
+  const titleLinks = screen.getAllByRole('link', { name: /settings/i });
+  // Should be exactly 2 links: mobile header and sidebar title
+  expect(titleLinks).toHaveLength(2);
+  // Both should have the default href from first nav item
+  titleLinks.forEach((link) => {
+    expect(link).toHaveAttribute('href', '/settings/profile');
+  });
 });
