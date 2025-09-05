@@ -9,6 +9,18 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export default defineConfig({
   test: {
     projects: [
+      // Unit testing project with traditional vitest tests
+      defineProject({
+        test: {
+          name: 'unit',
+          include: ['src/**/*.test.{ts,tsx}'],
+          exclude: ['src/**/*.stories.{ts,tsx}'],
+          environment: 'jsdom',
+          setupFiles: ['src/tests/setup.ts'],
+          globals: true,
+        },
+      }),
+      // Storybook interaction testing project
       defineProject({
         plugins: [
           storybookTest({

@@ -125,6 +125,12 @@
       "title": "Preview badge link URL",
       "description": "URL for the preview badge link",
       "default": "https://rsp.lsst.io/roadmap.html"
+    },
+    "settingsSessionsVisible": {
+      "type": "boolean",
+      "title": "Show Sessions in Settings",
+      "description": "Controls whether the Sessions page is visible in the Settings navigation. Allows deployment-specific control over which settings sections are available to users.",
+      "default": true
     }
   }
 }
