@@ -10,7 +10,7 @@ export type SidebarProps = {
   titleHref: string;
   navSections: NavSection[];
   currentPath: string;
-  onNavigate: () => void;
+  onNavigate: (e?: React.MouseEvent | React.KeyboardEvent) => void;
 };
 
 const SidebarRoot = styled.aside`
