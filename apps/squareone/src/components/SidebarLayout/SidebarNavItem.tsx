@@ -6,7 +6,7 @@ import type { NavItem } from './SidebarLayout';
 export type SidebarNavItemProps = {
   item: NavItem;
   isActive: boolean;
-  onNavigate: () => void;
+  onNavigate: (e?: React.MouseEvent) => void;
 };
 
 const NavigationLink = styled.a<{ $isActive: boolean }>`
@@ -47,10 +47,14 @@ export default function SidebarNavItem({
   isActive,
   onNavigate,
 }: SidebarNavItemProps) {
+  const handleClick = (e: React.MouseEvent) => {
+    onNavigate(e);
+  };
+
   return (
     <NavigationLink
       href={item.href}
-      onClick={onNavigate}
+      onClick={handleClick}
       aria-current={isActive ? 'page' : undefined}
       $isActive={isActive}
       data-testid="sidebar-nav-item"

@@ -133,7 +133,12 @@ export const InteractionTest: Story = {
     section: mockSectionWithLabel,
     sectionIndex: 0,
     currentPath: '',
-    onNavigate: () => {},
+    onNavigate: (e) => {
+      if (e) {
+        e.preventDefault();
+      }
+      console.log('Navigation prevented for Storybook test');
+    },
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
