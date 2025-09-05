@@ -1,8 +1,8 @@
 import type { ReactElement } from 'react';
 import { useMemo } from 'react';
+import { useRouter } from 'next/router';
 import { SidebarLayout } from '../SidebarLayout';
 import { useAppConfig } from '../../contexts/AppConfigContext';
-import { useGafaelfawrUser } from '@lsst-sqre/squared';
 import { getSettingsNavigation } from './settingsNavigation';
 
 type SettingsLayoutProps = {
@@ -16,18 +16,20 @@ type SettingsLayoutProps = {
  */
 export default function SettingsLayout({ children }: SettingsLayoutProps) {
   const config = useAppConfig();
-  const { user } = useGafaelfawrUser();
+  const router = useRouter();
 
   // Dynamically filter navigation based on config
   const navSections = useMemo(() => getSettingsNavigation(config), [config]);
 
-  // Dynamic title based on user context
-  const sidebarTitle = user?.username
-    ? `${user.username} Settings`
-    : 'Settings';
+  // Use static title to test hydration fix
+  const sidebarTitle = 'Settings';
 
   return (
-    <SidebarLayout sidebarTitle={sidebarTitle} navSections={navSections}>
+    <SidebarLayout
+      sidebarTitle={sidebarTitle}
+      navSections={navSections}
+      currentPath={router.pathname}
+    >
       {children}
     </SidebarLayout>
   );
