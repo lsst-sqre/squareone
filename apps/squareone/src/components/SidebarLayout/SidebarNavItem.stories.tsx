@@ -83,7 +83,12 @@ export const ClickInteraction: Story = {
   args: {
     item: mockItem,
     isActive: false,
-    onNavigate: () => {},
+    onNavigate: (e) => {
+      if (e) {
+        e.preventDefault();
+      }
+      console.log('Navigation prevented for Storybook test');
+    },
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
