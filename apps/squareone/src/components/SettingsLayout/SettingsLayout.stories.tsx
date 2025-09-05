@@ -191,9 +191,7 @@ export const MobileMenuToggle: Story = {
     const canvas = within(canvasElement);
 
     // Find and click the mobile menu toggle button
-    const menuButton = canvas.getByRole('button', {
-      name: /toggle navigation/i,
-    });
+    const menuButton = canvas.getByTestId('mobile-menu-toggle');
     await userEvent.click(menuButton);
 
     // Wait a moment for animation
