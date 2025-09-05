@@ -277,7 +277,6 @@ export default function SidebarLayout({
 
       <SidebarContainer
         data-testid="sidebar-container"
-        role="region"
         $isOpen={isExpanded}
         id={contentProps.id}
         aria-labelledby={contentProps['aria-labelledby']}
