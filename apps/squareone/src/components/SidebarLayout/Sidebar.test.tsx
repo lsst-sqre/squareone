@@ -25,7 +25,9 @@ const defaultProps = {
   titleHref: '/settings',
   navSections: mockNavSections,
   currentPath: '',
-  onNavigate: vi.fn(),
+  onNavigate: vi.fn((e) => {
+    if (e) e.preventDefault();
+  }),
 };
 
 test('renders sidebar title as heading', () => {
@@ -73,7 +75,7 @@ test('does not render section label when not provided', () => {
 test('marks current page as active', () => {
   render(<Sidebar {...defaultProps} currentPath="/settings/profile" />);
 
-  const activeLink = screen.getByRole('link', { name: /profile/i });
+  const activeLink = screen.getByRole('link', { name: 'Profile' });
   expect(activeLink).toHaveAttribute('aria-current', 'page');
 });
 
@@ -108,7 +110,9 @@ test('handles sections with empty items array', () => {
 });
 
 test('calls onNavigate when title is clicked', () => {
-  const mockOnNavigate = vi.fn();
+  const mockOnNavigate = vi.fn((e) => {
+    if (e) e.preventDefault();
+  });
   render(<Sidebar {...defaultProps} onNavigate={mockOnNavigate} />);
 
   const titleLink = screen.getByRole('link', { name: 'Settings' });

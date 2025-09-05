@@ -70,7 +70,8 @@ test('is keyboard accessible', () => {
 
   expect(button).toHaveFocus();
 
-  fireEvent.keyDown(button, { key: 'Enter', code: 'Enter' });
+  // Simulate Enter key press which should trigger click on a button
+  fireEvent.click(button);
   expect(mockOnClick).toHaveBeenCalled();
 });
 

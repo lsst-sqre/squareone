@@ -31,7 +31,7 @@ test('renders with required props', () => {
     </SidebarLayout>
   );
 
-  expect(screen.getByText('Settings')).toBeInTheDocument();
+  expect(screen.getAllByText('Settings')).toHaveLength(2); // Both mobile header and sidebar
   expect(screen.getByText('Main Content')).toBeInTheDocument();
   expect(screen.getByRole('main')).toBeInTheDocument();
 });
@@ -93,7 +93,7 @@ test('handles empty navigation sections', () => {
     </SidebarLayout>
   );
 
-  expect(screen.getByText('Settings')).toBeInTheDocument();
+  expect(screen.getAllByText('Settings')).toHaveLength(2); // Both mobile header and sidebar
   expect(screen.getByText('Main Content')).toBeInTheDocument();
 });
 
@@ -132,8 +132,12 @@ test('passes currentPath to sidebar for active state', () => {
     </SidebarLayout>
   );
 
-  const activeLink = screen.getByRole('link', { name: /profile/i });
-  expect(activeLink).toHaveAttribute('aria-current', 'page');
+  const allNavItems = screen.getAllByTestId('sidebar-nav-item');
+  const activeLink = allNavItems.find(
+    (item) => item.getAttribute('aria-current') === 'page'
+  );
+  expect(activeLink).toBeDefined();
+  expect(activeLink).toHaveTextContent('Profile');
 });
 
 test('renders custom titleHref when provided', () => {

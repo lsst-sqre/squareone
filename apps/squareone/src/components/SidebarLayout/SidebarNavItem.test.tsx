@@ -11,7 +11,9 @@ const mockItem = {
 const defaultProps = {
   item: mockItem,
   isActive: false,
-  onNavigate: vi.fn(),
+  onNavigate: vi.fn((e) => {
+    if (e) e.preventDefault();
+  }),
 };
 
 test('renders navigation item as link', () => {
@@ -28,7 +30,9 @@ test('displays correct label text', () => {
 });
 
 test('calls onNavigate when clicked', () => {
-  const mockOnNavigate = vi.fn();
+  const mockOnNavigate = vi.fn((e) => {
+    if (e) e.preventDefault();
+  });
   render(<SidebarNavItem {...defaultProps} onNavigate={mockOnNavigate} />);
 
   const link = screen.getByRole('link');
@@ -96,7 +100,9 @@ test('handles items with special characters in label', () => {
 });
 
 test('is keyboard accessible', () => {
-  const mockOnNavigate = vi.fn();
+  const mockOnNavigate = vi.fn((e) => {
+    if (e) e.preventDefault();
+  });
   render(<SidebarNavItem {...defaultProps} onNavigate={mockOnNavigate} />);
 
   const link = screen.getByRole('link');
@@ -109,7 +115,9 @@ test('is keyboard accessible', () => {
 });
 
 test('prevents default behavior correctly', () => {
-  const mockOnNavigate = vi.fn();
+  const mockOnNavigate = vi.fn((e) => {
+    if (e) e.preventDefault();
+  });
   render(<SidebarNavItem {...defaultProps} onNavigate={mockOnNavigate} />);
 
   const link = screen.getByRole('link');
