@@ -23,7 +23,9 @@ const defaultProps = {
   section: mockSectionWithLabel,
   sectionIndex: 0,
   currentPath: '',
-  onNavigate: vi.fn(),
+  onNavigate: vi.fn((e) => {
+    if (e) e.preventDefault();
+  }),
 };
 
 test('renders section with label', () => {
@@ -53,10 +55,10 @@ test('passes correct props to navigation items', () => {
     <SidebarNavSection {...defaultProps} currentPath="/settings/sessions" />
   );
 
-  const activeLink = screen.getByRole('link', { name: /sessions/i });
+  const activeLink = screen.getByRole('link', { name: 'Sessions' });
   expect(activeLink).toHaveAttribute('aria-current', 'page');
 
-  const inactiveLink = screen.getByRole('link', { name: /access tokens/i });
+  const inactiveLink = screen.getByRole('link', { name: 'Access Tokens' });
   expect(inactiveLink).not.toHaveAttribute('aria-current', 'page');
 });
 
@@ -131,7 +133,9 @@ test('handles long section labels', () => {
 });
 
 test('passes onNavigate handler to all navigation items', () => {
-  const mockOnNavigate = vi.fn();
+  const mockOnNavigate = vi.fn((e) => {
+    if (e) e.preventDefault();
+  });
   render(<SidebarNavSection {...defaultProps} onNavigate={mockOnNavigate} />);
 
   const firstLink = screen.getByText('Sessions');
