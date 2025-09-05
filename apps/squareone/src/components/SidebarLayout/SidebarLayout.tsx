@@ -123,7 +123,7 @@ const MobileHeader = styled.header`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem var(--size-screen-padding-min);
+  padding: 0.5rem 0;
   background: white;
   border-bottom: 1px solid var(--rsd-color-gray-200, #e5e7eb);
   position: sticky;
