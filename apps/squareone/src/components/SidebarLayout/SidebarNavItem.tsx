@@ -16,6 +16,7 @@ const NavigationLink = styled.a<{ $isActive: boolean }>`
   text-decoration: none;
   border-radius: 0.5rem;
   transition: background-color 0.2s ease, color 0.2s ease;
+  position: relative;
 
   &:hover {
     background-color: var(--rsd-color-primary-100, #e6f3ff);
@@ -27,13 +28,23 @@ const NavigationLink = styled.a<{ $isActive: boolean }>`
     outline-offset: -2px;
   }
 
-  /* Active/current page state */
+  /* Active/current page state - using pseudo-element for left bar */
   ${({ $isActive }) =>
     $isActive &&
     `
     font-weight: bold;
-    border-left: 4px solid var(--rsd-color-primary-600, #0066cc);
-    padding-left: calc(0.75rem - 4px); /* Adjust padding to account for border */
+    border-radius: 0 0.5rem 0.5rem 0;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background-color: var(--rsd-color-primary-600, #0066cc);
+      border-radius: 2px;
+    }
   `}
 `;
 
