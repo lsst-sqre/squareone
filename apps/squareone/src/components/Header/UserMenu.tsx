@@ -1,5 +1,6 @@
 /* Menu for a user profile and settings. */
 
+import { useState, useEffect } from 'react';
 import { ChevronDown } from 'react-feather';
 import { PrimaryNavigation } from '@lsst-sqre/squared';
 import { useGafaelfawrUser } from '@lsst-sqre/squared';
@@ -14,8 +15,15 @@ export default function UserMenu({ pageUrl }: UserMenuProps) {
   const { coManageRegistryUrl } = useAppConfig();
   const { user } = useGafaelfawrUser();
   const logoutUrl = getLogoutUrl(pageUrl.toString());
+  const [hasMounted, setHasMounted] = useState(false);
 
-  if (!user) {
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  // Always render empty during SSR and initial client render
+  // to avoid hydration mismatch
+  if (!hasMounted || !user) {
     return <></>;
   }
 
