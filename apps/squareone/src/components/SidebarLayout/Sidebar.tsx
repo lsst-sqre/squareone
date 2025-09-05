@@ -34,6 +34,11 @@ const SidebarTitle = styled.h2`
   font-size: 1.25rem;
   font-weight: bold;
   line-height: 1.2;
+
+  /* Hide on mobile to prevent duplication with MobileHeaderTitle */
+  @media (max-width: calc(${ContentMaxWidth} - 0.001rem)) {
+    display: none;
+  }
 `;
 
 const SidebarTitleLink = styled.a`
@@ -68,7 +73,7 @@ export default function Sidebar({
   onNavigate,
 }: SidebarProps) {
   return (
-    <SidebarRoot>
+    <SidebarRoot aria-label={title}>
       <SidebarTitle>
         <SidebarTitleLink href={titleHref} onClick={onNavigate}>
           {title}
