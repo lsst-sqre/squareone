@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { userEvent, within } from 'storybook/test';
 import SettingsLayout from './SettingsLayout';
+import { AppConfigProvider } from '../../contexts/AppConfigContext';
 
 const meta: Meta<typeof SettingsLayout> = {
   title: 'Components/SettingsLayout',
@@ -260,6 +261,150 @@ export const LongContent: Story = {
     nextjs: {
       navigation: {
         pathname: '/settings/tokens',
+      },
+    },
+  },
+};
+
+// Mock configurations for testing dynamic features
+const configWithSessionsHidden = {
+  siteName: 'Rubin Science Platform',
+  siteDescription:
+    'The Rubin Science Platform (RSP) provides web-based data access and analysis tools.',
+  showPreview: true,
+  previewLink: 'https://rsp.lsst.io/roadmap.html',
+  docsBaseUrl: 'https://rsp.lsst.io',
+  enableAppsMenu: false,
+  appLinks: [],
+  baseUrl: 'http://localhost:3000',
+  coManageRegistryUrl: null,
+  timesSquareUrl: null,
+  environmentName: 'storybook',
+  sentryDsn: null,
+  semaphoreUrl: null,
+  plausibleDomain: null,
+  mdxDir: '/mock/mdx',
+  settingsSessionsVisible: false,
+};
+
+const configWithSessionsVisible = {
+  siteName: 'Rubin Science Platform',
+  siteDescription:
+    'The Rubin Science Platform (RSP) provides web-based data access and analysis tools.',
+  showPreview: true,
+  previewLink: 'https://rsp.lsst.io/roadmap.html',
+  docsBaseUrl: 'https://rsp.lsst.io',
+  enableAppsMenu: false,
+  appLinks: [],
+  baseUrl: 'http://localhost:3000',
+  coManageRegistryUrl: null,
+  timesSquareUrl: null,
+  environmentName: 'storybook',
+  sentryDsn: null,
+  semaphoreUrl: null,
+  plausibleDomain: null,
+  mdxDir: '/mock/mdx',
+  settingsSessionsVisible: true,
+};
+
+// Mock user data for testing user context
+const mockUser = {
+  username: 'jdoe',
+  name: 'Jane Doe',
+  email: 'jane.doe@example.com',
+  uid: 12345,
+  gid: 12345,
+};
+
+// Create a mock for the useGafaelfawrUser hook
+const mockUseGafaelfawrUser = (userData: any) => ({
+  user: userData,
+  isLoading: false,
+  isValidating: false,
+  isLoggedIn: !!userData,
+  error: null,
+});
+
+export const SessionsHidden: Story = {
+  args: {
+    children: (
+      <div>
+        <h1>Sessions Navigation Hidden</h1>
+        <p>
+          This story demonstrates dynamic navigation filtering when
+          settingsSessionsVisible is set to false. The Sessions section should
+          not appear in the sidebar navigation.
+        </p>
+        <div
+          style={{
+            padding: '2rem',
+            background: '#f9f9f9',
+            borderRadius: '8px',
+          }}
+        >
+          <h2>Configuration Test</h2>
+          <p>settingsSessionsVisible: false</p>
+          <p>
+            Expected behavior: Only Account and Access Tokens sections visible
+          </p>
+        </div>
+      </div>
+    ),
+  },
+  decorators: [
+    (Story) => (
+      <AppConfigProvider config={configWithSessionsHidden}>
+        <Story />
+      </AppConfigProvider>
+    ),
+  ],
+  parameters: {
+    nextjs: {
+      navigation: {
+        pathname: '/settings',
+      },
+    },
+  },
+};
+
+export const SessionsVisible: Story = {
+  args: {
+    children: (
+      <div>
+        <h1>Sessions Navigation Visible</h1>
+        <p>
+          This story demonstrates dynamic navigation when
+          settingsSessionsVisible is set to true. The Sessions section should
+          appear in the sidebar navigation under Security.
+        </p>
+        <div
+          style={{
+            padding: '2rem',
+            background: '#f9f9f9',
+            borderRadius: '8px',
+          }}
+        >
+          <h2>Configuration Test</h2>
+          <p>settingsSessionsVisible: true</p>
+          <p>
+            Expected behavior: Account, Access Tokens, and Sessions sections
+            visible
+          </p>
+        </div>
+      </div>
+    ),
+  },
+  decorators: [
+    (Story) => (
+      <AppConfigProvider config={configWithSessionsVisible}>
+        <Story />
+      </AppConfigProvider>
+    ),
+  ],
+  parameters: {
+    nextjs: {
+      navigation: {
+        pathname: '/settings',
       },
     },
   },
