@@ -8,7 +8,7 @@ export type SidebarNavSectionProps = {
   section: NavSection;
   sectionIndex: number;
   currentPath: string;
-  onNavigate: () => void;
+  onNavigate: (e?: React.MouseEvent | React.KeyboardEvent) => void;
 };
 
 const NavigationSection = styled.div`
