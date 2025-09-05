@@ -23,6 +23,7 @@ export type SidebarLayoutProps = {
   currentPath?: string;
   prefetchPages?: boolean;
   titleHref?: string;
+  onNavigate?: (e: React.MouseEvent) => void;
 };
 
 const SkipLink = styled.a`
@@ -144,6 +145,7 @@ export default function SidebarLayout({
   currentPath = '',
   prefetchPages = false,
   titleHref,
+  onNavigate,
 }: SidebarLayoutProps) {
   // Refs for focus management
   const menuToggleRef = useRef<HTMLButtonElement>(null);
@@ -171,6 +173,19 @@ export default function SidebarLayout({
   };
 
   // Navigation handler - closes mobile menu when navigation occurs
+  const handleNavigateWithEvent = (e: React.MouseEvent) => {
+    // Call the custom onNavigate handler if provided
+    if (onNavigate) {
+      onNavigate(e);
+    }
+
+    // We need to manually trigger the toggle if the menu is open
+    if (isExpanded) {
+      toggleProps.onClick();
+    }
+  };
+
+  // Navigation handler for child components (without event parameter)
   const handleNavigate = () => {
     // We need to manually trigger the toggle if the menu is open
     if (isExpanded) {
@@ -216,7 +231,10 @@ export default function SidebarLayout({
 
       <MobileHeader data-testid="mobile-header">
         <MobileHeaderTitle>
-          <MobileHeaderTitleLink href={resolvedTitleHref}>
+          <MobileHeaderTitleLink
+            href={resolvedTitleHref}
+            onClick={handleNavigateWithEvent}
+          >
             {sidebarTitle}
           </MobileHeaderTitleLink>
         </MobileHeaderTitle>

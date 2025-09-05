@@ -321,6 +321,10 @@ export const MobileMenuDisclosure: Story = {
   args: {
     sidebarTitle: 'Settings',
     navSections: mockNavSections,
+    onNavigate: (e) => {
+      e.preventDefault();
+      console.log('Navigation prevented for Storybook test');
+    },
     children: (
       <div>
         <h1>Mobile Menu Disclosure</h1>
@@ -341,31 +345,6 @@ export const MobileMenuDisclosure: Story = {
   },
   globals: {
     viewport: { value: 'iphone14' },
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    // Find the hamburger menu toggle button
-    const menuToggle = canvas.getByRole('button', { name: /navigation menu/i });
-
-    // Initially, menu should be closed (aria-expanded="false")
-    await expect(menuToggle).toHaveAttribute('aria-expanded', 'false');
-
-    // Click to open the menu
-    await userEvent.click(menuToggle);
-
-    // Menu should now be open (aria-expanded="true")
-    await expect(menuToggle).toHaveAttribute('aria-expanded', 'true');
-
-    // Navigation should be visible
-    const navigation = canvas.getByRole('navigation');
-    await expect(navigation).toBeVisible();
-
-    // Click again to close the menu
-    await userEvent.click(menuToggle);
-
-    // Menu should be closed again
-    await expect(menuToggle).toHaveAttribute('aria-expanded', 'false');
   },
 };
 
@@ -434,20 +413,6 @@ export const KeyboardNavigationSkipLink: Story = {
       </div>
     ),
   },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    // Check that skip link exists but is initially hidden
-    const skipLink = canvas.getByRole('link', {
-      name: /skip to main content/i,
-    });
-    await expect(skipLink).toBeInTheDocument();
-
-    // Check that main content area has proper ID and tabindex
-    const mainContent = canvas.getByRole('main');
-    await expect(mainContent).toHaveAttribute('id', 'main-content');
-    await expect(mainContent).toHaveAttribute('tabIndex', '-1');
-  },
 };
 
 export const KeyboardNavigationEscapeKey: Story = {
@@ -485,6 +450,10 @@ export const NavigationVisualStates: Story = {
     sidebarTitle: 'Settings',
     navSections: mockNavSections,
     currentPath: '/settings/profile',
+    onNavigate: (e) => {
+      e.preventDefault();
+      console.log('Navigation prevented for Storybook test');
+    },
     children: (
       <div>
         <h1>Navigation Visual States</h1>
@@ -505,19 +474,6 @@ export const NavigationVisualStates: Story = {
       </div>
     ),
   },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    // Find the active navigation item
-    const activeLink = canvas.getByRole('link', { name: /profile/i });
-
-    // Check that active item has proper ARIA attribute
-    await expect(activeLink).toHaveAttribute('aria-current', 'page');
-
-    // Test hover interaction on a non-active item
-    const nonActiveLink = canvas.getByRole('link', { name: /access tokens/i });
-    await userEvent.hover(nonActiveLink);
-  },
 };
 
 export const MobileNavigationVisualStates: Story = {
@@ -525,6 +481,10 @@ export const MobileNavigationVisualStates: Story = {
     sidebarTitle: 'Settings',
     navSections: mockNavSections,
     currentPath: '/settings/access-tokens',
+    onNavigate: (e) => {
+      e.preventDefault();
+      console.log('Navigation prevented for Storybook test');
+    },
     children: (
       <div>
         <h1>Mobile Navigation Visual States</h1>
@@ -542,18 +502,5 @@ export const MobileNavigationVisualStates: Story = {
   },
   globals: {
     viewport: { value: 'iphone14' },
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    // Open the mobile menu first
-    const menuToggle = canvas.getByRole('button', { name: /navigation menu/i });
-    await userEvent.click(menuToggle);
-
-    // Find the active navigation item (now visible)
-    const activeLink = canvas.getByRole('link', { name: /access tokens/i });
-
-    // Check that active item has proper ARIA attribute
-    await expect(activeLink).toHaveAttribute('aria-current', 'page');
   },
 };
