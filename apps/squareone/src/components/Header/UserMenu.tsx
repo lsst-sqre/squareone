@@ -15,6 +15,8 @@ export default function UserMenu({ pageUrl }: UserMenuProps) {
   const { user } = useGafaelfawrUser();
   const logoutUrl = getLogoutUrl(pageUrl.toString());
 
+  // User data should be available when this component is rendered
+  // since Login component handles the hydration logic
   if (!user) {
     return <></>;
   }
