@@ -7,6 +7,7 @@ import { ContentMaxWidth } from '../../styles/sizes';
 export type MobileMenuToggleProps = {
   isOpen: boolean;
   onClick: () => void;
+  id?: string;
 };
 
 const ToggleButton = styled.button`
@@ -55,10 +56,11 @@ const ToggleButton = styled.button`
 const MobileMenuToggle = React.forwardRef<
   HTMLButtonElement,
   MobileMenuToggleProps
->(function MobileMenuToggle({ isOpen, onClick }, ref) {
+>(function MobileMenuToggle({ isOpen, onClick, id }, ref) {
   return (
     <ToggleButton
       ref={ref}
+      id={id}
       type="button"
       onClick={onClick}
       aria-expanded={isOpen}

@@ -269,14 +269,15 @@ export default function SidebarLayout({
         </MobileHeaderTitle>
         <MobileMenuToggle
           ref={menuToggleRef}
+          id={toggleProps.id}
           isOpen={isExpanded}
           onClick={handleMobileMenuToggle}
-          {...toggleProps}
         />
       </MobileHeader>
 
       <SidebarContainer
         data-testid="sidebar-container"
+        role="region"
         $isOpen={isExpanded}
         id={contentProps.id}
         aria-labelledby={contentProps['aria-labelledby']}
