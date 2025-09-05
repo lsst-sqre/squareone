@@ -136,7 +136,7 @@ const MobileHeader = styled.header`
   }
 `;
 
-const MobileHeaderTitle = styled.h1`
+const MobileHeaderTitle = styled.h2`
   margin: 0;
   font-size: 1.125rem;
   font-weight: bold;
