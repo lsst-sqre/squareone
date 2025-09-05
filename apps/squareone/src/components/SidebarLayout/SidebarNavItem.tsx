@@ -11,7 +11,7 @@ export type SidebarNavItemProps = {
 
 const NavigationLink = styled.a<{ $isActive: boolean }>`
   display: block;
-  padding: 0.5rem 0.75rem;
+  padding: 0.25rem 0.75rem;
   margin-left: -0.75rem;
   color: inherit;
   text-decoration: none;

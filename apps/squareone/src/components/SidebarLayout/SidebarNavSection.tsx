@@ -12,7 +12,7 @@ export type SidebarNavSectionProps = {
 };
 
 const NavigationSection = styled.div`
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 
   &:last-child {
     margin-bottom: 0;
@@ -20,7 +20,7 @@ const NavigationSection = styled.div`
 `;
 
 const SectionLabel = styled.h3`
-  margin: 1rem 0 0.5rem 0;
+  margin: 1rem 0 0.25rem 0;
   font-size: 0.875rem;
   font-weight: bold;
   color: var(--rsd-color-gray-600, #6b7280);
@@ -39,7 +39,7 @@ const NavigationList = styled.ul`
 `;
 
 const NavigationItem = styled.li`
-  margin-bottom: 0.25rem;
+  margin-bottom: 0;
 `;
 
 /*
