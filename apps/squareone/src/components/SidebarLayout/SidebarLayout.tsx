@@ -269,9 +269,9 @@ export default function SidebarLayout({
         </MobileHeaderTitle>
         <MobileMenuToggle
           ref={menuToggleRef}
+          id={toggleProps.id}
           isOpen={isExpanded}
           onClick={handleMobileMenuToggle}
-          {...toggleProps}
         />
       </MobileHeader>
 
