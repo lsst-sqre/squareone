@@ -17,6 +17,7 @@ const SidebarRoot = styled.aside`
   /* Mobile: add padding for better spacing inside disclosure container */
   @media (max-width: calc(${ContentMaxWidth} - 0.001rem)) {
     padding: 1rem var(--size-screen-padding-min);
+    padding-left: calc(var(--size-screen-padding-min) + 0.75rem);
   }
 
   /* Desktop: sticky positioning with full viewport height and overflow */
@@ -26,6 +27,7 @@ const SidebarRoot = styled.aside`
     height: 100vh;
     overflow-y: auto;
     padding-right: 1rem; /* Space for scrollbar */
+    padding-left: 0.75rem; /* Space for navigation items with negative margins */
   }
 `;
 
