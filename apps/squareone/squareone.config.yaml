@@ -23,3 +23,4 @@ sentryTracesSampleRate: 0
 sentryReplaysSessionSampleRate: 0
 sentryReplaysOnErrorSampleRate: 1.0
 sentryDebug: false
+settingsSessionsVisible: true
