@@ -186,6 +186,23 @@ export default function SidebarLayout({
     isExpanded: false,
   });
 
+  // Track if we're on mobile viewport to conditionally apply disclosure props
+  const [isMobile, setIsMobile] = React.useState(false);
+
+  useEffect(() => {
+    const checkIsMobile = () => {
+      // Match the CSS breakpoint: ContentMaxWidth = 60rem = 960px
+      setIsMobile(window.innerWidth < 960);
+    };
+
+    // Check initial size
+    checkIsMobile();
+
+    // Listen for resize events
+    window.addEventListener('resize', checkIsMobile);
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
+
   // Determine the title href - default to first navigation item if not provided
   const resolvedTitleHref = titleHref || navSections[0]?.items[0]?.href || '#';
 
@@ -278,7 +295,7 @@ export default function SidebarLayout({
       <SidebarContainer
         data-testid="sidebar-container"
         $isOpen={isExpanded}
-        {...contentProps}
+        {...(isMobile ? contentProps : {})}
       >
         <Sidebar
           title={sidebarTitle}
