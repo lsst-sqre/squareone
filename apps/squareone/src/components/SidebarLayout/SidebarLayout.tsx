@@ -31,7 +31,7 @@ const SkipLink = styled.a`
   position: absolute;
   top: -40px;
   left: 6px;
-  background: var(--rsd-color-primary-600, #0066cc);
+  background: var(--rsd-color-primary-700, #0c4a47);
   color: white;
   padding: 8px;
   z-index: 1000;
@@ -67,8 +67,23 @@ const SidebarContainer = styled.div<{ $isOpen: boolean }>`
   /* Mobile: navigation with disclosure animation */
   @media (max-width: calc(${ContentMaxWidth} - 0.001rem)) {
     overflow: hidden;
-    transition: max-height 0.3s ease;
+    transition: max-height 0.3s ease, visibility 0.3s ease;
     max-height: ${({ $isOpen }) => ($isOpen ? '100vh' : '0')};
+
+    /* When content is hidden via aria, ensure it's also visually hidden and not focusable */
+    &[aria-hidden='true'] {
+      visibility: hidden;
+
+      /* Remove all focusable descendants from tab order */
+      a,
+      button,
+      input,
+      select,
+      textarea,
+      [tabindex]:not([tabindex='-1']) {
+        /* Elements are hidden from focus via aria-hidden and visibility: hidden */
+      }
+    }
 
     /* When content is hidden via aria, ensure it's also visually hidden */
     &[hidden] {
@@ -85,6 +100,20 @@ const SidebarContainer = styled.div<{ $isOpen: boolean }>`
     &[hidden] {
       display: block;
       max-height: none;
+    }
+
+    /* Desktop sidebar should never have aria-hidden */
+    &[aria-hidden='true'] {
+      visibility: visible;
+
+      a,
+      button,
+      input,
+      select,
+      textarea,
+      [tabindex] {
+        /* Elements are accessible via normal tabindex behavior on desktop */
+      }
     }
   }
 `;
