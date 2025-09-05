@@ -2,6 +2,7 @@ import type { ReactElement } from 'react';
 import { useMemo } from 'react';
 import { SidebarLayout } from '../SidebarLayout';
 import { useAppConfig } from '../../contexts/AppConfigContext';
+import { useGafaelfawrUser } from '@lsst-sqre/squared';
 import { getSettingsNavigation } from './settingsNavigation';
 
 type SettingsLayoutProps = {
@@ -15,12 +16,15 @@ type SettingsLayoutProps = {
  */
 export default function SettingsLayout({ children }: SettingsLayoutProps) {
   const config = useAppConfig();
+  const { user } = useGafaelfawrUser();
 
   // Dynamically filter navigation based on config
   const navSections = useMemo(() => getSettingsNavigation(config), [config]);
 
-  // Static title for now
-  const sidebarTitle = 'Settings';
+  // Dynamic title based on user context
+  const sidebarTitle = user?.username
+    ? `${user.username} Settings`
+    : 'Settings';
 
   return (
     <SidebarLayout sidebarTitle={sidebarTitle} navSections={navSections}>
