@@ -275,18 +275,15 @@ export default function SidebarLayout({
         />
       </MobileHeader>
 
-      <SidebarContainer
-        data-testid="sidebar-container"
-        $isOpen={isExpanded}
-        id={contentProps.id}
-        aria-labelledby={contentProps['aria-labelledby']}
-      >
+      <SidebarContainer data-testid="sidebar-container" $isOpen={isExpanded}>
         <Sidebar
           title={sidebarTitle}
           titleHref={resolvedTitleHref}
           navSections={navSections}
           currentPath={currentPath}
           onNavigate={handleNavigate}
+          disclosureId={contentProps.id}
+          disclosureAriaLabelledby={contentProps['aria-labelledby']}
         />
       </SidebarContainer>
 

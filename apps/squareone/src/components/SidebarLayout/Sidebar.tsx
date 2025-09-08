@@ -11,6 +11,8 @@ export type SidebarProps = {
   navSections: NavSection[];
   currentPath: string;
   onNavigate: (e?: React.MouseEvent | React.KeyboardEvent) => void;
+  disclosureId?: string;
+  disclosureAriaLabelledby?: string;
 };
 
 const SidebarRoot = styled.aside`
@@ -73,9 +75,15 @@ export default function Sidebar({
   navSections,
   currentPath,
   onNavigate,
+  disclosureId,
+  disclosureAriaLabelledby,
 }: SidebarProps) {
   return (
-    <SidebarRoot aria-label={title}>
+    <SidebarRoot
+      aria-label={title}
+      id={disclosureId}
+      aria-labelledby={disclosureAriaLabelledby}
+    >
       <SidebarTitle>
         <SidebarTitleLink href={titleHref} onClick={onNavigate}>
           {title}
