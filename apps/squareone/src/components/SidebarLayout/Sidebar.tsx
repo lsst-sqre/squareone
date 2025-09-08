@@ -43,6 +43,11 @@ const SidebarTitle = styled.h2`
   @media (max-width: calc(${ContentMaxWidth} - 0.001rem)) {
     display: none;
   }
+
+  /* Desktop: add top margin */
+  @media (min-width: ${ContentMaxWidth}) {
+    margin-top: 1rem;
+  }
 `;
 
 const SidebarTitleLink = styled.a`
