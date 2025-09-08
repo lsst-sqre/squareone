@@ -10,10 +10,10 @@ export function getSettingsNavigation(
 ): NavSection[] {
   const navigation: NavSection[] = [
     {
-      items: [{ href: '/settings', label: 'Account' }],
-    },
-    {
-      items: [{ href: '/settings/tokens', label: 'Access Tokens' }],
+      items: [
+        { href: '/settings', label: 'Account' },
+        { href: '/settings/tokens', label: 'Access Tokens' },
+      ],
     },
   ];
 
