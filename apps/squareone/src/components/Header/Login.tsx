@@ -20,7 +20,7 @@ export default function Login({ pageUrl }: LoginProps) {
 
   // Always render "Log in" link on server and initial client render
   // to avoid hydration mismatch
-  if (!hasMounted || isLoading) {
+  if (!hasMounted) {
     return (
       <LoginNavItem>
         <PrimaryNavigation.TriggerLink href={getLoginUrl(pageUrl.toString())}>
@@ -30,7 +30,18 @@ export default function Login({ pageUrl }: LoginProps) {
     );
   }
 
-  // After hydration, show appropriate content based on login status
+  // After hydration, check loading state first
+  if (isLoading) {
+    return (
+      <LoginNavItem>
+        <PrimaryNavigation.TriggerLink href={getLoginUrl(pageUrl.toString())}>
+          Log in
+        </PrimaryNavigation.TriggerLink>
+      </LoginNavItem>
+    );
+  }
+
+  // Show appropriate content based on login status
   if (isLoggedIn === true) {
     return (
       <LoginNavItem>
@@ -49,10 +60,14 @@ export default function Login({ pageUrl }: LoginProps) {
 }
 
 const LoginNavItem = styled(PrimaryNavigation.Item)`
-  margin-left: auto;
-  margin-right: 0;
+  margin-left: auto !important;
+  margin-right: 0 !important;
   margin-top: 0;
   margin-bottom: 0;
+
+  /* Ensure consistent width to prevent layout shifts */
+  min-width: fit-content;
+  flex-shrink: 0;
 
   color: var(--rsd-component-header-nav-text-color);
   a {
