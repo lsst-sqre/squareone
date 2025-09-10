@@ -25,7 +25,7 @@ const NavigationLink = styled(Link)<{ $isActive: boolean }>`
     text-decoration: none;
   }
 
-  &:focus {
+  &:focus-visible {
     outline: 2px solid var(--rsd-color-primary-600, #0066cc);
     outline-offset: -2px;
   }
