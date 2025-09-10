@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import styled from 'styled-components';
 import Link from 'next/link';
 
@@ -60,21 +60,22 @@ export default function SidebarNavItem({
   isActive,
   onNavigate,
 }: SidebarNavItemProps) {
+  const linkRef = useRef<HTMLAnchorElement>(null);
+
   const handleClick = (e: React.MouseEvent) => {
     onNavigate(e);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
-      if (e.key === ' ') {
-        e.preventDefault();
-      }
+      // Let Next.js Link handle navigation, only call onNavigate for side effects
       onNavigate(e);
     }
   };
 
   return (
     <NavigationLink
+      ref={linkRef}
       href={item.href}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
