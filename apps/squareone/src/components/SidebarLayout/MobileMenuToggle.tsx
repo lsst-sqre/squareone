@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBars } from '@fortawesome/free-solid-svg-icons';
 
 import { ContentMaxWidth } from '../../styles/sizes';
 
@@ -67,7 +68,7 @@ const MobileMenuToggle = React.forwardRef<
       aria-label={isOpen ? 'Close navigation menu' : 'Open navigation menu'}
       data-testid="mobile-menu-toggle"
     >
-      <FontAwesomeIcon icon="bars" />
+      <FontAwesomeIcon icon={faBars} />
     </ToggleButton>
   );
 });
