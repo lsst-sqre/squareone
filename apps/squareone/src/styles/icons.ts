@@ -4,8 +4,11 @@
 
 // Icons from Font Awesome
 import { library } from '@fortawesome/fontawesome-svg-core';
+import { config } from '@fortawesome/fontawesome-svg-core';
+
 import {
   faAngleDown,
+  faBars,
   faFile,
   faCodePullRequest,
   faCodeMerge,
@@ -18,8 +21,12 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { faGithub } from '@fortawesome/free-brands-svg-icons';
 
+// Prevent Font Awesome from adding its CSS since we import it manually
+config.autoAddCss = false;
+
 // Add icons to the global Font Awesome library
 library.add(faAngleDown);
+library.add(faBars);
 library.add(faFile);
 library.add(faCodePullRequest);
 library.add(faCodeMerge);
