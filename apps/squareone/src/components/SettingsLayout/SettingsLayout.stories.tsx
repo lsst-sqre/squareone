@@ -61,7 +61,7 @@ export const AccountPageActive: Story = {
   },
   parameters: {
     nextjs: {
-      navigation: {
+      router: {
         pathname: '/settings',
       },
     },
@@ -93,7 +93,7 @@ export const AccessTokensPageActive: Story = {
   },
   parameters: {
     nextjs: {
-      navigation: {
+      router: {
         pathname: '/settings/tokens',
       },
     },
@@ -127,7 +127,7 @@ export const SessionsPageActive: Story = {
   },
   parameters: {
     nextjs: {
-      navigation: {
+      router: {
         pathname: '/settings/sessions',
       },
     },
@@ -159,7 +159,7 @@ export const MobileLayout: Story = {
   },
   parameters: {
     nextjs: {
-      navigation: {
+      router: {
         pathname: '/settings',
       },
     },
@@ -257,7 +257,7 @@ export const LongContent: Story = {
   },
   parameters: {
     nextjs: {
-      navigation: {
+      router: {
         pathname: '/settings/tokens',
       },
     },
@@ -358,7 +358,7 @@ export const SessionsHidden: Story = {
   ],
   parameters: {
     nextjs: {
-      navigation: {
+      router: {
         pathname: '/settings',
       },
     },
@@ -401,7 +401,7 @@ export const SessionsVisible: Story = {
   ],
   parameters: {
     nextjs: {
-      navigation: {
+      router: {
         pathname: '/settings',
       },
     },
