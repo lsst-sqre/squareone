@@ -1,14 +1,14 @@
 import React from 'react';
 import { forwardRef, useEffect, useRef } from 'react';
-import styled from 'styled-components';
 
 import * as RadixNavigationMenu from '@radix-ui/react-navigation-menu';
 
 import { mergeReferences } from './utils';
+import styles from './PrimaryNavigation.module.css';
 
 export type PrimaryNavigationType = React.ForwardRefExoticComponent<
   React.ComponentPropsWithoutRef<typeof RadixNavigationMenu.Root> &
-    React.RefAttributes<React.ElementRef<typeof RadixNavigationMenu.Root>>
+    React.RefAttributes<React.ComponentRef<typeof RadixNavigationMenu.Root>>
 > & {
   Item: typeof Item;
   Trigger: typeof Trigger;
@@ -99,14 +99,16 @@ export const PrimaryNavigation = forwardRef(
     }, []);
 
     return (
-      <Root
+      <RadixNavigationMenu.Root
         ref={mergeReferences([reference, containerReference])}
         {...props}
-        className={className}
+        className={`${styles.root} ${className || ''}`.trim()}
       >
-        <ItemList>{children}</ItemList>
+        <RadixNavigationMenu.List className={styles.itemList}>
+          {children}
+        </RadixNavigationMenu.List>
         <NavigationMenuViewport />
-      </Root>
+      </RadixNavigationMenu.Root>
     );
   }
 ) as PrimaryNavigationType;
@@ -114,38 +116,20 @@ export const PrimaryNavigation = forwardRef(
 PrimaryNavigation.displayName = 'PrimaryNavigation';
 
 /**
- * The root component for the primary navigation.
- *
- * This is a styled version of the `RadixNavigationMenu.Root` component and
- * isn't directly used by consumers of the component.
- */
-const Root = styled(RadixNavigationMenu.Root)`
-  position: relative;
-`;
-
-/**
- * The list of items in the primary navigation.
- *
- * This is a styled version of the `RadixNavigationMenu.List` component and
- * isn't directly used by consumers of the component.
- */
-const ItemList = styled(RadixNavigationMenu.List)`
-  list-style: none;
-  margin-bottom: 0;
-  padding: 0;
-  display: flex;
-  justify-self: end;
-  width: 100%;
-  font-size: 1.2rem;
-`;
-
-/**
  * An item in the primary navigation that can either link to a page or display
  * a dropdown menu.
  */
-const Item = styled(RadixNavigationMenu.Item)`
-  margin: 0 1em;
-`;
+const Item = forwardRef<
+  React.ComponentRef<typeof RadixNavigationMenu.Item>,
+  React.ComponentPropsWithoutRef<typeof RadixNavigationMenu.Item>
+>(({ className, ...props }, ref) => (
+  <RadixNavigationMenu.Item
+    ref={ref}
+    className={`${styles.item} ${className || ''}`.trim()}
+    {...props}
+  />
+));
+Item.displayName = 'Item';
 
 /**
  * A trigger in the primary navigation that links to a page rather than
@@ -153,243 +137,115 @@ const Item = styled(RadixNavigationMenu.Item)`
  *
  * Use the `href` prop to specify the URL of the page.
  */
-const TriggerLink = styled(RadixNavigationMenu.Link)`
-  color: var(--rsd-component-header-nav-text-color);
-  border: none;
-  border-radius: 0.5rem;
-  padding: 2px 4px;
-  display: inline-block; // For consistency with MenuTrigger button
-  /* padding: 0; */
-
-  &:hover {
-    color: var(--rsd-component-header-nav-text-hover-color);
-  }
-
-  &:focus {
-    outline: 1px solid var(--rsd-color-primary-500);
-  }
-`;
+const TriggerLink = forwardRef<
+  React.ComponentRef<typeof RadixNavigationMenu.Link>,
+  React.ComponentPropsWithoutRef<typeof RadixNavigationMenu.Link>
+>(({ className, ...props }, ref) => (
+  <RadixNavigationMenu.Link
+    ref={ref}
+    className={`${styles.triggerLink} ${className || ''}`.trim()}
+    {...props}
+  />
+));
+TriggerLink.displayName = 'TriggerLink';
 
 /**
  * The trigger for a `PrimaryNavigation.Item` that is displays a `Content`
  * dropdown when activated.
  */
-const Trigger = ({ children }: { children: React.ReactNode }) => {
+const Trigger = forwardRef<
+  React.ComponentRef<typeof RadixNavigationMenu.Trigger>,
+  React.ComponentPropsWithoutRef<typeof RadixNavigationMenu.Trigger>
+>(({ className, children, ...props }, ref) => {
   return (
-    <StyledTrigger
+    <RadixNavigationMenu.Trigger
+      ref={ref}
+      className={`${styles.styledTrigger} ${className || ''}`.trim()}
       onPointerMove={(event) => event.preventDefault()}
       onPointerEnter={(event) => event.preventDefault()}
       onPointerLeave={(event) => event.preventDefault()}
+      {...props}
     >
       {children}
-    </StyledTrigger>
+    </RadixNavigationMenu.Trigger>
   );
-};
-
-/**
- * A styled version of the `RadixNavigationMenu.Trigger` component that is
- * used by the `PrimaryNavigation.Trigger` component.
- */
-const StyledTrigger = styled(RadixNavigationMenu.Trigger)`
-  color: var(--rsd-component-header-nav-text-color);
-  padding: 2px 4px;
-  /* padding: 0; */
-
-  // Reset button styles
-  background-color: transparent;
-  border: none;
-  border-radius: 0.5rem;
-
-  &:focus {
-    outline: 1px solid var(--rsd-color-primary-500);
-  }
-
-  &:hover {
-    color: var(--rsd-component-header-nav-text-hover-color);
-    cursor: pointer;
-  }
-
-  svg {
-    display: inline-block;
-    width: 1rem;
-    height: 1rem;
-    vertical-align: middle;
-  }
-
-  &[data-state='open'] {
-    svg {
-      transform: rotate(180deg);
-    }
-  }
-`;
+});
+Trigger.displayName = 'Trigger';
 
 /**
  * The content of a `PrimaryNavigation.Item` that is displayed as a dropdown
  * when the item is activated.
  */
-const Content = ({ children }: { children: React.ReactNode }) => {
+const Content = forwardRef<
+  React.ComponentRef<typeof RadixNavigationMenu.Content>,
+  React.ComponentPropsWithoutRef<typeof RadixNavigationMenu.Content> & {
+    children: React.ReactNode;
+  }
+>(({ className, children, ...props }, ref) => {
   return (
-    <StyledContent
+    <RadixNavigationMenu.Content
+      ref={ref}
+      className={`${styles.styledContent} ${className || ''}`.trim()}
       onPointerMove={(event) => event.preventDefault()}
       onPointerEnter={(event) => event.preventDefault()}
       onPointerLeave={(event) => event.preventDefault()}
+      {...props}
     >
-      <ContentList>{children}</ContentList>
-    </StyledContent>
+      <ul className={styles.contentList}>{children}</ul>
+    </RadixNavigationMenu.Content>
   );
-};
-
-/**
- * A styled version of the `RadixNavigationMenu.Content` component that is
- * used by the `PrimaryNavigation.Content` component.
- */
-const StyledContent = styled(RadixNavigationMenu.Content)`
-  font-size: 1rem;
-  background-color: var(--rsd-component-header-nav-menulist-background-color);
-  min-width: 12rem;
-  border-radius: 0.5rem;
-  box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35),
-    0px 10px 20px -15px rgba(22, 23, 24, 0.2);
-  animation-duration: 400ms;
-  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: transform, opacity;
-`;
-
-/**
- * A list container for dropdown content items.
- */
-const ContentList = styled.ul`
-  /* This unit for the padding is also the basis for the spacing and
-   * sizing of the menu items.
-  */
-  --gafaelfawr-user-menu-padding: 0.5rem;
-
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  list-style: none;
-  margin: 0;
-  padding: var(--gafaelfawr-user-menu-padding);
-  padding-right: 0; // to avoid double padding on the right side with MenuLink
-`;
+});
+Content.displayName = 'Content';
 
 /**
  * A content item within a `PrimaryNavigation.Content`.
  */
-const ContentItem = styled.li`
-  display: flex;
-`;
+const ContentItem = forwardRef<
+  HTMLLIElement,
+  React.ComponentPropsWithoutRef<'li'>
+>(({ className, ...props }, ref) => (
+  <li
+    ref={ref}
+    className={`${styles.contentItem} ${className || ''}`.trim()}
+    {...props}
+  />
+));
+ContentItem.displayName = 'ContentItem';
 
 /**
  * A link to a page within the content of a `PrimaryNavigation.ContentItem`.
  *
  * Use the `href` prop to specify the URL of the page.
  */
-export const Link = styled(RadixNavigationMenu.Link)`
-  /* The styling on the menu triggers is overriding this colour. Need to re-address. */
-  border-radius: 0.5rem;
-  padding: calc(var(--gafaelfawr-user-menu-padding) / 2)
-    var(--gafaelfawr-user-menu-padding);
-  margin: calc(var(--gafaelfawr-user-menu-padding) / -2);
-  margin-bottom: calc(var(--gafaelfawr-user-menu-padding) / 2);
-  width: 100%;
-
-  color: var(--rsd-component-header-nav-menulist-text-color);
-
-  &:last-of-type {
-    margin-bottom: 0;
-  }
-
-  outline: 1px solid transparent;
-
-  &:focus {
-    outline: 1px solid
-      var(--rsd-component-header-nav-menulist-selected-background-color);
-  }
-
-  &:hover {
-    background-color: var(
-      --rsd-component-header-nav-menulist-selected-background-color
-    );
-    color: white !important;
-  }
-`;
+export const Link = forwardRef<
+  React.ComponentRef<typeof RadixNavigationMenu.Link>,
+  React.ComponentPropsWithoutRef<typeof RadixNavigationMenu.Link>
+>(({ className, ...props }, ref) => (
+  <RadixNavigationMenu.Link
+    ref={ref}
+    className={`${styles.link} ${className || ''}`.trim()}
+    {...props}
+  />
+));
+Link.displayName = 'Link';
 
 export const NavigationMenuViewport = forwardRef<
-  React.ElementRef<typeof RadixNavigationMenu.Viewport>,
+  React.ComponentRef<typeof RadixNavigationMenu.Viewport>,
   React.ComponentPropsWithoutRef<typeof RadixNavigationMenu.Viewport>
 >(({ className, ...props }, reference) => (
-  <NavigationMenuViewportContainer>
-    <NavigationMenuStyledViewport
-      className={className}
+  <div className={styles.navigationMenuViewportContainer}>
+    <RadixNavigationMenu.Viewport
+      className={`${styles.navigationMenuStyledViewport} ${
+        className || ''
+      }`.trim()}
       ref={reference}
       onPointerEnter={(event) => event.preventDefault()}
       onPointerLeave={(event) => event.preventDefault()}
       {...props}
     />
-  </NavigationMenuViewportContainer>
+  </div>
 ));
 NavigationMenuViewport.displayName = RadixNavigationMenu.Viewport.displayName;
-
-const NavigationMenuViewportContainer = styled.div`
-  position: absolute;
-  z-index: 1000; // Ensure the menu is above other content
-  left: var(--radix-navigation-menu-item-active-left);
-  right: var(--radix-navigation-menu-item-active-right);
-  top: 100%;
-  display: flex;
-  /* transform: translateX(var(--radix-navigation-menu-item-active-left)); */
-  justify-content: center;
-  transition: transform 100ms;
-`;
-
-const NavigationMenuStyledViewport = styled(RadixNavigationMenu.Viewport)`
-  position: relative;
-  margin-top: 0.375rem;
-  transform-origin: top center;
-  height: var(--radix-navigation-menu-viewport-height);
-  width: 100%;
-  overflow: hidden;
-  border-radius: 0.375rem;
-  border: 1px solid var(--border);
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  background-color: white;
-  color: black;
-
-  @media (min-width: 768px) {
-    width: var(--radix-navigation-menu-viewport-width);
-  }
-
-  &[data-state='open'] {
-    animation: menuIn 200ms ease;
-  }
-
-  &[data-state='closed'] {
-    animation: menuOut 200ms ease;
-  }
-
-  @keyframes menuIn {
-    from {
-      opacity: 0;
-      transform: scale(0.9);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-
-  @keyframes menuOut {
-    from {
-      opacity: 1;
-      transform: scale(1);
-    }
-    to {
-      opacity: 0;
-      transform: scale(0.95);
-    }
-  }
-`;
 
 // Associate child components with the parent for easier imports.
 PrimaryNavigation.Item = Item;
