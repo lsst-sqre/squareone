@@ -4,6 +4,7 @@
 module.exports = (phase, { defaultConfig }) => {
   const config = {
     ...defaultConfig,
+    transpilePackages: ['@lsst-sqre/squared'],
     compiler: {
       styledComponents: true,
     },
