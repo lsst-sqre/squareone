@@ -1,0 +1,288 @@
+/* Base button styles */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sqo-space-xxs);
+  font-family: inherit;
+  font-weight: 500;
+  border: 1px solid transparent;
+  border-radius: var(--sqo-border-radius-1);
+  transition: var(--sqo-transition-basic);
+  cursor: pointer;
+  text-decoration: none;
+  line-height: 1.2;
+  position: relative;
+  white-space: nowrap;
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--rsd-color-primary-600);
+  outline-offset: 2px;
+}
+
+.button:disabled,
+.button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Block variant */
+.block {
+  display: flex;
+  width: 100%;
+}
+
+/* Size variants */
+.sm {
+  padding: var(--sqo-space-xxxs) var(--sqo-space-xs);
+  font-size: 0.875rem;
+}
+
+.md {
+  padding: var(--sqo-space-xxxs) var(--sqo-space-unit);
+  font-size: 1rem;
+}
+
+.lg {
+  padding: var(--sqo-space-xxs) var(--sqo-space-md);
+  font-size: 1.125rem;
+}
+
+/* Appearance: Solid */
+.solid {
+  box-shadow: var(--sqo-elevation-md);
+}
+
+.solid:hover:not(:disabled):not(.disabled) {
+  box-shadow: var(--sqo-elevation-lg);
+}
+
+.solid:active:not(:disabled):not(.disabled) {
+  box-shadow: var(--sqo-elevation-sm);
+}
+
+/* Solid + Primary */
+.solid.primary {
+  background-color: var(--rsd-color-primary-600);
+  color: white;
+}
+
+.solid.primary:hover:not(:disabled):not(.disabled) {
+  background-color: var(--rsd-color-primary-400);
+}
+
+.solid.primary:active:not(:disabled):not(.disabled) {
+  background-color: var(--rsd-color-primary-700);
+}
+
+/* Solid + Secondary */
+.solid.secondary {
+  background-color: var(--rsd-color-gray-500);
+  color: white;
+}
+
+.solid.secondary:hover:not(:disabled):not(.disabled) {
+  background-color: var(--rsd-color-gray-800);
+}
+
+.solid.secondary:active:not(:disabled):not(.disabled) {
+  background-color: var(--rsd-color-gray-900);
+}
+
+/* Solid + Tertiary */
+.solid.tertiary {
+  background-color: var(--rsd-component-text-color);
+  color: var(--rsd-component-page-background-color);
+}
+
+.solid.tertiary:hover:not(:disabled):not(.disabled) {
+  opacity: 0.9;
+}
+
+.solid.tertiary:active:not(:disabled):not(.disabled) {
+  opacity: 0.8;
+}
+
+/* Solid + Danger */
+.solid.danger {
+  background-color: var(--rsd-color-red-500);
+  color: white;
+}
+
+.solid.danger:hover:not(:disabled):not(.disabled) {
+  background-color: #dc3232;
+}
+
+.solid.danger:active:not(:disabled):not(.disabled) {
+  background-color: #c92a2a;
+}
+
+/* Appearance: Outline */
+.outline {
+  background-color: transparent;
+  border-width: 1px;
+  border-style: solid;
+}
+
+.outline:hover:not(:disabled):not(.disabled) {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.outline:active:not(:disabled):not(.disabled) {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Outline + Primary */
+.outline.primary {
+  border-color: var(--rsd-color-primary-600);
+  color: var(--rsd-color-primary-600);
+}
+
+.outline.primary:hover:not(:disabled):not(.disabled) {
+  background-color: var(--rsd-color-primary-600);
+  color: white;
+}
+
+/* Outline + Secondary */
+.outline.secondary {
+  border-color: var(--rsd-color-gray-500);
+  color: var(--rsd-color-gray-800);
+}
+
+.outline.secondary:hover:not(:disabled):not(.disabled) {
+  background-color: var(--rsd-color-gray-500);
+  color: white;
+}
+
+/* Outline + Tertiary */
+.outline.tertiary {
+  border-color: currentColor;
+  color: inherit;
+}
+
+.outline.tertiary:hover:not(:disabled):not(.disabled) {
+  background-color: currentColor;
+  color: var(--rsd-component-page-background-color);
+}
+
+/* Outline + Danger */
+.outline.danger {
+  border-color: var(--rsd-color-red-500);
+  color: var(--rsd-color-red-500);
+}
+
+.outline.danger:hover:not(:disabled):not(.disabled) {
+  background-color: var(--rsd-color-red-500);
+  color: white;
+}
+
+/* Appearance: Text */
+.text {
+  background-color: transparent;
+  border-color: transparent;
+  padding-left: var(--sqo-space-xxxs);
+  padding-right: var(--sqo-space-xxxs);
+}
+
+.text:hover:not(:disabled):not(.disabled) {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.text:active:not(:disabled):not(.disabled) {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Text + Primary */
+.text.primary {
+  color: var(--rsd-color-primary-600);
+}
+
+.text.primary:hover:not(:disabled):not(.disabled) {
+  background-color: rgba(5, 139, 140, 0.1);
+}
+
+/* Text + Secondary */
+.text.secondary {
+  color: var(--rsd-color-gray-800);
+}
+
+.text.secondary:hover:not(:disabled):not(.disabled) {
+  background-color: rgba(106, 110, 110, 0.1);
+}
+
+/* Text + Tertiary */
+.text.tertiary {
+  color: inherit;
+}
+
+.text.tertiary:hover:not(:disabled):not(.disabled) {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Text + Danger */
+.text.danger {
+  color: var(--rsd-color-red-500);
+}
+
+.text.danger:hover:not(:disabled):not(.disabled) {
+  background-color: rgba(237, 76, 76, 0.1);
+}
+
+/* Icons */
+.leadingIcon,
+.trailingIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.leadingIcon svg,
+.trailingIcon svg {
+  width: 1em;
+  height: 1em;
+}
+
+/* Loading state */
+.loading {
+  color: transparent;
+}
+
+.spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinnerSvg {
+  width: 1.25em;
+  height: 1.25em;
+  animation: spin 1s linear infinite;
+}
+
+.spinnerCircle {
+  opacity: 0.25;
+}
+
+.spinnerCircle:nth-child(1) {
+  stroke-dasharray: 80;
+  stroke-dashoffset: 60;
+  opacity: 1;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Label */
+.label {
+  display: inline-flex;
+  align-items: center;
+}

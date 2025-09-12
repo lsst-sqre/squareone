@@ -1,4 +1,12 @@
 /* Components */
+export {
+  Button,
+  type ButtonProps,
+  type ButtonAppearance,
+  type ButtonTone,
+  type ButtonRole,
+  type ButtonSize,
+} from './components/Button';
 export { default as IconPill, type IconPillProps } from './components/IconPill';
 export {
   default as PrimaryNavigation,
