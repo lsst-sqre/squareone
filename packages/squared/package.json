@@ -48,7 +48,6 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-feather": "^2.0.10",
-    "styled-components": "^6.1.19",
     "swr": "^2.2.1",
     "unfetch": "^4.2.0"
   },
@@ -67,7 +66,6 @@
     "@testing-library/user-event": "^14.6.1",
     "@types/react": "^19.1.11",
     "@types/react-dom": "^19.1.8",
-    "@types/styled-components": "^5.1.26",
     "@vitejs/plugin-react": "^5.0.2",
     "@vitest/browser": "^3.2.4",
     "eslint": "^8.35.0",
