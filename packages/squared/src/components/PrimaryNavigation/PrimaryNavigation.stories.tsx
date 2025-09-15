@@ -31,9 +31,9 @@ export const Default: Story = {
       </PrimaryNavigation.Item>
 
       <PrimaryNavigation.Item>
-        <PrimaryNavigation.Trigger href="/nb">
-          Notebooks <ChevronDown />
-        </PrimaryNavigation.Trigger>
+        <PrimaryNavigation.TriggerLink href="/nb">
+          Notebooks
+        </PrimaryNavigation.TriggerLink>
         <PrimaryNavigation.Content>
           <PrimaryNavigation.ContentItem>
             <PrimaryNavigation.Link href="#">Settings</PrimaryNavigation.Link>
