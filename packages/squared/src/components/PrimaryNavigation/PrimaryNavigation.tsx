@@ -33,7 +33,7 @@ export const PrimaryNavigation = forwardRef(
       // Constainer is the <nav> element (essentially Root)
       const container = containerReference.current;
 
-      if (!container) return;
+      if (!container) return () => {};
 
       const updatePosition = (item: HTMLElement) => {
         // item is the trigger element
