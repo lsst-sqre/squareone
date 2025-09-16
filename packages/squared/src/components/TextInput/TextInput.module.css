@@ -1,0 +1,158 @@
+/* Container styles */
+.container {
+  display: inline-block;
+  position: relative;
+}
+
+.fullWidth {
+  display: block;
+  width: 100%;
+}
+
+/* Input wrapper for icon positioning */
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Base input styles */
+.input {
+  /* Consistent with Button component */
+  font-family: inherit;
+  border: 1px solid var(--rsd-color-gray-100);
+  border-radius: var(--sqo-border-radius-1);
+  background: var(--rsd-component-page-background-color);
+  color: var(--rsd-component-text-color);
+  transition: var(--sqo-transition-basic);
+  min-height: 44px;
+  width: 100%;
+  outline: none;
+}
+
+.input:focus-visible {
+  outline: 2px solid var(--rsd-color-primary-600);
+  outline-offset: 2px;
+  border-color: var(--rsd-color-primary-600);
+}
+
+.input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: var(--rsd-color-gray-50);
+}
+
+.input::placeholder {
+  color: var(--rsd-color-gray-500);
+  opacity: 1;
+}
+
+/* Size variants */
+.sm {
+  padding: var(--sqo-space-xxxs) var(--sqo-space-xxs);
+  font-size: 0.875rem;
+  min-height: 36px;
+}
+
+.md {
+  padding: var(--sqo-space-xxxs) var(--sqo-space-xs);
+  font-size: 1rem;
+  min-height: 44px;
+}
+
+.lg {
+  padding: var(--sqo-space-xxs) var(--sqo-space-md);
+  font-size: 1.125rem;
+  min-height: 52px;
+}
+
+/* Appearance variants */
+.default {
+  border-color: var(--rsd-color-gray-100);
+}
+
+.error {
+  border-color: var(--rsd-color-red-500);
+  color: var(--rsd-color-red-900);
+}
+
+.error:focus-visible {
+  outline-color: var(--rsd-color-red-500);
+  border-color: var(--rsd-color-red-500);
+}
+
+.success {
+  border-color: var(--rsd-color-green-500);
+  color: var(--rsd-color-green-900);
+}
+
+.success:focus-visible {
+  outline-color: var(--rsd-color-green-500);
+  border-color: var(--rsd-color-green-500);
+}
+
+/* Icon styles */
+.leadingIcon,
+.trailingIcon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  color: var(--rsd-color-gray-500);
+  z-index: 1;
+}
+
+.leadingIcon {
+  left: var(--sqo-space-xs);
+}
+
+.trailingIcon {
+  right: var(--sqo-space-xs);
+}
+
+/* Adjust input padding when icons are present */
+.hasLeadingIcon.sm {
+  padding-left: calc(var(--sqo-space-xxs) + 1.5rem);
+}
+
+.hasLeadingIcon.md {
+  padding-left: calc(var(--sqo-space-xs) + 1.5rem);
+}
+
+.hasLeadingIcon.lg {
+  padding-left: calc(var(--sqo-space-md) + 1.75rem);
+}
+
+.hasTrailingIcon.sm {
+  padding-right: calc(var(--sqo-space-xxs) + 1.5rem);
+}
+
+.hasTrailingIcon.md {
+  padding-right: calc(var(--sqo-space-xs) + 1.5rem);
+}
+
+.hasTrailingIcon.lg {
+  padding-right: calc(var(--sqo-space-md) + 1.75rem);
+}
+
+/* Icon size adjustments */
+.leadingIcon svg,
+.trailingIcon svg {
+  width: 1em;
+  height: 1em;
+}
+
+.sm .leadingIcon svg,
+.sm .trailingIcon svg {
+  width: 0.875em;
+  height: 0.875em;
+}
+
+.lg .leadingIcon svg,
+.lg .trailingIcon svg {
+  width: 1.125em;
+  height: 1.125em;
+}

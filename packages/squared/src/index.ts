@@ -12,6 +12,8 @@ export {
   default as PrimaryNavigation,
   type PrimaryNavigationType as PrimaryNavigationComponent,
 } from './components/PrimaryNavigation';
+export { TextInput } from './components/TextInput';
+export type { TextInputProps } from './components/TextInput';
 
 /* Hooks */
 export { default as useCurrentUrl } from './hooks/useCurrentUrl';
