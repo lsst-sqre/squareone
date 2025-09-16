@@ -46,7 +46,7 @@ This is a **monorepo** for Rubin Observatory front-end applications managed with
 
 ### Packages (`packages/`)
 
-- **`@lsst-sqre/squared`** - React component library (TypeScript)
+- **`@lsst-sqre/squared`** - React component library (TypeScript, CSS Modules, no build step)
 - **`@lsst-sqre/global-css`** - Base CSS and design token application
 - **`@lsst-sqre/rubin-style-dictionary`** - Design tokens built with style-dictionary
 - **`@lsst-sqre/eslint-config`** - Shared ESLint configuration
@@ -62,7 +62,8 @@ This is a **monorepo** for Rubin Observatory front-end applications managed with
 - **React Context-based** configuration access via `useAppConfig()` hook
 - **Kubernetes-ready** configuration that supports runtime ConfigMap mounting
 - **MDX content** loaded from filesystem (`src/content/pages/` in development, configurable via `mdxDir`)
-- Server-side rendering with styled-components
+- **Transpiles squared package** via Next.js `transpilePackages` configuration
+- Server-side rendering with styled-components (for squareone app only)
 - Gafaelfawr integration for authentication
 - Sentry integration for error tracking (see Sentry Configuration section below)
 - Plausible analytics integration
@@ -71,11 +72,13 @@ This is a **monorepo** for Rubin Observatory front-end applications managed with
 
 - Functional components with hooks
 - Component directories with index files for clean exports
-- Styled-components for styling with design tokens from rubin-style-dictionary
+- **CSS Modules for styling in squared package** with design tokens from rubin-style-dictionary
+- Styled-components for styling in squareone app (legacy components)
 - PropTypes for JavaScript components, TypeScript types for TypeScript components
 - **Prefer `type` over `interface` for component props and simple object types**
 - **Avoid using `React.FC` - type props directly in function parameters**
-- Storybook for component documentation and testing with vitest via addon-vitest
+- Storybook for component documentation
+- **Vitest for testing** - both unit tests and Storybook story tests via addon-vitest
 
 ### Times Square Integration
 
@@ -149,7 +152,8 @@ function MyComponent() {
 
 - Global CSS from `@lsst-sqre/global-css` package
 - Design tokens from `@lsst-sqre/rubin-style-dictionary`
-- styled-components for component-specific styling
+- **CSS Modules** for component-specific styling in squared package
+- styled-components for component-specific styling in squareone app (legacy)
 - Font Awesome icons via `@fortawesome/react-fontawesome`
 - CSS custom properties for design tokens
 
@@ -168,6 +172,26 @@ function MyComponent() {
 - **`.github/copilot-instructions.md`** - Contains detailed coding patterns and conventions
 
 ## Important Development Notes
+
+### Squared Package Architecture (CRITICAL)
+
+- **NO BUILD STEP** - The squared package exports TypeScript source directly
+- **CSS Modules only** - No styled-components in squared package
+- **Next.js transpilation** - Apps that consume squared must configure `transpilePackages: ['@lsst-sqre/squared']`
+- **Direct source exports** - Package.json main/module fields point to `src/index.ts`
+- **Testing with Vitest** - Both unit tests and Storybook story tests use vitest
+- **No tsup** - Build tool removed in favor of app-level transpilation
+
+### Testing Infrastructure
+
+- **Vitest configuration** - Configured in `vitest.config.ts` for unit tests
+- **Storybook addon-vitest** - Tests stories directly in vitest environment
+- **React Testing Library** - Primary testing utilities for component testing
+- **Test setup** - Common test utilities in `src/test-setup.ts`
+- **Running tests**: 
+  - `pnpm test` - Run unit tests
+  - `pnpm test-storybook` - Run Storybook story tests
+  - `pnpm test-storybook:watch` - Watch mode for story tests
 
 ### Configuration System Migration (CRITICAL)
 
