@@ -20,6 +20,11 @@ export { default as FormField } from './components/FormField';
 export type { FormFieldProps } from './components/FormField';
 export { TextInput } from './components/TextInput';
 export type { TextInputProps } from './components/TextInput';
+export { default as RadioGroup } from './components/RadioGroup';
+export type {
+  RadioGroupProps,
+  RadioGroupItemProps,
+} from './components/RadioGroup';
 
 /* Hooks */
 export { default as useCurrentUrl } from './hooks/useCurrentUrl';
