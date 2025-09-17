@@ -3,6 +3,7 @@ import styles from './FormField.module.css';
 import ErrorMessage from '../ErrorMessage';
 import Label from '../Label';
 import { TextInput } from '../TextInput';
+import RadioGroup from '../RadioGroup';
 import FormFieldContext, { useFormFieldContext } from './FormFieldContext';
 
 export type FormFieldProps = {
@@ -86,10 +87,34 @@ const FormFieldTextInput = React.forwardRef<
 
 FormFieldTextInput.displayName = 'FormField.TextInput';
 
+// Compound component: RadioGroup
+const FormFieldRadioGroup = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof RadioGroup>
+>((props, ref) => {
+  const context = useFormFieldContext();
+  const ariaDescribedBy =
+    [context?.errorId, context?.descriptionId, props['aria-describedby']]
+      .filter(Boolean)
+      .join(' ') || undefined;
+
+  return (
+    <RadioGroup
+      ref={ref}
+      aria-invalid={!!context?.error || props['aria-invalid']}
+      aria-describedby={ariaDescribedBy}
+      {...props}
+    />
+  );
+});
+
+FormFieldRadioGroup.displayName = 'FormField.RadioGroup';
+
 // Export compound components
 export const FormField = Object.assign(FormFieldRoot, {
   Label: FormFieldLabel,
   TextInput: FormFieldTextInput,
+  RadioGroup: FormFieldRadioGroup,
 });
 
 export default FormField;
