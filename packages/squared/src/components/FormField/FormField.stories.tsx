@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect } from 'storybook/test';
+import { userEvent, within, expect, waitFor } from 'storybook/test';
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import FormField from './FormField';
+import { Button } from '../Button';
 
 const meta: Meta<typeof FormField> = {
   title: 'Components/FormField',
@@ -299,5 +301,402 @@ export const LayoutStability: Story = {
     expect(
       canvas.queryByText('This field has an error')
     ).not.toBeInTheDocument();
+  },
+};
+
+// React Hook Form Integration Example
+export const ReactHookFormIntegration: Story = {
+  render: () => {
+    type FormData = {
+      email: string;
+      username: string;
+      password: string;
+      fullName: string;
+      phone?: string;
+    };
+
+    const {
+      register,
+      handleSubmit,
+      formState: { errors, isSubmitting, isSubmitSuccessful },
+      reset,
+    } = useForm<FormData>({
+      mode: 'onBlur', // Validate on blur for better UX
+    });
+
+    const [submitMessage, setSubmitMessage] = useState<string>('');
+
+    const onSubmit = async (data: FormData) => {
+      try {
+        // Simulate API call
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+        setSubmitMessage(
+          `Success! Welcome ${data.fullName}. Form data: ${JSON.stringify(
+            data,
+            null,
+            2
+          )}`
+        );
+
+        // Reset form after successful submission
+        setTimeout(() => {
+          reset();
+          setSubmitMessage('');
+        }, 3000);
+      } catch (error) {
+        setSubmitMessage('Submission failed. Please try again.');
+      }
+    };
+
+    return (
+      <div style={{ width: '400px', padding: '2rem' }}>
+        <h3
+          style={{
+            marginBottom: '1.5rem',
+            color: 'var(--rsd-component-text-color)',
+          }}
+        >
+          User Registration Form
+        </h3>
+
+        {submitMessage && (
+          <div
+            style={{
+              padding: '1rem',
+              marginBottom: '1.5rem',
+              borderRadius: 'var(--sqo-border-radius-1)',
+              backgroundColor: isSubmitSuccessful
+                ? 'var(--rsd-color-green-500)'
+                : 'var(--rsd-color-red-500)',
+              color: 'white',
+              fontSize: '0.875rem',
+            }}
+            role="alert"
+          >
+            {submitMessage}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit(onSubmit)} noValidate>
+          {/* Email Field */}
+          <FormField
+            error={errors.email?.message}
+            description="We'll use this for account verification"
+            required
+          >
+            <FormField.Label htmlFor="rhf-email">Email Address</FormField.Label>
+            <FormField.TextInput
+              id="rhf-email"
+              type="email"
+              placeholder="Enter your email"
+              appearance={errors.email ? 'error' : 'default'}
+              {...register('email', {
+                required: 'Email is required',
+                pattern: {
+                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                  message: 'Please enter a valid email address',
+                },
+              })}
+            />
+          </FormField>
+
+          {/* Username Field */}
+          <FormField
+            error={errors.username?.message}
+            description="Choose a unique username (letters, numbers, and underscores only)"
+            required
+          >
+            <FormField.Label htmlFor="rhf-username">Username</FormField.Label>
+            <FormField.TextInput
+              id="rhf-username"
+              placeholder="Enter username"
+              appearance={errors.username ? 'error' : 'default'}
+              {...register('username', {
+                required: 'Username is required',
+                minLength: {
+                  value: 3,
+                  message: 'Username must be at least 3 characters',
+                },
+                maxLength: {
+                  value: 20,
+                  message: 'Username must be no more than 20 characters',
+                },
+                pattern: {
+                  value: /^[a-zA-Z0-9_]+$/,
+                  message:
+                    'Username can only contain letters, numbers, and underscores',
+                },
+              })}
+            />
+          </FormField>
+
+          {/* Password Field */}
+          <FormField
+            error={errors.password?.message}
+            description="Must be at least 8 characters with letters and numbers"
+            required
+          >
+            <FormField.Label htmlFor="rhf-password">Password</FormField.Label>
+            <FormField.TextInput
+              id="rhf-password"
+              type="password"
+              placeholder="Enter password"
+              appearance={errors.password ? 'error' : 'default'}
+              {...register('password', {
+                required: 'Password is required',
+                minLength: {
+                  value: 8,
+                  message: 'Password must be at least 8 characters',
+                },
+                pattern: {
+                  value: /^(?=.*[A-Za-z])(?=.*\d)/,
+                  message: 'Password must contain both letters and numbers',
+                },
+              })}
+            />
+          </FormField>
+
+          {/* Full Name Field */}
+          <FormField error={errors.fullName?.message} required>
+            <FormField.Label htmlFor="rhf-fullName">Full Name</FormField.Label>
+            <FormField.TextInput
+              id="rhf-fullName"
+              placeholder="Enter your full name"
+              appearance={errors.fullName ? 'error' : 'default'}
+              {...register('fullName', {
+                required: 'Full name is required',
+                minLength: {
+                  value: 2,
+                  message: 'Full name must be at least 2 characters',
+                },
+              })}
+            />
+          </FormField>
+
+          {/* Phone Field (Optional) */}
+          <FormField
+            error={errors.phone?.message}
+            description="Optional - for account recovery (US format: xxx-xxx-xxxx)"
+          >
+            <FormField.Label htmlFor="rhf-phone">Phone Number</FormField.Label>
+            <FormField.TextInput
+              id="rhf-phone"
+              type="tel"
+              placeholder="123-456-7890"
+              inputMode="tel"
+              appearance={errors.phone ? 'error' : 'default'}
+              {...register('phone', {
+                pattern: {
+                  value: /^\d{3}-\d{3}-\d{4}$/,
+                  message: 'Phone number must be in format: xxx-xxx-xxxx',
+                },
+              })}
+            />
+          </FormField>
+
+          {/* Submit Button */}
+          <div style={{ marginTop: '1.5rem' }}>
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              block
+              role="primary"
+              size="md"
+            >
+              {isSubmitting ? 'Creating Account...' : 'Create Account'}
+            </Button>
+          </div>
+        </form>
+
+        {/* Documentation Comment */}
+        <div
+          style={{
+            marginTop: '2rem',
+            padding: '1rem',
+            backgroundColor: 'var(--rsd-color-primary-100)',
+            borderRadius: 'var(--sqo-border-radius-1)',
+            fontSize: '0.875rem',
+            color: 'var(--rsd-component-text-color)',
+          }}
+        >
+          <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1rem' }}>
+            Integration Notes:
+          </h4>
+          <ul style={{ margin: 0, paddingLeft: '1.5rem' }}>
+            <li>
+              Components work seamlessly with react-hook-form's{' '}
+              <code>register()</code> function
+            </li>
+            <li>
+              Error messages from validation rules are automatically passed to
+              FormField
+            </li>
+            <li>ARIA attributes are automatically applied for accessibility</li>
+            <li>Form validates on blur for better user experience</li>
+            <li>Success and error states are visually distinct</li>
+          </ul>
+        </div>
+      </div>
+    );
+  },
+  parameters: {
+    layout: 'padded',
+    docs: {
+      description: {
+        story: `
+This story demonstrates a complete integration with react-hook-form, showcasing:
+
+- **Registration**: Each FormField.TextInput uses \`{...register()}\` for automatic form handling
+- **Validation**: Complex validation rules with custom error messages
+- **Error Display**: Validation errors automatically flow to FormField's error prop
+- **Accessibility**: ARIA attributes are automatically applied based on error state
+- **User Experience**: Form validates on blur, provides clear feedback, and shows success states
+
+The FormField components are designed to work with any form library while maintaining clean, accessible markup.
+        `,
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // Test initial state - no errors should be visible
+    expect(canvas.queryByText('Email is required')).not.toBeInTheDocument();
+    expect(canvas.queryByText('Username is required')).not.toBeInTheDocument();
+    expect(canvas.queryByText('Password is required')).not.toBeInTheDocument();
+
+    // Get form elements
+    const emailInput = canvas.getByLabelText(/email address/i);
+    const usernameInput = canvas.getByLabelText(/username/i);
+    const passwordInput = canvas.getByLabelText(/password/i);
+    const fullNameInput = canvas.getByLabelText(/full name/i);
+    const phoneInput = canvas.getByLabelText(/phone number/i);
+    const submitButton = canvas.getByRole('button', {
+      name: /create account/i,
+    });
+
+    // Test validation on blur - enter invalid email and blur
+    await userEvent.type(emailInput, 'invalid-email');
+    await userEvent.tab(); // Blur the email field
+
+    // Wait for validation error to appear
+    const emailError = await canvas.findByText(
+      'Please enter a valid email address'
+    );
+    expect(emailError).toBeInTheDocument();
+    expect(emailInput).toHaveAttribute('aria-invalid', 'true');
+    expect(emailInput).toHaveAttribute('aria-describedby');
+
+    // Test username validation - too short
+    await userEvent.type(usernameInput, 'ab');
+    await userEvent.tab();
+
+    const usernameError = await canvas.findByText(
+      'Username must be at least 3 characters'
+    );
+    expect(usernameError).toBeInTheDocument();
+
+    // Test password validation - no numbers
+    await userEvent.type(passwordInput, 'password');
+    await userEvent.tab();
+
+    const passwordError = await canvas.findByText(
+      'Password must contain both letters and numbers'
+    );
+    expect(passwordError).toBeInTheDocument();
+
+    // Test phone number validation - invalid format
+    await userEvent.type(phoneInput, '1234567890');
+    await userEvent.tab();
+
+    const phoneError = await canvas.findByText(
+      'Phone number must be in format: xxx-xxx-xxxx'
+    );
+    expect(phoneError).toBeInTheDocument();
+
+    // Try to submit with errors - should not submit
+    await userEvent.click(submitButton);
+
+    // Required field errors should appear for empty fields
+    const fullNameError = await canvas.findByText('Full name is required');
+    expect(fullNameError).toBeInTheDocument();
+
+    // Now correct all the errors
+    // Fix email
+    await userEvent.clear(emailInput);
+    await userEvent.type(emailInput, 'test@example.com');
+    await userEvent.tab();
+
+    // Fix username
+    await userEvent.clear(usernameInput);
+    await userEvent.type(usernameInput, 'testuser123');
+    await userEvent.tab();
+
+    // Fix password
+    await userEvent.clear(passwordInput);
+    await userEvent.type(passwordInput, 'password123');
+    await userEvent.tab();
+
+    // Add full name
+    await userEvent.type(fullNameInput, 'John Doe');
+    await userEvent.tab();
+
+    // Fix phone number
+    await userEvent.clear(phoneInput);
+    await userEvent.type(phoneInput, '123-456-7890');
+    await userEvent.tab();
+
+    // Wait for errors to disappear
+    await waitFor(() => {
+      expect(
+        canvas.queryByText('Please enter a valid email address')
+      ).not.toBeInTheDocument();
+    });
+    expect(
+      canvas.queryByText('Username must be at least 3 characters')
+    ).not.toBeInTheDocument();
+    expect(
+      canvas.queryByText('Password must contain both letters and numbers')
+    ).not.toBeInTheDocument();
+    expect(canvas.queryByText('Full name is required')).not.toBeInTheDocument();
+    expect(
+      canvas.queryByText('Phone number must be in format: xxx-xxx-xxxx')
+    ).not.toBeInTheDocument();
+
+    // Verify ARIA attributes are updated (should be false/removed when no errors)
+    // React removes boolean attributes when they're false, so check they're not "true"
+    expect(emailInput).not.toHaveAttribute('aria-invalid', 'true');
+    expect(usernameInput).not.toHaveAttribute('aria-invalid', 'true');
+    expect(passwordInput).not.toHaveAttribute('aria-invalid', 'true');
+
+    // Submit the valid form
+    await userEvent.click(submitButton);
+
+    // Verify button changes to loading state
+    expect(canvas.getByText('Creating Account...')).toBeInTheDocument();
+    expect(submitButton).toBeDisabled();
+
+    // Wait for success message
+    const successMessage = await canvas.findByText(/Success! Welcome John Doe/);
+    expect(successMessage).toBeInTheDocument();
+    expect(successMessage).toHaveAttribute('role', 'alert');
+
+    // Verify form resets after success (wait up to 4 seconds)
+    await waitFor(
+      () => {
+        expect(
+          canvas.queryByText(/Success! Welcome John Doe/)
+        ).not.toBeInTheDocument();
+      },
+      { timeout: 4000 }
+    );
+
+    // Verify form fields are cleared
+    expect(emailInput).toHaveValue('');
+    expect(usernameInput).toHaveValue('');
+    expect(passwordInput).toHaveValue('');
+    expect(fullNameInput).toHaveValue('');
+    expect(phoneInput).toHaveValue('');
   },
 };
