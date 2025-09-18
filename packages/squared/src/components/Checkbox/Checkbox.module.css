@@ -161,6 +161,11 @@
   padding-top: calc((1rem - 1.2em) / 2);
 }
 
+/* Label text wrapper - keeps text and asterisk inline */
+.labelText {
+  display: inline;
+}
+
 .checkbox.sm + .label {
   /* Adjust for smaller checkbox */
   padding-top: calc((0.875rem - 1.2em) / 2);
@@ -184,6 +189,13 @@
   line-height: 1.3;
   margin-top: 0.125rem;
   font-weight: 400;
+}
+
+/* Required indicator */
+.required {
+  color: var(--rsd-color-red-500);
+  margin-left: 0.25rem;
+  font-weight: 500;
 }
 
 /* Error state support for FormField integration */

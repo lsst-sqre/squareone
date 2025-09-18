@@ -99,6 +99,23 @@ export const Disabled: Story = {
   ),
 };
 
+export const Required: Story = {
+  render: () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      <Checkbox label="Required checkbox" required />
+      <Checkbox
+        label="Required with description"
+        description="This field is required to continue"
+        required
+      />
+      <Checkbox
+        label="Optional checkbox"
+        description="This field is optional"
+      />
+    </div>
+  ),
+};
+
 export const DifferentSizes: Story = {
   render: () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -587,9 +604,12 @@ export const AccessibilityTest: Story = {
     expect(checkbox).toHaveAttribute('aria-describedby');
 
     // Test label association
-    const label = canvas.getByText('Accessibility Test Checkbox');
+    const labelText = canvas.getByText('Accessibility Test Checkbox');
+    expect(labelText).toBeInTheDocument();
+    // Find the actual label element (parent of the text span)
+    const label = labelText.closest('label');
     expect(label).toBeInTheDocument();
-    expect(label.getAttribute('for')).toBe(checkbox.getAttribute('id'));
+    expect(label?.getAttribute('for')).toBe(checkbox.getAttribute('id'));
 
     // Test description is linked
     const description = canvas.getByText('This tests ARIA attributes');

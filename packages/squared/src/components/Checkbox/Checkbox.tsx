@@ -6,10 +6,11 @@ export type CheckboxProps = {
   size?: 'sm' | 'md' | 'lg';
   label?: string;
   description?: string;
+  required?: boolean;
 } & React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root>;
 
 const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(
-  ({ size = 'md', label, description, className, ...props }, ref) => {
+  ({ size = 'md', label, description, required, className, ...props }, ref) => {
     const generatedId = React.useId();
     const checkboxId = props.id || generatedId;
 
@@ -22,6 +23,7 @@ const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(
         ref={ref}
         id={checkboxId}
         className={checkboxClassNames}
+        required={required}
         {...props}
       >
         <CheckboxPrimitive.Indicator className={styles.indicator} />
@@ -35,7 +37,14 @@ const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(
         <div className={styles.checkboxRow}>
           {checkbox}
           <label htmlFor={checkboxId} className={styles.label}>
-            {label}
+            <span className={styles.labelText}>
+              {label}
+              {required && (
+                <span className={styles.required} aria-hidden="true">
+                  *
+                </span>
+              )}
+            </span>
             {description && (
               <span className={styles.description}>{description}</span>
             )}
