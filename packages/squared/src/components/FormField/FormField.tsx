@@ -4,6 +4,7 @@ import ErrorMessage from '../ErrorMessage';
 import Label from '../Label';
 import { TextInput } from '../TextInput';
 import RadioGroup from '../RadioGroup';
+import { Checkbox } from '../Checkbox';
 import FormFieldContext, { useFormFieldContext } from './FormFieldContext';
 
 export type FormFieldProps = {
@@ -110,11 +111,35 @@ const FormFieldRadioGroup = React.forwardRef<
 
 FormFieldRadioGroup.displayName = 'FormField.RadioGroup';
 
+// Compound component: Checkbox
+const FormFieldCheckbox = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentPropsWithoutRef<typeof Checkbox>
+>((props, ref) => {
+  const context = useFormFieldContext();
+  const ariaDescribedBy =
+    [context?.errorId, context?.descriptionId, props['aria-describedby']]
+      .filter(Boolean)
+      .join(' ') || undefined;
+
+  return (
+    <Checkbox
+      ref={ref}
+      aria-invalid={!!context?.error || props['aria-invalid']}
+      aria-describedby={ariaDescribedBy}
+      {...props}
+    />
+  );
+});
+
+FormFieldCheckbox.displayName = 'FormField.Checkbox';
+
 // Export compound components
 export const FormField = Object.assign(FormFieldRoot, {
   Label: FormFieldLabel,
   TextInput: FormFieldTextInput,
   RadioGroup: FormFieldRadioGroup,
+  Checkbox: FormFieldCheckbox,
 });
 
 export default FormField;

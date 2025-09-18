@@ -25,6 +25,8 @@ export type {
   RadioGroupProps,
   RadioGroupItemProps,
 } from './components/RadioGroup';
+export { Checkbox } from './components/Checkbox';
+export type { CheckboxProps } from './components/Checkbox';
 
 /* Hooks */
 export { default as useCurrentUrl } from './hooks/useCurrentUrl';

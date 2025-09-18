@@ -1,0 +1,51 @@
+import React, { forwardRef } from 'react';
+import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
+import styles from './Checkbox.module.css';
+
+export type CheckboxProps = {
+  size?: 'sm' | 'md' | 'lg';
+  label?: string;
+  description?: string;
+} & React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root>;
+
+const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(
+  ({ size = 'md', label, description, className, ...props }, ref) => {
+    const generatedId = React.useId();
+    const checkboxId = props.id || generatedId;
+
+    const checkboxClassNames = [styles.checkbox, styles[size], className]
+      .filter(Boolean)
+      .join(' ');
+
+    const checkbox = (
+      <CheckboxPrimitive.Root
+        ref={ref}
+        id={checkboxId}
+        className={checkboxClassNames}
+        {...props}
+      >
+        <CheckboxPrimitive.Indicator className={styles.indicator} />
+      </CheckboxPrimitive.Root>
+    );
+
+    if (!label) return checkbox;
+
+    return (
+      <div className={styles.container}>
+        <div className={styles.checkboxRow}>
+          {checkbox}
+          <label htmlFor={checkboxId} className={styles.label}>
+            {label}
+            {description && (
+              <span className={styles.description}>{description}</span>
+            )}
+          </label>
+        </div>
+      </div>
+    );
+  }
+);
+
+Checkbox.displayName = 'Checkbox';
+
+export default Checkbox;

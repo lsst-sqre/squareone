@@ -1,0 +1,202 @@
+/* Checkbox container */
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Individual checkbox item container */
+.checkboxRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+/* Checkbox styling with WCAG 2.5.5 compliant touch targets */
+.checkbox {
+  /* Visual appearance - actual size without min constraints */
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1rem; /* 16px - matches text size */
+  height: 1rem; /* 16px - matches text size */
+  border: 0.125rem solid var(--rsd-color-gray-500); /* 2px */
+  border-radius: var(--sqo-border-radius-1); /* Square with slight rounding */
+  background: var(--rsd-component-page-background-color);
+  cursor: pointer;
+  transition: var(--sqo-transition-basic);
+  /* Ensure perfect square dimensions */
+  aspect-ratio: 1 / 1;
+  box-sizing: border-box;
+}
+
+/* Invisible touch target expansion */
+.checkbox::before {
+  content: '';
+  position: absolute;
+  /* Expand from 1rem visual to 2.75rem (44px) touch target */
+  inset: calc((2.75rem - 1rem) / -2); /* -0.875rem */
+  cursor: pointer;
+  z-index: 1;
+  border-radius: var(--sqo-border-radius-1);
+}
+
+/* Size variants */
+.checkbox.sm {
+  width: 0.875rem; /* 14px */
+  height: 0.875rem; /* 14px */
+  aspect-ratio: 1 / 1;
+  box-sizing: border-box;
+}
+
+.checkbox.sm::before {
+  /* Expand from 0.875rem visual to 2.75rem (44px) touch target */
+  inset: calc((2.75rem - 0.875rem) / -2); /* -0.9375rem */
+}
+
+.checkbox.lg {
+  width: 1.25rem; /* 20px */
+  height: 1.25rem; /* 20px */
+  aspect-ratio: 1 / 1;
+  box-sizing: border-box;
+}
+
+.checkbox.lg::before {
+  /* Expand from 1.25rem visual to 2.75rem (44px) touch target */
+  inset: calc((2.75rem - 1.25rem) / -2); /* -0.75rem */
+}
+
+/* Checked and indeterminate states */
+.checkbox[data-state='checked'],
+.checkbox[data-state='indeterminate'] {
+  background: var(--rsd-color-primary-600);
+  border-color: var(--rsd-color-primary-600);
+}
+
+/* Hover states */
+.checkbox:hover:not([data-disabled]) {
+  border-color: var(--rsd-color-primary-600);
+}
+
+.checkbox[data-state='checked']:hover:not([data-disabled]),
+.checkbox[data-state='indeterminate']:hover:not([data-disabled]) {
+  background: var(--rsd-color-primary-700);
+  border-color: var(--rsd-color-primary-700);
+}
+
+/* Focus states */
+.checkbox:focus-visible {
+  outline: 0.125rem solid var(--rsd-color-primary-600); /* 2px */
+  outline-offset: 0.125rem; /* 2px */
+}
+
+/* Disabled states */
+.checkbox[data-disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.checkbox[data-disabled]::before {
+  cursor: not-allowed;
+}
+
+/* Checkmark indicator for checked state */
+.checkbox[data-state='checked']::after {
+  content: '';
+  position: absolute;
+  width: 0.25rem;
+  height: 0.5rem;
+  border-right: 0.125rem solid white;
+  border-bottom: 0.125rem solid white;
+  transform: rotate(45deg) translate(-10%, -10%);
+  z-index: 2;
+}
+
+/* Size-specific checkmarks */
+.checkbox.sm[data-state='checked']::after {
+  width: 0.21875rem; /* Proportional to 14px checkbox */
+  height: 0.4375rem;
+}
+
+.checkbox.lg[data-state='checked']::after {
+  width: 0.3125rem; /* Proportional to 20px checkbox */
+  height: 0.625rem;
+}
+
+/* Minus indicator for indeterminate state */
+.checkbox[data-state='indeterminate']::after {
+  content: '';
+  position: absolute;
+  width: 0.5rem;
+  height: 0.125rem;
+  background-color: white;
+  z-index: 2;
+}
+
+/* Size-specific minus indicators */
+.checkbox.sm[data-state='indeterminate']::after {
+  width: 0.4375rem; /* Proportional to 14px checkbox */
+}
+
+.checkbox.lg[data-state='indeterminate']::after {
+  width: 0.625rem; /* Proportional to 20px checkbox */
+}
+
+/* Hide the Radix indicator since we use CSS pseudo-elements */
+.indicator {
+  display: none;
+}
+
+/* Label styling */
+.label {
+  cursor: pointer;
+  user-select: none;
+  color: var(--rsd-component-text-color);
+  font-size: 0.875rem;
+  line-height: 1.2;
+  display: flex;
+  flex-direction: column;
+  /* Center label with checkbox visually */
+  padding-top: calc((1rem - 1.2em) / 2);
+}
+
+.checkbox.sm + .label {
+  /* Adjust for smaller checkbox */
+  padding-top: calc((0.875rem - 1.2em) / 2);
+}
+
+.checkbox.lg + .label {
+  /* Adjust for larger checkbox */
+  padding-top: calc((1.25rem - 1.2em) / 2);
+}
+
+/* Disabled label styling - applied when parent container has disabled checkbox */
+.container:has(.checkbox[data-disabled]) .label {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Item description */
+.description {
+  color: var(--rsd-color-gray-500);
+  font-size: 0.8125rem;
+  line-height: 1.3;
+  margin-top: 0.125rem;
+  font-weight: 400;
+}
+
+/* Error state support for FormField integration */
+.checkbox[aria-invalid='true'] {
+  border-color: var(--rsd-color-red-500);
+}
+
+.checkbox[aria-invalid='true']:focus-visible {
+  outline-color: var(--rsd-color-red-500);
+}
+
+.checkbox[aria-invalid='true'][data-state='checked'],
+.checkbox[aria-invalid='true'][data-state='indeterminate'] {
+  background: var(--rsd-color-red-500);
+  border-color: var(--rsd-color-red-500);
+}
