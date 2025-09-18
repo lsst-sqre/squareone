@@ -6,6 +6,7 @@ import { TextInput } from '../TextInput';
 import RadioGroup from '../RadioGroup';
 import { Checkbox } from '../Checkbox';
 import { CheckboxGroup } from '../CheckboxGroup';
+import { Select } from '../Select';
 import FormFieldContext, { useFormFieldContext } from './FormFieldContext';
 
 export type FormFieldProps = {
@@ -158,6 +159,32 @@ const FormFieldCheckboxGroup = React.forwardRef<
 
 FormFieldCheckboxGroup.displayName = 'FormField.CheckboxGroup';
 
+// Compound component: Select
+const FormFieldSelect = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentPropsWithoutRef<typeof Select> & {
+    'aria-describedby'?: string;
+    'aria-invalid'?: boolean | 'false' | 'true';
+  }
+>((props, ref) => {
+  const context = useFormFieldContext();
+  const ariaDescribedBy =
+    [context?.errorId, context?.descriptionId, props['aria-describedby']]
+      .filter(Boolean)
+      .join(' ') || undefined;
+
+  return (
+    <Select
+      ref={ref}
+      aria-invalid={!!context?.error || props['aria-invalid']}
+      aria-describedby={ariaDescribedBy}
+      {...props}
+    />
+  );
+});
+
+FormFieldSelect.displayName = 'FormField.Select';
+
 // Export compound components
 export const FormField = Object.assign(FormFieldRoot, {
   Label: FormFieldLabel,
@@ -165,6 +192,7 @@ export const FormField = Object.assign(FormFieldRoot, {
   RadioGroup: FormFieldRadioGroup,
   Checkbox: FormFieldCheckbox,
   CheckboxGroup: FormFieldCheckboxGroup,
+  Select: FormFieldSelect,
 });
 
 export default FormField;

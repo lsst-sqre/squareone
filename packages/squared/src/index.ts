@@ -29,6 +29,12 @@ export { Checkbox } from './components/Checkbox';
 export type { CheckboxProps } from './components/Checkbox';
 export { CheckboxGroup } from './components/CheckboxGroup';
 export type { CheckboxGroupProps } from './components/CheckboxGroup';
+export { Select } from './components/Select';
+export type {
+  SelectProps,
+  SelectItemProps,
+  SelectGroupProps,
+} from './components/Select';
 
 /* Hooks */
 export { default as useCurrentUrl } from './hooks/useCurrentUrl';
