@@ -24,6 +24,7 @@
     "out",
     "**/*.stories.tsx",
     "**/*.stories.ts",
-    "vitest.config.ts"
+    "vitest.config.ts",
+    "../../packages/squared/src/**/*"
   ]
 }
