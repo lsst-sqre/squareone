@@ -1,5 +1,40 @@
 # squareone
 
+## 0.26.0
+
+### Minor Changes
+
+- [#205](https://github.com/lsst-sqre/squareone/pull/205) [`362b05ea70a859f982c01fd129328d126816dfba`](https://github.com/lsst-sqre/squareone/commit/362b05ea70a859f982c01fd129328d126816dfba) Thanks [@jonathansick](https://github.com/jonathansick)! - Adopted @storybook/addon-vitest for improved testing performance and browser-based testing
+
+  - Run `pnpm test-storybook` to execute Storybook tests using Vitest
+
+- [#208](https://github.com/lsst-sqre/squareone/pull/208) [`f6c8b474823fa07ed0940205858cd209bf67f2a6`](https://github.com/lsst-sqre/squareone/commit/f6c8b474823fa07ed0940205858cd209bf67f2a6) Thanks [@jonathansick](https://github.com/jonathansick)! - Fixed hydration mis-match warnings with the UserMenu
+
+- [#208](https://github.com/lsst-sqre/squareone/pull/208) [`f6c8b474823fa07ed0940205858cd209bf67f2a6`](https://github.com/lsst-sqre/squareone/commit/f6c8b474823fa07ed0940205858cd209bf67f2a6) Thanks [@jonathansick](https://github.com/jonathansick)! - Add comprehensive sidebar layout system and settings pages
+
+  - **New sidebar navigation page layout::**
+
+    - `SidebarLayout`: Responsive layout component with mobile-first design, CSS Grid on desktop, and flexbox on mobile
+    - `MobileMenuToggle`: Hamburger menu component with accessibility features and smooth animations
+    - `Sidebar`: Navigation sidebar with sticky positioning and structured navigation sections
+    - `SidebarNavItem`: Individual navigation items with hover, active, and focus states
+    - `SidebarNavSection`: Grouped navigation with optional section labels
+
+  - **Settings pages implementation:**
+    - `SettingsLayout`: Settings-specific layout using the sidebar system with dynamic navigation
+    - Three settings pages: Account (`/settings/`), Sessions (`/settings/sessions`), and Access Tokens (`/settings/tokens`)
+    - Dynamic navigation filtering based on `AppConfig` (e.g., sessions page visibility controlled by `settingsSessionsVisible`)
+    - Complete server-side rendering with proper `getServerSideProps` implementation
+
+- [#210](https://github.com/lsst-sqre/squareone/pull/210) [`98a4d6560c08a72ba52be6d9e8017e89f7df2cbb`](https://github.com/lsst-sqre/squareone/commit/98a4d6560c08a72ba52be6d9e8017e89f7df2cbb) Thanks [@jonathansick](https://github.com/jonathansick)! - Configure Next.js to transpile squared package
+
+  Added the @lsst-sqre/squared package to Next.js transpilePackages configuration to support the new build system that exports TypeScript source directly.
+
+### Patch Changes
+
+- Updated dependencies [[`98a4d6560c08a72ba52be6d9e8017e89f7df2cbb`](https://github.com/lsst-sqre/squareone/commit/98a4d6560c08a72ba52be6d9e8017e89f7df2cbb), [`9b6312854eee408a687b8c77978833032773934e`](https://github.com/lsst-sqre/squareone/commit/9b6312854eee408a687b8c77978833032773934e), [`98a4d6560c08a72ba52be6d9e8017e89f7df2cbb`](https://github.com/lsst-sqre/squareone/commit/98a4d6560c08a72ba52be6d9e8017e89f7df2cbb), [`4bdb71382f3c5a935a9309bd5e5cc32c8e2210e5`](https://github.com/lsst-sqre/squareone/commit/4bdb71382f3c5a935a9309bd5e5cc32c8e2210e5), [`362b05ea70a859f982c01fd129328d126816dfba`](https://github.com/lsst-sqre/squareone/commit/362b05ea70a859f982c01fd129328d126816dfba), [`3396e84b11d375679f9e93e12367e9b32c865cfd`](https://github.com/lsst-sqre/squareone/commit/3396e84b11d375679f9e93e12367e9b32c865cfd), [`a9e269c52e9259afd8657ca0c784b1aa966f0b27`](https://github.com/lsst-sqre/squareone/commit/a9e269c52e9259afd8657ca0c784b1aa966f0b27), [`98a4d6560c08a72ba52be6d9e8017e89f7df2cbb`](https://github.com/lsst-sqre/squareone/commit/98a4d6560c08a72ba52be6d9e8017e89f7df2cbb)]:
+  - @lsst-sqre/squared@0.9.0
+
 ## 0.25.0
 
 ### Minor Changes
