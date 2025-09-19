@@ -209,6 +209,41 @@ export const DifferentSizes: Story = {
   ),
 };
 
+export const LegendSizes: Story = {
+  render: () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+      <RadioGroup legend="Small Legend" size="sm" name="legend-sm" required>
+        <RadioGroup.Item value="option1" label="First option" size="sm" />
+        <RadioGroup.Item value="option2" label="Second option" size="sm" />
+      </RadioGroup>
+
+      <RadioGroup
+        legend="Medium Legend (Default)"
+        size="md"
+        name="legend-md"
+        description="This shows the default legend size"
+        required
+      >
+        <RadioGroup.Item value="option1" label="First option" />
+        <RadioGroup.Item value="option2" label="Second option" />
+      </RadioGroup>
+
+      <RadioGroup legend="Large Legend" size="lg" name="legend-lg" required>
+        <RadioGroup.Item value="option1" label="First option" size="lg" />
+        <RadioGroup.Item value="option2" label="Second option" size="lg" />
+      </RadioGroup>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'RadioGroup now supports size variants for the legend through the polymorphic Label component.',
+      },
+    },
+  },
+};
+
 export const WithFormField: Story = {
   render: () => (
     <FormField

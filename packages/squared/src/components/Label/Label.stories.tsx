@@ -9,10 +9,34 @@ const meta: Meta<typeof Label> = {
     layout: 'padded',
   },
   tags: ['autodocs'],
+  argTypes: {
+    as: {
+      control: { type: 'select' },
+      options: ['label', 'legend'],
+      description: 'Element type to render',
+    },
+    size: {
+      control: { type: 'select' },
+      options: ['sm', 'md', 'lg'],
+      description: 'Size variant',
+    },
+    required: {
+      control: { type: 'boolean' },
+      description: 'Show required indicator',
+    },
+    disabled: {
+      control: { type: 'boolean' },
+      description: 'Disabled state',
+    },
+    description: {
+      control: { type: 'text' },
+      description: 'Description text (for legends)',
+    },
+  },
 };
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<typeof Label>;
 
 export const Default: Story = {
   args: {
@@ -262,5 +286,116 @@ export const AccessibilityTest: Story = {
 
     await userEvent.click(optionalLabel);
     expect(optionalInput).toHaveFocus();
+  },
+};
+
+export const AsLegend: Story = {
+  render: () => (
+    <fieldset
+      style={{ border: '1px solid #ccc', padding: '1rem', borderRadius: '4px' }}
+    >
+      <Label
+        as="legend"
+        required
+        description="Choose your preferred color scheme"
+      >
+        Theme Preference
+      </Label>
+      <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+        <label>
+          <input
+            type="radio"
+            name="theme"
+            value="light"
+            style={{ marginRight: '0.5rem' }}
+          />
+          Light
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="theme"
+            value="dark"
+            style={{ marginRight: '0.5rem' }}
+          />
+          Dark
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="theme"
+            value="auto"
+            style={{ marginRight: '0.5rem' }}
+          />
+          Auto
+        </label>
+      </div>
+    </fieldset>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Label component used as a legend element with description support.',
+      },
+    },
+  },
+};
+
+export const LegendSizes: Story = {
+  render: () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+      <fieldset
+        style={{
+          border: '1px solid #ccc',
+          padding: '1rem',
+          borderRadius: '4px',
+        }}
+      >
+        <Label as="legend" size="sm" required>
+          Small Legend
+        </Label>
+        <input type="radio" name="size-sm" />
+      </fieldset>
+
+      <fieldset
+        style={{
+          border: '1px solid #ccc',
+          padding: '1rem',
+          borderRadius: '4px',
+        }}
+      >
+        <Label
+          as="legend"
+          size="md"
+          required
+          description="Medium size legend with description"
+        >
+          Medium Legend (Default)
+        </Label>
+        <input type="radio" name="size-md" />
+      </fieldset>
+
+      <fieldset
+        style={{
+          border: '1px solid #ccc',
+          padding: '1rem',
+          borderRadius: '4px',
+        }}
+      >
+        <Label as="legend" size="lg" required>
+          Large Legend
+        </Label>
+        <input type="radio" name="size-lg" />
+      </fieldset>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Legend variants showing different sizes available when using Label as a legend.',
+      },
+    },
   },
 };
