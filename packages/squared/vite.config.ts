@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
@@ -10,6 +10,12 @@ export default defineConfig({
     alias: {
       // Ensure we're using the correct React Vite framework for Storybook
       '@storybook/react-vite': '@storybook/react-vite',
+    },
+  },
+  css: {
+    modules: {
+      localsConvention: 'camelCase',
+      generateScopedName: '[name]__[local]___[hash:base64:5]',
     },
   },
 });

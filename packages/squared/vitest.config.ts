@@ -20,6 +20,22 @@ export default defineConfig({
       },
     },
     projects: [
+      // Unit testing project with traditional vitest tests
+      defineProject({
+        test: {
+          name: 'unit',
+          include: ['src/**/*.test.{ts,tsx}'],
+          exclude: ['src/**/*.stories.{ts,tsx}'],
+          environment: 'jsdom',
+          globals: true,
+          setupFiles: ['./src/test-setup.ts'],
+          css: {
+            modules: {
+              classNameStrategy: 'non-scoped',
+            },
+          },
+        },
+      }),
       defineProject({
         plugins: [
           storybookTest({

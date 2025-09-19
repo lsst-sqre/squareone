@@ -1,7 +1,7 @@
 import React from 'react';
-import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { IconPrefix, IconName } from '@fortawesome/fontawesome-svg-core';
+import styles from './IconPill.module.css';
 
 export type IconPillProps = {
   text: string;
@@ -11,39 +11,6 @@ export type IconPillProps = {
   hoverBackgroundColor?: string;
   textColor?: string;
 };
-
-const PillContainer = styled.span<{
-  $backgroundColor: string;
-  $hoverBackgroundColor: string;
-  $textColor: string;
-}>`
-  display: inline-block;
-  padding: var(--sqo-space-xxxs) var(--sqo-space-unit);
-  border: 1px solid transparent;
-  border-radius: var(--sqo-border-radius-2);
-  color: ${(props) => props.$textColor};
-  background-color: ${(props) => props.$backgroundColor};
-  font-size: 0.9rem;
-  font-weight: 700;
-  transition: var(--sqo-transition-basic);
-  box-shadow: var(--sqo-elevation-sm);
-
-  a {
-    text-decoration: none;
-    color: inherit;
-  }
-
-  &:hover {
-    background-color: ${(props) => props.$hoverBackgroundColor};
-    box-shadow: var(--sqo-elevation-lg);
-  }
-`;
-
-const StyledFontAwesomeIcon = styled(FontAwesomeIcon)`
-  display: inline-block;
-  margin-right: 0.4em;
-  font-size: 0.9em;
-`;
 
 /**
  * A pill-shaped button component that combines an icon and text with a link.
@@ -66,17 +33,19 @@ export const IconPill = ({
   hoverBackgroundColor = 'var(--sqo-primary-button-background-color-hover)',
   textColor = '#ffffff',
 }: IconPillProps) => {
+  const pillStyle = {
+    '--icon-pill-text-color': textColor,
+    '--icon-pill-bg-color': backgroundColor,
+    '--icon-pill-hover-bg-color': hoverBackgroundColor,
+  } as React.CSSProperties;
+
   return (
-    <PillContainer
-      $textColor={textColor}
-      $backgroundColor={backgroundColor}
-      $hoverBackgroundColor={hoverBackgroundColor}
-    >
-      <a href={url}>
-        <StyledFontAwesomeIcon icon={icon} />
+    <span className={styles.pill} style={pillStyle}>
+      <a href={url} className={styles.link}>
+        <FontAwesomeIcon icon={icon} className={styles.icon} />
         {text}
       </a>
-    </PillContainer>
+    </span>
   );
 };
 
