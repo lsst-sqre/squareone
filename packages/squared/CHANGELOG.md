@@ -1,5 +1,64 @@
 # @lsst-sqre/squared
 
+## 0.9.0
+
+### Minor Changes
+
+- [#210](https://github.com/lsst-sqre/squareone/pull/210) [`98a4d6560c08a72ba52be6d9e8017e89f7df2cbb`](https://github.com/lsst-sqre/squareone/commit/98a4d6560c08a72ba52be6d9e8017e89f7df2cbb) Thanks [@jonathansick](https://github.com/jonathansick)! - Replace tsup build with direct TypeScript transpilation
+
+  Replaced the tsup build tool with direct TypeScript transpilation through the consuming applications. This change:
+
+  - Exports TypeScript source files directly from the package
+  - Lets Next.js and other consuming apps handle transpilation
+  - Simplifies the build pipeline and removes the build step from the squared package
+  - Improves development experience with faster HMR
+
+- [#210](https://github.com/lsst-sqre/squareone/pull/210) [`9b6312854eee408a687b8c77978833032773934e`](https://github.com/lsst-sqre/squareone/commit/9b6312854eee408a687b8c77978833032773934e) Thanks [@jonathansick](https://github.com/jonathansick)! - Add a new Button component
+
+  This button has flexible styling and utility for a range of applications. It has two main axes of styling via props:
+
+  - `appearance` can be `solid|outline|text`
+  - `tone` is `primary|secondary|tertiary|danger` and controls the semantics of the button
+  - `role` is a way of quickly setting appearance and tone together for common uses. `role=primary` creates a solid button with primary tone.
+
+  The button also supports icons, loading state, and can be implemented both as a button element or as a link.
+
+- [#210](https://github.com/lsst-sqre/squareone/pull/210) [`98a4d6560c08a72ba52be6d9e8017e89f7df2cbb`](https://github.com/lsst-sqre/squareone/commit/98a4d6560c08a72ba52be6d9e8017e89f7df2cbb) Thanks [@jonathansick](https://github.com/jonathansick)! - Migrate components from styled-components to CSS Modules
+
+  Migrated the IconPill and PrimaryNavigation components from styled-components to CSS Modules for better performance and smaller bundle size. This change:
+
+  - Removes the styled-components dependency from the squared package
+  - Improves build-time CSS processing
+  - Maintains all existing styling and functionality
+  - Adds CSS Module type definitions for TypeScript support
+
+- [#211](https://github.com/lsst-sqre/squareone/pull/211) [`4bdb71382f3c5a935a9309bd5e5cc32c8e2210e5`](https://github.com/lsst-sqre/squareone/commit/4bdb71382f3c5a935a9309bd5e5cc32c8e2210e5) Thanks [@jonathansick](https://github.com/jonathansick)! - Add comprehensive form input component library
+
+  Introduces a complete set of foundational form components to the squared design system:
+
+  - **Label**: Accessible form labels with required indicator support and proper semantic markup
+  - **ErrorMessage**: Consistent error messaging component with accessibility features
+  - **TextInput**: Full-featured text input with validation states, sizing variants, and accessibility
+  - **FormField**: Compound component that provides context and orchestrates label, input, and error message relationships
+
+- [#205](https://github.com/lsst-sqre/squareone/pull/205) [`362b05ea70a859f982c01fd129328d126816dfba`](https://github.com/lsst-sqre/squareone/commit/362b05ea70a859f982c01fd129328d126816dfba) Thanks [@jonathansick](https://github.com/jonathansick)! - Adopted @storybook/addon-vitest for improved testing performance and browser-based testing
+
+  - Run `pnpm test-storybook` to execute Storybook tests using Vitest
+
+- [#205](https://github.com/lsst-sqre/squareone/pull/205) [`3396e84b11d375679f9e93e12367e9b32c865cfd`](https://github.com/lsst-sqre/squareone/commit/3396e84b11d375679f9e93e12367e9b32c865cfd) Thanks [@jonathansick](https://github.com/jonathansick)! - Drop GafaelfawrUserDropdown and GafaelfawrUserMenu components (replaced by PrimaryNavigation)
+
+- [#205](https://github.com/lsst-sqre/squareone/pull/205) [`a9e269c52e9259afd8657ca0c784b1aa966f0b27`](https://github.com/lsst-sqre/squareone/commit/a9e269c52e9259afd8657ca0c784b1aa966f0b27) Thanks [@jonathansick](https://github.com/jonathansick)! - Deleted the "Button" example component
+
+- [#210](https://github.com/lsst-sqre/squareone/pull/210) [`98a4d6560c08a72ba52be6d9e8017e89f7df2cbb`](https://github.com/lsst-sqre/squareone/commit/98a4d6560c08a72ba52be6d9e8017e89f7df2cbb) Thanks [@jonathansick](https://github.com/jonathansick)! - Add comprehensive testing setup for squared components
+
+  Added a complete testing infrastructure for the squared component library:
+
+  - Configured vitest for unit testing with React Testing Library
+  - Set up Storybook addon-vitest for testing stories
+  - Added test setup file for common test utilities
+  - Created comprehensive tests for the new Button component
+  - Configured testing commands for both unit tests and Storybook tests
+
 ## 0.8.0
 
 ### Minor Changes
