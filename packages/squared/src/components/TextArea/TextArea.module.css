@@ -1,0 +1,113 @@
+/* Container styles */
+.container {
+  display: inline-block;
+  position: relative;
+}
+
+.fullWidth {
+  display: block;
+  width: 100%;
+}
+
+/* Base textarea styles */
+.textarea {
+  /* Use CSS custom property for dynamic height calculation */
+  --textarea-rows: 3; /* Default fallback */
+
+  /* Calculate height based on line-height and rows */
+  height: calc(
+    var(--textarea-rows) * var(--textarea-line-height, 1.5em) +
+      var(--textarea-padding-y, 0.5rem) * 2
+  );
+
+  /* Allow manual resize but respect calculated height as minimum */
+  min-height: calc(
+    var(--textarea-rows) * var(--textarea-line-height, 1.5em) +
+      var(--textarea-padding-y, 0.5rem) * 2
+  );
+
+  /* Standard styling */
+  line-height: var(--textarea-line-height, 1.5em);
+  padding: var(--textarea-padding-y, 0.5rem) var(--textarea-padding-x, 0.75rem);
+
+  /* Consistent with TextInput */
+  font-family: inherit;
+  border: 1px solid var(--rsd-color-gray-100);
+  border-radius: var(--sqo-border-radius-1);
+  background: var(--rsd-component-page-background-color);
+  color: var(--rsd-component-text-color);
+  resize: vertical;
+  transition: var(--sqo-transition-basic);
+  width: 100%;
+  outline: none;
+}
+
+.textarea:focus-visible {
+  outline: 2px solid var(--rsd-color-primary-600);
+  outline-offset: 2px;
+  border-color: var(--rsd-color-primary-600);
+}
+
+.textarea:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: var(--rsd-color-gray-50);
+}
+
+.textarea::placeholder {
+  color: var(--rsd-color-gray-500);
+  opacity: 1;
+}
+
+/* Size variants adjust line-height and padding */
+.sm {
+  --textarea-line-height: 1.4em;
+  --textarea-padding-y: 0.375rem;
+  --textarea-padding-x: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.md {
+  --textarea-line-height: 1.5em;
+  --textarea-padding-y: 0.5rem;
+  --textarea-padding-x: 0.75rem;
+  font-size: 1rem;
+}
+
+.lg {
+  --textarea-line-height: 1.6em;
+  --textarea-padding-y: 0.75rem;
+  --textarea-padding-x: 1rem;
+  font-size: 1.125rem;
+}
+
+/* Appearance variants */
+.default {
+  border-color: var(--rsd-color-gray-100);
+}
+
+.error {
+  border-color: var(--rsd-color-red-500);
+  color: var(--rsd-color-red-900);
+}
+
+.error:focus-visible {
+  outline-color: var(--rsd-color-red-500);
+  border-color: var(--rsd-color-red-500);
+}
+
+.success {
+  border-color: var(--rsd-color-green-500);
+  color: var(--rsd-color-green-900);
+}
+
+.success:focus-visible {
+  outline-color: var(--rsd-color-green-500);
+  border-color: var(--rsd-color-green-500);
+}
+
+/* When auto-resize is enabled, prevent manual resize */
+.textarea[data-auto-resize='true'] {
+  resize: none;
+  overflow-y: auto;
+}

@@ -3,6 +3,7 @@ import styles from './FormField.module.css';
 import ErrorMessage from '../ErrorMessage';
 import Label from '../Label';
 import { TextInput } from '../TextInput';
+import TextArea from '../TextArea';
 import RadioGroup from '../RadioGroup';
 import { Checkbox } from '../Checkbox';
 import { CheckboxGroup } from '../CheckboxGroup';
@@ -89,6 +90,29 @@ const FormFieldTextInput = React.forwardRef<
 });
 
 FormFieldTextInput.displayName = 'FormField.TextInput';
+
+// Compound component: TextArea
+const FormFieldTextArea = React.forwardRef<
+  HTMLTextAreaElement,
+  React.ComponentPropsWithoutRef<typeof TextArea>
+>((props, ref) => {
+  const context = useFormFieldContext();
+  const ariaDescribedBy =
+    [context?.errorId, context?.descriptionId, props['aria-describedby']]
+      .filter(Boolean)
+      .join(' ') || undefined;
+
+  return (
+    <TextArea
+      ref={ref}
+      aria-invalid={!!context?.error || props['aria-invalid']}
+      aria-describedby={ariaDescribedBy}
+      {...props}
+    />
+  );
+});
+
+FormFieldTextArea.displayName = 'FormField.TextArea';
 
 // Compound component: RadioGroup
 const FormFieldRadioGroup = React.forwardRef<
@@ -189,6 +213,7 @@ FormFieldSelect.displayName = 'FormField.Select';
 export const FormField = Object.assign(FormFieldRoot, {
   Label: FormFieldLabel,
   TextInput: FormFieldTextInput,
+  TextArea: FormFieldTextArea,
   RadioGroup: FormFieldRadioGroup,
   Checkbox: FormFieldCheckbox,
   CheckboxGroup: FormFieldCheckboxGroup,
