@@ -1,5 +1,6 @@
 import React, { forwardRef } from 'react';
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
+import Label from '../Label';
 import styles from './RadioGroup.module.css';
 
 export type RadioGroupProps = {
@@ -7,6 +8,7 @@ export type RadioGroupProps = {
   description?: string;
   orientation?: 'horizontal' | 'vertical';
   required?: boolean;
+  size?: 'sm' | 'md' | 'lg';
   children: React.ReactNode;
 } & React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>;
 
@@ -18,6 +20,7 @@ const RadioGroupRoot = forwardRef<HTMLDivElement, RadioGroupProps>(
       description,
       orientation = 'vertical',
       required,
+      size = 'md',
       children,
       className,
       ...props
@@ -30,17 +33,14 @@ const RadioGroupRoot = forwardRef<HTMLDivElement, RadioGroupProps>(
 
     return (
       <fieldset className={styles.fieldset}>
-        <legend className={styles.legend}>
+        <Label
+          as="legend"
+          size={size}
+          required={required}
+          description={description}
+        >
           {legend}
-          {required && (
-            <span className={styles.required} aria-hidden="true">
-              *
-            </span>
-          )}
-          {description && (
-            <span className={styles.description}>{description}</span>
-          )}
-        </legend>
+        </Label>
         <RadioGroupPrimitive.Root
           ref={ref}
           className={groupClassNames}
