@@ -395,19 +395,26 @@ export const ReactHookFormIntegration: Story = {
 
     // Test changing account type to business
     const businessRadio = canvas.getByDisplayValue('business');
-    await userEvent.click(businessRadio);
+    const businessButton = canvas.getByRole('radio', {
+      name: /business account/i,
+    });
+    await userEvent.click(businessButton);
     expect(businessRadio).toBeChecked();
     expect(personalRadio).not.toBeChecked();
 
     // Test changing notification preference to push
     const pushRadio = canvas.getByDisplayValue('push');
-    await userEvent.click(pushRadio);
+    const pushButton = canvas.getByRole('radio', {
+      name: /push notifications/i,
+    });
+    await userEvent.click(pushButton);
     expect(pushRadio).toBeChecked();
     expect(emailRadio).not.toBeChecked();
 
     // Test changing theme to dark
     const darkRadio = canvas.getByDisplayValue('dark');
-    await userEvent.click(darkRadio);
+    const darkButton = canvas.getByRole('radio', { name: /dark/i });
+    await userEvent.click(darkButton);
     expect(darkRadio).toBeChecked();
     expect(lightRadio).not.toBeChecked();
 
@@ -428,7 +435,10 @@ export const ReactHookFormIntegration: Story = {
 
     // Change to enterprise account before submitting
     const enterpriseRadio = canvas.getByDisplayValue('enterprise');
-    await userEvent.click(enterpriseRadio);
+    const enterpriseButton = canvas.getByRole('radio', {
+      name: /enterprise account/i,
+    });
+    await userEvent.click(enterpriseButton);
     expect(enterpriseRadio).toBeChecked();
 
     // Mock window.alert to capture form submission
