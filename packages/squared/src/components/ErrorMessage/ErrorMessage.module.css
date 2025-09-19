@@ -1,0 +1,12 @@
+.errorMessage {
+  color: var(--rsd-color-red-500);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.errorMessage.placeholder {
+  /* Reserve space but remain invisible */
+  min-height: 1.2em;
+  visibility: hidden;
+}

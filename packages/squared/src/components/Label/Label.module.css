@@ -1,0 +1,38 @@
+.label {
+  font-family: inherit;
+  font-weight: 500;
+  color: var(--rsd-component-text-color);
+  margin-bottom: var(--sqo-space-xxxs);
+  display: block;
+  cursor: pointer;
+  line-height: 1.2;
+}
+
+.label:hover {
+  color: var(--rsd-component-text-color);
+}
+
+.label.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Size variants */
+.sm {
+  font-size: 0.875rem;
+}
+
+.md {
+  font-size: 1rem;
+}
+
+.lg {
+  font-size: 1.125rem;
+}
+
+/* Required indicator */
+.required {
+  color: var(--rsd-color-red-500);
+  margin-left: 0.25rem;
+  font-weight: 500;
+}

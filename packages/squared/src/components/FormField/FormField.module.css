@@ -1,0 +1,13 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sqo-space-xxxs);
+  margin-bottom: var(--sqo-space-xs);
+}
+
+.description {
+  color: var(--rsd-color-gray-500);
+  font-size: 0.875rem;
+  line-height: 1.4;
+  margin-top: var(--sqo-space-xxxs);
+}
