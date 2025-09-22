@@ -3,14 +3,32 @@ import * as LabelPrimitive from '@radix-ui/react-label';
 import styles from './Label.module.css';
 
 export type LabelProps = {
+  as?: 'label' | 'legend';
   required?: boolean;
   disabled?: boolean;
   size?: 'sm' | 'md' | 'lg';
   children: React.ReactNode;
-} & React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>;
+  description?: string;
+  className?: string;
+} & (
+  | React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
+  | React.ComponentPropsWithoutRef<'legend'>
+);
 
-const Label = forwardRef<HTMLLabelElement, LabelProps>(
-  ({ required, disabled, size = 'md', className, children, ...props }, ref) => {
+const Label = forwardRef<HTMLLabelElement | HTMLLegendElement, LabelProps>(
+  (
+    {
+      as = 'label',
+      required,
+      disabled,
+      size = 'md',
+      description,
+      className,
+      children,
+      ...props
+    },
+    ref
+  ) => {
     const classNames = [
       styles.label,
       styles[size],
@@ -20,14 +38,41 @@ const Label = forwardRef<HTMLLabelElement, LabelProps>(
       .filter(Boolean)
       .join(' ');
 
+    const requiredIndicator = required && (
+      <span className={styles.required} aria-hidden="true">
+        *
+      </span>
+    );
+
+    const descriptionElement = description && (
+      <span className={styles.description}>{description}</span>
+    );
+
+    if (as === 'legend') {
+      return (
+        <legend
+          ref={ref as React.Ref<HTMLLegendElement>}
+          className={classNames}
+          {...(props as React.ComponentPropsWithoutRef<'legend'>)}
+        >
+          {children}
+          {requiredIndicator}
+          {descriptionElement}
+        </legend>
+      );
+    }
+
     return (
-      <LabelPrimitive.Root ref={ref} className={classNames} {...props}>
+      <LabelPrimitive.Root
+        ref={ref as React.Ref<HTMLLabelElement>}
+        className={classNames}
+        {...(props as React.ComponentPropsWithoutRef<
+          typeof LabelPrimitive.Root
+        >)}
+      >
         {children}
-        {required && (
-          <span className={styles.required} aria-hidden="true">
-            *
-          </span>
-        )}
+        {requiredIndicator}
+        {descriptionElement}
       </LabelPrimitive.Root>
     );
   }

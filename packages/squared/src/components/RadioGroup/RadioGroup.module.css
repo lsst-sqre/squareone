@@ -1,0 +1,214 @@
+/* Fieldset styling - modern approach */
+.fieldset {
+  border: none;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+/* Legend styles now handled by polymorphic Label component */
+
+/* RadioGroup container */
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: var(--sqo-space-xs);
+}
+
+.group.horizontal {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+/* Individual radio item container */
+.item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+/* Radio button styling with WCAG 2.5.5 compliant touch targets */
+.radio {
+  /* Visual appearance - actual size without min constraints */
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1rem; /* 16px - matches text size */
+  height: 1rem; /* 16px - matches text size */
+  border: 0.125rem solid var(--rsd-color-gray-500); /* 2px */
+  border-radius: 50%; /* Circular for radio buttons */
+  background: var(--rsd-component-page-background-color);
+  cursor: pointer;
+  transition: var(--sqo-transition-basic);
+  /* Ensure perfect square dimensions */
+  aspect-ratio: 1 / 1;
+  box-sizing: border-box;
+}
+
+/* Invisible touch target expansion */
+.radio::before {
+  content: '';
+  position: absolute;
+  /* Expand from 1rem visual to 2.75rem (44px) touch target */
+  inset: calc((2.75rem - 1rem) / -2); /* -0.875rem */
+  cursor: pointer;
+  z-index: 1;
+  border-radius: 50%;
+}
+
+/* Size variants */
+.radio.sm {
+  width: 0.875rem; /* 14px */
+  height: 0.875rem; /* 14px */
+  aspect-ratio: 1 / 1;
+  box-sizing: border-box;
+}
+
+/* Small size indicator dot */
+.radio.sm[data-state='checked']::after {
+  width: 0.4375rem; /* 7px - proportional to 14px radio */
+  height: 0.4375rem; /* 7px - proportional to 14px radio */
+}
+
+.radio.sm::before {
+  /* Expand from 0.875rem visual to 2.75rem (44px) touch target */
+  inset: calc((2.75rem - 0.875rem) / -2); /* -0.9375rem */
+}
+
+.radio.lg {
+  width: 1.25rem; /* 20px */
+  height: 1.25rem; /* 20px */
+  aspect-ratio: 1 / 1;
+  box-sizing: border-box;
+}
+
+/* Large size indicator dot */
+.radio.lg[data-state='checked']::after {
+  width: 0.625rem; /* 10px - proportional to 20px radio */
+  height: 0.625rem; /* 10px - proportional to 20px radio */
+}
+
+.radio.lg::before {
+  /* Expand from 1.25rem visual to 2.75rem (44px) touch target */
+  inset: calc((2.75rem - 1.25rem) / -2); /* -0.75rem */
+}
+
+/* Selected state */
+.radio[data-state='checked'] {
+  background: var(--rsd-component-page-background-color);
+  border-color: var(--rsd-color-primary-600);
+}
+
+/* Hover states */
+.radio:hover:not([data-disabled]) {
+  border-color: var(--rsd-color-primary-600);
+}
+
+.radio[data-state='checked']:hover:not([data-disabled]) {
+  background: var(--rsd-component-page-background-color);
+  border-color: var(--rsd-color-primary-700);
+}
+
+/* Focus states */
+.radio:focus-visible {
+  outline: 0.125rem solid var(--rsd-color-primary-600); /* 2px */
+  outline-offset: 0.125rem; /* 2px */
+}
+
+/* Disabled states */
+.radio[data-disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.radio[data-disabled]::before {
+  cursor: not-allowed;
+}
+
+/* Selected indicator - filled circle inside radio */
+.indicator {
+  display: none;
+}
+
+/* Put the indicator dot directly on the radio button when selected */
+.radio[data-state='checked']::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 0.4rem; /* Fixed size for perfect circle */
+  height: 0.4rem; /* Fixed size for perfect circle */
+  border-radius: 50%;
+  background-color: var(--rsd-color-primary-600);
+  z-index: 2;
+}
+
+/* Label styling */
+.label {
+  cursor: pointer;
+  user-select: none;
+  color: var(--rsd-component-text-color);
+  font-size: 0.875rem;
+  line-height: 1.2;
+  display: flex;
+  flex-direction: column;
+  /* Center label with radio button visually */
+  padding-top: calc((1rem - 1.2em) / 2);
+}
+
+.radio.sm + .label {
+  /* Adjust for smaller radio */
+  padding-top: calc((0.875rem - 1.2em) / 2);
+}
+
+.radio.lg + .label {
+  /* Adjust for larger radio */
+  padding-top: calc((1.25rem - 1.2em) / 2);
+}
+
+.label:has(+ .radio[data-disabled]) {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Item description */
+.itemDescription {
+  color: var(--rsd-color-gray-500);
+  font-size: 0.8125rem;
+  line-height: 1.3;
+  margin-top: 0.125rem;
+  font-weight: 400;
+}
+
+/* Error state support for FormField integration */
+.radio[aria-invalid='true'] {
+  border-color: var(--rsd-color-red-500);
+}
+
+.radio[aria-invalid='true']:focus-visible {
+  outline-color: var(--rsd-color-red-500);
+}
+
+.radio[aria-invalid='true'][data-state='checked'] {
+  background: var(--rsd-color-red-500);
+  border-color: var(--rsd-color-red-500);
+}
+
+/* Horizontal layout adjustments */
+.group.horizontal .item {
+  margin-right: 0; /* Gap is handled by parent flex */
+}
+
+/* Responsive considerations */
+@media (max-width: 48rem) {
+  /* 768px */
+  .group.horizontal {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}

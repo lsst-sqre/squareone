@@ -36,3 +36,13 @@
   margin-left: 0.25rem;
   font-weight: 500;
 }
+
+/* Description text for legends */
+.description {
+  display: block;
+  font-weight: 400;
+  color: var(--rsd-color-gray-500);
+  margin-top: 0.25rem;
+  font-size: 0.8125rem;
+  line-height: 1.3;
+}
