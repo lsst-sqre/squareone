@@ -4,6 +4,8 @@ import ErrorMessage from '../ErrorMessage';
 import Label from '../Label';
 import { TextInput } from '../TextInput';
 import RadioGroup from '../RadioGroup';
+import { Checkbox } from '../Checkbox';
+import { CheckboxGroup } from '../CheckboxGroup';
 import FormFieldContext, { useFormFieldContext } from './FormFieldContext';
 
 export type FormFieldProps = {
@@ -110,11 +112,59 @@ const FormFieldRadioGroup = React.forwardRef<
 
 FormFieldRadioGroup.displayName = 'FormField.RadioGroup';
 
+// Compound component: Checkbox
+const FormFieldCheckbox = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentPropsWithoutRef<typeof Checkbox>
+>((props, ref) => {
+  const context = useFormFieldContext();
+  const ariaDescribedBy =
+    [context?.errorId, context?.descriptionId, props['aria-describedby']]
+      .filter(Boolean)
+      .join(' ') || undefined;
+
+  return (
+    <Checkbox
+      ref={ref}
+      aria-invalid={!!context?.error || props['aria-invalid']}
+      aria-describedby={ariaDescribedBy}
+      {...props}
+    />
+  );
+});
+
+FormFieldCheckbox.displayName = 'FormField.Checkbox';
+
+// Compound component: CheckboxGroup
+const FormFieldCheckboxGroup = React.forwardRef<
+  HTMLFieldSetElement,
+  React.ComponentPropsWithoutRef<typeof CheckboxGroup>
+>((props, ref) => {
+  const context = useFormFieldContext();
+  const ariaDescribedBy =
+    [context?.errorId, context?.descriptionId, props['aria-describedby']]
+      .filter(Boolean)
+      .join(' ') || undefined;
+
+  return (
+    <CheckboxGroup
+      ref={ref}
+      aria-invalid={!!context?.error || props['aria-invalid']}
+      aria-describedby={ariaDescribedBy}
+      {...props}
+    />
+  );
+});
+
+FormFieldCheckboxGroup.displayName = 'FormField.CheckboxGroup';
+
 // Export compound components
 export const FormField = Object.assign(FormFieldRoot, {
   Label: FormFieldLabel,
   TextInput: FormFieldTextInput,
   RadioGroup: FormFieldRadioGroup,
+  Checkbox: FormFieldCheckbox,
+  CheckboxGroup: FormFieldCheckboxGroup,
 });
 
 export default FormField;
