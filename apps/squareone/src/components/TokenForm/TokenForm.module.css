@@ -1,0 +1,31 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rsd-space-4x, 2rem);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.formContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rsd-space-3x, 1.5rem);
+}
+
+.actions {
+  display: flex;
+  gap: var(--rsd-space-2x, 0.75rem);
+  justify-content: flex-start;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .actions {
+    flex-direction: column;
+    gap: var(--rsd-space-2x, 0.75rem);
+  }
+
+  .actions button {
+    width: 100%;
+  }
+}

@@ -1,0 +1,29 @@
+.container {
+  /* Base styling for scope selector */
+}
+
+.scopeGrid {
+  /* Multi-column layout using CSS columns for automatic reflow */
+  columns: 1;
+  column-gap: var(--rsd-space-3x, 1.5rem);
+  break-inside: avoid;
+}
+
+/* Responsive column layout */
+@media (min-width: 768px) {
+  .scopeGrid {
+    columns: 2;
+  }
+}
+
+@media (min-width: 1200px) {
+  .scopeGrid {
+    columns: 3;
+  }
+}
+
+/* Ensure checkbox items don't break across columns */
+.scopeGrid > * {
+  break-inside: avoid;
+  margin-bottom: var(--rsd-space-2x, 0.75rem);
+}
