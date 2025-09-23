@@ -7,8 +7,8 @@ import type { NavSection } from './SidebarLayout';
 const mockSectionWithLabel: NavSection = {
   label: 'Security',
   items: [
-    { href: '/settings/sessions', label: 'Sessions' },
     { href: '/settings/tokens', label: 'Access Tokens' },
+    { href: '/settings/privacy', label: 'Privacy' },
   ],
 };
 
@@ -46,19 +46,19 @@ test('renders section without label when not provided', () => {
 test('renders all navigation items in section', () => {
   render(<SidebarNavSection {...defaultProps} />);
 
-  expect(screen.getByText('Sessions')).toBeInTheDocument();
   expect(screen.getByText('Access Tokens')).toBeInTheDocument();
+  expect(screen.getByText('Privacy')).toBeInTheDocument();
 });
 
 test('passes correct props to navigation items', () => {
   render(
-    <SidebarNavSection {...defaultProps} currentPath="/settings/sessions" />
+    <SidebarNavSection {...defaultProps} currentPath="/settings/tokens" />
   );
 
-  const activeLink = screen.getByRole('link', { name: 'Sessions' });
+  const activeLink = screen.getByRole('link', { name: 'Access Tokens' });
   expect(activeLink).toHaveAttribute('aria-current', 'page');
 
-  const inactiveLink = screen.getByRole('link', { name: 'Access Tokens' });
+  const inactiveLink = screen.getByRole('link', { name: 'Privacy' });
   expect(inactiveLink).not.toHaveAttribute('aria-current', 'page');
 });
 
@@ -138,7 +138,7 @@ test('passes onNavigate handler to all navigation items', () => {
   });
   render(<SidebarNavSection {...defaultProps} onNavigate={mockOnNavigate} />);
 
-  const firstLink = screen.getByText('Sessions');
+  const firstLink = screen.getByText('Access Tokens');
   firstLink.click();
 
   expect(mockOnNavigate).toHaveBeenCalledTimes(1);

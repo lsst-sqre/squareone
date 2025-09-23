@@ -17,13 +17,5 @@ export function getSettingsNavigation(
     },
   ];
 
-  // Only include Security section if sessions are visible
-  if (config.settingsSessionsVisible !== false) {
-    navigation.push({
-      label: 'Security',
-      items: [{ href: '/settings/sessions', label: 'Sessions' }],
-    });
-  }
-
   return navigation;
 }
