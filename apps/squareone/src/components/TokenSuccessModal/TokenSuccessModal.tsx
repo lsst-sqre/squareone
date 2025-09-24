@@ -51,6 +51,7 @@ export default function TokenSuccessModal({
       open={open}
       onOpenChange={handleClose}
       title="Your new access token"
+      description="Copy your new access token now. It won't be displayed again."
       size="medium"
     >
       <div className={styles.content}>
