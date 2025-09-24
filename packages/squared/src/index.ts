@@ -7,6 +7,8 @@ export {
   type ButtonRole,
   type ButtonSize,
 } from './components/Button';
+export { default as ClipboardButton } from './components/ClipboardButton';
+export type { ClipboardButtonProps } from './components/ClipboardButton';
 export { default as IconPill, type IconPillProps } from './components/IconPill';
 export {
   default as PrimaryNavigation,
