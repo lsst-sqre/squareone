@@ -1,4 +1,5 @@
 import * as Dialog from '@radix-ui/react-dialog';
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 import { X } from 'react-feather';
 import styles from './Modal.module.css';
 
@@ -33,13 +34,21 @@ export default function Modal({
           className={`${styles.content} ${className || ''}`}
           data-size={size}
         >
-          {title && (
+          {title ? (
             <Dialog.Title className={styles.title}>{title}</Dialog.Title>
+          ) : (
+            <VisuallyHidden.Root>
+              <Dialog.Title>Modal</Dialog.Title>
+            </VisuallyHidden.Root>
           )}
-          {description && (
+          {description ? (
             <Dialog.Description className={styles.description}>
               {description}
             </Dialog.Description>
+          ) : (
+            <VisuallyHidden.Root>
+              <Dialog.Description>Dialog description</Dialog.Description>
+            </VisuallyHidden.Root>
           )}
           {children}
           {closeButton && (

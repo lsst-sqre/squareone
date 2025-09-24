@@ -60,7 +60,10 @@ describe('Modal', () => {
       );
 
       expect(screen.getByText('Only content')).toBeInTheDocument();
-      expect(screen.queryByRole('heading')).not.toBeInTheDocument();
+      // Title should still exist for accessibility, but be visually hidden
+      expect(screen.getByRole('heading')).toBeInTheDocument();
+      // The default visually hidden title should be present
+      expect(screen.getByText('Modal')).toBeInTheDocument();
     });
 
     it('renders children content', () => {
