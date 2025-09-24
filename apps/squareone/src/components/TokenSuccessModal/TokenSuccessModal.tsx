@@ -51,7 +51,7 @@ export default function TokenSuccessModal({
       open={open}
       onOpenChange={handleClose}
       title="Your new access token"
-      description="Copy your new access token now. It won't be displayed again."
+      description="Copy this token. It won't be shown again. Treat this token like a password and do not share it."
       size="medium"
     >
       <div className={styles.content}>
@@ -69,11 +69,6 @@ export default function TokenSuccessModal({
           </div>
         </div>
 
-        <p className={styles.warningText}>
-          Copy this token. It won&apos;t be shown again. Treat this token like a
-          password and do not share it.
-        </p>
-
         <p className={styles.detailsText}>
           <em>
             Scopes: {scopes.join(', ')}. {formatExpirationDate(expiration)}.
@@ -88,7 +83,7 @@ export default function TokenSuccessModal({
             role="secondary"
             text={templateUrl}
             label="Copy token template"
-            successLabel="Template copied!"
+            successLabel="Template URL copied!"
             size="md"
             ariaLabel="Copy token template to clipboard"
             className={styles.templateCopyButton}
