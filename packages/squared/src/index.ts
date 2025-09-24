@@ -39,6 +39,8 @@ export type {
   SelectItemProps,
   SelectGroupProps,
 } from './components/Select';
+export { Modal } from './components/Modal';
+export type { ModalProps, ModalSize } from './components/Modal';
 
 /* Hooks */
 export { default as useCurrentUrl } from './hooks/useCurrentUrl';
