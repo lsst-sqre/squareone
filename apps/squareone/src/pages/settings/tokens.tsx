@@ -1,10 +1,13 @@
 import type { ReactElement } from 'react';
 import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
+import Link from 'next/link';
 
 import { getLayout } from '../../components/SettingsLayout';
 import { loadAppConfig } from '../../lib/config/loader';
 import { useAppConfig } from '../../contexts/AppConfigContext';
+import { Lede } from '@/components/Typography';
+import { Button } from '@lsst-sqre/squared';
 
 type NextPageWithLayout = {
   getLayout?: (page: ReactElement) => ReactElement;
@@ -21,32 +24,25 @@ const AccessTokensPage: NextPageWithLayout &
   return (
     <>
       <Head>
-        <title key="title">{`Access Tokens | ${appConfig.siteName}`}</title>
+        <title key="title">{`Access tokens | ${appConfig.siteName}`}</title>
         <meta
           name="description"
           key="description"
-          content="Manage your API access tokens and authentication credentials"
+          content="Manage your RSP API access tokens"
         />
         <meta property="og:title" key="ogtitle" content="Access Tokens" />
         <meta
           property="og:description"
           key="ogdescription"
-          content="Manage your API access tokens and authentication credentials"
+          content="Manage your RSP API access tokens"
         />
       </Head>
 
-      <h1>Access Tokens</h1>
-      <p>
-        Create and manage access tokens for programmatic access to the Rubin
-        Science Platform APIs. Access tokens allow you to authenticate with
-        services without using your password.
-      </p>
-      <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
-        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-        veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-        commodo consequat.
-      </p>
+      <h1>Access tokens</h1>
+      <Lede>Manage your RSP API access tokens.</Lede>
+      <Button role="primary" as={Link} href="/settings/tokens/new">
+        Create a token
+      </Button>
     </>
   );
 };
