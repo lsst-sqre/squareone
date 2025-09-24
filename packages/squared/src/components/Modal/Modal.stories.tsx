@@ -33,6 +33,16 @@ const meta: Meta<typeof Modal> = {
       control: 'text',
       description: 'Modal description',
     },
+    visuallyHideTitle: {
+      control: 'boolean',
+      description:
+        'Whether to visually hide the title while keeping it accessible',
+    },
+    visuallyHideDescription: {
+      control: 'boolean',
+      description:
+        'Whether to visually hide the description while keeping it accessible',
+    },
   },
 };
 
@@ -77,6 +87,7 @@ export const Small: Story = {
   render: (args) => <ModalWithTrigger {...args} />,
   args: {
     title: 'Small Modal',
+    description: 'A compact modal for simple interactions.',
     size: 'small',
     children: (
       <div>
@@ -93,6 +104,7 @@ export const Medium: Story = {
   render: (args) => <ModalWithTrigger {...args} />,
   args: {
     title: 'Medium Modal',
+    description: 'A medium-sized modal for forms and detailed content.',
     size: 'medium',
     children: (
       <div>
@@ -119,6 +131,7 @@ export const Large: Story = {
   render: (args) => <ModalWithTrigger {...args} />,
   args: {
     title: 'Large Modal',
+    description: 'A spacious modal for complex content and multiple sections.',
     size: 'large',
     children: (
       <div>
@@ -179,15 +192,20 @@ export const WithoutCloseButton: Story = {
   },
 };
 
-export const WithoutTitleOrDescription: Story = {
+export const WithVisuallyHiddenTitleAndDescription: Story = {
   render: (args) => <ModalWithTrigger {...args} />,
   args: {
+    title: 'Custom Content Modal',
+    description:
+      'A modal with custom content and visually hidden title and description for accessibility.',
+    visuallyHideTitle: true,
+    visuallyHideDescription: true,
     children: (
       <div>
         <h2 style={{ marginTop: 0, marginBottom: '1rem' }}>Custom Content</h2>
         <p style={{ marginBottom: '1rem' }}>
-          This modal doesn't use the built-in title and description props.
-          Instead, it uses custom content.
+          This modal uses visually hidden title and description for
+          accessibility, while displaying custom content.
         </p>
         <Button role="primary" block>
           Okay

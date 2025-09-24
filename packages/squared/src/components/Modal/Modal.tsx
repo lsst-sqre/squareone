@@ -8,12 +8,14 @@ export type ModalSize = 'small' | 'medium' | 'large';
 export type ModalProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  title?: string;
-  description?: string;
+  title: string;
+  description: string;
   children: React.ReactNode;
   className?: string;
   size?: ModalSize;
   closeButton?: boolean;
+  visuallyHideTitle?: boolean;
+  visuallyHideDescription?: boolean;
 };
 
 export default function Modal({
@@ -25,6 +27,8 @@ export default function Modal({
   className,
   size = 'medium',
   closeButton = true,
+  visuallyHideTitle = false,
+  visuallyHideDescription = false,
 }: ModalProps) {
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -34,21 +38,21 @@ export default function Modal({
           className={`${styles.content} ${className || ''}`}
           data-size={size}
         >
-          {title ? (
-            <Dialog.Title className={styles.title}>{title}</Dialog.Title>
-          ) : (
+          {visuallyHideTitle ? (
             <VisuallyHidden.Root>
-              <Dialog.Title>Modal</Dialog.Title>
+              <Dialog.Title>{title}</Dialog.Title>
             </VisuallyHidden.Root>
+          ) : (
+            <Dialog.Title className={styles.title}>{title}</Dialog.Title>
           )}
-          {description ? (
+          {visuallyHideDescription ? (
+            <VisuallyHidden.Root>
+              <Dialog.Description>{description}</Dialog.Description>
+            </VisuallyHidden.Root>
+          ) : (
             <Dialog.Description className={styles.description}>
               {description}
             </Dialog.Description>
-          ) : (
-            <VisuallyHidden.Root>
-              <Dialog.Description>Dialog description</Dialog.Description>
-            </VisuallyHidden.Root>
           )}
           {children}
           {closeButton && (
