@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Modal, ClipboardButton, Button } from '@lsst-sqre/squared';
 import { useRouter } from 'next/router';
 import { ExpirationValue } from '../../lib/tokens/expiration';
@@ -24,6 +24,7 @@ export default function TokenSuccessModal({
   templateUrl,
 }: TokenSuccessModalProps) {
   const router = useRouter();
+  const tokenCopyButtonRef = useRef<HTMLButtonElement>(null);
 
   const formatExpirationDate = (exp: ExpirationValue): string => {
     if (exp.type === 'never') {
@@ -46,6 +47,19 @@ export default function TokenSuccessModal({
     router.push('/settings/tokens');
   };
 
+  // Focus the token copy button when the modal opens
+  useEffect(() => {
+    if (open && tokenCopyButtonRef.current) {
+      // Use a small delay to ensure the modal is fully rendered and visible
+      const timeoutId = setTimeout(() => {
+        tokenCopyButtonRef.current?.focus();
+      }, 150);
+
+      return () => clearTimeout(timeoutId);
+    }
+    return undefined;
+  }, [open]);
+
   return (
     <Modal
       open={open}
@@ -59,6 +73,7 @@ export default function TokenSuccessModal({
           <div className={styles.tokenDisplay}>
             <code className={styles.tokenValue}>{token}</code>
             <ClipboardButton
+              ref={tokenCopyButtonRef}
               text={token}
               label="Copy"
               successLabel="Copied!"

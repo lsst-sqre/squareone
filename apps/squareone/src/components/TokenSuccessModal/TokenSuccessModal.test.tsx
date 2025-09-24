@@ -238,4 +238,21 @@ describe('TokenSuccessModal', () => {
       )
     ).toBeInTheDocument();
   });
+
+  describe('focus management', () => {
+    it('focuses the token copy button when modal opens', async () => {
+      render(<TokenSuccessModal {...defaultProps} />);
+
+      // Wait for the focus effect to complete
+      await waitFor(
+        () => {
+          const copyButton = screen.getByRole('button', {
+            name: 'Copy token to clipboard',
+          });
+          expect(copyButton).toHaveFocus();
+        },
+        { timeout: 200 }
+      );
+    });
+  });
 });
