@@ -11,8 +11,14 @@ import { useAppConfig } from '../../../contexts/AppConfigContext';
 import useLoginInfo, { type Scope } from '../../../hooks/useLoginInfo';
 import { TokenForm, type TokenFormValues } from '../../../components/TokenForm';
 import { parseTokenQueryParams } from '../../../lib/tokens/queryParams';
-import { parseExpirationFromQuery } from '../../../lib/tokens/expiration';
+import {
+  parseExpirationFromQuery,
+  formatExpiration,
+} from '../../../lib/tokens/expiration';
 import type { ParsedUrlQuery } from 'querystring';
+import useTokenCreation from '../../../hooks/useTokenCreation';
+import useTokenTemplateUrl from '../../../hooks/useTokenTemplateUrl';
+import TokenSuccessModal from '../../../components/TokenSuccessModal';
 
 type NextPageWithLayout = {
   getLayout?: (page: ReactElement) => ReactElement;
@@ -35,7 +41,17 @@ const NewTokenPage: NextPageWithLayout &
     error: loginError,
     isLoading: loginLoading,
   } = useLoginInfo();
+  const {
+    createToken,
+    isCreating,
+    error: creationError,
+    reset,
+  } = useTokenCreation();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [createdToken, setCreatedToken] = useState<string | null>(null);
+  const [tokenFormValues, setTokenFormValues] =
+    useState<TokenFormValues | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Prepare form initial values
   const formInitialValues: Partial<TokenFormValues> = {};
@@ -56,17 +72,25 @@ const NewTokenPage: NextPageWithLayout &
   }
 
   const handleSubmit = async (values: TokenFormValues) => {
+    if (!loginInfo) return;
+
     setIsSubmitting(true);
+    reset();
+
     try {
-      // For Phase 1, just console.log the values
-      console.log('Token creation form submitted:', values);
+      const expires = formatExpiration(values.expiration);
 
-      // TODO: In Phase 2, implement actual token creation API call
-      // For now, simulate success after a delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await createToken({
+        username: loginInfo.username,
+        csrf: loginInfo.csrf,
+        tokenName: values.name,
+        scopes: values.scopes,
+        expires,
+      });
 
-      // Navigate back to tokens page on success
-      router.push('/settings/tokens');
+      setCreatedToken(response.token);
+      setTokenFormValues(values);
+      setIsModalOpen(true);
     } catch (error) {
       console.error('Token creation failed:', error);
     } finally {
@@ -77,6 +101,23 @@ const NewTokenPage: NextPageWithLayout &
   const handleCancel = () => {
     router.push('/settings/tokens');
   };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setCreatedToken(null);
+    setTokenFormValues(null);
+    router.push('/settings/tokens');
+  };
+
+  const baseUrl =
+    typeof window !== 'undefined'
+      ? `${window.location.origin}/settings/tokens/new`
+      : '/settings/tokens/new';
+
+  const templateUrl = useTokenTemplateUrl(
+    baseUrl,
+    tokenFormValues || { name: '', scopes: [], expiration: { type: 'never' } }
+  );
 
   let content;
 
@@ -98,12 +139,28 @@ const NewTokenPage: NextPageWithLayout &
           without using your password.
         </p>
 
+        {creationError && (
+          <div
+            style={{
+              padding: 'var(--spacing-md)',
+              marginBottom: 'var(--spacing-md)',
+              backgroundColor: 'var(--color-background-error, #fee)',
+              border: '1px solid var(--color-border-error, #fcc)',
+              borderRadius: 'var(--border-radius-medium, 4px)',
+            }}
+          >
+            <p style={{ margin: 0, color: 'var(--color-text-error, #c00)' }}>
+              <strong>Error creating token:</strong> {creationError.message}
+            </p>
+          </div>
+        )}
+
         <TokenForm
           availableScopes={loginInfo.config.scopes}
           initialValues={formInitialValues}
           onSubmit={handleSubmit}
           onCancel={handleCancel}
-          isSubmitting={isSubmitting}
+          isSubmitting={isSubmitting || isCreating}
         />
       </>
     );
@@ -132,6 +189,18 @@ const NewTokenPage: NextPageWithLayout &
 
       <h1>Create an RSP access token</h1>
       {content}
+
+      {createdToken && tokenFormValues && (
+        <TokenSuccessModal
+          open={isModalOpen}
+          onClose={handleModalClose}
+          token={createdToken}
+          tokenName={tokenFormValues.name}
+          scopes={tokenFormValues.scopes}
+          expiration={tokenFormValues.expiration}
+          templateUrl={templateUrl}
+        />
+      )}
     </>
   );
 };
