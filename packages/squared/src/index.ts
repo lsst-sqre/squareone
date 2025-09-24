@@ -47,3 +47,6 @@ export {
 
 /* Lib */
 export * from './lib/authUrls';
+
+/* Utils */
+export { copyToClipboard } from './utils/clipboard';
