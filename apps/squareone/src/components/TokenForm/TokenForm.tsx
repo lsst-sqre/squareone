@@ -59,6 +59,9 @@ export default function TokenForm({
             id="token-name"
             placeholder="A descriptive name for your token to help you recognize it later."
             disabled={isSubmitting}
+            autoComplete="off"
+            data-1p-ignore
+            data-form-type="other"
             {...register('name', {
               required: 'Token name is required',
               minLength: {
