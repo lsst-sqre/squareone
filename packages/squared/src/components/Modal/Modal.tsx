@@ -16,6 +16,7 @@ export type ModalProps = {
   closeButton?: boolean;
   visuallyHideTitle?: boolean;
   visuallyHideDescription?: boolean;
+  onInteractOutside?: (event: Event) => void;
 };
 
 export default function Modal({
@@ -29,6 +30,7 @@ export default function Modal({
   closeButton = true,
   visuallyHideTitle = false,
   visuallyHideDescription = false,
+  onInteractOutside,
 }: ModalProps) {
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -37,6 +39,7 @@ export default function Modal({
         <Dialog.Content
           className={`${styles.content} ${className || ''}`}
           data-size={size}
+          onInteractOutside={onInteractOutside}
         >
           {visuallyHideTitle ? (
             <VisuallyHidden.Root>

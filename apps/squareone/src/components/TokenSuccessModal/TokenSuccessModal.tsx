@@ -64,6 +64,7 @@ export default function TokenSuccessModal({
     <Modal
       open={open}
       onOpenChange={handleClose}
+      onInteractOutside={(event: Event) => event.preventDefault()}
       title="Your new access token"
       description="Copy this token. It won't be shown again. Treat this token like a password and do not share it."
       size="medium"
