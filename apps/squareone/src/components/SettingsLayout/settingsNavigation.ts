@@ -12,7 +12,7 @@ export function getSettingsNavigation(
     {
       items: [
         { href: '/settings', label: 'Account' },
-        { href: '/settings/tokens', label: 'Access Tokens' },
+        { href: '/settings/tokens', label: 'Access tokens' },
       ],
     },
   ];

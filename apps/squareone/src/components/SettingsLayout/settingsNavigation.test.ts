@@ -28,7 +28,7 @@ test('generates navigation with Account and Access Tokens', () => {
   expect(navigation[0]).toEqual({
     items: [
       { href: '/settings', label: 'Account' },
-      { href: '/settings/tokens', label: 'Access Tokens' },
+      { href: '/settings/tokens', label: 'Access tokens' },
     ],
   });
 });
