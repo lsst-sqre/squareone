@@ -135,8 +135,7 @@ const NewTokenPage: NextPageWithLayout &
       <>
         <p>
           Create a new access token for programmatic access to the Rubin Science
-          Platform APIs. Access tokens allow you to authenticate with services
-          without using your password.
+          Platform APIs.
         </p>
 
         {creationError && (
