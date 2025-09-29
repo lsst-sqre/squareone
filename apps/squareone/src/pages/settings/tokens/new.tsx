@@ -19,6 +19,7 @@ import type { ParsedUrlQuery } from 'querystring';
 import useTokenCreation from '../../../hooks/useTokenCreation';
 import useTokenTemplateUrl from '../../../hooks/useTokenTemplateUrl';
 import TokenSuccessModal from '../../../components/TokenSuccessModal';
+import useUserTokens, { extractTokenNames } from '../../../hooks/useUserTokens';
 
 type NextPageWithLayout = {
   getLayout?: (page: ReactElement) => ReactElement;
@@ -47,6 +48,12 @@ const NewTokenPage: NextPageWithLayout &
     error: creationError,
     reset,
   } = useTokenCreation();
+  const {
+    tokens,
+    error: tokensError,
+    isLoading: tokensLoading,
+    mutate: mutateTokens,
+  } = useUserTokens(loginInfo?.username);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [createdToken, setCreatedToken] = useState<string | null>(null);
   const [tokenFormValues, setTokenFormValues] =
@@ -91,6 +98,9 @@ const NewTokenPage: NextPageWithLayout &
       setCreatedToken(response.token);
       setTokenFormValues(values);
       setIsModalOpen(true);
+
+      // Refresh the token list to include the newly created token
+      mutateTokens();
     } catch (error) {
       console.error('Token creation failed:', error);
     } finally {
@@ -119,15 +129,25 @@ const NewTokenPage: NextPageWithLayout &
     tokenFormValues || { name: '', scopes: [], expiration: { type: 'never' } }
   );
 
+  // Extract existing token names for validation
+  const existingTokenNames = extractTokenNames(tokens);
+
   let content;
 
-  if (loginLoading) {
+  if (loginLoading || tokensLoading) {
     content = <p>Loading…</p>;
   } else if (loginError || !loginInfo) {
     content = (
       <p>
         Failed to load authentication information. Please refresh the page or{' '}
         <Link href="/login">log in again</Link>.
+      </p>
+    );
+  } else if (tokensError) {
+    content = (
+      <p>
+        Failed to load existing tokens. Some validation features may not work
+        properly.
       </p>
     );
   } else {
@@ -160,6 +180,7 @@ const NewTokenPage: NextPageWithLayout &
           onSubmit={handleSubmit}
           onCancel={handleCancel}
           isSubmitting={isSubmitting || isCreating}
+          existingTokenNames={existingTokenNames}
         />
       </>
     );

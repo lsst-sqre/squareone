@@ -171,4 +171,89 @@ describe('TokenForm', () => {
       });
     });
   });
+
+  it('should show validation error for duplicate token name', async () => {
+    const user = userEvent.setup();
+    const existingTokenNames = ['existing token', 'another token'];
+
+    render(
+      <TokenForm {...defaultProps} existingTokenNames={existingTokenNames} />
+    );
+
+    const nameInput = screen.getByLabelText(/token name/i);
+    await user.type(nameInput, 'existing token');
+
+    // Trigger blur to validate immediately
+    await user.tab();
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(/a token with this name already exists/i)
+      ).toBeInTheDocument();
+    });
+  });
+
+  it('should disable submit button when token name is invalid', async () => {
+    const user = userEvent.setup();
+    const existingTokenNames = ['existing token'];
+
+    render(
+      <TokenForm {...defaultProps} existingTokenNames={existingTokenNames} />
+    );
+
+    const nameInput = screen.getByLabelText(/token name/i);
+    const submitButton = screen.getByRole('button', { name: /create token/i });
+
+    // Initially should be enabled (name is empty but valid)
+    expect(submitButton).toBeEnabled();
+
+    await user.type(nameInput, 'existing token');
+    await user.tab(); // Trigger validation
+
+    await waitFor(() => {
+      expect(submitButton).toBeDisabled();
+    });
+  });
+
+  it('should validate token name case insensitively', async () => {
+    const user = userEvent.setup();
+    const existingTokenNames = ['existing token'];
+
+    render(
+      <TokenForm {...defaultProps} existingTokenNames={existingTokenNames} />
+    );
+
+    const nameInput = screen.getByLabelText(/token name/i);
+    await user.type(nameInput, 'EXISTING TOKEN');
+    await user.tab();
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(/a token with this name already exists/i)
+      ).toBeInTheDocument();
+    });
+  });
+
+  it('should allow unique token names', async () => {
+    const user = userEvent.setup();
+    const existingTokenNames = ['existing token', 'another token'];
+
+    render(
+      <TokenForm {...defaultProps} existingTokenNames={existingTokenNames} />
+    );
+
+    const nameInput = screen.getByLabelText(/token name/i);
+    const submitButton = screen.getByRole('button', { name: /create token/i });
+
+    await user.type(nameInput, 'unique token name');
+    await user.tab();
+
+    // Should not show any validation error
+    expect(
+      screen.queryByText(/a token with this name already exists/i)
+    ).not.toBeInTheDocument();
+
+    // Submit button should remain enabled for name validation
+    expect(submitButton).toBeEnabled();
+  });
 });

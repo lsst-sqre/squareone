@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Button, FormField } from '@lsst-sqre/squared';
 import ScopeSelector, { type Scope } from './ScopeSelector';
 import ExpirationSelector from './ExpirationSelector';
 import { type ExpirationValue } from '../../lib/tokens/expiration';
+import useTokenNameValidation from '../../hooks/useTokenNameValidation';
 import styles from './TokenForm.module.css';
+
+// Stable empty array to prevent unnecessary re-renders
+const EMPTY_TOKEN_NAMES: string[] = [];
 
 export type TokenFormValues = {
   name: string;
@@ -18,6 +22,7 @@ export type TokenFormProps = {
   onSubmit: (values: TokenFormValues) => Promise<void>;
   onCancel: () => void;
   isSubmitting?: boolean;
+  existingTokenNames?: string[];
 };
 
 export default function TokenForm({
@@ -26,11 +31,13 @@ export default function TokenForm({
   onSubmit,
   onCancel,
   isSubmitting = false,
+  existingTokenNames = EMPTY_TOKEN_NAMES,
 }: TokenFormProps) {
   const {
     control,
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<TokenFormValues>({
     defaultValues: {
@@ -39,6 +46,13 @@ export default function TokenForm({
       expiration: initialValues?.expiration || { type: 'preset', value: '90d' },
     },
   });
+
+  // Watch the token name for validation (memoized to prevent unnecessary re-renders)
+  const watchedTokenName = watch('name');
+  const tokenName = useMemo(() => watchedTokenName, [watchedTokenName]);
+
+  // Token name validation
+  const nameValidation = useTokenNameValidation(tokenName, existingTokenNames);
 
   const handleFormSubmit = async (data: TokenFormValues) => {
     try {
@@ -53,7 +67,10 @@ export default function TokenForm({
     <form className={styles.form} onSubmit={handleSubmit(handleFormSubmit)}>
       <div className={styles.formContent}>
         {/* Token Name Field */}
-        <FormField error={errors.name?.message} required>
+        <FormField
+          error={errors.name?.message || nameValidation.errorMessage}
+          required
+        >
           <FormField.Label htmlFor="token-name">Token name</FormField.Label>
           <FormField.TextInput
             id="token-name"
@@ -62,6 +79,7 @@ export default function TokenForm({
             autoComplete="off"
             data-1p-ignore
             data-form-type="other"
+            onBlur={nameValidation.validateImmediately}
             {...register('name', {
               required: 'Token name is required',
               minLength: {
@@ -122,7 +140,7 @@ export default function TokenForm({
           type="submit"
           role="primary"
           loading={isSubmitting}
-          disabled={isSubmitting}
+          disabled={isSubmitting || !nameValidation.isValid}
         >
           Create token
         </Button>
