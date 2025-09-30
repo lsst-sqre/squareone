@@ -7,7 +7,8 @@ import { getLayout } from '../../components/SettingsLayout';
 import { loadAppConfig } from '../../lib/config/loader';
 import { useAppConfig } from '../../contexts/AppConfigContext';
 import { Lede } from '@/components/Typography';
-import { Button } from '@lsst-sqre/squared';
+import { Button, useGafaelfawrUser, getLoginUrl } from '@lsst-sqre/squared';
+import AccessTokensView from '@/components/AccessTokensView';
 
 type NextPageWithLayout = {
   getLayout?: (page: ReactElement) => ReactElement;
@@ -20,6 +21,25 @@ type AccessTokensPageProps = {
 const AccessTokensPage: NextPageWithLayout &
   ((props: AccessTokensPageProps) => ReactElement) = () => {
   const appConfig = useAppConfig();
+  const { user, isLoggedIn, isLoading } = useGafaelfawrUser();
+
+  // Handle authentication
+  if (!isLoading && !isLoggedIn) {
+    const loginUrl = getLoginUrl(window.location.href);
+    window.location.href = loginUrl;
+    return null;
+  }
+
+  if (isLoading) {
+    return (
+      <>
+        <Head>
+          <title key="title">{`Access tokens | ${appConfig.siteName}`}</title>
+        </Head>
+        <div>Loading...</div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -43,6 +63,7 @@ const AccessTokensPage: NextPageWithLayout &
       <Button role="primary" as={Link} href="/settings/tokens/new">
         Create a token
       </Button>
+      {user && <AccessTokensView username={user.username} />}
     </>
   );
 };
