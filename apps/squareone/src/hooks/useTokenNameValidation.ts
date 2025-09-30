@@ -149,7 +149,14 @@ export default function useTokenNameValidation(
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [tokenName, validateTokenName, debounceMs, validateOnChange]);
+  }, [
+    tokenName,
+    validateTokenName,
+    debounceMs,
+    validateOnChange,
+    existingTokenNames,
+    reset,
+  ]);
 
   return {
     ...validationState,
