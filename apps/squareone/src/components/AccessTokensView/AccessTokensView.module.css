@@ -1,0 +1,17 @@
+.container {
+  border: 1px solid var(--rsd-color-primary-600);
+  border-radius: var(--sqo-border-radius-2);
+  background-color: transparent;
+}
+
+.loading {
+  padding: var(--sqo-space-md-fixed);
+  text-align: center;
+  color: var(--rsd-color-gray-600);
+}
+
+.error {
+  padding: var(--sqo-space-md-fixed);
+  color: var(--rsd-color-red-500);
+  text-align: center;
+}
