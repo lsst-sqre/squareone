@@ -7,6 +7,8 @@ export {
   type ButtonRole,
   type ButtonSize,
 } from './components/Button';
+export { default as ClipboardButton } from './components/ClipboardButton';
+export type { ClipboardButtonProps } from './components/ClipboardButton';
 export { default as IconPill, type IconPillProps } from './components/IconPill';
 export {
   default as PrimaryNavigation,
@@ -37,6 +39,8 @@ export type {
   SelectItemProps,
   SelectGroupProps,
 } from './components/Select';
+export { Modal } from './components/Modal';
+export type { ModalProps, ModalSize } from './components/Modal';
 
 /* Hooks */
 export { default as useCurrentUrl } from './hooks/useCurrentUrl';
@@ -47,3 +51,6 @@ export {
 
 /* Lib */
 export * from './lib/authUrls';
+
+/* Utils */
+export { copyToClipboard } from './utils/clipboard';

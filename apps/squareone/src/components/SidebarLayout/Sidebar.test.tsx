@@ -14,8 +14,8 @@ const mockNavSections: NavSection[] = [
   {
     label: 'Security',
     items: [
-      { href: '/settings/sessions', label: 'Sessions' },
       { href: '/settings/tokens', label: 'Access Tokens' },
+      { href: '/settings/privacy', label: 'Privacy' },
     ],
   },
 ];
@@ -48,8 +48,8 @@ test('renders all navigation items', () => {
 
   expect(screen.getByText('Profile')).toBeInTheDocument();
   expect(screen.getByText('Account Settings')).toBeInTheDocument();
-  expect(screen.getByText('Sessions')).toBeInTheDocument();
   expect(screen.getByText('Access Tokens')).toBeInTheDocument();
+  expect(screen.getByText('Privacy')).toBeInTheDocument();
 });
 
 test('renders section labels when provided', () => {

@@ -12,18 +12,10 @@ export function getSettingsNavigation(
     {
       items: [
         { href: '/settings', label: 'Account' },
-        { href: '/settings/tokens', label: 'Access Tokens' },
+        { href: '/settings/tokens', label: 'Access tokens' },
       ],
     },
   ];
-
-  // Only include Security section if sessions are visible
-  if (config.settingsSessionsVisible !== false) {
-    navigation.push({
-      label: 'Security',
-      items: [{ href: '/settings/sessions', label: 'Sessions' }],
-    });
-  }
 
   return navigation;
 }

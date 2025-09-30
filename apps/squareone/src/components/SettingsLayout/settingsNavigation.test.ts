@@ -17,43 +17,10 @@ const baseConfig: AppConfigContextValue = {
   mdxDir: 'src/content/pages',
 };
 
-const configWithSessionsVisible: AppConfigContextValue = {
-  ...baseConfig,
-  settingsSessionsVisible: true,
-};
+// Test configuration - sessions functionality has been removed
 
-const configWithSessionsHidden: AppConfigContextValue = {
-  ...baseConfig,
-  settingsSessionsVisible: false,
-};
-
-const configWithSessionsUndefined: AppConfigContextValue = {
-  ...baseConfig,
-  // settingsSessionsVisible not defined - should default to showing sessions
-};
-
-test('generates navigation with Sessions visible when settingsSessionsVisible is true', () => {
-  const navigation = getSettingsNavigation(configWithSessionsVisible);
-
-  expect(navigation).toHaveLength(2);
-
-  // First section: Account and Access Tokens (no label)
-  expect(navigation[0]).toEqual({
-    items: [
-      { href: '/settings', label: 'Account' },
-      { href: '/settings/tokens', label: 'Access Tokens' },
-    ],
-  });
-
-  // Second section: Security with Sessions
-  expect(navigation[1]).toEqual({
-    label: 'Security',
-    items: [{ href: '/settings/sessions', label: 'Sessions' }],
-  });
-});
-
-test('generates navigation without Sessions when settingsSessionsVisible is false', () => {
-  const navigation = getSettingsNavigation(configWithSessionsHidden);
+test('generates navigation with Account and Access Tokens', () => {
+  const navigation = getSettingsNavigation(baseConfig);
 
   expect(navigation).toHaveLength(1);
 
@@ -61,31 +28,13 @@ test('generates navigation without Sessions when settingsSessionsVisible is fals
   expect(navigation[0]).toEqual({
     items: [
       { href: '/settings', label: 'Account' },
-      { href: '/settings/tokens', label: 'Access Tokens' },
+      { href: '/settings/tokens', label: 'Access tokens' },
     ],
-  });
-
-  // Sessions section should not exist
-  const hasSessionsSection = navigation.some((section) =>
-    section.items?.some((item) => item.label === 'Sessions')
-  );
-  expect(hasSessionsSection).toBe(false);
-});
-
-test('generates navigation with Sessions when settingsSessionsVisible is undefined (default behavior)', () => {
-  const navigation = getSettingsNavigation(configWithSessionsUndefined);
-
-  expect(navigation).toHaveLength(2);
-
-  // Should include the Sessions section by default
-  expect(navigation[1]).toEqual({
-    label: 'Security',
-    items: [{ href: '/settings/sessions', label: 'Sessions' }],
   });
 });
 
 test('all navigation items have required href and label properties', () => {
-  const navigation = getSettingsNavigation(configWithSessionsVisible);
+  const navigation = getSettingsNavigation(baseConfig);
 
   navigation.forEach((section) => {
     section.items.forEach((item) => {
@@ -98,71 +47,17 @@ test('all navigation items have required href and label properties', () => {
   });
 });
 
-test('navigation structure is consistent regardless of Sessions visibility', () => {
-  const navigationVisible = getSettingsNavigation(configWithSessionsVisible);
-  const navigationHidden = getSettingsNavigation(configWithSessionsHidden);
-
-  // Both should have the same first section (Account and Access Tokens)
-  expect(navigationVisible[0]).toEqual(navigationHidden[0]);
-
-  // Only difference should be the presence/absence of Security section
-  expect(navigationVisible).toHaveLength(2);
-  expect(navigationHidden).toHaveLength(1);
-});
-
-test('Security section is properly structured when included', () => {
-  const navigation = getSettingsNavigation(configWithSessionsVisible);
-  const securitySection = navigation[1];
-
-  expect(securitySection).toHaveProperty('label', 'Security');
-  expect(securitySection).toHaveProperty('items');
-  expect(securitySection.items).toHaveLength(1);
-  expect(securitySection.items[0]).toEqual({
-    href: '/settings/sessions',
-    label: 'Sessions',
-  });
-});
-
-test('navigation handles edge case where settingsSessionsVisible is explicitly set to true', () => {
-  const navigation = getSettingsNavigation({
-    ...baseConfig,
-    settingsSessionsVisible: true,
-  });
-
-  expect(navigation).toHaveLength(2);
-  const hasSessionsSection = navigation.some(
-    (section) => section.label === 'Security'
-  );
-  expect(hasSessionsSection).toBe(true);
-});
-
-test('navigation handles edge case where settingsSessionsVisible is explicitly set to false', () => {
-  const navigation = getSettingsNavigation({
-    ...baseConfig,
-    settingsSessionsVisible: false,
-  });
-
-  expect(navigation).toHaveLength(1);
-  const hasSessionsSection = navigation.some(
-    (section) => section.label === 'Security'
-  );
-  expect(hasSessionsSection).toBe(false);
-});
-
 test('sections without labels have correct structure', () => {
-  const navigation = getSettingsNavigation(configWithSessionsVisible);
+  const navigation = getSettingsNavigation(baseConfig);
 
-  // First section (Account and Access Tokens) should not have a label
+  // Account and Access Tokens section should not have a label
   expect(navigation[0]).not.toHaveProperty('label');
-
-  // But Security section should have a label
-  expect(navigation[1]).toHaveProperty('label', 'Security');
 });
 
 test('function is pure - multiple calls with same config return identical results', () => {
-  const navigation1 = getSettingsNavigation(configWithSessionsVisible);
-  const navigation2 = getSettingsNavigation(configWithSessionsVisible);
-  const navigation3 = getSettingsNavigation(configWithSessionsVisible);
+  const navigation1 = getSettingsNavigation(baseConfig);
+  const navigation2 = getSettingsNavigation(baseConfig);
+  const navigation3 = getSettingsNavigation(baseConfig);
 
   expect(navigation1).toEqual(navigation2);
   expect(navigation2).toEqual(navigation3);
@@ -171,23 +66,23 @@ test('function is pure - multiple calls with same config return identical result
 test('function handles various config properties without side effects', () => {
   // Test with different non-relevant config properties to ensure they don't affect navigation
   const configVariation1: AppConfigContextValue = {
-    ...configWithSessionsVisible,
+    ...baseConfig,
     siteName: 'Different Site Name',
     enableAppsMenu: true,
     showPreview: true,
   };
 
   const configVariation2: AppConfigContextValue = {
-    ...configWithSessionsVisible,
+    ...baseConfig,
     baseUrl: 'https://production.example.com',
     environmentName: 'production',
   };
 
   const navigation1 = getSettingsNavigation(configVariation1);
   const navigation2 = getSettingsNavigation(configVariation2);
-  const navigationOriginal = getSettingsNavigation(configWithSessionsVisible);
+  const navigationOriginal = getSettingsNavigation(baseConfig);
 
-  // All should be identical since only settingsSessionsVisible affects navigation
+  // All should be identical since navigation is static
   expect(navigation1).toEqual(navigationOriginal);
   expect(navigation2).toEqual(navigationOriginal);
 });
