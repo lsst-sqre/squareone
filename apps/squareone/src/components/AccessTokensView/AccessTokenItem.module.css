@@ -1,0 +1,91 @@
+.tokenItem {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto auto;
+  grid-template-areas:
+    'info dates'
+    'info delete'
+    'error error';
+  gap: var(--sqo-space-sm-fixed);
+  padding: var(--sqo-space-md-fixed);
+  border-bottom: 1px solid var(--rsd-color-primary-600);
+}
+
+.tokenItem:last-child {
+  border-bottom: none;
+}
+
+.tokenItemInfoCell {
+  grid-area: info;
+}
+
+.tokenItemDatesCell {
+  grid-area: dates;
+}
+
+.tokenItemDeleteCell {
+  grid-area: delete;
+}
+
+.tokenItemErrorCell {
+  grid-area: error;
+}
+
+.tokenName {
+  font-weight: 600;
+}
+
+.tokenKey {
+  font-family: monospace;
+  font-size: 0.875rem;
+  word-break: break-all;
+}
+
+.scopes {
+  font-size: 0.875rem;
+}
+
+.expiry {
+  text-align: right;
+}
+
+.lastUsed {
+  text-align: right;
+}
+
+.deleteButton {
+  display: flex;
+  justify-content: flex-end;
+  align-self: end;
+}
+
+.error {
+  color: var(--rsd-color-red-500);
+  font-size: var(--font-size-sm);
+  margin-top: var(--size-spacing-2);
+}
+
+/* Mobile layout */
+@media (max-width: 768px) {
+  .tokenItem {
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto auto;
+    grid-template-areas:
+      'info info'
+      'dates delete'
+      'error error';
+  }
+
+  .expiry,
+  .lastUsed {
+    text-align: left;
+    align-self: start;
+  }
+
+  .tokenItemDeleteCell {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-content: flex-end;
+  }
+}
