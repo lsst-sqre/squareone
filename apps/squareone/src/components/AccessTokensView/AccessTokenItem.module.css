@@ -21,10 +21,15 @@
 
 .tokenItemDatesCell {
   grid-area: dates;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
 .tokenItemDeleteCell {
   grid-area: delete;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .tokenItemErrorCell {
@@ -43,20 +48,6 @@
 
 .scopes {
   font-size: 0.875rem;
-}
-
-.expiry {
-  text-align: right;
-}
-
-.lastUsed {
-  text-align: right;
-}
-
-.deleteButton {
-  display: flex;
-  justify-content: flex-end;
-  align-self: end;
 }
 
 .error {
@@ -78,7 +69,7 @@
 
   .expiry,
   .lastUsed {
-    text-align: left;
+    /* text-align: left; */
     align-self: start;
   }
 

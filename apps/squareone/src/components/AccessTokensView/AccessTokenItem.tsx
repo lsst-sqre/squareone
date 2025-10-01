@@ -63,31 +63,27 @@ export default function AccessTokenItem({
           <div className={styles.scopes}>{scopesContent}</div>
         </div>
         <div className={styles.tokenItemDatesCell}>
-          <div className={styles.expiry}>
-            <TokenDate
-              display={expiration.display}
-              datetime={expiration.datetime}
-            />
-          </div>
-          <div className={styles.lastUsed}>
-            <TokenDate
-              display={lastUsed.display}
-              datetime={lastUsed.datetime}
-            />
-          </div>
+          <TokenDate
+            className={styles.expiry}
+            display={expiration.display}
+            datetime={expiration.datetime}
+          />
+          <TokenDate
+            className={styles.lastUsed}
+            display={lastUsed.display}
+            datetime={lastUsed.datetime}
+          />
         </div>
         <div className={styles.tokenItemDeleteCell}>
-          <div className={styles.deleteButton}>
-            <Button
-              type="button"
-              tone="danger"
-              appearance="outline"
-              size="md"
-              onClick={handleDeleteClick}
-            >
-              Delete
-            </Button>
-          </div>
+          <Button
+            type="button"
+            tone="danger"
+            appearance="outline"
+            size="md"
+            onClick={handleDeleteClick}
+          >
+            Delete
+          </Button>
         </div>
         {error && (
           <div className={styles.tokenItemErrorCell}>
