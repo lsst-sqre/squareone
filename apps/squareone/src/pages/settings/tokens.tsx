@@ -63,7 +63,11 @@ const AccessTokensPage: NextPageWithLayout &
       <Button role="primary" as={Link} href="/settings/tokens/new">
         Create a token
       </Button>
-      {user && <AccessTokensView username={user.username} />}
+      {user && (
+        <div style={{ marginTop: 'var(--sqo-space-lg-fixed)' }}>
+          <AccessTokensView username={user.username} />
+        </div>
+      )}
     </>
   );
 };
