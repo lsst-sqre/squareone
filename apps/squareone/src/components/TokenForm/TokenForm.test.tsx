@@ -37,7 +37,7 @@ describe('TokenForm', () => {
   });
 
   it('should show validation error for empty token name', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: 10 });
     render(<TokenForm {...defaultProps} />);
 
     const submitButton = screen.getByRole('button', { name: /create token/i });
@@ -49,7 +49,7 @@ describe('TokenForm', () => {
   });
 
   it('should show validation error when no scopes selected', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: 10 });
     render(<TokenForm {...defaultProps} />);
 
     const nameInput = screen.getByLabelText(/token name/i);
@@ -66,7 +66,7 @@ describe('TokenForm', () => {
   });
 
   it('should call onSubmit with form values when valid', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: 10 });
     const mockOnSubmit = vi.fn().mockResolvedValue(undefined);
 
     render(<TokenForm {...defaultProps} onSubmit={mockOnSubmit} />);
@@ -91,7 +91,7 @@ describe('TokenForm', () => {
   });
 
   it('should call onCancel when cancel button clicked', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: 10 });
     const mockOnCancel = vi.fn();
 
     render(<TokenForm {...defaultProps} onCancel={mockOnCancel} />);
@@ -128,14 +128,16 @@ describe('TokenForm', () => {
   });
 
   it('should validate token name length', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: 10 });
     render(<TokenForm {...defaultProps} />);
 
     const nameInput = screen.getByLabelText(/token name/i);
     const longName = 'a'.repeat(65); // Over 64 character limit
     await user.type(nameInput, longName);
 
-    const submitButton = screen.getByRole('button', { name: /create token/i });
+    const submitButton = screen.getByRole('button', {
+      name: /create token/i,
+    });
     await user.click(submitButton);
 
     await waitFor(() => {
@@ -143,10 +145,10 @@ describe('TokenForm', () => {
         screen.getByText(/token name must be 64 characters or less/i)
       ).toBeInTheDocument();
     });
-  });
+  }, 10000); // Increased timeout to 10s for typing 65 characters
 
   it('should allow multiple scope selection', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: 10 });
     const mockOnSubmit = vi.fn().mockResolvedValue(undefined);
 
     render(<TokenForm {...defaultProps} onSubmit={mockOnSubmit} />);
@@ -173,7 +175,7 @@ describe('TokenForm', () => {
   });
 
   it('should show validation error for duplicate token name', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: 10 });
     const existingTokenNames = ['existing token', 'another token'];
 
     render(
@@ -194,7 +196,7 @@ describe('TokenForm', () => {
   });
 
   it('should disable submit button when token name is invalid', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: 10 });
     const existingTokenNames = ['existing token'];
 
     render(
@@ -216,7 +218,7 @@ describe('TokenForm', () => {
   });
 
   it('should validate token name case insensitively', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: 10 });
     const existingTokenNames = ['existing token'];
 
     render(
@@ -235,7 +237,7 @@ describe('TokenForm', () => {
   });
 
   it('should allow unique token names', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: 10 });
     const existingTokenNames = ['existing token', 'another token'];
 
     render(
