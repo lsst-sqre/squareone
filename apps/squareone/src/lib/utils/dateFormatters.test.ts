@@ -22,6 +22,10 @@ describe('dateFormatters', () => {
       expect(formatExpiration(null)).toBe('Never expires');
     });
 
+    it('returns "Never expires" for undefined', () => {
+      expect(formatExpiration(undefined)).toBe('Never expires');
+    });
+
     it('returns "Expired" for past timestamps', () => {
       const pastTime = MOCK_NOW - SECONDS_PER_HOUR;
       expect(formatExpiration(pastTime)).toBe('Expired');
@@ -76,6 +80,10 @@ describe('dateFormatters', () => {
   describe('formatLastUsed', () => {
     it('returns "Never used" for null', () => {
       expect(formatLastUsed(null)).toBe('Never used');
+    });
+
+    it('returns "Never used" for undefined', () => {
+      expect(formatLastUsed(undefined)).toBe('Never used');
     });
 
     it('returns "Last used less than 1 hour ago" for < 1 hour', () => {

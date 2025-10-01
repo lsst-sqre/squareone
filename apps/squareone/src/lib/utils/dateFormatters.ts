@@ -9,11 +9,12 @@ const RELATIVE_THRESHOLD = SECONDS_PER_DAY; // 24 hours
 
 /**
  * Formats an expiration timestamp.
- * @param expires - Expiration timestamp in seconds since epoch, or null if never expires
+ * @param expires - Expiration timestamp in seconds since epoch, or null/undefined if never expires
  * @returns Formatted expiration string
  */
-export function formatExpiration(expires: number | null): string {
-  if (expires === null) {
+export function formatExpiration(expires: number | null | undefined): string {
+  if (expires == null) {
+    // Checks both null and undefined
     return 'Never expires';
   }
 
@@ -41,7 +42,20 @@ export function formatExpiration(expires: number | null): string {
   }
 
   // Show absolute date for longer periods
-  const expiryDate = new Date(expires * 1000);
+  // Check if expires is actually a string that needs parsing
+  let timestamp: number;
+  if (typeof expires === 'string') {
+    timestamp = Date.parse(expires);
+  } else {
+    timestamp = expires * 1000;
+  }
+
+  const expiryDate = new Date(timestamp);
+
+  if (isNaN(expiryDate.getTime())) {
+    return `Invalid date (${expires})`;
+  }
+
   const year = expiryDate.getUTCFullYear();
   const month = String(expiryDate.getUTCMonth() + 1).padStart(2, '0');
   const day = String(expiryDate.getUTCDate()).padStart(2, '0');
@@ -50,11 +64,12 @@ export function formatExpiration(expires: number | null): string {
 
 /**
  * Formats a last used timestamp.
- * @param lastUsed - Last used timestamp in seconds since epoch, or null if never used
+ * @param lastUsed - Last used timestamp in seconds since epoch, or null/undefined if never used
  * @returns Formatted last used string
  */
-export function formatLastUsed(lastUsed: number | null): string {
-  if (lastUsed === null) {
+export function formatLastUsed(lastUsed: number | null | undefined): string {
+  if (lastUsed == null) {
+    // Checks both null and undefined
     return 'Never used';
   }
 
@@ -77,7 +92,20 @@ export function formatLastUsed(lastUsed: number | null): string {
   }
 
   // Show absolute date for longer periods
-  const lastUsedDate = new Date(lastUsed * 1000);
+  // Check if lastUsed is actually a string that needs parsing
+  let timestamp: number;
+  if (typeof lastUsed === 'string') {
+    timestamp = Date.parse(lastUsed);
+  } else {
+    timestamp = lastUsed * 1000;
+  }
+
+  const lastUsedDate = new Date(timestamp);
+
+  if (isNaN(lastUsedDate.getTime())) {
+    return `Invalid date (${lastUsed})`;
+  }
+
   const year = lastUsedDate.getUTCFullYear();
   const month = String(lastUsedDate.getUTCMonth() + 1).padStart(2, '0');
   const day = String(lastUsedDate.getUTCDate()).padStart(2, '0');

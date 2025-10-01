@@ -52,7 +52,9 @@ export default function AccessTokenItem({
     <>
       <div className={styles.tokenItem}>
         <div className={styles.tokenItemInfoCell}>
-          <div className={styles.tokenName}>{token.token_name}</div>
+          <div className={styles.tokenName}>
+            {token.token_name || token.token}
+          </div>
           <div className={styles.tokenKey}>{token.token}</div>
           <div className={styles.scopes}>{scopesContent}</div>
         </div>
