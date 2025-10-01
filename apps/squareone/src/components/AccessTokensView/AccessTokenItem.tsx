@@ -3,10 +3,11 @@ import { Button } from '@lsst-sqre/squared';
 import type { TokenInfo } from '../../hooks/useUserTokens';
 import useDeleteToken from '../../hooks/useDeleteToken';
 import {
-  formatExpiration,
-  formatLastUsed,
-} from '../../lib/utils/dateFormatters';
+  formatTokenExpiration,
+  formatTokenLastUsed,
+} from './tokenDateFormatters';
 import DeleteTokenModal from './DeleteTokenModal';
+import TokenDate from './TokenDate';
 import styles from './AccessTokenItem.module.css';
 
 type AccessTokenItemProps = {
@@ -48,6 +49,9 @@ export default function AccessTokenItem({
   const scopesContent =
     sortedScopes.length > 0 ? sortedScopes.join(', ') : 'No scopes.';
 
+  const expiration = formatTokenExpiration(token.expires);
+  const lastUsed = formatTokenLastUsed(token.last_used);
+
   return (
     <>
       <div className={styles.tokenItem}>
@@ -59,9 +63,17 @@ export default function AccessTokenItem({
           <div className={styles.scopes}>{scopesContent}</div>
         </div>
         <div className={styles.tokenItemDatesCell}>
-          <div className={styles.expiry}>{formatExpiration(token.expires)}</div>
+          <div className={styles.expiry}>
+            <TokenDate
+              display={expiration.display}
+              datetime={expiration.datetime}
+            />
+          </div>
           <div className={styles.lastUsed}>
-            {formatLastUsed(token.last_used)}
+            <TokenDate
+              display={lastUsed.display}
+              datetime={lastUsed.datetime}
+            />
           </div>
         </div>
         <div className={styles.tokenItemDeleteCell}>

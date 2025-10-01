@@ -16,14 +16,24 @@ vi.mock('../../hooks/useDeleteToken', () => ({
   })),
 }));
 
-vi.mock('../../lib/utils/dateFormatters', () => ({
-  formatExpiration: vi.fn((expires) => {
-    if (expires === null) return 'Never expires';
-    return 'Expires on 2025-12-31';
+vi.mock('./tokenDateFormatters', () => ({
+  formatTokenExpiration: vi.fn((expires) => {
+    if (expires === null) {
+      return { display: 'Never expires', datetime: null };
+    }
+    return {
+      display: 'Expires on 2025-12-31',
+      datetime: '2025-12-31T00:00:00.000Z',
+    };
   }),
-  formatLastUsed: vi.fn((lastUsed) => {
-    if (lastUsed === null) return 'Never used';
-    return 'Last used 2 hours ago';
+  formatTokenLastUsed: vi.fn((lastUsed) => {
+    if (lastUsed === null) {
+      return { display: 'Never used', datetime: null };
+    }
+    return {
+      display: 'Last used 2 hours ago',
+      datetime: '2025-01-01T10:00:00.000Z',
+    };
   }),
 }));
 

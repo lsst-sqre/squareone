@@ -9,14 +9,24 @@ vi.mock('../../hooks/useDeleteToken', () => ({
   default: vi.fn(),
 }));
 
-vi.mock('../../lib/utils/dateFormatters', () => ({
-  formatExpiration: vi.fn((expires) => {
-    if (expires === null) return 'Never expires';
-    return 'Expires on 2025-12-31';
+vi.mock('./tokenDateFormatters', () => ({
+  formatTokenExpiration: vi.fn((expires) => {
+    if (expires === null) {
+      return { display: 'Never expires', datetime: null };
+    }
+    return {
+      display: 'Expires on 2025-12-31',
+      datetime: '2025-12-31T00:00:00.000Z',
+    };
   }),
-  formatLastUsed: vi.fn((lastUsed) => {
-    if (lastUsed === null) return 'Never used';
-    return 'Last used 2 hours ago';
+  formatTokenLastUsed: vi.fn((lastUsed) => {
+    if (lastUsed === null) {
+      return { display: 'Never used', datetime: null };
+    }
+    return {
+      display: 'Last used 2 hours ago',
+      datetime: '2025-01-01T10:00:00.000Z',
+    };
   }),
 }));
 
@@ -321,5 +331,76 @@ describe('AccessTokenItem', () => {
 
     // Should be sorted alphabetically
     expect(screen.getByText('a:scope, m:scope, z:scope')).toBeInTheDocument();
+  });
+
+  it('renders dates with semantic time elements', () => {
+    render(
+      <AccessTokenItem
+        token={baseToken}
+        username="testuser"
+        onDeleteSuccess={mockOnDeleteSuccess}
+        onDeleteError={mockOnDeleteError}
+      />
+    );
+
+    // Check for time elements with datetime attributes
+    const timeElements = screen.getAllByRole('time');
+    expect(timeElements).toHaveLength(2);
+
+    // Expiration time element
+    const expirationTime = screen.getByText('Expires on 2025-12-31');
+    expect(expirationTime.tagName).toBe('TIME');
+    expect(expirationTime).toHaveAttribute(
+      'datetime',
+      '2025-12-31T00:00:00.000Z'
+    );
+
+    // Last used time element
+    const lastUsedTime = screen.getByText('Last used 2 hours ago');
+    expect(lastUsedTime.tagName).toBe('TIME');
+    expect(lastUsedTime).toHaveAttribute(
+      'datetime',
+      '2025-01-01T10:00:00.000Z'
+    );
+  });
+
+  it('renders "Never expires" without time element', () => {
+    const tokenWithNoExpiry: TokenInfo = {
+      ...baseToken,
+      expires: null,
+    };
+
+    render(
+      <AccessTokenItem
+        token={tokenWithNoExpiry}
+        username="testuser"
+        onDeleteSuccess={mockOnDeleteSuccess}
+        onDeleteError={mockOnDeleteError}
+      />
+    );
+
+    const neverExpires = screen.getByText('Never expires');
+    expect(neverExpires.tagName).toBe('SPAN');
+    expect(neverExpires).not.toHaveAttribute('datetime');
+  });
+
+  it('renders "Never used" without time element', () => {
+    const tokenNeverUsed: TokenInfo = {
+      ...baseToken,
+      last_used: null,
+    };
+
+    render(
+      <AccessTokenItem
+        token={tokenNeverUsed}
+        username="testuser"
+        onDeleteSuccess={mockOnDeleteSuccess}
+        onDeleteError={mockOnDeleteError}
+      />
+    );
+
+    const neverUsed = screen.getByText('Never used');
+    expect(neverUsed.tagName).toBe('SPAN');
+    expect(neverUsed).not.toHaveAttribute('datetime');
   });
 });
