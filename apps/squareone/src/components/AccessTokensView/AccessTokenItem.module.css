@@ -7,12 +7,17 @@
     'info delete'
     'error error';
   gap: var(--sqo-space-sm-fixed);
-  padding: var(--sqo-space-md-fixed);
+  padding: var(--sqo-space-sm-fixed) var(--sqo-space-md-fixed);
   border-bottom: 1px solid var(--rsd-color-primary-600);
+}
+
+.tokenItem:first-child {
+  padding-top: var(--sqo-space-md-fixed);
 }
 
 .tokenItem:last-child {
   border-bottom: none;
+  padding-bottom: var(--sqo-space-md-fixed);
 }
 
 .tokenItemInfoCell {
@@ -52,8 +57,6 @@
 
 .error {
   color: var(--rsd-color-red-500);
-  font-size: var(--font-size-sm);
-  margin-top: var(--size-spacing-2);
 }
 
 /* Mobile layout */
