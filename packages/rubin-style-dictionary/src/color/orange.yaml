@@ -1,4 +1,26 @@
 color:
   orange:
+    '100':
+      value: '#FCEEE0' # H:30 S:72% L:93%
+      comment: 'Lightest orange tint for soft backgrounds'
+    '200':
+      value: '#F7D5B2' # H:30 S:72% L:85%
+      comment: 'Light orange for soft variant backgrounds'
+    '300':
+      value: '#F0B976' # H:30 S:72% L:70%
+      comment: 'Medium light orange'
+    '400':
+      value: '#E8A356' # H:30 S:72% L:62%
+      comment: 'Medium orange'
     '500':
-      value: '#E08D35'
+      value: '#E08D35' # H:30 S:72% L:54%
+      comment: 'Base orange color (Visual Identity Manual)'
+    '600':
+      value: '#8F4D0A' # H:30 S:86% L:30%
+      comment: 'Dark orange for solid backgrounds and text'
+    '700':
+      value: '#8B5016' # H:30 S:72% L:31%
+      comment: 'Darker orange'
+    '800':
+      value: '#5E350F' # H:30 S:72% L:21%
+      comment: 'Darkest orange'

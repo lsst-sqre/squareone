@@ -1,0 +1,201 @@
+/* Base badge styles */
+.badge {
+  /* Display */
+  display: inline-flex;
+  align-items: center;
+  vertical-align: baseline;
+
+  /* Typography */
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+
+  /* Spacing */
+  padding: 0.125em 0.5em;
+  gap: 0.25em;
+
+  /* Border */
+  border: 1px solid transparent;
+  border-radius: var(--sqo-border-radius-1);
+
+  /* Transition */
+  transition: var(--sqo-transition-basic);
+}
+
+/* Size variants */
+.sm {
+  font-size: 0.8em;
+}
+
+.md {
+  font-size: 1em;
+}
+
+.lg {
+  font-size: 1.2em;
+}
+
+/* Radius variants */
+.radiusNone {
+  border-radius: 0;
+}
+
+.radius1 {
+  border-radius: var(--sqo-border-radius-1);
+}
+
+.radiusFull {
+  border-radius: 9999px;
+}
+
+/* Solid variant - primary */
+.solid.primary {
+  background-color: var(--rsd-color-primary-600);
+  color: var(--rsd-color-gray-000);
+}
+
+/* Solid variant - blue */
+.solid.blue {
+  background-color: var(--rsd-color-blue-600);
+  color: var(--rsd-color-gray-000);
+}
+
+/* Solid variant - green */
+.solid.green {
+  background-color: var(--rsd-color-green-600);
+  color: var(--rsd-color-gray-000);
+}
+
+/* Solid variant - orange */
+.solid.orange {
+  background-color: var(--rsd-color-orange-600);
+  color: var(--rsd-color-gray-000);
+}
+
+/* Solid variant - purple */
+.solid.purple {
+  background-color: var(--rsd-color-purple-600);
+  color: var(--rsd-color-gray-000);
+}
+
+/* Solid variant - red */
+.solid.red {
+  background-color: var(--rsd-color-red-600);
+  color: var(--rsd-color-gray-000);
+}
+
+/* Solid variant - yellow */
+.solid.yellow {
+  background-color: var(--rsd-color-yellow-600);
+  color: var(--rsd-color-gray-000);
+}
+
+/* Solid variant - gray */
+.solid.gray {
+  background-color: var(--rsd-color-gray-500);
+  color: var(--rsd-color-gray-000);
+}
+
+/* Soft variant - primary */
+.soft.primary {
+  background-color: var(--rsd-color-primary-200);
+  color: var(--rsd-color-primary-600);
+}
+
+/* Soft variant - blue */
+.soft.blue {
+  background-color: var(--rsd-color-blue-200);
+  color: var(--rsd-color-blue-600);
+}
+
+/* Soft variant - green */
+.soft.green {
+  background-color: var(--rsd-color-green-200);
+  color: var(--rsd-color-green-600);
+}
+
+/* Soft variant - orange */
+.soft.orange {
+  background-color: var(--rsd-color-orange-200);
+  color: var(--rsd-color-orange-600);
+}
+
+/* Soft variant - purple */
+.soft.purple {
+  background-color: var(--rsd-color-purple-200);
+  color: var(--rsd-color-purple-600);
+}
+
+/* Soft variant - red */
+.soft.red {
+  background-color: var(--rsd-color-red-200);
+  color: var(--rsd-color-red-600);
+}
+
+/* Soft variant - yellow */
+.soft.yellow {
+  background-color: var(--rsd-color-yellow-200);
+  color: var(--rsd-color-yellow-600);
+}
+
+/* Soft variant - gray */
+.soft.gray {
+  background-color: var(--rsd-color-gray-100);
+  color: var(--rsd-color-gray-800);
+}
+
+/* Outline variant - primary */
+.outline.primary {
+  background-color: var(--rsd-component-page-background-color);
+  border-color: var(--rsd-color-primary-600);
+  color: var(--rsd-color-primary-600);
+}
+
+/* Outline variant - blue */
+.outline.blue {
+  background-color: var(--rsd-component-page-background-color);
+  border-color: var(--rsd-color-blue-600);
+  color: var(--rsd-color-blue-600);
+}
+
+/* Outline variant - green */
+.outline.green {
+  background-color: var(--rsd-component-page-background-color);
+  border-color: var(--rsd-color-green-600);
+  color: var(--rsd-color-green-600);
+}
+
+/* Outline variant - orange */
+.outline.orange {
+  background-color: var(--rsd-component-page-background-color);
+  border-color: var(--rsd-color-orange-600);
+  color: var(--rsd-color-orange-600);
+}
+
+/* Outline variant - purple */
+.outline.purple {
+  background-color: var(--rsd-component-page-background-color);
+  border-color: var(--rsd-color-purple-600);
+  color: var(--rsd-color-purple-600);
+}
+
+/* Outline variant - red */
+.outline.red {
+  background-color: var(--rsd-component-page-background-color);
+  border-color: var(--rsd-color-red-600);
+  color: var(--rsd-color-red-600);
+}
+
+/* Outline variant - yellow */
+.outline.yellow {
+  background-color: var(--rsd-component-page-background-color);
+  border-color: var(--rsd-color-yellow-600);
+  color: var(--rsd-color-yellow-600);
+}
+
+/* Outline variant - gray */
+.outline.gray {
+  background-color: var(--rsd-component-page-background-color);
+  border-color: var(--rsd-color-gray-500);
+  color: var(--rsd-color-gray-800);
+}

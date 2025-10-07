@@ -1,4 +1,26 @@
 color:
   green:
+    '100':
+      value: '#E9F7E9' # H:121 S:48% L:93%
+      comment: 'Lightest green tint for soft backgrounds'
+    '200':
+      value: '#C6E8C7' # H:121 S:48% L:85%
+      comment: 'Light green for soft variant backgrounds'
+    '300':
+      value: '#96D498' # H:121 S:48% L:70%
+      comment: 'Medium light green'
+    '400':
+      value: '#66C069' # H:121 S:48% L:58%
+      comment: 'Medium green'
     '500':
-      value: '#3cae3F'
+      value: '#3CAE3F' # H:121 S:48% L:46%
+      comment: 'Base green color (Visual Identity Manual)'
+    '600':
+      value: '#237028' # H:121 S:52% L:29%
+      comment: 'Dark green for solid backgrounds and text'
+    '700':
+      value: '#1F5D22' # H:121 S:48% L:24%
+      comment: 'Darker green'
+    '800':
+      value: '#143A15' # H:121 S:48% L:15%
+      comment: 'Darkest green'

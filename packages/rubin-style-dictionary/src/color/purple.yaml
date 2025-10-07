@@ -1,4 +1,26 @@
 color:
   purple:
+    '100':
+      value: '#EFE9F4' # H:278 S:35% L:93%
+      comment: 'Lightest purple tint for soft backgrounds'
+    '200':
+      value: '#D7C7E3' # H:278 S:35% L:85%
+      comment: 'Light purple for soft variant backgrounds'
+    '300':
+      value: '#B49CC8' # H:278 S:35% L:70%
+      comment: 'Medium light purple'
+    '400':
+      value: '#8E69A5' # H:278 S:35% L:53%
+      comment: 'Medium purple'
     '500':
-      value: '#583671'
+      value: '#583671' # H:278 S:35% L:33%
+      comment: 'Base purple color (Visual Identity Manual)'
+    '600':
+      value: '#412756' # H:278 S:35% L:24%
+      comment: 'Dark purple for solid backgrounds and text'
+    '700':
+      value: '#2E1B3D' # H:278 S:35% L:17%
+      comment: 'Darker purple'
+    '800':
+      value: '#1D1126' # H:278 S:35% L:11%
+      comment: 'Darkest purple'

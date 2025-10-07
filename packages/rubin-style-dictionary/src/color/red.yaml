@@ -1,4 +1,26 @@
 color:
   red:
+    '100':
+      value: '#FEE9E9' # H:0 S:82% L:95%
+      comment: 'Lightest red tint for soft backgrounds'
+    '200':
+      value: '#FCC7C7' # H:0 S:82% L:88%
+      comment: 'Light red for soft variant backgrounds'
+    '300':
+      value: '#F99393' # H:0 S:82% L:78%
+      comment: 'Medium light red'
+    '400':
+      value: '#F57070' # H:0 S:82% L:70%
+      comment: 'Medium red'
     '500':
-      value: '#ED4C4C'
+      value: '#ED4C4C' # H:0 S:82% L:62%
+      comment: 'Base red color (Visual Identity Manual)'
+    '600':
+      value: '#AD1919' # H:0 S:82% L:39%
+      comment: 'Dark red for solid backgrounds and text'
+    '700':
+      value: '#9D1B1B' # H:0 S:82% L:36%
+      comment: 'Darker red'
+    '800':
+      value: '#6B1212' # H:0 S:82% L:24%
+      comment: 'Darkest red'
