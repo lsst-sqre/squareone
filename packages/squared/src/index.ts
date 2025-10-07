@@ -1,5 +1,13 @@
 /* Components */
 export {
+  Badge,
+  type BadgeProps,
+  type BadgeColor,
+  type BadgeVariant,
+  type BadgeRadius,
+  type BadgeSize,
+} from './components/Badge';
+export {
   Button,
   type ButtonProps,
   type ButtonAppearance,
