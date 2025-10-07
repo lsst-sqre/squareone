@@ -1,4 +1,26 @@
 color:
   yellow:
+    '100':
+      value: '#FFFAEB' # H:48 S:100% L:96%
+      comment: 'Lightest yellow tint for soft backgrounds'
+    '200':
+      value: '#FFF2C7' # H:48 S:100% L:90%
+      comment: 'Light yellow for soft variant backgrounds'
+    '300':
+      value: '#FFE999' # H:48 S:100% L:80%
+      comment: 'Medium light yellow'
+    '400':
+      value: '#FFE266' # H:48 S:100% L:70%
+      comment: 'Medium yellow. Yellow from the Visual Identity Manual.'
     '500':
-      value: '#FFE266'
+      value: '#FFDB33' # H:48 S:100% L:60%
+      comment: 'Base yellow color'
+    '600':
+      value: '#806600' # H:48 S:100% L:25%
+      comment: 'Dark yellow for solid backgrounds and text'
+    '700':
+      value: '#B39600' # H:48 S:100% L:35%
+      comment: 'Darker yellow'
+    '800':
+      value: '#806D00' # H:48 S:100% L:25%
+      comment: 'Darkest yellow'

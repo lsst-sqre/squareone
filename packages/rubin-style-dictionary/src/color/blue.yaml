@@ -1,4 +1,26 @@
 color:
   blue:
+    '100':
+      value: '#E5F4F9' # H:195 S:70% L:93%
+      comment: 'Lightest blue tint for soft backgrounds'
+    '200':
+      value: '#B8E3F2' # H:195 S:70% L:85%
+      comment: 'Light blue for soft variant backgrounds'
+    '300':
+      value: '#7BCFE8' # H:195 S:70% L:70%
+      comment: 'Medium light blue'
+    '400':
+      value: '#3FB8DB' # H:195 S:70% L:55%
+      comment: 'Medium blue'
     '500':
-      value: '#1C81A4'
+      value: '#1C81A4' # H:195 S:70% L:38%
+      comment: 'Base blue color (Visual Identity Manual)'
+    '600':
+      value: '#145F7A' # H:195 S:70% L:28%
+      comment: 'Dark blue for solid backgrounds and text'
+    '700':
+      value: '#0D4157' # H:195 S:70% L:20%
+      comment: 'Darker blue'
+    '800':
+      value: '#072633' # H:195 S:70% L:12%
+      comment: 'Darkest blue'
