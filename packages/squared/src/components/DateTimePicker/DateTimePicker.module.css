@@ -1,0 +1,471 @@
+/* DateTimePicker component styles */
+
+.dateTimePicker {
+  display: inline-block;
+  position: relative;
+  font-family: inherit;
+  width: fit-content;
+}
+
+.fullWidth {
+  display: block;
+  width: 100%;
+}
+
+.fullWidth .inputSection {
+  width: 100%;
+}
+
+/* Input section */
+.inputSection {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sqo-space-xs);
+}
+
+/* Calendar button (inside input) */
+.calendarButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  padding: var(--sqo-space-xxs);
+  border-radius: var(--sqo-border-radius-1);
+  color: var(--rsd-color-gray-500);
+  cursor: pointer;
+  transition: var(--sqo-transition-basic);
+  outline: none;
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.calendarButton:hover:not(:disabled) {
+  background: var(--rsd-color-gray-100);
+  color: var(--rsd-color-gray-700);
+}
+
+.calendarButton:focus-visible {
+  outline: 2px solid var(--rsd-color-primary-600);
+  outline-offset: 2px;
+  background: var(--rsd-color-gray-100);
+}
+
+.calendarButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Calendar popover */
+.calendarPopover {
+  background: var(--rsd-component-page-background-color);
+  border: 1px solid var(--rsd-color-gray-200);
+  border-radius: var(--sqo-border-radius-2);
+  box-shadow: var(--sqo-elevation-lg);
+  z-index: 50;
+  min-width: 280px;
+  max-width: 400px;
+  outline: none;
+
+  /* Animation */
+  animation-duration: 0.2s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.calendarPopover[data-state='open'] {
+  animation-name: popoverShow;
+}
+
+.calendarPopover[data-state='closed'] {
+  animation-name: popoverHide;
+}
+
+@keyframes popoverShow {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes popoverHide {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95) translateY(-2px);
+  }
+}
+
+.calendarContainer {
+  padding: var(--sqo-space-xs);
+}
+
+/* Calendar styles */
+.calendar {
+  margin: 0;
+  margin-bottom: 0 !important;
+}
+
+/* Override react-day-picker month grid bottom margin */
+.calendar :global(.rdp-month_grid) {
+  margin-bottom: 0 !important;
+}
+
+/* Override react-day-picker caption height and line-height */
+.calendar :global(.rdp-month_caption) {
+  height: auto !important;
+  line-height: 1 !important;
+  min-height: 0 !important;
+}
+
+.calendarMonths {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.calendarMonth {
+  width: 100%;
+}
+
+.calendarCaption {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--sqo-space-xs);
+  padding: 0 var(--sqo-space-xxs);
+}
+
+.calendarCaptionLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--rsd-component-text-color);
+}
+
+.calendarNav {
+  display: flex;
+  gap: var(--sqo-space-xxs);
+}
+
+/* Custom calendar caption with controls */
+.customCalendarCaption {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--sqo-space-xxs);
+  margin-bottom: var(--sqo-space-xs);
+  padding: 0;
+}
+
+.calendarCaptionControls {
+  display: flex;
+  align-items: center;
+  gap: var(--sqo-space-xxs);
+  flex: 1;
+  justify-content: center;
+  min-width: 0; /* Allow flex items to shrink */
+}
+
+.monthSelect {
+  appearance: none;
+  background: var(--rsd-component-page-background-color);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.375rem center;
+  background-size: 10px;
+  border: 1px solid var(--rsd-color-gray-200);
+  border-radius: var(--sqo-border-radius-1);
+  color: var(--rsd-component-text-color);
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.375rem 1.5rem 0.375rem 0.5rem;
+  cursor: pointer;
+  transition: var(--sqo-transition-basic);
+  outline: none;
+  min-width: 0;
+  flex: 1;
+  max-width: 7rem;
+}
+
+.monthSelect:hover {
+  border-color: var(--rsd-color-gray-300);
+  background-color: var(--rsd-color-gray-50);
+}
+
+.monthSelect:focus-visible {
+  outline: 2px solid var(--rsd-color-primary-600);
+  outline-offset: 2px;
+  border-color: var(--rsd-color-primary-600);
+}
+
+.yearInput {
+  background: var(--rsd-component-page-background-color);
+  border: 1px solid var(--rsd-color-gray-200);
+  border-radius: var(--sqo-border-radius-1);
+  color: var(--rsd-component-text-color);
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.375rem 0.375rem;
+  text-align: center;
+  width: 3.5rem;
+  transition: var(--sqo-transition-basic);
+  outline: none;
+  flex-shrink: 0;
+}
+
+.yearInput:hover {
+  border-color: var(--rsd-color-gray-300);
+  background-color: var(--rsd-color-gray-50);
+}
+
+.yearInput:focus-visible {
+  outline: 2px solid var(--rsd-color-primary-600);
+  outline-offset: 2px;
+  border-color: var(--rsd-color-primary-600);
+}
+
+.calendarNavButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  background: none;
+  border: 1px solid var(--rsd-color-gray-200);
+  border-radius: var(--sqo-border-radius-1);
+  color: var(--rsd-color-gray-600);
+  cursor: pointer;
+  transition: var(--sqo-transition-basic);
+  outline: none;
+}
+
+.calendarNavButton:hover:not(:disabled) {
+  background: var(--rsd-color-gray-50);
+  border-color: var(--rsd-color-gray-300);
+  color: var(--rsd-color-gray-800);
+}
+
+.calendarNavButton:focus-visible {
+  outline: 2px solid var(--rsd-color-primary-600);
+  outline-offset: 2px;
+}
+
+.calendarNavButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.calendarTable {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+.calendarHeadRow {
+  margin-bottom: 0;
+}
+
+.calendarHeadCell {
+  padding: var(--sqo-space-xxs) var(--sqo-space-xxxs);
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--rsd-color-gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.calendarRow {
+  margin: 0;
+}
+
+.calendarCell {
+  padding: 1px;
+  text-align: center;
+  position: relative;
+}
+
+.calendarDay button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.875rem;
+  height: 1.875rem;
+  background: none;
+  border: none;
+  border-radius: var(--sqo-border-radius-1);
+  color: var(--rsd-component-text-color);
+  cursor: pointer;
+  font-size: 0.8125rem;
+  transition: var(--sqo-transition-basic);
+  outline: none;
+  position: relative;
+}
+
+.calendarDay button:hover:not(:disabled) {
+  background: var(--rsd-color-gray-50);
+}
+
+.calendarDay button:focus-visible {
+  outline: 2px solid var(--rsd-color-primary-600);
+  outline-offset: 2px;
+  z-index: 1;
+}
+
+.calendarDaySelected button {
+  background: var(--rsd-color-primary-600) !important;
+  color: white !important;
+  font-weight: 600;
+}
+
+.calendarDaySelected button:hover {
+  background: var(--rsd-color-primary-700) !important;
+}
+
+.calendarDayToday {
+  font-weight: 600;
+  position: relative;
+}
+
+.calendarDayToday::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  background: var(--rsd-color-primary-600);
+  border-radius: 50%;
+}
+
+.calendarDaySelected.calendarDayToday::after {
+  background: white;
+}
+
+.calendarDayOutside {
+  opacity: 0.5;
+  color: var(--rsd-color-gray-400);
+}
+
+.calendarDayDisabled button {
+  opacity: 0.3;
+  cursor: not-allowed;
+  background: none !important;
+}
+
+.calendarDayHidden {
+  visibility: hidden;
+}
+
+/* Time section */
+.timeSection {
+  padding-top: var(--sqo-space-xs);
+  border-top: 1px solid var(--rsd-color-gray-200);
+}
+
+.timeSectionLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--rsd-component-text-color);
+  margin-bottom: var(--sqo-space-xxs);
+}
+
+/* Timezone section */
+.timezoneSection {
+  padding-top: var(--sqo-space-xs);
+  border-top: 1px solid var(--rsd-color-gray-200);
+}
+
+.timezoneSectionLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--rsd-component-text-color);
+  margin-bottom: var(--sqo-space-xxs);
+}
+
+/* Error message */
+.errorMessage {
+  margin-top: var(--sqo-space-xs);
+  font-size: 0.875rem;
+  color: var(--rsd-color-red-600);
+  line-height: 1.25;
+}
+
+/* Focus management */
+.calendarPopover:focus-within .calendarDay:focus {
+  z-index: 2;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .calendarNavButton {
+    border-width: 2px;
+  }
+
+  .calendarDay button {
+    border: 1px solid transparent;
+  }
+
+  .calendarDay button:focus-visible {
+    border-color: currentColor;
+  }
+
+  .calendarDaySelected button {
+    border: 2px solid var(--rsd-color-primary-800) !important;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .calendarPopover,
+  .calendarNavButton,
+  .calendarDay button,
+  .calendarButton {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Dark theme adjustments */
+[data-theme='dark'] .calendarPopover {
+  border-color: var(--rsd-color-gray-700);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3),
+    0 4px 6px -2px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme='dark'] .calendarNavButton {
+  border-color: var(--rsd-color-gray-700);
+}
+
+[data-theme='dark'] .calendarNavButton:hover:not(:disabled) {
+  background: var(--rsd-color-gray-800);
+  border-color: var(--rsd-color-gray-600);
+}
+
+[data-theme='dark'] .calendarDay button:hover:not(:disabled) {
+  background: var(--rsd-color-gray-800);
+}
+
+[data-theme='dark'] .timeSection,
+[data-theme='dark'] .timezoneSection {
+  border-top-color: var(--rsd-color-gray-700);
+}
+
+[data-theme='dark'] .monthSelect,
+[data-theme='dark'] .yearInput {
+  border-color: var(--rsd-color-gray-700);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23999' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+}
+
+[data-theme='dark'] .monthSelect:hover,
+[data-theme='dark'] .yearInput:hover {
+  border-color: var(--rsd-color-gray-600);
+  background-color: var(--rsd-color-gray-800);
+}
