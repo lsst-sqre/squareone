@@ -12,6 +12,7 @@ export type SelectProps = {
   children: React.ReactNode;
   id?: string;
   className?: string;
+  'aria-label'?: string;
   'aria-describedby'?: string;
   'aria-invalid'?: boolean | 'false' | 'true';
 
@@ -68,6 +69,11 @@ const SelectRoot = forwardRef<HTMLButtonElement, SelectProps>(
 
     // Create accessible label for the trigger button
     const getAriaLabel = () => {
+      // If aria-label is explicitly provided, use it
+      if (props['aria-label']) {
+        return props['aria-label'];
+      }
+      // Otherwise, generate from value/placeholder
       const currentValue = props.value || props.defaultValue;
       const displayText = currentValue || placeholder;
       return label ? `${label}: ${displayText}` : displayText;
