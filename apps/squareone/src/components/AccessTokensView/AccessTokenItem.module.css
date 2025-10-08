@@ -55,6 +55,12 @@
   font-size: 0.875rem;
 }
 
+.scopesBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
 .error {
   color: var(--rsd-color-red-500);
 }

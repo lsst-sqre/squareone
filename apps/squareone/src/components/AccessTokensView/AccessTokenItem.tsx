@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button } from '@lsst-sqre/squared';
+import { Badge, Button } from '@lsst-sqre/squared';
 import type { TokenInfo } from '../../hooks/useUserTokens';
 import useDeleteToken from '../../hooks/useDeleteToken';
 import {
@@ -46,8 +46,6 @@ export default function AccessTokenItem({
   };
 
   const sortedScopes = [...token.scopes].sort();
-  const scopesContent =
-    sortedScopes.length > 0 ? sortedScopes.join(', ') : 'No scopes.';
 
   const expiration = formatTokenExpiration(token.expires);
   const lastUsed = formatTokenLastUsed(token.last_used);
@@ -60,7 +58,23 @@ export default function AccessTokenItem({
             {token.token_name || token.token}
           </div>
           <div className={styles.tokenKey}>{token.token}</div>
-          <div className={styles.scopes}>{scopesContent}</div>
+          {sortedScopes.length > 0 ? (
+            <div className={styles.scopesBadges}>
+              {sortedScopes.map((scope) => (
+                <Badge
+                  key={scope}
+                  variant="soft"
+                  color="gray"
+                  radius="full"
+                  size="sm"
+                >
+                  {scope}
+                </Badge>
+              ))}
+            </div>
+          ) : (
+            <div className={styles.scopes}>No scopes.</div>
+          )}
         </div>
         <div className={styles.tokenItemDatesCell}>
           <TokenDate

@@ -74,9 +74,10 @@ describe('AccessTokenItem', () => {
 
     expect(screen.getByText('my-token')).toBeInTheDocument();
     expect(screen.getByText('gt-abc123def456')).toBeInTheDocument();
-    expect(
-      screen.getByText('admin:token, read:user, write:user')
-    ).toBeInTheDocument();
+    // Each scope should be rendered as a separate badge
+    expect(screen.getByText('admin:token')).toBeInTheDocument();
+    expect(screen.getByText('read:user')).toBeInTheDocument();
+    expect(screen.getByText('write:user')).toBeInTheDocument();
     expect(screen.getByText('Expires on 2025-12-31')).toBeInTheDocument();
     expect(screen.getByText('Last used 2 hours ago')).toBeInTheDocument();
   });
@@ -92,10 +93,17 @@ describe('AccessTokenItem', () => {
     );
 
     // Scopes should be sorted: admin:token, read:user, write:user
-    const scopesText = screen.getByText(
-      'admin:token, read:user, write:user'
-    ).textContent;
-    expect(scopesText).toBe('admin:token, read:user, write:user');
+    // Each scope is rendered as a separate badge
+    const badges = [
+      screen.getByText('admin:token'),
+      screen.getByText('read:user'),
+      screen.getByText('write:user'),
+    ];
+
+    // Verify all badges are present
+    badges.forEach((badge) => {
+      expect(badge).toBeInTheDocument();
+    });
   });
 
   it('renders delete button', () => {
@@ -329,8 +337,10 @@ describe('AccessTokenItem', () => {
       />
     );
 
-    // Should be sorted alphabetically
-    expect(screen.getByText('a:scope, m:scope, z:scope')).toBeInTheDocument();
+    // Should be sorted alphabetically and rendered as separate badges
+    expect(screen.getByText('a:scope')).toBeInTheDocument();
+    expect(screen.getByText('m:scope')).toBeInTheDocument();
+    expect(screen.getByText('z:scope')).toBeInTheDocument();
   });
 
   it('renders dates with semantic time elements', () => {
@@ -402,5 +412,23 @@ describe('AccessTokenItem', () => {
     const neverUsed = screen.getByText('Never used');
     expect(neverUsed.tagName).toBe('SPAN');
     expect(neverUsed).not.toHaveAttribute('datetime');
+  });
+
+  it('renders "No scopes." when token has no scopes', () => {
+    const tokenWithNoScopes: TokenInfo = {
+      ...baseToken,
+      scopes: [],
+    };
+
+    render(
+      <AccessTokenItem
+        token={tokenWithNoScopes}
+        username="testuser"
+        onDeleteSuccess={mockOnDeleteSuccess}
+        onDeleteError={mockOnDeleteError}
+      />
+    );
+
+    expect(screen.getByText('No scopes.')).toBeInTheDocument();
   });
 });
