@@ -6,6 +6,7 @@ import type { TokenInfo } from '../../hooks/useUserTokens';
 import {
   formatTokenExpiration,
   formatTokenLastUsed,
+  formatTokenCreated,
 } from '../TokenDate/formatters';
 import TokenDate from '../TokenDate';
 import DeleteTokenModal from '../AccessTokensView/DeleteTokenModal';
@@ -152,9 +153,7 @@ function TokenDetailsViewWrapper({
   const sortedScopes = [...token.scopes].sort();
   const expiration = formatTokenExpiration(token.expires);
   const lastUsed = formatTokenLastUsed(token.last_used);
-  const created = token.created
-    ? formatTokenExpiration(token.created)
-    : { display: 'Unknown', datetime: null };
+  const created = formatTokenCreated(token.created);
 
   return (
     <div className={styles.container}>

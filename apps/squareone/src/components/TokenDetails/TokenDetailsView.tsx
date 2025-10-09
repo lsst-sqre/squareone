@@ -7,6 +7,7 @@ import useDeleteToken from '../../hooks/useDeleteToken';
 import {
   formatTokenExpiration,
   formatTokenLastUsed,
+  formatTokenCreated,
 } from '../TokenDate/formatters';
 import TokenDate from '../TokenDate';
 import TokenHistoryView from '../TokenHistory/TokenHistoryView';
@@ -112,9 +113,7 @@ export default function TokenDetailsView({
   const sortedScopes = [...token.scopes].sort();
   const expiration = formatTokenExpiration(token.expires);
   const lastUsed = formatTokenLastUsed(token.last_used);
-  const created = token.created
-    ? formatTokenExpiration(token.created)
-    : { display: 'Unknown', datetime: null };
+  const created = formatTokenCreated(token.created);
 
   return (
     <div className={styles.container}>

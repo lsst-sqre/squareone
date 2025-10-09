@@ -32,6 +32,15 @@ vi.mock('../TokenDate/formatters', () => ({
       datetime: '2025-01-01T10:00:00.000Z',
     };
   }),
+  formatTokenCreated: vi.fn((created) => {
+    if (created === null || created === undefined) {
+      return { display: 'Unknown', datetime: null };
+    }
+    return {
+      display: '2025-01-01T00:00:00.000Z',
+      datetime: '2025-01-01T00:00:00.000Z',
+    };
+  }),
 }));
 
 // Mock TokenHistoryView component
