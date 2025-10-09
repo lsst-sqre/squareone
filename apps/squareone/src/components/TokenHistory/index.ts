@@ -9,3 +9,5 @@ export { default as TokenHistoryItem } from './TokenHistoryItem';
 export { default as TokenHistoryList } from './TokenHistoryList';
 export { default as TokenHistoryFilters } from './TokenHistoryFilters';
 export type { TokenHistoryFiltersProps } from './TokenHistoryFilters';
+export { default as TokenHistoryView } from './TokenHistoryView';
+export type { TokenHistoryViewProps } from './TokenHistoryView';
