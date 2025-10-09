@@ -1,5 +1,5 @@
-import { useState, useCallback, useMemo, useEffect } from 'react';
-import useSWR, { type KeyedMutator } from 'swr';
+import { useCallback, useMemo } from 'react';
+import useSWRInfinite from 'swr/infinite';
 
 export type TokenType =
   | 'session'
@@ -49,9 +49,9 @@ type UseTokenChangeHistoryReturn = {
   error: Error | undefined;
   hasMore: boolean;
   totalCount: number | undefined;
-  loadMore: () => Promise<void>;
+  loadMore: () => void;
   isLoadingMore: boolean;
-  mutate: KeyedMutator<PaginatedResponse>;
+  mutate: () => Promise<PaginatedResponse[] | undefined>;
 };
 
 /**
@@ -127,7 +127,7 @@ const fetcher = async (url: string): Promise<PaginatedResponse> => {
  */
 function buildQueryString(
   options: UseTokenChangeHistoryOptions,
-  cursor?: string
+  cursor?: string | null
 ): string {
   const params = new URLSearchParams();
 
@@ -171,8 +171,8 @@ function buildQueryString(
  * A React hook for fetching token change history from the
  * `/auth/api/v1/users/{username}/token-change-history` endpoint.
  *
- * Uses SWR for data fetching and caching with cursor-based pagination.
- * Accumulates entries across pages when loading more.
+ * Uses SWR Infinite for data fetching and caching with cursor-based pagination.
+ * Automatically accumulates entries across pages.
  *
  * @param username - The username to fetch token history for
  * @param options - Filter options (tokenType, token, since, until, ipAddress, limit)
@@ -182,76 +182,94 @@ export default function useTokenChangeHistory(
   username: string | undefined,
   options: UseTokenChangeHistoryOptions = {}
 ): UseTokenChangeHistoryReturn {
-  // Destructure options to avoid dependency array issues
-  const { tokenType, token, since, until, ipAddress, limit } = options;
+  // Convert Date objects to timestamps for stable dependency tracking
+  const sinceTime = options.since?.getTime();
+  const untilTime = options.until?.getTime();
 
-  const [accumulatedEntries, setAccumulatedEntries] = useState<
-    TokenChangeHistoryEntry[]
-  >([]);
-  const [currentCursor, setCurrentCursor] = useState<string | undefined>(
-    undefined
+  // Memoize filter options with stable references
+  const filterOptions = useMemo(
+    () => ({
+      tokenType: options.tokenType,
+      token: options.token,
+      since: sinceTime ? new Date(sinceTime) : undefined,
+      until: untilTime ? new Date(untilTime) : undefined,
+      ipAddress: options.ipAddress,
+      limit: options.limit,
+    }),
+    [
+      options.tokenType,
+      options.token,
+      sinceTime,
+      untilTime,
+      options.ipAddress,
+      options.limit,
+    ]
   );
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  // Build the initial URL with filters
-  const queryString = useMemo(
-    () =>
-      buildQueryString(
-        { tokenType, token, since, until, ipAddress, limit },
-        currentCursor
-      ),
-    [tokenType, token, since, until, ipAddress, limit, currentCursor]
-  );
+  // Generate SWR key for each page
+  const getKey = useCallback(
+    (pageIndex: number, previousPageData: PaginatedResponse | null) => {
+      // No username, don't fetch
+      if (!username) return null;
 
-  const url = username
-    ? `/auth/api/v1/users/${username}/token-change-history?${queryString}`
-    : null;
+      // Reached the end
+      if (previousPageData && !previousPageData.nextCursor) return null;
 
-  const { data, error, mutate } = useSWR<PaginatedResponse>(url, fetcher, {
-    revalidateOnFocus: true,
-    revalidateOnReconnect: true,
-    dedupingInterval: 10000,
-  });
-
-  // Reset accumulated entries when filters change (but not when cursor changes)
-  useEffect(() => {
-    if (!currentCursor) {
-      setAccumulatedEntries([]);
-    }
-  }, [tokenType, token, since, until, ipAddress, limit, currentCursor]);
-
-  // Accumulate entries when new data arrives
-  useEffect(() => {
-    if (data?.entries) {
-      if (currentCursor) {
-        // Loading more - append to existing entries
-        setAccumulatedEntries((prev) => [...prev, ...data.entries]);
-      } else {
-        // Initial load or filter change - replace entries
-        setAccumulatedEntries(data.entries);
+      // First page, no cursor
+      if (pageIndex === 0) {
+        const queryString = buildQueryString(filterOptions);
+        return `/auth/api/v1/users/${username}/token-change-history?${queryString}`;
       }
-      setIsLoadingMore(false);
-    }
-  }, [data, currentCursor]);
 
-  const loadMore = useCallback(async () => {
-    if (!data?.nextCursor || isLoadingMore) return;
+      // Add cursor from previous page
+      const cursor = previousPageData?.nextCursor;
+      const queryString = buildQueryString(filterOptions, cursor);
+      return `/auth/api/v1/users/${username}/token-change-history?${queryString}`;
+    },
+    [username, filterOptions]
+  );
 
-    setIsLoadingMore(true);
-    setCurrentCursor(data.nextCursor);
-  }, [data?.nextCursor, isLoadingMore]);
+  const { data, error, size, setSize, mutate, isLoading, isValidating } =
+    useSWRInfinite<PaginatedResponse>(getKey, fetcher, {
+      revalidateFirstPage: false,
+      revalidateOnFocus: true,
+      revalidateOnReconnect: true,
+      dedupingInterval: 10000,
+    });
 
-  const isLoading = !error && !data && !!username;
-  const hasMore = !!data?.nextCursor;
-  const entries =
-    accumulatedEntries.length > 0 ? accumulatedEntries : data?.entries;
+  // Flatten all pages into a single array of entries
+  const entries = useMemo(() => {
+    if (!data) return undefined;
+    return data.flatMap((page) => page.entries);
+  }, [data]);
+
+  // Determine if there are more pages
+  const hasMore = useMemo(() => {
+    if (!data || data.length === 0) return false;
+    const lastPage = data[data.length - 1];
+    return !!lastPage.nextCursor;
+  }, [data]);
+
+  // Get total count from first page
+  const totalCount = useMemo(() => {
+    if (!data || data.length === 0) return undefined;
+    return data[0].totalCount ?? undefined;
+  }, [data]);
+
+  // Loading more is when we're validating and not on the first load
+  const isLoadingMore = isValidating && size > 0;
+
+  // Load more function
+  const loadMore = useCallback(() => {
+    setSize((currentSize) => currentSize + 1);
+  }, [setSize]);
 
   return {
     entries,
     isLoading,
     error,
     hasMore,
-    totalCount: data?.totalCount ?? undefined,
+    totalCount,
     loadMore,
     isLoadingMore,
     mutate,
