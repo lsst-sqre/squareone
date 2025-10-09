@@ -111,6 +111,27 @@ export function formatTokenLastUsed(
 }
 
 /**
+ * Format an expiration timestamp as ISO8601 string for change history display.
+ * Used in the Changes section to show what the expiration date was changed to/from.
+ * @param expires - Expiration timestamp in seconds since epoch, or null/undefined if never expires
+ * @returns ISO8601 timestamp string (e.g., "2025-03-15T14:30:45Z") or "Never expires"
+ */
+export function formatExpirationTimestamp(
+  expires: number | null | undefined
+): string {
+  if (expires == null) {
+    return 'Never expires';
+  }
+
+  const expiryDate = parseTimestamp(expires);
+  if (!expiryDate) {
+    return `Invalid date (${expires})`;
+  }
+
+  return expiryDate.toISOString();
+}
+
+/**
  * Format an event time for summary lines (relative time like "2h ago", "3d ago").
  * @param eventTime - Event timestamp in seconds since epoch
  * @returns Relative time string (e.g., "2h ago", "3d ago", "just now")

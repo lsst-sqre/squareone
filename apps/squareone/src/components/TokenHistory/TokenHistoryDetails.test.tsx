@@ -235,16 +235,17 @@ describe('TokenHistoryDetails', () => {
       const editEntry: TokenChangeHistoryEntry = {
         ...baseEntry,
         action: 'edit',
-        expires: 1710504645,
-        old_expires: 1709904645,
+        expires: 1710504645, // 2024-03-15T12:10:45.000Z
+        old_expires: 1709904645, // 2024-03-08T13:30:45.000Z
         old_token_name: null,
         old_scopes: null,
       };
 
-      render(<TokenHistoryDetails entry={editEntry} />);
+      const { container } = render(<TokenHistoryDetails entry={editEntry} />);
       expect(screen.getByText('Expires')).toBeInTheDocument();
-      // Both old and new expiration values should be present
-      expect(screen.getAllByText('Expired').length).toBeGreaterThan(0);
+      // Both old and new expiration ISO8601 timestamps should be present
+      expect(container.textContent).toContain('2024-03-08T13:30:45.000Z');
+      expect(container.textContent).toContain('2024-03-15T12:10:45.000Z');
     });
 
     test('displays scope additions', () => {
