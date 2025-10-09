@@ -6,10 +6,10 @@ export type TokenInfo = {
   service: string | null;
   scopes: string[];
   created?: number;
-  expires: number | null;
+  expires?: number; // Optional field - omitted means no expiration
   token: string;
-  token_name: string | null;
-  last_used: number | null;
+  token_name?: string; // Optional field - omitted for some token types
+  last_used?: number; // Optional field - omitted means never used
   parent: string | null;
 };
 

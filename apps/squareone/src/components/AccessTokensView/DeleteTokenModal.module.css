@@ -1,0 +1,6 @@
+.buttons {
+  display: flex;
+  gap: var(--sqo-space-sm, 12px);
+  justify-content: flex-end;
+  margin-top: var(--sqo-space-md, 16px);
+}
