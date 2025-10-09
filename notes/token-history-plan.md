@@ -89,7 +89,7 @@ For session tokens without names (when showing multiple token types):
   │ Expires   Mar 10 → Mar 15, 2025         │
   │           (old in light gray)           │
   │ Scopes    [- write:tap] [+ read:tap]    │
-  │           (red/green pills with icons)   │
+  │           (outline/soft variants)        │
   └─────────────────────────────────────────┘
 ```
 
@@ -118,7 +118,7 @@ For session tokens without names (when showing multiple token types):
 - For create/revoke/expire: show Expires and Scopes (when applicable)
 - For edit: show only changed fields under "Changes" header
 - Old values in Name/Expires changes use `--rsd-color-gray-400` with `→` arrow separator
-- Scope changes use TokenHistoryChangesPill components (with +/- icons)
+- Scope changes use TokenScopeChangeBadge components (with +/- icons and outline/soft variants)
 - Current scopes in create events use TokenScopeBadge components (no icons)
 
 **Navigation:**
@@ -131,9 +131,9 @@ For session tokens without names (when showing multiple token types):
 - Revoke actions: Red accent (`--rsd-color-red-500`)
 - Expire actions: Gray accent (`--rsd-color-gray-500`)
 
-**Change Pills:**
-- Removed/old values: Red background with minus icon `[-  old value]`
-- Added/new values: Green background with plus icon `[+  new value]`
+**Change Badges:**
+- Removed scopes: Outline variant with minus icon `[-  scope]`, uses scope-specific color
+- Added scopes: Soft variant with plus icon `[+  scope]`, uses scope-specific color
 
 ## Data Model
 
@@ -247,8 +247,8 @@ components/
 │   ├── TokenHistoryDetails.module.css
 │   ├── TokenScopeBadge.tsx                # Wrapper for Badge with scope color logic
 │   ├── TokenScopeBadge.module.css
-│   ├── TokenHistoryChangesPill.tsx        # Wrapper for Badge (red/green variants)
-│   ├── TokenHistoryChangesPill.module.css
+│   ├── TokenScopeChangeBadge.tsx          # Wrapper for Badge (outline/soft variants)
+│   ├── TokenScopeChangeBadge.module.css
 │   ├── TokenHistoryView.stories.tsx       # Storybook stories
 │   └── TokenHistoryView.test.tsx          # Vitest tests
 │
@@ -442,6 +442,8 @@ Location: `apps/squareone/src/components/TokenHistory/TokenScopeBadge.tsx`
 type TokenScopeBadgeProps = {
   scope: string;
   size?: 'sm' | 'md' | 'lg';
+  variant?: 'solid' | 'soft' | 'outline';  // Allow variant override
+  children?: React.ReactNode;  // Allow custom content (for icons)
 };
 ```
 
@@ -452,54 +454,78 @@ type TokenScopeBadgeProps = {
   - `read:` -> green
   - `write:` -> yellow
   - default -> gray
-- Uses 'soft' variant and 'full' radius for consistency with existing token display
+- Defaults to 'soft' variant and 'full' radius for consistency with existing token display
+- Accepts variant prop to allow consumers to override the variant
+- Accepts children prop to allow custom content (defaults to just the scope text)
 - Can be reused in both TokenHistoryDetails and AccessTokenItem (future refactoring)
 
 **Tests and stories for TokenScopeBadge:**
 - Create `TokenScopeBadge.test.tsx`:
   - Test scope color mapping logic (exec→red, read→green, write→yellow, default→gray)
   - Test size prop variations
+  - Test variant prop override (soft, outline, solid)
+  - Test children prop (custom content with icons)
+  - Test default behavior (renders scope text without children)
 - Create `TokenScopeBadge.stories.tsx`:
   - Story for each scope prefix with semantic colors (exec, read, write, default)
   - Different sizes (sm, md, lg)
+  - Different variants (soft, outline, solid)
+  - With custom children (showing extensibility for TokenScopeChangeBadge)
 
-**3.2 Create TokenHistoryChangesPill component (for scope change indicators)**
+**3.2 Create TokenScopeChangeBadge component (for scope change indicators)**
 
-Location: `apps/squareone/src/components/TokenHistory/TokenHistoryChangesPill.tsx`
+Location: `apps/squareone/src/components/TokenHistory/TokenScopeChangeBadge.tsx`
 
 ```typescript
-type TokenHistoryChangesPillProps = {
+type TokenScopeChangeBadgeProps = {
   type: 'added' | 'removed';
-  children: React.ReactNode;  // Scope text (e.g., "read:tap")
+  scope: string;  // Scope text (e.g., "read:tap")
+  size?: 'sm' | 'md' | 'lg';
 };
 ```
 
 **Implementation:**
-- Wrapper around Badge component from `@lsst-sqre/squared`
-- For 'added': green color with FontAwesome `faPlus` icon prepended to children
-- For 'removed': red color with FontAwesome `faMinus` icon prepended to children
-- Uses 'soft' variant, 'full' radius, and appropriate size
-- **Note**: This component uses change-specific colors (red/green) and OVERRIDES scope-specific colors
+- Wrapper around **TokenScopeBadge component** (not Badge directly) to reuse color logic
+- For 'added': passes `variant="soft"` with FontAwesome `faPlus` icon prepended to scope text
+- For 'removed': passes `variant="outline"` with FontAwesome `faMinus` icon prepended to scope text
+- Delegates all color logic to TokenScopeBadge (single source of truth for scope colors)
 - Used exclusively for edit actions to show scope additions/removals
 
 **Usage example:**
 ```tsx
 // For added scope
-<TokenHistoryChangesPill type="added">read:tap</TokenHistoryChangesPill>
-// Renders: [+ read:tap] in green
+<TokenScopeChangeBadge type="added" scope="read:tap" />
+// Renders: [+ read:tap] in green (soft variant) because TokenScopeBadge determines scope starts with "read:"
 
 // For removed scope
-<TokenHistoryChangesPill type="removed">write:tap</TokenHistoryChangesPill>
-// Renders: [- write:tap] in red
+<TokenScopeChangeBadge type="removed" scope="write:tap" />
+// Renders: [- write:tap] in yellow (outline variant) because TokenScopeBadge determines scope starts with "write:"
 ```
 
-**Tests and stories for TokenHistoryChangesPill:**
-- Create `TokenHistoryChangesPill.test.tsx`:
-  - Test 'added' type renders with plus icon and green color
-  - Test 'removed' type renders with minus icon and red color
-- Create `TokenHistoryChangesPill.stories.tsx`:
-  - Added/removed variants (green/red) with various scope texts
-  - Show examples with different scope types
+**Implementation detail:**
+```tsx
+export function TokenScopeChangeBadge({ type, scope, size }: TokenScopeChangeBadgeProps) {
+  const icon = type === 'added' ? faPlus : faMinus;
+  const variant = type === 'added' ? 'soft' : 'outline';
+
+  return (
+    <TokenScopeBadge scope={scope} variant={variant} size={size}>
+      <FontAwesomeIcon icon={icon} /> {scope}
+    </TokenScopeBadge>
+  );
+}
+```
+
+**Tests and stories for TokenScopeChangeBadge:**
+- Create `TokenScopeChangeBadge.test.tsx`:
+  - Test 'added' type renders with plus icon and soft variant
+  - Test 'removed' type renders with minus icon and outline variant
+  - Test that scope colors are delegated to TokenScopeBadge (inherits color logic)
+  - Test size prop variations
+- Create `TokenScopeChangeBadge.stories.tsx`:
+  - Added/removed variants with various scope types (exec, read, write, default)
+  - Show examples demonstrating outline vs soft variants
+  - Different sizes (sm, md, lg)
 
 **3.3 Create TokenHistorySummary component**
 
@@ -569,9 +595,9 @@ Use `<dl>` (definition list) with flexbox layout for all fields:
      - Format: `<span style="color: --rsd-color-gray-400">Mar 10</span> → Mar 15, 2025`
      - Old date in light gray, arrow separator, new date in default color
    - **Scopes** (only if changed):
-     - Show removed scopes as TokenHistoryChangesPill with type="removed" (red with minus icon)
-     - Show added scopes as TokenHistoryChangesPill with type="added" (green with plus icon)
-     - Change pills use red/green colors and override scope-specific colors
+     - Show removed scopes as TokenScopeChangeBadge with type="removed" (outline variant with minus icon)
+     - Show added scopes as TokenScopeChangeBadge with type="added" (soft variant with plus icon)
+     - Change badges use scope-specific colors with outline/soft variants to indicate removal/addition
 
 **Implementation notes:**
 - Use CSS Modules for flexbox layout (labels and values in two-column grid)
@@ -1011,7 +1037,7 @@ Use standard HTML elements with base styles from `base.css`:
 
 ### Week 2: Core UI
 6. Phase 3.1a: TokenScopeBadge component + tests + stories
-7. Phase 3.2: TokenHistoryChangesPill + tests + stories
+7. Phase 3.2: TokenScopeChangeBadge + tests + stories
 8. Phase 3.3: TokenHistorySummary
 9. Phase 3.4: TokenHistoryDetails + tests + stories
 10. Phase 3.5: TokenHistoryItem + tests + stories
@@ -1222,16 +1248,19 @@ The `Badge` component is already available in `@lsst-sqre/squared` (`packages/sq
 1. **TokenScopeBadge** - Wraps Badge with scope-specific color logic:
    - Maps scope prefixes to semantic colors (exec: → red, read: → green, write: → yellow)
    - Matches existing pattern from `AccessTokenItem.tsx` (see `getScopeColor` function)
-   - Uses 'soft' variant and 'full' radius
+   - Defaults to 'soft' variant and 'full' radius
+   - Accepts `variant` and `children` props for extensibility
+   - **Single source of truth** for scope color logic
    - **Usage**: Display scopes in create/revoke/expire events
    - Can be reused across TokenHistoryDetails, TokenDetailsView, and (future) refactored AccessTokenItem
 
-2. **TokenHistoryChangesPill** - Wraps Badge for scope change indicators:
-   - 'added' type: green color with FontAwesome plus icon
-   - 'removed' type: red color with FontAwesome minus icon
+2. **TokenScopeChangeBadge** - Wraps **TokenScopeBadge** for scope change indicators:
+   - 'added' type: passes `variant="soft"` with FontAwesome plus icon
+   - 'removed' type: passes `variant="outline"` with FontAwesome minus icon
+   - **Delegates color logic to TokenScopeBadge** - no color mapping in this component
    - **Usage**: Display scope changes in edit events only
-   - Uses change-specific colors (red/green) that override scope-specific colors
-   - Provides visual distinction between additions and removals
+   - Variant (outline vs soft) provides visual distinction between removals and additions
+   - Maintains consistent color semantics by reusing TokenScopeBadge
 
 ### DateTimePicker Component (Available in Squared Library)
 
