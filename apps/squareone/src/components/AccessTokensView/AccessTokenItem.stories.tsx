@@ -8,8 +8,8 @@ const baseToken: TokenInfo = {
   username: 'testuser',
   token_type: 'user',
   service: null,
-  scopes: ['read:user', 'write:user', 'admin:token'],
-  token: 'gt-abc123def456',
+  scopes: ['read:image', 'read:tap', 'user:token'],
+  token: '4dE8wPjqh1MY0zsD8svAHQ',
   token_name: 'my-token',
   created: Math.floor(Date.now() / 1000) - 86400 * 30, // 30 days ago
   expires: Math.floor(Date.now() / 1000) + 86400 * 30, // 30 days from now
@@ -107,13 +107,13 @@ export const ManyScopes: Story = {
     token: {
       ...baseToken,
       scopes: [
-        'read:user',
-        'write:user',
-        'admin:token',
+        'exec:admin',
         'exec:notebook',
         'exec:portal',
+        'read:image',
         'read:tap',
-        'write:workspace',
+        'write:files',
+        'write:sasquatch',
       ],
     },
   },
@@ -123,7 +123,7 @@ export const SingleScope: Story = {
   args: {
     token: {
       ...baseToken,
-      scopes: ['read:user'],
+      scopes: ['read:image'],
     },
   },
 };
