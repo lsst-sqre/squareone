@@ -10,6 +10,7 @@ export type TextInputProps = Omit<
   fullWidth?: boolean;
   leadingIcon?: React.ReactNode;
   trailingIcon?: React.ReactNode;
+  trailingAction?: React.ReactNode;
 };
 
 const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
@@ -19,12 +20,16 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
       appearance = 'default',
       leadingIcon,
       trailingIcon,
+      trailingAction,
       fullWidth,
       className,
       ...props
     },
     ref
   ) => {
+    // trailingAction and trailingIcon are mutually exclusive
+    const hasTrailingElement = !!(trailingAction || trailingIcon);
+
     const containerClassNames = [
       styles.container,
       fullWidth && styles.fullWidth,
@@ -38,7 +43,8 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
       styles[size],
       styles[appearance],
       leadingIcon && styles.hasLeadingIcon,
-      trailingIcon && styles.hasTrailingIcon,
+      hasTrailingElement && styles.hasTrailingIcon,
+      trailingAction && styles.hasTrailingAction,
     ]
       .filter(Boolean)
       .join(' ');
@@ -55,7 +61,10 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
             aria-invalid={appearance === 'error'}
             {...props}
           />
-          {trailingIcon && (
+          {trailingAction && (
+            <span className={styles.trailingAction}>{trailingAction}</span>
+          )}
+          {!trailingAction && trailingIcon && (
             <span className={styles.trailingIcon}>{trailingIcon}</span>
           )}
         </div>

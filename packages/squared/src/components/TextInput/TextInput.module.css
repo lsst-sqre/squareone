@@ -113,6 +113,19 @@
   right: var(--sqo-space-xs);
 }
 
+/* Trailing action (interactive button) */
+.trailingAction {
+  position: absolute;
+  top: 50%;
+  right: var(--sqo-space-xxxs);
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  z-index: 1;
+}
+
 /* Adjust input padding when icons are present */
 .hasLeadingIcon.sm {
   padding-left: calc(var(--sqo-space-xxs) + 1.5rem);
@@ -136,6 +149,19 @@
 
 .hasTrailingIcon.lg {
   padding-right: calc(var(--sqo-space-md) + 1.75rem);
+}
+
+/* Adjust input padding when trailing action is present */
+.hasTrailingAction.sm {
+  padding-right: calc(var(--sqo-space-xxs) + 2.25rem);
+}
+
+.hasTrailingAction.md {
+  padding-right: calc(var(--sqo-space-xs) + 2.5rem);
+}
+
+.hasTrailingAction.lg {
+  padding-right: calc(var(--sqo-space-md) + 2.75rem);
 }
 
 /* Icon size adjustments */

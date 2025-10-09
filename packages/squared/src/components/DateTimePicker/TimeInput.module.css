@@ -1,0 +1,183 @@
+/* TimeInput component styles */
+
+.timeInput {
+  display: flex;
+  align-items: center;
+  gap: var(--sqo-space-xxxs);
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
+}
+
+.timeInput.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Time field container */
+.timeField {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Spinbox container */
+.spinboxContainer {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--rsd-color-gray-100);
+  border-radius: var(--sqo-border-radius-1);
+  overflow: hidden;
+  transition: var(--sqo-transition-basic);
+}
+
+/* Time input field */
+.spinboxInput {
+  width: 2.5em;
+  padding: var(--sqo-space-xxxs) var(--sqo-space-xxs);
+  border: none;
+  border-radius: 0;
+  background: var(--rsd-component-page-background-color);
+  color: var(--rsd-component-text-color);
+  font-family: inherit;
+  font-size: inherit;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  transition: var(--sqo-transition-basic);
+  outline: none;
+
+  /* Remove number input arrows */
+  -webkit-appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.spinboxInput::-webkit-outer-spin-button,
+.spinboxInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.spinboxContainer:focus-within {
+  border-color: var(--rsd-color-primary-600);
+  outline: 2px solid var(--rsd-color-primary-600);
+  outline-offset: 2px;
+}
+
+.spinboxInput:disabled {
+  background-color: var(--rsd-color-gray-50);
+  cursor: not-allowed;
+}
+
+/* Spinbox buttons container */
+.spinboxButtons {
+  display: flex;
+  flex-direction: column;
+  width: 1.5em;
+  flex-shrink: 0;
+}
+
+.spinboxButton {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--rsd-component-page-background-color);
+  border: none;
+  border-left: 1px solid var(--rsd-color-gray-100);
+  color: var(--rsd-color-gray-500);
+  cursor: pointer;
+  transition: var(--sqo-transition-basic);
+  padding: 0;
+  outline: none;
+}
+
+.spinboxButton:first-child {
+  border-top-right-radius: var(--sqo-border-radius-1);
+}
+
+.spinboxButton:last-child {
+  border-bottom-right-radius: var(--sqo-border-radius-1);
+  border-top: 1px solid var(--rsd-color-gray-100);
+}
+
+.spinboxButton:hover:not(:disabled) {
+  background: var(--rsd-color-gray-50);
+  color: var(--rsd-color-gray-700);
+}
+
+.spinboxButton:active:not(:disabled) {
+  background: var(--rsd-color-gray-100);
+}
+
+.spinboxButton:focus-visible {
+  outline: 2px solid var(--rsd-color-primary-600);
+  outline-offset: -2px;
+  z-index: 1;
+}
+
+.spinboxButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Time separator */
+.timeSeparator {
+  color: var(--rsd-color-gray-500);
+  font-weight: 500;
+  user-select: none;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Size variants */
+.sm .spinboxInput {
+  padding: calc(var(--sqo-space-xxxs) * 0.75) var(--sqo-space-xxxs);
+  font-size: 0.75rem;
+  width: 2.25em;
+}
+
+.sm .spinboxButtons {
+  width: 1.25em;
+}
+
+.md .spinboxInput {
+  padding: var(--sqo-space-xxxs) var(--sqo-space-xxs);
+  font-size: 0.875rem;
+  width: 2.5em;
+}
+
+.md .spinboxButtons {
+  width: 1.5em;
+}
+
+.lg .spinboxInput {
+  padding: var(--sqo-space-xxs) var(--sqo-space-xs);
+  font-size: 1rem;
+  width: 2.75em;
+}
+
+.lg .spinboxButtons {
+  width: 1.75em;
+}
+
+/* Focus management */
+.spinboxContainer:focus-within .spinboxButtons {
+  border-left-color: var(--rsd-color-primary-600);
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .spinboxInput {
+    border-width: 2px;
+  }
+
+  .spinboxButton {
+    border-width: 2px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .spinboxInput,
+  .spinboxButton {
+    transition: none;
+  }
+}
