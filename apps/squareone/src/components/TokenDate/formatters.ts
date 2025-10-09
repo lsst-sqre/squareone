@@ -9,6 +9,8 @@ import {
   getRelativeTimeDescription,
 } from '../../lib/utils/dateFormatters';
 
+const SECONDS_PER_MINUTE = 60;
+const SECONDS_PER_HOUR = 3600;
 const SECONDS_PER_DAY = 86400;
 
 type FormattedDate = {
@@ -105,5 +107,106 @@ export function formatTokenLastUsed(
   return {
     display: `Last used ${formatAsISODate(lastUsedDate)}`,
     datetime: lastUsedDate.toISOString(),
+  };
+}
+
+/**
+ * Format an event time for summary lines (relative time like "2h ago", "3d ago").
+ * @param eventTime - Event timestamp in seconds since epoch
+ * @returns Relative time string (e.g., "2h ago", "3d ago", "just now")
+ */
+export function formatEventTime(eventTime: number | null | undefined): string {
+  if (eventTime == null) {
+    return 'Unknown time';
+  }
+
+  const eventDate = parseTimestamp(eventTime);
+  if (!eventDate) {
+    return `Invalid date (${eventTime})`;
+  }
+
+  const now = Math.floor(Date.now() / 1000);
+  const secondsAgo = now - eventTime;
+
+  // Future events (shouldn't happen for history, but handle gracefully)
+  if (secondsAgo < 0) {
+    return 'just now';
+  }
+
+  // Less than 1 minute
+  if (secondsAgo < SECONDS_PER_MINUTE) {
+    return 'just now';
+  }
+
+  // Less than 1 hour - show minutes
+  if (secondsAgo < SECONDS_PER_HOUR) {
+    const minutes = Math.floor(secondsAgo / SECONDS_PER_MINUTE);
+    return `${minutes}m ago`;
+  }
+
+  // Less than 1 day - show hours
+  if (secondsAgo < SECONDS_PER_DAY) {
+    const hours = Math.floor(secondsAgo / SECONDS_PER_HOUR);
+    return `${hours}h ago`;
+  }
+
+  // 1 day or more - show days
+  const days = Math.floor(secondsAgo / SECONDS_PER_DAY);
+  return `${days}d ago`;
+}
+
+/**
+ * Format an event time for detail view (exact UTC timestamp).
+ * @param eventTime - Event timestamp in seconds since epoch
+ * @returns UTC timestamp string (e.g., "2025-03-15 14:30:45 UTC")
+ */
+export function formatEventTimeUTC(
+  eventTime: number | null | undefined
+): string {
+  if (eventTime == null) {
+    return 'Unknown time';
+  }
+
+  const eventDate = parseTimestamp(eventTime);
+  if (!eventDate) {
+    return `Invalid date (${eventTime})`;
+  }
+
+  const year = eventDate.getUTCFullYear();
+  const month = String(eventDate.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(eventDate.getUTCDate()).padStart(2, '0');
+  const hours = String(eventDate.getUTCHours()).padStart(2, '0');
+  const minutes = String(eventDate.getUTCMinutes()).padStart(2, '0');
+  const seconds = String(eventDate.getUTCSeconds()).padStart(2, '0');
+
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds} UTC`;
+}
+
+/**
+ * Format an event time with both display and datetime values for TokenDate component.
+ * @param eventTime - Event timestamp in seconds since epoch
+ * @returns Object with display text (relative) and ISO datetime string
+ */
+export function formatEventTimeWithUTC(
+  eventTime: number | null | undefined
+): FormattedDate {
+  if (eventTime == null) {
+    return {
+      display: 'Unknown time',
+      datetime: null,
+    };
+  }
+
+  const eventDate = parseTimestamp(eventTime);
+  if (!eventDate) {
+    return {
+      display: `Invalid date (${eventTime})`,
+      datetime: null,
+    };
+  }
+
+  return {
+    display: formatEventTime(eventTime),
+    datetime: eventDate.toISOString(),
   };
 }
