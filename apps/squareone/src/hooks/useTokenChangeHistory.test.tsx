@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
+import { renderHook, waitFor, act } from '@testing-library/react';
 import { SWRConfig } from 'swr';
 import type { ReactNode } from 'react';
 import useTokenChangeHistory, {
@@ -123,7 +123,7 @@ describe('useTokenChangeHistory', () => {
     );
   });
 
-  it.skip('should handle pagination with cursor', async () => {
+  it('should handle pagination with cursor', async () => {
     const firstPageEntries = [mockEntries[0]];
     const secondPageEntries = [mockEntries[1], mockEntries[2]];
 
@@ -161,16 +161,13 @@ describe('useTokenChangeHistory', () => {
       }),
     });
 
-    await result.current.loadMore();
+    act(() => {
+      result.current.loadMore();
+    });
 
-    await waitFor(
-      () => {
-        expect(result.current.entries?.length).toBeGreaterThan(
-          firstPageEntries.length
-        );
-      },
-      { timeout: 3000 }
-    );
+    await waitFor(() => {
+      expect(result.current.entries?.length).toBe(3);
+    });
 
     // Should accumulate entries
     expect(result.current.entries).toEqual([
@@ -395,7 +392,7 @@ describe('useTokenChangeHistory', () => {
     expect(result.current.entries![0].ip_address).toBe(null);
   });
 
-  it.skip('should reset accumulated entries when filters change', async () => {
+  it('should reset entries when filters change', async () => {
     const firstFilterEntries = [mockEntries[0]];
     const secondFilterEntries = [mockEntries[1], mockEntries[2]];
 
@@ -430,7 +427,8 @@ describe('useTokenChangeHistory', () => {
     rerender({ token: 'DGO1OnPohl0r3C7wqhzRgQ' });
 
     await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
+      // Wait for entries to match the new filter data
+      expect(result.current.entries).toEqual(secondFilterEntries);
     });
 
     // Should replace entries, not accumulate
@@ -459,5 +457,46 @@ describe('useTokenChangeHistory', () => {
         expect.stringContaining('token_type=user')
       );
     });
+  });
+
+  it('should not refetch first page when loading more', async () => {
+    const firstPageEntries = [mockEntries[0]];
+    const secondPageEntries = [mockEntries[1]];
+
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => firstPageEntries,
+      headers: new Headers({
+        Link: '</auth/api/v1/users/testuser/token-change-history?cursor=p1_1614990000>; rel="next"',
+      }),
+    });
+
+    const { result } = renderHook(() => useTokenChangeHistory('testuser'), {
+      wrapper: createWrapper(),
+    });
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
+
+    const firstPageCallCount = mockFetch.mock.calls.length;
+
+    // Load second page
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => secondPageEntries,
+      headers: new Headers(),
+    });
+
+    act(() => {
+      result.current.loadMore();
+    });
+
+    await waitFor(() => {
+      expect(result.current.entries?.length).toBe(2);
+    });
+
+    // Should only have made one additional call (for page 2)
+    expect(mockFetch.mock.calls.length).toBe(firstPageCallCount + 1);
   });
 });
