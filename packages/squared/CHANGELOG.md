@@ -1,5 +1,196 @@
 # @lsst-sqre/squared
 
+## 0.9.0
+
+### Minor Changes
+
+- [#210](https://github.com/lsst-sqre/squareone/pull/210) [`98a4d6560c08a72ba52be6d9e8017e89f7df2cbb`](https://github.com/lsst-sqre/squareone/commit/98a4d6560c08a72ba52be6d9e8017e89f7df2cbb) Thanks [@jonathansick](https://github.com/jonathansick)! - Replace tsup build with direct TypeScript transpilation
+
+  Replaced the tsup build tool with direct TypeScript transpilation through the consuming applications. This change:
+
+  - Exports TypeScript source files directly from the package
+  - Lets Next.js and other consuming apps handle transpilation
+  - Simplifies the build pipeline and removes the build step from the squared package
+  - Improves development experience with faster HMR
+
+- [#210](https://github.com/lsst-sqre/squareone/pull/210) [`9b6312854eee408a687b8c77978833032773934e`](https://github.com/lsst-sqre/squareone/commit/9b6312854eee408a687b8c77978833032773934e) Thanks [@jonathansick](https://github.com/jonathansick)! - Add a new Button component
+
+  This button has flexible styling and utility for a range of applications. It has two main axes of styling via props:
+
+  - `appearance` can be `solid|outline|text`
+  - `tone` is `primary|secondary|tertiary|danger` and controls the semantics of the button
+  - `role` is a way of quickly setting appearance and tone together for common uses. `role=primary` creates a solid button with primary tone.
+
+  The button also supports icons, loading state, and can be implemented both as a button element or as a link.
+
+- [#213](https://github.com/lsst-sqre/squareone/pull/213) [`024b11f8653bb1ade38240f890d8fbbb02aa0841`](https://github.com/lsst-sqre/squareone/commit/024b11f8653bb1ade38240f890d8fbbb02aa0841) Thanks [@jonathansick](https://github.com/jonathansick)! - Add Checkbox and CheckboxGroup components with comprehensive accessibility features
+
+  Introduces new form input components that extend the squared design system:
+
+  - **Checkbox**: Accessible checkbox input with multiple size variants (sm, md, lg), disabled states, and error handling. Features WCAG 2.5.5 compliant touch targets with visual appearance that scales independently of the minimum touch area.
+
+  - **CheckboxGroup**: Fieldset-based container for multiple checkboxes with proper legend semantics, orientation options (horizontal/vertical), and FormField integration. Uses the polymorphic Label component for consistent legend styling with support for required indicators and descriptions.
+
+  Both components integrate seamlessly with React Hook Form and provide comprehensive Storybook stories for documentation and testing. The implementation follows the established patterns from RadioGroup and other form components in the library.
+
+- [#216](https://github.com/lsst-sqre/squareone/pull/216) [`7238f2ede9e3c1838311bea84d2c3c065be2ad13`](https://github.com/lsst-sqre/squareone/commit/7238f2ede9e3c1838311bea84d2c3c065be2ad13) Thanks [@jonathansick](https://github.com/jonathansick)! - Add ClipboardButton component with success feedback
+
+  New ClipboardButton component provides:
+
+  - One-click copying of text to clipboard
+  - Visual success feedback with configurable duration
+  - Support for static text or dynamic text via function callback
+  - Customizable labels for default and success states
+  - Optional icon display
+  - Forward ref support for focus management
+  - Built on squared Button component with consistent styling
+
+  Includes clipboard utility functions with fallback support for older browsers.
+
+- [#210](https://github.com/lsst-sqre/squareone/pull/210) [`98a4d6560c08a72ba52be6d9e8017e89f7df2cbb`](https://github.com/lsst-sqre/squareone/commit/98a4d6560c08a72ba52be6d9e8017e89f7df2cbb) Thanks [@jonathansick](https://github.com/jonathansick)! - Migrate components from styled-components to CSS Modules
+
+  Migrated the IconPill and PrimaryNavigation components from styled-components to CSS Modules for better performance and smaller bundle size. This change:
+
+  - Removes the styled-components dependency from the squared package
+  - Improves build-time CSS processing
+  - Maintains all existing styling and functionality
+  - Adds CSS Module type definitions for TypeScript support
+
+- [#219](https://github.com/lsst-sqre/squareone/pull/219) [`c85b08254b7bc14688b9f889541962a0a0d511b4`](https://github.com/lsst-sqre/squareone/commit/c85b08254b7bc14688b9f889541962a0a0d511b4) Thanks [@jonathansick](https://github.com/jonathansick)! - Add DateTimePicker component
+
+  A new comprehensive DateTimePicker component has been added to the squared package, providing:
+
+  - Date and time selection with ISO 8601 datetime-local format
+  - Timezone support with conversion between timezones
+  - Calendar picker with custom caption (month/year navigation)
+  - Time input with hours/minutes in 24-hour format
+  - Timezone selector integrated with the date/time picker
+  - Full keyboard accessibility and ARIA support
+  - CSS Modules styling with design tokens
+  - Comprehensive test coverage (unit and Storybook tests)
+  - Built on react-day-picker for calendar functionality
+
+  The component exports `DateTimePicker` as the main component, plus utility functions for date/time manipulation (`dateUtils.ts`) and timezone handling (`timezoneUtils.ts`).
+
+- [#211](https://github.com/lsst-sqre/squareone/pull/211) [`4bdb71382f3c5a935a9309bd5e5cc32c8e2210e5`](https://github.com/lsst-sqre/squareone/commit/4bdb71382f3c5a935a9309bd5e5cc32c8e2210e5) Thanks [@jonathansick](https://github.com/jonathansick)! - Add comprehensive form input component library
+
+  Introduces a complete set of foundational form components to the squared design system:
+
+  - **Label**: Accessible form labels with required indicator support and proper semantic markup
+  - **ErrorMessage**: Consistent error messaging component with accessibility features
+  - **TextInput**: Full-featured text input with validation states, sizing variants, and accessibility
+  - **FormField**: Compound component that provides context and orchestrates label, input, and error message relationships
+
+- [#205](https://github.com/lsst-sqre/squareone/pull/205) [`362b05ea70a859f982c01fd129328d126816dfba`](https://github.com/lsst-sqre/squareone/commit/362b05ea70a859f982c01fd129328d126816dfba) Thanks [@jonathansick](https://github.com/jonathansick)! - Adopted @storybook/addon-vitest for improved testing performance and browser-based testing
+
+  - Run `pnpm test-storybook` to execute Storybook tests using Vitest
+
+- [#216](https://github.com/lsst-sqre/squareone/pull/216) [`7238f2ede9e3c1838311bea84d2c3c065be2ad13`](https://github.com/lsst-sqre/squareone/commit/7238f2ede9e3c1838311bea84d2c3c065be2ad13) Thanks [@jonathansick](https://github.com/jonathansick)! - Add Modal component with accessibility support
+
+  New Modal component provides:
+
+  - Dialog overlay with backdrop click handling (configurable)
+  - Close button with customizable label
+  - Accessible ARIA labeling with title and optional description
+  - Focus management for keyboard navigation
+  - CSS Modules styling with design tokens
+  - Comprehensive Storybook documentation and tests
+
+  The Modal component follows accessibility best practices and integrates seamlessly with the squared design system.
+
+- [#212](https://github.com/lsst-sqre/squareone/pull/212) [`12939e7a098b995f0595e5d8ebdcf7427706298a`](https://github.com/lsst-sqre/squareone/commit/12939e7a098b995f0595e5d8ebdcf7427706298a) Thanks [@jonathansick](https://github.com/jonathansick)! - Add polymorphic support to Label component for legend elements
+
+  Enhances the Label component with polymorphic functionality to support both label and legend elements:
+
+  - **Polymorphic "as" prop**: Supports `as="label"` (default) and `as="legend"` for semantic flexibility
+  - **Description support**: New optional `description` prop for legend use cases
+  - **Consistent styling**: Ensures identical visual appearance between form labels and fieldset legends
+  - **Enhanced RadioGroup integration**: RadioGroup now uses polymorphic Label for legends with size variants
+  - **Improved spacing**: Better vertical separation between legends and form elements
+  - **Type safety**: Full TypeScript support with proper type inference for both element types
+
+  This change enables consistent typography and styling across all label and legend elements in the design system while maintaining semantic HTML correctness.
+
+- [#212](https://github.com/lsst-sqre/squareone/pull/212) [`514c4e752c0e6f3c35b58781d6584edd22de366a`](https://github.com/lsst-sqre/squareone/commit/514c4e752c0e6f3c35b58781d6584edd22de366a) Thanks [@jonathansick](https://github.com/jonathansick)! - Add RadioGroup component with comprehensive accessibility features
+
+  Introduces a new RadioGroup component built with Radix UI primitives:
+
+  - **Fieldset-based structure** with proper legend and description support
+  - **Multiple sizing variants** (sm, md, lg) for different use cases
+  - **Flexible layout options** with horizontal and vertical orientations
+  - **Individual item descriptions** for additional context
+  - **Full accessibility compliance** with ARIA attributes and keyboard navigation
+  - **Form integration** works seamlessly with FormField and React Hook Form
+  - **Disabled state support** for individual options
+  - **Required field indicators** with proper semantic markup
+  - **Compound component pattern** (RadioGroup.Item) for clean API
+
+  The component supports both controlled and uncontrolled usage patterns, making it suitable for various form implementation approaches across the design system.
+
+- [#214](https://github.com/lsst-sqre/squareone/pull/214) [`5de611d8d5a4ebf5677241982d6932e5e2aa77d1`](https://github.com/lsst-sqre/squareone/commit/5de611d8d5a4ebf5677241982d6932e5e2aa77d1) Thanks [@jonathansick](https://github.com/jonathansick)! - Add Select component with comprehensive accessibility and functionality
+
+  Introduces a new Select component built with Radix UI primitives that provides:
+
+  - **Multiple sizing variants** (sm, md, lg) for different UI contexts
+  - **Full accessibility compliance** with ARIA attributes and keyboard navigation
+  - **Compound component pattern** (Select.Item, Select.Group, Select.Separator) for flexible composition
+  - **Controlled and uncontrolled modes** supporting both React Hook Form and standalone usage
+  - **Group and separator support** for organizing complex option lists
+  - **Scrollable dropdown support** with visual scroll indicators for long option lists
+  - **Full-width layout option** for responsive form layouts
+  - **Form integration** works seamlessly with FormField and other form components
+  - **Disabled state support** for individual options
+  - **Portal-based rendering** to avoid z-index issues
+
+- [#205](https://github.com/lsst-sqre/squareone/pull/205) [`3396e84b11d375679f9e93e12367e9b32c865cfd`](https://github.com/lsst-sqre/squareone/commit/3396e84b11d375679f9e93e12367e9b32c865cfd) Thanks [@jonathansick](https://github.com/jonathansick)! - Drop GafaelfawrUserDropdown and GafaelfawrUserMenu components (replaced by PrimaryNavigation)
+
+- [#205](https://github.com/lsst-sqre/squareone/pull/205) [`a9e269c52e9259afd8657ca0c784b1aa966f0b27`](https://github.com/lsst-sqre/squareone/commit/a9e269c52e9259afd8657ca0c784b1aa966f0b27) Thanks [@jonathansick](https://github.com/jonathansick)! - Deleted the "Button" example component
+
+- [#210](https://github.com/lsst-sqre/squareone/pull/210) [`98a4d6560c08a72ba52be6d9e8017e89f7df2cbb`](https://github.com/lsst-sqre/squareone/commit/98a4d6560c08a72ba52be6d9e8017e89f7df2cbb) Thanks [@jonathansick](https://github.com/jonathansick)! - Add comprehensive testing setup for squared components
+
+  Added a complete testing infrastructure for the squared component library:
+
+  - Configured vitest for unit testing with React Testing Library
+  - Set up Storybook addon-vitest for testing stories
+  - Added test setup file for common test utilities
+  - Created comprehensive tests for the new Button component
+  - Configured testing commands for both unit tests and Storybook tests
+
+- [#215](https://github.com/lsst-sqre/squareone/pull/215) [`e28bd8c294249c99d12af40d36fc8bd93cc9b9e4`](https://github.com/lsst-sqre/squareone/commit/e28bd8c294249c99d12af40d36fc8bd93cc9b9e4) Thanks [@jonathansick](https://github.com/jonathansick)! - Add TextArea component with auto-resize and accessibility features
+
+  Introduces a new TextArea component to complement the existing form input library:
+
+  - **Multiple sizing variants** (sm, md, lg) for different UI contexts
+  - **Visual state indicators** (default, error, success) for form validation feedback
+  - **Auto-resize functionality** with configurable min/max rows for dynamic content
+  - **Full accessibility compliance** with proper ARIA attributes and semantic markup
+  - **FormField integration** works seamlessly with the form system for labels and error messages
+  - **Full-width layout option** for responsive form layouts
+  - **Flexible row configuration** with sensible defaults for different use cases
+
+  The component supports both controlled and uncontrolled usage patterns and integrates with React Hook Form validation. Auto-resize feature intelligently calculates height based on content while respecting min/max constraints.
+
+- [#219](https://github.com/lsst-sqre/squareone/pull/219) [`c85b08254b7bc14688b9f889541962a0a0d511b4`](https://github.com/lsst-sqre/squareone/commit/c85b08254b7bc14688b9f889541962a0a0d511b4) Thanks [@jonathansick](https://github.com/jonathansick)! - Add trailingAction prop to TextInput component
+
+  The TextInput component now supports a `trailingAction` prop for adding interactive elements (like buttons) at the end of the input field. This is distinct from `trailingIcon` which is for non-interactive visual elements.
+
+  - `trailingAction` and `trailingIcon` are mutually exclusive
+  - When `trailingAction` is provided, it takes precedence
+  - Proper styling and spacing for action elements
+  - Used by DateTimePicker for calendar toggle button
+
+### Patch Changes
+
+- [#219](https://github.com/lsst-sqre/squareone/pull/219) [`c85b08254b7bc14688b9f889541962a0a0d511b4`](https://github.com/lsst-sqre/squareone/commit/c85b08254b7bc14688b9f889541962a0a0d511b4) Thanks [@jonathansick](https://github.com/jonathansick)! - Add aria-label prop support to Select component
+
+  The Select component now accepts an explicit `aria-label` prop to provide custom accessible labels for the select trigger button. When provided, this overrides the automatically generated label from the value/placeholder text.
+
+  This improves accessibility for cases where the auto-generated label may not provide sufficient context.
+
+- Updated dependencies [[`0baaffd667f8d53aeb2963f36371415516b2c0ff`](https://github.com/lsst-sqre/squareone/commit/0baaffd667f8d53aeb2963f36371415516b2c0ff)]:
+  - @lsst-sqre/rubin-style-dictionary@0.6.0
+  - @lsst-sqre/global-css@0.2.3
+
 ## 0.8.0
 
 ### Minor Changes
