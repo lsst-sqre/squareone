@@ -4,6 +4,7 @@ import type { TokenChangeHistoryEntry } from '../../hooks/useTokenChangeHistory'
 import {
   formatEventTimeUTC,
   formatTokenExpiration,
+  formatExpirationTimestamp,
 } from '../TokenDate/formatters';
 import { TokenScopeBadge } from './TokenScopeBadge';
 import { TokenScopeChangeBadge } from './TokenScopeChangeBadge';
@@ -62,12 +63,12 @@ export function TokenHistoryDetails({
 
   const hasChanges = hasNameChange || hasExpiresChange || hasScopeChanges;
 
-  // Format expiration dates for edit actions
+  // Format expiration dates for edit actions (use ISO8601 timestamps for history)
   const oldExpires = entry.old_expires
-    ? formatTokenExpiration(entry.old_expires)
+    ? formatExpirationTimestamp(entry.old_expires)
     : null;
   const newExpires = entry.expires
-    ? formatTokenExpiration(entry.expires)
+    ? formatExpirationTimestamp(entry.expires)
     : null;
 
   return (
@@ -179,9 +180,9 @@ export function TokenHistoryDetails({
               <>
                 <dt className={styles.label}>Expires</dt>
                 <dd className={styles.value}>
-                  <span className={styles.oldValue}>{oldExpires?.display}</span>
+                  <span className={styles.oldValue}>{oldExpires}</span>
                   {' → '}
-                  {newExpires?.display}
+                  {newExpires}
                 </dd>
               </>
             )}
