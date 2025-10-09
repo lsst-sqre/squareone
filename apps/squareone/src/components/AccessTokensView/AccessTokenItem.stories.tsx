@@ -146,6 +146,15 @@ export const NoScopes: Story = {
   },
 };
 
+export const ScopeColorVariants: Story = {
+  args: {
+    token: {
+      ...baseToken,
+      scopes: ['exec:notebook', 'read:tap', 'write:files', 'user:token'],
+    },
+  },
+};
+
 export const WithDeleteError: Story = {
   args: {
     token: baseToken,

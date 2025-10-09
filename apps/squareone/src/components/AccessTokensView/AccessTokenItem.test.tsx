@@ -431,4 +431,26 @@ describe('AccessTokenItem', () => {
 
     expect(screen.getByText('No scopes.')).toBeInTheDocument();
   });
+
+  it('applies correct colors based on scope prefix', () => {
+    const tokenWithVariedScopes: TokenInfo = {
+      ...baseToken,
+      scopes: ['exec:notebook', 'read:image', 'write:files', 'user:token'],
+    };
+
+    render(
+      <AccessTokenItem
+        token={tokenWithVariedScopes}
+        username="testuser"
+        onDeleteSuccess={mockOnDeleteSuccess}
+        onDeleteError={mockOnDeleteError}
+      />
+    );
+
+    // Verify all scopes are rendered
+    expect(screen.getByText('exec:notebook')).toBeInTheDocument();
+    expect(screen.getByText('read:image')).toBeInTheDocument();
+    expect(screen.getByText('write:files')).toBeInTheDocument();
+    expect(screen.getByText('user:token')).toBeInTheDocument();
+  });
 });

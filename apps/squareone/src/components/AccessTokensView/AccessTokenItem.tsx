@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Badge, Button } from '@lsst-sqre/squared';
+import type { BadgeColor } from '@lsst-sqre/squared';
 import type { TokenInfo } from '../../hooks/useUserTokens';
 import useDeleteToken from '../../hooks/useDeleteToken';
 import {
@@ -9,6 +10,13 @@ import {
 import DeleteTokenModal from './DeleteTokenModal';
 import TokenDate from './TokenDate';
 import styles from './AccessTokenItem.module.css';
+
+function getScopeColor(scope: string): BadgeColor {
+  if (scope.startsWith('exec:')) return 'red';
+  if (scope.startsWith('read:')) return 'green';
+  if (scope.startsWith('write:')) return 'yellow';
+  return 'gray';
+}
 
 type AccessTokenItemProps = {
   token: TokenInfo;
@@ -64,7 +72,7 @@ export default function AccessTokenItem({
                 <Badge
                   key={scope}
                   variant="soft"
-                  color="gray"
+                  color={getScopeColor(scope)}
                   radius="full"
                   size="sm"
                 >
