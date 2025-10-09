@@ -1,0 +1,111 @@
+/**
+ * Styling for TokenHistoryDetails component
+ * Uses design tokens from @lsst-sqre/rubin-style-dictionary
+ */
+
+.details {
+  padding: var(--sqo-space-md);
+  background-color: var(--rsd-component-page-background-color);
+}
+
+/**
+ * Definition list layout with flexbox
+ * Labels left-aligned, values start at consistent position
+ */
+.metadataList {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--sqo-space-xs) var(--sqo-space-md);
+  margin: 0;
+  margin-bottom: var(--sqo-space-sm);
+}
+
+.metadataList:last-child {
+  margin-bottom: 0;
+}
+
+/**
+ * Label styling (dt elements)
+ * Subtle gray color for labels
+ */
+.label {
+  color: var(--rsd-color-gray-500);
+  font-weight: 500;
+  margin: 0;
+}
+
+/**
+ * Value styling (dd elements)
+ * Default text color for readability
+ */
+.value {
+  color: var(--rsd-component-text-color);
+  margin: 0;
+  word-break: break-word;
+}
+
+/**
+ * Link styling
+ * Uses design token link color
+ */
+.link {
+  color: var(--rsd-component-text-link-color);
+  text-decoration: none;
+  font-family: monospace;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+/**
+ * IP address button styling
+ * Appears as link but is button for accessibility
+ */
+.ipButton {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  color: var(--rsd-component-text-link-color);
+  text-decoration: none;
+  cursor: pointer;
+  font-family: monospace;
+  font-size: inherit;
+}
+
+.ipButton:hover {
+  text-decoration: underline;
+}
+
+/**
+ * Old value styling for edit changes
+ * Light gray to indicate it's the previous value
+ */
+.oldValue {
+  color: var(--rsd-color-gray-400);
+}
+
+/**
+ * Changes heading
+ * Small subheading above changed fields
+ */
+.changesHeading {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--rsd-color-gray-500);
+  margin: var(--sqo-space-md) 0 var(--sqo-space-xs) 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/**
+ * Scope list container
+ * Wraps badges to multiple lines
+ */
+.scopeList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sqo-space-xxs);
+  align-items: center;
+}
