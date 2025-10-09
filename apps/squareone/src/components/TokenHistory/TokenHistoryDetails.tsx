@@ -124,42 +124,41 @@ export function TokenHistoryDetails({
         {/* Timestamp (always shown) */}
         <dt className={styles.label}>Timestamp</dt>
         <dd className={styles.value}>{formatEventTimeUTC(entry.event_time)}</dd>
-      </dl>
 
-      {/* For create/revoke/expire: show Expires and Scopes */}
-      {entry.action !== 'edit' && (
-        <dl className={styles.metadataList}>
-          {/* Expires (if present) */}
-          {entry.expires && (
-            <>
-              <dt className={styles.label}>Expires</dt>
-              <dd className={styles.value}>
-                {formatExpirationTimestamp(entry.expires)}
-              </dd>
-            </>
-          )}
+        {/* For create/revoke/expire: show Expires and Scopes */}
+        {entry.action !== 'edit' && (
+          <>
+            {/* Expires (if present) */}
+            {entry.expires && (
+              <>
+                <dt className={styles.label}>Expires</dt>
+                <dd className={styles.value}>
+                  {formatExpirationTimestamp(entry.expires)}
+                </dd>
+              </>
+            )}
 
-          {/* Scopes */}
-          {entry.scopes.length > 0 && (
-            <>
-              <dt className={styles.label}>Scopes</dt>
-              <dd className={styles.value}>
-                <div className={styles.scopeList}>
-                  {entry.scopes.map((scope) => (
-                    <TokenScopeBadge key={scope} scope={scope} />
-                  ))}
-                </div>
-              </dd>
-            </>
-          )}
-        </dl>
-      )}
+            {/* Scopes */}
+            {entry.scopes.length > 0 && (
+              <>
+                <dt className={styles.label}>Scopes</dt>
+                <dd className={styles.value}>
+                  <div className={styles.scopeList}>
+                    {entry.scopes.map((scope) => (
+                      <TokenScopeBadge key={scope} scope={scope} />
+                    ))}
+                  </div>
+                </dd>
+              </>
+            )}
+          </>
+        )}
 
-      {/* For edit: show Changes section */}
-      {entry.action === 'edit' && hasChanges && (
-        <>
-          <h4 className={styles.changesHeading}>Changes</h4>
-          <dl className={styles.metadataList}>
+        {/* For edit: show Changes section */}
+        {entry.action === 'edit' && hasChanges && (
+          <>
+            <h4 className={styles.changesHeading}>Changes</h4>
+
             {/* Name change */}
             {hasNameChange && (
               <>
@@ -210,9 +209,9 @@ export function TokenHistoryDetails({
                 </dd>
               </>
             )}
-          </dl>
-        </>
-      )}
+          </>
+        )}
+      </dl>
     </div>
   );
 }

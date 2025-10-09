@@ -89,6 +89,7 @@
 /**
  * Changes heading
  * Small subheading above changed fields
+ * Spans both columns in the grid layout
  */
 .changesHeading {
   font-size: 0.875rem;
@@ -97,6 +98,7 @@
   margin: var(--sqo-space-md) 0 var(--sqo-space-xs) 0;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  grid-column: 1 / -1;
 }
 
 /**
