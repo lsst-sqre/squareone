@@ -6,9 +6,9 @@ import useDeleteToken from '../../hooks/useDeleteToken';
 import {
   formatTokenExpiration,
   formatTokenLastUsed,
-} from './tokenDateFormatters';
+} from '../TokenDate/formatters';
 import DeleteTokenModal from './DeleteTokenModal';
-import TokenDate from './TokenDate';
+import TokenDate from '../TokenDate';
 import styles from './AccessTokenItem.module.css';
 
 function getScopeColor(scope: string): BadgeColor {
