@@ -1,5 +1,75 @@
 # squareone
 
+## 0.26.0
+
+### Minor Changes
+
+- [#205](https://github.com/lsst-sqre/squareone/pull/205) [`362b05ea70a859f982c01fd129328d126816dfba`](https://github.com/lsst-sqre/squareone/commit/362b05ea70a859f982c01fd129328d126816dfba) Thanks [@jonathansick](https://github.com/jonathansick)! - Adopted @storybook/addon-vitest for improved testing performance and browser-based testing
+
+  - Run `pnpm test-storybook` to execute Storybook tests using Vitest
+
+- [#208](https://github.com/lsst-sqre/squareone/pull/208) [`f6c8b474823fa07ed0940205858cd209bf67f2a6`](https://github.com/lsst-sqre/squareone/commit/f6c8b474823fa07ed0940205858cd209bf67f2a6) Thanks [@jonathansick](https://github.com/jonathansick)! - Fixed hydration mis-match warnings with the UserMenu
+
+- [#208](https://github.com/lsst-sqre/squareone/pull/208) [`f6c8b474823fa07ed0940205858cd209bf67f2a6`](https://github.com/lsst-sqre/squareone/commit/f6c8b474823fa07ed0940205858cd209bf67f2a6) Thanks [@jonathansick](https://github.com/jonathansick)! - Add comprehensive sidebar layout system and settings pages
+
+  - **New sidebar navigation page layout::**
+
+    - `SidebarLayout`: Responsive layout component with mobile-first design, CSS Grid on desktop, and flexbox on mobile
+    - `MobileMenuToggle`: Hamburger menu component with accessibility features and smooth animations
+    - `Sidebar`: Navigation sidebar with sticky positioning and structured navigation sections
+    - `SidebarNavItem`: Individual navigation items with hover, active, and focus states
+    - `SidebarNavSection`: Grouped navigation with optional section labels
+
+  - **Settings pages implementation:**
+    - `SettingsLayout`: Settings-specific layout using the sidebar system with dynamic navigation
+    - Three settings pages: Account (`/settings/`), Sessions (`/settings/sessions`), and Access Tokens (`/settings/tokens`)
+    - Dynamic navigation filtering based on `AppConfig` (e.g., sessions page visibility controlled by `settingsSessionsVisible`)
+    - Complete server-side rendering with proper `getServerSideProps` implementation
+
+- [#210](https://github.com/lsst-sqre/squareone/pull/210) [`98a4d6560c08a72ba52be6d9e8017e89f7df2cbb`](https://github.com/lsst-sqre/squareone/commit/98a4d6560c08a72ba52be6d9e8017e89f7df2cbb) Thanks [@jonathansick](https://github.com/jonathansick)! - Configure Next.js to transpile squared package
+
+  Added the @lsst-sqre/squared package to Next.js transpilePackages configuration to support the new build system that exports TypeScript source directly.
+
+- [#216](https://github.com/lsst-sqre/squareone/pull/216) [`7238f2ede9e3c1838311bea84d2c3c065be2ad13`](https://github.com/lsst-sqre/squareone/commit/7238f2ede9e3c1838311bea84d2c3c065be2ad13) Thanks [@jonathansick](https://github.com/jonathansick)! - Add comprehensive token creation workflow
+
+  Implements a full-featured token creation system including:
+
+  - New `/settings/tokens/new` page with form interface
+  - Token name validation to prevent duplicates
+  - Scope selection with configurable available scopes
+  - Flexible expiration options (preset durations and custom dates)
+  - Query parameter support for pre-filling form values from URL templates
+  - Integration with Gafaelfawr token API for token creation
+  - Success modal displaying newly created tokens with copy functionality
+  - Enhanced navigation with "Access Tokens" link in settings
+
+  This feature enables users to create personal access tokens with appropriate scopes and expiration settings through a guided interface.
+
+- [#217](https://github.com/lsst-sqre/squareone/pull/217) [`8c5de054db869e7d02942e6c23ceaccab4f260bc`](https://github.com/lsst-sqre/squareone/commit/8c5de054db869e7d02942e6c23ceaccab4f260bc) Thanks [@jonathansick](https://github.com/jonathansick)! - Add token viewing and deletion functionality
+
+  Implements comprehensive token management capabilities including:
+
+  - New AccessTokensView component displaying user's existing tokens
+  - AccessTokenItem component with semantic HTML time elements for dates
+  - Token deletion workflow with confirmation modal
+  - useDeleteToken hook for API integration with Gafaelfawr
+  - Date formatting utilities with relative time display
+  - Integration into `/settings/tokens` page alongside token creation
+  - Proper handling of undefined/null token fields from API
+
+  Users can now view their existing access tokens, see expiration and last-used dates, and delete tokens through a confirmation workflow. The interface provides clear visual feedback and follows the application's design system.
+
+### Patch Changes
+
+- [#216](https://github.com/lsst-sqre/squareone/pull/216) [`7238f2ede9e3c1838311bea84d2c3c065be2ad13`](https://github.com/lsst-sqre/squareone/commit/7238f2ede9e3c1838311bea84d2c3c065be2ad13) Thanks [@jonathansick](https://github.com/jonathansick)! - Remove sessions page and related configuration
+
+  The sessions management page has been removed as this functionality is now handled through other interfaces. Configuration schema and navigation items related to sessions have also been cleaned up.
+
+- Updated dependencies [[`98a4d6560c08a72ba52be6d9e8017e89f7df2cbb`](https://github.com/lsst-sqre/squareone/commit/98a4d6560c08a72ba52be6d9e8017e89f7df2cbb), [`9b6312854eee408a687b8c77978833032773934e`](https://github.com/lsst-sqre/squareone/commit/9b6312854eee408a687b8c77978833032773934e), [`024b11f8653bb1ade38240f890d8fbbb02aa0841`](https://github.com/lsst-sqre/squareone/commit/024b11f8653bb1ade38240f890d8fbbb02aa0841), [`7238f2ede9e3c1838311bea84d2c3c065be2ad13`](https://github.com/lsst-sqre/squareone/commit/7238f2ede9e3c1838311bea84d2c3c065be2ad13), [`0baaffd667f8d53aeb2963f36371415516b2c0ff`](https://github.com/lsst-sqre/squareone/commit/0baaffd667f8d53aeb2963f36371415516b2c0ff), [`98a4d6560c08a72ba52be6d9e8017e89f7df2cbb`](https://github.com/lsst-sqre/squareone/commit/98a4d6560c08a72ba52be6d9e8017e89f7df2cbb), [`c85b08254b7bc14688b9f889541962a0a0d511b4`](https://github.com/lsst-sqre/squareone/commit/c85b08254b7bc14688b9f889541962a0a0d511b4), [`4bdb71382f3c5a935a9309bd5e5cc32c8e2210e5`](https://github.com/lsst-sqre/squareone/commit/4bdb71382f3c5a935a9309bd5e5cc32c8e2210e5), [`362b05ea70a859f982c01fd129328d126816dfba`](https://github.com/lsst-sqre/squareone/commit/362b05ea70a859f982c01fd129328d126816dfba), [`7238f2ede9e3c1838311bea84d2c3c065be2ad13`](https://github.com/lsst-sqre/squareone/commit/7238f2ede9e3c1838311bea84d2c3c065be2ad13), [`12939e7a098b995f0595e5d8ebdcf7427706298a`](https://github.com/lsst-sqre/squareone/commit/12939e7a098b995f0595e5d8ebdcf7427706298a), [`514c4e752c0e6f3c35b58781d6584edd22de366a`](https://github.com/lsst-sqre/squareone/commit/514c4e752c0e6f3c35b58781d6584edd22de366a), [`c85b08254b7bc14688b9f889541962a0a0d511b4`](https://github.com/lsst-sqre/squareone/commit/c85b08254b7bc14688b9f889541962a0a0d511b4), [`5de611d8d5a4ebf5677241982d6932e5e2aa77d1`](https://github.com/lsst-sqre/squareone/commit/5de611d8d5a4ebf5677241982d6932e5e2aa77d1), [`3396e84b11d375679f9e93e12367e9b32c865cfd`](https://github.com/lsst-sqre/squareone/commit/3396e84b11d375679f9e93e12367e9b32c865cfd), [`a9e269c52e9259afd8657ca0c784b1aa966f0b27`](https://github.com/lsst-sqre/squareone/commit/a9e269c52e9259afd8657ca0c784b1aa966f0b27), [`98a4d6560c08a72ba52be6d9e8017e89f7df2cbb`](https://github.com/lsst-sqre/squareone/commit/98a4d6560c08a72ba52be6d9e8017e89f7df2cbb), [`e28bd8c294249c99d12af40d36fc8bd93cc9b9e4`](https://github.com/lsst-sqre/squareone/commit/e28bd8c294249c99d12af40d36fc8bd93cc9b9e4), [`c85b08254b7bc14688b9f889541962a0a0d511b4`](https://github.com/lsst-sqre/squareone/commit/c85b08254b7bc14688b9f889541962a0a0d511b4)]:
+  - @lsst-sqre/squared@0.9.0
+  - @lsst-sqre/rubin-style-dictionary@0.6.0
+  - @lsst-sqre/global-css@0.2.3
+
 ## 0.25.0
 
 ### Minor Changes
