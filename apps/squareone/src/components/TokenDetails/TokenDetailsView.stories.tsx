@@ -1,47 +1,25 @@
-import React from 'react';
-import TokenDetailsView from './TokenDetailsView';
+import React, { useState } from 'react';
+import Link from 'next/link';
+import { Badge, Button } from '@lsst-sqre/squared';
+import type { BadgeColor } from '@lsst-sqre/squared';
 import type { TokenInfo } from '../../hooks/useUserTokens';
+import {
+  formatTokenExpiration,
+  formatTokenLastUsed,
+} from '../TokenDate/formatters';
+import TokenDate from '../TokenDate';
+import DeleteTokenModal from '../AccessTokensView/DeleteTokenModal';
+import styles from './TokenDetailsView.module.css';
 
-// Mock the hooks
-const mockUseTokenDetails = (
-  token: TokenInfo | undefined,
-  isLoading = false,
-  error: any = null
-) => ({
-  token,
-  error,
-  isLoading,
-  mutate: () => Promise.resolve(),
-});
-
-const mockUseDeleteToken = () => ({
-  deleteToken: async () => {},
-  isDeleting: false,
-  error: null,
-});
-
-// Mock modules
-vi.mock('../../hooks/useTokenDetails', () => ({
-  default: () => mockUseTokenDetails(mockToken),
-}));
-
-vi.mock('../../hooks/useDeleteToken', () => ({
-  default: () => mockUseDeleteToken(),
-}));
-
-vi.mock('../TokenHistory/TokenHistoryView', () => ({
-  default: ({ username, token }: { username: string; token: string }) => (
-    <div style={{ padding: '1rem', border: '1px solid #ccc' }}>
-      <p>Token History for: {token}</p>
-      <p>Username: {username}</p>
-      <p>(TokenHistoryView component mocked for stories)</p>
-    </div>
-  ),
-}));
+function getScopeColor(scope: string): BadgeColor {
+  if (scope.startsWith('exec:')) return 'red';
+  if (scope.startsWith('read:')) return 'green';
+  if (scope.startsWith('write:')) return 'yellow';
+  return 'gray';
+}
 
 export default {
   title: 'Components/TokenDetails/TokenDetailsView',
-  component: TokenDetailsView,
   parameters: {
     layout: 'padded',
   },
@@ -93,137 +71,279 @@ const mockNeverUsedToken: TokenInfo = {
   last_used: undefined,
 };
 
+// Wrapper component for stories that doesn't use hooks
+type TokenDetailsViewWrapperProps = {
+  token?: TokenInfo;
+  isLoading?: boolean;
+  error?: Error;
+  tokenKey: string;
+};
+
+function TokenDetailsViewWrapper({
+  token,
+  isLoading = false,
+  error,
+  tokenKey,
+}: TokenDetailsViewWrapperProps) {
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const handleDeleteClick = () => {
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    setIsDeleteModalOpen(false);
+    console.log('Token deleted');
+  };
+
+  const handleDeleteCancel = () => {
+    setIsDeleteModalOpen(false);
+  };
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className={styles.container}>
+        <p>Loading token details...</p>
+      </div>
+    );
+  }
+
+  // Error states
+  if (error) {
+    const is404 = error.message?.includes('404');
+    return (
+      <div className={styles.container}>
+        <div className={styles.error}>
+          {is404 ? (
+            <>
+              <h2>Token Not Found</h2>
+              <p>
+                The token with key <code>{tokenKey}</code> could not be found.
+                It may have been deleted or you may not have permission to view
+                it.
+              </p>
+              <p>
+                <Link href="/settings/tokens">Return to token list</Link>
+              </p>
+            </>
+          ) : (
+            <>
+              <h2>Error Loading Token</h2>
+              <p>{error.message}</p>
+              <p>
+                <Link href="/settings/tokens">Return to token list</Link>
+              </p>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (!token) {
+    return (
+      <div className={styles.container}>
+        <p>No token data available.</p>
+      </div>
+    );
+  }
+
+  const sortedScopes = [...token.scopes].sort();
+  const expiration = formatTokenExpiration(token.expires);
+  const lastUsed = formatTokenLastUsed(token.last_used);
+  const created = token.created
+    ? formatTokenExpiration(token.created)
+    : { display: 'Unknown', datetime: null };
+
+  return (
+    <div className={styles.container}>
+      {/* Token Metadata Card */}
+      <div className={styles.metadataCard}>
+        <div className={styles.metadataHeader}>
+          <h2 className={styles.tokenName}>
+            {token.token_name || token.token}
+          </h2>
+          <Button
+            type="button"
+            tone="danger"
+            appearance="outline"
+            size="md"
+            onClick={handleDeleteClick}
+          >
+            Delete
+          </Button>
+        </div>
+
+        <div className={styles.metadataGrid}>
+          <div className={styles.metadataRow}>
+            <dt className={styles.metadataLabel}>Token Key</dt>
+            <dd className={styles.metadataValue}>
+              <code className={styles.tokenKey}>{token.token}</code>
+            </dd>
+          </div>
+
+          {token.token_type && token.token_type !== 'user' && (
+            <div className={styles.metadataRow}>
+              <dt className={styles.metadataLabel}>Type</dt>
+              <dd className={styles.metadataValue}>{token.token_type}</dd>
+            </div>
+          )}
+
+          {token.parent && (
+            <div className={styles.metadataRow}>
+              <dt className={styles.metadataLabel}>Parent Token</dt>
+              <dd className={styles.metadataValue}>
+                <Link
+                  href={`/settings/tokens/${token.parent}`}
+                  className={styles.link}
+                >
+                  <code className={styles.tokenKey}>{token.parent}</code>
+                </Link>
+              </dd>
+            </div>
+          )}
+
+          <div className={styles.metadataRow}>
+            <dt className={styles.metadataLabel}>Created</dt>
+            <dd className={styles.metadataValue}>
+              <TokenDate
+                display={created.display}
+                datetime={created.datetime}
+              />
+            </dd>
+          </div>
+
+          <div className={styles.metadataRow}>
+            <dt className={styles.metadataLabel}>Expires</dt>
+            <dd className={styles.metadataValue}>
+              <TokenDate
+                display={expiration.display}
+                datetime={expiration.datetime}
+              />
+            </dd>
+          </div>
+
+          <div className={styles.metadataRow}>
+            <dt className={styles.metadataLabel}>Last Used</dt>
+            <dd className={styles.metadataValue}>
+              <TokenDate
+                display={lastUsed.display}
+                datetime={lastUsed.datetime}
+              />
+            </dd>
+          </div>
+
+          <div className={styles.metadataRow}>
+            <dt className={styles.metadataLabel}>Scopes</dt>
+            <dd className={styles.metadataValue}>
+              {sortedScopes.length > 0 ? (
+                <div className={styles.scopesBadges}>
+                  {sortedScopes.map((scope) => (
+                    <Badge
+                      key={scope}
+                      variant="soft"
+                      color={getScopeColor(scope)}
+                      radius="full"
+                      size="sm"
+                    >
+                      {scope}
+                    </Badge>
+                  ))}
+                </div>
+              ) : (
+                <span>No scopes</span>
+              )}
+            </dd>
+          </div>
+        </div>
+      </div>
+
+      {/* Change History Section */}
+      <div className={styles.historySection}>
+        <h2>Change History</h2>
+        <p style={{ color: 'var(--rsd-color-gray-500)' }}>
+          Token history view would appear here (mocked for Storybook)
+        </p>
+      </div>
+
+      {/* Delete Modal */}
+      <DeleteTokenModal
+        isOpen={isDeleteModalOpen}
+        tokenName={token.token_name || token.token}
+        onConfirm={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
+        isDeleting={false}
+      />
+    </div>
+  );
+}
+
 export const Default = {
-  args: {
-    username: 'testuser',
-    tokenKey: 'abc123xyz456789012345',
-  },
-  parameters: {
-    mockData: [
-      {
-        url: '/auth/api/v1/users/testuser/tokens/abc123xyz456789012345',
-        method: 'GET',
-        status: 200,
-        response: mockToken,
-      },
-    ],
-  },
+  render: () => (
+    <TokenDetailsViewWrapper token={mockToken} tokenKey={mockToken.token} />
+  ),
 };
 
 export const WithParent = {
-  args: {
-    username: 'testuser',
-    tokenKey: 'def456abc789012345678',
-  },
-  parameters: {
-    mockData: [
-      {
-        url: '/auth/api/v1/users/testuser/tokens/def456abc789012345678',
-        method: 'GET',
-        status: 200,
-        response: mockTokenWithParent,
-      },
-    ],
-  },
+  render: () => (
+    <TokenDetailsViewWrapper
+      token={mockTokenWithParent}
+      tokenKey={mockTokenWithParent.token}
+    />
+  ),
 };
 
 export const SessionToken = {
-  args: {
-    username: 'testuser',
-    tokenKey: 'session123456789012345',
-  },
-  parameters: {
-    mockData: [
-      {
-        url: '/auth/api/v1/users/testuser/tokens/session123456789012345',
-        method: 'GET',
-        status: 200,
-        response: mockSessionToken,
-      },
-    ],
-  },
+  render: () => (
+    <TokenDetailsViewWrapper
+      token={mockSessionToken}
+      tokenKey={mockSessionToken.token}
+    />
+  ),
 };
 
 export const ExpiredToken = {
-  args: {
-    username: 'testuser',
-    tokenKey: 'expired12345678901234',
-  },
-  parameters: {
-    mockData: [
-      {
-        url: '/auth/api/v1/users/testuser/tokens/expired12345678901234',
-        method: 'GET',
-        status: 200,
-        response: mockExpiredToken,
-      },
-    ],
-  },
+  render: () => (
+    <TokenDetailsViewWrapper
+      token={mockExpiredToken}
+      tokenKey={mockExpiredToken.token}
+    />
+  ),
 };
 
 export const NeverUsedToken = {
-  args: {
-    username: 'testuser',
-    tokenKey: 'neverused1234567890123',
-  },
-  parameters: {
-    mockData: [
-      {
-        url: '/auth/api/v1/users/testuser/tokens/neverused1234567890123',
-        method: 'GET',
-        status: 200,
-        response: mockNeverUsedToken,
-      },
-    ],
-  },
+  render: () => (
+    <TokenDetailsViewWrapper
+      token={mockNeverUsedToken}
+      tokenKey={mockNeverUsedToken.token}
+    />
+  ),
 };
 
 export const Loading = {
-  args: {
-    username: 'testuser',
-    tokenKey: 'abc123xyz456789012345',
-  },
-  parameters: {
-    mockData: [
-      {
-        url: '/auth/api/v1/users/testuser/tokens/abc123xyz456789012345',
-        method: 'GET',
-        delay: 9999999, // Infinite delay to simulate loading
-      },
-    ],
-  },
+  render: () => (
+    <TokenDetailsViewWrapper
+      isLoading={true}
+      tokenKey="abc123xyz456789012345"
+    />
+  ),
 };
 
 export const NotFound = {
-  args: {
-    username: 'testuser',
-    tokenKey: 'notfound12345678901234',
-  },
-  parameters: {
-    mockData: [
-      {
-        url: '/auth/api/v1/users/testuser/tokens/notfound12345678901234',
-        method: 'GET',
-        status: 404,
-        response: { detail: 'Token not found' },
-      },
-    ],
-  },
+  render: () => (
+    <TokenDetailsViewWrapper
+      error={new Error('HTTP 404: Not Found')}
+      tokenKey="notfound12345678901234"
+    />
+  ),
 };
 
 export const NetworkError = {
-  args: {
-    username: 'testuser',
-    tokenKey: 'error123456789012345',
-  },
-  parameters: {
-    mockData: [
-      {
-        url: '/auth/api/v1/users/testuser/tokens/error123456789012345',
-        method: 'GET',
-        status: 500,
-        response: { detail: 'Internal server error' },
-      },
-    ],
-  },
+  render: () => (
+    <TokenDetailsViewWrapper
+      error={new Error('Network error')}
+      tokenKey="error123456789012345"
+    />
+  ),
 };
