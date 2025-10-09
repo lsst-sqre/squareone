@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { Badge, Button } from '@lsst-sqre/squared';
 import type { BadgeColor } from '@lsst-sqre/squared';
 import type { TokenInfo } from '../../hooks/useUserTokens';
@@ -65,7 +66,12 @@ export default function AccessTokenItem({
           <div className={styles.tokenName}>
             {token.token_name || token.token}
           </div>
-          <div className={styles.tokenKey}>{token.token}</div>
+          <Link
+            href={`/settings/tokens/${token.token}`}
+            className={styles.tokenKey}
+          >
+            {token.token}
+          </Link>
           {sortedScopes.length > 0 ? (
             <div className={styles.scopesBadges}>
               {sortedScopes.map((scope) => (

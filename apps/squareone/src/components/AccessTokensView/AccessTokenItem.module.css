@@ -49,6 +49,14 @@
   font-family: monospace;
   font-size: 0.875rem;
   word-break: break-all;
+  color: var(--rsd-color-blue-500);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.tokenKey:hover {
+  color: var(--rsd-color-blue-600);
+  text-decoration: underline;
 }
 
 .scopes {
