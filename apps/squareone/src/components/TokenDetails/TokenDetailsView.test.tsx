@@ -237,9 +237,9 @@ describe('TokenDetailsView', () => {
     const deleteButton = screen.getByRole('button', { name: /delete/i });
     await user.click(deleteButton);
 
-    // DeleteTokenModal should be open (checking for confirmation button)
+    // DeleteTokenModal should be open (checking for delete token button)
     await waitFor(() => {
-      expect(screen.getByText(/confirm/i)).toBeInTheDocument();
+      expect(screen.getByText('Delete token')).toBeInTheDocument();
     });
   });
 
@@ -260,7 +260,7 @@ describe('TokenDetailsView', () => {
     await user.click(deleteButton);
 
     // Confirm deletion
-    const confirmButton = await screen.findByText(/confirm/i);
+    const confirmButton = await screen.findByText('Delete token');
     await user.click(confirmButton);
 
     await waitFor(() => {
@@ -288,7 +288,7 @@ describe('TokenDetailsView', () => {
     await user.click(deleteButton);
 
     // Confirm deletion
-    const confirmButton = await screen.findByText(/confirm/i);
+    const confirmButton = await screen.findByText('Delete token');
     await user.click(confirmButton);
 
     await waitFor(() => {
