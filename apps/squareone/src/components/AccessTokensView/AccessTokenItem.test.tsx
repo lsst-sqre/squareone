@@ -9,7 +9,7 @@ vi.mock('../../hooks/useDeleteToken', () => ({
   default: vi.fn(),
 }));
 
-vi.mock('./tokenDateFormatters', () => ({
+vi.mock('../TokenDate/formatters', () => ({
   formatTokenExpiration: vi.fn((expires) => {
     if (expires === null) {
       return { display: 'Never expires', datetime: null };
