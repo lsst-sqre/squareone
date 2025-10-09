@@ -3,7 +3,6 @@ import Link from 'next/link';
 import type { TokenChangeHistoryEntry } from '../../hooks/useTokenChangeHistory';
 import {
   formatEventTimeUTC,
-  formatTokenExpiration,
   formatExpirationTimestamp,
 } from '../TokenDate/formatters';
 import { TokenScopeBadge } from './TokenScopeBadge';
@@ -135,7 +134,7 @@ export function TokenHistoryDetails({
             <>
               <dt className={styles.label}>Expires</dt>
               <dd className={styles.value}>
-                {formatTokenExpiration(entry.expires).display}
+                {formatExpirationTimestamp(entry.expires)}
               </dd>
             </>
           )}

@@ -122,8 +122,10 @@ describe('TokenHistoryDetails', () => {
 
   describe('create action', () => {
     test('displays expires field when present', () => {
-      render(<TokenHistoryDetails entry={baseEntry} />);
+      const { container } = render(<TokenHistoryDetails entry={baseEntry} />);
       expect(screen.getByText('Expires')).toBeInTheDocument();
+      // Should display ISO8601 timestamp
+      expect(container.textContent).toContain('2024-03-15T12:10:45.000Z');
     });
 
     test('does not display expires field when null', () => {
@@ -187,10 +189,12 @@ describe('TokenHistoryDetails', () => {
     };
 
     test('displays expires and scopes like create action', () => {
-      render(<TokenHistoryDetails entry={expireEntry} />);
+      const { container } = render(<TokenHistoryDetails entry={expireEntry} />);
 
       expect(screen.getByText('Expires')).toBeInTheDocument();
       expect(screen.getByText('Scopes')).toBeInTheDocument();
+      // Should display ISO8601 timestamp
+      expect(container.textContent).toContain('2024-03-15T12:10:45.000Z');
     });
 
     test('does not display Changes section', () => {
