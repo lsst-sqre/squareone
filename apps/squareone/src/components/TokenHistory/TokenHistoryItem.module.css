@@ -1,0 +1,20 @@
+.item {
+  border-bottom: 1px solid var(--rsd-color-gray-200);
+}
+
+.item:last-child {
+  border-bottom: none;
+}
+
+.details {
+  padding: var(--sqo-space-md);
+  background-color: var(--rsd-color-gray-050);
+  border-top: 1px solid var(--rsd-color-gray-200);
+}
+
+/* Responsive design for mobile */
+@media (max-width: 768px) {
+  .details {
+    padding: var(--sqo-space-sm);
+  }
+}
