@@ -111,6 +111,36 @@ export function formatTokenLastUsed(
 }
 
 /**
+ * Format a token creation timestamp for display.
+ * Always shows the ISO8601 timestamp for when the token was created.
+ * @param created - Creation timestamp in seconds since epoch, or null/undefined if unknown
+ * @returns Object with display text (ISO8601 timestamp) and datetime for <time> element
+ */
+export function formatTokenCreated(
+  created: number | null | undefined
+): FormattedDate {
+  if (created == null) {
+    return {
+      display: 'Unknown',
+      datetime: null,
+    };
+  }
+
+  const createdDate = parseTimestamp(created);
+  if (!createdDate) {
+    return {
+      display: `Invalid date (${created})`,
+      datetime: null,
+    };
+  }
+
+  return {
+    display: createdDate.toISOString(),
+    datetime: createdDate.toISOString(),
+  };
+}
+
+/**
  * Format an expiration timestamp as ISO8601 string for change history display.
  * Used in the Changes section to show what the expiration date was changed to/from.
  * @param expires - Expiration timestamp in seconds since epoch, or null/undefined if never expires
