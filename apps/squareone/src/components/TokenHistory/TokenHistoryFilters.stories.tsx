@@ -33,8 +33,8 @@ export const WithFiltersApplied = {
     filters: {
       token: 'abc123xyz987def456ghi',
       ipAddress: '192.168.1.1',
-      since: new Date('2025-03-01T00:00:00Z'),
-      until: new Date('2025-03-15T23:59:59Z'),
+      since: new Date('2025-03-01T00:00Z'),
+      until: new Date('2025-03-15T23:59Z'),
     },
     onFilterChange: (filters: Partial<FilterType>) =>
       console.log('Filter changed:', filters),
@@ -189,8 +189,8 @@ export const StickyBehavior = {
 export const WithDateRange = {
   args: {
     filters: {
-      since: new Date('2025-03-01T00:00:00Z'),
-      until: new Date('2025-03-31T23:59:59Z'),
+      since: new Date('2025-03-01T00:00Z'),
+      until: new Date('2025-03-31T23:59Z'),
     },
     onFilterChange: (filters: Partial<FilterType>) =>
       console.log('Filter changed:', filters),
@@ -234,8 +234,8 @@ export const WithMultipleFilters = {
     filters: {
       token: 'abc123xyz987def456ghi',
       ipAddress: '192.168.1.1',
-      since: new Date('2025-03-01T00:00:00Z'),
-      until: new Date('2025-03-15T23:59:59Z'),
+      since: new Date('2025-03-01T00:00Z'),
+      until: new Date('2025-03-15T23:59Z'),
     },
     onFilterChange: (filters: Partial<FilterType>) =>
       console.log('Filter changed:', filters),
