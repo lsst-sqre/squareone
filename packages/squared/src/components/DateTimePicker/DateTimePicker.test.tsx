@@ -94,27 +94,15 @@ describe('DateTimePicker', () => {
   });
 
   describe('Time functionality', () => {
-    it('shows time input when showTime is true', async () => {
+    it('always shows time input in calendar popover', async () => {
       const user = userEvent.setup();
-      render(<DateTimePicker {...defaultProps} showTime />);
+      render(<DateTimePicker {...defaultProps} />);
 
       const calendarButton = screen.getByLabelText('Open calendar');
       await user.click(calendarButton);
 
       await waitFor(() => {
         expect(screen.getByLabelText('Select time')).toBeInTheDocument();
-      });
-    });
-
-    it('hides time input when showTime is false', async () => {
-      const user = userEvent.setup();
-      render(<DateTimePicker {...defaultProps} showTime={false} />);
-
-      const calendarButton = screen.getByLabelText('Open calendar');
-      await user.click(calendarButton);
-
-      await waitFor(() => {
-        expect(screen.queryByLabelText('Select time')).not.toBeInTheDocument();
       });
     });
   });
