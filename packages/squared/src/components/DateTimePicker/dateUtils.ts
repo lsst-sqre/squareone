@@ -63,9 +63,9 @@ export function parseISO8601(value: string): Date | null {
 }
 
 /**
- * Formats a Date object to ISO8601 string
+ * Formats a Date object to ISO8601 timestamp string
  * @param date - The date to format
- * @param includeTime - Whether to include time portion (default: true)
+ * @param includeTime - Reserved for API compatibility, always includes time
  * @param includeSeconds - Whether to include seconds (default: false)
  * @param timezone - Target timezone (default: UTC)
  */
@@ -89,24 +89,22 @@ export function formatToISO8601(
 
   // For UTC, format directly using ISO format
   if (timezone === 'UTC') {
-    if (!includeTime) {
-      // Use UTC date methods to extract the date
-      const year = date.getUTCFullYear();
-      const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-      const day = String(date.getUTCDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    }
+    // Extract UTC components
+    const year = date.getUTCFullYear();
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    const hours = String(date.getUTCHours()).padStart(2, '0');
+    const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+    const seconds = String(date.getUTCSeconds()).padStart(2, '0');
 
-    // Use toISOString which always returns UTC with format: 2024-03-15T14:30:45.123Z
-    // Then remove milliseconds to get: 2024-03-15T14:30:45Z
-    return date.toISOString().replace(/\.\d{3}Z$/, 'Z');
+    const dateStr = `${year}-${month}-${day}`;
+    const timeStr = includeSeconds
+      ? `${hours}:${minutes}:${seconds}`
+      : `${hours}:${minutes}`;
+    return `${dateStr}T${timeStr}Z`;
   }
 
   // For other timezones, use formatInTimeZone which handles timezone offsets correctly
-  if (!includeTime) {
-    return formatInTimeZone(date, timezone, 'yyyy-MM-dd');
-  }
-
   const timeFormat = includeSeconds ? 'HH:mm:ss' : 'HH:mm';
   const formatString = `yyyy-MM-dd'T'${timeFormat}xxx`;
 
