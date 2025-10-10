@@ -64,9 +64,21 @@ const AccessTokensPage: NextPageWithLayout &
         Create a token
       </Button>
       {user && (
-        <div style={{ marginTop: 'var(--sqo-space-lg-fixed)' }}>
-          <AccessTokensView username={user.username} />
-        </div>
+        <>
+          <div style={{ marginTop: 'var(--sqo-space-lg-fixed)' }}>
+            <AccessTokensView username={user.username} />
+          </div>
+          <div style={{ marginTop: 'var(--sqo-space-lg-fixed)' }}>
+            <Button
+              appearance="outline"
+              tone="secondary"
+              as={Link}
+              href="/settings/tokens/history"
+            >
+              View history
+            </Button>
+          </div>
+        </>
       )}
     </>
   );

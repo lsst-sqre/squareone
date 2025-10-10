@@ -1,0 +1,3049 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Gafaelfawr",
+    "description": "Gafaelfawr is a FastAPI application for the authorization and management of tokens, including their issuance and revocation.",
+    "version": "14.0.2.dev23+g94ff5538a"
+  },
+  "paths": {
+    "/auth/api/v1/admins": {
+      "get": {
+        "tags": ["admin"],
+        "summary": "List all administrators",
+        "operationId": "get_admins_auth_api_v1_admins_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Admin" },
+                  "title": "Response Get Admins Auth Api V1 Admins Get"
+                }
+              }
+            }
+          },
+          "401": { "description": "Unauthenticated" },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorModel" }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["admin"],
+        "summary": "Add new administrator",
+        "operationId": "add_admin_auth_api_v1_admins_post",
+        "parameters": [
+          {
+            "name": "x-csrf-token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "title": "CSRF token",
+              "description": "Only required when authenticating with a cookie, such as via the JavaScript UI.",
+              "examples": ["OmNdVTtKKuK_VuJsGFdrqg"]
+            },
+            "description": "Only required when authenticating with a cookie, such as via the JavaScript UI."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Admin" }
+            }
+          }
+        },
+        "responses": {
+          "204": { "description": "Successful Response" },
+          "401": { "description": "Unauthenticated" },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorModel" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/api/v1/admins/{username}": {
+      "delete": {
+        "tags": ["admin"],
+        "summary": "Delete an administrator",
+        "operationId": "delete_admin_auth_api_v1_admins__username__delete",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[a-z0-9](?:[a-z0-9]|-[a-z0-9])*[a-z](?:[a-z0-9]|-[a-z0-9])*$",
+              "title": "Administrator",
+              "description": "Username of administrator to delete",
+              "examples": ["adminuser"]
+            },
+            "description": "Username of administrator to delete"
+          },
+          {
+            "name": "x-csrf-token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "title": "CSRF token",
+              "description": "Only required when authenticating with a cookie, such as via the JavaScript UI.",
+              "examples": ["OmNdVTtKKuK_VuJsGFdrqg"]
+            },
+            "description": "Only required when authenticating with a cookie, such as via the JavaScript UI."
+          }
+        ],
+        "responses": {
+          "204": { "description": "Successful Response" },
+          "401": { "description": "Unauthenticated" },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorModel" }
+              }
+            }
+          },
+          "404": { "description": "Specified user is not an administrator" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/api/v1/history/token-changes": {
+      "get": {
+        "tags": ["admin"],
+        "summary": "Get token change history",
+        "description": "Get the change history of tokens for any user. If a limit or cursor was specified, links to paginated results may be found in the `Link` header of the reply and the total number of records in the `X-Total-Count` header.",
+        "operationId": "get_admin_token_change_history_auth_api_v1_history_token_changes_get",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^p?[0-9]+_[0-9]+$" },
+                { "type": "null" }
+              ],
+              "title": "Cursor",
+              "description": "Pagination cursor",
+              "examples": ["1614985055_4234"]
+            },
+            "description": "Pagination cursor"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "integer", "minimum": 1 },
+                { "type": "null" }
+              ],
+              "title": "Row limit",
+              "description": "Maximum number of entries to return",
+              "examples": [500]
+            },
+            "description": "Maximum number of entries to return"
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "$ref": "#/components/schemas/UtcDatetime" },
+                { "type": "null" }
+              ],
+              "title": "Not before",
+              "description": "Only show entries at or after this time",
+              "examples": ["2021-03-05T14:59:52Z"]
+            },
+            "description": "Only show entries at or after this time"
+          },
+          {
+            "name": "until",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "$ref": "#/components/schemas/UtcDatetime" },
+                { "type": "null" }
+              ],
+              "title": "Not after",
+              "description": "Only show entries before or at this time",
+              "examples": ["2021-03-05T14:59:52Z"]
+            },
+            "description": "Only show entries before or at this time"
+          },
+          {
+            "name": "username",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[a-z0-9](?:[a-z0-9]|-[a-z0-9])*[a-z](?:[a-z0-9]|-[a-z0-9])*$"
+                },
+                { "type": "null" }
+              ],
+              "title": "Username",
+              "description": "Only show tokens for this user",
+              "examples": ["someuser"]
+            },
+            "description": "Only show tokens for this user"
+          },
+          {
+            "name": "actor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[a-z0-9](?:[a-z0-9]|-[a-z0-9])*[a-z](?:[a-z0-9]|-[a-z0-9])*$|^<[a-z]+>$"
+                },
+                { "type": "null" }
+              ],
+              "title": "Actor",
+              "description": "Only show actions performed by this user",
+              "examples": ["adminuser"]
+            },
+            "description": "Only show actions performed by this user"
+          },
+          {
+            "name": "key",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "minLength": 22, "maxLength": 22 },
+                { "type": "null" }
+              ],
+              "title": "Token",
+              "description": "Only show changes for this token",
+              "examples": ["dDQg_NTNS51GxeEteqnkag"]
+            },
+            "description": "Only show changes for this token"
+          },
+          {
+            "name": "token_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "$ref": "#/components/schemas/TokenType" },
+                { "type": "null" }
+              ],
+              "title": "Token type",
+              "description": "Only show tokens of this type",
+              "examples": ["user"]
+            },
+            "description": "Only show tokens of this type"
+          },
+          {
+            "name": "ip_address",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "title": "IP or CIDR",
+              "description": "Only show changes from this IP or CIDR block",
+              "examples": ["198.51.100.0/24"]
+            },
+            "description": "Only show changes from this IP or CIDR block"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TokenChangeHistoryEntry"
+                  },
+                  "title": "Response Get Admin Token Change History Auth Api V1 History Token Changes Get"
+                }
+              }
+            },
+            "headers": {
+              "Link": {
+                "description": "Links to paginated results if `limit` or `cursor` was given, structured according to [RFC 5988](https://datatracker.ietf.org/doc/html/rfc5988). One or more of `prev`, `next`, and `first` relation types may be provided.",
+                "schema": { "type": "string" }
+              },
+              "X-Total-Count": {
+                "description": "Total number of results if `limit` or `cursor` was given",
+                "schema": { "type": "integer" }
+              }
+            }
+          },
+          "401": { "description": "Unauthenticated" },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorModel" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/api/v1/login": {
+      "get": {
+        "tags": ["browser"],
+        "summary": "Initialize UI",
+        "description": "Used by the JavaScript UI to obtain a CSRF token, user metadata, and server configuration. Not used with regular API calls.",
+        "operationId": "get_login_auth_api_v1_login_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/APILoginResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthenticated" },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorModel" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/api/v1/quota-overrides": {
+      "get": {
+        "tags": ["admin"],
+        "summary": "Get quota overrides",
+        "description": "Return the current quota overrides if any",
+        "operationId": "get_quota_overrides_auth_api_v1_quota_overrides_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/QuotaConfig-Output" }
+              }
+            }
+          },
+          "401": { "description": "Unauthenticated" },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorModel" }
+              }
+            }
+          },
+          "404": {
+            "description": "No quota overrides set",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorModel" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["admin"],
+        "summary": "Remove quota overrides",
+        "description": "Remove any existing quota overrides",
+        "operationId": "delete_quota_overrides_auth_api_v1_quota_overrides_delete",
+        "parameters": [
+          {
+            "name": "x-csrf-token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "title": "CSRF token",
+              "description": "Only required when authenticating with a cookie, such as via the JavaScript UI.",
+              "examples": ["OmNdVTtKKuK_VuJsGFdrqg"]
+            },
+            "description": "Only required when authenticating with a cookie, such as via the JavaScript UI."
+          }
+        ],
+        "responses": {
+          "204": { "description": "Successful Response" },
+          "401": { "description": "Unauthenticated" },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorModel" }
+              }
+            }
+          },
+          "404": {
+            "description": "No quota overrides set",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorModel" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["admin"],
+        "summary": "Set quota overrides",
+        "description": "Set the quota overrides",
+        "operationId": "put_quota_overrides_auth_api_v1_quota_overrides_put",
+        "parameters": [
+          {
+            "name": "x-csrf-token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "title": "CSRF token",
+              "description": "Only required when authenticating with a cookie, such as via the JavaScript UI.",
+              "examples": ["OmNdVTtKKuK_VuJsGFdrqg"]
+            },
+            "description": "Only required when authenticating with a cookie, such as via the JavaScript UI."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/QuotaConfig-Input" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/QuotaConfig-Output" }
+              }
+            }
+          },
+          "401": { "description": "Unauthenticated" },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorModel" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/api/v1/token-info": {
+      "get": {
+        "tags": ["user"],
+        "summary": "Get token details",
+        "description": "Return metadata about the authentication token",
+        "operationId": "get_token_info_auth_api_v1_token_info_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TokenInfo" }
+              }
+            }
+          },
+          "401": { "description": "Unauthenticated" },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorModel" }
+              }
+            }
+          },
+          "404": {
+            "description": "Token not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorModel" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/api/v1/tokens": {
+      "post": {
+        "tags": ["admin"],
+        "summary": "Create a token",
+        "operationId": "post_admin_tokens_auth_api_v1_tokens_post",
+        "parameters": [
+          {
+            "name": "x-csrf-token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "title": "CSRF token",
+              "description": "Only required when authenticating with a cookie, such as via the JavaScript UI.",
+              "examples": ["OmNdVTtKKuK_VuJsGFdrqg"]
+            },
+            "description": "Only required when authenticating with a cookie, such as via the JavaScript UI."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AdminTokenRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/NewToken" }
+              }
+            },
+            "headers": {
+              "Location": {
+                "description": "URL of new token",
+                "schema": { "type": "string" }
+              }
+            }
+          },
+          "401": { "description": "Unauthenticated" },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorModel" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/api/v1/user-info": {
+      "get": {
+        "tags": ["user"],
+        "summary": "Get user metadata",
+        "description": "Get metadata about the autheticated user",
+        "operationId": "get_user_info_auth_api_v1_user_info_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserInfo" }
+              }
+            }
+          },
+          "401": { "description": "Unauthenticated" },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorModel" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/api/v1/users/{username}/token-change-history": {
+      "get": {
+        "tags": ["user"],
+        "summary": "Get token change history",
+        "description": "Get the change history of tokens for the current user. If a limit or cursor was specified, links to paginated results may be found in the `Link` header of the reply and the total number of records in the `X-Total-Count` header.",
+        "operationId": "get_user_token_change_history_auth_api_v1_users__username__token_change_history_get",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[a-z0-9](?:[a-z0-9]|-[a-z0-9])*[a-z](?:[a-z0-9]|-[a-z0-9])*$",
+              "title": "Username",
+              "examples": ["someuser"]
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^p?[0-9]+_[0-9]+$" },
+                { "type": "null" }
+              ],
+              "title": "Cursor",
+              "description": "Pagination cursor",
+              "examples": ["1614985055_4234"]
+            },
+            "description": "Pagination cursor"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "integer", "minimum": 1 },
+                { "type": "null" }
+              ],
+              "title": "Row limit",
+              "description": "Maximum number of entries to return",
+              "examples": [500]
+            },
+            "description": "Maximum number of entries to return"
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "$ref": "#/components/schemas/UtcDatetime" },
+                { "type": "null" }
+              ],
+              "title": "Not before",
+              "description": "Only show entries at or after this time",
+              "examples": ["2021-03-05T14:59:52Z"]
+            },
+            "description": "Only show entries at or after this time"
+          },
+          {
+            "name": "until",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "$ref": "#/components/schemas/UtcDatetime" },
+                { "type": "null" }
+              ],
+              "title": "Not after",
+              "description": "Only show entries before or at this time",
+              "examples": ["2021-03-05T14:59:52Z"]
+            },
+            "description": "Only show entries before or at this time"
+          },
+          {
+            "name": "key",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "minLength": 22, "maxLength": 22 },
+                { "type": "null" }
+              ],
+              "title": "Token",
+              "description": "Only show changes for this token",
+              "examples": ["dDQg_NTNS51GxeEteqnkag"]
+            },
+            "description": "Only show changes for this token"
+          },
+          {
+            "name": "token_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "$ref": "#/components/schemas/TokenType" },
+                { "type": "null" }
+              ],
+              "title": "Token type",
+              "description": "Only show tokens of this type",
+              "examples": ["user"]
+            },
+            "description": "Only show tokens of this type"
+          },
+          {
+            "name": "ip_address",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "title": "IP or CIDR",
+              "description": "Only show changes from this IP or CIDR block",
+              "examples": ["198.51.100.0/24"]
+            },
+            "description": "Only show changes from this IP or CIDR block"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TokenChangeHistoryEntry"
+                  },
+                  "title": "Response Get User Token Change History Auth Api V1 Users  Username  Token Change History Get"
+                }
+              }
+            },
+            "headers": {
+              "Link": {
+                "description": "Links to paginated results if `limit` or `cursor` was given, structured according to [RFC 5988](https://datatracker.ietf.org/doc/html/rfc5988). One or more of `prev`, `next`, and `first` relation types may be provided.",
+                "schema": { "type": "string" }
+              },
+              "X-Total-Count": {
+                "description": "Total number of results if `limit` or `cursor` was given",
+                "schema": { "type": "integer" }
+              }
+            }
+          },
+          "401": { "description": "Unauthenticated" },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorModel" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/api/v1/users/{username}": {
+      "get": {
+        "tags": ["admin"],
+        "summary": "Get user information",
+        "description": "Only information from LDAP is displayed. Queries for bot users will not contain any useful information unless they also exist in LDAP, and Gafaelfawr installations using GitHub for authentication will return 404 errors for all users since LDAP is not configured.",
+        "operationId": "get_user_auth_api_v1_users__username__get",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[a-z0-9](?:[a-z0-9]|-[a-z0-9])*[a-z](?:[a-z0-9]|-[a-z0-9])*$",
+              "title": "Username",
+              "examples": ["someuser"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserInfo" }
+              }
+            }
+          },
+          "401": { "description": "Unauthenticated" },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorModel" }
+              }
+            }
+          },
+          "404": { "description": "LDAP is not configured" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/api/v1/users/{username}/tokens": {
+      "get": {
+        "tags": ["user"],
+        "summary": "List tokens",
+        "operationId": "get_tokens_auth_api_v1_users__username__tokens_get",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[a-z0-9](?:[a-z0-9]|-[a-z0-9])*[a-z](?:[a-z0-9]|-[a-z0-9])*$",
+              "title": "Username",
+              "examples": ["someuser"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/TokenInfo" },
+                  "title": "Response Get Tokens Auth Api V1 Users  Username  Tokens Get"
+                }
+              }
+            }
+          },
+          "401": { "description": "Unauthenticated" },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorModel" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["user"],
+        "summary": "Create user token",
+        "operationId": "post_tokens_auth_api_v1_users__username__tokens_post",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[a-z0-9](?:[a-z0-9]|-[a-z0-9])*[a-z](?:[a-z0-9]|-[a-z0-9])*$",
+              "title": "Username",
+              "examples": ["someuser"]
+            }
+          },
+          {
+            "name": "x-csrf-token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "title": "CSRF token",
+              "description": "Only required when authenticating with a cookie, such as via the JavaScript UI.",
+              "examples": ["OmNdVTtKKuK_VuJsGFdrqg"]
+            },
+            "description": "Only required when authenticating with a cookie, such as via the JavaScript UI."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UserTokenRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/NewToken" }
+              }
+            },
+            "headers": {
+              "Location": {
+                "description": "URL of new token",
+                "schema": { "type": "string" }
+              }
+            }
+          },
+          "401": { "description": "Unauthenticated" },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorModel" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/api/v1/users/{username}/tokens/{key}": {
+      "get": {
+        "tags": ["user"],
+        "summary": "Get token metadata",
+        "operationId": "get_token_auth_api_v1_users__username__tokens__key__get",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[a-z0-9](?:[a-z0-9]|-[a-z0-9])*[a-z](?:[a-z0-9]|-[a-z0-9])*$",
+              "title": "Username",
+              "examples": ["someuser"]
+            }
+          },
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 22,
+              "maxLength": 22,
+              "title": "Token key",
+              "examples": ["GpbIL3_qhgZlpfGTFF"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TokenInfo" }
+              }
+            }
+          },
+          "401": { "description": "Unauthenticated" },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorModel" }
+              }
+            }
+          },
+          "404": {
+            "description": "Token not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorModel" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["user"],
+        "summary": "Revoke token",
+        "operationId": "delete_token_auth_api_v1_users__username__tokens__key__delete",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[a-z0-9](?:[a-z0-9]|-[a-z0-9])*[a-z](?:[a-z0-9]|-[a-z0-9])*$",
+              "title": "Username",
+              "examples": ["someuser"]
+            }
+          },
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 22,
+              "maxLength": 22,
+              "title": "Token key",
+              "examples": ["GpbIL3_qhgZlpfGTFF"]
+            }
+          },
+          {
+            "name": "x-csrf-token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "title": "CSRF token",
+              "description": "Only required when authenticating with a cookie, such as via the JavaScript UI.",
+              "examples": ["OmNdVTtKKuK_VuJsGFdrqg"]
+            },
+            "description": "Only required when authenticating with a cookie, such as via the JavaScript UI."
+          }
+        ],
+        "responses": {
+          "204": { "description": "Successful Response" },
+          "401": { "description": "Unauthenticated" },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorModel" }
+              }
+            }
+          },
+          "404": {
+            "description": "Token not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorModel" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": ["admin"],
+        "summary": "Modify user token",
+        "description": "Replace metadata of a user token with provided values. Only the token name, scope, and expiration may be changed. Only token administrators may modify tokens; users cannot modify even their own tokens and should instead create a new token and delete the old one.",
+        "operationId": "patch_token_auth_api_v1_users__username__tokens__key__patch",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[a-z0-9](?:[a-z0-9]|-[a-z0-9])*[a-z](?:[a-z0-9]|-[a-z0-9])*$",
+              "title": "Username",
+              "examples": ["someuser"]
+            }
+          },
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 22,
+              "maxLength": 22,
+              "title": "Token key",
+              "examples": ["GpbIL3_qhgZlpfGTFF"]
+            }
+          },
+          {
+            "name": "x-csrf-token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "title": "CSRF token",
+              "description": "Only required when authenticating with a cookie, such as via the JavaScript UI.",
+              "examples": ["OmNdVTtKKuK_VuJsGFdrqg"]
+            },
+            "description": "Only required when authenticating with a cookie, such as via the JavaScript UI."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserTokenModifyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TokenInfo" }
+              }
+            }
+          },
+          "401": { "description": "Unauthenticated" },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorModel" }
+              }
+            }
+          },
+          "404": {
+            "description": "Token not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorModel" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/api/v1/users/{username}/tokens/{key}/change-history": {
+      "get": {
+        "tags": ["user"],
+        "summary": "Get change history of token",
+        "description": "All changes are returned. Pagination is not supported.",
+        "operationId": "get_token_change_history_auth_api_v1_users__username__tokens__key__change_history_get",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[a-z0-9](?:[a-z0-9]|-[a-z0-9])*[a-z](?:[a-z0-9]|-[a-z0-9])*$",
+              "title": "Username",
+              "examples": ["someuser"]
+            }
+          },
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 22,
+              "maxLength": 22,
+              "title": "Token key",
+              "examples": ["GpbIL3_qhgZlpfGTFF"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TokenChangeHistoryEntry"
+                  },
+                  "title": "Response Get Token Change History Auth Api V1 Users  Username  Tokens  Key  Change History Get"
+                }
+              }
+            }
+          },
+          "401": { "description": "Unauthenticated" },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorModel" }
+              }
+            }
+          },
+          "404": {
+            "description": "Token not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorModel" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ingress/auth": {
+      "get": {
+        "tags": ["internal"],
+        "summary": "Authenticate user",
+        "description": "Meant to be used as an NGINX auth_request handler",
+        "operationId": "get_auth_ingress_auth_get",
+        "parameters": [
+          {
+            "name": "allow_options",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "title": "Allow OPTIONS",
+              "description": "Whether to allow non-CORS OPTIONS requests",
+              "examples": ["true"],
+              "default": false
+            },
+            "description": "Whether to allow non-CORS OPTIONS requests"
+          },
+          {
+            "name": "auth_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/AuthType",
+              "title": "Challenge type",
+              "description": "Control the type of WWW-Authenticate challenge returned",
+              "examples": ["basic"],
+              "default": "bearer"
+            },
+            "description": "Control the type of WWW-Authenticate challenge returned"
+          },
+          {
+            "name": "delegate_to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "title": "Service name",
+              "description": "Create an internal token for the named service",
+              "examples": ["some-service"]
+            },
+            "description": "Create an internal token for the named service"
+          },
+          {
+            "name": "delegate_scope",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "array", "items": { "type": "string" } },
+                { "type": "null" }
+              ],
+              "title": "Scope of delegated token",
+              "description": "Scopes to add to the delegated token if present in the token used for authentication",
+              "examples": [["read:all", "write:all"]]
+            },
+            "description": "Scopes to add to the delegated token if present in the token used for authentication"
+          },
+          {
+            "name": "minimum_lifetime",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/SecondsTimedelta",
+                  "ge": "PT5M"
+                },
+                { "type": "null" }
+              ],
+              "title": "Required minimum lifetime",
+              "description": "Force reauthentication if the delegated token (internal or notebook) would have a shorter lifetime, in seconds, than this parameter.",
+              "examples": [86400]
+            },
+            "description": "Force reauthentication if the delegated token (internal or notebook) would have a shorter lifetime, in seconds, than this parameter."
+          },
+          {
+            "name": "notebook",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "title": "Request notebook token",
+              "description": "Cannot be used with `delegate_to` or `delegate_scope`",
+              "examples": [true],
+              "default": false
+            },
+            "description": "Cannot be used with `delegate_to` or `delegate_scope`"
+          },
+          {
+            "name": "only_service",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "array", "items": { "type": "string" } },
+                { "type": "null" }
+              ],
+              "title": "Restrict to service",
+              "description": "Restrict access to only tokens issued to the named service, in addition to any other constraints. This will prevent users from accessing the service directly, but allow the named service to access it on their behalf. May be given multiple times to allow multiple services.",
+              "examples": ["portal", "vo-cutouts"]
+            },
+            "description": "Restrict access to only tokens issued to the named service, in addition to any other constraints. This will prevent users from accessing the service directly, but allow the named service to access it on their behalf. May be given multiple times to allow multiple services."
+          },
+          {
+            "name": "satisfy",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Satisfy",
+              "title": "Scope matching policy",
+              "description": "Set to `all` to require all listed scopes, set to `any` to require any of the listed scopes",
+              "examples": ["any"],
+              "default": "all"
+            },
+            "description": "Set to `all` to require all listed scopes, set to `any` to require any of the listed scopes"
+          },
+          {
+            "name": "scope",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "array", "items": { "type": "string" } },
+                { "type": "null" }
+              ],
+              "title": "Required scopes",
+              "description": "If given more than once, meaning is determined by the `satisfy` parameter",
+              "examples": [["read:all"]]
+            },
+            "description": "If given more than once, meaning is determined by the `satisfy` parameter"
+          },
+          {
+            "name": "service",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "title": "Service",
+              "description": "Name of the underlying service",
+              "examples": ["tap"]
+            },
+            "description": "Name of the underlying service"
+          },
+          {
+            "name": "use_authorization",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "title": "Put delegated token in Authorization",
+              "description": "If true, also replace the Authorization header with any delegated token, passed as a bearer token.",
+              "examples": [true],
+              "default": false
+            },
+            "description": "If true, also replace the Authorization header with any delegated token, passed as a bearer token."
+          },
+          {
+            "name": "user_domain",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "title": "Enforce per-user hostnames",
+              "description": "Restrict access to only the user whose username matches the last component of the request hostname.",
+              "examples": [true],
+              "default": false
+            },
+            "description": "Restrict access to only the user whose username matches the last component of the request hostname."
+          },
+          {
+            "name": "username",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "title": "Restrict to username",
+              "description": "Only allow access to this ingress by the user with the given username. All other users, regardless of scopes, will receive 403 errors. The user must still meet the scope requirements for the ingress.",
+              "examples": ["rra"]
+            },
+            "description": "Only allow access to this ingress by the user with the given username. All other users, regardless of scopes, will receive 403 errors. The user must still meet the scope requirements for the ingress."
+          },
+          {
+            "name": "allow_cookies",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "title": "Whether to allow cookies",
+              "description": "Set to false to disallow cookie authentication",
+              "examples": [false],
+              "default": true
+            },
+            "description": "Set to false to disallow cookie authentication"
+          },
+          {
+            "name": "access-control-request-method",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "description": "Method for CORS preflight",
+              "title": "Access-Control-Request-Method"
+            },
+            "description": "Method for CORS preflight"
+          },
+          {
+            "name": "origin",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "description": "Origin header of original request",
+              "title": "Origin"
+            },
+            "description": "Origin header of original request"
+          },
+          {
+            "name": "x-original-method",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Request method",
+              "title": "X-Original-Method"
+            },
+            "description": "Request method"
+          },
+          {
+            "name": "x-original-url",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string", "title": "X-Original-Url" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" },
+                  "title": "Response Get Auth Ingress Auth Get"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorModel" }
+              }
+            }
+          },
+          "401": { "description": "Unauthenticated" },
+          "403": { "description": "Permission denied" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ingress/anonymous": {
+      "get": {
+        "tags": ["internal"],
+        "summary": "Filter headers for anonymous routes",
+        "description": "Intended for use as an auth-url handler for anonymous routes. No authentication is done and no authorization checks are performed, but the `Authorization` and `Cookie` headers are still reflected in the response with Gafaelfawr tokens and cookies stripped.",
+        "operationId": "get_anonymous_ingress_anonymous_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": { "type": "string" },
+                  "type": "object",
+                  "title": "Response Get Anonymous Ingress Anonymous Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/": {
+      "get": {
+        "tags": ["internal"],
+        "summary": "Application metadata",
+        "description": "Return metadata about the running application. This route is not exposed outside the cluster and therefore cannot be used by external clients.",
+        "operationId": "get_index__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Metadata" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/healthcheck_single": {
+      "get": {
+        "summary": "Get Index",
+        "operationId": "get_index_healthcheck_single_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Metadata" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": ["internal"],
+        "summary": "Health check",
+        "description": "Perform an internal health check",
+        "operationId": "get_health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HealthCheck" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/login": {
+      "get": {
+        "tags": ["browser"],
+        "summary": "Authenticate browser",
+        "description": "Protected services redirect to this URL when the user is not authenticated to start the authentication process. The user will then be sent to an authentication provider, back to this URL with additional parameters to complete the process, and then back to the protected site.",
+        "operationId": "get_login_login_get",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "title": "Provider code",
+              "description": "Set by the authentication provider after authentication",
+              "examples": ["V2hrNqgM_eiIjXvV41RlMw"]
+            },
+            "description": "Set by the authentication provider after authentication"
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "title": "Authentication state",
+              "description": "Set by the authentication provider after authentication to protect against session fixation",
+              "examples": ["wkC2bAP5VFpDioKc3JfaDA"]
+            },
+            "description": "Set by the authentication provider after authentication to protect against session fixation"
+          },
+          {
+            "name": "rd",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "title": "URL to return to",
+              "description": "User is sent here after successful authentication. Overrides `X-Auth-Request-Redirect` if both are set.",
+              "examples": ["https://example.com/"]
+            },
+            "description": "User is sent here after successful authentication. Overrides `X-Auth-Request-Redirect` if both are set."
+          },
+          {
+            "name": "x-auth-request-redirect",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "title": "URL to return to",
+              "description": "User is sent here after successful authentication",
+              "examples": ["https://example.com/"]
+            },
+            "description": "User is sent here after successful authentication"
+          }
+        ],
+        "responses": {
+          "307": {
+            "description": "Redirect to provider or destination",
+            "content": { "application/json": { "schema": {} } },
+            "headers": {
+              "Location": {
+                "description": "URL of authentication provider or protected site",
+                "schema": { "type": "string" }
+              }
+            }
+          },
+          "403": {
+            "content": { "text/html": {} },
+            "description": "Error authenticating the user"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/logout": {
+      "get": {
+        "tags": ["browser"],
+        "summary": "Log out",
+        "description": "Log out and redirect the user.\n\nThe user is redirected to the URL given in the rd parameter, if any, and\notherwise to the after_logout_url configuration setting.\n\nIf the user was logged in via GitHub (and Gafaelfawr is still configured\nto use GitHub), the GitHub OAuth authorization grant is also revoked.",
+        "operationId": "get_logout_logout_get",
+        "parameters": [
+          {
+            "name": "rd",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "title": "URL to return to",
+              "description": "User is sent here after operation",
+              "examples": ["https://example.com/"]
+            },
+            "description": "User is sent here after operation"
+          }
+        ],
+        "responses": {
+          "307": { "description": "Redirect to landing page" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/openid/login": {
+      "get": {
+        "tags": ["oidc"],
+        "summary": "Start OIDC authentication",
+        "description": "Authenticates the user and then returns an authorization code to the OpenID Connect client via redirect. All errors except those from an invalid OpenID client ID are reported via a redirect back to the protected service with error and error_description set.",
+        "operationId": "get_login_auth_openid_login_get",
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Client ID",
+              "description": "Identifier of the registered OpenID Client",
+              "examples": ["https://example.org/chronograf"]
+            },
+            "description": "Identifier of the registered OpenID Client"
+          },
+          {
+            "name": "redirect_uri",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "URL to return to",
+              "description": "User is sent here after successful or failed authentication",
+              "examples": ["https://example.com/"]
+            },
+            "description": "User is sent here after successful or failed authentication"
+          },
+          {
+            "name": "response_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "title": "Requested response type",
+              "description": "code is the only supported response type",
+              "examples": ["code"]
+            },
+            "description": "code is the only supported response type"
+          },
+          {
+            "name": "scope",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "title": "Requested token scopes",
+              "description": "Token scopes separated by spaces. The openid scope is required, and profile and email scopes are supported. All other scopes are ignored.",
+              "examples": ["openid", "openid profile email"]
+            },
+            "description": "Token scopes separated by spaces. The openid scope is required, and profile and email scopes are supported. All other scopes are ignored."
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "title": "Opaque state cookie",
+              "description": "Set by the client to prevent session fixation attacks. Will be returned verbatim in the response. The client should verify that it matches the code sent in the request by, for example comparing it to a code set in a cookie.",
+              "examples": ["omeKJ7MNv_9dKSKnVNjxMQ"]
+            },
+            "description": "Set by the client to prevent session fixation attacks. Will be returned verbatim in the response. The client should verify that it matches the code sent in the request by, for example comparing it to a code set in a cookie."
+          },
+          {
+            "name": "nonce",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "title": "ID token nonce",
+              "description": "Nonce to include in ID tokens to mitigate replay attacks or associate an ID token with a client session",
+              "examples": ["5Ndm2AFSZ6dN6Gt-Iu6lng"]
+            },
+            "description": "Nonce to include in ID tokens to mitigate replay attacks or associate an ID token with a client session"
+          }
+        ],
+        "responses": {
+          "307": {
+            "description": "Redirect for authentication or back to client"
+          },
+          "404": {
+            "description": "OpenID Connect server not configured",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorModel" }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid OpenID client ID",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorModel" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/openid/token": {
+      "post": {
+        "tags": ["oidc"],
+        "summary": "Request OIDC token",
+        "description": "Redeem an authorization code for a token",
+        "operationId": "post_token_auth_openid_token_post",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_post_token_auth_openid_token_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/OIDCTokenReply" }
+              }
+            }
+          },
+          "404": {
+            "description": "OpenID Connect server not configured",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorModel" }
+              }
+            }
+          },
+          "400": {
+            "description": "Request was invalid",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/OIDCErrorReply" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "oidc": [] }]
+      }
+    },
+    "/auth/openid/userinfo": {
+      "get": {
+        "tags": ["oidc"],
+        "summary": "Get user metadata from OIDC token",
+        "description": "Return information about the holder of a JWT",
+        "operationId": "get_userinfo_auth_openid_userinfo_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Get Userinfo Auth Openid Userinfo Get"
+                },
+                "example": {
+                  "email": "someone@example.com",
+                  "name": "Alice Example",
+                  "preferred_username": "someuser",
+                  "sub": "someuser"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "OpenID Connect server not configured",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorModel" }
+              }
+            }
+          },
+          "401": { "description": "Unauthenticated" },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorModel" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/.well-known/jwks.json": {
+      "get": {
+        "tags": ["oidc"],
+        "summary": "OIDC key set",
+        "description": "Returns the key set used for JWT signatures in the format specified in [RFC 7517](https://datatracker.ietf.org/doc/html/rfc7517) and [RFC 7518](https://datatracker.ietf.org/doc/html/rfc7518)",
+        "operationId": "get_well_known_jwks__well_known_jwks_json_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/JWKS" }
+              }
+            }
+          },
+          "404": {
+            "description": "OpenID Connect server not configured",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorModel" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/.well-known/openid-configuration": {
+      "get": {
+        "tags": ["oidc"],
+        "summary": "OIDC configuration",
+        "description": "Returns OpenID Connect configuration information in the format specified in the [OpenID Connect Discovery 1.0](https://openid.net/specs/openid-connect-discovery-1_0.html) specification.",
+        "operationId": "get_well_known_openid__well_known_openid_configuration_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/OIDCConfig" }
+              }
+            }
+          },
+          "404": {
+            "description": "OpenID Connect server not configured",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorModel" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "APIConfig": {
+        "properties": {
+          "scopes": {
+            "items": { "$ref": "#/components/schemas/Scope" },
+            "type": "array",
+            "title": "All known scopes",
+            "description": "All scopes currently recognized by the server.  Tokens may have other scopes, but new tokens may only be issued with one of these scopes."
+          }
+        },
+        "type": "object",
+        "required": ["scopes"],
+        "title": "APIConfig",
+        "description": "Configuration information for the API.\n\nSupplemental information about the Gafaelfawr configuration that is useful\nto a UI and therefore is returned as part of a login response."
+      },
+      "APILoginResponse": {
+        "properties": {
+          "csrf": {
+            "type": "string",
+            "title": "CSRF token",
+            "description": "This token must be included in any non-GET request using cookie authentication as the value of the ``X-CSRF-Token`` header",
+            "examples": ["OmNdVTtKKuK_VuJsGFdrqg"]
+          },
+          "username": {
+            "type": "string",
+            "title": "Username",
+            "description": "Authenticated identity from the cookie",
+            "examples": ["someuser"]
+          },
+          "scopes": {
+            "$ref": "#/components/schemas/Scopes-Output",
+            "title": "Access scopes",
+            "description": "Access scopes for this authenticated user",
+            "examples": [["read:all", "user:token"]]
+          },
+          "config": {
+            "$ref": "#/components/schemas/APIConfig",
+            "title": "Server configuration",
+            "description": "Additional configuration information"
+          }
+        },
+        "type": "object",
+        "required": ["csrf", "username", "scopes", "config"],
+        "title": "APILoginResponse",
+        "description": "Response to an API login request.\n\nThe JavaScript UI visits the ``/auth/api/v1/login`` route to get a CSRF\ntoken and metadata about the currently-authenticated user from the session\ncookie (which the UI doesn't have the keys to read)."
+      },
+      "Admin": {
+        "properties": {
+          "username": {
+            "type": "string",
+            "title": "Admin username",
+            "description": "Username of the token administrator",
+            "examples": ["adminuser"]
+          }
+        },
+        "type": "object",
+        "required": ["username"],
+        "title": "Admin",
+        "description": "A token administrator."
+      },
+      "AdminTokenRequest": {
+        "properties": {
+          "username": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[a-z0-9](?:[a-z0-9]|-[a-z0-9])*[a-z](?:[a-z0-9]|-[a-z0-9])*$",
+            "title": "User for which to issue a token",
+            "description": "The username may only contain lowercase letters, digits, and hyphen-minus, and may not start or end with a dash",
+            "examples": ["some-service"]
+          },
+          "token_type": {
+            "$ref": "#/components/schemas/TokenType",
+            "title": "Token type",
+            "description": "Must be either ``service`` or ``user``",
+            "examples": ["service"]
+          },
+          "token_name": {
+            "anyOf": [
+              { "type": "string", "maxLength": 64, "minLength": 1 },
+              { "type": "null" }
+            ],
+            "title": "User-given name of the token",
+            "description": "Only provide this field for a token type of ``user``",
+            "examples": ["laptop token"]
+          },
+          "scopes": {
+            "$ref": "#/components/schemas/Scopes-Input",
+            "title": "Token scopes",
+            "default": [],
+            "examples": [["read:all"]]
+          },
+          "expires": {
+            "anyOf": [
+              { "$ref": "#/components/schemas/UtcDatetime" },
+              { "type": "null" }
+            ],
+            "title": "Token expiration",
+            "description": "Expiration timestamp of the token in seconds since epoch, or omitted to never expire",
+            "examples": [1616986130]
+          },
+          "name": {
+            "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }],
+            "title": "Preferred full name",
+            "description": "If a value is not provided, and LDAP is configured, the full name from the LDAP entry for that username will be used",
+            "examples": ["Service User"]
+          },
+          "email": {
+            "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }],
+            "title": "Email address",
+            "description": "If a value is not provided, and LDAP is configured, the email address from the LDAP entry for that username will be used",
+            "examples": ["service@example.com"]
+          },
+          "uid": {
+            "anyOf": [
+              { "type": "integer", "minimum": 1.0 },
+              { "type": "null" }
+            ],
+            "title": "UID number",
+            "description": "If a value is not provided, and Firestore or LDAP are configured, the UID from Firestore (preferred) or the LDAP entry for that username will be used",
+            "examples": [4131]
+          },
+          "gid": {
+            "anyOf": [
+              { "type": "integer", "minimum": 1.0 },
+              { "type": "null" }
+            ],
+            "title": "Primary GID",
+            "description": "GID of primary group. If set, should correspond to the id of a group of which the user is a member. If a value is not provided and LDAP is configured to add user private groups, it will be set to the same value as the UID.",
+            "examples": [4123]
+          },
+          "groups": {
+            "anyOf": [
+              {
+                "items": { "$ref": "#/components/schemas/Group" },
+                "type": "array"
+              },
+              { "type": "null" }
+            ],
+            "title": "Groups",
+            "description": "Groups of which the user is a member. If a value is not provided, and LDAP is configured, the group membership from LDAP will be used"
+          }
+        },
+        "type": "object",
+        "required": ["username", "token_type"],
+        "title": "AdminTokenRequest",
+        "description": "A request to create a new token via the admin interface."
+      },
+      "AuthType": {
+        "type": "string",
+        "enum": ["basic", "bearer"],
+        "title": "AuthType",
+        "description": "Authentication types for the WWW-Authenticate header."
+      },
+      "Body_post_token_auth_openid_token_post": {
+        "properties": {
+          "grant_type": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Request type",
+            "description": "`authorization_code` is the only supported grant type",
+            "examples": ["authorization_code"]
+          },
+          "client_id": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "ID of client",
+            "examples": ["https://data.lsst.cloud/oidc-client"]
+          },
+          "client_secret": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Client secret",
+            "examples": ["rYTfX6h9-ilGwADfgn7KRQ"]
+          },
+          "code": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Authorization code",
+            "description": "Code returned from the `/auth/openid/login` endpoint",
+            "examples": ["gc-W74I5HltJZRc0fOUAapgVQ.3T1xQQgeD063KgmNinw-tA"]
+          },
+          "redirect_uri": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "URL of client",
+            "description": "Must match `redirect_uri` in the client registration",
+            "examples": ["https://example.com/"]
+          }
+        },
+        "type": "object",
+        "title": "Body_post_token_auth_openid_token_post"
+      },
+      "ErrorDetail": {
+        "properties": {
+          "loc": {
+            "anyOf": [
+              { "items": { "type": "string" }, "type": "array" },
+              { "type": "null" }
+            ],
+            "title": "Location",
+            "examples": [["area", "field"]]
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message",
+            "examples": ["Some error messge"]
+          },
+          "type": {
+            "type": "string",
+            "title": "Error type",
+            "examples": ["some_code"]
+          }
+        },
+        "type": "object",
+        "required": ["msg", "type"],
+        "title": "ErrorDetail",
+        "description": "The detail of the error message."
+      },
+      "ErrorModel": {
+        "properties": {
+          "detail": {
+            "items": { "$ref": "#/components/schemas/ErrorDetail" },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "required": ["detail"],
+        "title": "ErrorModel",
+        "description": "A structured API error message."
+      },
+      "Group": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^([a-zA-Z]|[a-zA-Z0-9][a-zA-Z0-9._-]*[a-zA-Z])[a-zA-Z0-9._-]*$",
+            "title": "Name of the group",
+            "examples": ["g_special_users"]
+          },
+          "id": {
+            "type": "integer",
+            "title": "Numeric GID of the group",
+            "examples": [123181]
+          }
+        },
+        "type": "object",
+        "required": ["name", "id"],
+        "title": "Group",
+        "description": "Information about a single group."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": { "$ref": "#/components/schemas/ValidationError" },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HealthCheck": {
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/HealthStatus",
+            "title": "Health status"
+          }
+        },
+        "type": "object",
+        "required": ["status"],
+        "title": "HealthCheck",
+        "description": "Results of an internal health check."
+      },
+      "HealthStatus": {
+        "type": "string",
+        "enum": ["healthy"],
+        "title": "HealthStatus",
+        "description": "Status of health check.\n\nSince errors are returned as HTTP 500 errors, currently the only status is\nthe healthy status."
+      },
+      "IpAddress": { "type": "string" },
+      "JWK": {
+        "properties": {
+          "alg": {
+            "type": "string",
+            "title": "Algorithm",
+            "description": "Will always be ``RS256``",
+            "examples": ["RS256"]
+          },
+          "kty": {
+            "type": "string",
+            "title": "Key type",
+            "description": "Will always be ``RSA``",
+            "examples": ["RSA"]
+          },
+          "use": {
+            "type": "string",
+            "title": "Key usage",
+            "description": "Will always be ``sig`` (signatures)",
+            "examples": ["sig"]
+          },
+          "kid": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Key ID",
+            "description": "A name for the key, also used in the header of a JWT signed by that key. Allows the signer to have multiple valid keys at a time and thus support key rotation.",
+            "examples": ["some-key-id"]
+          },
+          "n": {
+            "type": "string",
+            "title": "RSA modulus",
+            "description": "Big-endian modulus component of the RSA public key encoded in URL-safe base64 without trailing padding",
+            "examples": [
+              "ANKiIsSRoHb4n9xumf17III4O74-eYEMIb6KgGZmC9g7besYXa8vFi-FyHGhI9hUkaR0UeGLfsB18NWmdVmfGk1kiHOHVEXVjmr40FH8nGIU9Bh9bUwUlm18BEadHwoXCoiHW6Tm6cFNX8ANmOO3px99mpL5hd3Z2HFeKC230vpQ7ufbLj_QMIpFw3h-UOcJ9Yro_GFQB7tObL34HyrnzR-pS9DaAzQ0oGUwBHx-9b5iw75A2VEOraDoKgBlTuZgQpfGM8hJHJcEkg9htWceQfTCPAG7kP9p0K_bF3BM-8zXw53eE7g3Nd8Yz3875PrPIG7JeKWz7mef8YNmv331fXc"
+            ]
+          },
+          "e": {
+            "type": "string",
+            "title": "RSA exponent",
+            "description": "Big-endian exponent component of the RSA public key encoded in URL-safe base64 without trailing padding",
+            "examples": ["AQAB"]
+          }
+        },
+        "type": "object",
+        "required": ["alg", "kty", "use", "n", "e"],
+        "title": "JWK",
+        "description": "The schema for a JSON Web Key (RFCs 7517 and 7518)."
+      },
+      "JWKS": {
+        "properties": {
+          "keys": {
+            "items": { "$ref": "#/components/schemas/JWK" },
+            "type": "array",
+            "title": "Signing keys",
+            "description": "Valid signing keys for OpenID Connect JWTs"
+          }
+        },
+        "type": "object",
+        "required": ["keys"],
+        "title": "JWKS",
+        "description": "Schema for the ``/.well-known/jwks.json`` endpoint."
+      },
+      "Metadata": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Application name",
+            "examples": ["myapp"]
+          },
+          "version": {
+            "type": "string",
+            "title": "Version",
+            "examples": ["1.0.0"]
+          },
+          "description": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Description",
+            "examples": ["Some package description"]
+          },
+          "repository_url": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Repository URL",
+            "examples": ["https://example.com/"]
+          },
+          "documentation_url": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Documentation URL",
+            "examples": ["https://example.com/"]
+          }
+        },
+        "type": "object",
+        "required": ["name", "version"],
+        "title": "Metadata",
+        "description": "Metadata about a package."
+      },
+      "NewToken": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "title": "Newly-created token",
+            "examples": ["gt-2T1RHkIi4b14JzswnXfCsQ.8t5XdPSYTrteD0pDB15zqQ"]
+          }
+        },
+        "type": "object",
+        "required": ["token"],
+        "title": "NewToken",
+        "description": "Response to a token creation request."
+      },
+      "NotebookQuota": {
+        "properties": {
+          "cpu": {
+            "type": "number",
+            "title": "CPU equivalents",
+            "examples": [4.0]
+          },
+          "memory": {
+            "type": "number",
+            "title": "Maximum memory use (GiB)",
+            "examples": [16.0]
+          },
+          "spawn": {
+            "type": "boolean",
+            "title": "Spawning allowed",
+            "description": "Whether the user is allowed to spawn a notebook",
+            "default": true
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": ["cpu", "memory"],
+        "title": "NotebookQuota",
+        "description": "Notebook Aspect quota information for a user."
+      },
+      "OIDCConfig": {
+        "properties": {
+          "issuer": {
+            "type": "string",
+            "title": "iss value for JWTs",
+            "examples": ["https://example.com/"]
+          },
+          "authorization_endpoint": {
+            "type": "string",
+            "title": "URL to start login",
+            "examples": ["https://example.com/auth/openid/login"]
+          },
+          "token_endpoint": {
+            "type": "string",
+            "title": "URL to get token",
+            "examples": ["https://example.com/auth/openid/token"]
+          },
+          "userinfo_endpoint": {
+            "type": "string",
+            "title": "URL to get user metadata",
+            "examples": ["https://example.com/auth/openid/userinfo"]
+          },
+          "jwks_uri": {
+            "type": "string",
+            "title": "URL to get signing keys",
+            "description": "Endpoint will return a JWKS",
+            "examples": ["https://example.com/.well-known/jwks.json"]
+          },
+          "scopes_supported": {
+            "items": { "type": "string" },
+            "type": "array",
+            "title": "Supported scopes",
+            "description": "List of supported scopes",
+            "default": ["openid", "profile", "email", "rubin"],
+            "examples": [["openid", "profile", "email"]]
+          },
+          "response_types_supported": {
+            "items": { "type": "string" },
+            "type": "array",
+            "title": "Supported response types",
+            "description": "``code`` is the only supported response type",
+            "default": ["code"],
+            "examples": [["code"]]
+          },
+          "response_modes_supported": {
+            "items": { "type": "string" },
+            "type": "array",
+            "title": "Supported response modes",
+            "description": "``query`` is the only supported response mode",
+            "default": ["query"],
+            "examples": [["query"]]
+          },
+          "grant_types_supported": {
+            "items": { "type": "string" },
+            "type": "array",
+            "title": "Supported grant types",
+            "description": "``authorization_code`` is the only supported grant type",
+            "default": ["authorization_code"],
+            "examples": [["authorization_code"]]
+          },
+          "subject_types_supported": {
+            "items": { "type": "string" },
+            "type": "array",
+            "title": "Supported subject types",
+            "description": "``public`` is the only supported subject type",
+            "default": ["public"],
+            "examples": [["public"]]
+          },
+          "id_token_signing_alg_values_supported": {
+            "items": { "type": "string" },
+            "type": "array",
+            "title": "Supported JWT signing algorithms",
+            "description": "``RS256`` is the only supported signing algorithm",
+            "default": ["RS256"],
+            "examples": [["RS256"]]
+          },
+          "token_endpoint_auth_methods_supported": {
+            "items": { "type": "string" },
+            "type": "array",
+            "title": "Supported client auth methods",
+            "description": "``client_secret_basic`` and ``client_secret_post`` are supported",
+            "default": ["client_secret_basic", "client_secret_post"],
+            "examples": [["client_secret_basic", "client_secret_post"]]
+          }
+        },
+        "type": "object",
+        "required": [
+          "issuer",
+          "authorization_endpoint",
+          "token_endpoint",
+          "userinfo_endpoint",
+          "jwks_uri"
+        ],
+        "title": "OIDCConfig",
+        "description": "Schema for the ``/.well-known/openid-configuration`` endpoint."
+      },
+      "OIDCErrorReply": {
+        "properties": {
+          "error": {
+            "type": "string",
+            "title": "Error code",
+            "description": "See [RFC 6750](https://datatracker.ietf.org/doc/html/rfc6750) for possible codes",
+            "examples": ["some_code"]
+          },
+          "error_description": {
+            "type": "string",
+            "title": "Error message",
+            "examples": ["Some error message"]
+          }
+        },
+        "type": "object",
+        "required": ["error", "error_description"],
+        "title": "OIDCErrorReply",
+        "description": "An error from an OpenID Connect token request."
+      },
+      "OIDCTokenReply": {
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "title": "Authentication token",
+            "description": "access_token and id_token are the same in this implementation",
+            "examples": [
+              "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6InNvbWUta2lkIn0.eyJhdWQiOiJodHRwczovL2V4YW1wbGUuY29tLyIsImlhdCI6MTYxNTIzMzc4NCwiaXNzIjoiaHR0cHM6Ly90ZXN0LmV4YW1wbGUuY29tLyIsImV4cCI6MTYxNTMyMDE4NCwibmFtZSI6IlNvbWUgVXNlciIsInByZWZlcnJlZF91c2VybmFtZSI6InNvbWUtdXNlciIsInN1YiI6InNvbWUtdXNlciIsInVpZCI6InNvbWUtdXNlciIsInVpZE51bWJlciI6MTAwMCwianRpIjoiN2lDdjZvcHI3Vkp4ZkVDR19yWjA5dyIsInNjb3BlIjoib3BlbmlkIn0.vfR-J5SDWeydtd_HWBZ8o6RpLbOZcVXLvwfh_zpYAKRVN-nZ_H82hOsPjRKD0ujAxaPQJv5kmIAIVYrfDIpQDUcP0IISsZ_IuEO-BuotCtZ-MPU-hKMlWGG-B3goc3Ygu_HWlfO56GppTE7A9fksYVMcaSdi6zVvWZH-PmgZAlPZ4xs4NQ_pXdIUA5yc4NhLAoQ5jBkPCTXsr4tqTBkPKKXxsNDLUFeS262o58kvOAgSCDLRuFXVVHEUIOw-kGko_UGmG3O5R3o-dC7f7K3OOUI_UulCldWu1ZgdckUfIS7fyMDmcZ4vNL8EALDEewvmjwyO_OLqquNFnfMeJdKNPw"
+            ]
+          },
+          "id_token": {
+            "type": "string",
+            "title": "Identity token",
+            "description": "access_token and id_token are the same in this implementation",
+            "examples": [
+              "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6InNvbWUta2lkIn0.eyJhdWQiOiJodHRwczovL2V4YW1wbGUuY29tLyIsImlhdCI6MTYxNTIzMzc4NCwiaXNzIjoiaHR0cHM6Ly90ZXN0LmV4YW1wbGUuY29tLyIsImV4cCI6MTYxNTMyMDE4NCwibmFtZSI6IlNvbWUgVXNlciIsInByZWZlcnJlZF91c2VybmFtZSI6InNvbWUtdXNlciIsInN1YiI6InNvbWUtdXNlciIsInVpZCI6InNvbWUtdXNlciIsInVpZE51bWJlciI6MTAwMCwianRpIjoiN2lDdjZvcHI3Vkp4ZkVDR19yWjA5dyIsInNjb3BlIjoib3BlbmlkIn0.vfR-J5SDWeydtd_HWBZ8o6RpLbOZcVXLvwfh_zpYAKRVN-nZ_H82hOsPjRKD0ujAxaPQJv5kmIAIVYrfDIpQDUcP0IISsZ_IuEO-BuotCtZ-MPU-hKMlWGG-B3goc3Ygu_HWlfO56GppTE7A9fksYVMcaSdi6zVvWZH-PmgZAlPZ4xs4NQ_pXdIUA5yc4NhLAoQ5jBkPCTXsr4tqTBkPKKXxsNDLUFeS262o58kvOAgSCDLRuFXVVHEUIOw-kGko_UGmG3O5R3o-dC7f7K3OOUI_UulCldWu1ZgdckUfIS7fyMDmcZ4vNL8EALDEewvmjwyO_OLqquNFnfMeJdKNPw"
+            ]
+          },
+          "expires_in": {
+            "type": "integer",
+            "title": "Expiration in seconds",
+            "examples": [86400]
+          },
+          "scope": {
+            "type": "string",
+            "title": "Scopes of token",
+            "description": "Scopes of the issued token, with any unrecognized or unauthorized scopes from the request filtered out",
+            "examples": ["email openid profile"]
+          },
+          "token_type": {
+            "type": "string",
+            "title": "Type of token",
+            "description": "Will always be ``Bearer``",
+            "default": "Bearer",
+            "examples": ["Bearer"]
+          }
+        },
+        "type": "object",
+        "required": ["access_token", "id_token", "expires_in", "scope"],
+        "title": "OIDCTokenReply",
+        "description": "A reply to a successful OpenID Connect token request."
+      },
+      "Quota": {
+        "properties": {
+          "api": {
+            "additionalProperties": { "type": "integer" },
+            "type": "object",
+            "title": "API quotas",
+            "description": "Mapping of service names to allowed requests per minute.",
+            "default": {},
+            "examples": [
+              { "datalinker": 500, "hips": 2000, "tap": 500, "vo-cutouts": 100 }
+            ]
+          },
+          "notebook": {
+            "anyOf": [
+              { "$ref": "#/components/schemas/NotebookQuota" },
+              { "type": "null" }
+            ],
+            "title": "Notebook Aspect quotas"
+          },
+          "tap": {
+            "additionalProperties": { "$ref": "#/components/schemas/TapQuota" },
+            "type": "object",
+            "title": "TAP quotas",
+            "default": {},
+            "examples": [{ "qserv": { "concurrent": 5 } }]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "Quota",
+        "description": "Quota information for a user."
+      },
+      "QuotaConfig-Input": {
+        "properties": {
+          "default": {
+            "$ref": "#/components/schemas/Quota",
+            "title": "Default quota",
+            "description": "Default quotas for all users"
+          },
+          "groups": {
+            "additionalProperties": { "$ref": "#/components/schemas/Quota" },
+            "type": "object",
+            "title": "Quota grants by group",
+            "description": "Additional quota grants by group name",
+            "default": {}
+          },
+          "bypass": {
+            "items": { "type": "string" },
+            "type": "array",
+            "uniqueItems": true,
+            "title": "Groups without quotas",
+            "description": "Groups whose members bypass all quota restrictions",
+            "default": []
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "QuotaConfig",
+        "description": "Quota configuration."
+      },
+      "QuotaConfig-Output": {
+        "properties": {
+          "default": {
+            "$ref": "#/components/schemas/Quota",
+            "title": "Default quota",
+            "description": "Default quotas for all users"
+          },
+          "groups": {
+            "additionalProperties": { "$ref": "#/components/schemas/Quota" },
+            "type": "object",
+            "title": "Quota grants by group",
+            "description": "Additional quota grants by group name",
+            "default": {}
+          },
+          "bypass": {
+            "items": { "type": "string" },
+            "type": "array",
+            "uniqueItems": true,
+            "title": "Groups without quotas",
+            "description": "Groups whose members bypass all quota restrictions",
+            "default": []
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "QuotaConfig",
+        "description": "Quota configuration."
+      },
+      "Satisfy": {
+        "type": "string",
+        "enum": ["any", "all"],
+        "title": "Satisfy",
+        "description": "Authorization strategies.\n\nControls how to do authorization when there are multiple required scopes.\nA strategy of ANY allows the request if the authentication token has any\nof the required scopes.  A strategy of ALL requires that the\nauthentication token have all the required scopes."
+      },
+      "Scope": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Scope name",
+            "examples": ["user:token"]
+          },
+          "description": {
+            "type": "string",
+            "title": "Scope description",
+            "examples": ["Can create and modify user tokens"]
+          }
+        },
+        "type": "object",
+        "required": ["name", "description"],
+        "title": "Scope",
+        "description": "A known token scope."
+      },
+      "Scopes-Input": {},
+      "Scopes-Output": { "items": { "type": "string" }, "type": "array" },
+      "SecondsTimedelta": { "type": "string", "format": "duration" },
+      "TapQuota": {
+        "properties": {
+          "concurrent": {
+            "type": "integer",
+            "title": "Concurrent queries",
+            "examples": [5]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": ["concurrent"],
+        "title": "TapQuota",
+        "description": "TAP quota information for a user."
+      },
+      "Timestamp": { "type": "integer" },
+      "TokenChange": {
+        "type": "string",
+        "enum": ["create", "revoke", "expire", "edit"],
+        "title": "TokenChange",
+        "description": "Type of change made to a token."
+      },
+      "TokenChangeHistoryEntry": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "maxLength": 22,
+            "minLength": 22,
+            "title": "Token key",
+            "examples": ["dDQg_NTNS51GxeEteqnkag"]
+          },
+          "username": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Username of the token",
+            "examples": ["someuser"]
+          },
+          "token_type": {
+            "$ref": "#/components/schemas/TokenType",
+            "title": "Type of the token",
+            "examples": ["user"]
+          },
+          "token_name": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Name of the token",
+            "description": "Only set for tokens of type user. If the name was changed, this will be the new name of the token.",
+            "examples": ["a token"]
+          },
+          "parent": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Key of parent token of this token",
+            "examples": ["1NOV_8aPwhCWj6rM-p1XgQ"]
+          },
+          "scopes": {
+            "$ref": "#/components/schemas/Scopes-Output",
+            "title": "Scopes of the token",
+            "examples": [["read:all"]]
+          },
+          "service": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Service to which the token was issued",
+            "description": "Only set for tokens of type internal.",
+            "examples": ["some-service"]
+          },
+          "expires": {
+            "anyOf": [
+              { "$ref": "#/components/schemas/Timestamp" },
+              { "type": "null" }
+            ],
+            "title": "Expiration of the token",
+            "description": "If the expiration was changed, this will be the new expiration of the token.",
+            "examples": [1615785631]
+          },
+          "actor": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Username of person making the change",
+            "examples": ["adminuser"]
+          },
+          "action": {
+            "$ref": "#/components/schemas/TokenChange",
+            "title": "Type of change that was made",
+            "examples": ["edit"]
+          },
+          "old_token_name": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Previous name of the token",
+            "description": "This field will only be present for edit changes to user tokens that changed the token name.",
+            "examples": ["old name"]
+          },
+          "old_scopes": {
+            "anyOf": [
+              { "$ref": "#/components/schemas/Scopes-Output" },
+              { "type": "null" }
+            ],
+            "title": "Previous scopes of the token",
+            "description": "This field will only be present for edit changes that changed the token scopes.",
+            "examples": [["read:some"]]
+          },
+          "old_expires": {
+            "anyOf": [
+              { "$ref": "#/components/schemas/Timestamp" },
+              { "type": "null" }
+            ],
+            "title": "Previous expiration of the token",
+            "description": "This field will only be present for edit changes that changed the expiration of the token.",
+            "examples": [1614985631]
+          },
+          "ip_address": {
+            "anyOf": [
+              { "$ref": "#/components/schemas/IpAddress" },
+              { "type": "null" }
+            ],
+            "title": "IP address from which the change was made",
+            "description": "May be null if the change was made internally, such as token deletion due to expiration.",
+            "examples": ["198.51.100.50"]
+          },
+          "event_time": {
+            "$ref": "#/components/schemas/Timestamp",
+            "title": "Whent he change was made",
+            "examples": [1614985631]
+          }
+        },
+        "type": "object",
+        "required": [
+          "token",
+          "username",
+          "token_type",
+          "scopes",
+          "actor",
+          "action"
+        ],
+        "title": "TokenChangeHistoryEntry",
+        "description": "A record of a change to a token."
+      },
+      "TokenInfo": {
+        "properties": {
+          "username": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Username",
+            "description": "User to whom the token was issued",
+            "examples": ["someuser"]
+          },
+          "token_type": {
+            "$ref": "#/components/schemas/TokenType",
+            "title": "Token type",
+            "examples": ["session"]
+          },
+          "service": {
+            "anyOf": [
+              { "type": "string", "maxLength": 64, "minLength": 1 },
+              { "type": "null" }
+            ],
+            "title": "Service",
+            "description": "Service to which the token was delegated. Only present for internal tokens.",
+            "examples": ["some-service"]
+          },
+          "scopes": {
+            "$ref": "#/components/schemas/Scopes-Output",
+            "title": "Token scopes",
+            "description": "Scopes of the token",
+            "examples": [["read:all", "user:token"]]
+          },
+          "created": {
+            "$ref": "#/components/schemas/Timestamp",
+            "title": "Creation time",
+            "description": "Creation timestamp of the token in seconds since epoch",
+            "examples": [1614986130]
+          },
+          "expires": {
+            "anyOf": [
+              { "$ref": "#/components/schemas/Timestamp" },
+              { "type": "null" }
+            ],
+            "title": "Expiration time",
+            "description": "Expiration timestamp of the token in seconds since epoch",
+            "examples": [1616986130]
+          },
+          "token": {
+            "type": "string",
+            "maxLength": 22,
+            "minLength": 22,
+            "title": "Token key",
+            "examples": ["5KVApqcVbSQWtO3VIRgOhQ"]
+          },
+          "token_name": {
+            "anyOf": [
+              { "type": "string", "maxLength": 64, "minLength": 1 },
+              { "type": "null" }
+            ],
+            "title": "User-given name of the token",
+            "examples": ["laptop token"]
+          },
+          "last_used": {
+            "anyOf": [
+              { "$ref": "#/components/schemas/Timestamp" },
+              { "type": "null" }
+            ],
+            "title": "Last used",
+            "description": "When the token was last used in seconds since epoch",
+            "examples": [1614986130]
+          },
+          "parent": {
+            "anyOf": [
+              { "type": "string", "maxLength": 22, "minLength": 22 },
+              { "type": "null" }
+            ],
+            "title": "Parent token",
+            "examples": ["DGO1OnPohl0r3C7wqhzRgQ"]
+          }
+        },
+        "type": "object",
+        "required": ["username", "token_type", "scopes", "token"],
+        "title": "TokenInfo",
+        "description": "Information about a token.\n\nAll information about the token that's stored in the underlying\ndatabase. It includes some fields not present in Redis."
+      },
+      "TokenType": {
+        "type": "string",
+        "enum": ["session", "user", "notebook", "internal", "service", "oidc"],
+        "title": "TokenType",
+        "description": "The class of token."
+      },
+      "UserInfo": {
+        "properties": {
+          "username": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Username",
+            "description": "User to whom the token was issued",
+            "examples": ["someuser"]
+          },
+          "name": {
+            "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }],
+            "title": "Preferred full name",
+            "examples": ["Alice Example"]
+          },
+          "email": {
+            "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }],
+            "title": "Email address",
+            "examples": ["alice@example.com"]
+          },
+          "uid": {
+            "anyOf": [
+              { "type": "integer", "minimum": 1.0 },
+              { "type": "null" }
+            ],
+            "title": "UID number",
+            "examples": [4123]
+          },
+          "gid": {
+            "anyOf": [
+              { "type": "integer", "minimum": 1.0 },
+              { "type": "null" }
+            ],
+            "title": "Primary GID",
+            "description": "GID of primary group. If set, this will also be the GID of one of the groups of which the user is a member.",
+            "examples": [4123]
+          },
+          "groups": {
+            "items": { "$ref": "#/components/schemas/Group" },
+            "type": "array",
+            "title": "Groups",
+            "description": "Groups of which the user is a member",
+            "default": []
+          },
+          "quota": {
+            "anyOf": [
+              { "$ref": "#/components/schemas/Quota" },
+              { "type": "null" }
+            ],
+            "title": "Quota"
+          }
+        },
+        "type": "object",
+        "required": ["username"],
+        "title": "UserInfo",
+        "description": "Metadata about a user.\n\nAll user metadata from whatever source (admin request, GitHub, LDAP,\nFirestore, etc.)."
+      },
+      "UserTokenModifyRequest": {
+        "properties": {
+          "token_name": {
+            "anyOf": [
+              { "type": "string", "maxLength": 64, "minLength": 1 },
+              { "type": "null" }
+            ],
+            "title": "User-given name of the token",
+            "examples": ["laptop token"]
+          },
+          "scopes": {
+            "anyOf": [
+              { "$ref": "#/components/schemas/Scopes-Input" },
+              { "type": "null" }
+            ],
+            "title": "Token scopes",
+            "examples": [["read:all"]]
+          },
+          "expires": {
+            "anyOf": [
+              { "$ref": "#/components/schemas/UtcDatetime" },
+              { "type": "null" }
+            ],
+            "title": "Expiration time",
+            "description": "Expiration timestamp of the token in seconds since epoch, or None to never expire.",
+            "examples": [1625986130]
+          }
+        },
+        "type": "object",
+        "title": "UserTokenModifyRequest",
+        "description": "The parameters of a user token that can be changed.\n\nThis is a separate model from `UserTokenRequest` because the\n``token_name`` field is optional on modify requests."
+      },
+      "UserTokenRequest": {
+        "properties": {
+          "token_name": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "User-given name of the token",
+            "examples": ["laptop token"]
+          },
+          "scopes": {
+            "$ref": "#/components/schemas/Scopes-Input",
+            "title": "Token scope",
+            "default": [],
+            "examples": [["read:all"]]
+          },
+          "expires": {
+            "anyOf": [
+              { "$ref": "#/components/schemas/UtcDatetime" },
+              { "type": "null" }
+            ],
+            "title": "Expiration time",
+            "description": "Expiration timestamp of the token in seconds since epoch",
+            "examples": [1625986130]
+          }
+        },
+        "type": "object",
+        "required": ["token_name"],
+        "title": "UserTokenRequest",
+        "description": "The parameters of a user token that are under the user's control."
+      },
+      "UtcDatetime": { "type": "string", "format": "date-time" },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": { "anyOf": [{ "type": "string" }, { "type": "integer" }] },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": { "type": "string", "title": "Message" },
+          "type": { "type": "string", "title": "Error Type" }
+        },
+        "type": "object",
+        "required": ["loc", "msg", "type"],
+        "title": "ValidationError"
+      }
+    },
+    "securitySchemes": {
+      "oidc": {
+        "type": "http",
+        "description": "OpenID Connect client authentication",
+        "scheme": "basic"
+      }
+    }
+  }
+}

@@ -63,14 +63,9 @@ describe('dateUtils', () => {
   describe('formatToISO8601', () => {
     const testDate = new Date('2024-03-15T14:30:45.123Z');
 
-    it('formats with default options', () => {
+    it('formats with default options (timestamp without seconds)', () => {
       const result = formatToISO8601(testDate);
-      expect(result).toBe('2024-03-15T14:30:45Z');
-    });
-
-    it('formats date only', () => {
-      const result = formatToISO8601(testDate, { includeTime: false });
-      expect(result).toBe('2024-03-15');
+      expect(result).toBe('2024-03-15T14:30Z');
     });
 
     it('includes seconds when specified', () => {
@@ -78,9 +73,9 @@ describe('dateUtils', () => {
       expect(result).toBe('2024-03-15T14:30:45Z');
     });
 
-    it('excludes seconds by default', () => {
+    it('excludes seconds when includeSeconds is false', () => {
       const result = formatToISO8601(testDate, { includeSeconds: false });
-      expect(result).toBe('2024-03-15T14:30:45Z');
+      expect(result).toBe('2024-03-15T14:30Z');
     });
 
     it('throws error for invalid date', () => {

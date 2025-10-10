@@ -1,0 +1,32 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sqo-space-md);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--rsd-color-gray-200);
+  border-radius: var(--sqo-border-radius-1);
+  overflow: hidden;
+}
+
+.emptyState {
+  padding: var(--sqo-space-lg);
+  text-align: center;
+  color: var(--rsd-color-gray-500);
+  border: 1px solid var(--rsd-color-gray-200);
+  border-radius: var(--sqo-border-radius-1);
+  background-color: var(--rsd-color-gray-000);
+}
+
+.emptyState p {
+  margin: 0;
+}
+
+.loadMoreContainer {
+  display: flex;
+  justify-content: center;
+  padding: var(--sqo-space-sm) 0;
+}

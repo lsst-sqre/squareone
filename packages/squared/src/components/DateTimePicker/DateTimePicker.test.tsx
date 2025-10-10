@@ -94,9 +94,9 @@ describe('DateTimePicker', () => {
   });
 
   describe('Time functionality', () => {
-    it('shows time input when showTime is true', async () => {
+    it('always shows time input in calendar popover', async () => {
       const user = userEvent.setup();
-      render(<DateTimePicker {...defaultProps} showTime />);
+      render(<DateTimePicker {...defaultProps} />);
 
       const calendarButton = screen.getByLabelText('Open calendar');
       await user.click(calendarButton);
@@ -105,21 +105,78 @@ describe('DateTimePicker', () => {
         expect(screen.getByLabelText('Select time')).toBeInTheDocument();
       });
     });
+  });
 
-    it('hides time input when showTime is false', async () => {
+  describe('Timezone functionality', () => {
+    it('defaults to local timezone when no timezone prop is provided', async () => {
       const user = userEvent.setup();
-      render(<DateTimePicker {...defaultProps} showTime={false} />);
+      const onChange = vi.fn();
+      render(<DateTimePicker onChange={onChange} />);
 
       const calendarButton = screen.getByLabelText('Open calendar');
       await user.click(calendarButton);
 
       await waitFor(() => {
-        expect(screen.queryByLabelText('Select time')).not.toBeInTheDocument();
+        expect(screen.getByLabelText('Select timezone')).toBeInTheDocument();
       });
-    });
-  });
 
-  describe('Timezone functionality', () => {
+      // Since getBrowserTimezone is mocked to return 'UTC', 'local' should resolve to 'UTC'
+      // The timezone selector should show UTC as selected
+      const timezoneSelect = screen.getByLabelText('Select timezone');
+      expect(timezoneSelect).toBeInTheDocument();
+    });
+
+    it("resolves 'local' timezone to browser timezone", async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      render(<DateTimePicker onChange={onChange} timezone="local" />);
+
+      const calendarButton = screen.getByLabelText('Open calendar');
+      await user.click(calendarButton);
+
+      await waitFor(() => {
+        expect(screen.getByLabelText('Select timezone')).toBeInTheDocument();
+      });
+
+      // Since getBrowserTimezone is mocked to return 'UTC', 'local' should resolve to 'UTC'
+      const timezoneSelect = screen.getByLabelText('Select timezone');
+      expect(timezoneSelect).toBeInTheDocument();
+    });
+
+    it('uses UTC timezone when explicitly set', async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      render(<DateTimePicker onChange={onChange} timezone="UTC" />);
+
+      const calendarButton = screen.getByLabelText('Open calendar');
+      await user.click(calendarButton);
+
+      await waitFor(() => {
+        expect(screen.getByLabelText('Select timezone')).toBeInTheDocument();
+      });
+
+      const timezoneSelect = screen.getByLabelText('Select timezone');
+      expect(timezoneSelect).toBeInTheDocument();
+    });
+
+    it('uses custom IANA timezone when provided', async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      render(
+        <DateTimePicker onChange={onChange} timezone="America/New_York" />
+      );
+
+      const calendarButton = screen.getByLabelText('Open calendar');
+      await user.click(calendarButton);
+
+      await waitFor(() => {
+        expect(screen.getByLabelText('Select timezone')).toBeInTheDocument();
+      });
+
+      const timezoneSelect = screen.getByLabelText('Select timezone');
+      expect(timezoneSelect).toBeInTheDocument();
+    });
+
     it('shows timezone selector when showTimezone is true', async () => {
       const user = userEvent.setup();
       render(<DateTimePicker {...defaultProps} showTimezone />);

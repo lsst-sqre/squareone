@@ -13,7 +13,6 @@ const baseToken: TokenInfo = {
   token_name: 'my-token',
   created: Math.floor(Date.now() / 1000) - 86400 * 30, // 30 days ago
   expires: Math.floor(Date.now() / 1000) + 86400 * 30, // 30 days from now
-  last_used: Math.floor(Date.now() / 1000) - 3600 * 2, // 2 hours ago
   parent: null,
 };
 
@@ -48,15 +47,6 @@ export const NeverExpires: Story = {
   },
 };
 
-export const NeverUsed: Story = {
-  args: {
-    token: {
-      ...baseToken,
-      last_used: null,
-    },
-  },
-};
-
 export const ExpiringToday: Story = {
   args: {
     token: {
@@ -80,24 +70,6 @@ export const Expired: Story = {
     token: {
       ...baseToken,
       expires: Math.floor(Date.now() / 1000) - 86400, // Yesterday
-    },
-  },
-};
-
-export const LastUsedDaysAgo: Story = {
-  args: {
-    token: {
-      ...baseToken,
-      last_used: Math.floor(Date.now() / 1000) - 86400 * 5, // 5 days ago
-    },
-  },
-};
-
-export const LastUsedWeeksAgo: Story = {
-  args: {
-    token: {
-      ...baseToken,
-      last_used: Math.floor(Date.now() / 1000) - 86400 * 30, // 30 days ago
     },
   },
 };
