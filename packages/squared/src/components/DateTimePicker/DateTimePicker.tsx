@@ -29,7 +29,7 @@ import styles from './DateTimePicker.module.css';
 export type DateTimePickerProps = {
   value?: string; // ISO8601 string
   onChange: (value: string) => void;
-  timezone?: string; // IANA timezone identifier
+  timezone?: string; // IANA timezone identifier, or 'local' for browser timezone. Default: 'local'
   onTimezoneChange?: (timezone: string) => void;
   minDate?: Date;
   maxDate?: Date;
@@ -49,13 +49,17 @@ export type DateTimePickerProps = {
  * Combines ISO8601 text input with calendar popover, time controls, and timezone selector
  * Always produces full ISO8601 timestamps (date + time + timezone)
  * For date-only selection without time, use the DatePicker component instead
+ *
+ * @param timezone - IANA timezone identifier (e.g., 'America/New_York'), 'UTC', or 'local' for browser timezone. Default: 'local'
+ * @param showTimezone - Whether to show the timezone selector in the popover. Default: true
+ * @param showSeconds - Whether to include seconds in the timestamp. Default: false
  */
 const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
   (
     {
       value = '',
       onChange,
-      timezone,
+      timezone = 'local',
       onTimezoneChange,
       minDate,
       maxDate,
@@ -76,13 +80,16 @@ const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
     const [inputValue, setInputValue] = useState(value);
     const [calendarMonth, setCalendarMonth] = useState<Date>(() => {
       const parsed = parseISO8601(value);
-      return (
-        parsed || getCurrentTimeInTimezone(timezone || getBrowserTimezone())
-      );
+      const resolvedTimezone =
+        timezone === 'local' ? getBrowserTimezone() : timezone;
+      return parsed || getCurrentTimeInTimezone(resolvedTimezone);
     });
 
-    // Auto-detect browser timezone if not provided
-    const currentTimezone = timezone || getBrowserTimezone();
+    // Resolve timezone: 'local' becomes browser timezone, otherwise use the provided value
+    const currentTimezone = useMemo(() => {
+      if (timezone === 'local') return getBrowserTimezone();
+      return timezone;
+    }, [timezone]);
 
     // Refs
     const inputRef = useRef<HTMLInputElement>(null);
