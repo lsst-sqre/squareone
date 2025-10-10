@@ -6,7 +6,6 @@ import useTokenDetails from '../../hooks/useTokenDetails';
 import useDeleteToken from '../../hooks/useDeleteToken';
 import {
   formatTokenExpiration,
-  formatTokenLastUsed,
   formatTokenCreated,
 } from '../TokenDate/formatters';
 import TokenDate from '../TokenDate';
@@ -112,7 +111,6 @@ export default function TokenDetailsView({
 
   const sortedScopes = [...token.scopes].sort();
   const expiration = formatTokenExpiration(token.expires);
-  const lastUsed = formatTokenLastUsed(token.last_used);
   const created = formatTokenCreated(token.created);
 
   return (
@@ -179,16 +177,6 @@ export default function TokenDetailsView({
               <TokenDate
                 display={expiration.display}
                 datetime={expiration.datetime}
-              />
-            </dd>
-          </div>
-
-          <div className={styles.metadataRow}>
-            <dt className={styles.metadataLabel}>Last Used</dt>
-            <dd className={styles.metadataValue}>
-              <TokenDate
-                display={lastUsed.display}
-                datetime={lastUsed.datetime}
               />
             </dd>
           </div>

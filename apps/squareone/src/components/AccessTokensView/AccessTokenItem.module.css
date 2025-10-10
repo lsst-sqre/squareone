@@ -84,8 +84,7 @@
       'error error';
   }
 
-  .expiry,
-  .lastUsed {
+  .expiry {
     /* text-align: left; */
     align-self: start;
   }

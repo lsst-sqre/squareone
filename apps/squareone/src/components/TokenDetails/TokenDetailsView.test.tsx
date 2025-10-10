@@ -23,15 +23,6 @@ vi.mock('../TokenDate/formatters', () => ({
       datetime: '2025-12-31T00:00:00.000Z',
     };
   }),
-  formatTokenLastUsed: vi.fn((lastUsed) => {
-    if (lastUsed === null || lastUsed === undefined) {
-      return { display: 'Never used', datetime: null };
-    }
-    return {
-      display: 'Last used 2 hours ago',
-      datetime: '2025-01-01T10:00:00.000Z',
-    };
-  }),
   formatTokenCreated: vi.fn((created) => {
     if (created === null || created === undefined) {
       return { display: 'Unknown', datetime: null };

@@ -19,15 +19,6 @@ vi.mock('../TokenDate/formatters', () => ({
       datetime: '2025-12-31T00:00:00.000Z',
     };
   }),
-  formatTokenLastUsed: vi.fn((lastUsed) => {
-    if (lastUsed === null) {
-      return { display: 'Never used', datetime: null };
-    }
-    return {
-      display: 'Last used 2 hours ago',
-      datetime: '2025-01-01T10:00:00.000Z',
-    };
-  }),
 }));
 
 import useDeleteToken from '../../hooks/useDeleteToken';
@@ -79,7 +70,6 @@ describe('AccessTokenItem', () => {
     expect(screen.getByText('read:user')).toBeInTheDocument();
     expect(screen.getByText('write:user')).toBeInTheDocument();
     expect(screen.getByText('Expires on 2025-12-31')).toBeInTheDocument();
-    expect(screen.getByText('Last used 2 hours ago')).toBeInTheDocument();
   });
 
   it('sorts scopes alphabetically', () => {
@@ -286,24 +276,6 @@ describe('AccessTokenItem', () => {
     expect(screen.getByText('Never expires')).toBeInTheDocument();
   });
 
-  it('renders with null last_used', () => {
-    const tokenNeverUsed: TokenInfo = {
-      ...baseToken,
-      last_used: null,
-    };
-
-    render(
-      <AccessTokenItem
-        token={tokenNeverUsed}
-        username="testuser"
-        onDeleteSuccess={mockOnDeleteSuccess}
-        onDeleteError={mockOnDeleteError}
-      />
-    );
-
-    expect(screen.getByText('Never used')).toBeInTheDocument();
-  });
-
   it('renders with single scope', () => {
     const tokenWithSingleScope = {
       ...baseToken,
@@ -355,7 +327,7 @@ describe('AccessTokenItem', () => {
 
     // Check for time elements with datetime attributes
     const timeElements = screen.getAllByRole('time');
-    expect(timeElements).toHaveLength(2);
+    expect(timeElements).toHaveLength(1);
 
     // Expiration time element
     const expirationTime = screen.getByText('Expires on 2025-12-31');
@@ -363,14 +335,6 @@ describe('AccessTokenItem', () => {
     expect(expirationTime).toHaveAttribute(
       'datetime',
       '2025-12-31T00:00:00.000Z'
-    );
-
-    // Last used time element
-    const lastUsedTime = screen.getByText('Last used 2 hours ago');
-    expect(lastUsedTime.tagName).toBe('TIME');
-    expect(lastUsedTime).toHaveAttribute(
-      'datetime',
-      '2025-01-01T10:00:00.000Z'
     );
   });
 
@@ -392,26 +356,6 @@ describe('AccessTokenItem', () => {
     const neverExpires = screen.getByText('Never expires');
     expect(neverExpires.tagName).toBe('SPAN');
     expect(neverExpires).not.toHaveAttribute('datetime');
-  });
-
-  it('renders "Never used" without time element', () => {
-    const tokenNeverUsed: TokenInfo = {
-      ...baseToken,
-      last_used: null,
-    };
-
-    render(
-      <AccessTokenItem
-        token={tokenNeverUsed}
-        username="testuser"
-        onDeleteSuccess={mockOnDeleteSuccess}
-        onDeleteError={mockOnDeleteError}
-      />
-    );
-
-    const neverUsed = screen.getByText('Never used');
-    expect(neverUsed.tagName).toBe('SPAN');
-    expect(neverUsed).not.toHaveAttribute('datetime');
   });
 
   it('renders "No scopes." when token has no scopes', () => {
