@@ -84,7 +84,6 @@ export default function TokenHistoryFilters({
           <DateTimePicker
             value={filters.since ? filters.since.toISOString() : ''}
             onChange={handleSinceChange}
-            showTime={true}
             showTimezone={false}
             placeholder="Start date"
             size="md"
@@ -99,7 +98,6 @@ export default function TokenHistoryFilters({
           <DateTimePicker
             value={filters.until ? filters.until.toISOString() : ''}
             onChange={handleUntilChange}
-            showTime={true}
             showTimezone={false}
             placeholder="End date"
             size="md"
