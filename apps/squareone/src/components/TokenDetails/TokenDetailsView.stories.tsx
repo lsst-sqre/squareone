@@ -5,7 +5,6 @@ import type { BadgeColor } from '@lsst-sqre/squared';
 import type { TokenInfo } from '../../hooks/useUserTokens';
 import {
   formatTokenExpiration,
-  formatTokenLastUsed,
   formatTokenCreated,
 } from '../TokenDate/formatters';
 import TokenDate from '../TokenDate';
@@ -37,7 +36,6 @@ const mockToken: TokenInfo = {
   expires: now + 86400 * 30,
   token: 'abc123xyz456789012345',
   token_name: 'My Laptop Token',
-  last_used: now - 3600,
   parent: null,
 };
 
@@ -62,14 +60,6 @@ const mockExpiredToken: TokenInfo = {
   token: 'expired12345678901234',
   token_name: 'Expired Token',
   expires: now - 86400,
-  last_used: now - 86400 * 2,
-};
-
-const mockNeverUsedToken: TokenInfo = {
-  ...mockToken,
-  token: 'neverused1234567890123',
-  token_name: 'Never Used Token',
-  last_used: undefined,
 };
 
 // Wrapper component for stories that doesn't use hooks
@@ -152,7 +142,6 @@ function TokenDetailsViewWrapper({
 
   const sortedScopes = [...token.scopes].sort();
   const expiration = formatTokenExpiration(token.expires);
-  const lastUsed = formatTokenLastUsed(token.last_used);
   const created = formatTokenCreated(token.created);
 
   return (
@@ -219,16 +208,6 @@ function TokenDetailsViewWrapper({
               <TokenDate
                 display={expiration.display}
                 datetime={expiration.datetime}
-              />
-            </dd>
-          </div>
-
-          <div className={styles.metadataRow}>
-            <dt className={styles.metadataLabel}>Last Used</dt>
-            <dd className={styles.metadataValue}>
-              <TokenDate
-                display={lastUsed.display}
-                datetime={lastUsed.datetime}
               />
             </dd>
           </div>
@@ -307,15 +286,6 @@ export const ExpiredToken = {
     <TokenDetailsViewWrapper
       token={mockExpiredToken}
       tokenKey={mockExpiredToken.token}
-    />
-  ),
-};
-
-export const NeverUsedToken = {
-  render: () => (
-    <TokenDetailsViewWrapper
-      token={mockNeverUsedToken}
-      tokenKey={mockNeverUsedToken.token}
     />
   ),
 };

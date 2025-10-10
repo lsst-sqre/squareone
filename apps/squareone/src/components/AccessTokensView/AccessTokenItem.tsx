@@ -4,10 +4,7 @@ import { Badge, Button } from '@lsst-sqre/squared';
 import type { BadgeColor } from '@lsst-sqre/squared';
 import type { TokenInfo } from '../../hooks/useUserTokens';
 import useDeleteToken from '../../hooks/useDeleteToken';
-import {
-  formatTokenExpiration,
-  formatTokenLastUsed,
-} from '../TokenDate/formatters';
+import { formatTokenExpiration } from '../TokenDate/formatters';
 import DeleteTokenModal from './DeleteTokenModal';
 import TokenDate from '../TokenDate';
 import styles from './AccessTokenItem.module.css';
@@ -57,7 +54,6 @@ export default function AccessTokenItem({
   const sortedScopes = [...token.scopes].sort();
 
   const expiration = formatTokenExpiration(token.expires);
-  const lastUsed = formatTokenLastUsed(token.last_used);
 
   return (
     <>
@@ -95,11 +91,6 @@ export default function AccessTokenItem({
             className={styles.expiry}
             display={expiration.display}
             datetime={expiration.datetime}
-          />
-          <TokenDate
-            className={styles.lastUsed}
-            display={lastUsed.display}
-            datetime={lastUsed.datetime}
           />
         </div>
         <div className={styles.tokenItemDeleteCell}>
