@@ -19,6 +19,17 @@ export type TokenHistoryFiltersProps = {
 };
 
 /**
+ * Format a Date to ISO8601 string without seconds in UTC
+ * @param date - Date object to format
+ * @returns ISO8601 string in format YYYY-MM-DDTHH:mmZ (no seconds, UTC timezone)
+ */
+function formatDateWithoutSeconds(date: Date): string {
+  const isoString = date.toISOString();
+  // Remove seconds and milliseconds but keep UTC timezone: YYYY-MM-DDTHH:mm:ss.sssZ -> YYYY-MM-DDTHH:mmZ
+  return isoString.substring(0, 16) + 'Z';
+}
+
+/**
  * Filter controls for token history page.
  * Provides date range filtering, token key search, IP address filtering,
  * expand/collapse all control, and clear filters action.
@@ -82,9 +93,10 @@ export default function TokenHistoryFilters({
             Since
           </label>
           <DateTimePicker
-            value={filters.since ? filters.since.toISOString() : ''}
+            value={filters.since ? formatDateWithoutSeconds(filters.since) : ''}
             onChange={handleSinceChange}
-            showTimezone={false}
+            timezone="local"
+            showTimezone={true}
             placeholder="Start date"
             size="md"
             aria-label="Filter by start date"
@@ -96,9 +108,10 @@ export default function TokenHistoryFilters({
             Until
           </label>
           <DateTimePicker
-            value={filters.until ? filters.until.toISOString() : ''}
+            value={filters.until ? formatDateWithoutSeconds(filters.until) : ''}
             onChange={handleUntilChange}
-            showTimezone={false}
+            timezone="local"
+            showTimezone={true}
             placeholder="End date"
             size="md"
             aria-label="Filter by end date"
