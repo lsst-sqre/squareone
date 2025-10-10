@@ -42,6 +42,7 @@ The component accepts an ISO8601 timestamp string as its value and calls the onC
     timezone: {
       control: { type: 'select' },
       options: [
+        'local',
         'UTC',
         'America/New_York',
         'America/Chicago',
@@ -50,7 +51,8 @@ The component accepts an ISO8601 timestamp string as its value and calls the onC
         'Europe/Paris',
         'Asia/Tokyo',
       ],
-      description: 'IANA timezone identifier',
+      description:
+        "IANA timezone identifier, 'UTC', or 'local' for browser timezone (default: 'local')",
     },
     onTimezoneChange: {
       action: 'timezone-changed',
@@ -97,7 +99,7 @@ const ControlledDateTimePicker = (
   props: React.ComponentProps<typeof DateTimePicker>
 ) => {
   const [value, setValue] = useState(props.value || '');
-  const [timezone, setTimezone] = useState(props.timezone || 'UTC');
+  const [timezone, setTimezone] = useState(props.timezone || 'local');
 
   return (
     <DateTimePicker
@@ -115,8 +117,10 @@ export const Default: Story = {
     <ControlledDateTimePicker {...args} />
   ),
   args: {
-    value: '2024-03-15T14:30Z',
+    value: '',
     placeholder: 'Select date and time',
+    // timezone defaults to 'local' (browser timezone)
+    // showTimezone defaults to true
   },
 };
 
@@ -131,14 +135,15 @@ export const WithSeconds: Story = {
   },
 };
 
-export const WithoutTimezone: Story = {
+export const UTCOnly: Story = {
   render: (args: React.ComponentProps<typeof DateTimePicker>) => (
     <ControlledDateTimePicker {...args} />
   ),
   args: {
-    value: '2024-03-15T14:30',
+    value: '2024-03-15T14:30Z',
+    timezone: 'UTC',
     showTimezone: false,
-    placeholder: 'Select date and time',
+    placeholder: 'Select date and time (UTC)',
   },
 };
 
@@ -257,8 +262,8 @@ export const WithValidationError: Story = {
 export const FormIntegration: Story = {
   render: () => {
     const [formData, setFormData] = useState({
-      eventDate: '2024-03-15T14:30Z',
-      timezone: 'UTC',
+      eventDate: '',
+      timezone: 'local',
     });
 
     const handleDateChange = (value: string) => {
@@ -334,8 +339,8 @@ export const FormIntegration: Story = {
 // Interactive testing story
 export const InteractiveDemo: Story = {
   render: () => {
-    const [value, setValue] = useState('2024-03-15T14:30Z');
-    const [timezone, setTimezone] = useState('UTC');
+    const [value, setValue] = useState('');
+    const [timezone, setTimezone] = useState('local');
     const [showSeconds, setShowSeconds] = useState(false);
     const [showTimezone, setShowTimezone] = useState(true);
     const [disabled, setDisabled] = useState(false);
