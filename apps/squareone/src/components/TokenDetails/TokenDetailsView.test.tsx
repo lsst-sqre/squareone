@@ -195,7 +195,7 @@ describe('TokenDetailsView', () => {
     expect(screen.getByText('Loading token details...')).toBeInTheDocument();
   });
 
-  it('displays 404 error state', () => {
+  it('displays 404 error state with history', () => {
     mockUseTokenDetails.mockReturnValue({
       token: undefined,
       error: new Error('HTTP 404: Not Found'),
@@ -207,8 +207,24 @@ describe('TokenDetailsView', () => {
       <TokenDetailsView username="testuser" tokenKey="abc123xyz456789012345" />
     );
 
+    // Should show token not found message
     expect(screen.getByText('Token Not Found')).toBeInTheDocument();
-    expect(screen.getByText(/abc123xyz456789012345/)).toBeInTheDocument();
+    expect(screen.getByText(/no longer exists/i)).toBeInTheDocument();
+
+    // Should still display the token key (appears multiple times)
+    expect(screen.getByText('Token Key:')).toBeInTheDocument();
+    const tokenKeyInstances = screen.getAllByText('abc123xyz456789012345');
+    expect(tokenKeyInstances.length).toBeGreaterThan(0);
+
+    // Should show change history section
+    expect(screen.getByText('Change History')).toBeInTheDocument();
+    const historyView = screen.getByTestId('token-history-view');
+    expect(historyView).toBeInTheDocument();
+    expect(historyView).toHaveTextContent(
+      'Token History for: abc123xyz456789012345'
+    );
+
+    // Should have link back to token list
     expect(screen.getByText('Return to token list')).toBeInTheDocument();
   });
 

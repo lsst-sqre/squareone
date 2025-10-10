@@ -72,30 +72,50 @@ export default function TokenDetailsView({
   // Error states
   if (error) {
     const is404 = error.message?.includes('404');
+
+    if (is404) {
+      // Token not found, but we can still show history
+      return (
+        <div className={styles.container}>
+          <div className={styles.error}>
+            <h2>Token Not Found</h2>
+            <p>
+              The token with key <code>{tokenKey}</code> no longer exists. It
+              may have been deleted, expired, or revoked. However, the change
+              history for this token is still available below.
+            </p>
+            <p>
+              <strong>Token Key:</strong>{' '}
+              <code className={styles.tokenKey}>{tokenKey}</code>
+            </p>
+          </div>
+
+          {/* Change History Section */}
+          <div className={styles.historySection}>
+            <h2>Change History</h2>
+            <TokenHistoryView
+              username={username}
+              token={tokenKey}
+              showFilters={false}
+            />
+          </div>
+
+          <p>
+            <Link href="/settings/tokens">Return to token list</Link>
+          </p>
+        </div>
+      );
+    }
+
+    // Other errors
     return (
       <div className={styles.container}>
         <div className={styles.error}>
-          {is404 ? (
-            <>
-              <h2>Token Not Found</h2>
-              <p>
-                The token with key <code>{tokenKey}</code> could not be found.
-                It may have been deleted or you may not have permission to view
-                it.
-              </p>
-              <p>
-                <Link href="/settings/tokens">Return to token list</Link>
-              </p>
-            </>
-          ) : (
-            <>
-              <h2>Error Loading Token</h2>
-              <p>{error.message}</p>
-              <p>
-                <Link href="/settings/tokens">Return to token list</Link>
-              </p>
-            </>
-          )}
+          <h2>Error Loading Token</h2>
+          <p>{error.message}</p>
+          <p>
+            <Link href="/settings/tokens">Return to token list</Link>
+          </p>
         </div>
       </div>
     );
