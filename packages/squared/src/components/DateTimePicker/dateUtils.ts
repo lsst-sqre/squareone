@@ -305,3 +305,61 @@ export function getDateValidationError(
 
   return null;
 }
+
+/**
+ * Prepares an ISO8601 string for use with DateTimePicker
+ *
+ * This helper function makes the conversion from ISO8601 strings to Date objects
+ * explicit and helps developers understand timezone handling. The timezone encoded
+ * in an ISO8601 string (e.g., "-05:00") only determines the moment in time, not
+ * the timezone context for editing.
+ *
+ * @param iso8601 - ISO8601 timestamp string (e.g., "2024-03-15T14:30:00-05:00")
+ * @param options - Configuration options
+ * @param options.preferTimezone - IANA timezone to use for editing (overrides detection)
+ * @param options.fallbackTimezone - Timezone to use if detection fails (default: 'local')
+ * @returns Object with Date value, timezone for editing, and original offset
+ *
+ * @example
+ * // Use local timezone for editing
+ * const { value, timezone } = prepareDateTime("2024-03-15T14:30:00-08:00");
+ * <DateTimePicker value={value} timezone={timezone} />
+ *
+ * @example
+ * // Specify timezone for editing
+ * const { value } = prepareDateTime("2024-03-15T14:30:00Z", {
+ *   preferTimezone: "America/New_York"
+ * });
+ * <DateTimePicker value={value} timezone="America/New_York" />
+ */
+export function prepareDateTime(
+  iso8601: string,
+  options?: {
+    preferTimezone?: string;
+    fallbackTimezone?: string;
+  }
+): {
+  value: Date;
+  timezone: string;
+  originalOffset: string;
+} {
+  const date = parseISO8601(iso8601);
+  if (!date) {
+    throw new Error(`Invalid ISO8601 string: ${iso8601}`);
+  }
+
+  // Extract timezone offset from the ISO8601 string (e.g., "-05:00", "+00:00", "Z")
+  const offsetMatch = iso8601.match(/(Z|[+-]\d{2}:\d{2})$/);
+  const originalOffset = offsetMatch ? offsetMatch[1] : '';
+
+  // Determine timezone for editing context
+  // Order of precedence: preferTimezone > fallbackTimezone > 'local'
+  const timezone =
+    options?.preferTimezone || options?.fallbackTimezone || 'local';
+
+  return {
+    value: date,
+    timezone,
+    originalOffset,
+  };
+}

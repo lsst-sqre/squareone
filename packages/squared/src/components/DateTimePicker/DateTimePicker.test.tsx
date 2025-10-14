@@ -33,10 +33,10 @@ describe('DateTimePicker', () => {
     });
 
     it('displays the provided value', () => {
-      const value = '2024-03-15T14:30:00Z';
+      const value = new Date('2024-03-15T14:30:00Z');
       render(<DateTimePicker {...defaultProps} value={value} />);
 
-      const input = screen.getByDisplayValue(value);
+      const input = screen.getByDisplayValue('2024-03-15T14:30Z');
       expect(input).toBeInTheDocument();
     });
 
@@ -49,7 +49,11 @@ describe('DateTimePicker', () => {
       const input = screen.getByRole('textbox');
       await user.type(input, '2024-03-15T14:30:00Z');
 
-      expect(onChange).toHaveBeenCalledWith('2024-03-15T14:30:00Z');
+      // onChange is called with (Date, ISO8601 string)
+      expect(onChange).toHaveBeenCalled();
+      const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
+      expect(lastCall[0]).toBeInstanceOf(Date);
+      expect(lastCall[1]).toBe('2024-03-15T14:30:00Z');
     });
 
     it('shows placeholder text', () => {
@@ -241,21 +245,30 @@ describe('DateTimePicker', () => {
   });
 
   describe('Validation', () => {
-    it('shows error message for invalid input', () => {
-      render(<DateTimePicker {...defaultProps} value="invalid-date" />);
+    it('shows error message for invalid input', async () => {
+      const user = userEvent.setup();
+      render(<DateTimePicker {...defaultProps} />);
 
-      expect(screen.getByRole('alert')).toBeInTheDocument();
-      expect(screen.getByText(/Please enter a valid date/)).toBeInTheDocument();
+      const input = screen.getByRole('textbox');
+      await user.type(input, 'invalid-date');
+
+      await waitFor(() => {
+        expect(screen.getByRole('alert')).toBeInTheDocument();
+        expect(
+          screen.getByText(/Please enter a valid date/)
+        ).toBeInTheDocument();
+      });
     });
 
     it('shows error for date outside min/max range', () => {
       const minDate = new Date('2024-03-01');
       const maxDate = new Date('2024-03-31');
+      const value = new Date('2024-02-15T14:30:00Z');
 
       render(
         <DateTimePicker
           {...defaultProps}
-          value="2024-02-15T14:30:00Z"
+          value={value}
           minDate={minDate}
           maxDate={maxDate}
         />
@@ -265,11 +278,16 @@ describe('DateTimePicker', () => {
       expect(screen.getByText(/Date must be between/)).toBeInTheDocument();
     });
 
-    it('applies error appearance to input when invalid', () => {
-      render(<DateTimePicker {...defaultProps} value="invalid-date" />);
+    it('applies error appearance to input when invalid', async () => {
+      const user = userEvent.setup();
+      render(<DateTimePicker {...defaultProps} />);
 
       const input = screen.getByRole('textbox');
-      expect(input).toHaveAttribute('aria-invalid', 'true');
+      await user.type(input, 'invalid-date');
+
+      await waitFor(() => {
+        expect(input).toHaveAttribute('aria-invalid', 'true');
+      });
     });
   });
 
@@ -282,18 +300,29 @@ describe('DateTimePicker', () => {
       expect(input).toBeInTheDocument();
     });
 
-    it('has proper ARIA attributes for invalid state', () => {
-      render(<DateTimePicker {...defaultProps} value="invalid-date" />);
+    it('has proper ARIA attributes for invalid state', async () => {
+      const user = userEvent.setup();
+      render(<DateTimePicker {...defaultProps} />);
 
       const input = screen.getByRole('textbox');
-      expect(input).toHaveAttribute('aria-invalid', 'true');
+      await user.type(input, 'invalid-date');
+
+      await waitFor(() => {
+        expect(input).toHaveAttribute('aria-invalid', 'true');
+      });
     });
 
-    it('announces error messages to screen readers', () => {
-      render(<DateTimePicker {...defaultProps} value="invalid-date" />);
+    it('announces error messages to screen readers', async () => {
+      const user = userEvent.setup();
+      render(<DateTimePicker {...defaultProps} />);
 
-      const errorMessage = screen.getByRole('alert');
-      expect(errorMessage).toBeInTheDocument();
+      const input = screen.getByRole('textbox');
+      await user.type(input, 'invalid-date');
+
+      await waitFor(() => {
+        const errorMessage = screen.getByRole('alert');
+        expect(errorMessage).toBeInTheDocument();
+      });
     });
 
     it('supports keyboard navigation', async () => {

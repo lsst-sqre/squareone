@@ -98,14 +98,14 @@ type Story = StoryObj<typeof meta>;
 const ControlledDateTimePicker = (
   props: React.ComponentProps<typeof DateTimePicker>
 ) => {
-  const [value, setValue] = useState(props.value || '');
+  const [value, setValue] = useState<Date | null>(props.value || null);
   const [timezone, setTimezone] = useState(props.timezone || 'local');
 
   return (
     <DateTimePicker
       {...props}
       value={value}
-      onChange={setValue}
+      onChange={(date) => setValue(date)}
       timezone={timezone}
       onTimezoneChange={setTimezone}
     />
@@ -117,7 +117,7 @@ export const Default: Story = {
     <ControlledDateTimePicker {...args} />
   ),
   args: {
-    value: '',
+    value: null,
     placeholder: 'Select date and time',
     // timezone defaults to 'local' (browser timezone)
     // showTimezone defaults to true
@@ -129,7 +129,7 @@ export const WithSeconds: Story = {
     <ControlledDateTimePicker {...args} />
   ),
   args: {
-    value: '2024-03-15T14:30:45Z',
+    value: new Date('2024-03-15T14:30:45Z'),
     showSeconds: true,
     placeholder: 'Select date and time with seconds',
   },
@@ -140,7 +140,7 @@ export const UTCOnly: Story = {
     <ControlledDateTimePicker {...args} />
   ),
   args: {
-    value: '2024-03-15T14:30Z',
+    value: new Date('2024-03-15T14:30Z'),
     timezone: 'UTC',
     showTimezone: false,
     placeholder: 'Select date and time (UTC)',
@@ -152,7 +152,7 @@ export const WithConstraints: Story = {
     <ControlledDateTimePicker {...args} />
   ),
   args: {
-    value: '2024-03-15T14:30Z',
+    value: new Date('2024-03-15T14:30Z'),
     minDate: new Date('2024-03-01'),
     maxDate: new Date('2024-03-31'),
     placeholder: 'Select date within March 2024',
@@ -164,7 +164,7 @@ export const DifferentTimezone: Story = {
     <ControlledDateTimePicker {...args} />
   ),
   args: {
-    value: '2024-03-15T14:30-08:00',
+    value: new Date('2024-03-15T14:30-08:00'),
     timezone: 'America/Los_Angeles',
     placeholder: 'Select date and time in Pacific timezone',
   },
@@ -175,7 +175,7 @@ export const Disabled: Story = {
     <ControlledDateTimePicker {...args} />
   ),
   args: {
-    value: '2024-03-15T14:30Z',
+    value: new Date('2024-03-15T14:30Z'),
     disabled: true,
     placeholder: 'Disabled date picker',
   },
@@ -194,7 +194,7 @@ export const Sizes: Story = {
       <div>
         <h4>Small</h4>
         <ControlledDateTimePicker
-          value="2024-03-15T14:30Z"
+          value={new Date('2024-03-15T14:30Z')}
           size="sm"
           placeholder="Small size"
           onChange={() => {}}
@@ -203,7 +203,7 @@ export const Sizes: Story = {
       <div>
         <h4>Medium (Default)</h4>
         <ControlledDateTimePicker
-          value="2024-03-15T14:30Z"
+          value={new Date('2024-03-15T14:30Z')}
           size="md"
           placeholder="Medium size"
           onChange={() => {}}
@@ -212,7 +212,7 @@ export const Sizes: Story = {
       <div>
         <h4>Large</h4>
         <ControlledDateTimePicker
-          value="2024-03-15T14:30Z"
+          value={new Date('2024-03-15T14:30Z')}
           size="lg"
           placeholder="Large size"
           onChange={() => {}}
@@ -229,7 +229,7 @@ export const FullWidth: Story = {
     </div>
   ),
   args: {
-    value: '2024-03-15T14:30Z',
+    value: new Date('2024-03-15T14:30Z'),
     fullWidth: true,
     placeholder: 'Full width date picker',
   },
@@ -240,19 +240,19 @@ export const Empty: Story = {
     <ControlledDateTimePicker {...args} />
   ),
   args: {
-    value: '',
+    value: null,
     placeholder: 'YYYY-MM-DDTHH:mmZ',
   },
 };
 
 export const WithValidationError: Story = {
   render: () => {
-    const [value, setValue] = useState('invalid-date');
+    const [value, setValue] = useState<Date | null>(null);
 
     return (
       <DateTimePicker
         value={value}
-        onChange={setValue}
+        onChange={(date) => setValue(date)}
         placeholder="Try entering an invalid date"
       />
     );
@@ -261,13 +261,18 @@ export const WithValidationError: Story = {
 
 export const FormIntegration: Story = {
   render: () => {
-    const [formData, setFormData] = useState({
-      eventDate: '',
+    const [formData, setFormData] = useState<{
+      eventDate: Date | null;
+      eventDateIso: string;
+      timezone: string;
+    }>({
+      eventDate: null,
+      eventDateIso: '',
       timezone: 'local',
     });
 
-    const handleDateChange = (value: string) => {
-      setFormData((prev) => ({ ...prev, eventDate: value }));
+    const handleDateChange = (date: Date | null, iso: string) => {
+      setFormData((prev) => ({ ...prev, eventDate: date, eventDateIso: iso }));
     };
 
     const handleTimezoneChange = (timezone: string) => {
@@ -277,7 +282,9 @@ export const FormIntegration: Story = {
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
       alert(
-        `Form submitted with:\nDate: ${formData.eventDate}\nTimezone: ${formData.timezone}`
+        `Form submitted with:\nDate: ${formData.eventDate?.toISOString()}\nISO8601: ${
+          formData.eventDateIso
+        }\nTimezone: ${formData.timezone}`
       );
     };
 
@@ -327,7 +334,9 @@ export const FormIntegration: Story = {
         <div style={{ fontSize: '0.875rem', color: '#666' }}>
           <strong>Current values:</strong>
           <br />
-          Date: {formData.eventDate}
+          Date object: {formData.eventDate?.toISOString() || '(none)'}
+          <br />
+          ISO8601: {formData.eventDateIso || '(none)'}
           <br />
           Timezone: {formData.timezone}
         </div>
@@ -339,11 +348,17 @@ export const FormIntegration: Story = {
 // Interactive testing story
 export const InteractiveDemo: Story = {
   render: () => {
-    const [value, setValue] = useState('');
+    const [value, setValue] = useState<Date | null>(null);
+    const [valueIso, setValueIso] = useState('');
     const [timezone, setTimezone] = useState('local');
     const [showSeconds, setShowSeconds] = useState(false);
     const [showTimezone, setShowTimezone] = useState(true);
     const [disabled, setDisabled] = useState(false);
+
+    const handleChange = (date: Date | null, iso: string) => {
+      setValue(date);
+      setValueIso(iso);
+    };
 
     return (
       <div style={{ display: 'flex', gap: '2rem' }}>
@@ -351,7 +366,7 @@ export const InteractiveDemo: Story = {
           <h4>DateTimePicker</h4>
           <DateTimePicker
             value={value}
-            onChange={setValue}
+            onChange={handleChange}
             timezone={timezone}
             onTimezoneChange={setTimezone}
             showSeconds={showSeconds}
@@ -362,7 +377,11 @@ export const InteractiveDemo: Story = {
           <div
             style={{ marginTop: '1rem', fontSize: '0.875rem', color: '#666' }}
           >
-            <strong>Current value:</strong> {value || '(empty)'}
+            <strong>Current value:</strong>
+            <br />
+            Date: {value?.toISOString() || '(empty)'}
+            <br />
+            ISO8601: {valueIso || '(empty)'}
           </div>
         </div>
         <div>
@@ -396,7 +415,10 @@ export const InteractiveDemo: Story = {
             </label>
             <button
               type="button"
-              onClick={() => setValue('')}
+              onClick={() => {
+                setValue(null);
+                setValueIso('');
+              }}
               style={{ marginTop: '0.5rem', padding: '0.25rem 0.5rem' }}
             >
               Clear Value
