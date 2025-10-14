@@ -32,9 +32,9 @@ describe('DateTimePicker', () => {
       expect(calendarButton).toBeInTheDocument();
     });
 
-    it('displays the provided value', () => {
-      const value = new Date('2024-03-15T14:30:00Z');
-      render(<DateTimePicker {...defaultProps} value={value} />);
+    it('displays the provided default value', () => {
+      const defaultValue = '2024-03-15T14:30:00Z';
+      render(<DateTimePicker {...defaultProps} defaultValue={defaultValue} />);
 
       const input = screen.getByDisplayValue('2024-03-15T14:30Z');
       expect(input).toBeInTheDocument();
@@ -47,13 +47,14 @@ describe('DateTimePicker', () => {
       render(<DateTimePicker onChange={onChange} />);
 
       const input = screen.getByRole('textbox');
+      await user.clear(input);
       await user.type(input, '2024-03-15T14:30:00Z');
 
-      // onChange is called with (Date, ISO8601 string)
+      // onChange is called with ISO8601 string only
       expect(onChange).toHaveBeenCalled();
       const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-      expect(lastCall[0]).toBeInstanceOf(Date);
-      expect(lastCall[1]).toBe('2024-03-15T14:30:00Z');
+      expect(lastCall[0]).toBe('2024-03-15T14:30:00Z');
+      expect(lastCall.length).toBe(1); // Only one argument
     });
 
     it('shows placeholder text', () => {
@@ -112,7 +113,7 @@ describe('DateTimePicker', () => {
   });
 
   describe('Timezone functionality', () => {
-    it('defaults to local timezone when no timezone prop is provided', async () => {
+    it('defaults to local timezone when no defaultTimezone prop is provided', async () => {
       const user = userEvent.setup();
       const onChange = vi.fn();
       render(<DateTimePicker onChange={onChange} />);
@@ -130,10 +131,10 @@ describe('DateTimePicker', () => {
       expect(timezoneSelect).toBeInTheDocument();
     });
 
-    it("resolves 'local' timezone to browser timezone", async () => {
+    it("resolves 'local' defaultTimezone to browser timezone", async () => {
       const user = userEvent.setup();
       const onChange = vi.fn();
-      render(<DateTimePicker onChange={onChange} timezone="local" />);
+      render(<DateTimePicker onChange={onChange} defaultTimezone="local" />);
 
       const calendarButton = screen.getByLabelText('Open calendar');
       await user.click(calendarButton);
@@ -147,10 +148,10 @@ describe('DateTimePicker', () => {
       expect(timezoneSelect).toBeInTheDocument();
     });
 
-    it('uses UTC timezone when explicitly set', async () => {
+    it('uses UTC defaultTimezone when explicitly set', async () => {
       const user = userEvent.setup();
       const onChange = vi.fn();
-      render(<DateTimePicker onChange={onChange} timezone="UTC" />);
+      render(<DateTimePicker onChange={onChange} defaultTimezone="UTC" />);
 
       const calendarButton = screen.getByLabelText('Open calendar');
       await user.click(calendarButton);
@@ -163,11 +164,14 @@ describe('DateTimePicker', () => {
       expect(timezoneSelect).toBeInTheDocument();
     });
 
-    it('uses custom IANA timezone when provided', async () => {
+    it('uses custom IANA defaultTimezone when provided', async () => {
       const user = userEvent.setup();
       const onChange = vi.fn();
       render(
-        <DateTimePicker onChange={onChange} timezone="America/New_York" />
+        <DateTimePicker
+          onChange={onChange}
+          defaultTimezone="America/New_York"
+        />
       );
 
       const calendarButton = screen.getByLabelText('Open calendar');
@@ -216,7 +220,7 @@ describe('DateTimePicker', () => {
           {...defaultProps}
           showTimezone
           onTimezoneChange={onTimezoneChange}
-          timezone="UTC"
+          defaultTimezone="UTC"
         />
       );
 
@@ -263,12 +267,12 @@ describe('DateTimePicker', () => {
     it('shows error for date outside min/max range', () => {
       const minDate = new Date('2024-03-01');
       const maxDate = new Date('2024-03-31');
-      const value = new Date('2024-02-15T14:30:00Z');
+      const defaultValue = '2024-02-15T14:30:00Z';
 
       render(
         <DateTimePicker
           {...defaultProps}
-          value={value}
+          defaultValue={defaultValue}
           minDate={minDate}
           maxDate={maxDate}
         />
@@ -383,6 +387,99 @@ describe('DateTimePicker', () => {
       // The container should have full width styling
       const container = screen.getByRole('textbox').closest('.dateTimePicker');
       expect(container).toHaveClass('fullWidth');
+    });
+  });
+
+  describe('String-based API', () => {
+    it('accepts ISO8601 strings as defaultValue', () => {
+      const defaultValue = '2024-03-15T14:30:00Z';
+      render(<DateTimePicker {...defaultProps} defaultValue={defaultValue} />);
+
+      const input = screen.getByDisplayValue('2024-03-15T14:30Z');
+      expect(input).toBeInTheDocument();
+    });
+
+    it('handles ISO8601 strings with different timezone offsets', () => {
+      const defaultValue = '2024-03-15T14:30:00-08:00';
+      render(
+        <DateTimePicker
+          {...defaultProps}
+          defaultValue={defaultValue}
+          defaultTimezone="America/Los_Angeles"
+        />
+      );
+
+      // Should display in the specified timezone
+      expect(screen.getByRole('textbox')).toBeInTheDocument();
+    });
+
+    it('returns ISO8601 string from onChange', async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+
+      render(<DateTimePicker onChange={onChange} />);
+
+      const input = screen.getByRole('textbox');
+      await user.clear(input);
+      await user.type(input, '2024-03-15T14:30:00Z');
+
+      expect(onChange).toHaveBeenCalled();
+      const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
+      expect(typeof lastCall[0]).toBe('string');
+      expect(lastCall[0]).toBe('2024-03-15T14:30:00Z');
+    });
+
+    it('handles null defaultValue', () => {
+      render(<DateTimePicker {...defaultProps} defaultValue={null} />);
+
+      const input = screen.getByRole('textbox');
+      expect(input).toHaveValue('');
+    });
+
+    it('handles undefined defaultValue', () => {
+      render(<DateTimePicker {...defaultProps} defaultValue={undefined} />);
+
+      const input = screen.getByRole('textbox');
+      expect(input).toHaveValue('');
+    });
+
+    it('does not update when defaultValue prop changes (uncontrolled)', () => {
+      const { rerender } = render(
+        <DateTimePicker {...defaultProps} defaultValue="2024-03-15T14:30:00Z" />
+      );
+
+      expect(screen.getByDisplayValue('2024-03-15T14:30Z')).toBeInTheDocument();
+
+      // Changing defaultValue should not update the component (uncontrolled)
+      rerender(
+        <DateTimePicker {...defaultProps} defaultValue="2024-03-16T10:00:00Z" />
+      );
+
+      // Should still show original value
+      expect(screen.getByDisplayValue('2024-03-15T14:30Z')).toBeInTheDocument();
+    });
+
+    it('can be reset using key prop', () => {
+      const { rerender } = render(
+        <DateTimePicker
+          key="v1"
+          {...defaultProps}
+          defaultValue="2024-03-15T14:30:00Z"
+        />
+      );
+
+      expect(screen.getByDisplayValue('2024-03-15T14:30Z')).toBeInTheDocument();
+
+      // Changing key forces remount with new defaultValue
+      rerender(
+        <DateTimePicker
+          key="v2"
+          {...defaultProps}
+          defaultValue="2024-03-16T10:00:00Z"
+        />
+      );
+
+      expect(screen.getByDisplayValue('2024-03-16T10:00Z')).toBeInTheDocument();
     });
   });
 });

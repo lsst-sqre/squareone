@@ -2,22 +2,25 @@
 '@lsst-sqre/squared': minor
 ---
 
-Refactor DateTimePicker to use Date objects and local timezone
+Refactor DateTimePicker to use string-based API
 
 **Breaking changes in API (within 0.x versions):**
-- DateTimePicker now accepts and returns `Date` objects instead of timestamp strings
-- Removed timezone prop - component now operates exclusively in local timezone
-- Simplified internal state management focused on Date object manipulation
+- Renamed `value` → `defaultValue` (accepts ISO8601 strings)
+- Renamed `timezone` → `defaultTimezone` (clarifies initial timezone)
+- Simplified `onChange` signature to `(string)` - now returns only ISO8601 string
+- Component now uses uncontrolled pattern - use `key` prop to force resets with new values
 
 **Improvements:**
-- More intuitive API using native JavaScript Date objects
-- Better integration with forms and standard date handling
-- Clearer semantics - component handles local time, consumers handle timezone conversion if needed
-- Reduced complexity by removing internal timezone conversion logic
-- Updated date utility functions to work with Date objects
-- Enhanced test coverage for Date-based operations
+- Clearer API with explicit timezone control via `defaultTimezone` prop
+- Better interoperability with APIs - no Date conversion needed
+- Simpler component usage in common cases
+- String-based API makes timezone semantics more explicit
+- Preserved all functionality (timezone selection, seconds support, validation)
+- Enhanced test coverage for string-based operations and uncontrolled pattern
 
 **Migration notes:**
-- Convert existing timestamp string usage to Date objects: `new Date(timestamp)` for input, `date.toISOString()` for output
-- Handle timezone conversion at the application level if needed (e.g., in TokenHistoryFilters)
-- The component's datetime-local input now correctly represents local time without timezone confusion
+- Change `value={date}` to `defaultValue={date.toISOString()}`
+- Change `timezone="UTC"` to `defaultTimezone="UTC"`
+- Update `onChange` handlers from `(date, iso) => ...` to `(iso) => ...`
+- Convert ISO8601 strings to Date objects when needed: `new Date(iso)`
+- Use `key` prop to force component resets: `<DateTimePicker key={value} defaultValue={value} />`

@@ -52,12 +52,16 @@ export default function TokenHistoryFilters({
     };
   }, []);
 
-  const handleSinceChange = (date: Date | null) => {
-    onFilterChange({ since: date || undefined });
+  const handleSinceChange = (iso: string) => {
+    // Convert ISO8601 string to Date for the filter state
+    const date = iso ? new Date(iso) : undefined;
+    onFilterChange({ since: date });
   };
 
-  const handleUntilChange = (date: Date | null) => {
-    onFilterChange({ until: date || undefined });
+  const handleUntilChange = (iso: string) => {
+    // Convert ISO8601 string to Date for the filter state
+    const date = iso ? new Date(iso) : undefined;
+    onFilterChange({ until: date });
   };
 
   const handleTokenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,9 +85,9 @@ export default function TokenHistoryFilters({
           Since
         </label>
         <DateTimePicker
-          value={filters.since || null}
+          defaultValue={filters.since?.toISOString() || ''}
           onChange={handleSinceChange}
-          timezone="local"
+          defaultTimezone="local"
           showTimezone={true}
           placeholder="Start date"
           size="sm"
@@ -96,9 +100,9 @@ export default function TokenHistoryFilters({
           Until
         </label>
         <DateTimePicker
-          value={filters.until || null}
+          defaultValue={filters.until?.toISOString() || ''}
           onChange={handleUntilChange}
-          timezone="local"
+          defaultTimezone="local"
           showTimezone={true}
           placeholder="End date"
           size="sm"
