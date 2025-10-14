@@ -76,91 +76,87 @@ export default function TokenHistoryFilters({
 
   return (
     <div ref={containerRef} className={containerClassNames}>
-      <div className={styles.filtersSection}>
-        <div className={styles.filterGroup}>
-          <label htmlFor="filter-since" className={styles.filterLabel}>
-            Since
-          </label>
-          <DateTimePicker
-            value={filters.since || null}
-            onChange={handleSinceChange}
-            timezone="local"
-            showTimezone={true}
-            placeholder="Start date"
-            size="md"
-            aria-label="Filter by start date"
-          />
-        </div>
-
-        <div className={styles.filterGroup}>
-          <label htmlFor="filter-until" className={styles.filterLabel}>
-            Until
-          </label>
-          <DateTimePicker
-            value={filters.until || null}
-            onChange={handleUntilChange}
-            timezone="local"
-            showTimezone={true}
-            placeholder="End date"
-            size="md"
-            aria-label="Filter by end date"
-          />
-        </div>
-
-        <div className={styles.filterGroup}>
-          <label htmlFor="filter-token" className={styles.filterLabel}>
-            Token
-          </label>
-          <TextInput
-            id="filter-token"
-            type="text"
-            value={filters.token || ''}
-            onChange={handleTokenChange}
-            placeholder="Token key (22 chars)"
-            size="md"
-            aria-label="Filter by token key"
-          />
-        </div>
-
-        <div className={styles.filterGroup}>
-          <label htmlFor="filter-ip" className={styles.filterLabel}>
-            IP Address
-          </label>
-          <TextInput
-            id="filter-ip"
-            type="text"
-            value={filters.ipAddress || ''}
-            onChange={handleIpAddressChange}
-            placeholder="IP address or CIDR"
-            size="md"
-            aria-label="Filter by IP address"
-          />
-        </div>
+      <div className={styles.filterGroup}>
+        <label htmlFor="filter-since" className={styles.filterLabel}>
+          Since
+        </label>
+        <DateTimePicker
+          value={filters.since || null}
+          onChange={handleSinceChange}
+          timezone="local"
+          showTimezone={true}
+          placeholder="Start date"
+          size="sm"
+          aria-label="Filter by start date"
+        />
       </div>
 
-      <div className={styles.actionsSection}>
-        <Button
-          appearance="outline"
-          tone="secondary"
-          size="md"
-          leadingIcon={expandAll ? faChevronUp : faChevronDown}
-          onClick={onToggleExpandAll}
-          aria-label={expandAll ? 'Collapse all entries' : 'Expand all entries'}
-        >
-          {expandAll ? 'Collapse All' : 'Expand All'}
-        </Button>
-
-        <Button
-          appearance="outline"
-          tone="secondary"
-          size="md"
-          leadingIcon={faXmark}
-          onClick={onClearFilters}
-          aria-label="Clear all filters"
-        >
-          Clear Filters
-        </Button>
+      <div className={styles.filterGroup}>
+        <label htmlFor="filter-until" className={styles.filterLabel}>
+          Until
+        </label>
+        <DateTimePicker
+          value={filters.until || null}
+          onChange={handleUntilChange}
+          timezone="local"
+          showTimezone={true}
+          placeholder="End date"
+          size="sm"
+          aria-label="Filter by end date"
+        />
       </div>
+
+      <div className={styles.filterGroup}>
+        <label htmlFor="filter-token" className={styles.filterLabel}>
+          Token
+        </label>
+        <TextInput
+          id="filter-token"
+          type="text"
+          value={filters.token || ''}
+          onChange={handleTokenChange}
+          placeholder="Token key (22 chars)"
+          size="sm"
+          aria-label="Filter by token key"
+        />
+      </div>
+
+      <div className={styles.filterGroup}>
+        <label htmlFor="filter-ip" className={styles.filterLabel}>
+          IP Address
+        </label>
+        <TextInput
+          id="filter-ip"
+          type="text"
+          value={filters.ipAddress || ''}
+          onChange={handleIpAddressChange}
+          placeholder="IP address or CIDR"
+          size="sm"
+          aria-label="Filter by IP address"
+        />
+      </div>
+
+      <Button
+        appearance="outline"
+        tone="secondary"
+        size="sm"
+        leadingIcon={expandAll ? faChevronUp : faChevronDown}
+        onClick={onToggleExpandAll}
+        aria-label={expandAll ? 'Collapse all entries' : 'Expand all entries'}
+      >
+        {expandAll ? 'Collapse All' : 'Expand All'}
+      </Button>
+
+      <Button
+        appearance="outline"
+        tone="secondary"
+        size="sm"
+        leadingIcon={faXmark}
+        onClick={onClearFilters}
+        aria-label="Clear all filters"
+      >
+        Clear Filters
+      </Button>
     </div>
   );
 }

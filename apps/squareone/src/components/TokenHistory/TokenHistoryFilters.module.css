@@ -6,8 +6,8 @@
   z-index: 10;
   background-color: var(--rsd-component-page-background-color);
   padding: var(--sqo-space-md);
-  display: grid;
-  grid-template-columns: 1fr auto;
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--sqo-space-md);
   align-items: end;
   transition: box-shadow 0.2s ease;
@@ -15,13 +15,6 @@
 
 .container.stuck {
   box-shadow: var(--sqo-elevation-md);
-}
-
-.filtersSection {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--sqo-space-md);
-  align-items: end;
 }
 
 .filterGroup {
@@ -36,29 +29,20 @@
   color: var(--rsd-color-gray-500);
 }
 
-.actionsSection {
-  display: flex;
-  gap: var(--sqo-space-sm);
-  align-items: end;
-  flex-wrap: wrap;
+/* Constrain token input to 22 characters + padding */
+.filterGroup:has(#filter-token) {
+  width: 24ch;
 }
 
-/* Responsive layout: stack on mobile */
+/* Constrain IP address input to typical IP/CIDR size */
+.filterGroup:has(#filter-ip) {
+  width: 22ch;
+}
+
+/* Responsive layout: full width on mobile */
 @media (max-width: 768px) {
-  .container {
-    grid-template-columns: 1fr;
-    gap: var(--sqo-space-md);
-  }
-
-  .filtersSection {
-    grid-template-columns: 1fr;
-  }
-
-  .actionsSection {
-    justify-content: stretch;
-  }
-
-  .actionsSection button {
-    flex: 1;
+  .filterGroup:has(#filter-token),
+  .filterGroup:has(#filter-ip) {
+    width: 100%;
   }
 }
