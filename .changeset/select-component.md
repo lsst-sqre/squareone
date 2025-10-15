@@ -7,7 +7,7 @@ Add Select component with comprehensive accessibility and functionality
 Introduces a new Select component built with Radix UI primitives that provides:
 
 - **Multiple sizing variants** (sm, md, lg) for different UI contexts
-- **Full accessibility compliance** with ARIA attributes and keyboard navigation
+- **Full accessibility compliance** with ARIA attributes, keyboard navigation, and custom aria-label support
 - **Compound component pattern** (Select.Item, Select.Group, Select.Separator) for flexible composition
 - **Controlled and uncontrolled modes** supporting both React Hook Form and standalone usage
 - **Group and separator support** for organizing complex option lists
@@ -16,3 +16,4 @@ Introduces a new Select component built with Radix UI primitives that provides:
 - **Form integration** works seamlessly with FormField and other form components
 - **Disabled state support** for individual options
 - **Portal-based rendering** to avoid z-index issues
+- **Custom accessible labels** via optional aria-label prop for enhanced accessibility context

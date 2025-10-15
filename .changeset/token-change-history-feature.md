@@ -30,7 +30,7 @@ Implements a complete token change history system that allows users to view the 
 - Date range filtering with DateTimePicker integration
 - Event type filtering (creation, revocation, expiration, scope changes, etc.)
 - URL-based filter state (shareable/bookmarkable filtered views)
-- Local timezone support for all timestamps
+- Local timezone support with ISO 8601 format for all timestamps
 - Graceful handling of deleted tokens (shows history even when token no longer exists)
 - Responsive design with proper loading and error states
 - Comprehensive test coverage for all components and hooks
