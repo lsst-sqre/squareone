@@ -1,10 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import type { TokenChangeHistoryEntry } from '../../hooks/useTokenChangeHistory';
-import {
-  formatEventTimeUTC,
-  formatExpirationTimestamp,
-} from '../TokenDate/formatters';
+import { formatExpirationTimestamp } from '../TokenDate/formatters';
 import { TokenScopeBadge } from './TokenScopeBadge';
 import { TokenScopeChangeBadge } from './TokenScopeChangeBadge';
 import styles from './TokenHistoryDetails.module.css';
@@ -123,7 +120,9 @@ export function TokenHistoryDetails({
 
         {/* Timestamp (always shown) */}
         <dt className={styles.label}>Timestamp</dt>
-        <dd className={styles.value}>{formatEventTimeUTC(entry.event_time)}</dd>
+        <dd className={styles.value}>
+          {formatExpirationTimestamp(entry.event_time)}
+        </dd>
 
         {/* For create/revoke/expire: show Expires and Scopes */}
         {entry.action !== 'edit' && (

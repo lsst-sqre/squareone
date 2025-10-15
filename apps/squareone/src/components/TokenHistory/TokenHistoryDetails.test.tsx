@@ -112,11 +112,11 @@ describe('TokenHistoryDetails', () => {
       expect(ipText.tagName).not.toBe('BUTTON');
     });
 
-    test('displays timestamp in UTC format', () => {
-      render(<TokenHistoryDetails entry={baseEntry} />);
+    test('displays timestamp in ISO8601 format', () => {
+      const { container } = render(<TokenHistoryDetails entry={baseEntry} />);
       expect(screen.getByText('Timestamp')).toBeInTheDocument();
-      // formatEventTimeUTC should format as YYYY-MM-DD HH:MM:SS UTC
-      expect(screen.getByText(/UTC$/)).toBeInTheDocument();
+      // formatExpirationTimestamp should format as ISO8601 timestamp
+      expect(container.textContent).toContain('2024-03-08T13:30:45.000Z');
     });
   });
 
