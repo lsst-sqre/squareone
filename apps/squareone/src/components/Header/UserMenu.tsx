@@ -1,6 +1,7 @@
 /* Menu for a user profile and settings. */
 
 import { ChevronDown } from 'react-feather';
+import NextLink from 'next/link';
 import { PrimaryNavigation } from '@lsst-sqre/squared';
 import { useGafaelfawrUser } from '@lsst-sqre/squared';
 import { getLogoutUrl } from '@lsst-sqre/squared';
@@ -35,8 +36,8 @@ export default function UserMenu({ pageUrl }: UserMenuProps) {
           </PrimaryNavigation.ContentItem>
         )}
         <PrimaryNavigation.ContentItem>
-          <PrimaryNavigation.Link href="/auth/tokens">
-            Security tokens
+          <PrimaryNavigation.Link asChild>
+            <NextLink href="/settings/tokens">Access tokens</NextLink>
           </PrimaryNavigation.Link>
         </PrimaryNavigation.ContentItem>
         <PrimaryNavigation.ContentItem>
