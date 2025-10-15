@@ -2,7 +2,6 @@ import React, {
   forwardRef,
   useState,
   useCallback,
-  useEffect,
   useRef,
   useMemo,
 } from 'react';
@@ -29,6 +28,7 @@ import styles from './DateTimePicker.module.css';
 export type DateTimePickerProps = {
   defaultValue?: string | null; // ISO8601 timestamp string
   onChange: (iso8601: string) => void; // Returns ISO8601 string only
+  onOpenChange?: (open: boolean) => void; // Called when popover opens/closes
   defaultTimezone?: string; // IANA timezone identifier, or 'local' for browser timezone. Default: 'local'
   onTimezoneChange?: (timezone: string) => void;
   minDate?: Date;
@@ -62,7 +62,7 @@ export type DateTimePickerProps = {
  * <DateTimePicker
  *   defaultValue="2024-03-15T14:30:00Z"
  *   defaultTimezone="local"
- *   onChange={(iso) => console.log(iso)}
+ *   onChange={(iso) => handleChange(iso)}
  * />
  *
  * // Fixed UTC timezone
@@ -70,7 +70,7 @@ export type DateTimePickerProps = {
  *   defaultValue="2024-03-15T14:30:00Z"
  *   defaultTimezone="UTC"
  *   showTimezone={false}
- *   onChange={(iso) => console.log(iso)}
+ *   onChange={(iso) => handleChange(iso)}
  * />
  * ```
  *
@@ -85,6 +85,7 @@ const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
     {
       defaultValue = null,
       onChange,
+      onOpenChange,
       defaultTimezone = 'local',
       onTimezoneChange,
       minDate,
@@ -406,7 +407,11 @@ const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
         <div className={styles.inputSection}>
           <PopoverPrimitive.Root
             open={isCalendarOpen}
-            onOpenChange={setIsCalendarOpen}
+            onOpenChange={(open) => {
+              setIsCalendarOpen(open);
+              onOpenChange?.(open);
+            }}
+            modal={false}
           >
             <TextInput
               ref={inputRef}

@@ -104,7 +104,6 @@ const ControlledDateTimePicker = (
   return (
     <DateTimePicker
       {...props}
-      key={value} // Use key to allow reset
       defaultValue={value}
       onChange={(iso) => {
         setValue(iso);
@@ -375,7 +374,7 @@ export const InteractiveDemo: Story = {
         <div>
           <h4>DateTimePicker</h4>
           <DateTimePicker
-            key={value + timezone + showSeconds + showTimezone} // Force remount on any change
+            key={timezone + showSeconds + showTimezone} // Force remount on config changes only
             defaultValue={value}
             onChange={handleChange}
             defaultTimezone={timezone}

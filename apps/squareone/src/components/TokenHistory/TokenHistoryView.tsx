@@ -116,6 +116,7 @@ export default function TokenHistoryView({
     <div className={styles.container}>
       {showFilters && (
         <TokenHistoryFilters
+          key="token-history-filters"
           filters={filters}
           onFilterChange={handleFilterChange}
           onClearFilters={clearAllFilters}

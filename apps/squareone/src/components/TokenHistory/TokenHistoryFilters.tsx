@@ -33,6 +33,10 @@ export default function TokenHistoryFilters({
   const [isStuck, setIsStuck] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Track if any popover is open
+  const [isAnyPopoverOpen, setIsAnyPopoverOpen] = useState(false);
+  const pendingChangesRef = useRef<Partial<FilterType> | null>(null);
+
   // Detect when the filter bar is stuck to the top
   useEffect(() => {
     const container = containerRef.current;
@@ -52,16 +56,40 @@ export default function TokenHistoryFilters({
     };
   }, []);
 
+  // Apply pending changes when popover closes
+  useEffect(() => {
+    if (!isAnyPopoverOpen && pendingChangesRef.current) {
+      onFilterChange(pendingChangesRef.current);
+      pendingChangesRef.current = null;
+    }
+  }, [isAnyPopoverOpen, onFilterChange]);
+
   const handleSinceChange = (iso: string) => {
     // Convert ISO8601 string to Date for the filter state
     const date = iso ? new Date(iso) : undefined;
-    onFilterChange({ since: date });
+    if (isAnyPopoverOpen) {
+      // Store change while popover is open
+      pendingChangesRef.current = {
+        ...pendingChangesRef.current,
+        since: date,
+      };
+    } else {
+      onFilterChange({ since: date });
+    }
   };
 
   const handleUntilChange = (iso: string) => {
     // Convert ISO8601 string to Date for the filter state
     const date = iso ? new Date(iso) : undefined;
-    onFilterChange({ until: date });
+    if (isAnyPopoverOpen) {
+      // Store change while popover is open
+      pendingChangesRef.current = {
+        ...pendingChangesRef.current,
+        until: date,
+      };
+    } else {
+      onFilterChange({ until: date });
+    }
   };
 
   const handleTokenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -85,8 +113,10 @@ export default function TokenHistoryFilters({
           Since
         </label>
         <DateTimePicker
+          key="since-filter"
           defaultValue={filters.since?.toISOString() || ''}
           onChange={handleSinceChange}
+          onOpenChange={setIsAnyPopoverOpen}
           defaultTimezone="local"
           showTimezone={true}
           placeholder="Start date"
@@ -100,8 +130,10 @@ export default function TokenHistoryFilters({
           Until
         </label>
         <DateTimePicker
+          key="until-filter"
           defaultValue={filters.until?.toISOString() || ''}
           onChange={handleUntilChange}
+          onOpenChange={setIsAnyPopoverOpen}
           defaultTimezone="local"
           showTimezone={true}
           placeholder="End date"
