@@ -1,5 +1,11 @@
 # @lsst-sqre/tsconfig
 
+## 0.4.0
+
+### Minor Changes
+
+- [#202](https://github.com/lsst-sqre/squareone/pull/202) [`00541978853083e5d1d9a4ee19a033e19f774e6e`](https://github.com/lsst-sqre/squareone/commit/00541978853083e5d1d9a4ee19a033e19f774e6e) Thanks [@jonathansick](https://github.com/jonathansick)! - Update TypeScript target to ES2022 for modern JavaScript features and Node 22 compatibility
+
 ## 0.3.0
 
 ### Minor Changes
