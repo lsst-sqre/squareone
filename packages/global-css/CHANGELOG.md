@@ -1,5 +1,12 @@
 # @lsst-sqre/global-css
 
+## 0.2.3
+
+### Patch Changes
+
+- Updated dependencies [[`0baaffd667f8d53aeb2963f36371415516b2c0ff`](https://github.com/lsst-sqre/squareone/commit/0baaffd667f8d53aeb2963f36371415516b2c0ff)]:
+  - @lsst-sqre/rubin-style-dictionary@0.6.0
+
 ## 0.2.2
 
 ### Patch Changes
