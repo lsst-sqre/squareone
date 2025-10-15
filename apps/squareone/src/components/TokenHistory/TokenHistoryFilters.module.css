@@ -1,0 +1,48 @@
+/* TokenHistoryFilters: Filter controls for token history page */
+
+.container {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: var(--rsd-component-page-background-color);
+  padding: var(--sqo-space-md);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sqo-space-md);
+  align-items: end;
+  transition: box-shadow 0.2s ease;
+}
+
+.container.stuck {
+  box-shadow: var(--sqo-elevation-md);
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sqo-space-xxs);
+}
+
+.filterLabel {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--rsd-color-gray-500);
+}
+
+/* Constrain token input to 22 characters + padding */
+.filterGroup:has(#filter-token) {
+  width: 24ch;
+}
+
+/* Constrain IP address input to typical IP/CIDR size */
+.filterGroup:has(#filter-ip) {
+  width: 22ch;
+}
+
+/* Responsive layout: full width on mobile */
+@media (max-width: 768px) {
+  .filterGroup:has(#filter-token),
+  .filterGroup:has(#filter-ip) {
+    width: 100%;
+  }
+}

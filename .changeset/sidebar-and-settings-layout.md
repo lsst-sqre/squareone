@@ -14,6 +14,5 @@ Add comprehensive sidebar layout system and settings pages
 
 - **Settings pages implementation:**
   - `SettingsLayout`: Settings-specific layout using the sidebar system with dynamic navigation
-  - Three settings pages: Account (`/settings/`), Sessions (`/settings/sessions`), and Access Tokens (`/settings/tokens`)
-  - Dynamic navigation filtering based on `AppConfig` (e.g., sessions page visibility controlled by `settingsSessionsVisible`)
+  - Pages: Account (`/settings/`), and Access Tokens (`/settings/tokens`)
   - Complete server-side rendering with proper `getServerSideProps` implementation

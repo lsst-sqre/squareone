@@ -63,9 +63,9 @@ export function parseISO8601(value: string): Date | null {
 }
 
 /**
- * Formats a Date object to ISO8601 string
+ * Formats a Date object to ISO8601 timestamp string
  * @param date - The date to format
- * @param includeTime - Whether to include time portion (default: true)
+ * @param includeTime - Reserved for API compatibility, always includes time
  * @param includeSeconds - Whether to include seconds (default: false)
  * @param timezone - Target timezone (default: UTC)
  */
@@ -89,24 +89,22 @@ export function formatToISO8601(
 
   // For UTC, format directly using ISO format
   if (timezone === 'UTC') {
-    if (!includeTime) {
-      // Use UTC date methods to extract the date
-      const year = date.getUTCFullYear();
-      const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-      const day = String(date.getUTCDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    }
+    // Extract UTC components
+    const year = date.getUTCFullYear();
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    const hours = String(date.getUTCHours()).padStart(2, '0');
+    const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+    const seconds = String(date.getUTCSeconds()).padStart(2, '0');
 
-    // Use toISOString which always returns UTC with format: 2024-03-15T14:30:45.123Z
-    // Then remove milliseconds to get: 2024-03-15T14:30:45Z
-    return date.toISOString().replace(/\.\d{3}Z$/, 'Z');
+    const dateStr = `${year}-${month}-${day}`;
+    const timeStr = includeSeconds
+      ? `${hours}:${minutes}:${seconds}`
+      : `${hours}:${minutes}`;
+    return `${dateStr}T${timeStr}Z`;
   }
 
   // For other timezones, use formatInTimeZone which handles timezone offsets correctly
-  if (!includeTime) {
-    return formatInTimeZone(date, timezone, 'yyyy-MM-dd');
-  }
-
   const timeFormat = includeSeconds ? 'HH:mm:ss' : 'HH:mm';
   const formatString = `yyyy-MM-dd'T'${timeFormat}xxx`;
 
@@ -306,4 +304,62 @@ export function getDateValidationError(
   }
 
   return null;
+}
+
+/**
+ * Prepares an ISO8601 string for use with DateTimePicker
+ *
+ * This helper function makes the conversion from ISO8601 strings to Date objects
+ * explicit and helps developers understand timezone handling. The timezone encoded
+ * in an ISO8601 string (e.g., "-05:00") only determines the moment in time, not
+ * the timezone context for editing.
+ *
+ * @param iso8601 - ISO8601 timestamp string (e.g., "2024-03-15T14:30:00-05:00")
+ * @param options - Configuration options
+ * @param options.preferTimezone - IANA timezone to use for editing (overrides detection)
+ * @param options.fallbackTimezone - Timezone to use if detection fails (default: 'local')
+ * @returns Object with Date value, timezone for editing, and original offset
+ *
+ * @example
+ * // Use local timezone for editing
+ * const { value, timezone } = prepareDateTime("2024-03-15T14:30:00-08:00");
+ * <DateTimePicker value={value} timezone={timezone} />
+ *
+ * @example
+ * // Specify timezone for editing
+ * const { value } = prepareDateTime("2024-03-15T14:30:00Z", {
+ *   preferTimezone: "America/New_York"
+ * });
+ * <DateTimePicker value={value} timezone="America/New_York" />
+ */
+export function prepareDateTime(
+  iso8601: string,
+  options?: {
+    preferTimezone?: string;
+    fallbackTimezone?: string;
+  }
+): {
+  value: Date;
+  timezone: string;
+  originalOffset: string;
+} {
+  const date = parseISO8601(iso8601);
+  if (!date) {
+    throw new Error(`Invalid ISO8601 string: ${iso8601}`);
+  }
+
+  // Extract timezone offset from the ISO8601 string (e.g., "-05:00", "+00:00", "Z")
+  const offsetMatch = iso8601.match(/(Z|[+-]\d{2}:\d{2})$/);
+  const originalOffset = offsetMatch ? offsetMatch[1] : '';
+
+  // Determine timezone for editing context
+  // Order of precedence: preferTimezone > fallbackTimezone > 'local'
+  const timezone =
+    options?.preferTimezone || options?.fallbackTimezone || 'local';
+
+  return {
+    value: date,
+    timezone,
+    originalOffset,
+  };
 }

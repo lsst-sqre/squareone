@@ -10,36 +10,39 @@ const meta: Meta<typeof DateTimePicker> = {
     docs: {
       description: {
         component: `
-The DateTimePicker component provides a comprehensive interface for selecting dates and times with timezone support. It combines an editable ISO8601 text input with a calendar popover, time controls, and timezone selection.
+The DateTimePicker component provides a comprehensive interface for selecting timestamps with timezone support. It combines an editable ISO8601 text input with a calendar popover, time controls, and timezone selection.
+
+**Note:** This component always produces full ISO8601 timestamps (date + time + timezone). For date-only selection without time, use the DatePicker component instead.
 
 ## Features
 
 - **ISO8601 Text Input**: Direct text entry with real-time validation
 - **Calendar Popover**: Visual date selection with month navigation
-- **Time Controls**: Spinbox inputs for hours, minutes, and optional seconds
+- **Time Controls**: Always visible spinbox inputs for hours, minutes, and optional seconds
 - **Timezone Support**: Auto-detection with manual override options
 - **Date Constraints**: Min/max date boundaries
 - **Accessibility**: Full keyboard navigation and screen reader support
 
 ## Usage
 
-The component accepts an ISO8601 string as its value and calls the onChange handler with the updated ISO8601 string whenever the user makes changes.
+The component accepts an ISO8601 timestamp string as its value and calls the onChange handler with the updated ISO8601 timestamp string whenever the user makes changes.
         `,
       },
     },
   },
   argTypes: {
-    value: {
+    defaultValue: {
       control: { type: 'text' },
-      description: 'Current value as ISO8601 string',
+      description: 'Initial value as ISO8601 string',
     },
     onChange: {
       action: 'changed',
-      description: 'Called when the value changes',
+      description: 'Called when the value changes with ISO8601 string',
     },
-    timezone: {
+    defaultTimezone: {
       control: { type: 'select' },
       options: [
+        'local',
         'UTC',
         'America/New_York',
         'America/Chicago',
@@ -48,7 +51,8 @@ The component accepts an ISO8601 string as its value and calls the onChange hand
         'Europe/Paris',
         'Asia/Tokyo',
       ],
-      description: 'IANA timezone identifier',
+      description:
+        "IANA timezone identifier, 'UTC', or 'local' for browser timezone (default: 'local')",
     },
     onTimezoneChange: {
       action: 'timezone-changed',
@@ -65,10 +69,6 @@ The component accepts an ISO8601 string as its value and calls the onChange hand
     disabled: {
       control: { type: 'boolean' },
       description: 'Whether the component is disabled',
-    },
-    showTime: {
-      control: { type: 'boolean' },
-      description: 'Whether to show time selection',
     },
     showSeconds: {
       control: { type: 'boolean' },
@@ -98,16 +98,26 @@ type Story = StoryObj<typeof meta>;
 const ControlledDateTimePicker = (
   props: React.ComponentProps<typeof DateTimePicker>
 ) => {
-  const [value, setValue] = useState(props.value || '');
-  const [timezone, setTimezone] = useState(props.timezone || 'UTC');
+  const [value, setValue] = useState<string>(props.defaultValue || '');
+  const [timezone, setTimezone] = useState(props.defaultTimezone || 'local');
 
   return (
     <DateTimePicker
       {...props}
-      value={value}
-      onChange={setValue}
-      timezone={timezone}
-      onTimezoneChange={setTimezone}
+      defaultValue={value}
+      onChange={(iso) => {
+        setValue(iso);
+        if (props.onChange) {
+          props.onChange(iso);
+        }
+      }}
+      defaultTimezone={timezone}
+      onTimezoneChange={(tz) => {
+        setTimezone(tz);
+        if (props.onTimezoneChange) {
+          props.onTimezoneChange(tz);
+        }
+      }}
     />
   );
 };
@@ -117,19 +127,10 @@ export const Default: Story = {
     <ControlledDateTimePicker {...args} />
   ),
   args: {
-    value: '2024-03-15T14:30:00Z',
+    defaultValue: null,
     placeholder: 'Select date and time',
-  },
-};
-
-export const WithoutTime: Story = {
-  render: (args: React.ComponentProps<typeof DateTimePicker>) => (
-    <ControlledDateTimePicker {...args} />
-  ),
-  args: {
-    value: '2024-03-15',
-    showTime: false,
-    placeholder: 'Select date',
+    // defaultTimezone defaults to 'local' (browser timezone)
+    // showTimezone defaults to true
   },
 };
 
@@ -138,20 +139,21 @@ export const WithSeconds: Story = {
     <ControlledDateTimePicker {...args} />
   ),
   args: {
-    value: '2024-03-15T14:30:45Z',
+    defaultValue: '2024-03-15T14:30:45Z',
     showSeconds: true,
     placeholder: 'Select date and time with seconds',
   },
 };
 
-export const WithoutTimezone: Story = {
+export const UTCOnly: Story = {
   render: (args: React.ComponentProps<typeof DateTimePicker>) => (
     <ControlledDateTimePicker {...args} />
   ),
   args: {
-    value: '2024-03-15T14:30:00',
+    defaultValue: '2024-03-15T14:30:00Z',
+    defaultTimezone: 'UTC',
     showTimezone: false,
-    placeholder: 'Select date and time',
+    placeholder: 'Select date and time (UTC)',
   },
 };
 
@@ -160,7 +162,7 @@ export const WithConstraints: Story = {
     <ControlledDateTimePicker {...args} />
   ),
   args: {
-    value: '2024-03-15T14:30:00Z',
+    defaultValue: '2024-03-15T14:30:00Z',
     minDate: new Date('2024-03-01'),
     maxDate: new Date('2024-03-31'),
     placeholder: 'Select date within March 2024',
@@ -172,8 +174,8 @@ export const DifferentTimezone: Story = {
     <ControlledDateTimePicker {...args} />
   ),
   args: {
-    value: '2024-03-15T14:30:00-08:00',
-    timezone: 'America/Los_Angeles',
+    defaultValue: '2024-03-15T14:30:00-08:00',
+    defaultTimezone: 'America/Los_Angeles',
     placeholder: 'Select date and time in Pacific timezone',
   },
 };
@@ -183,7 +185,7 @@ export const Disabled: Story = {
     <ControlledDateTimePicker {...args} />
   ),
   args: {
-    value: '2024-03-15T14:30:00Z',
+    defaultValue: '2024-03-15T14:30:00Z',
     disabled: true,
     placeholder: 'Disabled date picker',
   },
@@ -202,7 +204,7 @@ export const Sizes: Story = {
       <div>
         <h4>Small</h4>
         <ControlledDateTimePicker
-          value="2024-03-15T14:30:00Z"
+          defaultValue="2024-03-15T14:30:00Z"
           size="sm"
           placeholder="Small size"
           onChange={() => {}}
@@ -211,7 +213,7 @@ export const Sizes: Story = {
       <div>
         <h4>Medium (Default)</h4>
         <ControlledDateTimePicker
-          value="2024-03-15T14:30:00Z"
+          defaultValue="2024-03-15T14:30:00Z"
           size="md"
           placeholder="Medium size"
           onChange={() => {}}
@@ -220,7 +222,7 @@ export const Sizes: Story = {
       <div>
         <h4>Large</h4>
         <ControlledDateTimePicker
-          value="2024-03-15T14:30:00Z"
+          defaultValue="2024-03-15T14:30:00Z"
           size="lg"
           placeholder="Large size"
           onChange={() => {}}
@@ -237,7 +239,7 @@ export const FullWidth: Story = {
     </div>
   ),
   args: {
-    value: '2024-03-15T14:30:00Z',
+    defaultValue: '2024-03-15T14:30:00Z',
     fullWidth: true,
     placeholder: 'Full width date picker',
   },
@@ -248,19 +250,20 @@ export const Empty: Story = {
     <ControlledDateTimePicker {...args} />
   ),
   args: {
-    value: '',
-    placeholder: 'YYYY-MM-DDTHH:mm:ssZ',
+    defaultValue: null,
+    placeholder: 'YYYY-MM-DDTHH:mmZ',
   },
 };
 
 export const WithValidationError: Story = {
   render: () => {
-    const [value, setValue] = useState('invalid-date');
+    const [value, setValue] = useState<string>('');
 
     return (
       <DateTimePicker
-        value={value}
-        onChange={setValue}
+        key={value}
+        defaultValue={value}
+        onChange={(iso) => setValue(iso)}
         placeholder="Try entering an invalid date"
       />
     );
@@ -269,13 +272,16 @@ export const WithValidationError: Story = {
 
 export const FormIntegration: Story = {
   render: () => {
-    const [formData, setFormData] = useState({
-      eventDate: '2024-03-15T14:30:00Z',
-      timezone: 'UTC',
+    const [formData, setFormData] = useState<{
+      eventTimestamp: string;
+      timezone: string;
+    }>({
+      eventTimestamp: '',
+      timezone: 'local',
     });
 
-    const handleDateChange = (value: string) => {
-      setFormData((prev) => ({ ...prev, eventDate: value }));
+    const handleDateChange = (iso: string) => {
+      setFormData((prev) => ({ ...prev, eventTimestamp: iso }));
     };
 
     const handleTimezoneChange = (timezone: string) => {
@@ -285,7 +291,7 @@ export const FormIntegration: Story = {
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
       alert(
-        `Form submitted with:\nDate: ${formData.eventDate}\nTimezone: ${formData.timezone}`
+        `Form submitted with:\nTimestamp: ${formData.eventTimestamp}\nTimezone: ${formData.timezone}`
       );
     };
 
@@ -311,9 +317,10 @@ export const FormIntegration: Story = {
             Event Date & Time
           </label>
           <DateTimePicker
-            value={formData.eventDate}
+            key={formData.eventTimestamp}
+            defaultValue={formData.eventTimestamp}
             onChange={handleDateChange}
-            timezone={formData.timezone}
+            defaultTimezone={formData.timezone}
             onTimezoneChange={handleTimezoneChange}
             placeholder="Select event date and time"
             aria-label="Event date and time"
@@ -335,7 +342,12 @@ export const FormIntegration: Story = {
         <div style={{ fontSize: '0.875rem', color: '#666' }}>
           <strong>Current values:</strong>
           <br />
-          Date: {formData.eventDate}
+          Timestamp: {formData.eventTimestamp || '(none)'}
+          <br />
+          Date object:{' '}
+          {formData.eventTimestamp
+            ? new Date(formData.eventTimestamp).toISOString()
+            : '(none)'}
           <br />
           Timezone: {formData.timezone}
         </div>
@@ -347,23 +359,26 @@ export const FormIntegration: Story = {
 // Interactive testing story
 export const InteractiveDemo: Story = {
   render: () => {
-    const [value, setValue] = useState('2024-03-15T14:30:00Z');
-    const [timezone, setTimezone] = useState('UTC');
-    const [showTime, setShowTime] = useState(true);
+    const [value, setValue] = useState<string>('');
+    const [timezone, setTimezone] = useState('local');
     const [showSeconds, setShowSeconds] = useState(false);
     const [showTimezone, setShowTimezone] = useState(true);
     const [disabled, setDisabled] = useState(false);
+
+    const handleChange = (iso: string) => {
+      setValue(iso);
+    };
 
     return (
       <div style={{ display: 'flex', gap: '2rem' }}>
         <div>
           <h4>DateTimePicker</h4>
           <DateTimePicker
-            value={value}
-            onChange={setValue}
-            timezone={timezone}
+            key={timezone + showSeconds + showTimezone} // Force remount on config changes only
+            defaultValue={value}
+            onChange={handleChange}
+            defaultTimezone={timezone}
             onTimezoneChange={setTimezone}
-            showTime={showTime}
             showSeconds={showSeconds}
             showTimezone={showTimezone}
             disabled={disabled}
@@ -372,7 +387,11 @@ export const InteractiveDemo: Story = {
           <div
             style={{ marginTop: '1rem', fontSize: '0.875rem', color: '#666' }}
           >
-            <strong>Current value:</strong> {value || '(empty)'}
+            <strong>Current value:</strong>
+            <br />
+            Timestamp: {value || '(empty)'}
+            <br />
+            Date object: {value ? new Date(value).toISOString() : '(empty)'}
           </div>
         </div>
         <div>
@@ -383,17 +402,8 @@ export const InteractiveDemo: Story = {
             <label>
               <input
                 type="checkbox"
-                checked={showTime}
-                onChange={(e) => setShowTime(e.target.checked)}
-              />{' '}
-              Show Time
-            </label>
-            <label>
-              <input
-                type="checkbox"
                 checked={showSeconds}
                 onChange={(e) => setShowSeconds(e.target.checked)}
-                disabled={!showTime}
               />{' '}
               Show Seconds
             </label>

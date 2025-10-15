@@ -17,7 +17,6 @@ const mockUserTokens: TokenInfo[] = [
     token_name: 'my-recent-token',
     created: now - 86400, // 1 day ago
     expires: now + 86400 * 30, // 30 days from now
-    last_used: now - 3600 * 2, // 2 hours ago
     parent: null,
   },
   {
@@ -29,7 +28,6 @@ const mockUserTokens: TokenInfo[] = [
     token_name: 'my-old-token',
     created: now - 86400 * 90, // 90 days ago
     expires: null, // Never expires
-    last_used: now - 86400 * 5, // 5 days ago
     parent: null,
   },
   {
@@ -41,7 +39,6 @@ const mockUserTokens: TokenInfo[] = [
     token_name: 'notebook-token',
     created: now - 86400 * 7, // 7 days ago
     expires: now + 86400 * 7, // 7 days from now
-    last_used: null, // Never used
     parent: null,
   },
 ];
@@ -57,7 +54,6 @@ const mockSessionTokens: TokenInfo[] = [
     token_name: 'session-token',
     created: now - 3600,
     expires: now + 3600 * 24,
-    last_used: now - 60,
     parent: null,
   },
 ];
@@ -211,7 +207,6 @@ export const ManyTokens: Story = {
         token_name: `token-${i}`,
         created: now - 86400 * (i + 1),
         expires: now + 86400 * 30,
-        last_used: now - 3600 * (i + 1),
         parent: null,
       };
     }),

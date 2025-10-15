@@ -9,7 +9,7 @@ export type TokenInfo = {
   expires?: number; // Optional field - omitted means no expiration
   token: string;
   token_name?: string; // Optional field - omitted for some token types
-  last_used?: number; // Optional field - omitted means never used
+  last_used?: number; // Optional field - not currently implemented by API
   parent: string | null;
 };
 

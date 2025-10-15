@@ -1,0 +1,121 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.metadataCard {
+  background-color: var(--sqo-doc-card-background-color);
+  border: 1px solid var(--rsd-color-primary-600);
+  border-radius: var(--sqo-border-radius-2);
+  padding: var(--sqo-space-md-fixed);
+  margin-bottom: var(--sqo-space-lg-fixed);
+  box-shadow: var(--sqo-elevation-sm);
+}
+
+.metadataHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--sqo-space-md-fixed);
+  gap: var(--sqo-space-md-fixed);
+}
+
+.tokenName {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.metadataGrid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sqo-space-sm-fixed);
+}
+
+.metadataRow {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: var(--sqo-space-md-fixed);
+  align-items: start;
+}
+
+.metadataLabel {
+  font-weight: 500;
+  color: var(--rsd-color-gray-500);
+  margin: 0;
+}
+
+.metadataValue {
+  margin: 0;
+  word-break: break-word;
+}
+
+.tokenKey {
+  font-family: monospace;
+  font-size: 0.875rem;
+  background-color: var(--rsd-color-gray-100);
+  padding: 0.125rem 0.25rem;
+  border-radius: var(--sqo-border-radius-1);
+}
+
+.link {
+  color: var(--rsd-component-text-link-color);
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.scopesBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.historySection {
+  margin-top: var(--sqo-space-xl-fixed);
+}
+
+.historySection h2 {
+  margin-bottom: var(--sqo-space-md-fixed);
+  font-size: 1.25rem;
+}
+
+.error {
+  padding: var(--sqo-space-md-fixed);
+  background-color: var(--rsd-color-red-100);
+  border: 1px solid var(--rsd-color-red-500);
+  border-radius: var(--sqo-border-radius-2);
+  color: var(--rsd-color-red-900);
+}
+
+.error h2 {
+  margin-top: 0;
+  color: var(--rsd-color-red-900);
+}
+
+.error code {
+  font-family: monospace;
+  background-color: var(--rsd-color-red-200);
+  padding: 0.125rem 0.25rem;
+  border-radius: var(--sqo-border-radius-1);
+}
+
+/* Mobile layout */
+@media (max-width: 768px) {
+  .metadataHeader {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .metadataRow {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+
+  .metadataLabel {
+    font-size: 0.875rem;
+  }
+}

@@ -8,3 +8,6 @@ export type { TimezoneSelectorProps } from './TimezoneSelector';
 // Utility exports
 export * from './dateUtils';
 export * from './timezoneUtils';
+
+// Re-export prepareDateTime explicitly for discoverability
+export { prepareDateTime } from './dateUtils';

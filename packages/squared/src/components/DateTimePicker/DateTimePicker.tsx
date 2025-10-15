@@ -2,7 +2,6 @@ import React, {
   forwardRef,
   useState,
   useCallback,
-  useEffect,
   useRef,
   useMemo,
 } from 'react';
@@ -27,14 +26,14 @@ import { getBrowserTimezone, getCurrentTimeInTimezone } from './timezoneUtils';
 import styles from './DateTimePicker.module.css';
 
 export type DateTimePickerProps = {
-  value?: string; // ISO8601 string
-  onChange: (value: string) => void;
-  timezone?: string; // IANA timezone identifier
+  defaultValue?: string | null; // ISO8601 timestamp string
+  onChange: (iso8601: string) => void; // Returns ISO8601 string only
+  onOpenChange?: (open: boolean) => void; // Called when popover opens/closes
+  defaultTimezone?: string; // IANA timezone identifier, or 'local' for browser timezone. Default: 'local'
   onTimezoneChange?: (timezone: string) => void;
   minDate?: Date;
   maxDate?: Date;
   disabled?: boolean;
-  showTime?: boolean; // Default: true
   showSeconds?: boolean; // Default: false
   showTimezone?: boolean; // Default: true
   placeholder?: string;
@@ -46,20 +45,52 @@ export type DateTimePickerProps = {
 };
 
 /**
- * DateTimePicker component for selecting dates and times with timezone support
- * Combines ISO8601 text input with calendar popover and time controls
+ * DateTimePicker component for selecting timestamps with timezone support
+ *
+ * Accepts ISO8601 timestamp strings and returns ISO8601 strings via onChange.
+ * The component displays an editable ISO8601 text input with calendar popover,
+ * time controls, and timezone selector.
+ *
+ * **Key Concepts:**
+ * - `defaultValue` prop: ISO8601 string representing the initial timestamp
+ * - `defaultTimezone` prop: Controls initial timezone and how defaultValue is interpreted
+ * - `onChange`: Returns an ISO8601 string with timezone offset
+ *
+ * **Usage:**
+ * ```tsx
+ * // Simple usage with local timezone
+ * <DateTimePicker
+ *   defaultValue="2024-03-15T14:30:00Z"
+ *   defaultTimezone="local"
+ *   onChange={(iso) => handleChange(iso)}
+ * />
+ *
+ * // Fixed UTC timezone
+ * <DateTimePicker
+ *   defaultValue="2024-03-15T14:30:00Z"
+ *   defaultTimezone="UTC"
+ *   showTimezone={false}
+ *   onChange={(iso) => handleChange(iso)}
+ * />
+ * ```
+ *
+ * @param defaultValue - ISO8601 timestamp string, or null/undefined for empty
+ * @param onChange - Callback that receives ISO8601 timestamp string
+ * @param defaultTimezone - IANA timezone identifier (e.g., 'America/New_York'), 'UTC', or 'local' for browser timezone. Default: 'local'
+ * @param showTimezone - Whether to show the timezone selector in the popover. Default: true
+ * @param showSeconds - Whether to include seconds in the timestamp. Default: false
  */
 const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
   (
     {
-      value = '',
+      defaultValue = null,
       onChange,
-      timezone,
+      onOpenChange,
+      defaultTimezone = 'local',
       onTimezoneChange,
       minDate,
       maxDate,
       disabled = false,
-      showTime = true,
       showSeconds = false,
       showTimezone = true,
       placeholder,
@@ -71,54 +102,71 @@ const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
     },
     ref
   ) => {
+    // Resolve timezone: 'local' becomes browser timezone, otherwise use the provided value
+    const currentTimezone = useMemo(() => {
+      if (defaultTimezone === 'local') return getBrowserTimezone();
+      return defaultTimezone;
+    }, [defaultTimezone]);
+
     // State management
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-    const [inputValue, setInputValue] = useState(value);
-    const [calendarMonth, setCalendarMonth] = useState<Date>(() => {
-      const parsed = parseISO8601(value);
-      return (
-        parsed || getCurrentTimeInTimezone(timezone || getBrowserTimezone())
-      );
+
+    // Display value is initialized from defaultValue (ISO8601 string)
+    const [displayValue, setDisplayValue] = useState<string>(() => {
+      if (!defaultValue) return '';
+      // Parse ISO8601 string and format in defaultTimezone
+      const date = parseISO8601(defaultValue);
+      if (!date) return '';
+      return formatToISO8601(date, {
+        includeTime: true,
+        includeSeconds: showSeconds,
+        timezone: currentTimezone,
+      });
     });
 
-    // Auto-detect browser timezone if not provided
-    const currentTimezone = timezone || getBrowserTimezone();
+    const [selectedTimezone, setSelectedTimezone] = useState<string>(() => {
+      return currentTimezone;
+    });
+
+    const [calendarMonth, setCalendarMonth] = useState<Date>(() => {
+      if (defaultValue) {
+        const date = parseISO8601(defaultValue);
+        if (date) return date;
+      }
+      return getCurrentTimeInTimezone(currentTimezone);
+    });
 
     // Refs
     const inputRef = useRef<HTMLInputElement>(null);
     const triggerRef = useRef<HTMLButtonElement>(null);
 
-    // Sync input value with prop value
-    useEffect(() => {
-      setInputValue(value);
-    }, [value]);
-
-    // Parse current date/time from input
-    const currentDate = useMemo(() => parseISO8601(inputValue), [inputValue]);
+    // Parse current date/time from display input
+    const currentDate = useMemo(
+      () => parseISO8601(displayValue),
+      [displayValue]
+    );
     const isInputValid = useMemo(() => {
-      if (!inputValue) return true; // Empty is valid
+      if (!displayValue) return true; // Empty is valid
       return (
-        isValidISO8601(inputValue) &&
+        isValidISO8601(displayValue) &&
         (!currentDate || isDateInRange(currentDate, minDate, maxDate))
       );
-    }, [inputValue, currentDate, minDate, maxDate]);
+    }, [displayValue, currentDate, minDate, maxDate]);
 
     // Get validation error message
     const validationError = useMemo(() => {
-      if (!inputValue) return null;
+      if (!displayValue) return null;
 
-      if (!isValidISO8601(inputValue)) {
+      if (!isValidISO8601(displayValue)) {
         let formatExample = 'YYYY-MM-DD';
-        if (showTime) {
-          formatExample += showSeconds ? 'THH:mm:ss' : 'THH:mm';
-        }
+        formatExample += showSeconds ? 'THH:mm:ss' : 'THH:mm';
         if (showTimezone) {
           formatExample += 'Z';
         }
         return `Please enter a valid date in ISO8601 format (${formatExample})`;
       }
 
-      const date = parseISO8601(inputValue);
+      const date = parseISO8601(displayValue);
       if (!date) {
         return 'Invalid date';
       }
@@ -136,21 +184,21 @@ const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
       }
 
       return null;
-    }, [inputValue, minDate, maxDate, showTime, showSeconds, showTimezone]);
+    }, [displayValue, minDate, maxDate, showSeconds, showTimezone]);
 
     // Extract time components from current date
     const timeComponents = useMemo(() => {
       if (!currentDate) {
-        const now = getCurrentTimeInTimezone(currentTimezone);
-        return extractDateComponents(now, currentTimezone);
+        const now = getCurrentTimeInTimezone(selectedTimezone);
+        return extractDateComponents(now, selectedTimezone);
       }
-      return extractDateComponents(currentDate, currentTimezone);
-    }, [currentDate, currentTimezone]);
+      return extractDateComponents(currentDate, selectedTimezone);
+    }, [currentDate, selectedTimezone]);
 
     // Handle input value changes
     const handleInputChange = useCallback(
       (newValue: string) => {
-        setInputValue(newValue);
+        setDisplayValue(newValue);
 
         // If the input is valid, update the parent
         if (isValidISO8601(newValue)) {
@@ -175,10 +223,11 @@ const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
 
         let newDateTime: Date;
 
-        if (showTime && currentDate) {
+        if (currentDate) {
+          // Preserve existing time components when changing date
           const timeComponents = extractDateComponents(
             currentDate,
-            currentTimezone
+            selectedTimezone
           );
           newDateTime = createDateFromComponents(
             selectedDate.getFullYear(),
@@ -187,9 +236,10 @@ const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
             timeComponents.hours,
             timeComponents.minutes,
             showSeconds ? timeComponents.seconds : 0,
-            currentTimezone
+            selectedTimezone
           );
         } else {
+          // Default to 00:00:00 if no current time
           newDateTime = createDateFromComponents(
             selectedDate.getFullYear(),
             selectedDate.getMonth() + 1,
@@ -197,21 +247,21 @@ const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
             0,
             0,
             0,
-            currentTimezone
+            selectedTimezone
           );
         }
 
         const isoString = formatToISO8601(newDateTime, {
-          includeTime: showTime,
+          includeTime: true,
           includeSeconds: showSeconds,
-          timezone: currentTimezone,
+          timezone: selectedTimezone,
         });
 
-        setInputValue(isoString);
+        setDisplayValue(isoString);
         onChange(isoString);
         // Keep popover open to allow time/timezone adjustments
       },
-      [currentDate, showTime, showSeconds, currentTimezone, onChange]
+      [currentDate, showSeconds, selectedTimezone, onChange]
     );
 
     // Handle time changes
@@ -228,10 +278,10 @@ const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
 
         let dateComponents;
         if (!currentDate) {
-          const today = getCurrentTimeInTimezone(currentTimezone);
-          dateComponents = extractDateComponents(today, currentTimezone);
+          const today = getCurrentTimeInTimezone(selectedTimezone);
+          dateComponents = extractDateComponents(today, selectedTimezone);
         } else {
-          dateComponents = extractDateComponents(currentDate, currentTimezone);
+          dateComponents = extractDateComponents(currentDate, selectedTimezone);
         }
 
         const newDateTime = createDateFromComponents(
@@ -241,24 +291,27 @@ const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
           hours,
           minutes,
           showSeconds ? seconds : 0,
-          currentTimezone
+          selectedTimezone
         );
 
         const isoString = formatToISO8601(newDateTime, {
           includeTime: true,
           includeSeconds: showSeconds,
-          timezone: currentTimezone,
+          timezone: selectedTimezone,
         });
 
-        setInputValue(isoString);
+        setDisplayValue(isoString);
         onChange(isoString);
       },
-      [currentDate, currentTimezone, showSeconds, onChange]
+      [currentDate, selectedTimezone, showSeconds, onChange]
     );
 
     // Handle timezone changes
     const handleTimezoneChange = useCallback(
       (newTimezone: string) => {
+        // Update internal state first
+        setSelectedTimezone(newTimezone);
+
         if (onTimezoneChange) {
           onTimezoneChange(newTimezone);
         }
@@ -268,7 +321,7 @@ const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
           // Extract date/time components from current timezone
           const components = extractDateComponents(
             currentDate,
-            currentTimezone
+            selectedTimezone
           );
 
           // Create a new date with the same components in the new timezone
@@ -283,22 +336,15 @@ const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
           );
 
           const isoString = formatToISO8601(newDateTime, {
-            includeTime: showTime,
+            includeTime: true,
             includeSeconds: showSeconds,
             timezone: newTimezone,
           });
-          setInputValue(isoString);
+          setDisplayValue(isoString);
           onChange(isoString);
         }
       },
-      [
-        currentDate,
-        currentTimezone,
-        showTime,
-        showSeconds,
-        onChange,
-        onTimezoneChange,
-      ]
+      [currentDate, selectedTimezone, showSeconds, onChange, onTimezoneChange]
     );
 
     // Handle calendar button click
@@ -323,23 +369,21 @@ const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
       if (placeholder) return placeholder;
 
       let format = 'YYYY-MM-DD';
-      if (showTime) {
-        format += showSeconds ? 'THH:mm:ss' : 'THH:mm';
-      }
+      format += showSeconds ? 'THH:mm:ss' : 'THH:mm';
       if (showTimezone) {
         format += 'Z';
       }
       return format;
-    }, [placeholder, showTime, showSeconds, showTimezone]);
+    }, [placeholder, showSeconds, showTimezone]);
 
     // Format current time for TimeInput
     const currentTimeString = useMemo(() => {
       if (!currentDate) {
-        const now = getCurrentTimeInTimezone(currentTimezone);
-        return formatTime(now, showSeconds, currentTimezone);
+        const now = getCurrentTimeInTimezone(selectedTimezone);
+        return formatTime(now, showSeconds, selectedTimezone);
       }
-      return formatTime(currentDate, showSeconds, currentTimezone);
-    }, [currentDate, currentTimezone, showSeconds]);
+      return formatTime(currentDate, showSeconds, selectedTimezone);
+    }, [currentDate, selectedTimezone, showSeconds]);
 
     const containerClassNames = [
       styles.dateTimePicker,
@@ -350,12 +394,12 @@ const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
 
     // Calculate dynamic input width based on content
     const inputWidth = useMemo(() => {
-      const content = inputValue || placeholderText;
+      const content = displayValue || placeholderText;
       // Add extra space for padding and button - varies by size due to different base padding
       const extraChars = size === 'lg' ? 10 : size === 'sm' ? 7 : 8;
       const charCount = content.length + extraChars;
       return `${charCount}ch`;
-    }, [inputValue, placeholderText, size]);
+    }, [displayValue, placeholderText, size]);
 
     return (
       <div ref={ref} className={containerClassNames} onKeyDown={handleKeyDown}>
@@ -363,11 +407,15 @@ const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
         <div className={styles.inputSection}>
           <PopoverPrimitive.Root
             open={isCalendarOpen}
-            onOpenChange={setIsCalendarOpen}
+            onOpenChange={(open) => {
+              setIsCalendarOpen(open);
+              onOpenChange?.(open);
+            }}
+            modal={false}
           >
             <TextInput
               ref={inputRef}
-              value={inputValue}
+              value={displayValue}
               onChange={(e) => handleInputChange(e.target.value)}
               placeholder={placeholderText}
               disabled={disabled}
@@ -442,19 +490,17 @@ const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
                     }}
                   />
 
-                  {showTime && (
-                    <div className={styles.timeSection}>
-                      <div className={styles.timeSectionLabel}>Time</div>
-                      <TimeInput
-                        value={currentTimeString}
-                        onChange={handleTimeChange}
-                        showSeconds={showSeconds}
-                        disabled={disabled}
-                        size={size}
-                        aria-label="Select time"
-                      />
-                    </div>
-                  )}
+                  <div className={styles.timeSection}>
+                    <div className={styles.timeSectionLabel}>Time</div>
+                    <TimeInput
+                      value={currentTimeString}
+                      onChange={handleTimeChange}
+                      showSeconds={showSeconds}
+                      disabled={disabled}
+                      size={size}
+                      aria-label="Select time"
+                    />
+                  </div>
 
                   {showTimezone && (
                     <div className={styles.timezoneSection}>
@@ -462,7 +508,7 @@ const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
                         Timezone
                       </div>
                       <TimezoneSelector
-                        value={currentTimezone}
+                        value={selectedTimezone}
                         onChange={handleTimezoneChange}
                         disabled={disabled}
                         size={size}
