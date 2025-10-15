@@ -1,5 +1,13 @@
 # squareone
 
+## 0.26.1
+
+### Patch Changes
+
+- [#223](https://github.com/lsst-sqre/squareone/pull/223) [`7df569fdb5075cb6882444c53f09fcf1bc094d04`](https://github.com/lsst-sqre/squareone/commit/7df569fdb5075cb6882444c53f09fcf1bc094d04) Thanks [@jonathansick](https://github.com/jonathansick)! - Fix docker-release workflow for missing pnpm setup
+
+  pnpm is now required to be present for the docker-release workflow because the root package.json specifies `pnpm` as the packageManager.
+
 ## 0.26.0
 
 ### Minor Changes
