@@ -1,0 +1,26 @@
+name: Build Squareone Docker Image
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        description: 'Tag for image (optional). If not set, tag will be derived from git branch.'
+        required: false
+        type: string
+    secrets:
+      GHCR_PUSH_TOKEN:
+        required: true
+      SENTRY_AUTH_TOKEN:
+        required: true
+
+jobs:
+  build:
+    uses: lsst-sqre/multiplatform-build-and-push/.github/workflows/build.yaml@tickets/DM-52930
+    with:
+      images: ghcr.io/${{ github.repository }}
+      dockerfile: apps/squareone/Dockerfile
+      tag: ${{ inputs.tag }}
+    secrets:
+      GHCR_PUSH_TOKEN: ${{ secrets.GHCR_PUSH_TOKEN }}
+      IMAGE_SECRETS: |
+        SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}

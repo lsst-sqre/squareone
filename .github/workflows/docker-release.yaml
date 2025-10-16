@@ -5,12 +5,11 @@ name: Docker release
     types: [published]
 
 jobs:
-  release-squareone:
-    timeout-minutes: 25
-    name: Release Squareone image
+  get-squareone-version:
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/squareone')
-
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v5
@@ -26,27 +25,14 @@ jobs:
       - name: Get version
         id: version
         run: |
-          echo "version=$(node -e "console.log(require('./apps/squareone/package.json').version);")" >> "$GITHUB_ENV"
+          echo "version=$(node -e "console.log(require('./apps/squareone/package.json').version);")" >> "$GITHUB_OUTPUT"
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push
-        uses: docker/build-push-action@v6
-        with:
-          context: '.'
-          file: 'apps/squareone/Dockerfile'
-          push: true
-          tags: |
-            ghcr.io/lsst-sqre/squareone:${{ env.version }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          secrets: |
-            SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
+  release-squareone:
+    uses: ./.github/workflows/build-squareone.yaml
+    needs: [get-squareone-version]
+    if: startsWith(github.ref, 'refs/tags/squareone')
+    with:
+      tag: ${{ needs.get-squareone-version.outputs.version }}
+    secrets:
+      GHCR_PUSH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
