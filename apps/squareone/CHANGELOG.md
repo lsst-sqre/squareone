@@ -1,5 +1,13 @@
 # squareone
 
+## 0.27.0
+
+### Minor Changes
+
+- [#225](https://github.com/lsst-sqre/squareone/pull/225) [`1cc6934203efa93b02d6d48a2ac10d72d40bd87a`](https://github.com/lsst-sqre/squareone/commit/1cc6934203efa93b02d6d48a2ac10d72d40bd87a) Thanks [@jonathansick](https://github.com/jonathansick)! - Publish arm64 in addition to amd64 platform Docker images
+
+  We now use https://github.com/lsst-sqre/multiplatform-build-and-push to generate amd64 and arm64 images for Squareone in parallel. This is packaged in our own reusable workflow at `.github/workflows/build-squareone.yaml` for use in CI and release workflow contexts.
+
 ## 0.26.1
 
 ### Patch Changes
