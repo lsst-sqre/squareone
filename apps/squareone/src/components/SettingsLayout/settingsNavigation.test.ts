@@ -17,18 +17,19 @@ const baseConfig: AppConfigContextValue = {
   mdxDir: 'src/content/pages',
 };
 
-// Test configuration - sessions functionality has been removed
+// Test configuration for settings navigation with sessions
 
-test('generates navigation with Account and Access Tokens', () => {
+test('generates navigation with Account, Access Tokens, and Sessions', () => {
   const navigation = getSettingsNavigation(baseConfig);
 
   expect(navigation).toHaveLength(1);
 
-  // Only section: Account and Access Tokens (no label)
+  // Only section: Account, Access Tokens, and Sessions (no label)
   expect(navigation[0]).toEqual({
     items: [
       { href: '/settings', label: 'Account' },
       { href: '/settings/tokens', label: 'Access tokens' },
+      { href: '/settings/sessions', label: 'Sessions' },
     ],
   });
 });
