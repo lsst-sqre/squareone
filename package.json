@@ -1,6 +1,7 @@
 {
   "private": true,
   "scripts": {
+    "localci": "pnpm run format && turbo run lint type-check test build",
     "build": "turbo run build",
     "dev": "turbo run dev",
     "test": "turbo run test",
