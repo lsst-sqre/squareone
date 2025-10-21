@@ -59,6 +59,13 @@ export type {
   TimeInputProps,
   TimezoneSelectorProps,
 } from './components/DateTimePicker';
+export { Tabs } from './components/Tabs';
+export type {
+  TabsProps,
+  TabsListProps,
+  TabsTriggerProps,
+  TabsContentProps,
+} from './components/Tabs';
 
 /* Hooks */
 export { default as useCurrentUrl } from './hooks/useCurrentUrl';

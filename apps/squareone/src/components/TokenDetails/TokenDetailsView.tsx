@@ -24,6 +24,7 @@ export type TokenDetailsViewProps = {
   username: string;
   tokenKey: string;
   onDeleteSuccess?: () => void;
+  returnUrl?: string;
 };
 
 /**
@@ -36,6 +37,7 @@ export default function TokenDetailsView({
   username,
   tokenKey,
   onDeleteSuccess,
+  returnUrl = '/settings/tokens',
 }: TokenDetailsViewProps) {
   const { token, error, isLoading } = useTokenDetails(username, tokenKey);
   const { deleteToken, isDeleting } = useDeleteToken();
@@ -101,7 +103,7 @@ export default function TokenDetailsView({
           </div>
 
           <p>
-            <Link href="/settings/tokens">Return to token list</Link>
+            <Link href={returnUrl}>Return to token list</Link>
           </p>
         </div>
       );
@@ -114,7 +116,7 @@ export default function TokenDetailsView({
           <h2>Error Loading Token</h2>
           <p>{error.message}</p>
           <p>
-            <Link href="/settings/tokens">Return to token list</Link>
+            <Link href={returnUrl}>Return to token list</Link>
           </p>
         </div>
       </div>
