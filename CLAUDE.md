@@ -27,6 +27,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `pnpm test-storybook:watch` - Run Storybook tests in watch mode
 - `pnpm test-storybook --filter @lsst-sqre/squared` - Run Storybook tests for squared package only
 - Uses vitest as the test runner with Storybook addon-vitest for testing stories
+- **Comprehensive testing** - Use the `test-suite-runner` agent (via Task tool) for running the full CI pipeline (`pnpm run localci`) and analyzing failures across all stages (formatting, linting, type-checking, testing, building)
 
 ### Version management
 
@@ -181,6 +182,29 @@ function MyComponent() {
 - **Direct source exports** - Package.json main/module fields point to `src/index.ts`
 - **Testing with Vitest** - Both unit tests and Storybook story tests use vitest
 - **No tsup** - Build tool removed in favor of app-level transpilation
+
+### Turborepo Remote Caching (CRITICAL)
+
+- **Always use root-level pnpm scripts** - Only the root `package.json` scripts use the wrapper (`scripts/turbo-wrapper.js`) that enables remote caching with authentication
+- **Never run scripts from individual packages/apps** - Individual package.json scripts bypass the wrapper and remote caching
+- **Use Turborepo filter syntax** - Target specific packages with `pnpm [script] --filter [package]` from repository root
+- **Never call `turbo` directly** - Direct `turbo` calls bypass the wrapper and won't benefit from remote caching authentication
+- **Exception for direct turbo calls** - Only acceptable when `TURBO_API`, `TURBO_TOKEN`, and `TURBO_TEAM` are already set as environment variables (e.g., in CI/CD pipelines or Docker builds)
+- **Remote cache server** - Uses `https://roundtable.lsst.cloud/turborepo-cache` with Gafaelfawr authentication
+- **Documentation** - See `docs/dev/remote-cache.rst` for detailed information about the remote caching system
+
+Examples of correct vs incorrect usage:
+
+```bash
+# ✅ Correct: Root script with filter
+pnpm test --filter @lsst-sqre/squared
+
+# ❌ Wrong: Individual package script
+cd packages/squared && pnpm test
+
+# ❌ Wrong: Direct turbo call (unless env vars pre-set)
+turbo run test --filter @lsst-sqre/squared
+```
 
 ### Testing Infrastructure
 
