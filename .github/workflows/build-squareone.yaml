@@ -8,8 +8,6 @@ on:
         required: false
         type: string
     secrets:
-      GHCR_PUSH_TOKEN:
-        required: true
       SENTRY_AUTH_TOKEN:
         required: true
       TURBO_TOKEN:
@@ -23,7 +21,6 @@ jobs:
       dockerfile: apps/squareone/Dockerfile
       tag: ${{ inputs.tag }}
     secrets:
-      GHCR_PUSH_TOKEN: ${{ secrets.GHCR_PUSH_TOKEN }}
       IMAGE_SECRETS: |
         SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
         TURBO_TOKEN=${{ secrets.TURBO_TOKEN }}
