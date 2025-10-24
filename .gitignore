@@ -39,6 +39,11 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
+# Turborepo remote cache credentials
+.env
+.env.op
+.env*.local
+
 # vercel
 .vercel
 

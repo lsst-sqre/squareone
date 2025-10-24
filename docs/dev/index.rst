@@ -11,6 +11,7 @@ If you are an admin looking to deploy and operate the Squareone app on the Rubin
 
    set-up
    development-tasks
+   remote-cache
    build-docs
    add-changesets
    making-releases
