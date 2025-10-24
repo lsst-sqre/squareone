@@ -149,17 +149,12 @@ See :doc:`remote-cache` for more details about the remote cache authentication s
 
 .. _docs-setup:
 
-Python dependencies for documentation
-=====================================
+Python dependencies for documentation with uv
+=============================================
 
 The Squareone documentation uses Sphinx_, a Python-based documentation generator.
-To make it easier to install and manage Python dependencies, we use `nox`_ to manage a virtual environment and run tasks in them.
-
-To install nox, run:
-
-.. code-block:: bash
-
-   python -m pip install nox
+To make it easier to install and manage Python dependencies, we use `uv`_ to manage a virtual environment and run tasks in them.
+See the `uv installation documentation <https://docs.astral.sh/uv/getting-started/installation/>`_ for details.
 
 Next steps
 ==========
