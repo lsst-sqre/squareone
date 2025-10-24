@@ -15,6 +15,8 @@ name: 'Run Chromatic'
     secrets:
       token:
         required: true
+      TURBO_TOKEN:
+        required: true
 
 jobs:
   chromatic:
@@ -37,6 +39,10 @@ jobs:
 
       - name: Build Storybook
         run: pnpm run build-storybook --filter ${{ inputs.workspaceFilter }}
+        env:
+          TURBO_API: ${{ vars.TURBO_API }}
+          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+          TURBO_TEAM: ${{ vars.TURBO_TEAM }}
         # In this workflow we manually build the storybooks rather than have
         # the chromatic/action do it so we can build dependencies first
         # via turborepo.
