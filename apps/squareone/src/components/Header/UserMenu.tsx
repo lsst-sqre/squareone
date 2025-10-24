@@ -5,14 +5,12 @@ import NextLink from 'next/link';
 import { PrimaryNavigation } from '@lsst-sqre/squared';
 import { useGafaelfawrUser } from '@lsst-sqre/squared';
 import { getLogoutUrl } from '@lsst-sqre/squared';
-import { useAppConfig } from '../../contexts/AppConfigContext';
 
 type UserMenuProps = {
   pageUrl: URL;
 };
 
 export default function UserMenu({ pageUrl }: UserMenuProps) {
-  const { coManageRegistryUrl } = useAppConfig();
   const { user } = useGafaelfawrUser();
   const logoutUrl = getLogoutUrl(pageUrl.toString());
 
@@ -28,16 +26,9 @@ export default function UserMenu({ pageUrl }: UserMenuProps) {
         {user.username} <ChevronDown />
       </PrimaryNavigation.Trigger>
       <PrimaryNavigation.Content>
-        {coManageRegistryUrl && (
-          <PrimaryNavigation.ContentItem>
-            <PrimaryNavigation.Link href={coManageRegistryUrl}>
-              Account settings
-            </PrimaryNavigation.Link>
-          </PrimaryNavigation.ContentItem>
-        )}
         <PrimaryNavigation.ContentItem>
           <PrimaryNavigation.Link asChild>
-            <NextLink href="/settings/tokens">Access tokens</NextLink>
+            <NextLink href="/settings">Settings</NextLink>
           </PrimaryNavigation.Link>
         </PrimaryNavigation.ContentItem>
         <PrimaryNavigation.ContentItem>
