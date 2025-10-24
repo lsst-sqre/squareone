@@ -12,6 +12,8 @@ on:
         required: true
       SENTRY_AUTH_TOKEN:
         required: true
+      TURBO_TOKEN:
+        required: true
 
 jobs:
   build:
@@ -24,3 +26,6 @@ jobs:
       GHCR_PUSH_TOKEN: ${{ secrets.GHCR_PUSH_TOKEN }}
       IMAGE_SECRETS: |
         SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
+        TURBO_TOKEN=${{ secrets.TURBO_TOKEN }}
+        TURBO_API=${{ vars.TURBO_API }}
+        TURBO_TEAM=${{ vars.TURBO_TEAM }}

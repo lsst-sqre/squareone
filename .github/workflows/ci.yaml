@@ -58,9 +58,17 @@ jobs:
 
       - name: Lint
         run: pnpm run lint
+        env:
+          TURBO_API: ${{ vars.TURBO_API }}
+          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+          TURBO_TEAM: ${{ vars.TURBO_TEAM }}
 
       - name: Build
         run: pnpm run build
+        env:
+          TURBO_API: ${{ vars.TURBO_API }}
+          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+          TURBO_TEAM: ${{ vars.TURBO_TEAM }}
 
       - name: Test
         run: pnpm run test
@@ -71,6 +79,10 @@ jobs:
           # Use browsers from Playwright container
           PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+          # Turborepo remote caching
+          TURBO_API: ${{ vars.TURBO_API }}
+          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+          TURBO_TEAM: ${{ vars.TURBO_TEAM }}
 
   build-squareone:
     uses: ./.github/workflows/build-squareone.yaml
@@ -79,6 +91,7 @@ jobs:
     secrets:
       GHCR_PUSH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
     # Only do Docker builds of tagged releases and pull requests from ticket
     # branches. This will still trigger on pull requests from untrusted
     # repositories whose branch names match our tickets/* branch convention,
