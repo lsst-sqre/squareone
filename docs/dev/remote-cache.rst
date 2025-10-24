@@ -14,6 +14,7 @@ The cache server is deployed on Roundtable and uses Gafaelfawr for authenticatio
 A wrapper script (:file:`scripts/turbo-wrapper.js`) intelligently detects and uses available authentication methods, allowing the monorepo to support multiple workflows:
 
 - **External contributors**: No authentication needed, uses local cache only
+- **CI/CD with injected secrets**: Environment variables (``TURBO_API``, ``TURBO_TOKEN``, ``TURBO_TEAM``) pre-set in environment
 - **Maintainers with 1Password**: Secure credential management via 1Password CLI
 - **Maintainers or environments without 1Password**: Plain :file:`.env` file support
 
@@ -24,19 +25,26 @@ Authentication priority
 
 The wrapper script checks for authentication in this order:
 
-1. **1Password** (:file:`.env.op` file present + ``op`` CLI available)
-2. **Plain environment** (:file:`.env` file present)
-3. **No authentication** (fallback to local cache only)
+1. **Environment variables** (``TURBO_API``, ``TURBO_TOKEN``, and ``TURBO_TEAM`` all set in environment)
+2. **1Password** (:file:`.env.op` file present + ``op`` CLI available)
+3. **Plain .env file** (:file:`.env` file present)
+4. **No authentication** (fallback to local cache only)
 
-This ensures maintainers with 1Password get secure credential management, while other users can still access the remote cache or work offline without any issues.
+This priority order ensures that:
+
+- CI/CD pipelines with secret injection work automatically without configuration files
+- Maintainers with 1Password get secure credential management
+- Other users can still access the remote cache via :file:`.env` files
+- External contributors can work offline without any setup
 
 Verifying remote cache
 ======================
 
 When running Turborepo commands, you'll see a message indicating which authentication method is active:
 
+- ✅ ``🔑 Using environment variables for Turborepo remote cache authentication`` - Pre-set environment variables active
 - ✅ ``🔐 Using 1Password for Turborepo remote cache authentication`` - 1Password method active
-- ✅ ``🔑 Using .env for Turborepo remote cache authentication`` - Plain .env method active
+- ✅ ``🔑 Using .env for Turborepo remote cache authentication`` - Plain .env file method active
 - ℹ️ ``ℹ️ Running Turborepo without remote cache (local cache only)`` - No authentication, local cache only
 
 You can also verify remote cache hits in the Turborepo output. Look for messages like:

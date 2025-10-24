@@ -25,8 +25,20 @@ async function runTurbo(args) {
 
   let command, commandArgs;
 
-  // Priority 1: Check for 1Password CLI with .env.op
-  if (existsSync(opEnvPath)) {
+  // Priority 1: Check for pre-set environment variables
+  if (
+    process.env.TURBO_API &&
+    process.env.TURBO_TOKEN &&
+    process.env.TURBO_TEAM
+  ) {
+    console.log(
+      '🔑 Using environment variables for Turborepo remote cache authentication'
+    );
+    command = TURBO_CMD;
+    commandArgs = args;
+  }
+  // Priority 2: Check for 1Password CLI with .env.op
+  else if (existsSync(opEnvPath)) {
     const opAvailable = await checkCommandExists('op');
 
     if (opAvailable) {
@@ -51,7 +63,7 @@ async function runTurbo(args) {
       commandArgs = args;
     }
   }
-  // Priority 2: Check for plain .env file
+  // Priority 3: Check for plain .env file
   else if (existsSync(plainEnvPath)) {
     console.log('🔑 Using .env for Turborepo remote cache authentication');
     // Load .env file manually
@@ -59,7 +71,7 @@ async function runTurbo(args) {
     command = TURBO_CMD;
     commandArgs = args;
   }
-  // Priority 3: No authentication
+  // Priority 4: No authentication
   else {
     console.log(
       'ℹ️  Running Turborepo without remote cache (local cache only)'

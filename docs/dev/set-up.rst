@@ -59,6 +59,11 @@ The remote cache is optional and does not affect your ability to contribute.
 
 **Rubin Observatory staff:** If you want to use the remote cache, you'll need to authenticate.
 The ``TURBO_TOKEN`` is a Gafaelfawr user access token for roundtable.lsst.cloud with the ``write:git-lfs`` scope.
+
+.. note::
+
+   If ``TURBO_API``, ``TURBO_TOKEN``, and ``TURBO_TEAM`` are already set as environment variables (e.g., in CI/CD pipelines with secret injection), the wrapper will automatically use them without requiring any configuration files.
+
 Choose one of the following authentication methods:
 
 .. tab-set::
