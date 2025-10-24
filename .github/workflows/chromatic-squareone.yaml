@@ -16,3 +16,4 @@ jobs:
       workspaceFilter: squareone
     secrets:
       token: ${{ secrets.SQUAREONE_CHROMATIC_TOKEN }}
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}

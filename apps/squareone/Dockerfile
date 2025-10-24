@@ -30,14 +30,12 @@ RUN pnpm install
 COPY --from=builder /app/out/full/ .
 COPY turbo.json turbo.json
 
-# Uncomment and use build args to enable remote caching
-# ARG TURBO_TEAM
-# ENV TURBO_TEAM=$TURBO_TEAM
-
-# ARG TURBO_TOKEN
-# ENV TURBO_TOKEN=$TURBO_TOKEN
-
-RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN,env=SENTRY_AUTH_TOKEN turbo run build --filter=squareone...
+# Remote caching for Turborepo
+RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN,env=SENTRY_AUTH_TOKEN \
+    --mount=type=secret,id=TURBO_TOKEN,env=TURBO_TOKEN \
+    --mount=type=secret,id=TURBO_API,env=TURBO_API \
+    --mount=type=secret,id=TURBO_TEAM,env=TURBO_TEAM \
+    turbo run build --filter=squareone...
 
 FROM base AS runner
 

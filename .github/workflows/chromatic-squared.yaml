@@ -16,3 +16,4 @@ jobs:
       workspaceFilter: '@lsst-sqre/squared'
     secrets:
       token: ${{ secrets.SQUARED_CHROMATIC_TOKEN }}
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
