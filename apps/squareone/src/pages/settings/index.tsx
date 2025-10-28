@@ -1,33 +1,40 @@
 import type { ReactElement } from 'react';
 import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
+import { MDXRemote } from 'next-mdx-remote';
+import { serialize } from 'next-mdx-remote/serialize';
 
 import { getLayout } from '../../components/SettingsLayout';
-import { loadAppConfig } from '../../lib/config/loader';
+import { loadConfigAndMdx } from '../../lib/config/loader';
 import { useAppConfig } from '../../contexts/AppConfigContext';
+import { commonMdxComponents } from '../../lib/utils/mdxComponents';
 
 type NextPageWithLayout = {
   getLayout?: (page: ReactElement) => ReactElement;
 };
 
 type AccountPageProps = {
-  // Add any page-specific props here
+  mdxSource: any;
+};
+
+const mdxComponents = {
+  ...commonMdxComponents,
 };
 
 const AccountPage: NextPageWithLayout &
-  ((props: AccountPageProps) => ReactElement) = () => {
+  ((props: AccountPageProps) => ReactElement) = ({ mdxSource }) => {
   const appConfig = useAppConfig();
 
   return (
     <>
       <Head>
-        <title key="title">{`Account Settings | ${appConfig.siteName}`}</title>
+        <title key="title">{`Account settings | ${appConfig.siteName}`}</title>
         <meta
           name="description"
           key="description"
           content="Manage your account settings and preferences"
         />
-        <meta property="og:title" key="ogtitle" content="Account Settings" />
+        <meta property="og:title" key="ogtitle" content="Account settings" />
         <meta
           property="og:description"
           key="ogdescription"
@@ -35,18 +42,7 @@ const AccountPage: NextPageWithLayout &
         />
       </Head>
 
-      <h1>Account</h1>
-      <p>
-        Manage your account information, preferences, and personal settings.
-        Update your profile details, change your display preferences, and
-        configure your account security options.
-      </p>
-      <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
-        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-        veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-        commodo consequat.
-      </p>
+      <MDXRemote {...mdxSource} components={mdxComponents} />
     </>
   );
 };
@@ -57,14 +53,37 @@ AccountPage.getLayout = getLayout;
 export const getServerSideProps: GetServerSideProps<
   AccountPageProps
 > = async () => {
-  const appConfig = await loadAppConfig();
+  try {
+    // Load config and raw MDX content
+    const { config: appConfig, mdxContent } = await loadConfigAndMdx(
+      'settings__index.mdx'
+    );
 
-  return {
-    props: {
-      appConfig, // Required for AppConfigProvider in _app.tsx
-      // Add any page-specific data here
-    },
-  };
+    // Serialize MDX content directly in getServerSideProps
+    const mdxSource = await serialize(mdxContent);
+
+    return {
+      props: {
+        appConfig, // Required for AppConfigProvider in _app.tsx
+        mdxSource,
+      },
+    };
+  } catch (error) {
+    // Fallback: load config only and provide default content
+    const { loadAppConfig } = await import('../../lib/config/loader');
+
+    const appConfig = await loadAppConfig();
+    const fallbackMdx = await serialize(
+      '# Account settings\n\nContent temporarily unavailable.'
+    );
+
+    return {
+      props: {
+        appConfig, // Required for AppConfigProvider in _app.tsx
+        mdxSource: fallbackMdx,
+      },
+    };
+  }
 };
 
 export default AccountPage;
