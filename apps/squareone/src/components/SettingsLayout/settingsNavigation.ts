@@ -13,6 +13,7 @@ export function getSettingsNavigation(
       items: [
         { href: '/settings', label: 'Account' },
         { href: '/settings/tokens', label: 'Access tokens' },
+        { href: '/settings/quotas', label: 'Quotas' },
         { href: '/settings/sessions', label: 'Sessions' },
       ],
     },

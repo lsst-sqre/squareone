@@ -19,16 +19,17 @@ const baseConfig: AppConfigContextValue = {
 
 // Test configuration for settings navigation with sessions
 
-test('generates navigation with Account, Access Tokens, and Sessions', () => {
+test('generates navigation with Account, Access Tokens, Quotas, and Sessions', () => {
   const navigation = getSettingsNavigation(baseConfig);
 
   expect(navigation).toHaveLength(1);
 
-  // Only section: Account, Access Tokens, and Sessions (no label)
+  // Only section: Account, Access Tokens, Quotas, and Sessions (no label)
   expect(navigation[0]).toEqual({
     items: [
       { href: '/settings', label: 'Account' },
       { href: '/settings/tokens', label: 'Access tokens' },
+      { href: '/settings/quotas', label: 'Quotas' },
       { href: '/settings/sessions', label: 'Sessions' },
     ],
   });

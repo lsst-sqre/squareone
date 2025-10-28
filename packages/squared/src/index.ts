@@ -77,6 +77,11 @@ export { default as useCurrentUrl } from './hooks/useCurrentUrl';
 export {
   default as useGafaelfawrUser,
   type GafaelfawrUser,
+  type GafaelfawrQuota,
+  type GafaelfawrNotebookQuota,
+  type GafaelfawrApiQuota,
+  type GafaelfawrTapQuota,
+  type GafaelfawrGroup,
 } from './hooks/useGafaelfawrUser';
 
 /* Lib */
