@@ -15,7 +15,7 @@ on:
 
 jobs:
   build:
-    uses: lsst-sqre/multiplatform-build-and-push/.github/workflows/build.yaml@v1
+    uses: lsst-sqre/multiplatform-build-and-push/.github/workflows/build.yaml@v2
     with:
       images: ghcr.io/${{ github.repository }}
       dockerfile: apps/squareone/Dockerfile
