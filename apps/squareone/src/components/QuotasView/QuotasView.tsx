@@ -48,9 +48,8 @@ export default function QuotasView({ quota }: QuotasViewProps) {
         <section id="tap" className={styles.section}>
           <h2 className={styles.sectionTitle}>Concurrent queries</h2>
           <p className={styles.sectionDescription}>
-            You can make a limited number of database queries at the same time.
-            If you hit this limit, wait for queries to finish before submitting
-            additional ones.
+            You can have a limited number of in-flight catalog queries. Wait for
+            queries to finish before submitting new ones.
           </p>
           <KeyValueList items={getTapItems(quota.tap)} />
         </section>

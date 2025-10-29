@@ -59,8 +59,8 @@ const QuotasPage: NextPageWithLayout &
 
       <h1>Quotas</h1>
       <Lede>
-        Information about limits to your resource usage on the Rubin Science
-        Platform.
+        Information about limits to your current resource usage on the Rubin
+        Science Platform. These limits can change.
       </Lede>
       {user?.quota ? (
         <div style={{ marginTop: 'var(--sqo-space-lg-fixed)' }}>
