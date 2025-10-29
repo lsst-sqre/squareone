@@ -31,18 +31,6 @@ export default function QuotasView({ quota }: QuotasViewProps) {
         </section>
       )}
 
-      {/* Rate Limits Section */}
-      {hasApiQuota && (
-        <section id="rate-limit" className={styles.section}>
-          <h2 className={styles.sectionTitle}>Rate limits</h2>
-          <p className={styles.sectionDescription}>
-            APIs limit the number of requests you can make in a 15 minute
-            window. Your request count resets every 15 minutes.
-          </p>
-          <KeyValueList items={getApiItems(quota.api)} />
-        </section>
-      )}
-
       {/* Concurrent Queries Section */}
       {hasTapQuota && (
         <section id="tap" className={styles.section}>
@@ -52,6 +40,18 @@ export default function QuotasView({ quota }: QuotasViewProps) {
             queries to finish before submitting new ones.
           </p>
           <KeyValueList items={getTapItems(quota.tap)} />
+        </section>
+      )}
+
+      {/* Rate Limits Section */}
+      {hasApiQuota && (
+        <section id="rate-limit" className={styles.section}>
+          <h2 className={styles.sectionTitle}>Rate limits</h2>
+          <p className={styles.sectionDescription}>
+            APIs limit the number of requests you can make in a 15 minute
+            window. Your request count resets every 15 minutes.
+          </p>
+          <KeyValueList items={getApiItems(quota.api)} />
         </section>
       )}
     </div>
