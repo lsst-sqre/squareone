@@ -13,11 +13,17 @@ type GafaelfawrApiQuota = {
 type GafaelfawrNotebookQuota = {
   cpu: number;
   memory: number;
+  spawn: boolean;
+};
+
+type GafaelfawrTapQuota = {
+  concurrent: number;
 };
 
 type GafaelfawrQuota = {
   api: GafaelfawrApiQuota;
-  notebook: GafaelfawrNotebookQuota;
+  notebook: GafaelfawrNotebookQuota | null;
+  tap: { [key: string]: GafaelfawrTapQuota };
 };
 
 type GafaelfawrUser = {
@@ -27,7 +33,7 @@ type GafaelfawrUser = {
   uid?: number;
   gid?: number;
   groups?: GafaelfawrGroup[];
-  quota?: GafaelfawrQuota;
+  quota?: GafaelfawrQuota | null;
 };
 
 const fetcher: Fetcher<GafaelfawrUser, string> = (url: string) =>
@@ -55,4 +61,11 @@ const useGafaelfawrUser = () => {
 };
 
 export default useGafaelfawrUser;
-export type { GafaelfawrUser };
+export type {
+  GafaelfawrUser,
+  GafaelfawrQuota,
+  GafaelfawrNotebookQuota,
+  GafaelfawrApiQuota,
+  GafaelfawrTapQuota,
+  GafaelfawrGroup,
+};

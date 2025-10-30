@@ -18,6 +18,11 @@ export {
 export { default as ClipboardButton } from './components/ClipboardButton';
 export type { ClipboardButtonProps } from './components/ClipboardButton';
 export { default as IconPill, type IconPillProps } from './components/IconPill';
+export { KeyValueList } from './components/KeyValueList';
+export type {
+  KeyValueListProps,
+  KeyValueListItem,
+} from './components/KeyValueList';
 export {
   default as PrimaryNavigation,
   type PrimaryNavigationType as PrimaryNavigationComponent,
@@ -72,6 +77,11 @@ export { default as useCurrentUrl } from './hooks/useCurrentUrl';
 export {
   default as useGafaelfawrUser,
   type GafaelfawrUser,
+  type GafaelfawrQuota,
+  type GafaelfawrNotebookQuota,
+  type GafaelfawrApiQuota,
+  type GafaelfawrTapQuota,
+  type GafaelfawrGroup,
 } from './hooks/useGafaelfawrUser';
 
 /* Lib */

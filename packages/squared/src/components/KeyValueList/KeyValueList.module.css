@@ -1,0 +1,54 @@
+/* Base definition list container */
+.keyValueList {
+  /* Reset default margins */
+  margin: 0;
+
+  /* Grid layout for key-value alignment */
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--sqo-space-sm-fixed) var(--sqo-space-md-fixed);
+  align-items: start;
+
+  /* Typography */
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* Term (key) styling */
+.term {
+  /* Typography */
+  font-weight: 500;
+  color: var(--rsd-color-gray-500);
+
+  /* Reset default margins */
+  margin: 0;
+
+  /* Ensure terms don't wrap */
+  white-space: nowrap;
+}
+
+/* Definition (value) styling */
+.definition {
+  /* Typography */
+  font-weight: 400;
+  color: inherit;
+
+  /* Reset default margins */
+  margin: 0;
+
+  /* Allow values to wrap if needed */
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Mobile responsive: stack vertically on small screens */
+@media (max-width: 768px) {
+  .keyValueList {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+
+  .term {
+    font-size: 0.875rem;
+  }
+}

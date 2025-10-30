@@ -1,0 +1,13 @@
+.sectionTitle {
+  color: var(--rsd-component-text-headline-color);
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  font-weight: 700;
+  line-height: 1.2;
+  font-size: 1.5rem;
+}
+
+.sectionDescription {
+  margin: 0 0 1em 0;
+  line-height: 1.6;
+}
