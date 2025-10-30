@@ -12,11 +12,56 @@ type TokenResponse = {
   token: string;
 };
 
+type ValidationError = {
+  msg: string;
+  type: string;
+  loc: string[];
+};
+
 type TokenCreationError = {
   status: number;
-  message: string;
-  details?: unknown;
+  message: string; // Always a formatted string for display
+  details?: {
+    detail?: string | ValidationError | ValidationError[];
+    [key: string]: unknown;
+  };
 };
+
+/**
+ * Formats error details from the Gafaelfawr API into a human-readable string.
+ * Handles multiple error response formats:
+ * - Array of Pydantic validation errors
+ * - Single validation error object
+ * - Simple string messages
+ */
+function formatErrorDetail(detail: unknown): string {
+  // Handle array of validation errors (Pydantic format)
+  if (Array.isArray(detail)) {
+    return detail
+      .map((err) => {
+        if (typeof err === 'object' && err !== null && 'msg' in err) {
+          const loc =
+            'loc' in err && Array.isArray(err.loc) ? err.loc.join('.') : '';
+          return loc ? `${loc}: ${err.msg}` : String(err.msg);
+        }
+        return String(err);
+      })
+      .join('; ');
+  }
+
+  // Handle single validation error object
+  if (typeof detail === 'object' && detail !== null && 'msg' in detail) {
+    return String(detail.msg);
+  }
+
+  // Handle string (legacy or simple error format)
+  if (typeof detail === 'string') {
+    return detail;
+  }
+
+  // Fallback for unknown formats
+  return 'An error occurred while creating the token.';
+}
 
 type UseTokenCreationReturn = {
   createToken: (params: CreateTokenParams) => Promise<TokenResponse>;
@@ -56,11 +101,20 @@ export default function useTokenCreation(): UseTokenCreationReturn {
         );
 
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
+          let errorData: Record<string, unknown> = {};
+          let jsonParseFailed = false;
+
+          try {
+            errorData = await response.json();
+          } catch {
+            jsonParseFailed = true;
+          }
+
           const tokenError: TokenCreationError = {
             status: response.status,
-            message:
-              errorData.detail || errorData.message || response.statusText,
+            message: jsonParseFailed
+              ? response.statusText
+              : formatErrorDetail(errorData.detail ?? errorData.message),
             details: errorData,
           };
           setError(tokenError);
@@ -104,4 +158,9 @@ export default function useTokenCreation(): UseTokenCreationReturn {
   };
 }
 
-export type { CreateTokenParams, TokenResponse, TokenCreationError };
+export type {
+  CreateTokenParams,
+  TokenResponse,
+  TokenCreationError,
+  ValidationError,
+};

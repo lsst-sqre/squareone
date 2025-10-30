@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import useTokenCreation from './useTokenCreation';
-import type { CreateTokenParams } from './useTokenCreation';
+import type { CreateTokenParams, ValidationError } from './useTokenCreation';
 
 describe('useTokenCreation', () => {
   let fetchMock: any;
@@ -420,5 +420,257 @@ describe('useTokenCreation', () => {
         }),
       })
     );
+  });
+
+  describe('validation error formatting', () => {
+    it('should format array of Pydantic validation errors', async () => {
+      fetchMock.mockResolvedValueOnce({
+        ok: false,
+        status: 422,
+        statusText: 'Unprocessable Entity',
+        json: async () => ({
+          detail: [
+            {
+              msg: 'String should have at most 64 characters',
+              type: 'string_too_long',
+              loc: ['body', 'token_name'],
+            },
+            {
+              msg: 'Invalid scope format',
+              type: 'value_error',
+              loc: ['body', 'scopes', 0],
+            },
+          ],
+        }),
+      });
+
+      const { result } = renderHook(() => useTokenCreation());
+
+      await act(async () => {
+        try {
+          await result.current.createToken(defaultParams);
+        } catch (err) {
+          // Expected error
+        }
+      });
+
+      expect(result.current.error?.message).toBe(
+        'body.token_name: String should have at most 64 characters; body.scopes.0: Invalid scope format'
+      );
+      expect(result.current.error?.status).toBe(422);
+    });
+
+    it('should format single Pydantic validation error object', async () => {
+      fetchMock.mockResolvedValueOnce({
+        ok: false,
+        status: 422,
+        statusText: 'Unprocessable Entity',
+        json: async () => ({
+          detail: {
+            msg: 'Token name already exists',
+            type: 'value_error.duplicate',
+            loc: ['body', 'token_name'],
+          },
+        }),
+      });
+
+      const { result } = renderHook(() => useTokenCreation());
+
+      await act(async () => {
+        try {
+          await result.current.createToken(defaultParams);
+        } catch (err) {
+          // Expected error
+        }
+      });
+
+      expect(result.current.error?.message).toBe('Token name already exists');
+      expect(result.current.error?.status).toBe(422);
+    });
+
+    it('should handle validation error without location field', async () => {
+      fetchMock.mockResolvedValueOnce({
+        ok: false,
+        status: 422,
+        statusText: 'Unprocessable Entity',
+        json: async () => ({
+          detail: [
+            {
+              msg: 'General validation error',
+              type: 'value_error',
+            },
+          ],
+        }),
+      });
+
+      const { result } = renderHook(() => useTokenCreation());
+
+      await act(async () => {
+        try {
+          await result.current.createToken(defaultParams);
+        } catch (err) {
+          // Expected error
+        }
+      });
+
+      expect(result.current.error?.message).toBe('General validation error');
+    });
+
+    it('should handle empty validation error array', async () => {
+      fetchMock.mockResolvedValueOnce({
+        ok: false,
+        status: 422,
+        statusText: 'Unprocessable Entity',
+        json: async () => ({
+          detail: [] as ValidationError[],
+        }),
+      });
+
+      const { result } = renderHook(() => useTokenCreation());
+
+      await act(async () => {
+        try {
+          await result.current.createToken(defaultParams);
+        } catch (err) {
+          // Expected error
+        }
+      });
+
+      expect(result.current.error?.message).toBe('');
+    });
+
+    it('should handle mixed array with validation errors and strings', async () => {
+      fetchMock.mockResolvedValueOnce({
+        ok: false,
+        status: 422,
+        statusText: 'Unprocessable Entity',
+        json: async () => ({
+          detail: [
+            {
+              msg: 'Field is required',
+              type: 'value_error.missing',
+              loc: ['body', 'expires'],
+            },
+            'Additional validation context',
+          ],
+        }),
+      });
+
+      const { result } = renderHook(() => useTokenCreation());
+
+      await act(async () => {
+        try {
+          await result.current.createToken(defaultParams);
+        } catch (err) {
+          // Expected error
+        }
+      });
+
+      expect(result.current.error?.message).toBe(
+        'body.expires: Field is required; Additional validation context'
+      );
+    });
+
+    it('should handle deeply nested location arrays', async () => {
+      fetchMock.mockResolvedValueOnce({
+        ok: false,
+        status: 422,
+        statusText: 'Unprocessable Entity',
+        json: async () => ({
+          detail: [
+            {
+              msg: 'Invalid value',
+              type: 'value_error',
+              loc: ['body', 'config', 'settings', 'feature', 'enabled'],
+            },
+          ],
+        }),
+      });
+
+      const { result } = renderHook(() => useTokenCreation());
+
+      await act(async () => {
+        try {
+          await result.current.createToken(defaultParams);
+        } catch (err) {
+          // Expected error
+        }
+      });
+
+      expect(result.current.error?.message).toBe(
+        'body.config.settings.feature.enabled: Invalid value'
+      );
+    });
+
+    it('should use fallback message for undefined error detail', async () => {
+      fetchMock.mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        statusText: 'Internal Server Error',
+        json: async () => ({}),
+      });
+
+      const { result } = renderHook(() => useTokenCreation());
+
+      await act(async () => {
+        try {
+          await result.current.createToken(defaultParams);
+        } catch (err) {
+          // Expected error
+        }
+      });
+
+      expect(result.current.error?.message).toBe(
+        'An error occurred while creating the token.'
+      );
+    });
+
+    it('should use fallback message for null error detail', async () => {
+      fetchMock.mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        statusText: 'Internal Server Error',
+        json: async () => ({}),
+      });
+
+      const { result } = renderHook(() => useTokenCreation());
+
+      await act(async () => {
+        try {
+          await result.current.createToken(defaultParams);
+        } catch (err) {
+          // Expected error
+        }
+      });
+
+      expect(result.current.error?.message).toBe(
+        'An error occurred while creating the token.'
+      );
+    });
+
+    it('should use fallback message for numeric error detail', async () => {
+      fetchMock.mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        statusText: 'Internal Server Error',
+        json: async () => ({
+          detail: 42,
+        }),
+      });
+
+      const { result } = renderHook(() => useTokenCreation());
+
+      await act(async () => {
+        try {
+          await result.current.createToken(defaultParams);
+        } catch (err) {
+          // Expected error
+        }
+      });
+
+      expect(result.current.error?.message).toBe(
+        'An error occurred while creating the token.'
+      );
+    });
   });
 });

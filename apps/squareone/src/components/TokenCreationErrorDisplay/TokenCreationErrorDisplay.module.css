@@ -1,0 +1,31 @@
+/* Error alert container */
+.errorAlert {
+  padding: var(--sqo-space-md, 1.25rem);
+  margin-bottom: var(--sqo-space-md, 1.25rem);
+  background-color: var(--rsd-color-red-100);
+  border: 1px solid var(--rsd-color-red-200);
+  border-radius: var(--sqo-border-radius-1, 4px);
+}
+
+/* Error message content */
+.errorContent {
+  color: var(--rsd-color-red-600);
+}
+
+/* Error list for multiple validation errors */
+.errorList {
+  margin-top: var(--sqo-space-sm, 0.75rem);
+  margin-bottom: 0;
+  padding-left: var(--sqo-space-lg, 2rem);
+}
+
+.errorListItem {
+  margin-bottom: var(--sqo-space-xs, 0.5rem);
+}
+
+/* Status code display */
+.statusCode {
+  margin-top: var(--sqo-space-sm, 0.75rem);
+  font-size: 0.9em;
+  opacity: 0.8;
+}

@@ -20,6 +20,7 @@ import useTokenCreation from '../../../hooks/useTokenCreation';
 import useTokenTemplateUrl from '../../../hooks/useTokenTemplateUrl';
 import TokenSuccessModal from '../../../components/TokenSuccessModal';
 import useUserTokens, { extractTokenNames } from '../../../hooks/useUserTokens';
+import { TokenCreationErrorDisplay } from '../../../components/TokenCreationErrorDisplay';
 
 type NextPageWithLayout = {
   getLayout?: (page: ReactElement) => ReactElement;
@@ -158,21 +159,7 @@ const NewTokenPage: NextPageWithLayout &
           Platform APIs.
         </p>
 
-        {creationError && (
-          <div
-            style={{
-              padding: 'var(--spacing-md)',
-              marginBottom: 'var(--spacing-md)',
-              backgroundColor: 'var(--color-background-error, #fee)',
-              border: '1px solid var(--color-border-error, #fcc)',
-              borderRadius: 'var(--border-radius-medium, 4px)',
-            }}
-          >
-            <p style={{ margin: 0, color: 'var(--color-text-error, #c00)' }}>
-              <strong>Error creating token:</strong> {creationError.message}
-            </p>
-          </div>
-        )}
+        {creationError && <TokenCreationErrorDisplay error={creationError} />}
 
         <TokenForm
           availableScopes={loginInfo.config.scopes}
