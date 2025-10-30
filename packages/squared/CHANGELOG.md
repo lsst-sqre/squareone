@@ -1,5 +1,47 @@
 # @lsst-sqre/squared
 
+## 0.10.0
+
+### Minor Changes
+
+- [#240](https://github.com/lsst-sqre/squareone/pull/240) [`1d8161aa169c159762e28b0e3c1afaea5514ef15`](https://github.com/lsst-sqre/squareone/commit/1d8161aa169c159762e28b0e3c1afaea5514ef15) Thanks [@jonathansick](https://github.com/jonathansick)! - Add TAP quota types and improve nullable handling in useGafaelfawrUser
+
+  The `useGafaelfawrUser` hook now includes complete type definitions for all Gafaelfawr quota types, supporting the new quotas page feature:
+
+  **New types added:**
+
+  - `GafaelfawrTapQuota`: Represents TAP service concurrent query limits with a `concurrent` field
+  - All quota-related types are now exported: `GafaelfawrQuota`, `GafaelfawrNotebookQuota`, `GafaelfawrApiQuota`, `GafaelfawrTapQuota`, `GafaelfawrGroup`
+
+  **Type improvements:**
+
+  - `GafaelfawrNotebookQuota`: Added `spawn: boolean` field to indicate if notebook spawning is allowed
+  - `GafaelfawrQuota`: Added `tap` field for TAP service quotas; made `notebook` explicitly nullable (`| null`)
+  - `GafaelfawrUser`: Made `quota` field explicitly nullable (`| null`) to properly handle API responses
+
+  These changes align with the Gafaelfawr API specification and enable proper handling of quota data in the quotas page, including null/empty states for optional quota sections.
+
+- [#240](https://github.com/lsst-sqre/squareone/pull/240) [`0e49cf80e8be37ffca6e7897ba07aa91881e7be3`](https://github.com/lsst-sqre/squareone/commit/0e49cf80e8be37ffca6e7897ba07aa91881e7be3) Thanks [@jonathansick](https://github.com/jonathansick)! - Add KeyValueList component for displaying key-value data
+
+  The KeyValueList component provides a reusable, accessible way to display key-value pairs using semantic HTML definition lists (`<dl>`, `<dt>`, `<dd>`). This component is designed for the quotas page but can be used throughout the application for displaying structured data.
+
+  Key features:
+
+  - **Semantic HTML**: Uses definition list elements for proper accessibility and screen reader support
+  - **Flexible values**: Supports both string and ReactNode values, allowing for badges, links, and formatted content
+  - **Responsive layout**: CSS Grid layout with two-column design on desktop, stacking vertically on mobile (≤768px)
+
+- [#228](https://github.com/lsst-sqre/squareone/pull/228) [`bf0a8e50a321874abe551ad148255b7546680f31`](https://github.com/lsst-sqre/squareone/commit/bf0a8e50a321874abe551ad148255b7546680f31) Thanks [@jonathansick](https://github.com/jonathansick)! - Add Tabs component for tabbed navigation interfaces
+
+  The Tabs component built on Radix UI primitives, providing a fully accessible tabbed interface for organizing content into multiple panels. Key Features:
+
+  - Compound component API (`Tabs.List`, `Tabs.Trigger`, `Tabs.Content`) for flexible composition
+  - Full keyboard navigation support (Arrow keys, Home, End)
+  - WCAG AAA compliant touch targets (44px minimum)
+  - Controlled and uncontrolled modes for state management
+  - CSS Modules styling with design tokens from rubin-style-dictionary
+  - Comprehensive Storybook documentation with 11 interactive stories and automated tests
+
 ## 0.9.0
 
 ### Minor Changes

@@ -1,5 +1,74 @@
 # squareone
 
+## 0.28.0
+
+### Minor Changes
+
+- [#237](https://github.com/lsst-sqre/squareone/pull/237) [`af2ef1a46ed362af3aed65e4f212ec0f4d556cd8`](https://github.com/lsst-sqre/squareone/commit/af2ef1a46ed362af3aed65e4f212ec0f4d556cd8) Thanks [@jonathansick](https://github.com/jonathansick)! - Add MDX content support to Account settings page
+
+  The Account settings page (`/settings`) now uses MDX for its content instead of hardcoded placeholder text. This enables deployments to customize account management instructions and external links via ConfigMaps.
+
+  Key changes:
+
+  - Account page loads content from `settings__index.mdx` using the existing MDX content system
+  - Includes error handling with fallback content when MDX file is unavailable
+  - Default content includes sections for account management, identity providers, and personal information
+  - Uses `Lede` and `CtaLink` components for consistent styling
+  - Deployments can provide custom MDX files via `mdxDir` configuration to include deployment-specific URLs and instructions for their account management systems (COManage, etc.)
+
+- [#240](https://github.com/lsst-sqre/squareone/pull/240) [`a387930a65aecb397b22c8d275c8d9f31bbfd156`](https://github.com/lsst-sqre/squareone/commit/a387930a65aecb397b22c8d275c8d9f31bbfd156) Thanks [@jonathansick](https://github.com/jonathansick)! - Add Quotas page for viewing user resource limits
+
+  A new Quotas page is now available at `/settings/quotas` that displays user quota allocations from Gafaelfawr for notebook servers, API rate limits, and TAP concurrent query limits.
+
+  **New features:**
+
+  - **QuotasView component**: Displays quota information organized into three conditional sections:
+    - Notebooks section: Shows CPU cores, memory (GB), and spawning status (only displayed when disabled)
+    - Rate limits section: Shows API request quotas per service in a 15-minute window
+    - Concurrent queries section: Shows TAP database query limits per service
+  - **Settings navigation**: Added "Quotas" link to the settings sidebar between "Access tokens" and "Sessions"
+  - **Deep linking**: Each section has an anchor tag for direct linking (`#notebook`, `#rate-limit`, `#tap`)
+  - **Empty states**: Sections are omitted when no data is available; "Not configured" message shown if entire quota object is missing
+
+- [#228](https://github.com/lsst-sqre/squareone/pull/228) [`f5ec250ce28a0f2185aadd916608161f830318bb`](https://github.com/lsst-sqre/squareone/commit/f5ec250ce28a0f2185aadd916608161f830318bb) Thanks [@jonathansick](https://github.com/jonathansick)! - Add session tokens management pages
+
+  Implements a new `/settings/sessions` section for viewing and managing web sessions, notebook sessions, and internal tokens. This feature provides users with a unified interface to monitor and control their active sessions across the platform.
+
+  New pages:
+
+  - **`/settings/sessions`** main page: Tab-based UI using the new Tabs component for type-based filtering with URL state management. `?type=` query parameter persists selected tab.
+  - **`/settings/sessions/history`** page: Displays change history for sessions with tab-based navigation and filter persistence.
+  - **`/settings/sessions/[id]`** details page: Shows detailed information for individual session tokens with edit/delete capabilities.
+
+  New components:
+
+  - **SessionTokensView component**: Displays tokens by type (web sessions, notebook sessions, internal tokens) with filtering, loading states, and error handling
+  - **SessionTokenItem component**: Individual token card showing metadata (creation date, expiration, host), with delete functionality
+
+### Patch Changes
+
+- [#237](https://github.com/lsst-sqre/squareone/pull/237) [`d1a05ef7e32c9a20f38eeb7e36a384aeea21c69e`](https://github.com/lsst-sqre/squareone/commit/d1a05ef7e32c9a20f38eeb7e36a384aeea21c69e) Thanks [@jonathansick](https://github.com/jonathansick)! - Simplify user menu to show only Settings and Log out
+
+  The user menu has been streamlined to display only two essential items:
+
+  - **Settings** - Links to `/settings` page for all account and token management
+  - **Log out** - Logs user out with proper redirect handling
+
+  This change removes the conditional external "Account settings" link and consolidates the "Access tokens" link into a general "Settings" link. All settings pages remain accessible through the sidebar navigation at `/settings`, including:
+
+  - Account settings (`/settings`)
+  - Access tokens (`/settings/tokens`)
+  - Sessions (`/settings/sessions`)
+
+  This simplification improves the user experience by reducing menu clutter while maintaining full access to all functionality through the settings section.
+
+- [#241](https://github.com/lsst-sqre/squareone/pull/241) [`7b013336c51bc891a4470a90a01bbcb58528fdaf`](https://github.com/lsst-sqre/squareone/commit/7b013336c51bc891a4470a90a01bbcb58528fdaf) Thanks [@jonathansick](https://github.com/jonathansick)! - Fix token creation error display for validation errors
+
+  Resolved Sentry [SQUAREONE-26](https://rubin-observatory.sentry.io/issues/6981134766/events/1d39710f9f6e4fa1b0aa581ab120226a/): Fixed a crash that occurred when the Gafaelfawr API returned Pydantic validation errors during token creation. Previously, validation error objects were rendered directly in React, causing "Objects are not valid as a React child" errors.
+
+- Updated dependencies [[`1d8161aa169c159762e28b0e3c1afaea5514ef15`](https://github.com/lsst-sqre/squareone/commit/1d8161aa169c159762e28b0e3c1afaea5514ef15), [`0e49cf80e8be37ffca6e7897ba07aa91881e7be3`](https://github.com/lsst-sqre/squareone/commit/0e49cf80e8be37ffca6e7897ba07aa91881e7be3), [`bf0a8e50a321874abe551ad148255b7546680f31`](https://github.com/lsst-sqre/squareone/commit/bf0a8e50a321874abe551ad148255b7546680f31)]:
+  - @lsst-sqre/squared@0.10.0
+
 ## 0.27.0
 
 ### Minor Changes
