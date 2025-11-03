@@ -147,7 +147,7 @@
 /* Outline + Secondary */
 .outline.secondary {
   border-color: var(--rsd-color-gray-500);
-  color: var(--rsd-color-gray-800);
+  color: var(--rsd-component-text-color);
 }
 
 .outline.secondary:hover:not(:disabled):not(.disabled) {
