@@ -451,7 +451,7 @@
 }
 
 [data-theme='dark'] .calendarDay button:hover:not(:disabled) {
-  background: var(--rsd-color-gray-800);
+  background: var(--rsd-color-gray-700);
 }
 
 [data-theme='dark'] .timeSection,
