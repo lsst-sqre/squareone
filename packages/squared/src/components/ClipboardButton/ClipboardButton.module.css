@@ -16,6 +16,10 @@
   animation: fadeIn 200ms ease-in-out;
 }
 
+[data-theme='dark'] .successState {
+  color: var(--rsd-component-text-color);
+}
+
 .successState[data-size='sm'] {
   padding: var(--sqo-space-xxxs) var(--sqo-space-xs);
   font-size: 0.875rem;
