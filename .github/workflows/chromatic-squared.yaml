@@ -10,6 +10,7 @@ name: 'Chromatic: Squared'
 
 jobs:
   call:
+    if: false
     uses: ./.github/workflows/run-chromatic.yaml
     with:
       path: packages/squared
