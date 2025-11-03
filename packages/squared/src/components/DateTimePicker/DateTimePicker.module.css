@@ -367,6 +367,7 @@
 /* Time section */
 .timeSection {
   padding-top: var(--sqo-space-xs);
+  padding-bottom: var(--sqo-space-xs);
   border-top: 1px solid var(--rsd-color-gray-200);
 }
 
