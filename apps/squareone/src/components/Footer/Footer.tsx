@@ -30,6 +30,27 @@ const StyledFooter = styled.footer`
       padding: 2rem 0;
     }
   }
+
+  /* Link styling */
+  a {
+    color: var(--rsd-component-text-link-color);
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: var(--rsd-component-text-link-hover-color);
+    text-decoration: underline;
+  }
+
+  /* Dark mode override - use primary-300 for better contrast on teal background */
+  [data-theme='dark'] & a {
+    color: var(--rsd-color-primary-300);
+  }
+
+  [data-theme='dark'] & a:hover {
+    color: var(--rsd-color-primary-300);
+    text-decoration: underline;
+  }
 `;
 
 const PartnerLogoContainer = styled.div`
