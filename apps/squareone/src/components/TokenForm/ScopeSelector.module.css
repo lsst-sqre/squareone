@@ -24,6 +24,8 @@
 
 /* Ensure checkbox items don't break across columns */
 .scopeGrid > * {
+  display: inline-block; /* Prevents outline fragmentation across columns */
+  width: 100%; /* Maintains full-width layout */
   break-inside: avoid;
   margin-bottom: var(--rsd-space-2x, 0.75rem);
 }
