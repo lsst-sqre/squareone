@@ -3,29 +3,21 @@
 }
 
 .scopeGrid {
-  /* Multi-column layout using CSS columns for automatic reflow */
-  columns: 1;
-  column-gap: var(--rsd-space-3x, 1.5rem);
-  break-inside: avoid;
+  /* Grid layout prevents focus outline fragmentation (unlike CSS columns) */
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--rsd-space-2x, 0.75rem) var(--rsd-space-3x, 1.5rem);
 }
 
 /* Responsive column layout */
 @media (min-width: 768px) {
   .scopeGrid {
-    columns: 2;
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (min-width: 1200px) {
   .scopeGrid {
-    columns: 3;
+    grid-template-columns: repeat(3, 1fr);
   }
-}
-
-/* Ensure checkbox items don't break across columns */
-.scopeGrid > * {
-  display: inline-block; /* Prevents outline fragmentation across columns */
-  width: 100%; /* Maintains full-width layout */
-  break-inside: avoid;
-  margin-bottom: var(--rsd-space-2x, 0.75rem);
 }
