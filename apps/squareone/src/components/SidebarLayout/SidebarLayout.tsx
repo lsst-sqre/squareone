@@ -160,6 +160,11 @@ const MobileHeaderTitleLink = styled.a`
 
 const MainContentContainer = styled.main`
   /* Full-width content areas with appropriate structure for mobile/desktop */
+  padding-bottom: 2rem;
+
+  @media (min-width: ${ContentMaxWidth}) {
+    padding-bottom: 3rem;
+  }
 `;
 
 /*

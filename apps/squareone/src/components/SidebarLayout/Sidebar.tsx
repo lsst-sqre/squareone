@@ -26,7 +26,7 @@ const SidebarRoot = styled.aside`
   @media (min-width: ${ContentMaxWidth}) {
     position: sticky;
     top: 0;
-    height: 100vh;
+    max-height: 100vh;
     overflow-y: auto;
     padding-right: 1rem; /* Space for scrollbar */
     padding-left: 0.75rem; /* Space for navigation items with negative margins */
