@@ -1,5 +1,42 @@
 # @lsst-sqre/squared
 
+## 0.10.1
+
+### Patch Changes
+
+- [#242](https://github.com/lsst-sqre/squareone/pull/242) [`5641bc3b4b3e704d0cc489b3db909ee0b43fe317`](https://github.com/lsst-sqre/squareone/commit/5641bc3b4b3e704d0cc489b3db909ee0b43fe317) Thanks [@jonathansick](https://github.com/jonathansick)! - Improve dark mode accessibility and color system
+
+  Enhanced dark mode support across components with improved text contrast for better accessibility:
+
+  - Fixed button text visibility in dark theme (secondary buttons)
+  - Fixed ClipboardButton success text contrast
+  - Fixed DateTimePicker calendar hover states and year input backgrounds
+  - Fixed TokenHistory hover text contrast
+  - Improved token key text contrast in TokenDetailsView
+  - Enhanced footer and general link contrast with blue-300 color
+  - Adapted dropdown shadows for better dark mode visibility
+  - Consolidated navigation menu viewport styling
+
+  Added complete color ramps to design tokens:
+
+  - Added missing primary color shades (primary-300, primary-400, primary-600, primary-700)
+  - Added complete gray color scale (gray-100 through gray-900)
+  - Added text-light token for improved light text on dark backgrounds
+
+  These changes ensure WCAG AA compliance for text contrast in both light and dark themes.
+
+- [#242](https://github.com/lsst-sqre/squareone/pull/242) [`5641bc3b4b3e704d0cc489b3db909ee0b43fe317`](https://github.com/lsst-sqre/squareone/commit/5641bc3b4b3e704d0cc489b3db909ee0b43fe317) Thanks [@jonathansick](https://github.com/jonathansick)! - Add bottom padding to DateTimePicker time section
+
+  Improved visual spacing in the DateTimePicker component by adding bottom padding to the time selection section, preventing the UI from feeling cramped at the bottom of the picker.
+
+- [#242](https://github.com/lsst-sqre/squareone/pull/242) [`5641bc3b4b3e704d0cc489b3db909ee0b43fe317`](https://github.com/lsst-sqre/squareone/commit/5641bc3b4b3e704d0cc489b3db909ee0b43fe317) Thanks [@jonathansick](https://github.com/jonathansick)! - Add dark theme support to Storybook
+
+  Added dark theme background support to both squareone and squared Storybook configurations, enabling proper testing and development of components in dark mode. This includes setting up the appropriate CSS custom properties for dark theme backgrounds in Storybook preview environments.
+
+- Updated dependencies [[`5641bc3b4b3e704d0cc489b3db909ee0b43fe317`](https://github.com/lsst-sqre/squareone/commit/5641bc3b4b3e704d0cc489b3db909ee0b43fe317)]:
+  - @lsst-sqre/rubin-style-dictionary@0.7.0
+  - @lsst-sqre/global-css@0.2.4
+
 ## 0.10.0
 
 ### Minor Changes
