@@ -26,7 +26,7 @@ const TokensHistoryPage: NextPageWithLayout & (() => ReactElement) = () => {
     return (
       <>
         <Head>
-          <title key="title">{`Token History | ${appConfig.siteName}`}</title>
+          <title key="title">{`Access token history | ${appConfig.siteName}`}</title>
         </Head>
         <div>Loading...</div>
       </>
@@ -36,13 +36,17 @@ const TokensHistoryPage: NextPageWithLayout & (() => ReactElement) = () => {
   return (
     <>
       <Head>
-        <title key="title">{`Token History | ${appConfig.siteName}`}</title>
+        <title key="title">{`Access token history | ${appConfig.siteName}`}</title>
         <meta
           name="description"
           key="description"
           content="View the change history for your RSP access tokens"
         />
-        <meta property="og:title" key="ogtitle" content="Token History" />
+        <meta
+          property="og:title"
+          key="ogtitle"
+          content="Access token history"
+        />
         <meta
           property="og:description"
           key="ogdescription"

@@ -212,7 +212,7 @@ describe('TokenDetailsView', () => {
     expect(screen.getByText(/no longer exists/i)).toBeInTheDocument();
 
     // Should still display the token key (appears multiple times)
-    expect(screen.getByText('Token Key:')).toBeInTheDocument();
+    expect(screen.getByText('Token key:')).toBeInTheDocument();
     const tokenKeyInstances = screen.getAllByText('abc123xyz456789012345');
     expect(tokenKeyInstances.length).toBeGreaterThan(0);
 

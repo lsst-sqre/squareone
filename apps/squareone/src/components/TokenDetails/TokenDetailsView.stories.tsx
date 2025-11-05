@@ -165,7 +165,7 @@ function TokenDetailsViewWrapper({
 
         <div className={styles.metadataGrid}>
           <div className={styles.metadataRow}>
-            <dt className={styles.metadataLabel}>Token Key</dt>
+            <dt className={styles.metadataLabel}>Token key</dt>
             <dd className={styles.metadataValue}>
               <code className={styles.tokenKey}>{token.token}</code>
             </dd>

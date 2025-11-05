@@ -87,7 +87,7 @@ export default function TokenDetailsView({
               history for this token is still available below.
             </p>
             <p>
-              <strong>Token Key:</strong>{' '}
+              <strong>Token key:</strong>{' '}
               <code className={styles.tokenKey}>{tokenKey}</code>
             </p>
           </div>
@@ -156,7 +156,7 @@ export default function TokenDetailsView({
 
         <div className={styles.metadataGrid}>
           <div className={styles.metadataRow}>
-            <dt className={styles.metadataLabel}>Token Key</dt>
+            <dt className={styles.metadataLabel}>Token key</dt>
             <dd className={styles.metadataValue}>
               <code className={styles.tokenKey}>{token.token}</code>
             </dd>
