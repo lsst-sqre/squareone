@@ -1,7 +1,7 @@
 {
   "name": "@lsst-sqre/global-css",
   "description": "Global stylesheets for Squareone projects.",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "private": true,
   "main": "./dist/next.css",
   "license": "MIT",
