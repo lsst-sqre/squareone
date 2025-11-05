@@ -19,7 +19,7 @@ component:
           light:
             value: '#146685' # darker than blue-500
           dark:
-            value: '{color.blue.500.value}'
+            value: '{color.blue.300.value}'
       hover:
         color:
           themed:

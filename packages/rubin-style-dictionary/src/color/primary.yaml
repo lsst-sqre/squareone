@@ -2,19 +2,33 @@
 
 color:
   primary:
+    '50':
+      value: '#FBFEFE' # H:180 S:8% L:99%
+      comment: 'Lightest teal tint for soft backgrounds'
     '100':
       value: '{color.imagotype.white.value}'
+      comment: 'Very light neutral for backgrounds'
     '200':
       value: '#D9F7F6' # H:178 S:12 B:97
+      comment: 'Light teal tint'
     '300':
       value: '#B1F2EF' # H:177 S:27 B:95
+      comment: 'Medium light teal'
     '400':
       value: '{color.imagotype.light.value}'
+      comment: 'Base light teal from imagotype'
     '500':
       value: '#009FA1' # H:181 S:100 B:63
+      comment: 'Medium teal'
     '600':
       value: '{color.imagotype.dark.value}'
+      comment: 'Base dark teal from imagotype'
     '700':
       value: '#0C4A47' # H:177 S:84 B:29
+      comment: 'Dark teal'
     '800':
       value: '{color.imagotype.black.value}'
+      comment: 'Darkest neutral from imagotype'
+    '900':
+      value: '#0F1212' # H:180 S:10% L:7%
+      comment: 'Darkest teal shade, near black'

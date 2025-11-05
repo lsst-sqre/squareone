@@ -1,6 +1,7 @@
 // Storybook configuration for component testing
 import React from 'react';
 import type { Preview } from '@storybook/nextjs-vite';
+import { withThemeByDataAttribute } from '@storybook/addon-themes';
 import { INITIAL_VIEWPORTS } from 'storybook/viewport';
 import { AppConfigProvider } from '../src/contexts/AppConfigContext';
 
@@ -66,6 +67,14 @@ const preview: Preview = {
   },
 
   decorators: [
+    withThemeByDataAttribute({
+      themes: {
+        light: 'light',
+        dark: 'dark',
+      },
+      defaultTheme: 'light',
+      attributeName: 'data-theme',
+    }),
     (Story) => (
       <AppConfigProvider config={mockAppConfig}>
         <Story />

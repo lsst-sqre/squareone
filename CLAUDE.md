@@ -1,45 +1,14 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides essential guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Development Commands
-
-### Main commands (run from repository root)
-
-- `pnpm dev` - Start development servers for all apps
-- `pnpm build` - Build all packages and apps
-- `pnpm lint` - Run ESLint across all packages
-- `pnpm type-check` - Run TypeScript type checking
-- `pnpm format` - Format code with Prettier
-- `pnpm storybook` - Start Storybook for all packages
-- `pnpm docs` - Generate Sphinx documentation for all packages
-
-### App-specific commands
-
-- `pnpm dev --filter squareone` - Start development server for squareone app only
-- `pnpm build --filter squareone` - Build squareone app only
-- `pnpm lint --filter squareone` - Lint squareone app only
-
-### Testing commands
-
-- `pnpm test` - Run vitest tests across all packages
-- `pnpm test-storybook` - Run Storybook tests using vitest across all packages
-- `pnpm test-storybook:watch` - Run Storybook tests in watch mode
-- `pnpm test-storybook --filter @lsst-sqre/squared` - Run Storybook tests for squared package only
-- Uses vitest as the test runner with Storybook addon-vitest for testing stories
-- **Comprehensive testing** - Use the `test-suite-runner` agent (via Task tool) for running the full CI pipeline (`pnpm run localci`) and analyzing failures across all stages (formatting, linting, type-checking, testing, building)
-
-### Version management
-
-- `npx changeset` - Create a changeset for versioning new changes
-
-## Repository Architecture
+## Quick Reference
 
 This is a **monorepo** for Rubin Observatory front-end applications managed with:
 
-- **pnpm** for package management with workspaces
-- **Turborepo** for build orchestration and caching
-- **Changesets** for versioning and publishing
+- **pnpm** - Package management with workspaces
+- **Turborepo** - Build orchestration and caching
+- **Changesets** - Versioning and publishing
 
 ### Applications (`apps/`)
 
@@ -53,189 +22,189 @@ This is a **monorepo** for Rubin Observatory front-end applications managed with
 - **`@lsst-sqre/eslint-config`** - Shared ESLint configuration
 - **`@lsst-sqre/tsconfig`** - Shared TypeScript configuration
 
+## Development Commands
+
+### Main Commands (run from repository root)
+
+```bash
+pnpm dev              # Start development servers
+pnpm build            # Build all packages and apps
+pnpm lint             # Run ESLint
+pnpm type-check       # Run TypeScript type checking
+pnpm format           # Format code with Prettier
+pnpm test             # Run vitest tests
+pnpm test-storybook   # Run Storybook tests
+pnpm storybook        # Start Storybook
+pnpm docs             # Generate Sphinx documentation
+npx changeset         # Create changeset for versioning
+```
+
+### Targeted Commands
+
+Use `--filter` to target specific packages:
+
+```bash
+pnpm dev --filter squareone
+pnpm build --filter @lsst-sqre/squared
+pnpm test --filter @lsst-sqre/squared
+```
+
+⚠️ **Critical**: Always run commands from repository root with filters. Individual package scripts bypass Turborepo's remote caching. See **turborepo-workflow** skill for details.
+
+## React Component Basics
+
+- **Functional components** with hooks
+- **TypeScript** preferred for new code
+- **Prefer `type` over `interface`** for props
+- **Avoid `React.FC`** - type props directly in function parameters
+- **Component directories** with index files for clean exports
+- **Default exports** for components
+- **CSS Modules** for styling in squared package
+- **styled-components** for styling in squareone app (legacy)
+
+### Import Order
+
+```typescript
+// External libraries first
+import React from 'react';
+import { useState } from 'react';
+
+// Internal packages
+import { Button } from '@lsst-sqre/squared';
+import '@lsst-sqre/global-css';
+
+// Relative imports
+import styles from './Component.module.css';
+import SubComponent from './SubComponent';
+```
+
 ## Key Architecture Patterns
 
-### Next.js App Configuration
+### Next.js App (squareone)
 
 - **Filesystem-based configuration** via YAML files (`squareone.config.yaml`, `squareone.serverconfig.yaml`)
 - **AppConfig system** replaces `next/config` for runtime configuration
 - **Server-side configuration loading** via `loadAppConfig()` in `getServerSideProps`
 - **React Context-based** configuration access via `useAppConfig()` hook
+- **MDX content** loaded from filesystem, configurable via `mdxDir`
+- **Transpiles squared package** via `transpilePackages: ['@lsst-sqre/squared']`
 - **Kubernetes-ready** configuration that supports runtime ConfigMap mounting
-- **MDX content** loaded from filesystem (`src/content/pages/` in development, configurable via `mdxDir`)
-- **Transpiles squared package** via Next.js `transpilePackages` configuration
-- Server-side rendering with styled-components (for squareone app only)
-- Gafaelfawr integration for authentication
-- Sentry integration for error tracking (see Sentry Configuration section below)
-- Plausible analytics integration
 
-### React Component Architecture
+See **appconfig-system** skill for complete patterns.
 
-- Functional components with hooks
-- Component directories with index files for clean exports
-- **CSS Modules for styling in squared package** with design tokens from rubin-style-dictionary
-- Styled-components for styling in squareone app (legacy components)
-- PropTypes for JavaScript components, TypeScript types for TypeScript components
-- **Prefer `type` over `interface` for component props and simple object types**
-- **Avoid using `React.FC` - type props directly in function parameters**
-- Storybook for component documentation
-- **Vitest for testing** - both unit tests and Storybook story tests via addon-vitest
+### Squared Package Architecture
 
-### Times Square Integration
+⚠️ **Critical**: Squared has NO BUILD STEP - exports TypeScript source directly.
 
-Times Square is a notebook execution system integrated into the squareone app:
+- **CSS Modules only** - No styled-components in squared
+- **Apps must transpile** - Configure `transpilePackages: ['@lsst-sqre/squared']`
+- **Direct source exports** - package.json points to `src/index.ts`
+- **Testing with Vitest** - Both unit tests and Storybook tests
 
-- Use `TimesSquareUrlParametersContext` for URL-based state management
-- Use `TimesSquareHtmlEventsContext` for real-time SSE (Server-Sent Events) updates
-- GitHub PR preview support at `/times-square/github-pr/:owner/:repo/:commit` paths
-- Mock API endpoints in `/pages/api/dev/times-square/` for development
+See **squared-package** skill for complete architecture.
 
 ### Data Fetching
 
-- SWR for data fetching and caching
-- Custom hooks for API interactions (e.g., `useUserInfo`, `useTimesSquarePage`)
-- Mock data in `src/lib/mocks/` for development
+- **SWR** for data fetching and caching
+- **Custom hooks** for API interactions (e.g., `useUserInfo`, `useTimesSquarePage`)
+- **Mock data** in `src/lib/mocks/` for development
 
-### AppConfig System (Runtime Configuration)
+See **data-fetching-patterns** skill for complete patterns.
 
-The squareone app uses a filesystem-based configuration system that replaces `next/config`:
+### Times Square Integration
 
-#### Configuration Loading
+- **TimesSquareUrlParametersContext** for URL-based state management
+- **TimesSquareHtmlEventsContext** for real-time SSE updates
+- **GitHub PR preview support** at `/times-square/github-pr/:owner/:repo/:commit`
+- **Mock API endpoints** in `/pages/api/dev/times-square/` for development
 
-- **Server-side**: Use `loadAppConfig()` from `src/lib/config/loader.ts` in `getServerSideProps`
-- **Client-side**: Use `useAppConfig()` hook from `src/contexts/AppConfigContext.tsx`
-- **Configuration files**: `squareone.config.yaml` (public) and `squareone.serverconfig.yaml` (server-only)
-- **Schema validation**: Ajv-based validation with default values and property removal
+See **times-square-integration** skill for complete patterns.
 
-#### Sentry configuration loading
+## Specialized Skills
 
-- **Server-side** (`sentry.server.config.js`): Sentry configuration is loaded from environment variables and injected into the AppConfig
-- **Client-side** (`instrumentation-client.js`): Sentry configuration is injected into the browser via `window.__SENTRY_CONFIG__` in `_document.tsx`. This requires that pages implement `getServerSideProps` to enable configuration injection. Statically rendered pages get the default configuration which disables client-side Sentry reporting.
+For detailed guidance on specific topics, Claude has access to specialized skills that provide comprehensive patterns, templates, and troubleshooting:
 
-#### Page Pattern
+- **appconfig-system** - Configuration loading, YAML files, MDX content, Sentry config injection
+- **turborepo-workflow** - Build commands, remote caching, filter syntax, troubleshooting
+- **squared-package** - NO BUILD STEP architecture, CSS Modules, transpilation, testing
+- **design-system** - Complete CSS variable reference, design tokens, colors, spacing, typography
+- **component-creation** - TypeScript patterns, CSS Modules with design tokens, Storybook, tests
+- **testing-infrastructure** - Vitest, React Testing Library, Storybook tests, CI pipeline
+- **times-square-integration** - Context providers, hooks, SSE, GitHub PR previews
+- **data-fetching-patterns** - SWR patterns, custom hooks, error handling, mock data
+- **platform-api-integration** - OpenAPI specs, API discovery, hook patterns, authentication
+- **migrate-styled-components-to-css-modules** - Converting styled-components to CSS Modules
 
-```typescript
-// In pages (e.g., pages/docs.tsx)
-export const getServerSideProps: GetServerSideProps = async () => {
-  const { config: appConfig, mdxSource } = await loadConfigAndMdx('docs.mdx');
-  return { props: { appConfig, mdxSource } };
-};
-```
-
-#### Component Pattern
-
-```typescript
-// In components
-import { useAppConfig } from '../contexts/AppConfigContext';
-
-function MyComponent() {
-  const config = useAppConfig();
-  return <div>{config.siteName}</div>;
-}
-```
-
-#### MDX Content Loading
-
-- **Development**: MDX files in `src/content/pages/` (relative path)
-- **Production**: Configurable via `mdxDir` in YAML (absolute path for ConfigMaps)
-- **Loading functions**: `loadMdxContent()` and `loadConfigAndMdx()` in config loader
-- **Serialization**: Uses `next-mdx-remote` for server-side MDX processing
-
-#### Key Benefits
-
-- **Kubernetes-ready**: Configuration via ConfigMaps at runtime
-- **No hydration issues**: No `next/config` or `getInitialProps` dependencies
-- **Type-safe**: Full TypeScript support with `AppConfig` interface
-- **Environment-agnostic**: Same system works in development and production
-- **Content management**: MDX files separate from configuration, easier to edit
-
-### Styling System
-
-- Global CSS from `@lsst-sqre/global-css` package
-- Design tokens from `@lsst-sqre/rubin-style-dictionary`
-- **CSS Modules** for component-specific styling in squared package
-- styled-components for component-specific styling in squareone app (legacy)
-- Font Awesome icons via `@fortawesome/react-fontawesome`
-- CSS custom properties for design tokens
+These skills automatically activate when relevant or can be referenced explicitly. See `.claude/README.md` for complete skill documentation.
 
 ## Configuration Files
 
 - **`turbo.json`** - Turborepo build pipeline configuration
 - **`pnpm-workspace.yaml`** - pnpm workspace configuration
-- **`apps/squareone/squareone.config.yaml`** - Public runtime configuration (accessible client-side)
-- **`apps/squareone/squareone.serverconfig.yaml`** - Server-only configuration (secrets, etc.)
+- **`apps/squareone/squareone.config.yaml`** - Public runtime configuration (client-accessible)
+- **`apps/squareone/squareone.serverconfig.yaml`** - Server-only configuration (secrets)
 - **`apps/squareone/squareone.config.schema.json`** - JSON schema for public config validation
-- **`apps/squareone/squareone.serverconfig.schema.json`** - JSON schema for server config validation
-- **`apps/squareone/next.config.js`** - Next.js configuration (no runtime config, only rewrites/webpack)
+- **`apps/squareone/next.config.js`** - Next.js configuration (no runtime config, only build config)
 - **`apps/squareone/src/content/pages/`** - Development MDX content files
-- **`apps/squareone/src/lib/config/loader.ts`** - Configuration and MDX loading utilities
-- **`apps/squareone/src/contexts/AppConfigContext.tsx`** - React context for configuration
 - **`.github/copilot-instructions.md`** - Contains detailed coding patterns and conventions
 
 ## Important Development Notes
 
-### Squared Package Architecture (CRITICAL)
+### Critical Patterns
 
-- **NO BUILD STEP** - The squared package exports TypeScript source directly
-- **CSS Modules only** - No styled-components in squared package
-- **Next.js transpilation** - Apps that consume squared must configure `transpilePackages: ['@lsst-sqre/squared']`
-- **Direct source exports** - Package.json main/module fields point to `src/index.ts`
-- **Testing with Vitest** - Both unit tests and Storybook story tests use vitest
-- **No tsup** - Build tool removed in favor of app-level transpilation
+1. **Turborepo Remote Caching**
+   - **Always use root-level pnpm scripts** (e.g., `pnpm build --filter squareone`)
+   - **Never run scripts from individual packages** (bypasses remote caching)
+   - Only root scripts use `scripts/turbo-wrapper.js` for authentication
+   - See **turborepo-workflow** skill for complete details
 
-### Turborepo Remote Caching (CRITICAL)
+2. **Configuration System**
+   - **NEVER use `next/config` or `getConfig()`** - Use AppConfig system instead
+   - Server-side: `loadAppConfig()` in `getServerSideProps`
+   - Client-side: `useAppConfig()` hook
+   - See **appconfig-system** skill for complete patterns
 
-- **Always use root-level pnpm scripts** - Only the root `package.json` scripts use the wrapper (`scripts/turbo-wrapper.js`) that enables remote caching with authentication
-- **Never run scripts from individual packages/apps** - Individual package.json scripts bypass the wrapper and remote caching
-- **Use Turborepo filter syntax** - Target specific packages with `pnpm [script] --filter [package]` from repository root
-- **Never call `turbo` directly** - Direct `turbo` calls bypass the wrapper and won't benefit from remote caching authentication
-- **Exception for direct turbo calls** - Only acceptable when `TURBO_API`, `TURBO_TOKEN`, and `TURBO_TEAM` are already set as environment variables (e.g., in CI/CD pipelines or Docker builds)
-- **Remote cache server** - Uses `https://roundtable.lsst.cloud/turborepo-cache` with Gafaelfawr authentication
-- **Documentation** - See `docs/dev/remote-cache.rst` for detailed information about the remote caching system
+3. **Squared Package**
+   - **NO BUILD STEP** - exports TypeScript source directly
+   - **CSS Modules only** - No styled-components in squared
+   - Apps must configure `transpilePackages: ['@lsst-sqre/squared']`
+   - See **squared-package** skill for complete architecture
 
-Examples of correct vs incorrect usage:
+## Testing
+
+### Quick Commands
 
 ```bash
-# ✅ Correct: Root script with filter
-pnpm test --filter @lsst-sqre/squared
-
-# ❌ Wrong: Individual package script
-cd packages/squared && pnpm test
-
-# ❌ Wrong: Direct turbo call (unless env vars pre-set)
-turbo run test --filter @lsst-sqre/squared
+pnpm test                              # Run unit tests
+pnpm test --filter @lsst-sqre/squared  # Test specific package
+pnpm test-storybook                     # Run Storybook tests
+pnpm test-storybook:watch               # Watch mode
 ```
 
-### Testing Infrastructure
+### Comprehensive Testing
 
-- **Vitest configuration** - Configured in `vitest.config.ts` for unit tests
-- **Storybook addon-vitest** - Tests stories directly in vitest environment
-- **React Testing Library** - Primary testing utilities for component testing
-- **Test setup** - Common test utilities in `src/test-setup.ts`
-- **Running tests**: 
-  - `pnpm test` - Run unit tests
-  - `pnpm test-storybook` - Run Storybook story tests
-  - `pnpm test-storybook:watch` - Watch mode for story tests
+Use the `test-suite-runner` agent (via Task tool) for running the full CI pipeline (`pnpm run localci`) and analyzing failures across all stages.
 
-### Configuration System Migration (CRITICAL)
+See **testing-infrastructure** skill for complete patterns.
 
-- **NEVER use `next/config` or `getConfig()`** - The app has been migrated away from this pattern
-- **Use AppConfig system instead**: `loadAppConfig()` for server-side, `useAppConfig()` for client-side
-- **No `getInitialProps`** except in `_document.tsx` (required for styled-components SSR)
-- **All configuration must be loaded via `getServerSideProps`** and passed through React context
-- **Environment variables**: Use direct `process.env` access for infrastructure concerns (Sentry config files)
-- **Avoid `NEXT_PUBLIC_` environment variables** for runtime config - use YAML files instead
+## General Development Guidelines
 
-### Pages and Components
+1. **Use TypeScript** for new components in squared package
+2. **Follow import conventions** - external → internal → relative
+3. **Check existing components** for patterns before creating new ones
+4. **Write tests** for components (unit or story tests)
+5. **Document with JSDoc** for public APIs
+6. **Use design tokens** (CSS variables) for all styling values (see **design-system** skill)
+7. **Run linting and type-checking** before committing
+8. **Create changesets** for changes (`npx changeset`)
 
-- **Pages requiring config**: Must use `getServerSideProps` with `loadAppConfig()` or `loadConfigAndMdx()`
-- **Components needing config**: Use `useAppConfig()` hook, must be within `AppConfigProvider`
-- **API routes**: Use `loadAppConfig()` directly for server-side configuration access
-- **Storybook**: Uses `AppConfigProvider` decorator with mock configuration
+## Getting Detailed Help
 
-### General Development
+This file provides essential context. For detailed patterns, templates, and troubleshooting:
 
-- Use TypeScript for new components in the squared package
-- Follow existing import patterns: external libraries first, internal packages, then relative imports
-- Always check existing components for patterns before creating new ones
-- MDX content is loaded from filesystem, configured via `mdxDir` setting
+- **Specific topics**: Reference the appropriate skill (skills activate automatically)
+- **Skills directory**: See `.claude/README.md` for complete skill documentation
+- **Coding conventions**: See `.github/copilot-instructions.md` for detailed patterns
+- **Remote caching**: See `docs/dev/remote-cache.rst` for infrastructure details
+
+When in doubt, ask Claude - the specialized skills will activate automatically to provide detailed guidance!

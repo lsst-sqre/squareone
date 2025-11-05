@@ -4,7 +4,8 @@
     "build": {
       "dependsOn": ["^build", "type-check"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"],
-      "passThroughEnv": ["SENTRY_AUTH_TOKEN"]
+      "passThroughEnv": ["SENTRY_AUTH_TOKEN"],
+      "outputLogs": "errors-only"
     },
     "test": {
       "dependsOn": ["^build"],
@@ -12,11 +13,15 @@
       "passThroughEnv": [
         "PLAYWRIGHT_BROWSERS_PATH",
         "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD"
-      ]
+      ],
+      "outputLogs": "errors-only"
     },
-    "lint": {},
+    "lint": {
+      "outputLogs": "errors-only"
+    },
     "type-check": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "outputLogs": "errors-only"
     },
     "dev": {
       "cache": false,

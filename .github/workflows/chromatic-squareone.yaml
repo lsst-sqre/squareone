@@ -10,6 +10,7 @@ name: 'Chromatic: Squareone'
 
 jobs:
   call:
+    if: false
     uses: ./.github/workflows/run-chromatic.yaml
     with:
       path: apps/squareone

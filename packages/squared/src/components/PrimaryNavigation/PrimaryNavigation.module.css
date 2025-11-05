@@ -70,11 +70,7 @@
 /* Content (dropdown) styles */
 .styledContent {
   font-size: 1rem;
-  background-color: var(--rsd-component-header-nav-menulist-background-color);
   min-width: 12rem;
-  border-radius: 0.5rem;
-  box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35),
-    0px 10px 20px -15px rgba(22, 23, 24, 0.2);
   animation-duration: 400ms;
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform, opacity;
@@ -152,11 +148,16 @@
   height: var(--radix-navigation-menu-viewport-height);
   width: 100%;
   overflow: hidden;
-  border-radius: 0.375rem;
-  border: 1px solid var(--border);
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  background-color: white;
-  color: black;
+  border-radius: 0.5rem;
+  box-shadow: var(--sqo-elevation-lg);
+  background-color: var(--rsd-component-header-nav-menulist-background-color);
+  color: var(--rsd-component-header-nav-menulist-text-color);
+}
+
+/* Dark mode viewport shadow override for teal background */
+[data-theme='dark'] .navigationMenuStyledViewport {
+  box-shadow: 0px 10px 15px -3px rgba(0, 0, 0, 0.4),
+    0px 4px 6px -2px rgba(0, 0, 0, 0.3);
 }
 
 @media (min-width: 768px) {

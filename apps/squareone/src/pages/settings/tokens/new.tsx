@@ -21,6 +21,7 @@ import useTokenTemplateUrl from '../../../hooks/useTokenTemplateUrl';
 import TokenSuccessModal from '../../../components/TokenSuccessModal';
 import useUserTokens, { extractTokenNames } from '../../../hooks/useUserTokens';
 import { TokenCreationErrorDisplay } from '../../../components/TokenCreationErrorDisplay';
+import { Lede } from '@/components/Typography/Typography';
 
 type NextPageWithLayout = {
   getLayout?: (page: ReactElement) => ReactElement;
@@ -154,10 +155,10 @@ const NewTokenPage: NextPageWithLayout &
   } else {
     content = (
       <>
-        <p>
-          Create a new access token for programmatic access to the Rubin Science
+        <Lede>
+          Create a new access token for programmatic access to Rubin Science
           Platform APIs.
-        </p>
+        </Lede>
 
         {creationError && <TokenCreationErrorDisplay error={creationError} />}
 

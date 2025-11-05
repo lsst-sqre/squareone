@@ -16,6 +16,7 @@
 
 .summary:hover {
   background-color: var(--rsd-color-gray-100);
+  color: var(--rsd-color-gray-700);
 }
 
 .summary:focus {
@@ -58,6 +59,12 @@
 
 .summary.expire .icon {
   color: var(--rsd-color-gray-500);
+}
+
+/* Dark theme overrides */
+[data-theme='dark'] .summary:hover {
+  background-color: var(--rsd-color-gray-700);
+  color: var(--rsd-color-gray-100);
 }
 
 /* Responsive design for mobile */
