@@ -112,4 +112,28 @@
   display: none;
 }
 
-/* Dark mode support - handled automatically by design tokens */
+/* Dark mode support */
+[data-theme='dark'] .trigger {
+  color: var(
+    --rsd-component-text-reverse-color
+  ); /* Light gray for better contrast */
+}
+
+[data-theme='dark'] .trigger:hover:not([data-disabled]) {
+  color: var(--rsd-color-primary-400); /* Lighter teal on hover */
+  background: rgba(255, 255, 255, 0.05); /* Subtle light background */
+}
+
+[data-theme='dark'] .trigger[data-state='active'] {
+  color: var(--rsd-color-primary-400); /* Lighter teal for selected tab */
+  border-bottom-color: var(--rsd-color-primary-400);
+}
+
+[data-theme='dark'] .trigger[data-state='active']:hover {
+  color: var(--rsd-color-primary-300); /* Even lighter on hover */
+  border-bottom-color: var(--rsd-color-primary-300);
+}
+
+[data-theme='dark'] .trigger[data-disabled] {
+  color: var(--rsd-color-gray-500); /* Slightly lighter disabled state */
+}
