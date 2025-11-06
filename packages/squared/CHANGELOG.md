@@ -1,5 +1,13 @@
 # @lsst-sqre/squared
 
+## 0.10.2
+
+### Patch Changes
+
+- [#244](https://github.com/lsst-sqre/squareone/pull/244) [`3e4a8fb612ac14d0f1ec214ed09be4a567b6b16a`](https://github.com/lsst-sqre/squareone/commit/3e4a8fb612ac14d0f1ec214ed09be4a567b6b16a) Thanks [@jonathansick](https://github.com/jonathansick)! - Improve Tabs component contrast in dark mode
+
+  Enhanced the visibility of unselected tab labels in dark mode by implementing proper color overrides. Unselected tabs now use light gray text (`--rsd-component-text-reverse-color`) instead of dark gray, significantly improving readability on dark backgrounds. Selected tabs and hover states use lighter teal colors that maintain the visual hierarchy while providing better contrast.
+
 ## 0.10.1
 
 ### Patch Changes

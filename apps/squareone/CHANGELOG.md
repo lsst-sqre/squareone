@@ -1,5 +1,12 @@
 # squareone
 
+## 0.28.2
+
+### Patch Changes
+
+- Updated dependencies [[`3e4a8fb612ac14d0f1ec214ed09be4a567b6b16a`](https://github.com/lsst-sqre/squareone/commit/3e4a8fb612ac14d0f1ec214ed09be4a567b6b16a)]:
+  - @lsst-sqre/squared@0.10.2
+
 ## 0.28.1
 
 ### Patch Changes
