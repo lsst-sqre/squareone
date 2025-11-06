@@ -1,4 +1,4 @@
-FROM node:22.13.0-alpine AS base
+FROM node:22.21.1-alpine AS base
 
 RUN npm install -g corepack@latest  # Ensure latest corepack
 RUN corepack enable
