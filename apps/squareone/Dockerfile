@@ -4,7 +4,6 @@ RUN npm install -g corepack@latest  # Ensure latest corepack
 RUN corepack enable
 RUN apk add --no-cache libc6-compat
 RUN apk update
-RUN npm install -g turbo
 ENV CI=1
 
 FROM base AS builder
@@ -13,7 +12,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN turbo prune --scope=squareone --docker
+RUN pnpm dlx turbo@2.6.0 prune --scope=squareone --docker
 
 
 FROM base AS installer
@@ -28,6 +27,7 @@ RUN pnpm install
 
 # Build the project and its dependencies
 COPY --from=builder /app/out/full/ .
+COPY --from=builder /app/scripts/ ./scripts/
 COPY turbo.json turbo.json
 
 # Remote caching for Turborepo
@@ -35,7 +35,7 @@ RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN,env=SENTRY_AUTH_TOKEN \
     --mount=type=secret,id=TURBO_TOKEN,env=TURBO_TOKEN \
     --mount=type=secret,id=TURBO_API,env=TURBO_API \
     --mount=type=secret,id=TURBO_TEAM,env=TURBO_TEAM \
-    turbo run build --filter=squareone...
+    pnpm build --filter=squareone...
 
 FROM base AS runner
 
@@ -54,5 +54,4 @@ ENV PORT=3000
 
 COPY --from=installer /app .
 
-# TODO: Maybe use the npm script?
 CMD ["pnpm", "--filter", "squareone", "run", "start"]
