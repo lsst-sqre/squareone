@@ -165,7 +165,9 @@ function NewTokenPageSimulator() {
         without using your password.
       </p>
       <TokenForm
-        availableScopes={loginInfo.config.scopes}
+        availableScopes={loginInfo.config.scopes.filter((scope) =>
+          loginInfo.scopes.includes(scope.name)
+        )}
         initialValues={formInitialValues}
         onSubmit={handleSubmit}
         onCancel={handleCancel}
@@ -357,6 +359,92 @@ export const ErrorState = {
       <MockFetchProvider mockError={true}>
         <Story />
       </MockFetchProvider>
+    ),
+  ],
+  parameters: {
+    nextjs: {
+      router: {
+        pathname: '/settings/tokens/new',
+        query: {},
+      },
+    },
+  },
+};
+
+// Mock with limited user scopes to demonstrate scope filtering
+const limitedScopeMockLoginInfo: LoginInfo = {
+  csrf: 'mock-csrf-token-limited',
+  username: 'limiteduser',
+  scopes: ['read:all', 'user:token'], // User only has 2 scopes
+  config: {
+    scopes: [
+      {
+        name: 'read:all',
+        description: 'Read access to all services',
+      },
+      {
+        name: 'user:token',
+        description: 'Can create and modify user tokens',
+      },
+      {
+        name: 'exec:notebook',
+        description: 'Can execute notebooks',
+      },
+      {
+        name: 'write:file',
+        description: 'Can write files',
+      },
+      {
+        name: 'admin:token',
+        description: 'Can manage all tokens',
+      },
+    ], // System has 5 scopes available
+  },
+};
+
+const mockFetchWithLimitedScopes = async (
+  url: string | URL | Request,
+  options?: RequestInit
+) => {
+  const urlString =
+    typeof url === 'string'
+      ? url
+      : url instanceof URL
+      ? url.toString()
+      : url.url;
+
+  if (urlString.includes('/auth/api/v1/login')) {
+    return {
+      ok: true,
+      status: 200,
+      json: async () => limitedScopeMockLoginInfo,
+    } as Response;
+  }
+
+  return originalFetch(url, options);
+};
+
+function LimitedScopesMockProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  useEffect(() => {
+    window.fetch = mockFetchWithLimitedScopes as any;
+    return () => {
+      window.fetch = originalFetch;
+    };
+  }, []);
+
+  return <>{children}</>;
+}
+
+export const LimitedScopes = {
+  decorators: [
+    (Story: any) => (
+      <LimitedScopesMockProvider>
+        <Story />
+      </LimitedScopesMockProvider>
     ),
   ],
   parameters: {

@@ -163,7 +163,9 @@ const NewTokenPage: NextPageWithLayout &
         {creationError && <TokenCreationErrorDisplay error={creationError} />}
 
         <TokenForm
-          availableScopes={loginInfo.config.scopes}
+          availableScopes={loginInfo.config.scopes.filter((scope) =>
+            loginInfo.scopes.includes(scope.name)
+          )}
           initialValues={formInitialValues}
           onSubmit={handleSubmit}
           onCancel={handleCancel}
