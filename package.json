@@ -18,6 +18,7 @@
     "turbo": "node scripts/turbo-wrapper.js",
     "build:local": "turbo run build",
     "docs": "uv run noxfile.py -s docs",
+    "validate-docker": "node scripts/validate-docker-versions.js",
     "prepare": "node -e \"try { require('husky').install() } catch (e) {if (e.code !== 'MODULE_NOT_FOUND') throw e}\""
   },
   "devDependencies": {

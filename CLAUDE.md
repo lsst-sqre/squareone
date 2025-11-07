@@ -36,6 +36,7 @@ pnpm test             # Run vitest tests
 pnpm test-storybook   # Run Storybook tests
 pnpm storybook        # Start Storybook
 pnpm docs             # Generate Sphinx documentation
+pnpm validate-docker  # Validate Dockerfile versions match package.json
 npx changeset         # Create changeset for versioning
 ```
 
@@ -134,6 +135,7 @@ For detailed guidance on specific topics, Claude has access to specialized skill
 - **data-fetching-patterns** - SWR patterns, custom hooks, error handling, mock data
 - **platform-api-integration** - OpenAPI specs, API discovery, hook patterns, authentication
 - **migrate-styled-components-to-css-modules** - Converting styled-components to CSS Modules
+- **docker-version-validation** - Dockerfile version synchronization, validation rules, troubleshooting
 
 These skills automatically activate when relevant or can be referenced explicitly. See `.claude/README.md` for complete skill documentation.
 

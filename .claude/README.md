@@ -20,7 +20,8 @@ This directory contains configuration for Claude Code, including specialized ski
 │   ├── times-square-integration/ # Times Square notebook system
 │   ├── data-fetching-patterns/ # SWR data fetching patterns
 │   ├── migrate-styled-components-to-css-modules/ # Migration guide
-│   └── platform-api-integration/ # RSP API discovery & integration
+│   ├── platform-api-integration/ # RSP API discovery & integration
+│   └── docker-version-validation/ # Dockerfile version synchronization
 ├── tasks/                      # Gitignored task-specific docs
 ├── projects/                   # Project-specific configurations
 ├── settings.local.json         # Local settings & permissions
@@ -234,6 +235,23 @@ Skills are modular capabilities that extend Claude's expertise with domain-speci
 - API registry with OpenAPI spec URLs
 - Hook template for new endpoints
 - Integration patterns and examples
+
+#### docker-version-validation
+
+**When to use**: Updating Dockerfile versions, synchronizing Node.js/pnpm/turbo versions, troubleshooting version mismatch errors, creating new Dockerfiles, understanding validation failures
+
+**Covers**:
+
+- Validation rules for Node.js (major.minor match), pnpm (exact match), and turbo (exact match)
+- Pre-commit hook integration via lint-staged
+- CI pipeline validation in GitHub Actions
+- Manual validation with `pnpm validate-docker`
+- Troubleshooting version mismatch errors
+- Best practices for updating versions in sync
+
+**Supporting files**:
+
+- None (references validation script at `scripts/validate-docker-versions.js`)
 
 ## Agents
 
