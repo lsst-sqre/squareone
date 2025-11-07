@@ -18,18 +18,23 @@
     "turbo": "node scripts/turbo-wrapper.js",
     "build:local": "turbo run build",
     "docs": "uv run noxfile.py -s docs",
+    "validate-docker": "node scripts/validate-docker-versions.js",
     "prepare": "node -e \"try { require('husky').install() } catch (e) {if (e.code !== 'MODULE_NOT_FOUND') throw e}\""
   },
   "devDependencies": {
-    "@changesets/changelog-github": "^0.4.8",
-    "@changesets/cli": "^2.26.2",
-    "@turbo/gen": "^1.10.12",
+    "@changesets/changelog-github": "^0.5.1",
+    "@changesets/cli": "^2.29.7",
+    "@turbo/gen": "^2.6.0",
     "dotenv": "^17.2.3",
     "eslint": "^8.46.0",
     "husky": "^8.0.3",
     "lint-staged": "^13.2.3",
     "prettier": "^2.8.8",
-    "turbo": "2.5.6"
+    "turbo": "2.6.0"
   },
-  "packageManager": "pnpm@10.12.1+sha512.f0dda8580f0ee9481c5c79a1d927b9164f2c478e90992ad268bbb2465a736984391d6333d2c327913578b2804af33474ca554ba29c04a8b13060a717675ae3ac"
+  "engines": {
+    "node": "^22.21.1",
+    "pnpm": ">=10.20.0"
+  },
+  "packageManager": "pnpm@10.20.0+sha512.cf9998222162dd85864d0a8102e7892e7ba4ceadebbf5a31f9c2fce48dfce317a9c53b9f6464d1ef9042cba2e02ae02a9f7c143a2b438cd93c91840f0192b9dd"
 }

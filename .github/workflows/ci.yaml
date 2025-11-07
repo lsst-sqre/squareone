@@ -53,6 +53,9 @@ jobs:
       - name: Install npm packages
         run: pnpm install --frozen-lockfile
 
+      - name: Validate Docker versions
+        run: node scripts/validate-docker-versions.js
+
       - name: Check formatting
         run: pnpm run format:check
 
