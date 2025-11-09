@@ -1,26 +1,177 @@
 version: 2
+
 updates:
-  - package-ecosystem: 'github-actions'
-    directory: '/'
-    schedule:
-      interval: 'weekly'
-  - package-ecosystem: 'pip'
-    directory: '/'
-    schedule:
-      interval: 'weekly'
-  - package-ecosystem: 'docker'
-    directory: '/'
-    schedule:
-      interval: 'weekly'
+  # npm/pnpm package ecosystem
   - package-ecosystem: 'npm'
     directory: '/'
     schedule:
       interval: 'weekly'
-    # Generally this means we'll get minor and patch updates, but we'll
-    # manually need to roll out major version changes.
-    versioning-strategy: 'lockfile-only'
+      day: 'monday'
+      time: '03:00'
+    open-pull-requests-limit: 15
+    rebase-strategy: 'auto'
+    commit-message:
+      prefix: 'chore(deps)'
+      include: 'scope'
+
+    # Block major version updates globally (manual review required)
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
+
     registries:
       - npm-github
+
+    groups:
+      # React ecosystem - must update together (CRITICAL)
+      react:
+        patterns:
+          - 'react'
+          - 'react-dom'
+          - '@types/react'
+          - '@types/react-dom'
+
+      # Next.js framework and plugins
+      nextjs:
+        patterns:
+          - 'next'
+          - '@next/*'
+          - 'next-*'
+          - 'eslint-config-next'
+
+      # Storybook ecosystem (CRITICAL - version lock)
+      storybook:
+        patterns:
+          - 'storybook'
+          - '@storybook/*'
+          - 'eslint-plugin-storybook'
+          - 'msw-storybook-addon'
+
+      # Vitest testing framework (CRITICAL)
+      vitest:
+        patterns:
+          - 'vitest'
+          - '@vitest/*'
+
+      # Testing Library ecosystem
+      testing-library:
+        patterns:
+          - '@testing-library/*'
+
+      # TypeScript and type definitions
+      typescript:
+        patterns:
+          - 'typescript'
+          - '@types/*'
+          - 'typescript-plugin-*'
+        exclude-patterns:
+          - '@types/react'
+          - '@types/react-dom'
+
+      # Turborepo build orchestration
+      turborepo:
+        patterns:
+          - 'turbo'
+          - '@turbo/*'
+          - 'eslint-config-turbo'
+
+      # ESLint ecosystem
+      eslint:
+        patterns:
+          - 'eslint'
+          - 'eslint-config-*'
+          - 'eslint-plugin-*'
+        exclude-patterns:
+          - 'eslint-config-next'
+          - 'eslint-config-turbo'
+          - 'eslint-plugin-storybook'
+
+      # Radix UI component primitives
+      radix-ui:
+        patterns:
+          - '@radix-ui/*'
+
+      # FontAwesome icon library
+      fontawesome:
+        patterns:
+          - '@fortawesome/*'
+
+      # Date handling libraries
+      date-handling:
+        patterns:
+          - 'date-fns'
+          - 'date-fns-*'
+          - 'react-day-picker'
+
+      # Markdown/MDX processing
+      markdown:
+        patterns:
+          - 'remark'
+          - 'remark-*'
+          - 'next-mdx-remote'
+
+      # CSS build tools
+      css-tools:
+        patterns:
+          - 'lightningcss'
+          - 'lightningcss-*'
+
+      # Changesets versioning
+      changesets:
+        patterns:
+          - '@changesets/*'
+
+      # Design system and styling
+      styling:
+        patterns:
+          - 'styled-components'
+          - '@types/styled-components'
+          - 'style-dictionary'
+          - 'style-dictionary-*'
+
+      # Build and bundler tools
+      build-tools:
+        patterns:
+          - 'vite'
+          - '@vitejs/*'
+          - 'tsup'
+
+      # Playwright browser testing
+      playwright:
+        patterns:
+          - 'playwright'
+          - '@playwright/*'
+
+      # Sentry monitoring
+      sentry:
+        patterns:
+          - '@sentry/*'
+
+  # GitHub Actions updates
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'monthly'
+    rebase-strategy: 'auto'
+    groups:
+      actions:
+        patterns:
+          - '*'
+
+  # Python dependencies (pip)
+  - package-ecosystem: 'pip'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+    rebase-strategy: 'auto'
+
+  # Docker base images
+  - package-ecosystem: 'docker'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+    rebase-strategy: 'auto'
+
 registries:
   npm-github:
     type: npm-registry
