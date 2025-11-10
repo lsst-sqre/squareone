@@ -1,18 +1,23 @@
-import path from 'node:path';
+// This file has been automatically migrated to valid ESM format by Storybook.
+import { fileURLToPath } from 'node:url';
+import path, { dirname } from 'node:path';
 import type { StorybookConfig } from '@storybook/nextjs-vite';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const config: StorybookConfig = {
   stories: ['../src/**/*.stories.mdx', '../src/**/*.stories.@(js|jsx|ts|tsx)'],
   addons: [
-    '@storybook/addon-links',
-    '@storybook/addon-a11y',
-    '@storybook/addon-docs',
-    '@storybook/addon-themes',
-    '@storybook/addon-vitest',
+    getAbsolutePath('@storybook/addon-links'),
+    getAbsolutePath('@storybook/addon-a11y'),
+    getAbsolutePath('@storybook/addon-docs'),
+    getAbsolutePath('@storybook/addon-themes'),
+    getAbsolutePath('@storybook/addon-vitest'),
   ],
 
   framework: {
-    name: '@storybook/nextjs-vite',
+    name: getAbsolutePath('@storybook/nextjs-vite'),
     options: {
       nextConfigPath: path.resolve(__dirname, '../next.config.js'),
     },
@@ -54,3 +59,7 @@ const config: StorybookConfig = {
 };
 
 export default config;
+
+function getAbsolutePath(value: string): any {
+  return dirname(fileURLToPath(import.meta.resolve(`${value}/package.json`)));
+}
