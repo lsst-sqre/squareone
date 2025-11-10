@@ -23,11 +23,28 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.pull_request.user.login == 'dependabot[bot]'
     steps:
+      - name: Generate GitHub App Token
+        # Associated app: https://github.com/organizations/lsst-sqre/settings/apps/squareone-ci
+        id: generate_token
+        uses: tibdex/github-app-token@v2
+        with:
+          app_id: ${{ secrets.SQUAREONE_CI_GH_APP_ID }}
+          private_key: ${{ secrets.SQUAREONE_CI_GH_APP_PRIVATE_KEY }}
+
+      - name: Get GitHub App User ID
+        id: get_user_id
+        run: |
+          USER_ID=$(gh api "/users/squareone-ci[bot]" --jq .id)
+          echo "user-id=$USER_ID" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}
+
       - name: Checkout PR branch
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.ref }}
+          token: ${{ steps.generate_token.outputs.token }}
 
       - name: Generate changeset
         uses: StafflinePeoplePlus/dependabot-changesets@v0.1.5
@@ -35,4 +52,6 @@ jobs:
           owner: lsst-sqre
           repo: squareone
           pr-number: ${{ github.event.pull_request.number }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ steps.generate_token.outputs.token }}
+          git-user: 'squareone-ci[bot]'
+          git-email: '${{ steps.get_user_id.outputs.user-id }}+squareone-ci[bot]@users.noreply.github.com'
