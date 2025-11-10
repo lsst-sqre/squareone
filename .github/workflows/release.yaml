@@ -42,6 +42,11 @@ jobs:
           app_id: ${{ secrets.SQUAREONE_CI_GH_APP_ID }}
           private_key: ${{ secrets.SQUAREONE_CI_GH_APP_PRIVATE_KEY }}
 
+      - name: Configure git identity for GitHub App
+        run: |
+          git config --global user.name "squareone-ci[bot]"
+          git config --global user.email "${{ secrets.SQUAREONE_CI_GH_APP_ID }}+squareone-ci[bot]@users.noreply.github.com"
+
       - name: Create Release Pull Request
         uses: changesets/action@v1
         with:
