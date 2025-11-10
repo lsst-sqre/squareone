@@ -1,0 +1,38 @@
+name: Add Changesets to Dependabot PRs
+
+# Security Design:
+# - Uses `pull_request` trigger (not `pull_request_target`) to avoid "pwn request"
+#   vulnerability where untrusted code executes with write permissions
+# - Verifies PR author using `github.event.pull_request.user.login` instead of
+#   `github.actor` to prevent "Confused Deputy" attacks where attackers
+#   manipulate Dependabot to trigger malicious actions
+# - Safe for Dependabot PRs because Dependabot creates branches in the same
+#   repository (not forks), so `pull_request` trigger has necessary permissions
+# - This pattern is recommended by GitHub's official Dependabot documentation
+
+permissions:
+  contents: write
+  pull-requests: write
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  dependabot-changesets:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Generate changeset
+        uses: StafflinePeoplePlus/dependabot-changesets@v0.1.5
+        with:
+          owner: lsst-sqre
+          repo: squareone
+          pr-number: ${{ github.event.pull_request.number }}
+          token: ${{ secrets.GITHUB_TOKEN }}

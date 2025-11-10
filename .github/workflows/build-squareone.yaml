@@ -7,6 +7,11 @@ on:
         description: 'Tag for image (optional). If not set, tag will be derived from git branch.'
         required: false
         type: string
+      push:
+        description: 'Push image to registry. Set to false for build-only validation.'
+        required: false
+        type: boolean
+        default: true
     secrets:
       SENTRY_AUTH_TOKEN:
         required: true
@@ -20,6 +25,7 @@ jobs:
       images: ghcr.io/${{ github.repository }}
       dockerfile: apps/squareone/Dockerfile
       tag: ${{ inputs.tag }}
+      push: ${{ inputs.push }}
     secrets:
       IMAGE_SECRETS: |
         SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
