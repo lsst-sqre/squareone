@@ -12,8 +12,26 @@ jobs:
     name: Release packages
     runs-on: ubuntu-latest
     steps:
+      - name: Generate GitHub App Token
+        # Associated app: https://github.com/organizations/lsst-sqre/settings/apps/squareone-ci
+        id: generate_token
+        uses: tibdex/github-app-token@v2
+        with:
+          app_id: ${{ secrets.SQUAREONE_CI_GH_APP_ID }}
+          private_key: ${{ secrets.SQUAREONE_CI_GH_APP_PRIVATE_KEY }}
+
+      - name: Get GitHub App User ID
+        id: get_user_id
+        run: |
+          USER_ID=$(gh api "/users/squareone-ci[bot]" --jq .id)
+          echo "user-id=$USER_ID" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}
+
       - name: Checkout Repo
         uses: actions/checkout@v5
+        with:
+          token: ${{ steps.generate_token.outputs.token }}
 
       - uses: pnpm/action-setup@v4
 
@@ -34,24 +52,17 @@ jobs:
       - name: Install Dependencies
         run: pnpm install
 
-      - name: Generate GitHub App Token
-        # Associated app: https://github.com/organizations/lsst-sqre/settings/apps/squareone-ci
-        id: generate_token
-        uses: tibdex/github-app-token@v2
-        with:
-          app_id: ${{ secrets.SQUAREONE_CI_GH_APP_ID }}
-          private_key: ${{ secrets.SQUAREONE_CI_GH_APP_PRIVATE_KEY }}
-
       - name: Configure git identity for GitHub App
         run: |
           git config --global user.name "squareone-ci[bot]"
-          git config --global user.email "${{ secrets.SQUAREONE_CI_GH_APP_ID }}+squareone-ci[bot]@users.noreply.github.com"
+          git config --global user.email "${{ steps.get_user_id.outputs.user-id }}+squareone-ci[bot]@users.noreply.github.com"
 
       - name: Create Release Pull Request
         uses: changesets/action@v1
         with:
           publish: pnpm run ci:publish
           version: pnpm run ci:version
+          setupGitUser: false
         env:
           GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
           NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
