@@ -1,0 +1,168 @@
+name: Dependabot Auto-Merge
+
+# This workflow automatically enables auto-merge for Dependabot PRs that:
+# 1. Pass CI (test job completion)
+# 2. Have a changeset file
+# 3. Are not major version updates
+#
+# Security: Uses workflow_run trigger to run in the context of the default
+# branch, avoiding "pwn request" vulnerabilities. Verifies PR author before
+# taking any actions.
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+
+# Minimal permissions for security
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    # Only run if CI succeeded and was triggered by a pull_request event
+    if: >
+      github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request'
+
+
+    steps:
+      # Get PR information from the workflow run
+      - name: Get PR number
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pullRequests = context.payload.workflow_run.pull_requests;
+            if (!pullRequests || pullRequests.length === 0) {
+              console.log('No pull requests found for this workflow run');
+              return null;
+            }
+
+            const pr = pullRequests[0];
+            console.log(`Found PR #${pr.number}`);
+
+            return {
+              number: pr.number,
+              html_url: pr.html_url,
+              head_sha: pr.head.sha,
+              head_ref: pr.head.ref,
+              user_login: pr.user.login
+            };
+
+      # Security: Verify PR is from Dependabot
+      # We check github.event.workflow_run.pull_requests[0].user.login instead of
+      # github.actor because github.actor represents the user who triggered the
+      # workflow_run (often the repo owner), not the PR author.
+      - name: Verify Dependabot PR
+        if: steps.pr.outputs.result != 'null'
+        id: verify
+        run: |
+          USER_LOGIN=$(echo '${{ steps.pr.outputs.result }}' | jq -r '.user_login')
+          echo "PR author: $USER_LOGIN"
+
+          if [ "$USER_LOGIN" != "dependabot[bot]" ]; then
+            echo "Not a Dependabot PR, skipping"
+            echo "is_dependabot=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "is_dependabot=true" >> $GITHUB_OUTPUT
+
+      # Fetch Dependabot metadata for semver analysis
+      - name: Dependabot metadata
+        if: steps.verify.outputs.is_dependabot == 'true'
+        id: metadata
+        uses: dependabot/fetch-metadata@v2
+        with:
+          github-token: '${{ secrets.GITHUB_TOKEN }}'
+
+      # Check if PR has changeset files
+      # The dependabot-changesets.yaml workflow should have already created these
+      - name: Check for changeset
+        if: steps.verify.outputs.is_dependabot == 'true'
+        id: changeset
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ fromJson(steps.pr.outputs.result).number }}
+        run: |
+          echo "Checking for changeset files in PR #$PR_NUMBER"
+
+          # Get list of changed files
+          FILES=$(gh pr view "$PR_NUMBER" --repo "${{ github.repository }}" --json files --jq '.files[].path')
+
+          echo "Changed files:"
+          echo "$FILES"
+
+          # Check if any file is in .changeset/ directory
+          if echo "$FILES" | grep -q '^\.changeset/.*\.md$'; then
+            echo "✓ Changeset found"
+            echo "has_changeset=true" >> $GITHUB_OUTPUT
+          else
+            echo "✗ No changeset found"
+            echo "has_changeset=false" >> $GITHUB_OUTPUT
+          fi
+
+      # Enable auto-merge if all conditions are met:
+      # 1. PR is from Dependabot (verified above)
+      # 2. Not a major version update
+      # 3. Has a changeset file
+      - name: Enable auto-merge with squash
+        if: >
+          steps.verify.outputs.is_dependabot == 'true' && steps.metadata.outputs.update-type != 'version-update:semver-major' && steps.changeset.outputs.has_changeset == 'true'
+
+
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ fromJson(steps.pr.outputs.result).html_url }}
+          UPDATE_TYPE: ${{ steps.metadata.outputs.update-type }}
+        run: |
+          echo "Enabling auto-merge for $UPDATE_TYPE update"
+          gh pr merge --auto --squash "$PR_URL"
+
+      # Add comment for visibility
+      - name: Comment on PR
+        if: >
+          steps.verify.outputs.is_dependabot == 'true' && steps.metadata.outputs.update-type != 'version-update:semver-major' && steps.changeset.outputs.has_changeset == 'true'
+
+
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ fromJson(steps.pr.outputs.result).number }}
+          UPDATE_TYPE: ${{ steps.metadata.outputs.update-type }}
+          DEPENDENCY_NAMES: ${{ steps.metadata.outputs.dependency-names }}
+        run: |
+          gh pr comment "$PR_NUMBER" --repo "${{ github.repository }}" --body \
+            "🤖 **Auto-merge enabled**
+
+            This Dependabot PR has been configured for auto-merge with squash strategy:
+            - ✅ CI passed
+            - ✅ Changeset detected
+            - ✅ Update type: \`$UPDATE_TYPE\`
+            - 📦 Dependencies: $DEPENDENCY_NAMES
+
+            The PR will automatically merge once all branch protection requirements are satisfied."
+
+      # Log when auto-merge is skipped
+      - name: Log skip reason
+        if: >
+          steps.verify.outputs.is_dependabot == 'true' && (steps.metadata.outputs.update-type == 'version-update:semver-major' ||
+           steps.changeset.outputs.has_changeset != 'true')
+
+
+        env:
+          UPDATE_TYPE: ${{ steps.metadata.outputs.update-type }}
+          HAS_CHANGESET: ${{ steps.changeset.outputs.has_changeset }}
+        run: |
+          echo "Auto-merge skipped:"
+          echo "  Update type: $UPDATE_TYPE"
+          echo "  Has changeset: $HAS_CHANGESET"
+
+          if [ "$UPDATE_TYPE" = "version-update:semver-major" ]; then
+            echo "  Reason: Major version updates require manual review"
+          fi
+
+          if [ "$HAS_CHANGESET" != "true" ]; then
+            echo "  Reason: No changeset file found (may still be generating)"
+          fi

@@ -16,7 +16,8 @@ Squareone uses a combination of standalone and reusable workflows:
 
    ci.yaml
    ├─→ build-squareone.yaml (reusable)
-   └─→ Builds Docker images for branches/PRs
+   ├─→ Builds Docker images for branches/PRs
+   └─→ Triggers dependabot-auto-merge.yaml (on completion)
 
    release.yaml (on push to main)
    └─→ Creates GitHub Releases
@@ -25,6 +26,9 @@ Squareone uses a combination of standalone and reusable workflows:
 
    dependabot-changesets.yaml
    └─→ Auto-generates changesets for Dependabot PRs
+
+   dependabot-auto-merge.yaml (triggered by ci.yaml)
+   └─→ Enables auto-merge for Dependabot PRs after CI passes
 
    codeql-analysis.yaml
    └─→ Security scanning (weekly + on main)
@@ -254,6 +258,178 @@ Organization administrators must configure these secrets at the organization or 
 Without these Dependabot secrets configured, the workflow will fail with an error like "app_id is not set" even though the GitHub Actions secrets are properly configured.
 
 For more information, see GitHub's documentation on `Automating Dependabot with GitHub Actions <https://docs.github.com/en/code-security/dependabot/working-with-dependabot/automating-dependabot-with-github-actions>`__ and `Managing encrypted secrets for Dependabot <https://docs.github.com/en/code-security/dependabot/working-with-dependabot/managing-encrypted-secrets-for-dependabot>`__.
+
+Auto-merging Dependabot PRs — dependabot-auto-merge.yaml
+========================================================
+
+The ``dependabot-auto-merge.yaml`` workflow automatically enables auto-merge for Dependabot pull requests that meet specific criteria, streamlining the dependency update process while maintaining safety and quality standards.
+
+This workflow works in conjunction with ``dependabot-changesets.yaml`` to provide a complete automated dependency update pipeline: changesets are automatically created, CI runs, and then auto-merge is enabled for qualifying PRs.
+
+**Triggers:**
+
+- ``workflow_run``: Triggered when the ``ci.yaml`` workflow completes successfully
+- Only processes PRs (not direct pushes)
+
+Workflow behavior
+-----------------
+
+The workflow follows these steps to safely enable auto-merge:
+
+1. **Extract PR information** from the workflow run event
+2. **Verify PR author** is ``dependabot[bot]`` using secure identity checking
+3. **Fetch Dependabot metadata** to determine the semantic version update type
+4. **Check for changeset file** to ensure the PR has versioning information
+5. **Enable auto-merge** with squash strategy if all conditions are met
+6. **Comment on PR** for visibility and audit trail
+
+Auto-merge conditions
+^^^^^^^^^^^^^^^^^^^^^
+
+Auto-merge is enabled only when ALL of the following conditions are met:
+
+- ✅ PR is authored by ``dependabot[bot]``
+- ✅ CI workflow completed successfully
+- ✅ Update type is NOT a major version update (``version-update:semver-major``)
+- ✅ Changeset file exists in the PR (created by ``dependabot-changesets.yaml``)
+
+**Excluded updates:**
+
+- ❌ Major version updates (e.g., ``v1.x.x`` → ``v2.0.0``) - These require manual review due to potential breaking changes
+- ❌ PRs without changesets - The workflow waits for ``dependabot-changesets.yaml`` to complete first
+
+Merge strategy
+^^^^^^^^^^^^^^
+
+All auto-merged Dependabot PRs use the **squash merge** strategy, which:
+
+- Combines all commits from the PR into a single commit on the main branch
+- Maintains a clean git history
+- Preserves the Dependabot PR title and changeset information
+
+The PR will merge automatically once all branch protection requirements are satisfied (e.g., required status checks, required reviews if configured).
+
+Security considerations
+-----------------------
+
+This workflow implements several security best practices aligned with the ``dependabot-changesets.yaml`` workflow:
+
+**Secure trigger pattern:**
+
+- Uses ``workflow_run`` trigger which executes in the context of the default branch, not the PR branch
+- Avoids "pwn request" vulnerabilities where untrusted code could execute with elevated permissions
+- Only processes workflow runs triggered by ``pull_request`` events, not direct pushes
+
+**Safe identity verification:**
+
+- Verifies PR author using ``github.event.workflow_run.pull_requests[0].user.login`` instead of ``github.actor``
+- Prevents "Confused Deputy" attacks where an attacker could impersonate Dependabot
+- Follows GitHub's recommendations for safely automating Dependabot workflows
+
+**Minimal permissions:**
+
+- ``contents: read`` - Only reads repository data
+- ``pull-requests: write`` - Required to enable auto-merge and add comments
+- No additional permissions beyond what's necessary
+
+**Authentication:**
+
+- Uses default ``GITHUB_TOKEN`` which is automatically scoped to the repository
+- No additional secrets required (unlike workflows that need to trigger other workflows)
+
+Timing and workflow coordination
+---------------------------------
+
+The ``dependabot-auto-merge.yaml`` workflow is designed to run after both the ``dependabot-changesets.yaml`` and ``ci.yaml`` workflows have completed:
+
+.. code-block:: text
+
+   1. Dependabot opens PR
+      ↓
+   2. dependabot-changesets.yaml runs (pull_request trigger)
+      ├─→ Creates changeset file
+      └─→ Commits to PR
+      ↓
+   3. ci.yaml runs (pull_request trigger, includes new changeset)
+      ├─→ Runs tests
+      ├─→ Runs linting
+      ├─→ Builds packages
+      └─→ Completes successfully
+      ↓
+   4. dependabot-auto-merge.yaml runs (workflow_run trigger)
+      ├─→ Verifies changeset exists
+      ├─→ Checks update type
+      └─→ Enables auto-merge if all conditions met
+      ↓
+   5. GitHub auto-merges when branch protection satisfied
+
+**Race condition handling:**
+
+The workflow explicitly checks for the existence of changeset files to ensure ``dependabot-changesets.yaml`` has completed before enabling auto-merge. If no changeset is found, auto-merge is skipped and logged.
+
+Workflow outputs and visibility
+--------------------------------
+
+**On successful auto-merge enablement:**
+
+The workflow adds a comment to the PR with details:
+
+- ✅ Confirmation that auto-merge was enabled
+- 📋 Update type (e.g., ``version-update:semver-minor``)
+- 📦 List of updated dependencies
+- ℹ️ Explanation of next steps (waiting for branch protection)
+
+**When auto-merge is skipped:**
+
+The workflow logs the skip reason to the GitHub Actions console:
+
+- Major version update requiring manual review
+- Changeset not yet created (workflow may retry on next push)
+
+**Example comment:**
+
+.. code-block:: text
+
+   🤖 **Auto-merge enabled**
+
+   This Dependabot PR has been configured for auto-merge with squash strategy:
+   - ✅ CI passed
+   - ✅ Changeset detected
+   - ✅ Update type: `version-update:semver-patch`
+   - 📦 Dependencies: @types/react, @types/react-dom
+
+   The PR will automatically merge once all branch protection requirements are satisfied.
+
+Integration with Dependabot configuration
+------------------------------------------
+
+This workflow respects the Dependabot configuration in :file:`.github/dependabot.yml`:
+
+**Major version blocking:**
+
+The Dependabot configuration already blocks major version updates with ``open-pull-requests-limit: 0`` for major updates. The workflow adds an additional safety layer by checking ``update-type`` and explicitly skipping major updates even if they somehow bypass the Dependabot configuration.
+
+**Grouped updates:**
+
+When Dependabot creates grouped update PRs (e.g., "Update React ecosystem"), the workflow treats the group as a single PR and applies auto-merge if ALL updates in the group meet the criteria (no major versions in the group).
+
+Disabling auto-merge
+---------------------
+
+To disable automatic merging for Dependabot PRs:
+
+**Temporary (single PR):**
+
+Add a comment or label to the PR. GitHub will automatically cancel the auto-merge if:
+
+- A new review is requested
+- The PR is marked as "draft"
+- Labels are added that conflict with branch protection rules
+
+**Permanent:**
+
+1. Remove or disable the :file:`.github/workflows/dependabot-auto-merge.yaml` workflow file
+2. Dependabot PRs will still receive changeset files but will require manual merge
 
 Reusable workflows
 ==================
