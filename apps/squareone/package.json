@@ -86,7 +86,7 @@
     "jsdom": "^26.1.0",
     "playwright": "^1.55.0",
     "storybook": "10.0.6",
-    "typescript": "^5.9.2",
+    "typescript": "^5.9.3",
     "vitest": "^3.2.4"
   }
 }
