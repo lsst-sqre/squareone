@@ -40,15 +40,9 @@ jobs:
               return null;
             }
 
-            const pr = pullRequests[0];
-            console.log(`Found PR #${pr.number}`);
-
-            return {
-              number: pr.number,
-              html_url: pr.html_url,
-              head_sha: pr.head.sha,
-              head_ref: pr.head.ref
-            };
+            const prNumber = pullRequests[0].number;
+            console.log(`Found PR #${prNumber}`);
+            return prNumber;
 
       # Security: Verify PR is from Dependabot
       # We fetch the full PR details using the GitHub API to access the author information,
@@ -60,7 +54,7 @@ jobs:
         uses: actions/github-script@v8
         with:
           script: |
-            const prNumber = JSON.parse('${{ steps.pr.outputs.result }}').number;
+            const prNumber = ${{ steps.pr.outputs.result }};
             const { data: pr } = await github.rest.pulls.get({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -75,7 +69,11 @@ jobs:
               return;
             }
 
+            // Output all PR data needed by downstream steps
             core.setOutput('is_dependabot', 'true');
+            core.setOutput('html_url', pr.html_url);
+            core.setOutput('head_sha', pr.head.sha);
+            core.setOutput('head_ref', pr.head.ref);
 
       # Extract Dependabot metadata for semver analysis
       # We can't use dependabot/fetch-metadata action because it requires pull_request
@@ -87,7 +85,7 @@ jobs:
         uses: actions/github-script@v8
         with:
           script: |
-            const prNumber = JSON.parse('${{ steps.pr.outputs.result }}').number;
+            const prNumber = ${{ steps.pr.outputs.result }};
 
             // Fetch PR details
             const { data: pr } = await github.rest.pulls.get({
@@ -200,7 +198,7 @@ jobs:
         id: changeset
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ fromJson(steps.pr.outputs.result).number }}
+          PR_NUMBER: ${{ steps.pr.outputs.result }}
         run: |
           echo "Checking for changeset files in PR #$PR_NUMBER"
 
@@ -230,7 +228,7 @@ jobs:
 
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_URL: ${{ fromJson(steps.pr.outputs.result).html_url }}
+          PR_URL: ${{ steps.verify.outputs.html_url }}
           UPDATE_TYPE: ${{ steps.metadata.outputs.update-type }}
         run: |
           echo "Enabling auto-merge for $UPDATE_TYPE update"
@@ -244,7 +242,7 @@ jobs:
 
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ fromJson(steps.pr.outputs.result).number }}
+          PR_NUMBER: ${{ steps.pr.outputs.result }}
           UPDATE_TYPE: ${{ steps.metadata.outputs.update-type }}
           DEPENDENCY_NAMES: ${{ steps.metadata.outputs.dependency-names }}
         run: |
