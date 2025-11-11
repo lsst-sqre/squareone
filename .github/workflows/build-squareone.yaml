@@ -18,6 +18,12 @@ on:
       TURBO_TOKEN:
         required: true
 
+permissions:
+  actions: write # Required by multiplatform-build-and-push
+  contents: read # Required to checkout repository code
+  packages: write # Required to push images to ghcr.io
+  statuses: read # Required by multiplatform-build-and-push
+
 jobs:
   build:
     uses: lsst-sqre/multiplatform-build-and-push/.github/workflows/build.yaml@v2
@@ -32,3 +38,128 @@ jobs:
         TURBO_TOKEN=${{ secrets.TURBO_TOKEN }}
         TURBO_API=${{ vars.TURBO_API }}
         TURBO_TEAM=${{ vars.TURBO_TEAM }}
+
+  report-size:
+    name: Report Image Size
+    needs: build
+    runs-on: ubuntu-latest
+    if: inputs.push == true
+    steps:
+      - name: Install crane
+        uses: imjasonh/setup-crane@v0.4
+
+      - name: Login to GHCR
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | crane auth login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Get image sizes per platform
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const { execSync } = require('child_process');
+
+            // Helper to run crane commands and return output
+            function crane(args) {
+              try {
+                return execSync(`crane ${args}`, { encoding: 'utf-8' }).trim();
+              } catch (error) {
+                throw new Error(`crane command failed: ${error.message}`);
+              }
+            }
+
+            // Helper to convert bytes to human-readable format
+            function formatSize(bytes) {
+              const mb = (bytes / 1048576).toFixed(2);
+              const gb = (bytes / 1073741824).toFixed(2);
+              return { bytes, mb, gb };
+            }
+
+            // Main execution
+            const image = `ghcr.io/${{ github.repository }}:${{ needs.build.outputs.tag }}`;
+
+            core.info(`Inspecting image: ${image}`);
+
+            // Get and parse multi-platform manifest
+            let manifest;
+            try {
+              manifest = JSON.parse(crane(`manifest ${image}`));
+            } catch (error) {
+              core.setFailed(`Failed to fetch image manifest: ${error.message}`);
+              return;
+            }
+
+            // Validate multi-platform manifest
+            if (!manifest.manifests || !Array.isArray(manifest.manifests)) {
+              core.setFailed('Expected multi-platform manifest but got single platform');
+              return;
+            }
+
+            // Initialize summary table
+            const tableRows = [
+              [
+                { data: 'Platform', header: true },
+                { data: 'Compressed Size', header: true }
+              ]
+            ];
+
+            let processedCount = 0;
+
+            // Process each platform
+            for (const { platform, digest } of manifest.manifests) {
+              const platformName = `${platform.os}/${platform.architecture}`;
+
+              // Skip unknown platforms
+              if (platform.os === 'unknown' || platform.architecture === 'unknown') {
+                core.info(`Skipping unknown platform: ${platformName}`);
+                continue;
+              }
+
+              core.info(`Processing platform: ${platformName}`);
+
+              try {
+                // Get platform-specific manifest
+                const platformManifest = JSON.parse(crane(`manifest ${image}@${digest}`));
+
+                // Calculate compressed size (what gets downloaded)
+                // In OCI/Docker manifests, layers[].size is the compressed blob size
+                const configSize = platformManifest.config?.size || 0;
+                const layersCompressed = platformManifest.layers?.reduce((sum, layer) => sum + (layer.size || 0), 0) || 0;
+                const compressedTotal = configSize + layersCompressed;
+
+                if (compressedTotal === 0) {
+                  core.warning(`Failed to calculate compressed size for ${platformName}`);
+                  continue;
+                }
+
+                // Format sizes
+                const compressed = formatSize(compressedTotal);
+
+                // Add row to summary table
+                tableRows.push([
+                  platformName,
+                  `${compressed.mb} MB (${compressed.gb} GB)`
+                ]);
+
+                processedCount++;
+
+              } catch (error) {
+                core.warning(`Failed to process ${platformName}: ${error.message}`);
+              }
+            }
+
+            // Write summary
+            await core.summary
+              .addHeading('📦 Docker Image Size Report', 2)
+              .addRaw(`\n**Image:** \`${image}\`\n\n`)
+              .addTable(tableRows)
+              .addRaw('\n\n_Compressed size: Download size from the container registry_\n')
+              .write();
+
+            // Create single summary annotation
+            if (processedCount > 0) {
+              core.notice(`Processed ${processedCount} platform(s). See job summary for details.`, {
+                title: 'Docker Image Size Report'
+              });
+            } else {
+              core.warning('No platforms were successfully processed');
+            }

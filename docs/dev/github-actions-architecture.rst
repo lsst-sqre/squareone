@@ -459,6 +459,26 @@ build-squareone.yaml — Docker image build
 
 The workflow uses the ``lsst-sqre/multiplatform-build-and-push`` reusable workflow to build multi-platform Docker images (linux/amd64, linux/arm64) and push them to ``ghcr.io``.
 
+**Image size reporting:**
+
+The workflow includes a ``report-size`` job that automatically reports Docker image sizes after successful builds.
+This job only runs when ``inputs.push`` is ``true`` (i.e., when images are actually pushed to the registry).
+
+The job reports sizes for each platform (linux/amd64 and linux/arm64) separately, showing both:
+
+- **Compressed size**: The size of data downloaded from the container registry during image pulls
+- **Uncompressed size**: The runtime memory footprint of the image layers in Kubernetes pods
+
+Size reports appear in two locations:
+
+1. **Workflow annotations**: Quick-view notices at the top of the workflow run (similar to Docker build summaries)
+2. **Job summary**: A formatted table in the ``report-size`` job summary showing per-platform sizes
+
+The job uses the ``crane`` tool to inspect image manifests and configs from the GitHub Container Registry (ghcr.io).
+Compressed sizes are calculated from the manifest layer sizes, while uncompressed sizes are extracted from the image configuration history.
+
+**Security note**: The workflow uses minimal permissions (``contents: read``) and authenticates to the container registry using the default ``GITHUB_TOKEN`` for read-only access.
+
 run-chromatic.yaml — Storybook visual testing
 ---------------------------------------------
 
