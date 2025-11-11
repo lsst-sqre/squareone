@@ -234,7 +234,7 @@ jobs:
           UPDATE_TYPE: ${{ steps.metadata.outputs.update-type }}
         run: |
           echo "Enabling auto-merge for $UPDATE_TYPE update"
-          gh pr merge --auto --squash "$PR_URL"
+          gh pr merge --auto --squash "$PR_URL" --repo "${{ github.repository }}"
 
       # Add comment for visibility
       - name: Comment on PR
