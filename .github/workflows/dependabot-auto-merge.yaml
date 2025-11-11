@@ -28,6 +28,14 @@ jobs:
 
 
     steps:
+      - name: Generate GitHub App Token
+        # Associated app: https://github.com/organizations/lsst-sqre/settings/apps/squareone-ci
+        id: generate_token
+        uses: tibdex/github-app-token@v2
+        with:
+          app_id: ${{ secrets.SQUAREONE_CI_GH_APP_ID }}
+          private_key: ${{ secrets.SQUAREONE_CI_GH_APP_PRIVATE_KEY }}
+
       # Get PR information from the workflow run
       - name: Get PR number
         id: pr
@@ -197,7 +205,7 @@ jobs:
         if: steps.verify.outputs.is_dependabot == 'true'
         id: changeset
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}
           PR_NUMBER: ${{ steps.pr.outputs.result }}
         run: |
           echo "Checking for changeset files in PR #$PR_NUMBER"
@@ -227,7 +235,7 @@ jobs:
 
 
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}
           PR_URL: ${{ steps.verify.outputs.html_url }}
           UPDATE_TYPE: ${{ steps.metadata.outputs.update-type }}
         run: |
@@ -241,7 +249,7 @@ jobs:
 
 
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}
           PR_NUMBER: ${{ steps.pr.outputs.result }}
           UPDATE_TYPE: ${{ steps.metadata.outputs.update-type }}
           DEPENDENCY_NAMES: ${{ steps.metadata.outputs.dependency-names }}
