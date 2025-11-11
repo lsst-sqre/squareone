@@ -23,6 +23,15 @@ updates:
       - npm-github
 
     groups:
+      # Security updates - patch and minor versions (FIRST - highest priority)
+      security-patch:
+        applies-to: security-updates
+        update-types:
+          - 'patch'
+          - 'minor'
+        patterns:
+          - '*'
+
       # React ecosystem - must update together (CRITICAL)
       react:
         patterns:
