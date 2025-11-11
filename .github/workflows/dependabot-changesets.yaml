@@ -9,6 +9,13 @@ name: Add Changesets to Dependabot PRs
 # - Safe for Dependabot PRs because Dependabot creates branches in the same
 #   repository (not forks), so `pull_request` trigger has necessary permissions
 # - This pattern is recommended by GitHub's official Dependabot documentation
+#
+# IMPORTANT: Dependabot Secrets Requirement
+# - GitHub App credentials (SQUAREONE_CI_GH_APP_ID, SQUAREONE_CI_GH_APP_PRIVATE_KEY)
+#   must be configured as DEPENDABOT SECRETS, not just GitHub Actions secrets
+# - GitHub isolates Dependabot workflows for security - only Dependabot secrets
+#   are accessible when Dependabot triggers pull_request events
+# - See docs/dev/github-actions-architecture.rst for configuration instructions
 
 permissions:
   contents: write
