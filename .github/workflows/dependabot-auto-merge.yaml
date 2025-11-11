@@ -77,13 +77,121 @@ jobs:
 
             core.setOutput('is_dependabot', 'true');
 
-      # Fetch Dependabot metadata for semver analysis
-      - name: Dependabot metadata
+      # Extract Dependabot metadata for semver analysis
+      # We can't use dependabot/fetch-metadata action because it requires pull_request
+      # context, but we're running in workflow_run context for security reasons.
+      # Instead, we parse the PR title and commits to determine update type.
+      - name: Get Dependabot metadata
         if: steps.verify.outputs.is_dependabot == 'true'
         id: metadata
-        uses: dependabot/fetch-metadata@v2
+        uses: actions/github-script@v8
         with:
-          github-token: '${{ secrets.GITHUB_TOKEN }}'
+          script: |
+            const prNumber = JSON.parse('${{ steps.pr.outputs.result }}').number;
+
+            // Fetch PR details
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber
+            });
+
+            console.log(`PR title: ${pr.title}`);
+
+            // Parse PR title for dependency information
+            // Formats:
+            // - "Bump package from 1.0.0 to 2.0.0"
+            // - "Bump package from 1.0.0 to 2.0.0 in /path"
+            // - "Bump the group-name group with X updates" (grouped updates)
+            // - "Bump the group-name group across 1 directory with X updates"
+
+            let updateType = 'version-update:semver-patch';
+            let dependencyNames = '';
+
+            // Check for grouped updates
+            const groupMatch = pr.title.match(/Bump the (.+) group/);
+            if (groupMatch) {
+              dependencyNames = `${groupMatch[1]} group`;
+
+              // For grouped updates, we need to check commits to determine if any are major
+              const { data: commits } = await github.rest.pulls.listCommits({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: prNumber
+              });
+
+              // Check all commits for version changes
+              let hasMajor = false;
+              let hasMinor = false;
+
+              for (const commit of commits) {
+                const message = commit.commit.message;
+                const bumpMatch = message.match(/Bump .+ from ([\d.]+) to ([\d.]+)/);
+
+                if (bumpMatch) {
+                  const [, oldVersion, newVersion] = bumpMatch;
+                  const type = determineUpdateType(oldVersion, newVersion);
+
+                  if (type === 'major') {
+                    hasMajor = true;
+                    break;
+                  } else if (type === 'minor') {
+                    hasMinor = true;
+                  }
+                }
+              }
+
+              if (hasMajor) {
+                updateType = 'version-update:semver-major';
+              } else if (hasMinor) {
+                updateType = 'version-update:semver-minor';
+              } else {
+                updateType = 'version-update:semver-patch';
+              }
+            } else {
+              // Single dependency update
+              const bumpMatch = pr.title.match(/Bump (.+?) from ([\d.]+) to ([\d.]+)/);
+
+              if (bumpMatch) {
+                const [, packageName, oldVersion, newVersion] = bumpMatch;
+                dependencyNames = packageName;
+
+                const type = determineUpdateType(oldVersion, newVersion);
+                updateType = `version-update:semver-${type}`;
+              } else {
+                console.log('Could not parse Dependabot PR title format');
+                dependencyNames = 'unknown';
+              }
+            }
+
+            function determineUpdateType(oldVersion, newVersion) {
+              const oldParts = oldVersion.split('.').map(v => parseInt(v) || 0);
+              const newParts = newVersion.split('.').map(v => parseInt(v) || 0);
+
+              // Compare major version
+              if (newParts[0] > oldParts[0]) {
+                return 'major';
+              }
+
+              // Compare minor version
+              if (newParts[1] > oldParts[1]) {
+                return 'minor';
+              }
+
+              // Otherwise it's a patch
+              return 'patch';
+            }
+
+            console.log(`Dependency names: ${dependencyNames}`);
+            console.log(`Update type: ${updateType}`);
+
+            core.setOutput('dependency-names', dependencyNames);
+            core.setOutput('update-type', updateType);
+
+            return {
+              dependency_names: dependencyNames,
+              update_type: updateType
+            };
 
       # Check if PR has changeset files
       # The dependabot-changesets.yaml workflow should have already created these
