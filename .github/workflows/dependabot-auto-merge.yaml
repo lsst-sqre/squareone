@@ -31,7 +31,7 @@ jobs:
       # Get PR information from the workflow run
       - name: Get PR number
         id: pr
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const pullRequests = context.payload.workflow_run.pull_requests;
@@ -47,28 +47,35 @@ jobs:
               number: pr.number,
               html_url: pr.html_url,
               head_sha: pr.head.sha,
-              head_ref: pr.head.ref,
-              user_login: pr.user.login
+              head_ref: pr.head.ref
             };
 
       # Security: Verify PR is from Dependabot
-      # We check github.event.workflow_run.pull_requests[0].user.login instead of
-      # github.actor because github.actor represents the user who triggered the
-      # workflow_run (often the repo owner), not the PR author.
+      # We fetch the full PR details using the GitHub API to access the author information,
+      # as the workflow_run payload's pull_requests array contains simplified PR objects
+      # that don't include the user property.
       - name: Verify Dependabot PR
         if: steps.pr.outputs.result != 'null'
         id: verify
-        run: |
-          USER_LOGIN=$(echo '${{ steps.pr.outputs.result }}' | jq -r '.user_login')
-          echo "PR author: $USER_LOGIN"
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const prNumber = JSON.parse('${{ steps.pr.outputs.result }}').number;
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber
+            });
 
-          if [ "$USER_LOGIN" != "dependabot[bot]" ]; then
-            echo "Not a Dependabot PR, skipping"
-            echo "is_dependabot=false" >> $GITHUB_OUTPUT
-            exit 0
-          fi
+            console.log(`PR author: ${pr.user.login}`);
 
-          echo "is_dependabot=true" >> $GITHUB_OUTPUT
+            if (pr.user.login !== 'dependabot[bot]') {
+              console.log('Not a Dependabot PR, skipping');
+              core.setOutput('is_dependabot', 'false');
+              return;
+            }
+
+            core.setOutput('is_dependabot', 'true');
 
       # Fetch Dependabot metadata for semver analysis
       - name: Dependabot metadata
