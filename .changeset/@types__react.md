@@ -2,4 +2,4 @@
 "squareone": patch
 ---
 
-Bump @types/react from 19.1.12 to 19.2.2
+Bump @types/react from 19.1.12 to 19.2.3 in the react group
