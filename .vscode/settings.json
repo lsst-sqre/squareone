@@ -5,7 +5,26 @@
     "./packages/squared",
     "./packages/rubin-style-dictionary"
   ],
+
+  // Formatting
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
   "[yaml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.insertSpaces": true,
     "editor.tabSize": 2,
     // "editor.autoIndent": "keep",
