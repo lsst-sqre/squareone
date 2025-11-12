@@ -1,31 +1,408 @@
 {
   "version": "2.0.0",
   "tasks": [
+    // === Development Tasks ===
     {
+      "label": "Dev: All Apps",
       "type": "npm",
       "script": "dev",
-      "problemMatcher": [],
-      "label": "npm: dev",
-      "detail": "Run dev servers for all apps",
+      "problemMatcher": {
+        "owner": "typescript",
+        "source": "ts",
+        "applyTo": "allDocuments",
+        "fileLocation": "relative",
+        "pattern": {
+          "regexp": "^(.+)\\((\\d+),(\\d+)\\):\\s+(warning|error)\\s+TS(\\d+):\\s+(.*)$",
+          "file": 1,
+          "line": 2,
+          "column": 3,
+          "severity": 4,
+          "code": 5,
+          "message": 6
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Starting compilation in watch mode",
+          "endsPattern": "(Compiled successfully|Failed to compile)"
+        }
+      },
+      "detail": "Start all dev servers (runs: node scripts/turbo-wrapper.js run dev)",
       "group": {
         "kind": "build",
         "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "isBackground": true
+    },
+    {
+      "label": "Dev: Squareone Only",
+      "type": "shell",
+      "command": "pnpm --filter squareone dev",
+      "problemMatcher": {
+        "owner": "typescript",
+        "source": "ts",
+        "applyTo": "allDocuments",
+        "fileLocation": "relative",
+        "pattern": {
+          "regexp": "^(.+)\\((\\d+),(\\d+)\\):\\s+(warning|error)\\s+TS(\\d+):\\s+(.*)$",
+          "file": 1,
+          "line": 2,
+          "column": 3,
+          "severity": 4,
+          "code": 5,
+          "message": 6
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Starting compilation in watch mode",
+          "endsPattern": "(Compiled successfully|Failed to compile)"
+        }
+      },
+      "detail": "Start squareone app dev server (port 3000)",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "isBackground": true
+    },
+
+    // === Storybook Tasks ===
+    {
+      "label": "Storybook: Squared",
+      "type": "shell",
+      "command": "pnpm --filter @lsst-sqre/squared storybook",
+      "problemMatcher": {
+        "owner": "typescript",
+        "source": "ts",
+        "applyTo": "allDocuments",
+        "fileLocation": "relative",
+        "pattern": {
+          "regexp": "^(.+)\\((\\d+),(\\d+)\\):\\s+(warning|error)\\s+TS(\\d+):\\s+(.*)$",
+          "file": 1,
+          "line": 2,
+          "column": 3,
+          "severity": 4,
+          "code": 5,
+          "message": 6
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "starting",
+          "endsPattern": "(Storybook.*started|\\[vite\\] .* ready in)"
+        }
+      },
+      "detail": "Start Squared component library Storybook (port 6006)",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "isBackground": true
+    },
+    {
+      "label": "Storybook: Squareone",
+      "type": "shell",
+      "command": "pnpm --filter squareone storybook",
+      "problemMatcher": {
+        "owner": "typescript",
+        "source": "ts",
+        "applyTo": "allDocuments",
+        "fileLocation": "relative",
+        "pattern": {
+          "regexp": "^(.+)\\((\\d+),(\\d+)\\):\\s+(warning|error)\\s+TS(\\d+):\\s+(.*)$",
+          "file": 1,
+          "line": 2,
+          "column": 3,
+          "severity": 4,
+          "code": 5,
+          "message": 6
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "starting",
+          "endsPattern": "(Storybook.*started|\\[vite\\] .* ready in)"
+        }
+      },
+      "detail": "Start Squareone app Storybook (port 6007)",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "isBackground": true
+    },
+    {
+      "label": "Storybook: All",
+      "type": "npm",
+      "script": "storybook",
+      "problemMatcher": {
+        "owner": "typescript",
+        "source": "ts",
+        "applyTo": "allDocuments",
+        "fileLocation": "relative",
+        "pattern": {
+          "regexp": "^(.+)\\((\\d+),(\\d+)\\):\\s+(warning|error)\\s+TS(\\d+):\\s+(.*)$",
+          "file": 1,
+          "line": 2,
+          "column": 3,
+          "severity": 4,
+          "code": 5,
+          "message": 6
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "starting",
+          "endsPattern": "(Storybook.*started|\\[vite\\] .* ready in)"
+        }
+      },
+      "detail": "Start all Storybook servers (runs: node scripts/turbo-wrapper.js run storybook)",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "isBackground": true
+    },
+
+    // === Testing Tasks ===
+    {
+      "label": "Test: All",
+      "type": "npm",
+      "script": "test",
+      "problemMatcher": {
+        "owner": "vitest",
+        "source": "vitest",
+        "pattern": [
+          {
+            "regexp": "^\\s*FAIL\\s+(.*)$",
+            "file": 1
+          },
+          {
+            "regexp": "^\\s*●\\s+(.*)$",
+            "message": 1
+          },
+          {
+            "regexp": "^\\s+at.*\\((.*):(\\d+):(\\d+)\\)$",
+            "file": 1,
+            "line": 2,
+            "column": 3
+          }
+        ]
+      },
+      "detail": "Run all tests across monorepo (runs: node scripts/turbo-wrapper.js run test)",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
       }
     },
     {
+      "label": "Test: Storybook Tests",
       "type": "npm",
-      "script": "lint",
+      "script": "test-storybook",
       "problemMatcher": [],
-      "label": "npm: lint",
-      "detail": "next lint"
+      "detail": "Run Storybook interaction tests (runs: node scripts/turbo-wrapper.js run test-storybook)",
+      "group": "test"
     },
     {
+      "label": "Test: Storybook Tests (Watch)",
+      "type": "npm",
+      "script": "test-storybook:watch",
+      "problemMatcher": [],
+      "detail": "Run Storybook tests in watch mode (runs: node scripts/turbo-wrapper.js run test-storybook:watch)",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Test: Squared",
+      "type": "shell",
+      "command": "pnpm --filter @lsst-sqre/squared test",
+      "problemMatcher": {
+        "owner": "vitest",
+        "source": "vitest",
+        "pattern": [
+          {
+            "regexp": "^\\s*FAIL\\s+(.*)$",
+            "file": 1
+          },
+          {
+            "regexp": "^\\s*●\\s+(.*)$",
+            "message": 1
+          },
+          {
+            "regexp": "^\\s+at.*\\((.*):(\\d+):(\\d+)\\)$",
+            "file": 1,
+            "line": 2,
+            "column": 3
+          }
+        ]
+      },
+      "detail": "Run tests for Squared package",
+      "group": "test"
+    },
+    {
+      "label": "Test: Squareone",
+      "type": "shell",
+      "command": "pnpm --filter squareone test",
+      "problemMatcher": {
+        "owner": "vitest",
+        "source": "vitest",
+        "pattern": [
+          {
+            "regexp": "^\\s*FAIL\\s+(.*)$",
+            "file": 1
+          },
+          {
+            "regexp": "^\\s*●\\s+(.*)$",
+            "message": 1
+          },
+          {
+            "regexp": "^\\s+at.*\\((.*):(\\d+):(\\d+)\\)$",
+            "file": 1,
+            "line": 2,
+            "column": 3
+          }
+        ]
+      },
+      "detail": "Run tests for Squareone app",
+      "group": "test"
+    },
+
+    // === Quality Checks ===
+    {
+      "label": "Lint: All",
+      "type": "npm",
+      "script": "lint",
+      "problemMatcher": ["$eslint-stylish"],
+      "detail": "Run ESLint on all packages (runs: node scripts/turbo-wrapper.js run lint)",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Type Check: All",
+      "type": "npm",
+      "script": "type-check",
+      "problemMatcher": ["$tsc"],
+      "detail": "Run TypeScript type checking (runs: node scripts/turbo-wrapper.js run type-check)",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Format: All Files",
+      "type": "npm",
+      "script": "format",
+      "problemMatcher": [],
+      "detail": "Format all files with Prettier (runs: prettier --write)"
+    },
+    {
+      "label": "Format: Check Only",
+      "type": "npm",
+      "script": "format:check",
+      "problemMatcher": {
+        "owner": "prettier",
+        "source": "prettier",
+        "severity": "warning",
+        "fileLocation": "relative",
+        "pattern": {
+          "regexp": "^(.+)$",
+          "file": 1,
+          "message": 0
+        }
+      },
+      "detail": "Check formatting without modifying files (runs: prettier --check)"
+    },
+
+    // === Build Tasks ===
+    {
+      "label": "Build: All",
       "type": "npm",
       "script": "build",
-      "group": "build",
+      "problemMatcher": ["$tsc"],
+      "detail": "Build all apps and packages (runs: node scripts/turbo-wrapper.js run build)",
+      "group": "build"
+    },
+    {
+      "label": "Build: Squareone",
+      "type": "shell",
+      "command": "pnpm --filter squareone build",
+      "problemMatcher": ["$tsc"],
+      "detail": "Build Squareone app only",
+      "group": "build"
+    },
+    {
+      "label": "Build: Storybook (All)",
+      "type": "npm",
+      "script": "build-storybook",
       "problemMatcher": [],
-      "label": "npm: build",
-      "detail": "Build all apps and packages"
+      "detail": "Build static Storybook sites (runs: node scripts/turbo-wrapper.js run build-storybook)"
+    },
+
+    // === CI/CD Tasks ===
+    {
+      "label": "CI: Local CI Pipeline",
+      "type": "npm",
+      "script": "localci",
+      "problemMatcher": ["$eslint-stylish", "$tsc"],
+      "detail": "Run complete CI pipeline locally (runs: pnpm run format && node scripts/turbo-wrapper.js run lint type-check test build)",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+
+    // === Documentation Tasks ===
+    {
+      "label": "Docs: Build",
+      "type": "npm",
+      "script": "docs",
+      "problemMatcher": {
+        "owner": "sphinx",
+        "source": "sphinx",
+        "fileLocation": "relative",
+        "pattern": [
+          {
+            "regexp": "^(.+):(\\d+):\\s+(WARNING|ERROR):\\s+(.*)$",
+            "file": 1,
+            "line": 2,
+            "severity": 3,
+            "message": 4
+          }
+        ]
+      },
+      "detail": "Build Sphinx documentation (runs: uv run noxfile.py -s docs)",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Docs: Link Check",
+      "type": "shell",
+      "command": "uv run noxfile.py -s docs-linkcheck",
+      "problemMatcher": [],
+      "detail": "Check for broken links in documentation"
+    },
+
+    // === Utility Tasks ===
+    {
+      "label": "Validate: Docker Versions",
+      "type": "npm",
+      "script": "validate-docker",
+      "problemMatcher": [],
+      "detail": "Validate Dockerfile versions match package.json (runs: node scripts/validate-docker-versions.js)"
     }
   ]
 }
