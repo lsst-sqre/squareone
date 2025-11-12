@@ -4,6 +4,12 @@ name: Docker release
   release:
     types: [published]
 
+permissions:
+  actions: write # Required by build-squareone.yaml for multiplatform-build-and-push
+  contents: read # Read repository code and package.json
+  packages: write # Required by build-squareone.yaml to push images to ghcr.io
+  statuses: read # Required by build-squareone.yaml for multiplatform-build-and-push
+
 jobs:
   get-squareone-version:
     runs-on: ubuntu-latest

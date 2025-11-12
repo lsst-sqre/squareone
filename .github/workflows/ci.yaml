@@ -13,6 +13,12 @@ name: CI
       - 'u/**'
   pull_request: {}
 
+permissions:
+  actions: write # Required by build-squareone.yaml for multiplatform-build-and-push
+  contents: read # Checkout repository and run tests
+  packages: write # Required by build-squareone.yaml to push images to ghcr.io
+  statuses: read # Required by build-squareone.yaml for multiplatform-build-and-push
+
 jobs:
   changes:
     runs-on: ubuntu-latest

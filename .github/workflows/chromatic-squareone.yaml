@@ -8,6 +8,9 @@ name: 'Chromatic: Squareone'
     tags-ignore:
       - '*'
 
+permissions:
+  contents: read # Required by called workflow
+
 jobs:
   call:
     if: false

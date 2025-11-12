@@ -7,6 +7,11 @@ name: Release
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
+permissions:
+  contents: write # Commit version bumps, create releases
+  pull-requests: write # Create/update release PR
+  packages: write # Publish to GitHub Packages
+
 jobs:
   release:
     name: Release packages

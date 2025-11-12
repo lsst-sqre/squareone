@@ -18,6 +18,9 @@ name: 'Run Chromatic'
       TURBO_TOKEN:
         required: true
 
+permissions:
+  contents: read # Checkout repository with full history
+
 jobs:
   chromatic:
     runs-on: ubuntu-latest
