@@ -78,8 +78,8 @@ importers:
         specifier: ^3.6.0
         version: 3.6.0
       formik:
-        specifier: ^2.2.9
-        version: 2.4.6(@types/react@19.2.3)(react@19.2.0)
+        specifier: ^2.4.9
+        version: 2.4.9(@types/react@19.2.3)(react@19.2.0)
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.0
@@ -4001,8 +4001,8 @@ packages:
     resolution: {integrity: sha512-gIXjKqtFuWEgzFRJA9WCQeSJLZDjgJUOMCMzxtvFq/37KojM1BFGufqsCy0r4qSQmYLsZYMeyRqzIWOMup03sw==}
     engines: {node: '>=14'}
 
-  formik@2.4.6:
-    resolution: {integrity: sha512-A+2EI7U7aG296q2TLGvNapDNTZp1khVt5Vk0Q/fyfSROss0V/V6+txt2aJnwEos44IxTCW/LYAi/zgWzlevj+g==}
+  formik@2.4.9:
+    resolution: {integrity: sha512-5nI94BMnlFDdQRBY4Sz39WkhxajZJ57Fzs8wVbtsQlm5ScKIR1QLYqv/ultBnobObtlUyxpxoLodpixrsf36Og==}
     peerDependencies:
       react: '>=16.8.0'
 
@@ -11202,7 +11202,7 @@ snapshots:
       cross-spawn: 7.0.6
       signal-exit: 4.1.0
 
-  formik@2.4.6(@types/react@19.2.3)(react@19.2.0):
+  formik@2.4.9(@types/react@19.2.3)(react@19.2.0):
     dependencies:
       '@types/hoist-non-react-statics': 3.3.7(@types/react@19.2.3)
       deepmerge: 2.2.1
