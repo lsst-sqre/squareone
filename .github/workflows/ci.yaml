@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       # https://playwright.dev/docs/docker#pull-the-image
-      image: mcr.microsoft.com/playwright:v1.55.0-noble
+      image: mcr.microsoft.com/playwright:v1.56.1-noble
       options: --user 1001
 
     steps:
