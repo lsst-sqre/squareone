@@ -28,4 +28,18 @@ Squareone is a monorepo for [Rubin Observatory](https://rubinobservatory.org) Da
 
 ## Development
 
+### Development with GitHub Codespaces
+
+This repository supports GitHub Codespaces for instant development environments:
+
+1. Click "Code" → "Codespaces" → "Create codespace on main"
+2. Wait for the environment to build (~3-5 minutes first time)
+3. Run `pnpm dev` to start development
+
+See [`.devcontainer/README.md`](./.devcontainer/README.md) for details.
+
+**Note for external contributors:** Remote caching is only available to repository collaborators. Your codespace will use local caching, which works fine but may be slower on first build.
+
+### Local Development
+
 To set up your development environment and run the site locally, see Squareone's development documentation: https://squareone.lsst.io/dev/
