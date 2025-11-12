@@ -1,0 +1,77 @@
+{
+  "name": "Squareone Monorepo",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm",
+
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "22",
+      "nodeGypDependencies": true,
+      "installYarnUsingApt": false
+    },
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.13",
+      "installTools": true
+    }
+  },
+
+  "remoteUser": "node",
+
+  "postCreateCommand": "corepack install && corepack enable && pnpm install && pip install uv",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "styled-components.vscode-styled-components",
+        "csstools.postcss",
+        "unifiedjs.vscode-mdx",
+        "vitest.explorer",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "charliermarsh.ruff",
+        "GitHub.copilot",
+        "GitHub.copilot-chat"
+      ],
+      "settings": {
+        // Container-specific settings only
+        // Most settings are in .vscode/settings.json (shared with local dev)
+        "typescript.tsdk": "node_modules/typescript/lib",
+        "typescript.enablePromptUseWorkspaceTsdk": true
+      }
+    }
+  },
+
+  "forwardPorts": [3000, 3001, 6006, 6007],
+
+  "portsAttributes": {
+    "3000": {
+      "label": "Squareone App",
+      "onAutoForward": "openBrowser"
+    },
+    "3001": {
+      "label": "Squareone Alt Port",
+      "onAutoForward": "notify"
+    },
+    "6006": {
+      "label": "Squared Storybook",
+      "onAutoForward": "openBrowser"
+    },
+    "6007": {
+      "label": "Squareone Storybook",
+      "onAutoForward": "openBrowser"
+    }
+  },
+
+  "mounts": [
+    "source=squareone-pnpm-store,target=${containerWorkspaceFolder}/.pnpm-store,type=volume"
+  ],
+
+  "remoteEnv": {
+    "PNPM_HOME": "/home/node/.local/share/pnpm",
+    "COREPACK_ENABLE_DOWNLOAD_PROMPT": "0",
+    "TURBO_API": "https://roundtable.lsst.cloud/turborepo-cache"
+  }
+}

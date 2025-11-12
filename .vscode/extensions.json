@@ -1,0 +1,14 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "styled-components.vscode-styled-components",
+    "csstools.postcss",
+    "unifiedjs.vscode-mdx",
+    "vitest.explorer",
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "charliermarsh.ruff"
+  ],
+  "unwantedRecommendations": []
+}
