@@ -97,8 +97,9 @@ jobs:
     needs:
       - test
     with:
-      # Build-only (no push) for dependabot, changeset-release, and u/ branches; push to registry for others
-      push: ${{ !(startsWith(github.head_ref, 'dependabot/') || startsWith(github.head_ref, 'changeset-release/') || startsWith(github.head_ref, 'u/') || startsWith(github.ref, 'refs/heads/changeset-release/')) }}
+      # Build-only (no push) for dependabot and u/ branches; push with "next" tag for changeset-release/main; push normally for others
+      push: ${{ !(startsWith(github.head_ref, 'dependabot/') || startsWith(github.head_ref, 'u/') || (startsWith(github.head_ref, 'changeset-release/') && github.head_ref != 'changeset-release/main') || (startsWith(github.ref, 'refs/heads/changeset-release/') && github.ref != 'refs/heads/changeset-release/main')) }}
+      additional-tags: ${{ (github.head_ref == 'changeset-release/main' || github.ref == 'refs/heads/changeset-release/main') && 'next' || '' }}
     secrets:
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
