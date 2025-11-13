@@ -1,5 +1,30 @@
 # @lsst-sqre/squared
 
+## 0.11.0
+
+### Minor Changes
+
+- [#269](https://github.com/lsst-sqre/squareone/pull/269) [`c2de825`](https://github.com/lsst-sqre/squareone/commit/c2de825b768357572e37f6c8396bde57fdc11430) Thanks [@jonathansick](https://github.com/jonathansick)! - Upgrade to Storybook 10.0.6
+
+  - Migrated both squared and squareone Storybook configurations to Storybook 10.0.6
+  - Updated all Storybook addons and dependencies to v10
+  - Applied ESM migration with standardized `import.meta.resolve()` for addon resolution
+  - Added a11y testing configuration with 'todo' mode (shows violations without failing CI)
+  - Improved vitest integration with a11y addon annotations in squared package
+
+### Patch Changes
+
+- [#291](https://github.com/lsst-sqre/squareone/pull/291) [`5027c65`](https://github.com/lsst-sqre/squareone/commit/5027c650d8e64ee73c98dc840d6aed18bd1f6e97) Thanks [@jonathansick](https://github.com/jonathansick)! - Bump playwright from 1.55.0 to 1.56.1
+
+- [#250](https://github.com/lsst-sqre/squareone/pull/250) [`eff9f7a`](https://github.com/lsst-sqre/squareone/commit/eff9f7a9716cdf974372f74f338a81f86f98f75c) Thanks [@jonathansick](https://github.com/jonathansick)! - Align dependency versions across packages to prepare for Dependabot groups
+
+  - Update eslint-config-next from 12.2.4 to 15.5.0 in eslint-config package
+  - Standardize eslint to 8.46.0 across squared and squareone packages
+  - Update swr from 2.2.1 to 2.3.6 in squared package
+  - Update @fortawesome/react-fontawesome from 0.2.0 to 0.2.2 in squareone package
+
+  These version alignments eliminate inconsistencies that could cause conflicts when Dependabot groups are enabled for coordinated dependency updates.
+
 ## 0.10.2
 
 ### Patch Changes
