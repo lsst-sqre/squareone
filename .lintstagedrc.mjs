@@ -1,4 +1,4 @@
 export default {
-  '*.{js,jsx,ts,tsx,yaml,yml,json,graphql}': ['prettier --write'],
+  '*': ['biome check --write --staged --no-errors-on-unmatched'],
   '**/Dockerfile*': ['node scripts/validate-docker-versions.js'],
 };
