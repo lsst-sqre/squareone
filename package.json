@@ -22,6 +22,7 @@
     "prepare": "node -e \"try { require('husky').install() } catch (e) {if (e.code !== 'MODULE_NOT_FOUND') throw e}\""
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.3.5",
     "@changesets/changelog-github": "^0.5.1",
     "@changesets/cli": "^2.29.7",
     "@turbo/gen": "^2.6.1",
