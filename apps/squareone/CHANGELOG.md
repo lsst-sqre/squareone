@@ -1,5 +1,151 @@
 # squareone
 
+## 0.28.4
+
+### Patch Changes
+
+- [#259](https://github.com/lsst-sqre/squareone/pull/259) [`ba1633c`](https://github.com/lsst-sqre/squareone/commit/ba1633cccbb8331592fe209c26e9a7e0c4d844ef) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @radix-ui/react-label from 2.1.7 to 2.1.8
+
+- [#259](https://github.com/lsst-sqre/squareone/pull/259) [`ba1633c`](https://github.com/lsst-sqre/squareone/commit/ba1633cccbb8331592fe209c26e9a7e0c4d844ef) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @radix-ui/react-visually-hidden from 1.2.3 to 1.2.4
+
+- [#263](https://github.com/lsst-sqre/squareone/pull/263) [`f0f29ef`](https://github.com/lsst-sqre/squareone/commit/f0f29ef9957b6bbdce7aa3f21c872e3938df39a3) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @sentry/nextjs from 10.8.0 to 10.25.0 in the sentry group
+
+- [#279](https://github.com/lsst-sqre/squareone/pull/279) [`fc4e806`](https://github.com/lsst-sqre/squareone/commit/fc4e806547d421d672e0e78412dc3d4a6bb0b903) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-a11y from 10.0.6 to 10.0.7
+
+- [#279](https://github.com/lsst-sqre/squareone/pull/279) [`fc4e806`](https://github.com/lsst-sqre/squareone/commit/fc4e806547d421d672e0e78412dc3d4a6bb0b903) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-docs from 10.0.6 to 10.0.7
+
+- [#279](https://github.com/lsst-sqre/squareone/pull/279) [`fc4e806`](https://github.com/lsst-sqre/squareone/commit/fc4e806547d421d672e0e78412dc3d4a6bb0b903) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-links from 10.0.6 to 10.0.7
+
+- [#279](https://github.com/lsst-sqre/squareone/pull/279) [`fc4e806`](https://github.com/lsst-sqre/squareone/commit/fc4e806547d421d672e0e78412dc3d4a6bb0b903) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-onboarding from 10.0.6 to 10.0.7
+
+- [#279](https://github.com/lsst-sqre/squareone/pull/279) [`fc4e806`](https://github.com/lsst-sqre/squareone/commit/fc4e806547d421d672e0e78412dc3d4a6bb0b903) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-themes from 10.0.6 to 10.0.7
+
+- [#279](https://github.com/lsst-sqre/squareone/pull/279) [`fc4e806`](https://github.com/lsst-sqre/squareone/commit/fc4e806547d421d672e0e78412dc3d4a6bb0b903) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-vitest from 10.0.6 to 10.0.7
+
+- [#279](https://github.com/lsst-sqre/squareone/pull/279) [`fc4e806`](https://github.com/lsst-sqre/squareone/commit/fc4e806547d421d672e0e78412dc3d4a6bb0b903) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/nextjs-vite from 10.0.6 to 10.0.7
+
+- [#279](https://github.com/lsst-sqre/squareone/pull/279) [`fc4e806`](https://github.com/lsst-sqre/squareone/commit/fc4e806547d421d672e0e78412dc3d4a6bb0b903) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/react-vite from 10.0.6 to 10.0.7
+
+- [#255](https://github.com/lsst-sqre/squareone/pull/255) [`5a7c20e`](https://github.com/lsst-sqre/squareone/commit/5a7c20e23172a66bfd06b7d3ffe64d1918763e90) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @testing-library/jest-dom from 6.8.0 to 6.9.1 in the testing-library group
+
+- [#273](https://github.com/lsst-sqre/squareone/pull/273) [`28644d0`](https://github.com/lsst-sqre/squareone/commit/28644d0cbab26003fe1e3a6fe856337f09d7627f) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @turbo/gen from 2.6.0 to 2.6.1
+
+- [#287](https://github.com/lsst-sqre/squareone/pull/287) [`b145d65`](https://github.com/lsst-sqre/squareone/commit/b145d65bb77ee135c6c238f2c977c93c22424086) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @types/node from 24.10.0 to 24.10.1
+
+- [#252](https://github.com/lsst-sqre/squareone/pull/252) [`4fa4584`](https://github.com/lsst-sqre/squareone/commit/4fa45848df9497ef6012b961596684481f2a5445) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @types/react-dom from 19.1.9 to 19.2.3
+
+- [#252](https://github.com/lsst-sqre/squareone/pull/252) [`4fa4584`](https://github.com/lsst-sqre/squareone/commit/4fa45848df9497ef6012b961596684481f2a5445) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @types/react from 19.1.12 to 19.2.3
+
+- [#261](https://github.com/lsst-sqre/squareone/pull/261) [`fe635ef`](https://github.com/lsst-sqre/squareone/commit/fe635ef7a0c09ee3c28374e588717d5d3f0646da) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @types/styled-components from 5.1.34 to 5.1.35 in the styling group
+
+- [#262](https://github.com/lsst-sqre/squareone/pull/262) [`1cff726`](https://github.com/lsst-sqre/squareone/commit/1cff72645e54ab79df0a85b1eef03f2290de5f67) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @vitejs/plugin-react from 5.0.2 to 5.1.0 in the build-tools group
+
+- [#246](https://github.com/lsst-sqre/squareone/pull/246) [`dc8cc3f`](https://github.com/lsst-sqre/squareone/commit/dc8cc3f57ca666d1523079a0f0bcb5c775a3e3ab) Thanks [@jonathansick](https://github.com/jonathansick)! - Update Node.js from 22.13.0 to 22.21.1
+
+  This infrastructure update brings the latest LTS improvements, bug fixes, and security patches from Node.js 22. Updated in:
+
+  - `.nvmrc` for local development environment
+  - `apps/squareone/Dockerfile` for production Docker builds
+  - GitHub Actions workflows automatically use the `.nvmrc` version
+
+  Developers should run `nvm use` to switch to the new Node.js version locally.
+
+- [#246](https://github.com/lsst-sqre/squareone/pull/246) [`2af16dd`](https://github.com/lsst-sqre/squareone/commit/2af16dd28503456b304701b22126f53a8718db98) Thanks [@jonathansick](https://github.com/jonathansick)! - Pre-install pnpm in Docker base image to eliminate startup download
+
+  The Dockerfile now uses `corepack prepare pnpm@10.20.0 --activate` in the base stage to download and cache pnpm during the image build. This eliminates the "Corepack is about to download..." message and network request that previously occurred on every container startup.
+
+  This improves container startup time and reliability, especially in environments with restricted network access.
+
+- [#246](https://github.com/lsst-sqre/squareone/pull/246) [`8158829`](https://github.com/lsst-sqre/squareone/commit/8158829cfa67fd27a82fc732e1f192f8cda2a630) Thanks [@jonathansick](https://github.com/jonathansick)! - Use local turbo via pnpm in Dockerfile
+
+  The Dockerfile now uses `pnpm dlx turbo@2.6.0` instead of a globally installed turbo package. This:
+
+  - Removes the `npm install -g turbo` step from the base image
+  - Uses the exact turbo version (2.6.0) consistently via pnpm dlx
+  - Copies the `scripts/` directory to ensure `turbo-wrapper.js` is available for remote caching
+  - Aligns Docker builds with the local development workflow that uses pnpm scripts
+
+  This change makes the Docker build process more consistent with local development and reduces the base image size.
+
+- [#270](https://github.com/lsst-sqre/squareone/pull/270) [`26789ea`](https://github.com/lsst-sqre/squareone/commit/26789eab22b0d0697236a9f085be71df8f2f83a5) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump eslint-config-next from 15.5.2 to 15.5.6
+
+- [#273](https://github.com/lsst-sqre/squareone/pull/273) [`28644d0`](https://github.com/lsst-sqre/squareone/commit/28644d0cbab26003fe1e3a6fe856337f09d7627f) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump eslint-config-turbo from 2.5.6 to 2.6.1
+
+- [#279](https://github.com/lsst-sqre/squareone/pull/279) [`fc4e806`](https://github.com/lsst-sqre/squareone/commit/fc4e806547d421d672e0e78412dc3d4a6bb0b903) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump eslint-plugin-storybook from 10.0.6 to 10.0.7
+
+- [#281](https://github.com/lsst-sqre/squareone/pull/281) [`a79fd1f`](https://github.com/lsst-sqre/squareone/commit/a79fd1f4819a9e53e242f493c5958c43ea31a554) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump formik from 2.4.6 to 2.4.9
+
+- [#260](https://github.com/lsst-sqre/squareone/pull/260) [`3c86dc3`](https://github.com/lsst-sqre/squareone/commit/3c86dc35372aa806c90e47ad324d1fa7bee3ac47) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump lightningcss-cli from 1.30.1 to 1.30.2
+
+- [#260](https://github.com/lsst-sqre/squareone/pull/260) [`3c86dc3`](https://github.com/lsst-sqre/squareone/commit/3c86dc35372aa806c90e47ad324d1fa7bee3ac47) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump lightningcss from 1.30.1 to 1.30.2
+
+- [#265](https://github.com/lsst-sqre/squareone/pull/265) [`02a9457`](https://github.com/lsst-sqre/squareone/commit/02a945743223dbca902d5c4558ce822a18bd3ff1) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump msw from 2.12.0 to 2.12.1
+
+- [#294](https://github.com/lsst-sqre/squareone/pull/294) [`a88c2b0`](https://github.com/lsst-sqre/squareone/commit/a88c2b022f2f02c2de8f32f55e09fdc2b69462bd) Thanks [@jonathansick](https://github.com/jonathansick)! - Enable "next" image tag for changeset release previews
+
+  The CI workflow now builds and pushes Docker images with a special "next" tag when the `changeset-release/main` branch is updated. This allows developers and managers to preview the next version before merging the "Version Packages" PR.
+
+  Previously, the workflow would only build images for the changeset-release branch without pushing them to the registry. Now:
+
+  - Images are pushed to ghcr.io with both the branch-derived tag and the "next" tag
+  - The "next" tag can be used to deploy and test the upcoming version in staging environments
+  - Other changeset-release branches (non-main) remain build-only
+
+  This improves the release preview workflow by making pre-release images easily accessible via a stable tag name.
+
+- [#270](https://github.com/lsst-sqre/squareone/pull/270) [`26789ea`](https://github.com/lsst-sqre/squareone/commit/26789eab22b0d0697236a9f085be71df8f2f83a5) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump next-plausible from 3.12.4 to 3.12.5
+
+- [#270](https://github.com/lsst-sqre/squareone/pull/270) [`26789ea`](https://github.com/lsst-sqre/squareone/commit/26789eab22b0d0697236a9f085be71df8f2f83a5) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump next-themes from 0.2.1 to 0.4.6
+
+- [#270](https://github.com/lsst-sqre/squareone/pull/270) [`26789ea`](https://github.com/lsst-sqre/squareone/commit/26789eab22b0d0697236a9f085be71df8f2f83a5) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump next from 15.5.2 to 15.5.6
+
+- [#291](https://github.com/lsst-sqre/squareone/pull/291) [`5027c65`](https://github.com/lsst-sqre/squareone/commit/5027c650d8e64ee73c98dc840d6aed18bd1f6e97) Thanks [@jonathansick](https://github.com/jonathansick)! - Bump playwright from 1.55.0 to 1.56.1
+
+- [#252](https://github.com/lsst-sqre/squareone/pull/252) [`4fa4584`](https://github.com/lsst-sqre/squareone/commit/4fa45848df9497ef6012b961596684481f2a5445) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump react-dom from 19.1.1 to 19.2.0
+
+- [#264](https://github.com/lsst-sqre/squareone/pull/264) [`a266241`](https://github.com/lsst-sqre/squareone/commit/a266241e6b7e4ed3f3e8b87531440f6015306e13) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump react-hook-form from 7.62.0 to 7.66.0
+
+- [#252](https://github.com/lsst-sqre/squareone/pull/252) [`4fa4584`](https://github.com/lsst-sqre/squareone/commit/4fa45848df9497ef6012b961596684481f2a5445) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump react from 19.1.1 to 19.2.0
+
+- [#250](https://github.com/lsst-sqre/squareone/pull/250) [`eff9f7a`](https://github.com/lsst-sqre/squareone/commit/eff9f7a9716cdf974372f74f338a81f86f98f75c) Thanks [@jonathansick](https://github.com/jonathansick)! - Align dependency versions across packages to prepare for Dependabot groups
+
+  - Update eslint-config-next from 12.2.4 to 15.5.0 in eslint-config package
+  - Standardize eslint to 8.46.0 across squared and squareone packages
+  - Update swr from 2.2.1 to 2.3.6 in squared package
+  - Update @fortawesome/react-fontawesome from 0.2.0 to 0.2.2 in squareone package
+
+  These version alignments eliminate inconsistencies that could cause conflicts when Dependabot groups are enabled for coordinated dependency updates.
+
+- [#269](https://github.com/lsst-sqre/squareone/pull/269) [`c2de825`](https://github.com/lsst-sqre/squareone/commit/c2de825b768357572e37f6c8396bde57fdc11430) Thanks [@jonathansick](https://github.com/jonathansick)! - Upgrade to Storybook 10.0.6
+
+  - Migrated both squared and squareone Storybook configurations to Storybook 10.0.6
+  - Updated all Storybook addons and dependencies to v10
+  - Applied ESM migration with standardized `import.meta.resolve()` for addon resolution
+  - Added a11y testing configuration with 'todo' mode (shows violations without failing CI)
+  - Improved vitest integration with a11y addon annotations in squared package
+
+- [#279](https://github.com/lsst-sqre/squareone/pull/279) [`fc4e806`](https://github.com/lsst-sqre/squareone/commit/fc4e806547d421d672e0e78412dc3d4a6bb0b903) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump storybook from 10.0.6 to 10.0.7
+
+- [#273](https://github.com/lsst-sqre/squareone/pull/273) [`28644d0`](https://github.com/lsst-sqre/squareone/commit/28644d0cbab26003fe1e3a6fe856337f09d7627f) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump turbo from 2.6.0 to 2.6.1
+
+- [#287](https://github.com/lsst-sqre/squareone/pull/287) [`b145d65`](https://github.com/lsst-sqre/squareone/commit/b145d65bb77ee135c6c238f2c977c93c22424086) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump typescript from 5.9.2 to 5.9.3
+
+- [#246](https://github.com/lsst-sqre/squareone/pull/246) [`33f3a82`](https://github.com/lsst-sqre/squareone/commit/33f3a82cfee7d1dfd1c4a1eef3b1a399e060ffec) Thanks [@jonathansick](https://github.com/jonathansick)! - Update Turborepo from 2.5.6 to 2.6.0
+
+  This infrastructure update brings the latest improvements and bug fixes from Turborepo 2.6.0. Updated packages:
+
+  - `turbo` from 2.5.6 to 2.6.0
+  - `@turbo/gen` from 1.13.4 to 2.6.0
+
+  The global turbo installation has been removed as it's not needed for this monorepo workflow - all commands use the local installation via `turbo-wrapper.js`.
+
+- [#246](https://github.com/lsst-sqre/squareone/pull/246) [`8ddc6f3`](https://github.com/lsst-sqre/squareone/commit/8ddc6f38fc9afc9dc041b216514333db1ff4a760) Thanks [@jonathansick](https://github.com/jonathansick)! - Update pnpm from 10.12.1 to 10.20.0
+
+  This infrastructure update improves package management performance and includes the latest bug fixes and security patches. The pnpm version is managed via corepack and specified in the root package.json.
+
+- Updated dependencies [[`5027c65`](https://github.com/lsst-sqre/squareone/commit/5027c650d8e64ee73c98dc840d6aed18bd1f6e97), [`eff9f7a`](https://github.com/lsst-sqre/squareone/commit/eff9f7a9716cdf974372f74f338a81f86f98f75c), [`c2de825`](https://github.com/lsst-sqre/squareone/commit/c2de825b768357572e37f6c8396bde57fdc11430)]:
+  - @lsst-sqre/squared@0.11.0
+
 ## 0.28.3
 
 ### Patch Changes
