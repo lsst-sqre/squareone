@@ -344,7 +344,7 @@ export const ReactHookFormIntegration: Story = {
           reset();
           setSubmitMessage('');
         }, 3000);
-      } catch (error) {
+      } catch (_error) {
         setSubmitMessage('Submission failed. Please try again.');
       }
     };
@@ -497,13 +497,7 @@ export const ReactHookFormIntegration: Story = {
 
           {/* Submit Button */}
           <div style={{ marginTop: '1.5rem' }}>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              block
-              role="primary"
-              size="md"
-            >
+            <Button type="submit" disabled={isSubmitting} block size="md">
               {isSubmitting ? 'Creating Account...' : 'Create Account'}
             </Button>
           </div>

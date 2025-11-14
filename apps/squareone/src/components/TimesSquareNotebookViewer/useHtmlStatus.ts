@@ -64,7 +64,7 @@ function useHtmlStatus(): UseHtmlStatusReturn {
     htmlAvailable: data ? data.available : false,
     htmlHash: data ? data.html_hash : null,
     htmlUrl: data ? data.html_url : null,
-    iframeKey: data && data.available ? data.html_hash : 'html-not-available',
+    iframeKey: data?.available ? data.html_hash : 'html-not-available',
   };
 }
 

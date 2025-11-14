@@ -382,14 +382,14 @@ describe('useTokenChangeHistory', () => {
     });
 
     expect(result.current.entries).toBeDefined();
-    expect(result.current.entries![0].token_name).toBe(null);
-    expect(result.current.entries![0].parent).toBe(null);
-    expect(result.current.entries![0].service).toBe(null);
-    expect(result.current.entries![0].expires).toBe(null);
-    expect(result.current.entries![0].old_token_name).toBe(null);
-    expect(result.current.entries![0].old_scopes).toBe(null);
-    expect(result.current.entries![0].old_expires).toBe(null);
-    expect(result.current.entries![0].ip_address).toBe(null);
+    expect(result.current.entries?.[0].token_name).toBe(null);
+    expect(result.current.entries?.[0].parent).toBe(null);
+    expect(result.current.entries?.[0].service).toBe(null);
+    expect(result.current.entries?.[0].expires).toBe(null);
+    expect(result.current.entries?.[0].old_token_name).toBe(null);
+    expect(result.current.entries?.[0].old_scopes).toBe(null);
+    expect(result.current.entries?.[0].old_expires).toBe(null);
+    expect(result.current.entries?.[0].ip_address).toBe(null);
   });
 
   it('should reset entries when filters change', async () => {

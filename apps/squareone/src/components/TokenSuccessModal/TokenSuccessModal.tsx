@@ -1,7 +1,7 @@
 import { Button, ClipboardButton, Modal } from '@lsst-sqre/squared';
 import { useRouter } from 'next/router';
-import React, { useEffect, useRef } from 'react';
-import { ExpirationValue } from '../../lib/tokens/expiration';
+import { useEffect, useRef } from 'react';
+import type { ExpirationValue } from '../../lib/tokens/expiration';
 import styles from './TokenSuccessModal.module.css';
 
 export type TokenSuccessModalProps = {
@@ -31,7 +31,7 @@ export default function TokenSuccessModal({
       return 'Does not expire';
     }
 
-    const days = parseInt(exp.value.replace('d', ''));
+    const days = parseInt(exp.value.replace('d', ''), 10);
     const dateToFormat = new Date();
     dateToFormat.setDate(dateToFormat.getDate() + days);
 
@@ -92,11 +92,8 @@ export default function TokenSuccessModal({
         </p>
 
         <div className={styles.actions}>
-          <Button role="primary" onClick={handleClose}>
-            Done
-          </Button>
+          <Button onClick={handleClose}>Done</Button>
           <ClipboardButton
-            role="secondary"
             text={templateUrl}
             label="Copy token template"
             successLabel="Template URL copied!"

@@ -3,11 +3,11 @@
  * This component handles the useTimesSquarePage hook on the client side only.
  */
 
-import Ajv, { ValidateFunction } from 'ajv';
+import Ajv, { type ValidateFunction } from 'ajv';
 import addFormats from 'ajv-formats';
-import { Field, Formik, FormikHelpers } from 'formik';
+import { Field, Formik, type FormikHelpers } from 'formik';
 import { useRouter } from 'next/router';
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { type ChangeEvent, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import useTimesSquarePage from '../../hooks/useTimesSquarePage';
 import Button, { RedGhostButton } from '../Button';
@@ -126,9 +126,9 @@ export default function TimesSquareParametersClient() {
     }
 
     if (values.tsHideCode) {
-      query['ts_hide_code'] = '1';
+      query.ts_hide_code = '1';
     } else {
-      query['ts_hide_code'] = '0';
+      query.ts_hide_code = '0';
     }
 
     router.push({ pathname: router.pathname, query: query }, undefined, {

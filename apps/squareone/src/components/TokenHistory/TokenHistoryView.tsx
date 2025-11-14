@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import useTokenChangeHistory, {
   type TokenType,
 } from '../../hooks/useTokenChangeHistory';

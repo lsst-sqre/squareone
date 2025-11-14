@@ -1,5 +1,3 @@
-import React from 'react';
-
 import GitHubCheckBadge from './GitHubCheckBadge';
 
 export default {

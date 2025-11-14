@@ -5,7 +5,7 @@
  * https://www.joshwcomeau.com/react/file-structure/
  */
 
-import React from 'react';
+import type React from 'react';
 import styled from 'styled-components';
 
 import Directory from './Directory';
@@ -40,7 +40,7 @@ function generateChildren(
   props: Record<string, any>
 ): React.ReactNode[] {
   return contents.map((item) => {
-    if (item.node_type != 'page') {
+    if (item.node_type !== 'page') {
       return (
         <Directory
           title={item.title}

@@ -1,7 +1,7 @@
 // next.config.js
 // https://nextjs.org/docs/api-reference/next.config.js/introduction
 
-module.exports = (phase, { defaultConfig }) => {
+module.exports = (_phase, { defaultConfig }) => {
   const config = {
     ...defaultConfig,
     transpilePackages: ['@lsst-sqre/squared'],

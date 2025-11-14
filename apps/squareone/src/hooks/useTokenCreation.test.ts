@@ -115,7 +115,7 @@ describe('useTokenCreation', () => {
     expect(result.current.isCreating).toBe(true);
 
     await act(async () => {
-      resolveFetch!({
+      resolveFetch?.({
         ok: true,
         json: async () => mockResponse,
       });
@@ -226,7 +226,7 @@ describe('useTokenCreation', () => {
     await act(async () => {
       try {
         await result.current.createToken(defaultParams);
-      } catch (err) {
+      } catch (_err) {
         // Expected error
       }
     });
@@ -298,7 +298,7 @@ describe('useTokenCreation', () => {
     await act(async () => {
       try {
         await result.current.createToken(defaultParams);
-      } catch (err) {
+      } catch (_err) {
         // Expected error
       }
     });
@@ -331,7 +331,7 @@ describe('useTokenCreation', () => {
     await act(async () => {
       try {
         await result.current.createToken(defaultParams);
-      } catch (err) {
+      } catch (_err) {
         // Expected error
       }
     });
@@ -449,7 +449,7 @@ describe('useTokenCreation', () => {
       await act(async () => {
         try {
           await result.current.createToken(defaultParams);
-        } catch (err) {
+        } catch (_err) {
           // Expected error
         }
       });
@@ -479,7 +479,7 @@ describe('useTokenCreation', () => {
       await act(async () => {
         try {
           await result.current.createToken(defaultParams);
-        } catch (err) {
+        } catch (_err) {
           // Expected error
         }
       });
@@ -508,7 +508,7 @@ describe('useTokenCreation', () => {
       await act(async () => {
         try {
           await result.current.createToken(defaultParams);
-        } catch (err) {
+        } catch (_err) {
           // Expected error
         }
       });
@@ -531,7 +531,7 @@ describe('useTokenCreation', () => {
       await act(async () => {
         try {
           await result.current.createToken(defaultParams);
-        } catch (err) {
+        } catch (_err) {
           // Expected error
         }
       });
@@ -561,7 +561,7 @@ describe('useTokenCreation', () => {
       await act(async () => {
         try {
           await result.current.createToken(defaultParams);
-        } catch (err) {
+        } catch (_err) {
           // Expected error
         }
       });
@@ -592,7 +592,7 @@ describe('useTokenCreation', () => {
       await act(async () => {
         try {
           await result.current.createToken(defaultParams);
-        } catch (err) {
+        } catch (_err) {
           // Expected error
         }
       });
@@ -615,7 +615,7 @@ describe('useTokenCreation', () => {
       await act(async () => {
         try {
           await result.current.createToken(defaultParams);
-        } catch (err) {
+        } catch (_err) {
           // Expected error
         }
       });
@@ -638,7 +638,7 @@ describe('useTokenCreation', () => {
       await act(async () => {
         try {
           await result.current.createToken(defaultParams);
-        } catch (err) {
+        } catch (_err) {
           // Expected error
         }
       });
@@ -663,7 +663,7 @@ describe('useTokenCreation', () => {
       await act(async () => {
         try {
           await result.current.createToken(defaultParams);
-        } catch (err) {
+        } catch (_err) {
           // Expected error
         }
       });

@@ -11,7 +11,7 @@ export {
   Button,
   type ButtonAppearance,
   type ButtonProps,
-  type ButtonRole,
+  type ButtonVariant,
   type ButtonSize,
   type ButtonTone,
 } from './components/Button';

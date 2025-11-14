@@ -32,7 +32,7 @@ export default function useTokenTemplateUrl(
   return useMemo(() => {
     const params = new URLSearchParams();
 
-    if (values.name && values.name.trim()) {
+    if (values.name?.trim()) {
       params.append('name', values.name.trim());
     }
 

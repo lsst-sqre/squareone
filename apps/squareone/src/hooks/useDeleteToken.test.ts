@@ -93,7 +93,7 @@ describe('useDeleteToken', () => {
     expect(result.current.isDeleting).toBe(true);
 
     await act(async () => {
-      resolveFetch!({
+      resolveFetch?.({
         ok: true,
         status: 204,
       });
@@ -256,7 +256,7 @@ describe('useDeleteToken', () => {
     await act(async () => {
       try {
         await result.current.deleteToken('testuser', 'gt-token-123');
-      } catch (err) {
+      } catch (_err) {
         // Expected error
       }
     });
@@ -356,7 +356,7 @@ describe('useDeleteToken', () => {
     await act(async () => {
       try {
         await result.current.deleteToken('testuser', 'gt-token-1');
-      } catch (err) {
+      } catch (_err) {
         // Expected error
       }
     });
@@ -432,7 +432,7 @@ describe('useDeleteToken', () => {
     await act(async () => {
       try {
         await result.current.deleteToken('testuser', 'gt-token-123');
-      } catch (err) {
+      } catch (_err) {
         // Expected error
       }
     });

@@ -163,7 +163,7 @@ describe('dateFormatters', () => {
 
     it('pads single-digit months and days in absolute dates', () => {
       vi.setSystemTime(new Date('2024-01-01T00:00:00Z'));
-      const nowSeconds = Math.floor(Date.now() / 1000);
+      const _nowSeconds = Math.floor(Date.now() / 1000);
 
       // February 5th should be 2024-02-05
       const feb5 = new Date('2024-02-05T00:00:00Z').getTime() / 1000;

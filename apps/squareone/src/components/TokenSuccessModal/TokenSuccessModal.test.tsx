@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ExpirationValue } from '../../lib/tokens/expiration';
+import type { ExpirationValue } from '../../lib/tokens/expiration';
 import TokenSuccessModal from './TokenSuccessModal';
 
 vi.mock('next/router', () => ({

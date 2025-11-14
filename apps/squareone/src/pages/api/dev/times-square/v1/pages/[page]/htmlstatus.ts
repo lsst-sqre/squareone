@@ -16,9 +16,9 @@ export default async function handler(
     const pageBaseUrl = `${timesSquareUrl}/v1/pages/${page}`;
 
     const content = {
-      available: a != '2', // magic value to toggle status modes
+      available: a !== '2', // magic value to toggle status modes
       html_url: `${pageBaseUrl}/html?a=${a}`,
-      html_hash: a != '2' ? '12345' : null,
+      html_hash: a !== '2' ? '12345' : null,
     };
 
     console.log(content);

@@ -65,7 +65,7 @@ export const getServerSideProps: GetServerSideProps<
         mdxSource,
       },
     };
-  } catch (error) {
+  } catch (_error) {
     // Fallback: load config only and provide default content
     const { loadAppConfig } = await import('../lib/config/loader');
 

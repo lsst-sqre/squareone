@@ -28,7 +28,7 @@ export default function useUserInfo(): UseUserInfoReturn {
   });
 
   const isLoading = !error && !data;
-  const isLoggedIn = !error && data && data.hasOwnProperty('username');
+  const isLoggedIn = !error && data && Object.hasOwn(data, 'username');
 
   return {
     userInfo: data,

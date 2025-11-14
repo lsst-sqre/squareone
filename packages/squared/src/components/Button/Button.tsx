@@ -1,18 +1,19 @@
-import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { forwardRef } from 'react';
+import type React from 'react';
+import { forwardRef } from 'react';
 import styles from './Button.module.css';
 
 export type ButtonAppearance = 'solid' | 'outline' | 'text';
 export type ButtonTone = 'primary' | 'secondary' | 'tertiary' | 'danger';
-export type ButtonRole = 'primary' | 'secondary' | 'danger';
+export type ButtonVariant = 'primary' | 'secondary' | 'danger';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 type PolymorphicButtonProps<T extends React.ElementType = 'button'> = {
   as?: T;
   appearance?: ButtonAppearance;
   tone?: ButtonTone;
-  role?: ButtonRole;
+  variant?: ButtonVariant;
   block?: boolean;
   leadingIcon?: IconDefinition | React.ComponentType<any>;
   trailingIcon?: IconDefinition | React.ComponentType<any>;
@@ -30,7 +31,7 @@ const Button = forwardRef<any, ButtonProps<any>>(
       as: Component = 'button',
       appearance,
       tone,
-      role,
+      variant,
       block = false,
       leadingIcon,
       trailingIcon,
@@ -43,12 +44,12 @@ const Button = forwardRef<any, ButtonProps<any>>(
     },
     ref
   ) => {
-    // Resolve appearance and tone from role if provided
+    // Resolve appearance and tone from variant if provided
     let finalAppearance = appearance;
     let finalTone = tone;
 
-    if (role && !appearance && !tone) {
-      switch (role) {
+    if (variant && !appearance && !tone) {
+      switch (variant) {
         case 'primary':
           finalAppearance = 'solid';
           finalTone = 'primary';

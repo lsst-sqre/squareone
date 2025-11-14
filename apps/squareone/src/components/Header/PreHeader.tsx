@@ -3,9 +3,7 @@ import Image from 'next/legacy/image';
 import Link from 'next/link';
 import styled from 'styled-components';
 
-type PreLogoProps = {};
-
-const PreLogo = ({}: PreLogoProps) => {
+const PreLogo = () => {
   /*
    * We're using the "intrinsic" layout behaviour for the legacy Next.js Image
    * component. This means that the image will be the set size up to the set

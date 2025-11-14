@@ -31,7 +31,7 @@ console.log(
   '   This may take a few minutes on first install or after Playwright updates.'
 );
 
-const { spawn } = require('child_process');
+const { spawn } = require('node:child_process');
 
 // Install only chromium (the browser we actually use in tests)
 const proc = spawn(

@@ -2,19 +2,17 @@ import '@testing-library/jest-dom';
 
 // Polyfills for JSDOM environment needed by Radix UI components
 Object.defineProperty(Element.prototype, 'hasPointerCapture', {
-  value: function () {
-    return false;
-  },
+  value: () => false,
   writable: true,
 });
 
 Object.defineProperty(Element.prototype, 'setPointerCapture', {
-  value: function () {},
+  value: () => {},
   writable: true,
 });
 
 Object.defineProperty(Element.prototype, 'releasePointerCapture', {
-  value: function () {},
+  value: () => {},
   writable: true,
 });
 
@@ -26,4 +24,4 @@ global.ResizeObserver = class ResizeObserver {
 };
 
 // Mock scrollIntoView which is used by Radix UI focus management
-Element.prototype.scrollIntoView = function () {};
+Element.prototype.scrollIntoView = () => {};

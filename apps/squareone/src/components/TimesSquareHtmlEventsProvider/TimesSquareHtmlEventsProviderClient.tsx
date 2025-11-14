@@ -66,13 +66,13 @@ export default function TimesSquareHtmlEventsProviderClient({
             let parsedData: HtmlEvent;
             try {
               parsedData = JSON.parse(event.data);
-            } catch (error) {
+            } catch (_error) {
               return;
             }
             setHtmlEvent(parsedData);
 
             if (
-              parsedData.execution_status == 'complete' &&
+              parsedData.execution_status === 'complete' &&
               parsedData.html_hash
             ) {
               abortController.abort();

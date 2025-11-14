@@ -2,7 +2,7 @@
 
 import type { GetServerSideProps } from 'next';
 import type { ChangeEvent, ReactElement, ReactNode } from 'react';
-import { FormEvent, useState } from 'react';
+import { type FormEvent, useState } from 'react';
 import MainContent from '../components/MainContent';
 import type { AppConfigContextValue } from '../contexts/AppConfigContext';
 import useCurrentUrl from '../hooks/useCurrentUrl';
@@ -73,7 +73,7 @@ export const getServerSideProps: GetServerSideProps<LoginProps> = async () => {
         appConfig,
       },
     };
-  } catch (error) {
+  } catch (_error) {
     // Return a fallback config if loading fails
     const fallbackConfig: AppConfigContextValue = {
       siteName: 'Rubin Science Platform',

@@ -1,7 +1,7 @@
 import { PrimaryNavigation } from '@lsst-sqre/squared';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
-import React from 'react';
+import type React from 'react';
 import styled from 'styled-components';
 import { useAppConfig } from '../../contexts/AppConfigContext';
 import useCurrentUrl from '../../hooks/useCurrentUrl';
@@ -89,7 +89,7 @@ const NavItem = styled(PrimaryNavigation.Item)`
 
 const InternalTriggerLink = ({ href, children }: InternalTriggerLinkProps) => {
   const router = useRouter();
-  const isActive = href === router.pathname;
+  const _isActive = href === router.pathname;
 
   return (
     <NextLink href={href} passHref legacyBehavior>

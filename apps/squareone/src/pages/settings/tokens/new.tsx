@@ -2,7 +2,6 @@ import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import type { ParsedUrlQuery } from 'querystring';
 import type { ReactElement } from 'react';
 import { useState } from 'react';
 import { Lede } from '@/components/Typography/Typography';
@@ -11,7 +10,7 @@ import { TokenCreationErrorDisplay } from '../../../components/TokenCreationErro
 import { TokenForm, type TokenFormValues } from '../../../components/TokenForm';
 import TokenSuccessModal from '../../../components/TokenSuccessModal';
 import { useAppConfig } from '../../../contexts/AppConfigContext';
-import useLoginInfo, { type Scope } from '../../../hooks/useLoginInfo';
+import useLoginInfo from '../../../hooks/useLoginInfo';
 import useTokenCreation from '../../../hooks/useTokenCreation';
 import useTokenTemplateUrl from '../../../hooks/useTokenTemplateUrl';
 import useUserTokens, { extractTokenNames } from '../../../hooks/useUserTokens';

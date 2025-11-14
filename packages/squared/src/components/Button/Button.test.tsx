@@ -25,21 +25,21 @@ describe('Button', () => {
     });
   });
 
-  describe('Role prop', () => {
-    it('applies primary role correctly', () => {
-      const { container } = render(<Button role="primary">Primary</Button>);
+  describe('Variant prop', () => {
+    it('applies primary variant correctly', () => {
+      const { container } = render(<Button variant="primary">Primary</Button>);
       const button = container.querySelector('button');
       expect(button).toHaveClass('solid', 'primary');
     });
 
-    it('applies secondary role correctly', () => {
-      const { container } = render(<Button role="secondary">Secondary</Button>);
+    it('applies secondary variant correctly', () => {
+      const { container } = render(<Button variant="secondary">Secondary</Button>);
       const button = container.querySelector('button');
       expect(button).toHaveClass('outline', 'secondary');
     });
 
-    it('applies danger role correctly', () => {
-      const { container } = render(<Button role="danger">Danger</Button>);
+    it('applies danger variant correctly', () => {
+      const { container } = render(<Button variant="danger">Danger</Button>);
       const button = container.querySelector('button');
       expect(button).toHaveClass('solid', 'danger');
     });
@@ -56,9 +56,9 @@ describe('Button', () => {
       expect(button).toHaveClass('outline', 'tertiary');
     });
 
-    it('appearance and tone override role prop', () => {
+    it('appearance and tone override variant prop', () => {
       const { container } = render(
-        <Button role="primary" appearance="text" tone="danger">
+        <Button appearance="text" tone="danger">
           Override
         </Button>
       );

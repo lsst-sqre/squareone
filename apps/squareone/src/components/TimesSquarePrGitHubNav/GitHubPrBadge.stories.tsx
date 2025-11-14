@@ -1,5 +1,3 @@
-import React from 'react';
-
 import GitHubPrBadge from './GitHubPrBadge';
 
 export default {

@@ -55,16 +55,12 @@ AupPage.getLayout = function getLayout(page: ReactElement): ReactNode {
 export const getServerSideProps: GetServerSideProps<
   AupPageProps
 > = async () => {
-  try {
-    // Load app configuration for context
-    const appConfig = await loadAppConfig();
+  // Load app configuration for context
+  const appConfig = await loadAppConfig();
 
-    return {
-      props: {
-        appConfig, // Still needed for _app.tsx to extract into context
-      },
-    };
-  } catch (error) {
-    throw error;
-  }
+  return {
+    props: {
+      appConfig, // Still needed for _app.tsx to extract into context
+    },
+  };
 };

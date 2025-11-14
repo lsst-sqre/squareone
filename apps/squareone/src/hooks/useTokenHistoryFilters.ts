@@ -28,7 +28,7 @@ function parseDate(value: string | string[] | undefined): Date | undefined {
   if (!value || Array.isArray(value)) return undefined;
   try {
     const date = new Date(value);
-    return isNaN(date.getTime()) ? undefined : date;
+    return Number.isNaN(date.getTime()) ? undefined : date;
   } catch {
     return undefined;
   }

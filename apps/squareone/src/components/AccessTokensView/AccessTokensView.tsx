@@ -1,5 +1,4 @@
-import React from 'react';
-import useUserTokens, { type TokenInfo } from '../../hooks/useUserTokens';
+import useUserTokens from '../../hooks/useUserTokens';
 import AccessTokenItem from './AccessTokenItem';
 import styles from './AccessTokensView.module.css';
 

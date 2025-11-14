@@ -4,7 +4,7 @@
  * page, usually the page viewer, or a markdown view of the GitHub repository.
  */
 
-import React, { ReactNode } from 'react';
+import React, { type ReactNode } from 'react';
 import styled from 'styled-components';
 import TimesSquareGitHubPagePanel from '../TimesSquareGitHubPagePanel/TimesSquareGitHubPagePanel';
 import TimesSquareMainGitHubNav from '../TimesSquareMainGitHubNav';

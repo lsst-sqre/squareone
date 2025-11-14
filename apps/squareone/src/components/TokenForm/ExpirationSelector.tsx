@@ -1,5 +1,4 @@
 import { FormField, Select } from '@lsst-sqre/squared';
-import React from 'react';
 import {
   calculateExpirationDate,
   EXPIRATION_OPTIONS,

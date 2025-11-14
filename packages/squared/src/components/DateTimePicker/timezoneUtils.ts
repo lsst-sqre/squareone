@@ -1,4 +1,3 @@
-import { format } from 'date-fns';
 import { getTimezoneOffset as getOffset, toZonedTime } from 'date-fns-tz';
 
 /**
@@ -160,7 +159,7 @@ export function getTimezoneOffset(
     const offsetMinutes = getOffset(timezone, date) / (1000 * 60);
 
     // Check for NaN
-    if (isNaN(offsetMinutes)) {
+    if (Number.isNaN(offsetMinutes)) {
       return '+00:00';
     }
 

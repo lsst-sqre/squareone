@@ -27,7 +27,7 @@ export function parseTimestamp(
   }
 
   const date = new Date(timestamp);
-  return isNaN(date.getTime()) ? null : date;
+  return Number.isNaN(date.getTime()) ? null : date;
 }
 
 /**
@@ -50,7 +50,7 @@ export function formatAsISODate(date: Date): string {
  */
 export function getRelativeTimeDescription(
   seconds: number,
-  direction: 'past' | 'future' = 'future'
+  _direction: 'past' | 'future' = 'future'
 ): string {
   const days = Math.floor(seconds / SECONDS_PER_DAY);
   if (days >= 1) {

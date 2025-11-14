@@ -1,12 +1,4 @@
-import {
-  format,
-  formatISO,
-  isAfter,
-  isBefore,
-  isValid,
-  parse,
-  parseISO,
-} from 'date-fns';
+import { format, isAfter, isBefore, isValid, parseISO } from 'date-fns';
 import { formatInTimeZone, fromZonedTime, toZonedTime } from 'date-fns-tz';
 
 /**
@@ -130,7 +122,7 @@ export function createDateFromComponents(
     .padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
   if (timezone === 'UTC') {
-    return new Date(dateString + 'Z');
+    return new Date(`${dateString}Z`);
   } else {
     return fromZonedTime(dateString, timezone);
   }

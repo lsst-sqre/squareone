@@ -16,7 +16,7 @@ import '../styles/icons';
 
 import Page from '../components/Page';
 import {
-  AppConfigContextValue,
+  type AppConfigContextValue,
   AppConfigProvider,
 } from '../contexts/AppConfigContext';
 

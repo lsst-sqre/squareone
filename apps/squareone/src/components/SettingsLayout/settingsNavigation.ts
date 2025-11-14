@@ -6,7 +6,7 @@ import type { NavSection } from '../SidebarLayout';
  * Filters navigation items based on configuration settings.
  */
 export function getSettingsNavigation(
-  config: AppConfigContextValue
+  _config: AppConfigContextValue
 ): NavSection[] {
   const navigation: NavSection[] = [
     {

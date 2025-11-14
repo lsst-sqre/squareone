@@ -1,5 +1,3 @@
-import React from 'react';
-
 import GitHubPrTitle from './GitHubPrTitle';
 
 export default {

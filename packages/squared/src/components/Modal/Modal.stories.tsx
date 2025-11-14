@@ -76,7 +76,7 @@ export const Basic: Story = {
           <Button appearance="outline" tone="secondary">
             Cancel
           </Button>
-          <Button role="primary">Confirm</Button>
+          <Button>Confirm</Button>
         </div>
       </div>
     ),
@@ -92,9 +92,7 @@ export const Small: Story = {
     children: (
       <div>
         <p style={{ marginBottom: '1rem' }}>This is a small modal.</p>
-        <Button role="primary" block>
-          Got it
-        </Button>
+        <Button block>Got it</Button>
       </div>
     ),
   },
@@ -120,7 +118,7 @@ export const Medium: Story = {
           <Button appearance="outline" tone="secondary">
             Cancel
           </Button>
-          <Button role="primary">Save</Button>
+          <Button>Save</Button>
         </div>
       </div>
     ),
@@ -166,7 +164,7 @@ export const Large: Story = {
           <Button appearance="outline" tone="secondary">
             Cancel
           </Button>
-          <Button role="primary">Continue</Button>
+          <Button>Continue</Button>
         </div>
       </div>
     ),
@@ -184,9 +182,7 @@ export const WithoutCloseButton: Story = {
         <p style={{ marginBottom: '1rem' }}>
           You must use the action buttons to close this modal.
         </p>
-        <Button role="primary" block>
-          Close
-        </Button>
+        <Button block>Close</Button>
       </div>
     ),
   },
@@ -207,9 +203,7 @@ export const WithVisuallyHiddenTitleAndDescription: Story = {
           This modal uses visually hidden title and description for
           accessibility, while displaying custom content.
         </p>
-        <Button role="primary" block>
-          Okay
-        </Button>
+        <Button block>Okay</Button>
       </div>
     ),
   },
@@ -243,7 +237,7 @@ export const LongContent: Story = {
           <Button appearance="outline" tone="secondary">
             Cancel
           </Button>
-          <Button role="primary">Confirm</Button>
+          <Button>Confirm</Button>
         </div>
       </div>
     ),
@@ -264,7 +258,7 @@ export const ConfirmationDialog: Story = {
         <Button appearance="outline" tone="secondary">
           Cancel
         </Button>
-        <Button role="danger">Delete</Button>
+        <Button>Delete</Button>
       </div>
     ),
   },
@@ -319,9 +313,7 @@ export const FormModal: Story = {
           <Button appearance="outline" tone="secondary">
             Cancel
           </Button>
-          <Button role="primary" type="submit">
-            Create
-          </Button>
+          <Button type="submit">Create</Button>
         </div>
       </form>
     ),
@@ -339,9 +331,7 @@ export const OpenByDefault: Story = {
         <p style={{ marginBottom: '1rem' }}>
           In Storybook, you can control the open state using the controls panel.
         </p>
-        <Button role="primary" block>
-          Close
-        </Button>
+        <Button block>Close</Button>
       </div>
     ),
   },
@@ -357,9 +347,7 @@ export const KeyboardTest: Story = {
         <p style={{ marginBottom: '1rem' }}>
           This modal tests keyboard navigation and accessibility features.
         </p>
-        <Button role="primary" block>
-          Close
-        </Button>
+        <Button block>Close</Button>
       </div>
     ),
   },
@@ -415,11 +403,7 @@ export const AccessibilityTest: Story = {
   args: {
     title: 'Accessibility Test',
     description: 'This modal tests accessibility attributes.',
-    children: (
-      <Button role="primary" block>
-        Confirm
-      </Button>
-    ),
+    children: <Button block>Confirm</Button>,
   },
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);

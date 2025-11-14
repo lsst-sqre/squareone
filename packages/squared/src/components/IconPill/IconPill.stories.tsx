@@ -1,7 +1,6 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faBook } from '@fortawesome/free-solid-svg-icons';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import React from 'react';
 import { IconPill } from './IconPill';
 
 // Add icons to the global Font Awesome library

@@ -1,7 +1,7 @@
 // Server-side configuration loader with Ajv validation (migrated from next.config.js)
 // Using require() for server-side modules to avoid dynamic import issues in production builds
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 const yaml = require('js-yaml');
 const Ajv = require('ajv');
 // Removed serialize - now handled in individual page getServerSideProps

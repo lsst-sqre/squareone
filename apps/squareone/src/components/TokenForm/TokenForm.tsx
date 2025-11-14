@@ -1,8 +1,8 @@
 import { Button, FormField } from '@lsst-sqre/squared';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import useTokenNameValidation from '../../hooks/useTokenNameValidation';
-import { type ExpirationValue } from '../../lib/tokens/expiration';
+import type { ExpirationValue } from '../../lib/tokens/expiration';
 import ExpirationSelector from './ExpirationSelector';
 import ScopeSelector, { type Scope } from './ScopeSelector';
 import styles from './TokenForm.module.css';
@@ -138,18 +138,12 @@ export default function TokenForm({
       <div className={styles.actions}>
         <Button
           type="submit"
-          role="primary"
           loading={isSubmitting}
           disabled={isSubmitting || !nameValidation.isValid}
         >
           Create token
         </Button>
-        <Button
-          type="button"
-          role="secondary"
-          onClick={onCancel}
-          disabled={isSubmitting}
-        >
+        <Button type="button" onClick={onCancel} disabled={isSubmitting}>
           Cancel
         </Button>
       </div>

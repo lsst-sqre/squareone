@@ -3,7 +3,6 @@ import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import type { ReactElement, ReactNode } from 'react';
-import React from 'react';
 import styled from 'styled-components';
 
 import TimesSquareApp from '../../../../../components/TimesSquareApp';
@@ -131,7 +130,7 @@ export const getServerSideProps: GetServerSideProps<
     const appConfig = await loadAppConfig();
 
     // Make the page return a 404 if Times Square is not configured
-    const notFound = appConfig.timesSquareUrl ? false : true;
+    const notFound = !appConfig.timesSquareUrl;
 
     return {
       notFound,

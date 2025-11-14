@@ -1,4 +1,5 @@
-import React, { createContext, useContext } from 'react';
+import type React from 'react';
+import { createContext, useContext } from 'react';
 
 // Configuration interface for app-level configuration consumed by components
 export interface AppConfigContextValue {

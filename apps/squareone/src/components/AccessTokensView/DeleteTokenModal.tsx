@@ -1,5 +1,4 @@
 import { Button, Modal } from '@lsst-sqre/squared';
-import React from 'react';
 import styles from './DeleteTokenModal.module.css';
 
 type DeleteTokenModalProps = {
@@ -40,17 +39,11 @@ export default function DeleteTokenModal({
       onInteractOutside={handleInteractOutside}
     >
       <div className={styles.buttons}>
-        <Button
-          type="button"
-          role="secondary"
-          onClick={onCancel}
-          disabled={isDeleting}
-        >
+        <Button type="button" onClick={onCancel} disabled={isDeleting}>
           Cancel
         </Button>
         <Button
           type="button"
-          role="danger"
           onClick={onConfirm}
           loading={isDeleting}
           disabled={isDeleting}

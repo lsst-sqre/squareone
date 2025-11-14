@@ -1,7 +1,7 @@
 import type { BadgeColor } from '@lsst-sqre/squared';
 import { Badge, Button } from '@lsst-sqre/squared';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import useDeleteToken from '../../hooks/useDeleteToken';
 import type { TokenInfo } from '../../hooks/useUserTokens';
 import TokenDate from '../TokenDate';

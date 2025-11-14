@@ -1,13 +1,8 @@
 import * as PopoverPrimitive from '@radix-ui/react-popover';
-import React, {
-  forwardRef,
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import type React from 'react';
+import { forwardRef, useCallback, useMemo, useRef, useState } from 'react';
 import { DayPicker } from 'react-day-picker';
-// @ts-ignore - Calendar icon exists but is missing from react-feather type definitions
+// @ts-expect-error - Calendar icon exists but is missing from react-feather type definitions
 import { Calendar } from 'react-feather';
 import { TextInput } from '../TextInput';
 import { CalendarCaption } from './CalendarCaption';
@@ -145,7 +140,7 @@ const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
       () => parseISO8601(displayValue),
       [displayValue]
     );
-    const isInputValid = useMemo(() => {
+    const _isInputValid = useMemo(() => {
       if (!displayValue) return true; // Empty is valid
       return (
         isValidISO8601(displayValue) &&
@@ -187,7 +182,7 @@ const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
     }, [displayValue, minDate, maxDate, showSeconds, showTimezone]);
 
     // Extract time components from current date
-    const timeComponents = useMemo(() => {
+    const _timeComponents = useMemo(() => {
       if (!currentDate) {
         const now = getCurrentTimeInTimezone(selectedTimezone);
         return extractDateComponents(now, selectedTimezone);
@@ -348,7 +343,7 @@ const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
     );
 
     // Handle calendar button click
-    const handleCalendarToggle = useCallback(() => {
+    const _handleCalendarToggle = useCallback(() => {
       if (disabled) return;
       setIsCalendarOpen((prev) => !prev);
     }, [disabled]);

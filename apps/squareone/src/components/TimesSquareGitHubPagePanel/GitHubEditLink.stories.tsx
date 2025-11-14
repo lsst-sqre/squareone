@@ -1,5 +1,4 @@
 import type { Meta, StoryFn } from '@storybook/nextjs-vite';
-import React from 'react';
 
 import GitHubEditLink from './GitHubEditLink';
 

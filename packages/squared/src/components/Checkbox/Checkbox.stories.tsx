@@ -380,20 +380,10 @@ export const ReactHookFormIntegration: Story = {
         </FormField>
 
         <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <Button
-            type="submit"
-            role="primary"
-            size="md"
-            disabled={isSubmitting}
-          >
+          <Button type="submit" size="md" disabled={isSubmitting}>
             {isSubmitting ? 'Submitting...' : 'Submit Form'}
           </Button>
-          <Button
-            type="button"
-            role="secondary"
-            size="md"
-            onClick={() => reset()}
-          >
+          <Button type="button" size="md" onClick={() => reset()}>
             Reset Form
           </Button>
         </div>

@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import type React from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { MonthCaptionProps } from 'react-day-picker';
-// @ts-ignore - ChevronLeft and ChevronRight exist but are missing from react-feather type definitions
+// @ts-expect-error - ChevronLeft and ChevronRight exist but are missing from react-feather type definitions
 import { ChevronLeft, ChevronRight } from 'react-feather';
 import styles from './DateTimePicker.module.css';
 
@@ -75,7 +76,12 @@ export function CalendarCaption({
 
       // Only update the calendar if we have a valid 4-digit year
       const year = parseInt(value, 10);
-      if (value.length === 4 && !isNaN(year) && year >= 1900 && year <= 2100) {
+      if (
+        value.length === 4 &&
+        !Number.isNaN(year) &&
+        year >= 1900 &&
+        year <= 2100
+      ) {
         if (onMonthChange) {
           const newDate = new Date(displayMonth);
           newDate.setFullYear(year);
@@ -90,7 +96,7 @@ export function CalendarCaption({
     // On blur, validate and reset to current year if invalid
     const year = parseInt(yearInputValue, 10);
     if (
-      isNaN(year) ||
+      Number.isNaN(year) ||
       year < 1900 ||
       year > 2100 ||
       yearInputValue.length !== 4

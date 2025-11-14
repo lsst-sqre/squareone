@@ -14,8 +14,8 @@
  * - 2: Validation error (missing files, parse errors)
  */
 
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 
 // ANSI color codes for terminal output
 const colors = {
@@ -94,7 +94,7 @@ function findNearestPackageJson(filePath) {
         ) {
           return packageJsonPath;
         }
-      } catch (error) {
+      } catch (_error) {
         // Continue searching if parse fails
       }
     }

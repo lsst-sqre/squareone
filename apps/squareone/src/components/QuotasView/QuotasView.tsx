@@ -4,7 +4,6 @@ import {
   KeyValueList,
   type KeyValueListItem,
 } from '@lsst-sqre/squared';
-import React from 'react';
 import styles from './QuotasView.module.css';
 
 type QuotasViewProps = {

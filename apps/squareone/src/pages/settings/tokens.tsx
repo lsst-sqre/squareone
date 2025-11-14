@@ -59,7 +59,7 @@ const AccessTokensPage: NextPageWithLayout &
 
       <h1>Access tokens</h1>
       <Lede>Manage your RSP API access tokens.</Lede>
-      <Button role="primary" as={Link} href="/settings/tokens/new">
+      <Button as={Link} href="/settings/tokens/new">
         Create a token
       </Button>
       {user && (

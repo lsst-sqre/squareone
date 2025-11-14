@@ -63,7 +63,7 @@ export default function TimesSquareUrlParametersProvider({
   // matching the parameter schema.
   const userParameters = Object.fromEntries(
     Object.entries(router.query)
-      .filter((item) => item[0] != 'tsSlug')
+      .filter((item) => item[0] !== 'tsSlug')
       .map((item) => item)
   );
 

@@ -75,8 +75,8 @@ export const DynamicText: Story = {
 export const ButtonVariants: Story = {
   render: () => (
     <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-      <ClipboardButton text="Primary" role="primary" />
-      <ClipboardButton text="Secondary" role="secondary" />
+      <ClipboardButton text="Primary" />
+      <ClipboardButton text="Secondary" />
       <ClipboardButton
         text="Outline Primary"
         appearance="outline"
@@ -136,7 +136,7 @@ export const TokenCopyExample: Story = {
     label: 'Copy Token',
     successLabel: 'Token Copied!',
     successDuration: 5000,
-    role: 'primary',
+    variant: 'primary',
   },
   parameters: {
     docs: {
@@ -198,7 +198,7 @@ export const DisabledInteractionTest: Story = {
 
 export const DynamicTextTest: Story = {
   args: {
-    text: () => 'Dynamic text ' + Math.random().toString(36).substring(7),
+    text: () => `Dynamic text ${Math.random().toString(36).substring(7)}`,
     label: 'Copy Dynamic',
   },
   play: async ({ canvasElement }) => {

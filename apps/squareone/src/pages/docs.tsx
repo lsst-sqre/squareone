@@ -118,7 +118,7 @@ export default function DocsPage({ mdxSource }: DocsPageProps) {
 
   // Check for specific components that might be undefined
   const problematicComponents = Object.entries(mdxComponents).filter(
-    ([key, comp]) => !comp
+    ([_key, comp]) => !comp
   );
   if (problematicComponents.length > 0) {
     console.error(
@@ -166,7 +166,7 @@ export const getServerSideProps: GetServerSideProps<
         mdxSource,
       },
     };
-  } catch (error) {
+  } catch (_error) {
     // Fallback: load config only and provide default content
     const { loadAppConfig } = await import('../lib/config/loader');
 

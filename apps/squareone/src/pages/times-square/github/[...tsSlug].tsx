@@ -38,7 +38,7 @@ export const getServerSideProps: GetServerSideProps<
     const appConfig = await loadAppConfig();
 
     // Make the page return a 404 if Times Square is not configured
-    const notFound = appConfig.timesSquareUrl ? false : true;
+    const notFound = !appConfig.timesSquareUrl;
 
     return {
       notFound,

@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import React from 'react';
 import type { TokenInfo } from '../../hooks/useUserTokens';
 import AccessTokenItem from './AccessTokenItem';
 import styles from './AccessTokensView.module.css';
@@ -144,7 +143,7 @@ export const Loading: Story = {
   },
 };
 
-export const Error: Story = {
+export const ErrorState: Story = {
   args: {
     tokens: [],
     error: 'HTTP 404: Not Found',

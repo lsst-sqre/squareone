@@ -3,7 +3,7 @@
  */
 
 import Link from 'next/link';
-import { ComponentType } from 'react';
+import type { ComponentType } from 'react';
 import { CtaLink, Lede } from '../../components/Typography';
 
 export const commonMdxComponents: Record<string, ComponentType<any>> = {

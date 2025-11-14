@@ -2,7 +2,6 @@ import * as Sentry from '@sentry/nextjs';
 import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import type { MouseEvent } from 'react';
-import type { AppConfigContextValue } from '../contexts/AppConfigContext';
 import { loadAppConfig } from '../lib/config/loader';
 
 export default function Page() {
@@ -50,7 +49,7 @@ export default function Page() {
             fontSize: '14px',
             margin: '18px',
           }}
-          onClick={async (event: MouseEvent<HTMLButtonElement>) => {
+          onClick={async (_event: MouseEvent<HTMLButtonElement>) => {
             await Sentry.startSpan(
               {
                 name: 'Example Frontend Span',
