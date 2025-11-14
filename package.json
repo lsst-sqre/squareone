@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "localci": "pnpm run format && node scripts/turbo-wrapper.js run lint type-check test build",
+    "localci": "node scripts/turbo-wrapper.js run biome:format:check lint type-check test build",
     "build": "node scripts/turbo-wrapper.js run build",
     "dev": "node scripts/turbo-wrapper.js run dev",
     "test": "node scripts/turbo-wrapper.js run test",
@@ -13,8 +13,6 @@
     "type-check": "node scripts/turbo-wrapper.js run type-check",
     "biome:format": "biome check . --write",
     "biome:format:check": "biome check .",
-    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,graphql,yaml}\"",
-    "format:check": "prettier --check \"**/*.{js,ts,tsx,json,css,graphql,yaml}\"",
     "ci:publish": "node scripts/turbo-wrapper.js run build && changeset publish",
     "ci:version": "changeset version && pnpm install --no-frozen-lockfile",
     "turbo": "node scripts/turbo-wrapper.js",
@@ -22,6 +20,22 @@
     "docs": "uv run noxfile.py -s docs",
     "validate-docker": "node scripts/validate-docker-versions.js",
     "prepare": "node -e \"try { require('husky').install() } catch (e) {if (e.code !== 'MODULE_NOT_FOUND') throw e}\""
+  },
+  "prettier": {
+    "overrides": [
+      {
+        "files": [
+          "*.yaml",
+          "*.yml"
+        ],
+        "options": {
+          "singleQuote": true,
+          "tabWidth": 2,
+          "printWidth": 80,
+          "trailingComma": "none"
+        }
+      }
+    ]
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.5",
