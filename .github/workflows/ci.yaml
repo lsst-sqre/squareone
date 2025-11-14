@@ -61,8 +61,11 @@ jobs:
       - name: Validate Docker versions
         run: node scripts/validate-docker-versions.js
 
-      - name: Check formatting
-        run: pnpm run format:check
+      - name: Check formatting with Biome
+        run: pnpm run biome:format:check
+
+      - name: Check YAML formatting with Prettier
+        run: pnpm exec prettier --check "**/*.{yaml,yml}"
 
       - name: Lint
         run: pnpm run lint
@@ -111,7 +114,6 @@ jobs:
     # secrets won't be set.
     if: >
       github.event_name != 'merge_group' && (startsWith(github.ref, 'refs/tags/') || startsWith(github.head_ref, 'tickets/') || startsWith(github.head_ref, 'u/') || startsWith(github.head_ref, 'dependabot/') || github.ref == 'refs/heads/changeset-release/main')
-
 
   docs:
     needs: [changes]
