@@ -47,6 +47,13 @@
     "test-storybook:watch": {
       "dependsOn": ["^build"],
       "outputs": []
+    },
+    "//#biome:format:check": {
+      "outputLogs": "errors-only"
+    },
+    "//#biome:format": {
+      "cache": false,
+      "outputLogs": "errors-only"
     }
   }
 }

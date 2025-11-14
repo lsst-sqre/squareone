@@ -1,7 +1,6 @@
-import React from 'react';
+import type { GafaelfawrQuota } from '@lsst-sqre/squared';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import QuotasView from './QuotasView';
-import type { GafaelfawrQuota } from '@lsst-sqre/squared';
 
 const meta: Meta<typeof QuotasView> = {
   title: 'Components/QuotasView',

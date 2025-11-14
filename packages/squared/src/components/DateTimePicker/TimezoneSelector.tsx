@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Select } from '../Select';
-import { getTimezoneGroups, formatTimezoneDisplay } from './timezoneUtils';
+import { formatTimezoneDisplay, getTimezoneGroups } from './timezoneUtils';
 
 export type TimezoneSelectorProps = {
   value: string;

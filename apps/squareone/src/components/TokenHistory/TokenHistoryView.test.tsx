@@ -1,11 +1,11 @@
-import React from 'react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import TokenHistoryView from './TokenHistoryView';
+import React from 'react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { TokenChangeHistoryEntry } from '../../hooks/useTokenChangeHistory';
 import * as useTokenChangeHistoryModule from '../../hooks/useTokenChangeHistory';
 import * as useTokenHistoryFiltersModule from '../../hooks/useTokenHistoryFilters';
-import type { TokenChangeHistoryEntry } from '../../hooks/useTokenChangeHistory';
+import TokenHistoryView from './TokenHistoryView';
 
 // Mock Next.js router
 vi.mock('next/router', () => ({

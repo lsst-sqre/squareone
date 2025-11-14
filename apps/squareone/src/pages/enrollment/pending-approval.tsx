@@ -1,14 +1,14 @@
+import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
-import type { GetServerSideProps } from 'next';
-import type { ReactElement, ReactNode } from 'react';
 import { MDXRemote } from 'next-mdx-remote';
 import { serialize } from 'next-mdx-remote/serialize';
+import type { ReactElement, ReactNode } from 'react';
 
 import MainContent from '../../components/MainContent';
-import { commonMdxComponents } from '../../lib/utils/mdxComponents';
-import { loadConfigAndMdx } from '../../lib/config/loader';
 import { useAppConfig } from '../../contexts/AppConfigContext';
+import { loadConfigAndMdx } from '../../lib/config/loader';
+import { commonMdxComponents } from '../../lib/utils/mdxComponents';
 
 type PendingApprovalPageProps = {
   mdxSource: any;

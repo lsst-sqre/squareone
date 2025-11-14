@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { defineConfig, defineProject } from 'vitest/config';
 import storybookTest from '@storybook/addon-vitest/vitest-plugin';
+import { defineConfig, defineProject } from 'vitest/config';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 

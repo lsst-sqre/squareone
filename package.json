@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "localci": "pnpm run format && node scripts/turbo-wrapper.js run lint type-check test build",
+    "localci": "node scripts/turbo-wrapper.js run biome:format:check lint type-check test build",
     "build": "node scripts/turbo-wrapper.js run build",
     "dev": "node scripts/turbo-wrapper.js run dev",
     "test": "node scripts/turbo-wrapper.js run test",
@@ -11,17 +11,34 @@
     "test-storybook:watch": "node scripts/turbo-wrapper.js run test-storybook:watch",
     "lint": "node scripts/turbo-wrapper.js run lint",
     "type-check": "node scripts/turbo-wrapper.js run type-check",
-    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,graphql,yaml}\"",
-    "format:check": "prettier --check \"**/*.{js,ts,tsx,json,css,graphql,yaml}\"",
+    "biome:format": "biome check . --write",
+    "biome:format:check": "biome check .",
     "ci:publish": "node scripts/turbo-wrapper.js run build && changeset publish",
     "ci:version": "changeset version && pnpm install --no-frozen-lockfile",
     "turbo": "node scripts/turbo-wrapper.js",
     "build:local": "turbo run build",
     "docs": "uv run noxfile.py -s docs",
     "validate-docker": "node scripts/validate-docker-versions.js",
-    "prepare": "node -e \"try { require('husky').install() } catch (e) {if (e.code !== 'MODULE_NOT_FOUND') throw e}\""
+    "prepare": "node -e \"try { require('husky').install() } catch (e) {if (e.code !== 'MODULE_NOT_FOUND') throw e}\" && node scripts/install-playwright.js"
+  },
+  "prettier": {
+    "overrides": [
+      {
+        "files": [
+          "*.yaml",
+          "*.yml"
+        ],
+        "options": {
+          "singleQuote": true,
+          "tabWidth": 2,
+          "printWidth": 80,
+          "trailingComma": "none"
+        }
+      }
+    ]
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.3.5",
     "@changesets/changelog-github": "^0.5.1",
     "@changesets/cli": "^2.29.7",
     "@turbo/gen": "^2.6.1",

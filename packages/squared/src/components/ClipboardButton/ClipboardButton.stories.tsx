@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, waitFor } from 'storybook/test';
+import { expect, userEvent, within } from 'storybook/test';
 import ClipboardButton from './ClipboardButton';
 
 const meta: Meta<typeof ClipboardButton> = {

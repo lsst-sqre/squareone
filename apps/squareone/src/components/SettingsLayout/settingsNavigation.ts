@@ -1,5 +1,5 @@
-import type { NavSection } from '../SidebarLayout';
 import type { AppConfigContextValue } from '../../contexts/AppConfigContext';
+import type { NavSection } from '../SidebarLayout';
 
 /**
  * Generates settings navigation configuration based on app config.

@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, waitFor, act } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import { mutate } from 'swr';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import useDeleteToken from './useDeleteToken';
 
 // Mock SWR mutate
@@ -13,8 +13,8 @@ vi.mock('./useLoginInfo', () => ({
   default: vi.fn(),
 }));
 
-import useLoginInfo from './useLoginInfo';
 import type { LoginInfo } from './useLoginInfo';
+import useLoginInfo from './useLoginInfo';
 
 describe('useDeleteToken', () => {
   let fetchMock: any;

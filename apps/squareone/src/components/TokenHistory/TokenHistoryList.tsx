@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Button } from '@lsst-sqre/squared';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { Button } from '@lsst-sqre/squared';
+import React, { useEffect, useState } from 'react';
 import type { TokenChangeHistoryEntry } from '../../hooks/useTokenChangeHistory';
 import TokenHistoryItem from './TokenHistoryItem';
 import styles from './TokenHistoryList.module.css';

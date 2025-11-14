@@ -3,8 +3,8 @@
  * Uses client-only component to handle SWR hooks safely.
  */
 
-import React from 'react';
 import dynamic from 'next/dynamic';
+import React from 'react';
 
 type TimesSquareHtmlEventsProviderProps = {
   children: React.ReactNode;

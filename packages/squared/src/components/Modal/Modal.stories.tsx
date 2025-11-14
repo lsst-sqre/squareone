@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect } from 'storybook/test';
 import { useState } from 'react';
-import Modal from './Modal';
+import { expect, userEvent, within } from 'storybook/test';
 import Button from '../Button/Button';
+import Modal from './Modal';
 
 const meta: Meta<typeof Modal> = {
   title: 'Components/Modal',

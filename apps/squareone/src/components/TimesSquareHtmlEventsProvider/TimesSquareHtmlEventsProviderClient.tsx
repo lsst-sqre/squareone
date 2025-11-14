@@ -3,8 +3,8 @@
  * This component handles the useTimesSquarePage hook on the client side only.
  */
 
-import React, { useState, useEffect } from 'react';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
+import React, { useEffect, useState } from 'react';
 
 import useTimesSquarePage from '../../hooks/useTimesSquarePage';
 import { TimesSquareUrlParametersContext } from '../TimesSquareUrlParametersProvider';

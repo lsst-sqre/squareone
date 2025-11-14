@@ -3,15 +3,14 @@
  * This component handles the useGitHubPrContentsListing hook on the client side only.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-
-import TimesSquareGitHubNav from '../TimesSquareGitHubNav';
-import useGitHubPrContentsListing from './useGitHubPrContentsListing';
-import GitHubPrTitle from './GitHubPrTitle';
-import GitHubPrBadge from './GitHubPrBadge';
-import GitHubCheckBadge from './GitHubCheckBadge';
 import { useAppConfig } from '../../contexts/AppConfigContext';
+import TimesSquareGitHubNav from '../TimesSquareGitHubNav';
+import GitHubCheckBadge from './GitHubCheckBadge';
+import GitHubPrBadge from './GitHubPrBadge';
+import GitHubPrTitle from './GitHubPrTitle';
+import useGitHubPrContentsListing from './useGitHubPrContentsListing';
 
 type TimesSquarePrGitHubNavClientProps = {
   owner: string;

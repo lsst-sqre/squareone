@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { TokenInfo } from '../../hooks/useUserTokens';
 
 // Mock the hooks
@@ -43,8 +43,8 @@ vi.mock('../TokenHistory/TokenHistoryView', () => ({
   ),
 }));
 
-import useTokenDetails from '../../hooks/useTokenDetails';
 import useDeleteToken from '../../hooks/useDeleteToken';
+import useTokenDetails from '../../hooks/useTokenDetails';
 import TokenDetailsView from './TokenDetailsView';
 
 const mockUseTokenDetails = vi.mocked(useTokenDetails);

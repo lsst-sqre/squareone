@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { userEvent, within } from 'storybook/test';
-import SettingsLayout from './SettingsLayout';
 import { AppConfigProvider } from '../../contexts/AppConfigContext';
+import SettingsLayout from './SettingsLayout';
 
 const meta: Meta<typeof SettingsLayout> = {
   title: 'Components/SettingsLayout',

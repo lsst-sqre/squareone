@@ -3,8 +3,8 @@
  * that come from the URL path and query parameters.
  */
 
-import React from 'react';
 import { useRouter } from 'next/router';
+import React from 'react';
 import { useAppConfig } from '../../contexts/AppConfigContext';
 
 type DisplaySettings = {

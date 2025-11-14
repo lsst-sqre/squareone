@@ -26,7 +26,6 @@ jobs:
     if: >
       github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request'
 
-
     steps:
       - name: Generate GitHub App Token
         # Associated app: https://github.com/organizations/lsst-sqre/settings/apps/squareone-ci
@@ -233,7 +232,6 @@ jobs:
         if: >
           steps.verify.outputs.is_dependabot == 'true' && steps.metadata.outputs.update-type != 'version-update:semver-major' && steps.changeset.outputs.has_changeset == 'true'
 
-
         env:
           GH_TOKEN: ${{ steps.generate_token.outputs.token }}
           PR_URL: ${{ steps.verify.outputs.html_url }}
@@ -246,7 +244,6 @@ jobs:
       - name: Comment on PR
         if: >
           steps.verify.outputs.is_dependabot == 'true' && steps.metadata.outputs.update-type != 'version-update:semver-major' && steps.changeset.outputs.has_changeset == 'true'
-
 
         env:
           GH_TOKEN: ${{ steps.generate_token.outputs.token }}
@@ -270,7 +267,6 @@ jobs:
         if: >
           steps.verify.outputs.is_dependabot == 'true' && (steps.metadata.outputs.update-type == 'version-update:semver-major' ||
            steps.changeset.outputs.has_changeset != 'true')
-
 
         env:
           UPDATE_TYPE: ${{ steps.metadata.outputs.update-type }}

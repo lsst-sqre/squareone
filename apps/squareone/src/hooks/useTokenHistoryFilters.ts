@@ -99,8 +99,8 @@ export default function useTokenHistoryFilters(): UseTokenHistoryFiltersReturn {
         key === 'tokenType'
           ? 'token_type'
           : key === 'ipAddress'
-          ? 'ip_address'
-          : key;
+            ? 'ip_address'
+            : key;
 
       if (value === undefined || value === null) {
         // Remove parameter if value is undefined or null

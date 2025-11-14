@@ -1,16 +1,16 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
+  convertTimezone,
+  formatTimezoneDisplay,
   getAllTimezones,
+  getBrowserTimezone,
+  getCommonTimezones,
+  getCurrentTimeInTimezone,
   getTimezoneGroups,
   getTimezoneLabel,
-  getBrowserTimezone,
-  isValidTimezone,
   getTimezoneOffset,
-  convertTimezone,
-  getCurrentTimeInTimezone,
-  formatTimezoneDisplay,
+  isValidTimezone,
   searchTimezones,
-  getCommonTimezones,
 } from './timezoneUtils';
 
 describe('timezoneUtils', () => {

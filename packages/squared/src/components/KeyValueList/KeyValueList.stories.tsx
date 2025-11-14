@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { KeyValueList } from './KeyValueList';
 import { Badge } from '../Badge';
+import { KeyValueList } from './KeyValueList';
 
 const meta: Meta<typeof KeyValueList> = {
   title: 'Components/KeyValueList',

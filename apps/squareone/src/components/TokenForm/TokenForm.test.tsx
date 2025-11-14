@@ -1,9 +1,9 @@
-import React from 'react';
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import TokenForm from './TokenForm';
+import React from 'react';
+import { describe, expect, it, vi } from 'vitest';
 import type { Scope } from './ScopeSelector';
+import TokenForm from './TokenForm';
 
 const mockScopes: Scope[] = [
   {

@@ -1,10 +1,7 @@
-import React from 'react';
-import { forwardRef, useEffect, useRef } from 'react';
-
 import * as RadixNavigationMenu from '@radix-ui/react-navigation-menu';
-
-import { mergeReferences } from './utils';
+import React, { forwardRef, useEffect, useRef } from 'react';
 import styles from './PrimaryNavigation.module.css';
+import { mergeReferences } from './utils';
 
 export type PrimaryNavigationType = React.ForwardRefExoticComponent<
   React.ComponentPropsWithoutRef<typeof RadixNavigationMenu.Root> &

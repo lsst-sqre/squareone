@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import type { MonthCaptionProps } from 'react-day-picker';
 // @ts-ignore - ChevronLeft and ChevronRight exist but are missing from react-feather type definitions
 import { ChevronLeft, ChevronRight } from 'react-feather';

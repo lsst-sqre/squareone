@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect } from 'storybook/test';
-import { Mail, Search, User, Eye, EyeOff } from 'react-feather';
+import { Eye, EyeOff, Mail, Search, User } from 'react-feather';
+import { expect, userEvent, within } from 'storybook/test';
 import TextInput from './TextInput';
 
 const meta: Meta<typeof TextInput> = {

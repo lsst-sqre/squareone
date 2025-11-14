@@ -27,17 +27,17 @@
   outline: none;
 }
 
-.content[data-size='small'] {
+.content[data-size="small"] {
   width: 90vw;
   max-width: 450px;
 }
 
-.content[data-size='medium'] {
+.content[data-size="medium"] {
   width: 90vw;
   max-width: 550px;
 }
 
-.content[data-size='large'] {
+.content[data-size="large"] {
   width: 90vw;
   max-width: 750px;
 }
@@ -70,7 +70,9 @@
   border: none;
   cursor: pointer;
   color: var(--rsd-color-gray-500);
-  transition: background-color 0.2s, color 0.2s;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
 }
 
 .closeButton:hover {
@@ -103,24 +105,24 @@
   }
 }
 
-[data-theme='dark'] .content {
+[data-theme="dark"] .content {
   background-color: var(--rsd-color-gray-800);
   border-color: var(--rsd-color-gray-500);
 }
 
-[data-theme='dark'] .title {
+[data-theme="dark"] .title {
   color: var(--rsd-component-text-reverse-color);
 }
 
-[data-theme='dark'] .description {
+[data-theme="dark"] .description {
   color: var(--rsd-color-gray-100);
 }
 
-[data-theme='dark'] .closeButton {
+[data-theme="dark"] .closeButton {
   color: var(--rsd-color-gray-100);
 }
 
-[data-theme='dark'] .closeButton:hover {
+[data-theme="dark"] .closeButton:hover {
   background-color: var(--rsd-color-gray-500);
   color: var(--rsd-component-text-reverse-color);
 }

@@ -1,16 +1,14 @@
 /* Mock log in page */
 
-import { useState, FormEvent } from 'react';
 import type { GetServerSideProps } from 'next';
-import type { ReactElement, ReactNode, ChangeEvent } from 'react';
-
-import sleep from '../lib/utils/sleep';
-import { getDevLoginEndpoint } from '../lib/utils/url';
+import type { ChangeEvent, ReactElement, ReactNode } from 'react';
+import { FormEvent, useState } from 'react';
+import MainContent from '../components/MainContent';
+import type { AppConfigContextValue } from '../contexts/AppConfigContext';
 import useCurrentUrl from '../hooks/useCurrentUrl';
 import { loadAppConfig } from '../lib/config/loader';
-import type { AppConfigContextValue } from '../contexts/AppConfigContext';
-
-import MainContent from '../components/MainContent';
+import sleep from '../lib/utils/sleep';
+import { getDevLoginEndpoint } from '../lib/utils/url';
 
 export default function Login() {
   const [username, setUsername] = useState('');

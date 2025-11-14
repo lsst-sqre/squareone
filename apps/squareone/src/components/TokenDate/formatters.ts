@@ -4,9 +4,9 @@
  */
 
 import {
-  parseTimestamp,
   formatAsISODate,
   getRelativeTimeDescription,
+  parseTimestamp,
 } from '../../lib/utils/dateFormatters';
 
 const SECONDS_PER_MINUTE = 60;

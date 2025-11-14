@@ -1,7 +1,7 @@
-import React from 'react';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import AccessTokenItem from './AccessTokenItem';
+import React from 'react';
 import type { TokenInfo } from '../../hooks/useUserTokens';
+import AccessTokenItem from './AccessTokenItem';
 import styles from './AccessTokensView.module.css';
 
 // Mock token data

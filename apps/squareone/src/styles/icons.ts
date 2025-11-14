@@ -3,23 +3,21 @@
  */
 
 // Icons from Font Awesome
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { config } from '@fortawesome/fontawesome-svg-core';
-
+import { config, library } from '@fortawesome/fontawesome-svg-core';
+import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import {
   faAngleDown,
   faBars,
-  faFile,
-  faCodePullRequest,
-  faCodeMerge,
-  faCircleXmark,
+  faBook,
   faCircleCheck,
   faCircleMinus,
+  faCircleXmark,
   faCodeCommit,
+  faCodeMerge,
+  faCodePullRequest,
   faDownload,
-  faBook,
+  faFile,
 } from '@fortawesome/free-solid-svg-icons';
-import { faGithub } from '@fortawesome/free-brands-svg-icons';
 
 // Prevent Font Awesome from adding its CSS since we import it manually
 config.autoAddCss = false;

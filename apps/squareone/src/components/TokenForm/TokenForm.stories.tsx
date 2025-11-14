@@ -1,5 +1,5 @@
-import TokenForm from './TokenForm';
 import type { Scope } from './ScopeSelector';
+import TokenForm from './TokenForm';
 
 const mockScopes: Scope[] = [
   {

@@ -1,7 +1,7 @@
-import React from 'react';
-import type { Preview } from '@storybook/react-vite';
 import { withThemeByDataAttribute } from '@storybook/addon-themes';
+import type { Preview } from '@storybook/react-vite';
 import { initialize, mswLoader } from 'msw-storybook-addon';
+import React from 'react';
 
 // Import font assets and stylesheets with @font-face declarations
 import '@fontsource/source-sans-pro/400.css';

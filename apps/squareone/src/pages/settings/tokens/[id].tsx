@@ -1,12 +1,12 @@
-import type { ReactElement } from 'react';
 import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
+import type { ReactElement } from 'react';
 import { getLayout } from '../../../components/SettingsLayout';
-import { loadAppConfig } from '../../../lib/config/loader';
+import TokenDetailsView from '../../../components/TokenDetails';
 import { useAppConfig } from '../../../contexts/AppConfigContext';
 import useLoginInfo from '../../../hooks/useLoginInfo';
-import TokenDetailsView from '../../../components/TokenDetails';
+import { loadAppConfig } from '../../../lib/config/loader';
 
 type NextPageWithLayout = {
   getLayout?: (page: ReactElement) => ReactElement;

@@ -1,8 +1,8 @@
-import React from 'react';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, waitFor, act } from '@testing-library/react';
-import { SWRConfig } from 'swr';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
+import React from 'react';
+import { SWRConfig } from 'swr';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import useTokenChangeHistory, {
   type TokenChangeHistoryEntry,
 } from './useTokenChangeHistory';

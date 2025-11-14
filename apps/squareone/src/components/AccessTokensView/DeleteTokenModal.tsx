@@ -1,5 +1,5 @@
+import { Button, Modal } from '@lsst-sqre/squared';
 import React from 'react';
-import { Modal, Button } from '@lsst-sqre/squared';
 import styles from './DeleteTokenModal.module.css';
 
 type DeleteTokenModalProps = {

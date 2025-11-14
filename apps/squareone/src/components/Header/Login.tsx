@@ -1,8 +1,8 @@
 /* Login component with proper hydration handling */
 
-import { useState, useEffect } from 'react';
+import { getLoginUrl, PrimaryNavigation } from '@lsst-sqre/squared';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { PrimaryNavigation, getLoginUrl } from '@lsst-sqre/squared';
 import useUserInfo from '../../hooks/useUserInfo';
 import UserMenu from './UserMenu';
 

@@ -3,9 +3,9 @@
   grid-template-columns: 1fr auto;
   grid-template-rows: auto auto auto;
   grid-template-areas:
-    'info dates'
-    'info delete'
-    'error error';
+    "info dates"
+    "info delete"
+    "error error";
   gap: var(--sqo-space-sm-fixed);
   padding: var(--sqo-space-sm-fixed) var(--sqo-space-md-fixed);
   border-bottom: 1px solid var(--rsd-color-primary-600);
@@ -79,9 +79,9 @@
     grid-template-columns: 1fr auto;
     grid-template-rows: auto auto auto;
     grid-template-areas:
-      'info info'
-      'dates delete'
-      'error error';
+      "info info"
+      "dates delete"
+      "error error";
   }
 
   .expiry {

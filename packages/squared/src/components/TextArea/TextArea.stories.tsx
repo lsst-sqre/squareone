@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect } from 'storybook/test';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import TextArea from './TextArea';
+import { expect, userEvent, within } from 'storybook/test';
+import { Button } from '../Button';
 import FormField from '../FormField';
 import Label from '../Label';
-import { Button } from '../Button';
+import TextArea from './TextArea';
 
 const meta: Meta<typeof TextArea> = {
   title: 'Components/TextArea',

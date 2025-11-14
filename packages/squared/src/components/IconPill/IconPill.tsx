@@ -1,6 +1,6 @@
-import React from 'react';
+import { IconName, IconPrefix } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IconPrefix, IconName } from '@fortawesome/fontawesome-svg-core';
+import React from 'react';
 import styles from './IconPill.module.css';
 
 export type IconPillProps = {

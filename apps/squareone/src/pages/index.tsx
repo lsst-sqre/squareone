@@ -1,11 +1,10 @@
-import Head from 'next/head';
 import type { GetServerSideProps } from 'next';
+import Head from 'next/head';
 import type { ReactElement, ReactNode } from 'react';
-
-import MainContent from '../components/MainContent';
 import HomepageHero from '../components/HomepageHero';
-import { loadAppConfig } from '../lib/config/loader';
+import MainContent from '../components/MainContent';
 import { useAppConfig } from '../contexts/AppConfigContext';
+import { loadAppConfig } from '../lib/config/loader';
 
 type HomeProps = {};
 

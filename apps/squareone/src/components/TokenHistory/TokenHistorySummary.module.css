@@ -62,7 +62,7 @@
 }
 
 /* Dark theme overrides */
-[data-theme='dark'] .summary:hover {
+[data-theme="dark"] .summary:hover {
   background-color: var(--rsd-color-gray-700);
   color: var(--rsd-color-gray-100);
 }

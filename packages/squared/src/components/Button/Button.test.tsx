@@ -1,7 +1,7 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
 import { faHome } from '@fortawesome/free-solid-svg-icons';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { Home } from 'react-feather';
+import { describe, expect, it, vi } from 'vitest';
 import Button from './Button';
 
 describe('Button', () => {

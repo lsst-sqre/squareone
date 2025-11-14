@@ -2,14 +2,12 @@
  * The navigational sidebar for Times Square.
  */
 
-import { ReactNode } from 'react';
-import Link from 'next/link';
-import styled from 'styled-components';
-
 import { IconPill } from '@lsst-sqre/squared';
-
-import { getDocsUrl } from '../../lib/utils/docsUrls';
+import Link from 'next/link';
+import { ReactNode } from 'react';
+import styled from 'styled-components';
 import { useAppConfig } from '../../contexts/AppConfigContext';
+import { getDocsUrl } from '../../lib/utils/docsUrls';
 
 type SidebarProps = {
   pageNav?: ReactNode;

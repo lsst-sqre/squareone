@@ -1,5 +1,5 @@
-import TokenCreationErrorDisplay from './TokenCreationErrorDisplay';
 import type { TokenCreationError } from '../../hooks/useTokenCreation';
+import TokenCreationErrorDisplay from './TokenCreationErrorDisplay';
 
 export default {
   title: 'Components/TokenCreationErrorDisplay',

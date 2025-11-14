@@ -4,11 +4,10 @@
  * https://www.joshwcomeau.com/react/file-structure/
  */
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
-import Link from 'next/link';
-
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 type PageProps = {
   title: string;

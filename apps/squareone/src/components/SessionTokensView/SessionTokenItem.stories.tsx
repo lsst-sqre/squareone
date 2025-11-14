@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { fn } from 'storybook/test';
-import SessionTokenItem from './SessionTokenItem';
 import type { TokenInfo } from '../../hooks/useUserTokens';
+import SessionTokenItem from './SessionTokenItem';
 
 // Mock token data
 const now = Math.floor(Date.now() / 1000);

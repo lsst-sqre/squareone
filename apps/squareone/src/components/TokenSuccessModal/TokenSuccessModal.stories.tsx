@@ -1,8 +1,8 @@
+import { Button } from '@lsst-sqre/squared';
 import type { Meta, StoryObj } from '@storybook/nextjs';
 import { useState } from 'react';
-import { Button } from '@lsst-sqre/squared';
-import TokenSuccessModal from './TokenSuccessModal';
 import { ExpirationValue } from '../../lib/tokens/expiration';
+import TokenSuccessModal from './TokenSuccessModal';
 
 const meta = {
   title: 'Tokens/TokenSuccessModal',

@@ -1,6 +1,6 @@
 import React from 'react';
-import { TokenHistoryDetails } from './TokenHistoryDetails';
 import type { TokenChangeHistoryEntry } from '../../hooks/useTokenChangeHistory';
+import { TokenHistoryDetails } from './TokenHistoryDetails';
 
 export default {
   title: 'Components/TokenHistory/TokenHistoryDetails',

@@ -1,5 +1,5 @@
-import styled from 'styled-components';
 import useDisclosure from 'react-a11y-disclosure';
+import styled from 'styled-components';
 
 import { ContentMaxWidth } from '../../styles/sizes';
 

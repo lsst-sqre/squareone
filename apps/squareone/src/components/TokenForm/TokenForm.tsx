@@ -1,10 +1,10 @@
-import React, { useMemo } from 'react';
-import { useForm, Controller } from 'react-hook-form';
 import { Button, FormField } from '@lsst-sqre/squared';
-import ScopeSelector, { type Scope } from './ScopeSelector';
-import ExpirationSelector from './ExpirationSelector';
-import { type ExpirationValue } from '../../lib/tokens/expiration';
+import React, { useMemo } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import useTokenNameValidation from '../../hooks/useTokenNameValidation';
+import { type ExpirationValue } from '../../lib/tokens/expiration';
+import ExpirationSelector from './ExpirationSelector';
+import ScopeSelector, { type Scope } from './ScopeSelector';
 import styles from './TokenForm.module.css';
 
 // Stable empty array to prevent unnecessary re-renders

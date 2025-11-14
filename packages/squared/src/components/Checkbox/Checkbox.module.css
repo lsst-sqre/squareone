@@ -33,7 +33,7 @@
 
 /* Invisible touch target expansion */
 .checkbox::before {
-  content: '';
+  content: "";
   position: absolute;
   /* Expand from 1rem visual to 2.75rem (44px) touch target */
   inset: calc((2.75rem - 1rem) / -2); /* -0.875rem */
@@ -68,8 +68,8 @@
 }
 
 /* Checked and indeterminate states */
-.checkbox[data-state='checked'],
-.checkbox[data-state='indeterminate'] {
+.checkbox[data-state="checked"],
+.checkbox[data-state="indeterminate"] {
   background: var(--rsd-color-primary-600);
   border-color: var(--rsd-color-primary-600);
 }
@@ -79,8 +79,8 @@
   border-color: var(--rsd-color-primary-600);
 }
 
-.checkbox[data-state='checked']:hover:not([data-disabled]),
-.checkbox[data-state='indeterminate']:hover:not([data-disabled]) {
+.checkbox[data-state="checked"]:hover:not([data-disabled]),
+.checkbox[data-state="indeterminate"]:hover:not([data-disabled]) {
   background: var(--rsd-color-primary-700);
   border-color: var(--rsd-color-primary-700);
 }
@@ -102,8 +102,8 @@
 }
 
 /* Checkmark indicator for checked state */
-.checkbox[data-state='checked']::after {
-  content: '';
+.checkbox[data-state="checked"]::after {
+  content: "";
   position: absolute;
   width: 0.25rem;
   height: 0.5rem;
@@ -114,19 +114,19 @@
 }
 
 /* Size-specific checkmarks */
-.checkbox.sm[data-state='checked']::after {
+.checkbox.sm[data-state="checked"]::after {
   width: 0.21875rem; /* Proportional to 14px checkbox */
   height: 0.4375rem;
 }
 
-.checkbox.lg[data-state='checked']::after {
+.checkbox.lg[data-state="checked"]::after {
   width: 0.3125rem; /* Proportional to 20px checkbox */
   height: 0.625rem;
 }
 
 /* Minus indicator for indeterminate state */
-.checkbox[data-state='indeterminate']::after {
-  content: '';
+.checkbox[data-state="indeterminate"]::after {
+  content: "";
   position: absolute;
   width: 0.5rem;
   height: 0.125rem;
@@ -135,11 +135,11 @@
 }
 
 /* Size-specific minus indicators */
-.checkbox.sm[data-state='indeterminate']::after {
+.checkbox.sm[data-state="indeterminate"]::after {
   width: 0.4375rem; /* Proportional to 14px checkbox */
 }
 
-.checkbox.lg[data-state='indeterminate']::after {
+.checkbox.lg[data-state="indeterminate"]::after {
   width: 0.625rem; /* Proportional to 20px checkbox */
 }
 
@@ -199,16 +199,16 @@
 }
 
 /* Error state support for FormField integration */
-.checkbox[aria-invalid='true'] {
+.checkbox[aria-invalid="true"] {
   border-color: var(--rsd-color-red-500);
 }
 
-.checkbox[aria-invalid='true']:focus-visible {
+.checkbox[aria-invalid="true"]:focus-visible {
   outline-color: var(--rsd-color-red-500);
 }
 
-.checkbox[aria-invalid='true'][data-state='checked'],
-.checkbox[aria-invalid='true'][data-state='indeterminate'] {
+.checkbox[aria-invalid="true"][data-state="checked"],
+.checkbox[aria-invalid="true"][data-state="indeterminate"] {
   background: var(--rsd-color-red-500);
   border-color: var(--rsd-color-red-500);
 }

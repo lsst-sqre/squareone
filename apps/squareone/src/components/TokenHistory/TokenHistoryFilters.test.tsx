@@ -1,9 +1,9 @@
-import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
-import { expect, test, describe, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import TokenHistoryFilters from './TokenHistoryFilters';
+import React from 'react';
+import { describe, expect, test, vi } from 'vitest';
 import type { TokenHistoryFilters as FilterType } from '../../hooks/useTokenHistoryFilters';
+import TokenHistoryFilters from './TokenHistoryFilters';
 
 describe('TokenHistoryFilters', () => {
   const defaultFilters: FilterType = {

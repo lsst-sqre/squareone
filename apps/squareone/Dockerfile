@@ -25,11 +25,11 @@ WORKDIR /app
 COPY .gitignore .gitignore
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
+COPY --from=builder /app/scripts/ ./scripts/
 RUN pnpm install
 
 # Build the project and its dependencies
 COPY --from=builder /app/out/full/ .
-COPY --from=builder /app/scripts/ ./scripts/
 COPY turbo.json turbo.json
 
 # Remote caching for Turborepo

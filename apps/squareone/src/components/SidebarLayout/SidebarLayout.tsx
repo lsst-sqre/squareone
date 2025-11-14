@@ -1,10 +1,10 @@
-import React, { useRef, useEffect } from 'react';
-import styled from 'styled-components';
+import React, { useEffect, useRef } from 'react';
 import useDisclosure from 'react-a11y-disclosure';
+import styled from 'styled-components';
 
 import { ContentMaxWidth } from '../../styles/sizes';
-import Sidebar from './Sidebar';
 import MobileMenuToggle from './MobileMenuToggle';
+import Sidebar from './Sidebar';
 
 export type NavItem = {
   href: string;

@@ -1,6 +1,6 @@
+import Link from 'next/link';
 import React, { useRef } from 'react';
 import styled from 'styled-components';
-import Link from 'next/link';
 
 import type { NavItem } from './SidebarLayout';
 

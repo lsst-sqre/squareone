@@ -1,8 +1,8 @@
-import type { AppProps } from 'next/app';
-import type { ReactElement, ReactNode } from 'react';
 import type { NextPage } from 'next';
-import { ThemeProvider } from 'next-themes';
+import type { AppProps } from 'next/app';
 import PlausibleProvider from 'next-plausible';
+import { ThemeProvider } from 'next-themes';
+import type { ReactElement, ReactNode } from 'react';
 
 // Global CSS
 // Keep these imports in sync with .storybook/preview.js (Next can't import
@@ -16,8 +16,8 @@ import '../styles/icons';
 
 import Page from '../components/Page';
 import {
-  AppConfigProvider,
   AppConfigContextValue,
+  AppConfigProvider,
 } from '../contexts/AppConfigContext';
 
 type NextPageWithLayout = NextPage & {

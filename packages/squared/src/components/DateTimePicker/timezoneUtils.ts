@@ -1,5 +1,5 @@
 import { format } from 'date-fns';
-import { toZonedTime, getTimezoneOffset as getOffset } from 'date-fns-tz';
+import { getTimezoneOffset as getOffset, toZonedTime } from 'date-fns-tz';
 
 /**
  * Common timezone identifiers grouped by region

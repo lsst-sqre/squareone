@@ -1,2 +1,2 @@
-export { default } from './TokenSuccessModal';
 export type { TokenSuccessModalProps } from './TokenSuccessModal';
+export { default } from './TokenSuccessModal';

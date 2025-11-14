@@ -1,10 +1,10 @@
-import React from 'react';
 import Link from 'next/link';
+import React from 'react';
 import type { TokenChangeHistoryEntry } from '../../hooks/useTokenChangeHistory';
 import { formatExpirationTimestamp } from '../TokenDate/formatters';
+import styles from './TokenHistoryDetails.module.css';
 import { TokenScopeBadge } from './TokenScopeBadge';
 import { TokenScopeChangeBadge } from './TokenScopeChangeBadge';
-import styles from './TokenHistoryDetails.module.css';
 
 export type TokenHistoryDetailsProps = {
   /**

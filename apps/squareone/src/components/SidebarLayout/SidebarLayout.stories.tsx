@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { userEvent, within, expect } from 'storybook/test';
 import SidebarLayout from './SidebarLayout';
 
 const meta: Meta<typeof SidebarLayout> = {

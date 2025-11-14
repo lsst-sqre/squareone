@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { TokenChangeHistoryEntry } from '../../hooks/useTokenChangeHistory';
-import TokenHistorySummary from './TokenHistorySummary';
 import { TokenHistoryDetails } from './TokenHistoryDetails';
 import styles from './TokenHistoryItem.module.css';
+import TokenHistorySummary from './TokenHistorySummary';
 
 type TokenHistoryItemProps = {
   entry: TokenChangeHistoryEntry;

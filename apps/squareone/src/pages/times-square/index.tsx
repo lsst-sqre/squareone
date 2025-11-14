@@ -1,13 +1,13 @@
-import Head from 'next/head';
 import type { GetServerSideProps } from 'next';
+import Head from 'next/head';
 import type { ReactElement, ReactNode } from 'react';
 
 import TimesSquareApp from '../../components/TimesSquareApp';
-import WideContentLayout from '../../components/WideContentLayout';
 import TimesSquareUrlParametersProvider from '../../components/TimesSquareUrlParametersProvider';
-import { loadAppConfig } from '../../lib/config/loader';
-import { useAppConfig } from '../../contexts/AppConfigContext';
+import WideContentLayout from '../../components/WideContentLayout';
 import type { AppConfigContextValue } from '../../contexts/AppConfigContext';
+import { useAppConfig } from '../../contexts/AppConfigContext';
+import { loadAppConfig } from '../../lib/config/loader';
 
 type TimesSquareHomeProps = {
   appConfig: AppConfigContextValue;

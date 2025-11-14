@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import Link from 'next/link';
-import { Badge, Button } from '@lsst-sqre/squared';
 import type { BadgeColor } from '@lsst-sqre/squared';
-import type { TokenInfo } from '../../hooks/useUserTokens';
+import { Badge, Button } from '@lsst-sqre/squared';
+import Link from 'next/link';
+import React, { useState } from 'react';
 import useDeleteToken from '../../hooks/useDeleteToken';
-import { formatTokenExpiration } from '../TokenDate/formatters';
-import DeleteTokenModal from './DeleteTokenModal';
+import type { TokenInfo } from '../../hooks/useUserTokens';
 import TokenDate from '../TokenDate';
+import { formatTokenExpiration } from '../TokenDate/formatters';
 import styles from './AccessTokenItem.module.css';
+import DeleteTokenModal from './DeleteTokenModal';
 
 function getScopeColor(scope: string): BadgeColor {
   if (scope.startsWith('exec:')) return 'red';

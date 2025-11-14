@@ -6,12 +6,11 @@
 
 import React, { ReactNode } from 'react';
 import styled from 'styled-components';
-
-import Sidebar from './Sidebar';
-import { TimesSquareUrlParametersContext } from '../TimesSquareUrlParametersProvider';
+import TimesSquareGitHubPagePanel from '../TimesSquareGitHubPagePanel/TimesSquareGitHubPagePanel';
 import TimesSquareMainGitHubNav from '../TimesSquareMainGitHubNav';
 import TimesSquarePrGitHubNav from '../TimesSquarePrGitHubNav';
-import TimesSquareGitHubPagePanel from '../TimesSquareGitHubPagePanel/TimesSquareGitHubPagePanel';
+import { TimesSquareUrlParametersContext } from '../TimesSquareUrlParametersProvider';
+import Sidebar from './Sidebar';
 
 type TimesSquareAppProps = {
   children: ReactNode;

@@ -1,9 +1,9 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { expect, test, describe, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { TokenHistoryDetails } from './TokenHistoryDetails';
+import React from 'react';
+import { describe, expect, test, vi } from 'vitest';
 import type { TokenChangeHistoryEntry } from '../../hooks/useTokenChangeHistory';
+import { TokenHistoryDetails } from './TokenHistoryDetails';
 
 // Mock Next.js Link component
 vi.mock('next/link', () => ({

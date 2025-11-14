@@ -16,8 +16,18 @@ html,
 body {
   padding: 0;
   margin: 0;
-  font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, Segoe UI,
-    Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
+  font-family:
+    "Source Sans Pro",
+    -apple-system,
+    BlinkMacSystemFont,
+    Segoe UI,
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    Fira Sans,
+    Droid Sans,
+    Helvetica Neue,
     sans-serif;
   line-height: 1.4;
   color: var(--rsd-component-text-color);
@@ -73,6 +83,6 @@ img.u-invertable-image {
 /*
  * Design token overrides for dark theme.
  */
-[data-theme='dark'] body {
+[data-theme="dark"] body {
   --rsd-component-image-invert: 100%;
 }

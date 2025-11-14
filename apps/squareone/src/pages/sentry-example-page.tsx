@@ -1,9 +1,9 @@
-import Head from 'next/head';
 import * as Sentry from '@sentry/nextjs';
-import type { MouseEvent } from 'react';
 import type { GetServerSideProps } from 'next';
-import { loadAppConfig } from '../lib/config/loader';
+import Head from 'next/head';
+import type { MouseEvent } from 'react';
 import type { AppConfigContextValue } from '../contexts/AppConfigContext';
+import { loadAppConfig } from '../lib/config/loader';
 
 export default function Page() {
   return (

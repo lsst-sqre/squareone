@@ -1,10 +1,10 @@
-import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect } from 'storybook/test';
+import React from 'react';
 import { useForm } from 'react-hook-form';
-import CheckboxGroup from './CheckboxGroup';
-import FormField from '../FormField';
+import { expect, userEvent, within } from 'storybook/test';
 import { Button } from '../Button';
+import FormField from '../FormField';
+import CheckboxGroup from './CheckboxGroup';
 
 const meta: Meta<typeof CheckboxGroup> = {
   title: 'Components/CheckboxGroup',

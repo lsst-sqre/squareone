@@ -3,18 +3,17 @@
  * This component handles the useTimesSquarePage hook on the client side only.
  */
 
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import Head from 'next/head';
 import Error from 'next/error';
-
+import Head from 'next/head';
+import React, { useEffect, useState } from 'react';
+import styled from 'styled-components';
+import { useAppConfig } from '../../contexts/AppConfigContext';
 import useTimesSquarePage from '../../hooks/useTimesSquarePage';
-import { TimesSquareUrlParametersContext } from '../TimesSquareUrlParametersProvider';
 import TimesSquareParameters from '../TimesSquareParameters';
+import { TimesSquareUrlParametersContext } from '../TimesSquareUrlParametersProvider';
 import ExecStats from './ExecStats';
 import GitHubEditLink from './GitHubEditLink';
 import IpynbDownloadLink from './IpynbDownloadLink';
-import { useAppConfig } from '../../contexts/AppConfigContext';
 
 export default function TimesSquareGitHubPagePanelClient() {
   const [isClient, setIsClient] = useState(false);
