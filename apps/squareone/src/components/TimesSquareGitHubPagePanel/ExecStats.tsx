@@ -5,12 +5,11 @@
  * Updated to handle undefined context gracefully.
  */
 
+import { formatDistanceToNow, parseISO } from 'date-fns';
 import React from 'react';
 import styled from 'styled-components';
-import { parseISO, formatDistanceToNow } from 'date-fns';
-
-import { TimesSquareHtmlEventsContext } from '../TimesSquareHtmlEventsProvider';
 import { GhostButton } from '../Button';
+import { TimesSquareHtmlEventsContext } from '../TimesSquareHtmlEventsProvider';
 
 export default function ExecStats() {
   const htmlEvent = React.useContext(TimesSquareHtmlEventsContext);

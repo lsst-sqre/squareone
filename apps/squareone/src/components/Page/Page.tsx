@@ -1,12 +1,11 @@
 import { ReactNode } from 'react';
 import styled from 'styled-components';
-
+import { useAppConfig } from '../../contexts/AppConfigContext';
+import BroadcastBannerStack from '../BroadcastBannerStack';
+import Footer from '../Footer';
 import Header from '../Header';
 import MainContent from '../MainContent';
-import Footer from '../Footer';
 import Meta from '../Meta';
-import BroadcastBannerStack from '../BroadcastBannerStack';
-import { useAppConfig } from '../../contexts/AppConfigContext';
 
 type PageProps = {
   children?: ReactNode;

@@ -1,7 +1,7 @@
 import React, { forwardRef } from 'react';
-import styles from './CheckboxGroup.module.css';
 import { Checkbox } from '../Checkbox';
 import Label from '../Label';
+import styles from './CheckboxGroup.module.css';
 
 export type CheckboxGroupProps = {
   legend: string;

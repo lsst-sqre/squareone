@@ -3,12 +3,11 @@
  * This component handles the useGitHubContentsListing hook on the client side only.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-
+import { useAppConfig } from '../../contexts/AppConfigContext';
 import TimesSquareGitHubNav from '../TimesSquareGitHubNav';
 import useGitHubContentsListing from './useGitHubContentsListing';
-import { useAppConfig } from '../../contexts/AppConfigContext';
 
 type TimesSquareMainGitHubNavClientProps = {
   pagePath: string;

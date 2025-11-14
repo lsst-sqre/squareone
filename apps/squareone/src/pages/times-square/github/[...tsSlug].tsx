@@ -2,12 +2,12 @@ import type { GetServerSideProps } from 'next';
 import type { ReactElement, ReactNode } from 'react';
 
 import TimesSquareApp from '../../../components/TimesSquareApp';
-import WideContentLayout from '../../../components/WideContentLayout';
+import TimesSquareHtmlEventsProvider from '../../../components/TimesSquareHtmlEventsProvider/TimesSquareHtmlEventsProvider';
 import TimesSquareNotebookViewer from '../../../components/TimesSquareNotebookViewer';
 import TimesSquareUrlParametersProvider from '../../../components/TimesSquareUrlParametersProvider';
-import TimesSquareHtmlEventsProvider from '../../../components/TimesSquareHtmlEventsProvider/TimesSquareHtmlEventsProvider';
-import { loadAppConfig } from '../../../lib/config/loader';
+import WideContentLayout from '../../../components/WideContentLayout';
 import type { AppConfigContextValue } from '../../../contexts/AppConfigContext';
+import { loadAppConfig } from '../../../lib/config/loader';
 
 type GitHubNotebookViewPageProps = {
   appConfig: AppConfigContextValue;

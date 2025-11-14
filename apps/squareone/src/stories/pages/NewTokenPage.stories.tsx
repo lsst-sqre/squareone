@@ -1,10 +1,10 @@
 import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import { TokenForm, type TokenFormValues } from '../../components/TokenForm';
-import { parseTokenQueryParams } from '../../lib/tokens/queryParams';
-import { parseExpirationFromQuery } from '../../lib/tokens/expiration';
 import type { LoginInfo } from '../../hooks/useLoginInfo';
 import useLoginInfo from '../../hooks/useLoginInfo';
-import { useState, useEffect } from 'react';
+import { parseExpirationFromQuery } from '../../lib/tokens/expiration';
+import { parseTokenQueryParams } from '../../lib/tokens/queryParams';
 
 const mockLoginInfo: LoginInfo = {
   csrf: 'mock-csrf-token-abc123',
@@ -44,8 +44,8 @@ const mockFetch = async (
     typeof url === 'string'
       ? url
       : url instanceof URL
-      ? url.toString()
-      : url.url;
+        ? url.toString()
+        : url.url;
 
   if (urlString.includes('/auth/api/v1/login')) {
     return {
@@ -76,8 +76,8 @@ function MockFetchProvider({
           typeof url === 'string'
             ? url
             : url instanceof URL
-            ? url.toString()
-            : url.url;
+              ? url.toString()
+              : url.url;
         if (urlString.includes('/auth/api/v1/login')) {
           throw new Error('Failed to load login info');
         }
@@ -410,8 +410,8 @@ const mockFetchWithLimitedScopes = async (
     typeof url === 'string'
       ? url
       : url instanceof URL
-      ? url.toString()
-      : url.url;
+        ? url.toString()
+        : url.url;
 
   if (urlString.includes('/auth/api/v1/login')) {
     return {

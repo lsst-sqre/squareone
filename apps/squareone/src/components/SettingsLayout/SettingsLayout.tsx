@@ -1,8 +1,8 @@
+import { useRouter } from 'next/router';
 import type { ReactElement } from 'react';
 import { useMemo } from 'react';
-import { useRouter } from 'next/router';
-import { SidebarLayout } from '../SidebarLayout';
 import { useAppConfig } from '../../contexts/AppConfigContext';
+import { SidebarLayout } from '../SidebarLayout';
 import { getSettingsNavigation } from './settingsNavigation';
 
 type SettingsLayoutProps = {

@@ -1,6 +1,6 @@
 import React, { forwardRef, useCallback, useRef } from 'react';
 // @ts-ignore - ChevronUp and ChevronDown icons exist but missing from react-feather type definitions
-import { ChevronUp, ChevronDown } from 'react-feather';
+import { ChevronDown, ChevronUp } from 'react-feather';
 import styles from './TimeInput.module.css';
 
 export type TimeInputProps = {

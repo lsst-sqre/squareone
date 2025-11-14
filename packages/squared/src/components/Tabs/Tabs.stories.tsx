@@ -1,9 +1,9 @@
-import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect } from 'storybook/test';
-import { Home, User, Settings, Bell } from 'react-feather';
-import Tabs from './Tabs';
+import React from 'react';
+import { Bell, Home, Settings, User } from 'react-feather';
+import { expect, userEvent, within } from 'storybook/test';
 import { Button } from '../Button';
+import Tabs from './Tabs';
 
 const meta: Meta<typeof Tabs> = {
   title: 'Components/Tabs',

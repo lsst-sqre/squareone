@@ -1,20 +1,20 @@
-import React from 'react';
-import styled from 'styled-components';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import type { GetServerSideProps } from 'next';
 import type { ReactElement, ReactNode } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React from 'react';
+import styled from 'styled-components';
 
 import TimesSquareApp from '../../../../../components/TimesSquareApp';
 import TimesSquarePrGitHubNav from '../../../../../components/TimesSquarePrGitHubNav';
-import WideContentLayout from '../../../../../components/WideContentLayout';
-import useGitHubPrContentsListing from '../../../../../components/TimesSquarePrGitHubNav/useGitHubPrContentsListing';
 import GitHubCheckBadge from '../../../../../components/TimesSquarePrGitHubNav/GitHubCheckBadge';
 import GitHubPrBadge from '../../../../../components/TimesSquarePrGitHubNav/GitHubPrBadge';
-import { loadAppConfig } from '../../../../../lib/config/loader';
-import { useAppConfig } from '../../../../../contexts/AppConfigContext';
+import useGitHubPrContentsListing from '../../../../../components/TimesSquarePrGitHubNav/useGitHubPrContentsListing';
+import WideContentLayout from '../../../../../components/WideContentLayout';
 import type { AppConfigContextValue } from '../../../../../contexts/AppConfigContext';
+import { useAppConfig } from '../../../../../contexts/AppConfigContext';
+import { loadAppConfig } from '../../../../../lib/config/loader';
 
 type GitHubPrLandingPageProps = {
   appConfig: AppConfigContextValue;

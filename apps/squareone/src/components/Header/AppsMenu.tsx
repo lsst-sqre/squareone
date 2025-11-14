@@ -1,8 +1,7 @@
-import React from 'react';
-import { useRouter } from 'next/router';
-
-import { ChevronDown } from 'react-feather';
 import { PrimaryNavigation } from '@lsst-sqre/squared';
+import { useRouter } from 'next/router';
+import React from 'react';
+import { ChevronDown } from 'react-feather';
 import { useAppConfig } from '../../contexts/AppConfigContext';
 
 type AppLink = {

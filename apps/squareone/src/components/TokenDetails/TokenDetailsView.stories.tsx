@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import Link from 'next/link';
-import { Badge, Button } from '@lsst-sqre/squared';
 import type { BadgeColor } from '@lsst-sqre/squared';
+import { Badge, Button } from '@lsst-sqre/squared';
+import Link from 'next/link';
+import React, { useState } from 'react';
 import type { TokenInfo } from '../../hooks/useUserTokens';
-import {
-  formatTokenExpiration,
-  formatTokenCreated,
-} from '../TokenDate/formatters';
-import TokenDate from '../TokenDate';
 import DeleteTokenModal from '../AccessTokensView/DeleteTokenModal';
+import TokenDate from '../TokenDate';
+import {
+  formatTokenCreated,
+  formatTokenExpiration,
+} from '../TokenDate/formatters';
 import styles from './TokenDetailsView.module.css';
 
 function getScopeColor(scope: string): BadgeColor {

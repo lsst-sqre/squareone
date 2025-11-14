@@ -1,7 +1,7 @@
-import React from 'react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import { useRouter } from 'next/router';
+import React from 'react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import useTokenHistoryFilters from './useTokenHistoryFilters';
 
 // Mock Next.js router

@@ -3,11 +3,10 @@
  * This component handles the useHtmlStatus hook on the client side only.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-
-import useHtmlStatus from './useHtmlStatus';
 import { TimesSquareUrlParametersContext } from '../TimesSquareUrlParametersProvider';
+import useHtmlStatus from './useHtmlStatus';
 
 const StyledIframe = styled.iframe`
   border: 0px solid black;

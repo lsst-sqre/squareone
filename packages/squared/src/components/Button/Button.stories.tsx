@@ -1,12 +1,12 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect } from 'storybook/test';
 import {
-  faHome,
-  faUser,
   faChevronRight,
   faDownload,
+  faHome,
+  faUser,
 } from '@fortawesome/free-solid-svg-icons';
-import { ArrowRight, Download, User, Home } from 'react-feather';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { ArrowRight, Download, Home, User } from 'react-feather';
+import { expect, userEvent, within } from 'storybook/test';
 import Button from './Button';
 
 const meta: Meta<typeof Button> = {

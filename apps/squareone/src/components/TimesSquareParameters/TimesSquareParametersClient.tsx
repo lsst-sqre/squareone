@@ -3,19 +3,17 @@
  * This component handles the useTimesSquarePage hook on the client side only.
  */
 
-import React, { ChangeEvent, useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import styled from 'styled-components';
-import { Formik, Field, FormikHelpers } from 'formik';
 import Ajv, { ValidateFunction } from 'ajv';
 import addFormats from 'ajv-formats';
-
-import Button, { RedGhostButton } from '../Button';
-import StringInput from './StringInput';
-import ParameterInput from './ParameterInput';
-
-import { TimesSquareUrlParametersContext } from '../TimesSquareUrlParametersProvider';
+import { Field, Formik, FormikHelpers } from 'formik';
+import { useRouter } from 'next/router';
+import React, { ChangeEvent, useEffect, useState } from 'react';
+import styled from 'styled-components';
 import useTimesSquarePage from '../../hooks/useTimesSquarePage';
+import Button, { RedGhostButton } from '../Button';
+import { TimesSquareUrlParametersContext } from '../TimesSquareUrlParametersProvider';
+import ParameterInput from './ParameterInput';
+import StringInput from './StringInput';
 
 type ParameterSchema = {
   type: string;

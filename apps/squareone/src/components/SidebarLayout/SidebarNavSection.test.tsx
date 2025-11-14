@@ -1,8 +1,8 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
+import React from 'react';
 import { expect, test, vi } from 'vitest';
-import SidebarNavSection from './SidebarNavSection';
 import type { NavSection } from './SidebarLayout';
+import SidebarNavSection from './SidebarNavSection';
 
 const mockSectionWithLabel: NavSection = {
   label: 'Security',

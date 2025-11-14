@@ -1,10 +1,10 @@
-import React from 'react';
 import { FormField, Select } from '@lsst-sqre/squared';
+import React from 'react';
 import {
-  EXPIRATION_OPTIONS,
   calculateExpirationDate,
-  formatDateOnly,
+  EXPIRATION_OPTIONS,
   type ExpirationValue,
+  formatDateOnly,
 } from '../../lib/tokens/expiration';
 import styles from './ExpirationSelector.module.css';
 

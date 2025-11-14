@@ -1,12 +1,12 @@
-import type { ReactElement } from 'react';
 import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { MDXRemote } from 'next-mdx-remote';
 import { serialize } from 'next-mdx-remote/serialize';
+import type { ReactElement } from 'react';
 
 import { getLayout } from '../../components/SettingsLayout';
-import { loadConfigAndMdx } from '../../lib/config/loader';
 import { useAppConfig } from '../../contexts/AppConfigContext';
+import { loadConfigAndMdx } from '../../lib/config/loader';
 import { commonMdxComponents } from '../../lib/utils/mdxComponents';
 
 type NextPageWithLayout = {

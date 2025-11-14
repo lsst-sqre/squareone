@@ -44,7 +44,7 @@
 }
 
 /* Error state support for FormField integration */
-.fieldset[aria-invalid='true'] .options {
+.fieldset[aria-invalid="true"] .options {
   /* Error styling can be added here if needed */
 }
 

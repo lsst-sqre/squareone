@@ -1,8 +1,7 @@
-import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, screen, within, expect } from 'storybook/test';
-
+import React from 'react';
 import { ChevronDown } from 'react-feather';
+import { expect, screen, userEvent, within } from 'storybook/test';
 
 import { PrimaryNavigation } from './PrimaryNavigation';
 

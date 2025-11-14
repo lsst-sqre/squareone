@@ -1,10 +1,12 @@
 /* Menu for a user profile and settings. */
 
-import { ChevronDown } from 'react-feather';
+import {
+  getLogoutUrl,
+  PrimaryNavigation,
+  useGafaelfawrUser,
+} from '@lsst-sqre/squared';
 import NextLink from 'next/link';
-import { PrimaryNavigation } from '@lsst-sqre/squared';
-import { useGafaelfawrUser } from '@lsst-sqre/squared';
-import { getLogoutUrl } from '@lsst-sqre/squared';
+import { ChevronDown } from 'react-feather';
 
 type UserMenuProps = {
   pageUrl: URL;

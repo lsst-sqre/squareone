@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
-import { getSettingsNavigation } from './settingsNavigation';
 import type { AppConfigContextValue } from '../../contexts/AppConfigContext';
+import { getSettingsNavigation } from './settingsNavigation';
 
 // Mock AppConfig configurations for testing
 const baseConfig: AppConfigContextValue = {

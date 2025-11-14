@@ -1,13 +1,13 @@
 // Example page with AppConfig loading
 // This template shows the complete pattern for pages that need configuration
 
-import Head from 'next/head';
 import type { GetServerSideProps } from 'next';
+import Head from 'next/head';
 import type { ReactElement, ReactNode } from 'react';
 
 import MainContent from '../components/MainContent';
-import { loadAppConfig } from '../lib/config/loader';
 import { useAppConfig } from '../contexts/AppConfigContext';
+import { loadAppConfig } from '../lib/config/loader';
 
 // Define prop types (can be empty if no additional props needed)
 type PageProps = {};

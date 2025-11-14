@@ -1,27 +1,26 @@
-import type { ReactElement } from 'react';
 import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import type { ParsedUrlQuery } from 'querystring';
+import type { ReactElement } from 'react';
 import { useState } from 'react';
-
+import { Lede } from '@/components/Typography/Typography';
 import { getLayout } from '../../../components/SettingsLayout';
-import { loadAppConfig } from '../../../lib/config/loader';
+import { TokenCreationErrorDisplay } from '../../../components/TokenCreationErrorDisplay';
+import { TokenForm, type TokenFormValues } from '../../../components/TokenForm';
+import TokenSuccessModal from '../../../components/TokenSuccessModal';
 import { useAppConfig } from '../../../contexts/AppConfigContext';
 import useLoginInfo, { type Scope } from '../../../hooks/useLoginInfo';
-import { TokenForm, type TokenFormValues } from '../../../components/TokenForm';
-import { parseTokenQueryParams } from '../../../lib/tokens/queryParams';
-import {
-  parseExpirationFromQuery,
-  formatExpiration,
-} from '../../../lib/tokens/expiration';
-import type { ParsedUrlQuery } from 'querystring';
 import useTokenCreation from '../../../hooks/useTokenCreation';
 import useTokenTemplateUrl from '../../../hooks/useTokenTemplateUrl';
-import TokenSuccessModal from '../../../components/TokenSuccessModal';
 import useUserTokens, { extractTokenNames } from '../../../hooks/useUserTokens';
-import { TokenCreationErrorDisplay } from '../../../components/TokenCreationErrorDisplay';
-import { Lede } from '@/components/Typography/Typography';
+import { loadAppConfig } from '../../../lib/config/loader';
+import {
+  formatExpiration,
+  parseExpirationFromQuery,
+} from '../../../lib/tokens/expiration';
+import { parseTokenQueryParams } from '../../../lib/tokens/queryParams';
 
 type NextPageWithLayout = {
   getLayout?: (page: ReactElement) => ReactElement;

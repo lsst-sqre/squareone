@@ -1,9 +1,8 @@
-import styled from 'styled-components';
 import Link from 'next/link';
-
-import FullBleedBackgroundImageSection from '../FullBleedBackgroundImageSection';
-import { ContentMaxWidth } from '../../styles/sizes';
+import styled from 'styled-components';
 import { useAppConfig } from '../../contexts/AppConfigContext';
+import { ContentMaxWidth } from '../../styles/sizes';
+import FullBleedBackgroundImageSection from '../FullBleedBackgroundImageSection';
 
 const ContentContainer = styled.div`
   margin: 0 auto;

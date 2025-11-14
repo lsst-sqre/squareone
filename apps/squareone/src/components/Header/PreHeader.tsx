@@ -1,8 +1,7 @@
+import LogoImage from '@lsst-sqre/rubin-style-dictionary/assets/triad-horizontal/triad-horizontal-color-dark.png';
 import Image from 'next/legacy/image';
 import Link from 'next/link';
 import styled from 'styled-components';
-
-import LogoImage from '@lsst-sqre/rubin-style-dictionary/assets/triad-horizontal/triad-horizontal-color-dark.png';
 
 type PreLogoProps = {};
 

@@ -1,7 +1,7 @@
-import { useState, useCallback, useEffect, useRef, forwardRef } from 'react';
-import { Clipboard, Check } from 'react-feather';
-import Button, { ButtonProps } from '../Button/Button';
+import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
+import { Check, Clipboard } from 'react-feather';
 import { copyToClipboard } from '../../utils/clipboard';
+import Button, { ButtonProps } from '../Button/Button';
 import styles from './ClipboardButton.module.css';
 
 export type ClipboardButtonProps = Omit<ButtonProps, 'onClick' | 'children'> & {

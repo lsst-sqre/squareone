@@ -1,5 +1,5 @@
-import React, { forwardRef } from 'react';
 import * as TabsPrimitive from '@radix-ui/react-tabs';
+import React, { forwardRef } from 'react';
 import styles from './Tabs.module.css';
 
 export type TabsProps = {

@@ -1,7 +1,7 @@
-import React from 'react';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import SessionTokenItem from './SessionTokenItem';
+import React from 'react';
 import type { TokenInfo } from '../../hooks/useUserTokens';
+import SessionTokenItem from './SessionTokenItem';
 import styles from './SessionTokensView.module.css';
 
 // Mock token data

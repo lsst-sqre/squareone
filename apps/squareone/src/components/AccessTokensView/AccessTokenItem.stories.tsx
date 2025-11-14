@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { fn } from 'storybook/test';
-import AccessTokenItem from './AccessTokenItem';
 import type { TokenInfo } from '../../hooks/useUserTokens';
+import AccessTokenItem from './AccessTokenItem';
 
 // Mock token data
 const baseToken: TokenInfo = {

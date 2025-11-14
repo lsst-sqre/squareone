@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
-import useTokenTemplateUrl from './useTokenTemplateUrl';
+import { describe, expect, it } from 'vitest';
 import type { TokenFormValues } from '../components/TokenForm';
+import useTokenTemplateUrl from './useTokenTemplateUrl';
 
 /**
  * Test suite for useTokenTemplateUrl hook.

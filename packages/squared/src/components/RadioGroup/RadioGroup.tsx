@@ -1,5 +1,5 @@
-import React, { forwardRef } from 'react';
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
+import React, { forwardRef } from 'react';
 import Label from '../Label';
 import styles from './RadioGroup.module.css';
 

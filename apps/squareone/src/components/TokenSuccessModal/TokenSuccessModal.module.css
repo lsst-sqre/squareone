@@ -18,7 +18,7 @@
   box-shadow: var(--sqo-elevation-sm);
 }
 
-[data-theme='dark'] .tokenDisplay {
+[data-theme="dark"] .tokenDisplay {
   background-color: var(--rsd-color-primary-700);
 }
 

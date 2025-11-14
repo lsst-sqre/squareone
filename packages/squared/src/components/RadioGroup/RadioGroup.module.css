@@ -51,7 +51,7 @@
 
 /* Invisible touch target expansion */
 .radio::before {
-  content: '';
+  content: "";
   position: absolute;
   /* Expand from 1rem visual to 2.75rem (44px) touch target */
   inset: calc((2.75rem - 1rem) / -2); /* -0.875rem */
@@ -69,7 +69,7 @@
 }
 
 /* Small size indicator dot */
-.radio.sm[data-state='checked']::after {
+.radio.sm[data-state="checked"]::after {
   width: 0.4375rem; /* 7px - proportional to 14px radio */
   height: 0.4375rem; /* 7px - proportional to 14px radio */
 }
@@ -87,7 +87,7 @@
 }
 
 /* Large size indicator dot */
-.radio.lg[data-state='checked']::after {
+.radio.lg[data-state="checked"]::after {
   width: 0.625rem; /* 10px - proportional to 20px radio */
   height: 0.625rem; /* 10px - proportional to 20px radio */
 }
@@ -98,7 +98,7 @@
 }
 
 /* Selected state */
-.radio[data-state='checked'] {
+.radio[data-state="checked"] {
   background: var(--rsd-component-page-background-color);
   border-color: var(--rsd-color-primary-600);
 }
@@ -108,7 +108,7 @@
   border-color: var(--rsd-color-primary-600);
 }
 
-.radio[data-state='checked']:hover:not([data-disabled]) {
+.radio[data-state="checked"]:hover:not([data-disabled]) {
   background: var(--rsd-component-page-background-color);
   border-color: var(--rsd-color-primary-700);
 }
@@ -135,8 +135,8 @@
 }
 
 /* Put the indicator dot directly on the radio button when selected */
-.radio[data-state='checked']::after {
-  content: '';
+.radio[data-state="checked"]::after {
+  content: "";
   position: absolute;
   top: 50%;
   left: 50%;
@@ -186,15 +186,15 @@
 }
 
 /* Error state support for FormField integration */
-.radio[aria-invalid='true'] {
+.radio[aria-invalid="true"] {
   border-color: var(--rsd-color-red-500);
 }
 
-.radio[aria-invalid='true']:focus-visible {
+.radio[aria-invalid="true"]:focus-visible {
   outline-color: var(--rsd-color-red-500);
 }
 
-.radio[aria-invalid='true'][data-state='checked'] {
+.radio[aria-invalid="true"][data-state="checked"] {
   background: var(--rsd-color-red-500);
   border-color: var(--rsd-color-red-500);
 }

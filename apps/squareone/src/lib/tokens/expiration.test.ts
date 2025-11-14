@@ -1,11 +1,11 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   calculateExpirationDate,
-  formatExpiration,
+  EXPIRATION_OPTIONS,
   formatDateInTimezone,
   formatDateOnly,
+  formatExpiration,
   parseExpirationFromQuery,
-  EXPIRATION_OPTIONS,
 } from './expiration';
 
 describe('calculateExpirationDate', () => {

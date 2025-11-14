@@ -1,8 +1,8 @@
-export { default as Button } from './Button';
 export type {
-  ButtonProps,
   ButtonAppearance,
-  ButtonTone,
+  ButtonProps,
   ButtonRole,
   ButtonSize,
+  ButtonTone,
 } from './Button';
+export { default as Button } from './Button';

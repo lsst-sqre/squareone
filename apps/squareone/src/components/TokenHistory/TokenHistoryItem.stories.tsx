@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import TokenHistoryItem from './TokenHistoryItem';
 import type { TokenChangeHistoryEntry } from '../../hooks/useTokenChangeHistory';
+import TokenHistoryItem from './TokenHistoryItem';
 
 export default {
   title: 'Components/TokenHistory/TokenHistoryItem',

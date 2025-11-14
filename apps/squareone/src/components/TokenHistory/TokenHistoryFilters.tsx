@@ -1,12 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { DateTimePicker } from '@lsst-sqre/squared';
-import { TextInput } from '@lsst-sqre/squared';
-import { Button } from '@lsst-sqre/squared';
 import {
   faChevronDown,
   faChevronUp,
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
+import { Button, DateTimePicker, TextInput } from '@lsst-sqre/squared';
+import React, { useEffect, useRef, useState } from 'react';
 import type { TokenHistoryFilters as FilterType } from '../../hooks/useTokenHistoryFilters';
 import styles from './TokenHistoryFilters.module.css';
 

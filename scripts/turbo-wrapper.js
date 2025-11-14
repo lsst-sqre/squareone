@@ -73,9 +73,7 @@ async function runTurbo(args) {
   }
   // Priority 4: No authentication
   else {
-    console.log(
-      'ℹ️  Running Turborepo without remote cache (local cache only)'
-    );
+    console.log('ℹ️  Running Turborepo without remote cache (local cache only)');
     command = TURBO_CMD;
     commandArgs = args;
   }

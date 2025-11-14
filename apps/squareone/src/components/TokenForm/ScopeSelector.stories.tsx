@@ -1,5 +1,5 @@
-import ScopeSelector from './ScopeSelector';
 import type { Scope } from './ScopeSelector';
+import ScopeSelector from './ScopeSelector';
 
 const mockScopes: Scope[] = [
   {

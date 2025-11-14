@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { userEvent, within, expect } from 'storybook/test';
+import { expect, userEvent, within } from 'storybook/test';
 import SidebarNavItem from './SidebarNavItem';
 
 const meta: Meta<typeof SidebarNavItem> = {

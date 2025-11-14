@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { userEvent, within, expect, waitFor } from 'storybook/test';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Select } from './Select';
-import FormField from '../FormField';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Button } from '../Button';
+import FormField from '../FormField';
+import { Select } from './Select';
 import styles from './Select.module.css';
 
 const meta: Meta<typeof Select> = {

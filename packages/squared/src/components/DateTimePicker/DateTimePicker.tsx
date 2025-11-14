@@ -1,29 +1,29 @@
+import * as PopoverPrimitive from '@radix-ui/react-popover';
 import React, {
   forwardRef,
-  useState,
   useCallback,
-  useRef,
   useMemo,
+  useRef,
+  useState,
 } from 'react';
-import * as PopoverPrimitive from '@radix-ui/react-popover';
 import { DayPicker } from 'react-day-picker';
 // @ts-ignore - Calendar icon exists but is missing from react-feather type definitions
 import { Calendar } from 'react-feather';
 import { TextInput } from '../TextInput';
-import TimeInput from './TimeInput';
-import TimezoneSelector from './TimezoneSelector';
 import { CalendarCaption } from './CalendarCaption';
+import styles from './DateTimePicker.module.css';
 import {
+  createDateFromComponents,
+  extractDateComponents,
+  formatTime,
+  formatToISO8601,
+  isDateInRange,
   isValidISO8601,
   parseISO8601,
-  formatToISO8601,
-  extractDateComponents,
-  createDateFromComponents,
-  formatTime,
-  isDateInRange,
 } from './dateUtils';
+import TimeInput from './TimeInput';
+import TimezoneSelector from './TimezoneSelector';
 import { getBrowserTimezone, getCurrentTimeInTimezone } from './timezoneUtils';
-import styles from './DateTimePicker.module.css';
 
 export type DateTimePickerProps = {
   defaultValue?: string | null; // ISO8601 timestamp string

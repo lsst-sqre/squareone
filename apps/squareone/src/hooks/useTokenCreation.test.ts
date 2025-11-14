@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, waitFor, act } from '@testing-library/react';
-import useTokenCreation from './useTokenCreation';
+import { act, renderHook, waitFor } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { CreateTokenParams, ValidationError } from './useTokenCreation';
+import useTokenCreation from './useTokenCreation';
 
 describe('useTokenCreation', () => {
   let fetchMock: any;

@@ -1,7 +1,7 @@
-import React, { forwardRef } from 'react';
 import * as SelectPrimitive from '@radix-ui/react-select';
+import React, { forwardRef } from 'react';
 // @ts-ignore - Check icon exists but is missing from react-feather type definitions
-import { ChevronDown, ChevronUp, Check } from 'react-feather';
+import { Check, ChevronDown, ChevronUp } from 'react-feather';
 import styles from './Select.module.css';
 
 export type SelectProps = {

@@ -1,8 +1,7 @@
-import styled from 'styled-components';
+import AgencyLogos from '@lsst-sqre/rubin-style-dictionary/assets/partner-logos/rubin-partners.png';
 import Image from 'next/legacy/image';
 import Link from 'next/link';
-
-import AgencyLogos from '@lsst-sqre/rubin-style-dictionary/assets/partner-logos/rubin-partners.png';
+import styled from 'styled-components';
 
 import { ContentMaxWidth } from '../../styles/sizes';
 

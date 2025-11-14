@@ -1,20 +1,19 @@
-import type { ReactElement } from 'react';
+import {
+  Button,
+  getLoginUrl,
+  Tabs,
+  useGafaelfawrUser,
+} from '@lsst-sqre/squared';
 import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-
-import { getLayout } from '../../../components/SettingsLayout';
-import { loadAppConfig } from '../../../lib/config/loader';
-import { useAppConfig } from '../../../contexts/AppConfigContext';
-import { Lede } from '@/components/Typography';
-import {
-  Button,
-  useGafaelfawrUser,
-  getLoginUrl,
-  Tabs,
-} from '@lsst-sqre/squared';
+import type { ReactElement } from 'react';
 import SessionTokensView from '@/components/SessionTokensView';
+import { Lede } from '@/components/Typography';
+import { getLayout } from '../../../components/SettingsLayout';
+import { useAppConfig } from '../../../contexts/AppConfigContext';
+import { loadAppConfig } from '../../../lib/config/loader';
 
 type NextPageWithLayout = {
   getLayout?: (page: ReactElement) => ReactElement;

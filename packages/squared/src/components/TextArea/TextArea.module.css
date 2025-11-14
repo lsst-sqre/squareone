@@ -16,14 +16,18 @@
 
   /* Calculate height based on line-height and rows */
   height: calc(
-    var(--textarea-rows) * var(--textarea-line-height, 1.5em) +
-      var(--textarea-padding-y, 0.5rem) * 2
+    var(--textarea-rows) *
+    var(--textarea-line-height, 1.5em) +
+    var(--textarea-padding-y, 0.5rem) *
+    2
   );
 
   /* Allow manual resize but respect calculated height as minimum */
   min-height: calc(
-    var(--textarea-rows) * var(--textarea-line-height, 1.5em) +
-      var(--textarea-padding-y, 0.5rem) * 2
+    var(--textarea-rows) *
+    var(--textarea-line-height, 1.5em) +
+    var(--textarea-padding-y, 0.5rem) *
+    2
   );
 
   /* Standard styling */
@@ -107,7 +111,7 @@
 }
 
 /* When auto-resize is enabled, prevent manual resize */
-.textarea[data-auto-resize='true'] {
+.textarea[data-auto-resize="true"] {
   resize: none;
   overflow-y: auto;
 }

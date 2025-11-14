@@ -1,14 +1,13 @@
 /* Mock log out page */
 
 import type { GetServerSideProps } from 'next';
-import type { ReactElement, ReactNode, FormEvent } from 'react';
-import sleep from '../lib/utils/sleep';
-import { getDevLogoutEndpoint } from '../lib/utils/url';
+import type { FormEvent, ReactElement, ReactNode } from 'react';
+import MainContent from '../components/MainContent';
+import type { AppConfigContextValue } from '../contexts/AppConfigContext';
 import useCurrentUrl from '../hooks/useCurrentUrl';
 import { loadAppConfig } from '../lib/config/loader';
-import type { AppConfigContextValue } from '../contexts/AppConfigContext';
-
-import MainContent from '../components/MainContent';
+import sleep from '../lib/utils/sleep';
+import { getDevLogoutEndpoint } from '../lib/utils/url';
 
 export default function Logout() {
   const currentUrl = useCurrentUrl();

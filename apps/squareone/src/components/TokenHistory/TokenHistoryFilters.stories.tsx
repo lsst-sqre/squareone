@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import TokenHistoryFilters from './TokenHistoryFilters';
 import type { TokenHistoryFilters as FilterType } from '../../hooks/useTokenHistoryFilters';
+import TokenHistoryFilters from './TokenHistoryFilters';
 
 export default {
   title: 'Components/TokenHistory/TokenHistoryFilters',
