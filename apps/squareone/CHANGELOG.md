@@ -1,5 +1,40 @@
 # squareone
 
+## 0.28.5
+
+### Patch Changes
+
+- [#295](https://github.com/lsst-sqre/squareone/pull/295) [`8190c5a`](https://github.com/lsst-sqre/squareone/commit/8190c5af9ac6e9975930923ae71abc8f90eabeae) Thanks [@jonathansick](https://github.com/jonathansick)! - Adopt Biome as primary code formatter
+
+  Replaced Prettier with Biome for formatting JavaScript, TypeScript, JSON, and CSS files. Biome provides faster formatting with better tooling integration while maintaining the same code style. Prettier is retained exclusively for YAML file formatting.
+
+  Key changes:
+
+  - Added Biome configuration matching existing Prettier formatting rules
+  - Updated CI workflow to check Biome formatting
+  - Configured VSCode to use Biome as the default formatter
+  - Updated pre-commit hooks (lint-staged) to run Biome
+  - Applied Biome formatting across the entire codebase
+  - Cleaned up unused imports exposed by Biome's import organization
+
+  Developer impact:
+
+  - Formatting commands changed: Use `pnpm run biome:format` instead of `pnpm run format`
+  - VSCode will now use Biome for auto-formatting JavaScript/TypeScript files
+  - YAML files continue to use Prettier formatting
+  - package.json files are intentionally excluded from automatic formatting to avoid conflicts with pnpm and dependabot
+
+- [#297](https://github.com/lsst-sqre/squareone/pull/297) [`67085a9`](https://github.com/lsst-sqre/squareone/commit/67085a9ff092996df44a3b5fe66d957e47391cc2) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump js-yaml from 4.1.0 to 4.1.1 in the security-patch group across 1 directory
+
+- [#295](https://github.com/lsst-sqre/squareone/pull/295) [`8190c5a`](https://github.com/lsst-sqre/squareone/commit/8190c5af9ac6e9975930923ae71abc8f90eabeae) Thanks [@jonathansick](https://github.com/jonathansick)! - Automate Playwright browser installation in CI
+
+  Added automatic Playwright browser installation script that runs during CI setup. This eliminates manual browser installation steps and ensures the correct browser versions are always available for testing.
+
+  The installation script detects the CI environment and automatically installs Playwright browsers when needed, improving CI reliability and reducing setup complexity.
+
+- Updated dependencies [[`8190c5a`](https://github.com/lsst-sqre/squareone/commit/8190c5af9ac6e9975930923ae71abc8f90eabeae)]:
+  - @lsst-sqre/squared@0.11.1
+
 ## 0.28.4
 
 ### Patch Changes
