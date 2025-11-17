@@ -67,12 +67,16 @@ jobs:
       - name: Check YAML formatting with Prettier
         run: pnpm exec prettier --check "**/*.{yaml,yml}"
 
-      - name: Lint
+      - name: Lint with Biome and ESLint
         run: pnpm run lint
         env:
           TURBO_API: ${{ vars.TURBO_API }}
           TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
           TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+
+      - name: Lint with Biome (advisory)
+        run: pnpm run biome:lint || true
+        continue-on-error: true
 
       - name: Build
         run: pnpm run build
