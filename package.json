@@ -11,6 +11,7 @@
     "test-storybook:watch": "node scripts/turbo-wrapper.js run test-storybook:watch",
     "lint": "node scripts/turbo-wrapper.js run lint",
     "type-check": "node scripts/turbo-wrapper.js run type-check",
+    "biome:lint": "biome lint .",
     "biome:format": "biome check . --write",
     "biome:format:check": "biome check .",
     "ci:publish": "node scripts/turbo-wrapper.js run build && changeset publish",
