@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react';
 import React from 'react';
+import { render, screen } from '@testing-library/react';
 import { expect, test, vi } from 'vitest';
 import Sidebar from './Sidebar';
 import type { NavSection } from './SidebarLayout';
