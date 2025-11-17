@@ -115,7 +115,7 @@ const Button = forwardRef<any, ButtonProps<any>>(
     const buttonContent = (
       <>
         {loading && (
-          <span className={styles.spinner} aria-label="Loading">
+          <span className={styles.spinner} role="status" aria-label="Loading">
             <svg
               className={styles.spinnerSvg}
               viewBox="0 0 24 24"
