@@ -213,7 +213,7 @@ export const Loading = {
 /**
  * Error state with retry option
  */
-export const Error = {
+export const ErrorState = {
   render: () => (
     <TokenHistoryViewWrapper
       entries={[]}

@@ -3,7 +3,7 @@
  * This component handles the useTimesSquarePage hook on the client side only.
  */
 
-import Error from 'next/error';
+import NextError from 'next/error';
 import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
@@ -43,7 +43,7 @@ export default function TimesSquareGitHubPagePanelClient() {
     );
   }
   if (pageData.error) {
-    return <Error statusCode={404} />;
+    return <NextError statusCode={404} />;
   }
 
   const { title, description } = pageData;
