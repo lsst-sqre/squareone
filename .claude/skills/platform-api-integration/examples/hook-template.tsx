@@ -11,6 +11,7 @@
  * - /api/v1/your-endpoint -> Your actual endpoint path
  */
 
+import React from 'react';
 import useSWR from 'swr';
 
 // =============================================================================
@@ -71,6 +72,15 @@ const fetcher = async (...args: Parameters<typeof fetch>) => {
 };
 
 /**
+ * Type for Pydantic validation error detail
+ */
+type PydanticErrorDetail = {
+  msg: string;
+  loc?: (string | number)[];
+  type?: string;
+};
+
+/**
  * Parse API errors into user-friendly messages
  *
  * Handles common error formats:
@@ -78,19 +88,36 @@ const fetcher = async (...args: Parameters<typeof fetch>) => {
  * - Simple error messages (detail string)
  * - HTTP status codes
  */
-function parseError(response: Response, data: any): Error {
+function parseError(response: Response, data: unknown): Error {
   // Handle Pydantic validation errors (FastAPI)
-  if (Array.isArray(data.detail)) {
-    const errors = data.detail.map((err: any) => err.msg).join(', ');
+  if (
+    typeof data === 'object' &&
+    data !== null &&
+    'detail' in data &&
+    Array.isArray(data.detail)
+  ) {
+    const errors = data.detail
+      .map((err: PydanticErrorDetail) => err.msg)
+      .join(', ');
     return new Error(errors);
   }
 
   // Handle simple error messages
-  if (data.detail) {
+  if (
+    typeof data === 'object' &&
+    data !== null &&
+    'detail' in data &&
+    typeof data.detail === 'string'
+  ) {
     return new Error(data.detail);
   }
 
-  if (data.message) {
+  if (
+    typeof data === 'object' &&
+    data !== null &&
+    'message' in data &&
+    typeof data.message === 'string'
+  ) {
     return new Error(data.message);
   }
 
@@ -458,7 +485,9 @@ export function ExampleComponent() {
     return (
       <div>
         <p>Error: {error.message}</p>
-        <button onClick={() => mutate()}>Retry</button>
+        <button type="button" onClick={() => mutate()}>
+          Retry
+        </button>
       </div>
     );
   }
@@ -472,7 +501,9 @@ export function ExampleComponent() {
   return (
     <div>
       <h1>{data.name}</h1>
-      <button onClick={() => mutate()}>Refresh</button>
+      <button type="button" onClick={() => mutate()}>
+        Refresh
+      </button>
     </div>
   );
 }
@@ -494,7 +525,7 @@ export function ExampleMutationComponent() {
 
   return (
     <div>
-      <button onClick={handleSubmit} disabled={isLoading}>
+      <button type="button" onClick={handleSubmit} disabled={isLoading}>
         {isLoading ? 'Submitting...' : 'Submit'}
       </button>
 

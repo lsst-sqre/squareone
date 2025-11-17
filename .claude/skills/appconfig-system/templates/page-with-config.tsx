@@ -10,9 +10,9 @@ import { useAppConfig } from '../contexts/AppConfigContext';
 import { loadAppConfig } from '../lib/config/loader';
 
 // Define prop types (can be empty if no additional props needed)
-type PageProps = {};
+type PageProps = Record<string, never>;
 
-export default function MyPage({}: PageProps) {
+export default function MyPage(_props: PageProps) {
   // Access configuration via hook
   const appConfig = useAppConfig();
 
