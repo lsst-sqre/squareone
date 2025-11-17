@@ -21,11 +21,11 @@ export default function BroadcastBannerStackClient({
 
   // Don't render anything until client-side hydration
   if (!isClient) {
-    return <></>;
+    return null;
   }
 
   if (isLoading || error) {
-    return <></>;
+    return null;
   }
 
   return (
