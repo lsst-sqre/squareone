@@ -16,7 +16,7 @@ type HtmlStatusData = {
 };
 
 type UseHtmlStatusReturn = {
-  error: any;
+  error: unknown;
   loading: boolean;
   htmlAvailable: boolean;
   htmlHash: string | null;
@@ -29,15 +29,15 @@ const fetcher = (...args: Parameters<typeof fetch>) =>
 
 export function parameterizeUrl(
   baseUrl: string,
-  parameters: Record<string, any>,
-  displaySettings: Record<string, any>
+  parameters: Record<string, unknown>,
+  displaySettings: Record<string, unknown>
 ): string {
   const url = new URL(baseUrl);
   Object.entries(parameters).map((item) =>
-    url.searchParams.set(item[0], item[1])
+    url.searchParams.set(item[0], String(item[1]))
   );
   Object.entries(displaySettings).map((item) =>
-    url.searchParams.set(item[0], item[1])
+    url.searchParams.set(item[0], String(item[1]))
   );
   return url.toString();
 }

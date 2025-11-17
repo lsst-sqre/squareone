@@ -16,7 +16,7 @@ type GitHubContentsListingData = {
 };
 
 type UseGitHubContentsListingReturn = {
-  error: any;
+  error: unknown;
   loading: boolean;
   contents: ContentNode[];
 };

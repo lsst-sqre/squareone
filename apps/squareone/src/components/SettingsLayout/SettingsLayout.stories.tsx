@@ -315,7 +315,7 @@ const _mockUser = {
 };
 
 // Create a mock for the useGafaelfawrUser hook
-const _mockUseGafaelfawrUser = (userData: any) => ({
+const _mockUseGafaelfawrUser = (userData: unknown) => ({
   user: userData,
   isLoading: false,
   isValidating: false,

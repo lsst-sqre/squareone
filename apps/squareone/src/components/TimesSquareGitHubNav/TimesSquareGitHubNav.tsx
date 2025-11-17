@@ -37,7 +37,7 @@ function generateChildren(
   contents: ContentNode[],
   currentPath: string | null,
   pathRoot: string,
-  props: Record<string, any>
+  props: Record<string, unknown>
 ): React.ReactNode[] {
   return contents.map((item) => {
     if (item.node_type !== 'page') {
