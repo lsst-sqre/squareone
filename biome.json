@@ -22,6 +22,9 @@
 			"quoteStyle": "single",
 			"trailingCommas": "es5",
 			"semicolons": "always"
+		},
+		"linter": {
+			"enabled": true
 		}
 	},
 	"json": {
@@ -44,20 +47,13 @@
 		"rules": {
 			"recommended": true,
 			"a11y": {
-				"recommended": true,
-				"noSvgWithoutTitle": "warn",
-				"useSemanticElements": "warn",
-				"noStaticElementInteractions": "warn"
+				"recommended": true
 			},
 			"complexity": {
-				"recommended": true,
-				"noUselessFragments": "warn"
+				"recommended": true
 			},
 			"correctness": {
-				"recommended": true,
-				"noUnusedFunctionParameters": "warn",
-				"noUnusedVariables": "warn",
-				"noEmptyPattern": "warn"
+				"recommended": true
 			},
 			"performance": {
 				"recommended": true
@@ -66,13 +62,10 @@
 				"recommended": true
 			},
 			"style": {
-				"recommended": true,
-				"noNonNullAssertion": "warn"
+				"recommended": true
 			},
 			"suspicious": {
-				"recommended": true,
-				"noExplicitAny": "warn",
-				"noImplicitAnyLet": "warn"
+				"recommended": true
 			}
 		}
 	}
