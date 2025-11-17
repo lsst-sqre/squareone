@@ -101,10 +101,9 @@ export default function TimesSquareParametersClient() {
   // JSON schema definitions.
   const schemas: { [key: string]: ValidateFunction } = {};
   if (parameters) {
-    Object.entries(parameters).forEach(
-      ([paramName, paramSchemaDef]) =>
-        (schemas[paramName] = ajv.compile(paramSchemaDef))
-    );
+    Object.entries(parameters).forEach(([paramName, paramSchemaDef]) => {
+      schemas[paramName] = ajv.compile(paramSchemaDef);
+    });
   }
 
   // Callback function to handle form submission by "navigating"
@@ -120,9 +119,9 @@ export default function TimesSquareParametersClient() {
 
     // 2. Update object with form's `values`
     if (parameters) {
-      Object.keys(parameters).forEach(
-        (paramName) => (query[paramName] = values[paramName])
-      );
+      Object.keys(parameters).forEach((paramName) => {
+        query[paramName] = values[paramName];
+      });
     }
 
     if (values.tsHideCode) {
