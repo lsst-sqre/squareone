@@ -4,12 +4,6 @@ import type React from 'react';
 import { ChevronDown } from 'react-feather';
 import { useAppConfig } from '../../contexts/AppConfigContext';
 
-type AppLink = {
-  href: string;
-  label: string;
-  internal?: boolean;
-};
-
 type LinkProps = {
   href: string;
   internal?: boolean;

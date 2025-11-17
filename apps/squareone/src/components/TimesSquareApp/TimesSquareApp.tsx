@@ -33,8 +33,9 @@ export default function TimesSquareApp({
   children,
   pageNav: providedPageNav,
 }: TimesSquareAppProps) {
-  const { tsSlug, owner, repo, commit, githubSlug, urlQueryString } =
-    React.useContext(TimesSquareUrlParametersContext);
+  const { tsSlug, owner, repo, commit, githubSlug } = React.useContext(
+    TimesSquareUrlParametersContext
+  );
 
   const defaultPageNav = commit ? (
     <TimesSquarePrGitHubNav owner={owner} repo={repo} commitSha={commit} />
