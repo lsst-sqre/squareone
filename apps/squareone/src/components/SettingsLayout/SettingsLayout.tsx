@@ -1,3 +1,4 @@
+import React from 'react';
 import { useRouter } from 'next/router';
 import type { ReactElement } from 'react';
 import { useMemo } from 'react';

@@ -1,3 +1,4 @@
+import React from 'react';
 /*
  * The navigational sidebar for Times Square.
  */

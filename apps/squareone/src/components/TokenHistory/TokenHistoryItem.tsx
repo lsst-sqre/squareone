@@ -1,3 +1,4 @@
+import React from 'react';
 import { useEffect, useState } from 'react';
 import type { TokenChangeHistoryEntry } from '../../hooks/useTokenChangeHistory';
 import { TokenHistoryDetails } from './TokenHistoryDetails';

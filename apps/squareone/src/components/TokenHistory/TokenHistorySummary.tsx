@@ -1,3 +1,4 @@
+import React from 'react';
 import type { TokenChangeHistoryEntry } from '../../hooks/useTokenChangeHistory';
 import { formatEventTime } from '../TokenDate/formatters';
 import styles from './TokenHistorySummary.module.css';

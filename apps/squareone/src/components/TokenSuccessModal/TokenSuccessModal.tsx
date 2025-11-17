@@ -1,3 +1,4 @@
+import React from 'react';
 import { Button, ClipboardButton, Modal } from '@lsst-sqre/squared';
 import { useRouter } from 'next/router';
 import { useEffect, useRef } from 'react';

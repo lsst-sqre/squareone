@@ -1,3 +1,4 @@
+import React from 'react';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { Button } from '@lsst-sqre/squared';
 import { useEffect, useState } from 'react';

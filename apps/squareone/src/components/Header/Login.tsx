@@ -1,3 +1,4 @@
+import React from 'react';
 /* Login component with proper hydration handling */
 
 import { getLoginUrl, PrimaryNavigation } from '@lsst-sqre/squared';

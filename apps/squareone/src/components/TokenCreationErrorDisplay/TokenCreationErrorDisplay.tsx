@@ -1,3 +1,4 @@
+import React from 'react';
 import type { TokenCreationError } from '../../hooks/useTokenCreation';
 import styles from './TokenCreationErrorDisplay.module.css';
 

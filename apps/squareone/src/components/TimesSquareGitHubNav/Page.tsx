@@ -1,3 +1,4 @@
+import React from 'react';
 /* A "Page" filesystem tree item, which links to a single page.
  *
  * This is based on a Josh Comeau blog post:

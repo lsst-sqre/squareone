@@ -1,3 +1,4 @@
+import React from 'react';
 /* Menu for a user profile and settings. */
 
 import {

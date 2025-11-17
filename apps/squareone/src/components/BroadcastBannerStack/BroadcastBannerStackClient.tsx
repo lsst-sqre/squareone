@@ -1,3 +1,4 @@
+import React from 'react';
 /* Client-only BroadcastBannerStack component - uses SWR without SSR conflicts */
 
 import { useEffect, useState } from 'react';

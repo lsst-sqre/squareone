@@ -1,3 +1,4 @@
+import React from 'react';
 import { Button, Modal } from '@lsst-sqre/squared';
 import styles from './DeleteTokenModal.module.css';
 
