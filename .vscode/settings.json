@@ -1,12 +1,14 @@
 {
-  // Solve "Parsing error: Cannot find module 'next/babel'"
+  // Hybrid linting setup: Biome + ESLint
+  // - Biome: General JS/TS/React linting (via biomejs.biome extension)
+  // - ESLint: Framework-specific rules for Next.js/Storybook
   "eslint.workingDirectories": [
     "./apps/squareone",
     "./packages/squared",
     "./packages/rubin-style-dictionary"
   ],
 
-  // Formatting
+  // Formatting with Biome (YAML uses Prettier)
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "biomejs.biome",
 
