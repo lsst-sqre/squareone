@@ -13,7 +13,7 @@
     "type-check": "node scripts/turbo-wrapper.js run type-check",
     "biome:lint": "biome lint .",
     "biome:format": "biome check . --write",
-    "biome:format:check": "biome check .",
+    "biome:format:check": "biome format .",
     "ci:publish": "node scripts/turbo-wrapper.js run build && changeset publish",
     "ci:version": "changeset version && pnpm install --no-frozen-lockfile",
     "turbo": "node scripts/turbo-wrapper.js",

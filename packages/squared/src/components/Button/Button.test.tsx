@@ -33,7 +33,9 @@ describe('Button', () => {
     });
 
     it('applies secondary variant correctly', () => {
-      const { container } = render(<Button variant="secondary">Secondary</Button>);
+      const { container } = render(
+        <Button variant="secondary">Secondary</Button>
+      );
       const button = container.querySelector('button');
       expect(button).toHaveClass('outline', 'secondary');
     });
