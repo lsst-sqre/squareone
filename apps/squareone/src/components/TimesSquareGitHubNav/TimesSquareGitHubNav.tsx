@@ -5,7 +5,7 @@
  * https://www.joshwcomeau.com/react/file-structure/
  */
 
-import type React from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
 import Directory from './Directory';

@@ -1,4 +1,4 @@
-import type React from 'react';
+import React from 'react';
 import { createContext, useContext } from 'react';
 
 // Configuration interface for app-level configuration consumed by components

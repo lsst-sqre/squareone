@@ -6,7 +6,7 @@
  */
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import type React from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
 type DirectoryProps = {

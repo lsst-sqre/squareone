@@ -4,7 +4,7 @@ import {
   type BadgeSize,
   type BadgeVariant,
 } from '@lsst-sqre/squared';
-import type React from 'react';
+import React from 'react';
 
 export type TokenScopeBadgeProps = {
   /**

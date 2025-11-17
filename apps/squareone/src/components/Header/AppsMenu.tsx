@@ -1,6 +1,6 @@
 import { PrimaryNavigation } from '@lsst-sqre/squared';
 import { useRouter } from 'next/router';
-import type React from 'react';
+import React from 'react';
 import { ChevronDown } from 'react-feather';
 import { useAppConfig } from '../../contexts/AppConfigContext';
 
