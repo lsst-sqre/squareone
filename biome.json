@@ -17,6 +17,7 @@
     "lineEnding": "lf"
   },
   "javascript": {
+    "jsxRuntime": "reactClassic",
     "formatter": {
       "enabled": true,
       "quoteStyle": "single",
