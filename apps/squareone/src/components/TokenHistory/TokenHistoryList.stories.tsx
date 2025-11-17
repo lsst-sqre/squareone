@@ -116,7 +116,7 @@ export const WithExpandAllControl = {
     return (
       <div>
         <div style={{ marginBottom: '16px' }}>
-          <button onClick={() => setExpandAll(!expandAll)}>
+          <button type="button" onClick={() => setExpandAll(!expandAll)}>
             {expandAll ? 'Collapse All' : 'Expand All'}
           </button>
           <span
