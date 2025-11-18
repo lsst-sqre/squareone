@@ -81,6 +81,7 @@ export default function TokenSuccessModal({
               size="md"
               ariaLabel="Copy token to clipboard"
               className={styles.tokenCopyButton}
+              variant="secondary"
             />
           </div>
         </div>
@@ -100,6 +101,7 @@ export default function TokenSuccessModal({
             size="md"
             ariaLabel="Copy token template to clipboard"
             className={styles.templateCopyButton}
+            variant="secondary"
           />
         </div>
       </div>

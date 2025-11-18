@@ -143,7 +143,12 @@ export default function TokenForm({
         >
           Create token
         </Button>
-        <Button type="button" onClick={onCancel} disabled={isSubmitting}>
+        <Button
+          type="button"
+          onClick={onCancel}
+          disabled={isSubmitting}
+          variant="secondary"
+        >
           Cancel
         </Button>
       </div>
