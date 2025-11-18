@@ -1,5 +1,62 @@
 # @lsst-sqre/squared
 
+## 0.11.1
+
+### Patch Changes
+
+- [#295](https://github.com/lsst-sqre/squareone/pull/295) [`8190c5a`](https://github.com/lsst-sqre/squareone/commit/8190c5af9ac6e9975930923ae71abc8f90eabeae) Thanks [@jonathansick](https://github.com/jonathansick)! - Adopt Biome as primary code formatter
+
+  Replaced Prettier with Biome for formatting JavaScript, TypeScript, JSON, and CSS files. Biome provides faster formatting with better tooling integration while maintaining the same code style. Prettier is retained exclusively for YAML file formatting.
+
+  Key changes:
+
+  - Added Biome configuration matching existing Prettier formatting rules
+  - Updated CI workflow to check Biome formatting
+  - Configured VSCode to use Biome as the default formatter
+  - Updated pre-commit hooks (lint-staged) to run Biome
+  - Applied Biome formatting across the entire codebase
+  - Cleaned up unused imports exposed by Biome's import organization
+
+  Developer impact:
+
+  - Formatting commands changed: Use `pnpm run biome:format` instead of `pnpm run format`
+  - VSCode will now use Biome for auto-formatting JavaScript/TypeScript files
+  - YAML files continue to use Prettier formatting
+  - package.json files are intentionally excluded from automatic formatting to avoid conflicts with pnpm and dependabot
+
+- [#298](https://github.com/lsst-sqre/squareone/pull/298) [`4f37d09`](https://github.com/lsst-sqre/squareone/commit/4f37d09b5ac6ee258a013d6c44849a35298111ec) Thanks [@jonathansick](https://github.com/jonathansick)! - Add Biome linting alongside ESLint for comprehensive code quality
+
+  Enabled Biome's linting capabilities to complement the existing ESLint setup, creating a hybrid approach that leverages the strengths of both tools.
+
+  **Biome linting features:**
+
+  - Fast, modern linting for JavaScript/TypeScript/JSON/CSS
+  - All recommended rule groups enabled (accessibility, complexity, correctness, performance, security, style, suspicious)
+  - Severity-based exit behavior: errors block builds, warnings are visible but non-blocking
+  - Integrated with the same `biome check` command used for formatting
+
+  **Linting strategy:**
+
+  - Biome provides fast feedback for common issues with auto-fix capabilities
+  - ESLint continues to run via Turborepo for comprehensive rule coverage and framework-specific rules
+  - Both tools run in CI for thorough code quality validation
+
+  **Code quality improvements:**
+
+  - Resolved 152 Biome linting violations across the codebase
+  - Fixed unused variables and unreachable code
+  - Replaced `any` types with `unknown` or proper types for better type safety
+  - Fixed accessibility issues (ARIA roles, button types, semantic elements)
+  - Eliminated unnecessary code fragments and shadowed restricted names
+  - Added missing React imports for JSX transform compatibility
+
+  Developer impact:
+
+  - Use `pnpm biome:lint` for fast local linting with auto-fix
+  - Use `pnpm lint` for comprehensive ESLint checks via Turborepo
+  - Both checks run in CI and `pnpm localci` for pre-push validation
+  - VSCode configured to show Biome diagnostics in real-time
+
 ## 0.11.0
 
 ### Minor Changes
