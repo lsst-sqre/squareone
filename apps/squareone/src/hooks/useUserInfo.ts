@@ -2,11 +2,13 @@ import useSWR from 'swr';
 
 type UserInfo = {
   username: string;
+  // biome-ignore lint/suspicious/noExplicitAny: Gafaelfawr /user-info endpoint returns additional dynamic fields
   [key: string]: any;
 };
 
 type UseUserInfoReturn = {
   userInfo: UserInfo | undefined;
+  // biome-ignore lint/suspicious/noExplicitAny: SWR error type is unknown
   error: any;
   isLoading: boolean;
   isLoggedIn: boolean;

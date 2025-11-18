@@ -14,6 +14,7 @@ type NextPageWithLayout = {
 };
 
 type AccountPageProps = {
+  // biome-ignore lint/suspicious/noExplicitAny: MDX serialized source is an opaque type from next-mdx-remote
   mdxSource: any;
 };
 

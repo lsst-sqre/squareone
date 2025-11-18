@@ -14,6 +14,7 @@ type DisplaySettings = {
 type TimesSquareUrlParametersContextValue = {
   tsPageUrl: string;
   displaySettings: DisplaySettings;
+  // biome-ignore lint/suspicious/noExplicitAny: Notebook parameters from URL can be any type (string, number, boolean, etc.)
   notebookParameters: Record<string, any>;
   owner: string | null;
   repo: string | null;

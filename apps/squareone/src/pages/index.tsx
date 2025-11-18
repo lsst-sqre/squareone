@@ -6,9 +6,10 @@ import MainContent from '../components/MainContent';
 import { useAppConfig } from '../contexts/AppConfigContext';
 import { loadAppConfig } from '../lib/config/loader';
 
+// biome-ignore lint/complexity/noBannedTypes: Empty props object required for Next.js page
 type HomeProps = {};
 
-export default function Home({}: HomeProps) {
+export default function Home() {
   const appConfig = useAppConfig();
 
   return (

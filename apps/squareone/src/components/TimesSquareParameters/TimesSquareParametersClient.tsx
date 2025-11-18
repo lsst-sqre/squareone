@@ -19,14 +19,12 @@ type ParameterSchema = {
   type: string;
   format?: string;
   description: string;
+  // biome-ignore lint/suspicious/noExplicitAny: Default values from Times Square JSON schema can be any type
   default?: any;
 };
 
-type Parameters = {
-  [key: string]: ParameterSchema;
-} | null;
-
 type FormValues = {
+  // biome-ignore lint/suspicious/noExplicitAny: Dynamic notebook parameters from Times Square API can be any type
   [key: string]: any;
   tsHideCode: boolean;
 };
@@ -34,6 +32,7 @@ type FormValues = {
 type InputFactoryProps = {
   paramName: string;
   paramSchema: ParameterSchema;
+  // biome-ignore lint/suspicious/noExplicitAny: Parameter values from Times Square API can be any type (string, number, boolean, etc.)
   value: any;
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
   errors?: string;
@@ -87,7 +86,8 @@ export default function TimesSquareParametersClient() {
     Object.entries(parameters).forEach(([paramName, paramSchemaDef]) => {
       initialValues[paramName] = userParameters[paramName]
         ? userParameters[paramName]
-        : (paramSchemaDef as any)?.default;
+        : // biome-ignore lint/suspicious/noExplicitAny: paramSchemaDef type is unknown from API, needs cast to access optional default property
+          (paramSchemaDef as any)?.default;
     });
   }
 

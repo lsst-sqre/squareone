@@ -1,7 +1,6 @@
-import React from 'react';
 import { useRouter } from 'next/router';
 import type { ReactElement } from 'react';
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useAppConfig } from '../../contexts/AppConfigContext';
 import { SidebarLayout } from '../SidebarLayout';
 import { getSettingsNavigation } from './settingsNavigation';

@@ -5,15 +5,13 @@ import type { ReactElement, ReactNode } from 'react';
 import TimesSquareApp from '../../components/TimesSquareApp';
 import TimesSquareUrlParametersProvider from '../../components/TimesSquareUrlParametersProvider';
 import WideContentLayout from '../../components/WideContentLayout';
-import type { AppConfigContextValue } from '../../contexts/AppConfigContext';
 import { useAppConfig } from '../../contexts/AppConfigContext';
 import { loadAppConfig } from '../../lib/config/loader';
 
-type TimesSquareHomeProps = {
-  appConfig: AppConfigContextValue;
-};
+// biome-ignore lint/complexity/noBannedTypes: Empty props object required for Next.js page
+type TimesSquareHomeProps = {};
 
-export default function TimesSquareHome({}: TimesSquareHomeProps) {
+export default function TimesSquareHome() {
   const appConfig = useAppConfig();
   return (
     <TimesSquareUrlParametersProvider>

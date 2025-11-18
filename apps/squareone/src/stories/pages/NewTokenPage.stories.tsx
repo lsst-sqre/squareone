@@ -89,6 +89,7 @@ function MockFetchProvider({
         return new Promise(() => {});
       };
     } else {
+      // biome-ignore lint/suspicious/noExplicitAny: Mock fetch needs to match global fetch type
       window.fetch = mockFetch as any;
     }
 
@@ -181,6 +182,7 @@ export default {
   title: 'Pages/Settings/NewTokenPage',
   component: NewTokenPageSimulator,
   decorators: [
+    // biome-ignore lint/suspicious/noExplicitAny: Storybook decorator accepts any Story component
     (Story: any) => (
       <MockFetchProvider>
         <Story />
@@ -337,6 +339,7 @@ export const WithWhitespaceInScopes = {
 
 export const LoadingState = {
   decorators: [
+    // biome-ignore lint/suspicious/noExplicitAny: Storybook decorator accepts any Story component
     (Story: any) => (
       <MockFetchProvider mockLoading={true}>
         <Story />
@@ -355,6 +358,7 @@ export const LoadingState = {
 
 export const ErrorState = {
   decorators: [
+    // biome-ignore lint/suspicious/noExplicitAny: Storybook decorator accepts any Story component
     (Story: any) => (
       <MockFetchProvider mockError={true}>
         <Story />
@@ -430,6 +434,7 @@ function LimitedScopesMockProvider({
   children: React.ReactNode;
 }) {
   useEffect(() => {
+    // biome-ignore lint/suspicious/noExplicitAny: Mock fetch needs to match global fetch type
     window.fetch = mockFetchWithLimitedScopes as any;
     return () => {
       window.fetch = originalFetch;
@@ -441,6 +446,7 @@ function LimitedScopesMockProvider({
 
 export const LimitedScopes = {
   decorators: [
+    // biome-ignore lint/suspicious/noExplicitAny: Storybook decorator accepts any Story component
     (Story: any) => (
       <LimitedScopesMockProvider>
         <Story />

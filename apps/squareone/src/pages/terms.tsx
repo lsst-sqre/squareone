@@ -9,9 +9,10 @@ import { loadAppConfig } from '../lib/config/loader';
 const pageDescription =
   'Learn about the Rubin Science Platform Acceptable Use Policy';
 
+// biome-ignore lint/complexity/noBannedTypes: Empty props object required for Next.js page
 type AupPageProps = {};
 
-export default function AupPage({}: AupPageProps) {
+export default function AupPage() {
   const appConfig = useAppConfig();
 
   return (

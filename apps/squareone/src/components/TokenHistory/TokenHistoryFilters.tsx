@@ -4,8 +4,7 @@ import {
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import { Button, DateTimePicker, TextInput } from '@lsst-sqre/squared';
-import React from 'react';
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import type { TokenHistoryFilters as FilterType } from '../../hooks/useTokenHistoryFilters';
 import styles from './TokenHistoryFilters.module.css';
 

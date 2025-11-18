@@ -1,5 +1,4 @@
-import React from 'react';
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import useDisclosure from 'react-a11y-disclosure';
 import styled from 'styled-components';
 
@@ -178,7 +177,7 @@ export default function SidebarLayout({
   sidebarTitle,
   navSections,
   currentPath = '',
-  prefetchPages = false,
+  prefetchPages: _prefetchPages = false,
   titleHref,
   onNavigate,
 }: SidebarLayoutProps) {

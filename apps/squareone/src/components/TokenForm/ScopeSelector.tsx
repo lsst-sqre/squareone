@@ -1,5 +1,5 @@
-import React from 'react';
 import { Checkbox, CheckboxGroup } from '@lsst-sqre/squared';
+import React from 'react';
 import styles from './ScopeSelector.module.css';
 
 export type Scope = {

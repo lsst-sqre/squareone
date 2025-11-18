@@ -1,5 +1,5 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
+import React from 'react';
 import { describe, expect, test } from 'vitest';
 import { TokenScopeBadge } from './TokenScopeBadge';
 
@@ -112,7 +112,7 @@ describe('TokenScopeBadge', () => {
     });
 
     test('applies correct color even when using custom children', () => {
-      const { container } = render(
+      const { container: _container } = render(
         <TokenScopeBadge scope="exec:notebook">
           <span>Custom Content</span>
         </TokenScopeBadge>

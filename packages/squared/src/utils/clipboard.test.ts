@@ -74,7 +74,7 @@ describe('copyToClipboard', () => {
 
     afterEach(() => {
       vi.restoreAllMocks();
-      delete (document as any).execCommand;
+      delete (document as unknown as Record<string, unknown>).execCommand;
     });
 
     it('copies text using fallback method', async () => {
@@ -152,7 +152,7 @@ describe('copyToClipboard', () => {
       expect(document.execCommand).toHaveBeenCalledWith('copy');
 
       vi.restoreAllMocks();
-      delete (document as any).execCommand;
+      delete (document as unknown as Record<string, unknown>).execCommand;
     });
 
     it('uses fallback when clipboard API is undefined', async () => {
@@ -182,7 +182,7 @@ describe('copyToClipboard', () => {
       expect(document.execCommand).toHaveBeenCalledWith('copy');
 
       vi.restoreAllMocks();
-      delete (document as any).execCommand;
+      delete (document as unknown as Record<string, unknown>).execCommand;
     });
   });
 });

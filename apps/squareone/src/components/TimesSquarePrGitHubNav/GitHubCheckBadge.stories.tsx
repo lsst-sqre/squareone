@@ -1,3 +1,4 @@
+import React from 'react';
 import GitHubCheckBadge from './GitHubCheckBadge';
 
 export default {
@@ -5,7 +6,9 @@ export default {
   title: 'Components/TimesSquare/GitHubCheckBadge',
 };
 
-const Template = (args: any) => <GitHubCheckBadge {...args} />;
+const Template = (args: React.ComponentProps<typeof GitHubCheckBadge>) => (
+  <GitHubCheckBadge {...args} />
+);
 
 export const Success = Template.bind({});
 Success.args = {

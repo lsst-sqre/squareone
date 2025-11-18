@@ -28,6 +28,7 @@ type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
   pageProps: {
     appConfig?: AppConfigContextValue;
+    // biome-ignore lint/suspicious/noExplicitAny: Next.js page props can contain any additional properties
     [key: string]: any;
   };
 };

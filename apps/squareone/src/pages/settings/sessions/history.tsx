@@ -12,6 +12,7 @@ type NextPageWithLayout = {
   getLayout?: (page: ReactElement) => ReactElement;
 };
 
+// biome-ignore lint/complexity/noBannedTypes: Empty props object required for Next.js page pattern
 type SessionTokensHistoryPageProps = {
   // Add any page-specific props here
 };

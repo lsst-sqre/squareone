@@ -25,6 +25,7 @@ import { loadAppConfig } from '../lib/config/loader';
 export default class MyDocument extends Document {
   static async getInitialProps(
     ctx: DocumentContext
+    // biome-ignore lint/suspicious/noExplicitAny: Sentry config structure is dynamic
   ): Promise<DocumentInitialProps & { sentryConfig?: any }> {
     const sheet = new ServerStyleSheet();
     const originalRenderPage = ctx.renderPage;
@@ -41,7 +42,7 @@ export default class MyDocument extends Document {
       const initialProps = await Document.getInitialProps(ctx);
 
       // Load app configuration for Sentry setup
-      let sentryConfig;
+      let sentryConfig: unknown;
       try {
         const config = await loadAppConfig();
         // Extract Sentry configuration from server-side AppConfig and prepare it
@@ -77,6 +78,7 @@ export default class MyDocument extends Document {
   }
 
   render() {
+    // biome-ignore lint/suspicious/noExplicitAny: Need to access sentryConfig from props for injection
     const { sentryConfig } = this.props as any;
 
     return (

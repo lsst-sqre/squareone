@@ -4,6 +4,7 @@ import type { CreateTokenParams, ValidationError } from './useTokenCreation';
 import useTokenCreation from './useTokenCreation';
 
 describe('useTokenCreation', () => {
+  // biome-ignore lint/suspicious/noExplicitAny: Test mock accepts any arguments
   let fetchMock: any;
 
   beforeEach(() => {
@@ -45,7 +46,7 @@ describe('useTokenCreation', () => {
 
     const { result } = renderHook(() => useTokenCreation());
 
-    let tokenResponse;
+    let tokenResponse: unknown;
     await act(async () => {
       tokenResponse = await result.current.createToken(defaultParams);
     });
@@ -98,6 +99,7 @@ describe('useTokenCreation', () => {
 
   it('should set isCreating to true during API call', async () => {
     const mockResponse = { token: 'gt-test-token-123' };
+    // biome-ignore lint/suspicious/noExplicitAny: Test promise resolver can accept any value
     let resolveFetch: (value: any) => void;
     const fetchPromise = new Promise((resolve) => {
       resolveFetch = resolve;
@@ -107,6 +109,7 @@ describe('useTokenCreation', () => {
 
     const { result } = renderHook(() => useTokenCreation());
 
+    // biome-ignore lint/suspicious/noExplicitAny: Test promise can resolve to any value
     let createPromise: Promise<any>;
     act(() => {
       createPromise = result.current.createToken(defaultParams);
@@ -135,7 +138,7 @@ describe('useTokenCreation', () => {
 
     const { result } = renderHook(() => useTokenCreation());
 
-    let error;
+    let error: unknown;
     await act(async () => {
       try {
         await result.current.createToken(defaultParams);
@@ -163,7 +166,7 @@ describe('useTokenCreation', () => {
 
     const { result } = renderHook(() => useTokenCreation());
 
-    let error;
+    let error: unknown;
     await act(async () => {
       try {
         await result.current.createToken(defaultParams);
@@ -193,7 +196,7 @@ describe('useTokenCreation', () => {
 
     const { result } = renderHook(() => useTokenCreation());
 
-    let error;
+    let error: unknown;
     await act(async () => {
       try {
         await result.current.createToken(defaultParams);
@@ -246,7 +249,7 @@ describe('useTokenCreation', () => {
 
     const { result } = renderHook(() => useTokenCreation());
 
-    let error;
+    let error: unknown;
     await act(async () => {
       try {
         await result.current.createToken(defaultParams);
@@ -268,7 +271,7 @@ describe('useTokenCreation', () => {
 
     const { result } = renderHook(() => useTokenCreation());
 
-    let error;
+    let error: unknown;
     await act(async () => {
       try {
         await result.current.createToken(defaultParams);

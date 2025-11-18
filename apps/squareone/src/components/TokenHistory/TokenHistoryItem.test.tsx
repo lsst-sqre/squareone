@@ -1,13 +1,21 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 import { describe, expect, test, vi } from 'vitest';
 import type { TokenChangeHistoryEntry } from '../../hooks/useTokenChangeHistory';
 import TokenHistoryItem from './TokenHistoryItem';
 
 // Mock Next.js Link component
 vi.mock('next/link', () => ({
-  default: ({ href, children, className }: any) => (
+  default: ({
+    href,
+    children,
+    className,
+  }: {
+    href: string;
+    children: React.ReactNode;
+    className?: string;
+  }) => (
     <a href={href} className={className}>
       {children}
     </a>
@@ -257,7 +265,7 @@ describe('TokenHistoryItem', () => {
         token_type: 'session',
       };
 
-      const { rerender } = render(
+      const { rerender: _rerender } = render(
         <TokenHistoryItem entry={entryWithoutName} showTokenType={true} />
       );
 

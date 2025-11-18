@@ -21,7 +21,7 @@ const htmlContent = `
 `;
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { page } = req.query;
+  const { page: _page } = req.query;
   console.log(req.url);
 
   res.statusCode = 200;

@@ -11,9 +11,9 @@ export {
   Button,
   type ButtonAppearance,
   type ButtonProps,
-  type ButtonVariant,
   type ButtonSize,
   type ButtonTone,
+  type ButtonVariant,
 } from './components/Button';
 export type { CheckboxProps } from './components/Checkbox';
 export { Checkbox } from './components/Checkbox';

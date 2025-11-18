@@ -110,6 +110,7 @@ const pageDescription =
   'Find documentation for Rubin Observatory data, science platform services, and software.';
 
 type DocsPageProps = {
+  // biome-ignore lint/suspicious/noExplicitAny: MDX serialized source is an opaque type from next-mdx-remote
   mdxSource: any;
 };
 

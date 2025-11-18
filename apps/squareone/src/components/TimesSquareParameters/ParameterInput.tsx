@@ -1,5 +1,5 @@
-import React from 'react';
 import type { ReactNode } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
 type ParameterSchema = {
@@ -20,7 +20,7 @@ export default function ParameterInput({
   children,
   paramName,
   paramSchema,
-  touched,
+  touched: _touched,
   errors,
 }: ParameterInputProps) {
   const errorMessage = computeErrorMessage(errors, paramSchema);

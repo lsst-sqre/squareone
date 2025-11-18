@@ -1,7 +1,7 @@
-import React from 'react';
 import LogoImage from '@lsst-sqre/rubin-style-dictionary/assets/triad-horizontal/triad-horizontal-color-dark.png';
 import Image from 'next/legacy/image';
 import Link from 'next/link';
+import React from 'react';
 import styled from 'styled-components';
 
 const PreLogo = () => {

@@ -6,14 +6,12 @@ import TimesSquareHtmlEventsProvider from '../../../components/TimesSquareHtmlEv
 import TimesSquareNotebookViewer from '../../../components/TimesSquareNotebookViewer';
 import TimesSquareUrlParametersProvider from '../../../components/TimesSquareUrlParametersProvider';
 import WideContentLayout from '../../../components/WideContentLayout';
-import type { AppConfigContextValue } from '../../../contexts/AppConfigContext';
 import { loadAppConfig } from '../../../lib/config/loader';
 
-type GitHubNotebookViewPageProps = {
-  appConfig: AppConfigContextValue;
-};
+// biome-ignore lint/complexity/noBannedTypes: Empty props object required for Next.js page
+type GitHubNotebookViewPageProps = {};
 
-export default function GitHubNotebookViewPage({}: GitHubNotebookViewPageProps) {
+export default function GitHubNotebookViewPage() {
   return (
     <TimesSquareUrlParametersProvider>
       <TimesSquareHtmlEventsProvider>

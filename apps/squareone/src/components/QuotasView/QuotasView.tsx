@@ -1,10 +1,10 @@
-import React from 'react';
 import {
   type GafaelfawrQuota,
   type GafaelfawrTapQuota,
   KeyValueList,
   type KeyValueListItem,
 } from '@lsst-sqre/squared';
+import React from 'react';
 import styles from './QuotasView.module.css';
 
 type QuotasViewProps = {

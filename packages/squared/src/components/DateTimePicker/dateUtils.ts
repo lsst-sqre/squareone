@@ -70,7 +70,7 @@ export function formatToISO8601(
   } = {}
 ): string {
   const {
-    includeTime = true,
+    includeTime: _includeTime = true,
     includeSeconds = false,
     timezone = 'UTC',
   } = options;

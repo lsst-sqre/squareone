@@ -34,6 +34,7 @@ type GitHubCheck = {
 };
 
 type GitHubPrContentsData = {
+  // biome-ignore lint/suspicious/noExplicitAny: GitHub API returns untyped file listing data
   contents: any[];
   pull_requests: PullRequest[];
   yaml_check?: GitHubCheck;
@@ -41,8 +42,10 @@ type GitHubPrContentsData = {
 };
 
 type UseGitHubPrContentsListingReturn = {
+  // biome-ignore lint/suspicious/noExplicitAny: SWR error type is unknown
   error: any;
   loading: boolean;
+  // biome-ignore lint/suspicious/noExplicitAny: GitHub API returns untyped file listing data
   contents: any[];
   pullRequests: PullRequest[];
   yamlCheck?: GitHubCheck;

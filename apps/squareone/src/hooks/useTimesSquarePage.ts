@@ -5,6 +5,7 @@ import { TimesSquareUrlParametersContext } from '../components/TimesSquareUrlPar
 
 type TimesSquarePageData = {
   title: string;
+  // biome-ignore lint/suspicious/noExplicitAny: Times Square API returns dynamic parameter schemas
   parameters: any;
   description: {
     html: string;
@@ -30,9 +31,11 @@ type GitHubInfo = {
 };
 
 type UseTimesSquarePageReturn = {
+  // biome-ignore lint/suspicious/noExplicitAny: SWR error type is unknown
   error: any;
   loading: boolean;
   title: string | null;
+  // biome-ignore lint/suspicious/noExplicitAny: Times Square API returns dynamic parameter schemas
   parameters: any | null;
   description: {
     html: string;

@@ -1,7 +1,7 @@
-import React from 'react';
 import AgencyLogos from '@lsst-sqre/rubin-style-dictionary/assets/partner-logos/rubin-partners.png';
 import Image from 'next/legacy/image';
 import Link from 'next/link';
+import React from 'react';
 import styled from 'styled-components';
 
 import { ContentMaxWidth } from '../../styles/sizes';

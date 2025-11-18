@@ -82,11 +82,72 @@
   },
   "overrides": [
     {
-      "includes": ["**/*.test.ts", "**/*.test.tsx"],
+      "includes": ["**/*.test.ts", "**/*.test.tsx", "**/*.stories.tsx"],
       "linter": {
         "rules": {
           "correctness": {
             "noUnusedImports": "off"
+          },
+          "suspicious": {
+            "noExplicitAny": "warn"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["**/*.d.ts"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noBannedTypes": "off"
+          },
+          "suspicious": {
+            "noExplicitAny": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "**/packages/squared/src/components/DateTimePicker/TimeInput.tsx",
+        "**/packages/squared/src/components/Select/Select.tsx"
+      ],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noTsIgnore": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "**/packages/squared/vitest.config.ts",
+        "**/packages/squared/src/components/Button/Button.tsx"
+      ],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "**/packages/squared/**/*.tsx",
+        "**/packages/squared/**/*.ts",
+        "**/packages/squared/**/*.css"
+      ],
+      "linter": {
+        "rules": {
+          "a11y": {
+            "useSemanticElements": "off",
+            "noSvgWithoutTitle": "off",
+            "noStaticElementInteractions": "off"
+          },
+          "style": {
+            "noDescendingSpecificity": "off"
           }
         }
       }

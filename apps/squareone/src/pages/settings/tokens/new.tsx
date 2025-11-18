@@ -132,7 +132,7 @@ const NewTokenPage: NextPageWithLayout &
   // Extract existing token names for validation
   const existingTokenNames = extractTokenNames(tokens);
 
-  let content;
+  let content: React.ReactNode;
 
   if (loginLoading || tokensLoading) {
     content = <p>Loading…</p>;

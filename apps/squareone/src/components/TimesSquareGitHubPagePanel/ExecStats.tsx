@@ -24,7 +24,11 @@ export default function ExecStats() {
   ) => {
     event.preventDefault();
 
-    await fetch(htmlEvent.htmlUrl!, {
+    if (!htmlEvent.htmlUrl) {
+      return;
+    }
+
+    await fetch(htmlEvent.htmlUrl, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -33,15 +37,19 @@ export default function ExecStats() {
   };
 
   if (htmlEvent.executionStatus === 'complete') {
-    const dateFinished = parseISO(htmlEvent.dateFinished!);
+    if (!htmlEvent.dateFinished) {
+      return null;
+    }
+
+    const dateFinished = parseISO(htmlEvent.dateFinished);
     const formattedDuration = Number(htmlEvent.executionDuration).toFixed(1);
     return (
       <StyledContainer>
         <StyledContent>
           Computed{' '}
           <time
-            dateTime={htmlEvent.dateFinished!}
-            title={htmlEvent.dateFinished!}
+            dateTime={htmlEvent.dateFinished}
+            title={htmlEvent.dateFinished}
           >
             {formatDistanceToNow(dateFinished, { addSuffix: true })}
           </time>{' '}

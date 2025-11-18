@@ -49,7 +49,7 @@ const meta: Meta<typeof Modal> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-function ModalWithTrigger(args: any) {
+function ModalWithTrigger(args: React.ComponentProps<typeof Modal>) {
   const [open, setOpen] = useState(false);
 
   return (

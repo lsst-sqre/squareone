@@ -9,14 +9,22 @@ export type ButtonTone = 'primary' | 'secondary' | 'tertiary' | 'danger';
 export type ButtonVariant = 'primary' | 'secondary' | 'danger';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
+type FeatherIconProps = {
+  size?: number;
+  className?: string;
+  strokeWidth?: number;
+};
+
+type IconType = IconDefinition | React.ComponentType<FeatherIconProps>;
+
 type PolymorphicButtonProps<T extends React.ElementType = 'button'> = {
   as?: T;
   appearance?: ButtonAppearance;
   tone?: ButtonTone;
   variant?: ButtonVariant;
   block?: boolean;
-  leadingIcon?: IconDefinition | React.ComponentType<any>;
-  trailingIcon?: IconDefinition | React.ComponentType<any>;
+  leadingIcon?: IconType;
+  trailingIcon?: IconType;
   size?: ButtonSize;
   loading?: boolean;
   children: React.ReactNode;
@@ -84,7 +92,7 @@ const Button = forwardRef<any, ButtonProps<any>>(
 
     // Render icon helper
     const renderIcon = (
-      icon: IconDefinition | React.ComponentType<any> | undefined,
+      icon: IconType | undefined,
       position: 'leading' | 'trailing'
     ) => {
       if (!icon) return null;
@@ -102,7 +110,8 @@ const Button = forwardRef<any, ButtonProps<any>>(
       }
 
       // Otherwise, it's a Feather icon component
-      const FeatherIconComponent = icon as React.ComponentType<any>;
+      const FeatherIconComponent =
+        icon as React.ComponentType<FeatherIconProps>;
       return (
         <span className={iconClass}>
           <FeatherIconComponent

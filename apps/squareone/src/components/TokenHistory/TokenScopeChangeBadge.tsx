@@ -1,7 +1,7 @@
-import React from 'react';
 import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import type { BadgeSize } from '@lsst-sqre/squared';
+import React from 'react';
 import { TokenScopeBadge } from './TokenScopeBadge';
 
 export type TokenScopeChangeBadgeProps = {

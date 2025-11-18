@@ -44,6 +44,7 @@ export interface AppConfig {
 }
 
 // Migrated from next.config.js - YAML loading with Ajv validation
+// biome-ignore lint/suspicious/noExplicitAny: YAML configuration can contain any dynamically-validated structure
 function readYamlConfig(configPath: string, schemaPath: string): any {
   try {
     const schema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
@@ -69,6 +70,7 @@ function readYamlConfig(configPath: string, schemaPath: string): any {
   }
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: YAML configuration can contain any dynamically-validated structure
 function readPublicYamlConfig(): any {
   const p = process.env.SQUAREONE_CONFIG_PATH || 'squareone.config.yaml';
   const configPath = path.isAbsolute(p) ? p : path.join(process.cwd(), p);
@@ -77,6 +79,7 @@ function readPublicYamlConfig(): any {
   return readYamlConfig(configPath, schemaPath);
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: YAML configuration can contain any dynamically-validated structure
 function readServerYamlConfig(): any {
   const p =
     process.env.SQUAREONE_SERVER_CONFIG_PATH || 'squareone.serverconfig.yaml';
@@ -141,7 +144,10 @@ export async function loadMdxContent(
 
   // Return cached content if available and caching is enabled
   if (ENABLE_CACHING && mdxContentCache.has(cacheKey)) {
-    return mdxContentCache.get(cacheKey)!;
+    const cachedContent = mdxContentCache.get(cacheKey);
+    if (cachedContent) {
+      return cachedContent;
+    }
   }
 
   // Validate file exists before reading

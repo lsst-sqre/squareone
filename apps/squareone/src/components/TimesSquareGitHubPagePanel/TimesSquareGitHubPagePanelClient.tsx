@@ -23,7 +23,13 @@ export default function TimesSquareGitHubPagePanelClient() {
   }, []);
 
   const { siteName } = useAppConfig();
-  const { urlQueryString } = React.useContext(TimesSquareUrlParametersContext)!;
+  const context = React.useContext(TimesSquareUrlParametersContext);
+  if (!context) {
+    throw new Error(
+      'TimesSquareUrlParametersContext must be used within a provider'
+    );
+  }
+  const { urlQueryString } = context;
   const pageData = useTimesSquarePage();
 
   // Show loading state until client-side hydration

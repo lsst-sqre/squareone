@@ -15,6 +15,7 @@ const pageDescription =
   'Integrate Rubin data into your analysis tools with APIs.';
 
 type ApiAspectPageProps = {
+  // biome-ignore lint/suspicious/noExplicitAny: MDX serialized source is an opaque type from next-mdx-remote
   mdxSource: any;
 };
 

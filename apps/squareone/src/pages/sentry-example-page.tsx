@@ -22,6 +22,7 @@ export default function Page() {
         }}
       >
         <h1 style={{ fontSize: '4rem', margin: '14px 0' }}>
+          {/* biome-ignore lint/a11y/noSvgWithoutTitle: Decorative logo, accessible via alt text on parent link */}
           <svg
             style={{
               height: '1em',

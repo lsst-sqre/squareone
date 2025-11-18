@@ -11,7 +11,7 @@ export default async function handler(
 ) {
   try {
     const appConfig = await loadAppConfig();
-    const { timesSquareUrl } = appConfig;
+    const { timesSquareUrl: _timesSquareUrl } = appConfig;
 
     const content = {
       contents: [

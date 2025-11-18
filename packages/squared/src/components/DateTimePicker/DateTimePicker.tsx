@@ -271,7 +271,14 @@ const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
 
         if (hours > 23 || minutes > 59 || seconds > 59) return;
 
-        let dateComponents;
+        let dateComponents: {
+          year: number;
+          month: number;
+          day: number;
+          hours: number;
+          minutes: number;
+          seconds: number;
+        };
         if (!currentDate) {
           const today = getCurrentTimeInTimezone(selectedTimezone);
           dateComponents = extractDateComponents(today, selectedTimezone);

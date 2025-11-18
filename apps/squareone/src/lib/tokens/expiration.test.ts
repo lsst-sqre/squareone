@@ -57,6 +57,7 @@ describe('formatExpiration', () => {
   });
 
   it('should throw error for unknown type', () => {
+    // biome-ignore lint/suspicious/noExplicitAny: Test validates error handling for invalid expiration type
     expect(() => formatExpiration({ type: 'unknown' } as any)).toThrow(
       'Unknown expiration type: unknown'
     );

@@ -20,6 +20,7 @@ const pageDescription =
   'Get help with the Rubin Science Platform, data, and software.';
 
 type SupportPageProps = {
+  // biome-ignore lint/suspicious/noExplicitAny: MDX serialized source is an opaque type from next-mdx-remote
   mdxSource: any;
 };
 

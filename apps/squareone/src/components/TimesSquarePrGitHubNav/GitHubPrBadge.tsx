@@ -1,5 +1,5 @@
-import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React from 'react';
 import styled from 'styled-components';
 
 type GitHubPrState = 'open' | 'draft' | 'merged' | 'closed';
@@ -72,7 +72,7 @@ const HiddenLink = styled.a`
 `;
 
 function PrStatusIcon({ state, url }: PrStatusIconProps) {
-  let icon;
+  let icon: React.ReactElement;
   if (state === 'closed') {
     icon = <StyledFontAwesomeIcon icon="circle-xmark" />;
   } else if (state === 'merged') {

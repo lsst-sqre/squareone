@@ -179,7 +179,7 @@ const config = {
       // 2 attributes: contents which is a string of the file contents, and
       // filePath which is the path of the file.
       // The function is expected to return a plain object.
-      parse: ({ contents, filePath }) => yaml.parse(contents),
+      parse: ({ contents, filePath: _filePath }) => yaml.parse(contents),
     },
   ],
   transform: {

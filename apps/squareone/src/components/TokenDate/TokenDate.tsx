@@ -1,4 +1,5 @@
 import React from 'react';
+
 type TokenDateProps = {
   /** Human-readable display text */
   display: string;

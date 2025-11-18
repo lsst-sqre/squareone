@@ -1,5 +1,5 @@
-import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React from 'react';
 import styled from 'styled-components';
 
 type GitHubCheckStatus = 'queued' | 'in_progress' | 'completed';
@@ -44,7 +44,7 @@ export default function GitHubCheckBadge({
   conclusion = null,
   url = '#',
 }: GitHubCheckBadgeProps) {
-  let icon;
+  let icon: React.ReactElement;
   if (status === 'completed') {
     if (conclusion === 'success') {
       icon = (

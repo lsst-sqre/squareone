@@ -1,6 +1,5 @@
-import React from 'react';
 import { Button, FormField } from '@lsst-sqre/squared';
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import useTokenNameValidation from '../../hooks/useTokenNameValidation';
 import type { ExpirationValue } from '../../lib/tokens/expiration';

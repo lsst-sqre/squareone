@@ -1,3 +1,4 @@
+import React from 'react';
 import GitHubPrTitle from './GitHubPrTitle';
 
 export default {
@@ -5,7 +6,9 @@ export default {
   title: 'Components/TimesSquare/GitHubPrTitle',
 };
 
-const Template = (args: any) => <GitHubPrTitle {...args} />;
+const Template = (args: React.ComponentProps<typeof GitHubPrTitle>) => (
+  <GitHubPrTitle {...args} />
+);
 
 export const Default = Template.bind({});
 Default.args = {

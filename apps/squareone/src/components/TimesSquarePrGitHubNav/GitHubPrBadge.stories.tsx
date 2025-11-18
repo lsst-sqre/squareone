@@ -1,3 +1,4 @@
+import React from 'react';
 import GitHubPrBadge from './GitHubPrBadge';
 
 export default {
@@ -5,7 +6,9 @@ export default {
   title: 'Components/TimesSquare/GitHubPrBadge',
 };
 
-const Template = (args: any) => <GitHubPrBadge {...args} />;
+const Template = (args: React.ComponentProps<typeof GitHubPrBadge>) => (
+  <GitHubPrBadge {...args} />
+);
 
 export const OpenPr = Template.bind({});
 OpenPr.args = {

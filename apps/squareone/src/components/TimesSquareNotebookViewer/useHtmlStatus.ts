@@ -43,13 +43,26 @@ export function parameterizeUrl(
 }
 
 function useHtmlStatus(): UseHtmlStatusReturn {
-  const { notebookParameters: parameters, displaySettings } = React.useContext(
-    TimesSquareUrlParametersContext
-  )!;
+  const context = React.useContext(TimesSquareUrlParametersContext);
+  if (!context) {
+    throw new Error(
+      'TimesSquareUrlParametersContext must be used within a provider'
+    );
+  }
+  const { notebookParameters: parameters, displaySettings } = context;
   const pageData = useTimesSquarePage();
 
   const { data, error } = useSWR<HtmlStatusData>(
-    () => parameterizeUrl(pageData.htmlStatusUrl!, parameters, displaySettings),
+    () => {
+      if (!pageData.htmlStatusUrl) {
+        return null;
+      }
+      return parameterizeUrl(
+        pageData.htmlStatusUrl,
+        parameters,
+        displaySettings
+      );
+    },
     fetcher,
     {
       // ping every 1 second while browser in focus.
