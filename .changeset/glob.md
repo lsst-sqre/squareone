@@ -2,4 +2,4 @@
 "squareone": patch
 ---
 
-Bump glob from 11.0.3 to 11.1.0
+Bump glob from 11.0.3 to 12.0.0
