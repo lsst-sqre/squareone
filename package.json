@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "localci": "node scripts/turbo-wrapper.js run biome:format:check prettier:yaml lint type-check test build",
+    "localci": "node scripts/turbo-wrapper.js run biome:format:check prettier:yaml lint type-check test build && pnpm run biome:lint",
     "build": "node scripts/turbo-wrapper.js run build",
     "dev": "node scripts/turbo-wrapper.js run dev",
     "test": "node scripts/turbo-wrapper.js run test",
