@@ -75,12 +75,18 @@ The container ensures consistent browser testing environments.
 Key steps:
 
 1. **Docker Version Validation**: Runs :file:`scripts/validate-docker-versions.js` to ensure Dockerfile version tags match :file:`package.json` versions for Node.js, pnpm, and Turborepo
-2. **Format Check**: Verifies code formatting with Prettier
-3. **Lint**: Runs ESLint with Turborepo remote caching
-4. **Build**: Builds all packages and applications with Turborepo remote caching
-5. **Test**: Runs vitest tests and Storybook tests with Turborepo remote caching
+2. **Biome Format Check**: Verifies code formatting for JavaScript, TypeScript, JSON, and CSS with Biome_
+3. **YAML Format Check**: Verifies YAML file formatting with Prettier_ (Biome doesn't support YAML)
+4. **Biome Lint**: Runs Biome linting for correctness, accessibility, performance, security, and code style
+5. **ESLint**: Runs ESLint with Turborepo remote caching for comprehensive rule coverage
+6. **Build**: Builds all packages and applications with Turborepo remote caching
+7. **Test**: Runs vitest tests and Storybook tests with Turborepo remote caching
 
 The workflow uses :doc:`Turborepo's remote caching <remote-cache>` (configured via ``TURBO_TOKEN``, ``TURBO_API``, ``TURBO_TEAM``) to speed up builds by reusing cached results from previous runs.
+
+.. note::
+
+   The CI workflow uses both Biome and ESLint for linting. Biome provides fast, modern linting and formatting, while ESLint continues to run for comprehensive rule coverage. This dual linting approach ensures thorough code quality validation during the transition period.
 
 Docker image build (build-squareone job)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -111,6 +117,98 @@ Runs conditionally only if the :file:`docs/` directory has changed (based on the
 
 Builds the Sphinx-based documentation site and deploys it to https://squareone.lsst.io using the ``lsst-sqre/ltd-upload`` action.
 The default branch is deployed to https://squareone.lsst.io/ and other branches are deployed to https://squareone.lsst.io/v/.
+
+Code quality and validation tools
+==================================
+
+The CI workflow uses several tools to ensure code quality, consistency, and correct configuration.
+
+Docker version validation
+-------------------------
+
+The :file:`scripts/validate-docker-versions.js` script ensures that all Dockerfile version tags stay synchronized with the versions specified in :file:`package.json`.
+
+**What it validates:**
+
+- Node.js versions match between Dockerfiles and package.json ``engines.node``
+- pnpm versions match between Dockerfiles and package.json ``packageManager``
+- Turborepo versions match between Dockerfiles and package.json ``devDependencies.turbo``
+
+This prevents runtime errors caused by version mismatches between development and production environments.
+The same validation runs locally via pre-commit hooks when Dockerfiles are modified.
+
+**Usage:**
+
+.. code-block:: bash
+
+   pnpm validate-docker
+
+See :file:`docs/dev/docker-version-validation.md` for complete documentation.
+
+Biome — Modern linting and formatting
+--------------------------------------
+
+Biome_ is the primary tool for code formatting and linting in the monorepo.
+It provides fast, consistent formatting and catches common errors, accessibility issues, security vulnerabilities, and code style problems.
+
+**What Biome validates:**
+
+- **Formatting**: JavaScript, TypeScript, JSON, and CSS (including CSS Modules)
+- **Linting**:
+
+  - Correctness (unused variables, parameters, implicit returns)
+  - Accessibility (a11y rules for React components)
+  - Security (no eval, no dangerouslySetInnerHTML without sanitization)
+  - Performance (key props in React, useMemo/useCallback usage)
+  - Code style (consistent naming, import organization)
+  - Suspicious patterns (explicit any, console statements)
+
+**Configuration:** :file:`biome.json` at repository root
+
+**CI commands:**
+
+.. code-block:: bash
+
+   pnpm biome:format:check   # Check formatting
+   pnpm biome:lint           # Run linting
+
+.. note::
+
+   Biome does not support YAML files. YAML formatting is handled separately with Prettier.
+
+ESLint — Comprehensive rule coverage
+-------------------------------------
+
+ESLint continues to run alongside Biome to provide comprehensive rule coverage, especially for framework-specific rules (Next.js, React) and complex linting scenarios.
+
+**Why both tools:**
+
+- **Biome**: Fast, modern tool with great DX for core JavaScript/TypeScript/CSS
+- **ESLint**: Mature ecosystem with framework-specific plugins and rules
+
+This dual linting approach ensures thorough validation while the team evaluates the long-term tooling strategy.
+
+**Configuration:**
+
+- Root: :file:`packages/eslint-config/` (shared config)
+- Per-package: :file:`.eslintrc.js` files
+
+**CI command:**
+
+.. code-block:: bash
+
+   pnpm lint   # Runs via Turborepo with remote caching
+
+Prettier — YAML formatting
+--------------------------
+
+Prettier_ handles YAML file formatting since Biome doesn't support YAML.
+
+**CI command:**
+
+.. code-block:: bash
+
+   pnpm prettier:yaml
 
 Preparing and making releases — release.yaml
 ============================================

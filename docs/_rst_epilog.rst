@@ -1,4 +1,5 @@
 
+.. _Biome: https://biomejs.dev
 .. _Changesets: https://github.com/changesets/changesets
 .. _CommonMark: https://commonmark.org/
 .. _MDX: https://mdxjs.com
