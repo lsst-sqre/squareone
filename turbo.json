@@ -20,7 +20,6 @@
       "outputLogs": "errors-only"
     },
     "type-check": {
-      "dependsOn": ["^build"],
       "outputLogs": "errors-only"
     },
     "dev": {
