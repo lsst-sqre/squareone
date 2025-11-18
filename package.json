@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "localci": "node scripts/turbo-wrapper.js run biome:format:check lint type-check test build",
+    "localci": "node scripts/turbo-wrapper.js run biome:format:check prettier:yaml lint type-check test build",
     "build": "node scripts/turbo-wrapper.js run build",
     "dev": "node scripts/turbo-wrapper.js run dev",
     "test": "node scripts/turbo-wrapper.js run test",
@@ -14,6 +14,7 @@
     "biome:lint": "biome lint . --max-diagnostics 500",
     "biome:format": "biome check . --write",
     "biome:format:check": "biome format .",
+    "prettier:yaml": "prettier --check \"**/*.{yaml,yml}\"",
     "ci:publish": "node scripts/turbo-wrapper.js run build && changeset publish",
     "ci:version": "changeset version && pnpm install --no-frozen-lockfile",
     "turbo": "node scripts/turbo-wrapper.js",

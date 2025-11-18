@@ -56,6 +56,9 @@
     },
     "//#biome:lint": {
       "outputLogs": "errors-only"
+    },
+    "//#prettier:yaml": {
+      "outputLogs": "errors-only"
     }
   }
 }
