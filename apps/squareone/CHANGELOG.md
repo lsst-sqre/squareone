@@ -1,5 +1,104 @@
 # squareone
 
+## 0.28.5
+
+### Patch Changes
+
+- [#295](https://github.com/lsst-sqre/squareone/pull/295) [`8190c5a`](https://github.com/lsst-sqre/squareone/commit/8190c5af9ac6e9975930923ae71abc8f90eabeae) Thanks [@jonathansick](https://github.com/jonathansick)! - Adopt Biome as primary code formatter
+
+  Replaced Prettier with Biome for formatting JavaScript, TypeScript, JSON, and CSS files. Biome provides faster formatting with better tooling integration while maintaining the same code style. Prettier is retained exclusively for YAML file formatting.
+
+  Key changes:
+
+  - Added Biome configuration matching existing Prettier formatting rules
+  - Updated CI workflow to check Biome formatting
+  - Configured VSCode to use Biome as the default formatter
+  - Updated pre-commit hooks (lint-staged) to run Biome
+  - Applied Biome formatting across the entire codebase
+  - Cleaned up unused imports exposed by Biome's import organization
+
+  Developer impact:
+
+  - Formatting commands changed: Use `pnpm run biome:format` instead of `pnpm run format`
+  - VSCode will now use Biome for auto-formatting JavaScript/TypeScript files
+  - YAML files continue to use Prettier formatting
+  - package.json files are intentionally excluded from automatic formatting to avoid conflicts with pnpm and dependabot
+
+- [#298](https://github.com/lsst-sqre/squareone/pull/298) [`4f37d09`](https://github.com/lsst-sqre/squareone/commit/4f37d09b5ac6ee258a013d6c44849a35298111ec) Thanks [@jonathansick](https://github.com/jonathansick)! - Add Biome linting alongside ESLint for comprehensive code quality
+
+  Enabled Biome's linting capabilities to complement the existing ESLint setup, creating a hybrid approach that leverages the strengths of both tools.
+
+  **Biome linting features:**
+
+  - Fast, modern linting for JavaScript/TypeScript/JSON/CSS
+  - All recommended rule groups enabled (accessibility, complexity, correctness, performance, security, style, suspicious)
+  - Severity-based exit behavior: errors block builds, warnings are visible but non-blocking
+  - Integrated with the same `biome check` command used for formatting
+
+  **Linting strategy:**
+
+  - Biome provides fast feedback for common issues with auto-fix capabilities
+  - ESLint continues to run via Turborepo for comprehensive rule coverage and framework-specific rules
+  - Both tools run in CI for thorough code quality validation
+
+  **Code quality improvements:**
+
+  - Resolved 152 Biome linting violations across the codebase
+  - Fixed unused variables and unreachable code
+  - Replaced `any` types with `unknown` or proper types for better type safety
+  - Fixed accessibility issues (ARIA roles, button types, semantic elements)
+  - Eliminated unnecessary code fragments and shadowed restricted names
+  - Added missing React imports for JSX transform compatibility
+
+  Developer impact:
+
+  - Use `pnpm biome:lint` for fast local linting with auto-fix
+  - Use `pnpm lint` for comprehensive ESLint checks via Turborepo
+  - Both checks run in CI and `pnpm localci` for pre-push validation
+  - VSCode configured to show Biome diagnostics in real-time
+
+- [#298](https://github.com/lsst-sqre/squareone/pull/298) [`4f37d09`](https://github.com/lsst-sqre/squareone/commit/4f37d09b5ac6ee258a013d6c44849a35298111ec) Thanks [@jonathansick](https://github.com/jonathansick)! - Improve CI validation with better tooling and local testing
+
+  Enhanced the GitHub Actions CI workflow and local development validation to catch issues earlier and provide better feedback:
+
+  **New validation tools:**
+
+  - Docker version validation ensures Dockerfile versions match package.json before builds
+  - Prettier YAML formatting check catches configuration file formatting issues
+  - Biome formatting and linting integrated into CI pipeline
+
+  **localci improvements:**
+
+  - Comprehensive local CI simulation matching production workflow exactly
+  - Execution order mirrors CI: Docker validation → formatting → linting → type-check → tests → build
+  - Catches all CI issues locally before pushing
+
+  **CI workflow enhancements:**
+
+  - Renamed linting steps for clarity ("ESLint" instead of generic "Lint")
+  - Proper Biome severity handling: errors fail builds, warnings are visible but non-blocking
+  - Optimized type-check dependencies to enable better parallelization
+
+  Developer impact:
+
+  - Run `pnpm localci` to validate changes exactly as CI will before pushing
+  - Earlier detection of Docker version mismatches
+  - YAML formatting validation prevents workflow file issues
+  - Faster feedback loop with local validation matching CI behavior
+
+- [#299](https://github.com/lsst-sqre/squareone/pull/299) [`62a81bc`](https://github.com/lsst-sqre/squareone/commit/62a81bc54462e2360e17cc8acf58c9c32a9bed2b) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump glob from 11.0.3 to 12.0.0
+
+- [#297](https://github.com/lsst-sqre/squareone/pull/297) [`67085a9`](https://github.com/lsst-sqre/squareone/commit/67085a9ff092996df44a3b5fe66d957e47391cc2) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump js-yaml from 4.1.0 to 4.1.1 in the security-patch group across 1 directory
+
+- [#295](https://github.com/lsst-sqre/squareone/pull/295) [`8190c5a`](https://github.com/lsst-sqre/squareone/commit/8190c5af9ac6e9975930923ae71abc8f90eabeae) Thanks [@jonathansick](https://github.com/jonathansick)! - Automate Playwright browser installation in CI
+
+  Added automatic Playwright browser installation script that runs during CI setup. This eliminates manual browser installation steps and ensures the correct browser versions are always available for testing.
+
+  The installation script detects the CI environment and automatically installs Playwright browsers when needed, improving CI reliability and reducing setup complexity.
+
+- Updated dependencies [[`8190c5a`](https://github.com/lsst-sqre/squareone/commit/8190c5af9ac6e9975930923ae71abc8f90eabeae), [`4f37d09`](https://github.com/lsst-sqre/squareone/commit/4f37d09b5ac6ee258a013d6c44849a35298111ec)]:
+  - @lsst-sqre/squared@0.11.1
+
 ## 0.28.4
 
 ### Patch Changes
