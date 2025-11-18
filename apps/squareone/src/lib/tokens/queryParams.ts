@@ -1,4 +1,4 @@
-import type { ParsedUrlQuery } from 'querystring';
+import type { ParsedUrlQuery } from 'node:querystring';
 
 interface TokenQueryParams {
   name?: string;
@@ -54,7 +54,9 @@ function isValidISODate(dateString: string): boolean {
   try {
     const date = new Date(dateString);
     return (
-      date instanceof Date && !isNaN(date.getTime()) && dateString.includes('T')
+      date instanceof Date &&
+      !Number.isNaN(date.getTime()) &&
+      dateString.includes('T')
     );
   } catch {
     return false;

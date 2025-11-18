@@ -3,7 +3,6 @@ import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import type { ReactElement, ReactNode } from 'react';
-import React from 'react';
 import styled from 'styled-components';
 
 import TimesSquareApp from '../../../../../components/TimesSquareApp';
@@ -12,15 +11,13 @@ import GitHubCheckBadge from '../../../../../components/TimesSquarePrGitHubNav/G
 import GitHubPrBadge from '../../../../../components/TimesSquarePrGitHubNav/GitHubPrBadge';
 import useGitHubPrContentsListing from '../../../../../components/TimesSquarePrGitHubNav/useGitHubPrContentsListing';
 import WideContentLayout from '../../../../../components/WideContentLayout';
-import type { AppConfigContextValue } from '../../../../../contexts/AppConfigContext';
 import { useAppConfig } from '../../../../../contexts/AppConfigContext';
 import { loadAppConfig } from '../../../../../lib/config/loader';
 
-type GitHubPrLandingPageProps = {
-  appConfig: AppConfigContextValue;
-};
+// biome-ignore lint/complexity/noBannedTypes: Empty props object required for Next.js page
+type GitHubPrLandingPageProps = {};
 
-export default function GitHubPrLandingPage({}: GitHubPrLandingPageProps) {
+export default function GitHubPrLandingPage() {
   const appConfig = useAppConfig();
   const { timesSquareUrl } = appConfig;
   const router = useRouter();
@@ -42,7 +39,7 @@ export default function GitHubPrLandingPage({}: GitHubPrLandingPageProps) {
     />
   );
 
-  let prDetails;
+  let prDetails: React.ReactNode;
   if (!(githubContents.loading || githubContents.error)) {
     const { nbCheck, yamlCheck } = githubContents;
     prDetails = (
@@ -88,7 +85,7 @@ export default function GitHubPrLandingPage({}: GitHubPrLandingPageProps) {
       </>
     );
   } else {
-    prDetails = <></>;
+    prDetails = null;
   }
 
   return (
@@ -131,7 +128,7 @@ export const getServerSideProps: GetServerSideProps<
     const appConfig = await loadAppConfig();
 
     // Make the page return a 404 if Times Square is not configured
-    const notFound = appConfig.timesSquareUrl ? false : true;
+    const notFound = !appConfig.timesSquareUrl;
 
     return {
       notFound,

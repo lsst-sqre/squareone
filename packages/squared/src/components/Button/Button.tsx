@@ -1,21 +1,30 @@
-import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { forwardRef } from 'react';
+import type React from 'react';
+import { forwardRef } from 'react';
 import styles from './Button.module.css';
 
 export type ButtonAppearance = 'solid' | 'outline' | 'text';
 export type ButtonTone = 'primary' | 'secondary' | 'tertiary' | 'danger';
-export type ButtonRole = 'primary' | 'secondary' | 'danger';
+export type ButtonVariant = 'primary' | 'secondary' | 'danger';
 export type ButtonSize = 'sm' | 'md' | 'lg';
+
+type FeatherIconProps = {
+  size?: number;
+  className?: string;
+  strokeWidth?: number;
+};
+
+type IconType = IconDefinition | React.ComponentType<FeatherIconProps>;
 
 type PolymorphicButtonProps<T extends React.ElementType = 'button'> = {
   as?: T;
   appearance?: ButtonAppearance;
   tone?: ButtonTone;
-  role?: ButtonRole;
+  variant?: ButtonVariant;
   block?: boolean;
-  leadingIcon?: IconDefinition | React.ComponentType<any>;
-  trailingIcon?: IconDefinition | React.ComponentType<any>;
+  leadingIcon?: IconType;
+  trailingIcon?: IconType;
   size?: ButtonSize;
   loading?: boolean;
   children: React.ReactNode;
@@ -30,7 +39,7 @@ const Button = forwardRef<any, ButtonProps<any>>(
       as: Component = 'button',
       appearance,
       tone,
-      role,
+      variant,
       block = false,
       leadingIcon,
       trailingIcon,
@@ -43,12 +52,12 @@ const Button = forwardRef<any, ButtonProps<any>>(
     },
     ref
   ) => {
-    // Resolve appearance and tone from role if provided
+    // Resolve appearance and tone from variant if provided
     let finalAppearance = appearance;
     let finalTone = tone;
 
-    if (role && !appearance && !tone) {
-      switch (role) {
+    if (variant && !appearance && !tone) {
+      switch (variant) {
         case 'primary':
           finalAppearance = 'solid';
           finalTone = 'primary';
@@ -83,7 +92,7 @@ const Button = forwardRef<any, ButtonProps<any>>(
 
     // Render icon helper
     const renderIcon = (
-      icon: IconDefinition | React.ComponentType<any> | undefined,
+      icon: IconType | undefined,
       position: 'leading' | 'trailing'
     ) => {
       if (!icon) return null;
@@ -101,7 +110,8 @@ const Button = forwardRef<any, ButtonProps<any>>(
       }
 
       // Otherwise, it's a Feather icon component
-      const FeatherIconComponent = icon as React.ComponentType<any>;
+      const FeatherIconComponent =
+        icon as React.ComponentType<FeatherIconProps>;
       return (
         <span className={iconClass}>
           <FeatherIconComponent
@@ -114,7 +124,7 @@ const Button = forwardRef<any, ButtonProps<any>>(
     const buttonContent = (
       <>
         {loading && (
-          <span className={styles.spinner} aria-label="Loading">
+          <span className={styles.spinner} role="status" aria-label="Loading">
             <svg
               className={styles.spinnerSvg}
               viewBox="0 0 24 24"

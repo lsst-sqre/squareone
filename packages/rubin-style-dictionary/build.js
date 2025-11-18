@@ -11,12 +11,12 @@ function fileHeader(options, commentStyle) {
     if (commentStyle === 'short') {
       to_ret += '\n';
       to_ret += '// Do not edit directly\n';
-      to_ret += '// Generated on ' + new Date().toUTCString() + '\n';
+      to_ret += `// Generated on ${new Date().toUTCString()}\n`;
       to_ret += '\n';
     } else {
       to_ret += '/**\n';
       to_ret += ' * Do not edit directly\n';
-      to_ret += ' * Generated on ' + new Date().toUTCString() + '\n';
+      to_ret += ` * Generated on ${new Date().toUTCString()}\n`;
       to_ret += ' */\n\n';
     }
   }
@@ -27,29 +27,27 @@ function fileHeader(options, commentStyle) {
 /* From style-dictionary/lib/common/formats.js */
 function variablesWithPrefix(prefix, properties, commentStyle) {
   return properties
-    .map(function (prop) {
+    .map((prop) => {
       var to_ret_prop =
         prefix +
         prop.name +
         ': ' +
         (prop.attributes.category === 'asset'
-          ? '"' + prop.value + '"'
+          ? `"${prop.value}"`
           : prop.value) +
         ';';
 
       if (prop.comment) {
         if (commentStyle === 'short') {
-          to_ret_prop = to_ret_prop.concat(' // ' + prop.comment);
+          to_ret_prop = to_ret_prop.concat(` // ${prop.comment}`);
         } else {
-          to_ret_prop = to_ret_prop.concat(' /* ' + prop.comment + ' */');
+          to_ret_prop = to_ret_prop.concat(` /* ${prop.comment} */`);
         }
       }
 
       return to_ret_prop;
     })
-    .filter(function (strVal) {
-      return !!strVal;
-    })
+    .filter((strVal) => !!strVal)
     .join('\n');
 }
 
@@ -150,7 +148,7 @@ styleDictionary.registerFilter({
   name: 'isDefaultTheme',
   matcher: (prop) => {
     const pathLength = prop.path.length;
-    if (prop.path[pathLength - 2] != 'themed') {
+    if (prop.path[pathLength - 2] !== 'themed') {
       return true;
     }
     if (prop.path[pathLength - 1] === 'light') {
@@ -181,7 +179,7 @@ const config = {
       // 2 attributes: contents which is a string of the file contents, and
       // filePath which is the path of the file.
       // The function is expected to return a plain object.
-      parse: ({ contents, filePath }) => yaml.parse(contents),
+      parse: ({ contents, filePath: _filePath }) => yaml.parse(contents),
     },
   ],
   transform: {

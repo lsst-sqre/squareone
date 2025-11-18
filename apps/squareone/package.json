@@ -19,7 +19,6 @@
   "eslintConfig": {
     "extends": [
       "next/core-web-vitals",
-      "prettier",
       "plugin:storybook/recommended"
     ],
     "rules": {
@@ -81,7 +80,6 @@
     "chromatic": "^6.17.1",
     "eslint": "^8.46.0",
     "eslint-config-next": "^15.5.6",
-    "eslint-config-prettier": "^8.6.0",
     "eslint-plugin-storybook": "^10.0.7",
     "jsdom": "^26.1.0",
     "playwright": "^1.56.1",

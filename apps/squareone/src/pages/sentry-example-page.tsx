@@ -2,7 +2,6 @@ import * as Sentry from '@sentry/nextjs';
 import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import type { MouseEvent } from 'react';
-import type { AppConfigContextValue } from '../contexts/AppConfigContext';
 import { loadAppConfig } from '../lib/config/loader';
 
 export default function Page() {
@@ -23,6 +22,7 @@ export default function Page() {
         }}
       >
         <h1 style={{ fontSize: '4rem', margin: '14px 0' }}>
+          {/* biome-ignore lint/a11y/noSvgWithoutTitle: Decorative logo, accessible via alt text on parent link */}
           <svg
             style={{
               height: '1em',
@@ -50,7 +50,7 @@ export default function Page() {
             fontSize: '14px',
             margin: '18px',
           }}
-          onClick={async (event: MouseEvent<HTMLButtonElement>) => {
+          onClick={async (_event: MouseEvent<HTMLButtonElement>) => {
             await Sentry.startSpan(
               {
                 name: 'Example Frontend Span',

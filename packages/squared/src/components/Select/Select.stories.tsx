@@ -178,7 +178,8 @@ export const FullWidth: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement.parentElement!);
+    const parentElement = canvasElement.parentElement ?? document.body;
+    const canvas = within(parentElement);
     const container = canvas
       .getByRole('combobox')
       .closest('[class*="container"]');
@@ -431,7 +432,7 @@ export const ReactHookFormIntegration: Story = {
     const watchCountry = watch('country');
     const watchLanguage = watch('language');
 
-    const onSubmit = (data: any) => {
+    const onSubmit = (data: { country: string; language: string }) => {
       alert(`Form submitted: ${JSON.stringify(data, null, 2)}`);
     };
 

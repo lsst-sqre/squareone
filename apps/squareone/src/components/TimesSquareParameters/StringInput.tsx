@@ -1,4 +1,5 @@
-import { ChangeEvent } from 'react';
+import type { ChangeEvent } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
 type StringInputProps = {

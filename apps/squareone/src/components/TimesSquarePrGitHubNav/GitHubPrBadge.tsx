@@ -72,7 +72,7 @@ const HiddenLink = styled.a`
 `;
 
 function PrStatusIcon({ state, url }: PrStatusIconProps) {
-  let icon;
+  let icon: React.ReactElement;
   if (state === 'closed') {
     icon = <StyledFontAwesomeIcon icon="circle-xmark" />;
   } else if (state === 'merged') {

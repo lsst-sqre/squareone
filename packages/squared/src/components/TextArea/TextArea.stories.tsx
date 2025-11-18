@@ -569,7 +569,7 @@ export const ReactHookFormIntegration: Story = {
           reset();
           setSubmitMessage('');
         }, 4000);
-      } catch (error) {
+      } catch (_error) {
         setSubmitMessage('Submission failed. Please try again.');
       }
     };

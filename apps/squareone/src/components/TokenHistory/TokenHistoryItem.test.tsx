@@ -7,7 +7,15 @@ import TokenHistoryItem from './TokenHistoryItem';
 
 // Mock Next.js Link component
 vi.mock('next/link', () => ({
-  default: ({ href, children, className }: any) => (
+  default: ({
+    href,
+    children,
+    className,
+  }: {
+    href: string;
+    children: React.ReactNode;
+    className?: string;
+  }) => (
     <a href={href} className={className}>
       {children}
     </a>
@@ -257,7 +265,7 @@ describe('TokenHistoryItem', () => {
         token_type: 'session',
       };
 
-      const { rerender } = render(
+      const { rerender: _rerender } = render(
         <TokenHistoryItem entry={entryWithoutName} showTokenType={true} />
       );
 

@@ -1,5 +1,6 @@
-import React, { forwardRef, useCallback, useRef } from 'react';
-// @ts-ignore - ChevronUp and ChevronDown icons exist but missing from react-feather type definitions
+import type React from 'react';
+import { forwardRef, useCallback, useRef } from 'react';
+// @ts-ignore - ChevronUp is missing from react-feather type definitions
 import { ChevronDown, ChevronUp } from 'react-feather';
 import styles from './TimeInput.module.css';
 
@@ -141,7 +142,7 @@ const TimeInput = forwardRef<HTMLDivElement, TimeInputProps>(
     const handleInputChange = useCallback(
       (field: TimeField, inputValue: string) => {
         const numValue = parseInt(inputValue, 10);
-        if (!isNaN(numValue)) {
+        if (!Number.isNaN(numValue)) {
           updateTimeField(field, numValue);
         }
       },

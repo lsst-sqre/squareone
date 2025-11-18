@@ -2,7 +2,6 @@
 
 import { withThemeByDataAttribute } from '@storybook/addon-themes';
 import type { Preview } from '@storybook/nextjs-vite';
-import React from 'react';
 import { INITIAL_VIEWPORTS } from 'storybook/viewport';
 import { AppConfigProvider } from '../src/contexts/AppConfigContext';
 

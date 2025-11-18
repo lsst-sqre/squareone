@@ -15,6 +15,7 @@ export type TokenInfo = {
 
 type UseUserTokensReturn = {
   tokens: TokenInfo[] | undefined;
+  // biome-ignore lint/suspicious/noExplicitAny: SWR error type is unknown
   error: any;
   isLoading: boolean;
   mutate: KeyedMutator<TokenInfo[]>;

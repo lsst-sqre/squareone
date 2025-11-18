@@ -382,7 +382,11 @@ export const ReactHookFormIntegration: Story = {
 
     const watchedValues = watch();
 
-    const onSubmit = async (data: any) => {
+    const onSubmit = async (data: {
+      notifications: string[];
+      features: string[];
+      agreements: string[];
+    }) => {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
       alert(`Form submitted with data: ${JSON.stringify(data, null, 2)}`);

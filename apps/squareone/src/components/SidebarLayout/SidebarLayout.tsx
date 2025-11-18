@@ -177,7 +177,7 @@ export default function SidebarLayout({
   sidebarTitle,
   navSections,
   currentPath = '',
-  prefetchPages = false,
+  prefetchPages: _prefetchPages = false,
   titleHref,
   onNavigate,
 }: SidebarLayoutProps) {

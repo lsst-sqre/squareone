@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-const { spawn } = require('child_process');
-const { existsSync } = require('fs');
-const { resolve } = require('path');
+const { spawn } = require('node:child_process');
+const { existsSync } = require('node:fs');
+const { resolve } = require('node:path');
 
 const TURBO_CMD = 'turbo';
 const OP_ENV_FILE = '.env.op';

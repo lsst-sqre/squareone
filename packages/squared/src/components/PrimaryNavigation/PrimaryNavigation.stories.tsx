@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import React from 'react';
 import { ChevronDown } from 'react-feather';
 import { expect, screen, userEvent, within } from 'storybook/test';
 

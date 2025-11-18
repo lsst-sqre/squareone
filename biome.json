@@ -17,11 +17,15 @@
     "lineEnding": "lf"
   },
   "javascript": {
+    "jsxRuntime": "reactClassic",
     "formatter": {
       "enabled": true,
       "quoteStyle": "single",
       "trailingCommas": "es5",
       "semicolons": "always"
+    },
+    "linter": {
+      "enabled": true
     }
   },
   "json": {
@@ -40,6 +44,113 @@
     }
   },
   "linter": {
-    "enabled": false
-  }
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "a11y": {
+        "recommended": true,
+        "noSvgWithoutTitle": "warn",
+        "useSemanticElements": "warn",
+        "noStaticElementInteractions": "warn"
+      },
+      "complexity": {
+        "recommended": true,
+        "noUselessFragments": "warn"
+      },
+      "correctness": {
+        "recommended": true,
+        "noUnusedFunctionParameters": "warn",
+        "noUnusedVariables": "warn",
+        "noEmptyPattern": "warn"
+      },
+      "performance": {
+        "recommended": true
+      },
+      "security": {
+        "recommended": true
+      },
+      "style": {
+        "recommended": true,
+        "noNonNullAssertion": "warn"
+      },
+      "suspicious": {
+        "recommended": true,
+        "noExplicitAny": "warn",
+        "noImplicitAnyLet": "warn"
+      }
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["**/*.test.ts", "**/*.test.tsx", "**/*.stories.tsx"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUnusedImports": "off"
+          },
+          "suspicious": {
+            "noExplicitAny": "warn"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["**/*.d.ts"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noBannedTypes": "off"
+          },
+          "suspicious": {
+            "noExplicitAny": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "**/packages/squared/src/components/DateTimePicker/TimeInput.tsx",
+        "**/packages/squared/src/components/Select/Select.tsx"
+      ],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noTsIgnore": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "**/packages/squared/vitest.config.ts",
+        "**/packages/squared/src/components/Button/Button.tsx"
+      ],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "**/packages/squared/**/*.tsx",
+        "**/packages/squared/**/*.ts",
+        "**/packages/squared/**/*.css"
+      ],
+      "linter": {
+        "rules": {
+          "a11y": {
+            "useSemanticElements": "off",
+            "noSvgWithoutTitle": "off",
+            "noStaticElementInteractions": "off"
+          },
+          "style": {
+            "noDescendingSpecificity": "off"
+          }
+        }
+      }
+    }
+  ]
 }

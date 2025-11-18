@@ -3,7 +3,7 @@
  * This component handles the useTimesSquarePage hook on the client side only.
  */
 
-import Error from 'next/error';
+import NextError from 'next/error';
 import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
@@ -23,7 +23,13 @@ export default function TimesSquareGitHubPagePanelClient() {
   }, []);
 
   const { siteName } = useAppConfig();
-  const { urlQueryString } = React.useContext(TimesSquareUrlParametersContext)!;
+  const context = React.useContext(TimesSquareUrlParametersContext);
+  if (!context) {
+    throw new Error(
+      'TimesSquareUrlParametersContext must be used within a provider'
+    );
+  }
+  const { urlQueryString } = context;
   const pageData = useTimesSquarePage();
 
   // Show loading state until client-side hydration
@@ -43,7 +49,7 @@ export default function TimesSquareGitHubPagePanelClient() {
     );
   }
   if (pageData.error) {
-    return <Error statusCode={404} />;
+    return <NextError statusCode={404} />;
   }
 
   const { title, description } = pageData;

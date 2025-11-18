@@ -6,12 +6,12 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { loadAppConfig } from '../../../../../lib/config/loader';
 
 export default async function handler(
-  req: NextApiRequest,
+  _req: NextApiRequest,
   res: NextApiResponse
 ) {
   try {
     const appConfig = await loadAppConfig();
-    const { timesSquareUrl } = appConfig;
+    const { timesSquareUrl: _timesSquareUrl } = appConfig;
 
     const content = {
       contents: [

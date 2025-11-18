@@ -81,6 +81,7 @@ export const Interactive: Story = {
     return (
       <div style={{ padding: '1rem' }}>
         <button
+          type="button"
           onClick={toggleError}
           style={{
             padding: '0.5rem 1rem',

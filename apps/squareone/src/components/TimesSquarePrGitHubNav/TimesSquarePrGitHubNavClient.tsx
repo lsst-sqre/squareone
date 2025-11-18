@@ -1,9 +1,10 @@
+import React from 'react';
 /*
  * Client-only TimesSquarePrGitHubNav component - uses SWR without SSR conflicts
  * This component handles the useGitHubPrContentsListing hook on the client side only.
  */
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useAppConfig } from '../../contexts/AppConfigContext';
 import TimesSquareGitHubNav from '../TimesSquareGitHubNav';

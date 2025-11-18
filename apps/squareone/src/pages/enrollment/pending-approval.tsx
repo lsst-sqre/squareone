@@ -1,6 +1,5 @@
 import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
-import Link from 'next/link';
 import { MDXRemote } from 'next-mdx-remote';
 import { serialize } from 'next-mdx-remote/serialize';
 import type { ReactElement, ReactNode } from 'react';
@@ -11,6 +10,7 @@ import { loadConfigAndMdx } from '../../lib/config/loader';
 import { commonMdxComponents } from '../../lib/utils/mdxComponents';
 
 type PendingApprovalPageProps = {
+  // biome-ignore lint/suspicious/noExplicitAny: MDX serialized source is an opaque type from next-mdx-remote
   mdxSource: any;
 };
 

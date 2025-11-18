@@ -1,3 +1,4 @@
+import React from 'react';
 import useDisclosure from 'react-a11y-disclosure';
 import styled from 'styled-components';
 
@@ -117,7 +118,7 @@ export default function BroadcastBanner({ broadcast }: BroadcastBannerProps) {
 
   // If there isn't any broadcast content, don't show a banner
   if (!broadcast) {
-    return <></>;
+    return null;
   }
 
   /* eslint-disable react/no-danger */

@@ -6,14 +6,12 @@ import TimesSquareHtmlEventsProvider from '../../../components/TimesSquareHtmlEv
 import TimesSquareNotebookViewer from '../../../components/TimesSquareNotebookViewer';
 import TimesSquareUrlParametersProvider from '../../../components/TimesSquareUrlParametersProvider';
 import WideContentLayout from '../../../components/WideContentLayout';
-import type { AppConfigContextValue } from '../../../contexts/AppConfigContext';
 import { loadAppConfig } from '../../../lib/config/loader';
 
-type GitHubNotebookViewPageProps = {
-  appConfig: AppConfigContextValue;
-};
+// biome-ignore lint/complexity/noBannedTypes: Empty props object required for Next.js page
+type GitHubNotebookViewPageProps = {};
 
-export default function GitHubNotebookViewPage({}: GitHubNotebookViewPageProps) {
+export default function GitHubNotebookViewPage() {
   return (
     <TimesSquareUrlParametersProvider>
       <TimesSquareHtmlEventsProvider>
@@ -38,7 +36,7 @@ export const getServerSideProps: GetServerSideProps<
     const appConfig = await loadAppConfig();
 
     // Make the page return a 404 if Times Square is not configured
-    const notFound = appConfig.timesSquareUrl ? false : true;
+    const notFound = !appConfig.timesSquareUrl;
 
     return {
       notFound,

@@ -44,7 +44,7 @@ export default function GitHubCheckBadge({
   conclusion = null,
   url = '#',
 }: GitHubCheckBadgeProps) {
-  let icon;
+  let icon: React.ReactElement;
   if (status === 'completed') {
     if (conclusion === 'success') {
       icon = (

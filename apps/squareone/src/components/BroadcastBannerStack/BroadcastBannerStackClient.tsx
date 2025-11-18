@@ -1,3 +1,4 @@
+import React from 'react';
 /* Client-only BroadcastBannerStack component - uses SWR without SSR conflicts */
 
 import { useEffect, useState } from 'react';
@@ -21,11 +22,11 @@ export default function BroadcastBannerStackClient({
 
   // Don't render anything until client-side hydration
   if (!isClient) {
-    return <></>;
+    return null;
   }
 
   if (isLoading || error) {
-    return <></>;
+    return null;
   }
 
   return (

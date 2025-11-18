@@ -106,7 +106,7 @@ export function TokenHistoryDetails({
               {onIpAddressClick ? (
                 <button
                   type="button"
-                  onClick={() => onIpAddressClick(entry.ip_address!)}
+                  onClick={() => onIpAddressClick(entry.ip_address)}
                   className={styles.ipButton}
                 >
                   {entry.ip_address}

@@ -21,7 +21,13 @@ export default function TimesSquareNotebookViewerClient() {
     setIsClient(true);
   }, []);
 
-  const { tsPageUrl } = React.useContext(TimesSquareUrlParametersContext)!;
+  const context = React.useContext(TimesSquareUrlParametersContext);
+  if (!context) {
+    throw new Error(
+      'TimesSquareUrlParametersContext must be used within a provider'
+    );
+  }
+  const { tsPageUrl } = context;
   const htmlStatus = useHtmlStatus();
 
   // Show loading state until client-side hydration

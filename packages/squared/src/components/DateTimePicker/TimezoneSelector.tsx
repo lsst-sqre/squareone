@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react';
+import type React from 'react';
+import { useMemo } from 'react';
 import { Select } from '../Select';
 import { formatTimezoneDisplay, getTimezoneGroups } from './timezoneUtils';
 
@@ -29,7 +30,7 @@ const TimezoneSelector: React.FC<TimezoneSelectorProps> = ({
   const timezoneGroups = useMemo(() => getTimezoneGroups(), []);
 
   // Format the current timezone for display
-  const currentTimezoneDisplay = useMemo(() => {
+  const _currentTimezoneDisplay = useMemo(() => {
     return formatTimezoneDisplay(value);
   }, [value]);
 

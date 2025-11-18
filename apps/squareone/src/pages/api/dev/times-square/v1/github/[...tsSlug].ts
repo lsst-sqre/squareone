@@ -21,7 +21,7 @@ export default async function handler(
     const { timesSquareUrl } = appConfig;
     const pageBaseUrl = `${timesSquareUrl}/v1/pages/${page}`;
 
-    if (page == 'not-found') {
+    if (page === 'not-found') {
       // simulate a page that doesn't exist in the backend
       res.statusCode = 404;
       res.end();

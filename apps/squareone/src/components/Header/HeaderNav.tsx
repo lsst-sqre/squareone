@@ -89,7 +89,7 @@ const NavItem = styled(PrimaryNavigation.Item)`
 
 const InternalTriggerLink = ({ href, children }: InternalTriggerLinkProps) => {
   const router = useRouter();
-  const isActive = href === router.pathname;
+  const _isActive = href === router.pathname;
 
   return (
     <NextLink href={href} passHref legacyBehavior>

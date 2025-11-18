@@ -3,11 +3,11 @@
  * This component handles the useTimesSquarePage hook on the client side only.
  */
 
-import Ajv, { ValidateFunction } from 'ajv';
+import Ajv, { type ValidateFunction } from 'ajv';
 import addFormats from 'ajv-formats';
-import { Field, Formik, FormikHelpers } from 'formik';
+import { Field, Formik, type FormikHelpers } from 'formik';
 import { useRouter } from 'next/router';
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { type ChangeEvent, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import useTimesSquarePage from '../../hooks/useTimesSquarePage';
 import Button, { RedGhostButton } from '../Button';
@@ -19,14 +19,12 @@ type ParameterSchema = {
   type: string;
   format?: string;
   description: string;
+  // biome-ignore lint/suspicious/noExplicitAny: Default values from Times Square JSON schema can be any type
   default?: any;
 };
 
-type Parameters = {
-  [key: string]: ParameterSchema;
-} | null;
-
 type FormValues = {
+  // biome-ignore lint/suspicious/noExplicitAny: Dynamic notebook parameters from Times Square API can be any type
   [key: string]: any;
   tsHideCode: boolean;
 };
@@ -34,6 +32,7 @@ type FormValues = {
 type InputFactoryProps = {
   paramName: string;
   paramSchema: ParameterSchema;
+  // biome-ignore lint/suspicious/noExplicitAny: Parameter values from Times Square API can be any type (string, number, boolean, etc.)
   value: any;
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
   errors?: string;
@@ -87,7 +86,8 @@ export default function TimesSquareParametersClient() {
     Object.entries(parameters).forEach(([paramName, paramSchemaDef]) => {
       initialValues[paramName] = userParameters[paramName]
         ? userParameters[paramName]
-        : (paramSchemaDef as any)?.default;
+        : // biome-ignore lint/suspicious/noExplicitAny: paramSchemaDef type is unknown from API, needs cast to access optional default property
+          (paramSchemaDef as any)?.default;
     });
   }
 
@@ -101,10 +101,9 @@ export default function TimesSquareParametersClient() {
   // JSON schema definitions.
   const schemas: { [key: string]: ValidateFunction } = {};
   if (parameters) {
-    Object.entries(parameters).forEach(
-      ([paramName, paramSchemaDef]) =>
-        (schemas[paramName] = ajv.compile(paramSchemaDef))
-    );
+    Object.entries(parameters).forEach(([paramName, paramSchemaDef]) => {
+      schemas[paramName] = ajv.compile(paramSchemaDef);
+    });
   }
 
   // Callback function to handle form submission by "navigating"
@@ -120,15 +119,15 @@ export default function TimesSquareParametersClient() {
 
     // 2. Update object with form's `values`
     if (parameters) {
-      Object.keys(parameters).forEach(
-        (paramName) => (query[paramName] = values[paramName])
-      );
+      Object.keys(parameters).forEach((paramName) => {
+        query[paramName] = values[paramName];
+      });
     }
 
     if (values.tsHideCode) {
-      query['ts_hide_code'] = '1';
+      query.ts_hide_code = '1';
     } else {
-      query['ts_hide_code'] = '0';
+      query.ts_hide_code = '0';
     }
 
     router.push({ pathname: router.pathname, query: query }, undefined, {

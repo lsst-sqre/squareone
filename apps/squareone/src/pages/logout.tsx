@@ -44,7 +44,7 @@ export const getServerSideProps: GetServerSideProps<LogoutProps> = async () => {
         appConfig,
       },
     };
-  } catch (error) {
+  } catch (_error) {
     // Return a fallback config if loading fails
     const fallbackConfig: AppConfigContextValue = {
       siteName: 'Rubin Science Platform',

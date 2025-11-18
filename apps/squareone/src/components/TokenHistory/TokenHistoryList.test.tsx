@@ -7,7 +7,15 @@ import TokenHistoryList from './TokenHistoryList';
 
 // Mock Next.js Link component
 vi.mock('next/link', () => ({
-  default: ({ href, children, className }: any) => (
+  default: ({
+    href,
+    children,
+    className,
+  }: {
+    href: string;
+    children: React.ReactNode;
+    className?: string;
+  }) => (
     <a href={href} className={className}>
       {children}
     </a>

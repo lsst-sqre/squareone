@@ -10,6 +10,7 @@ import { loadConfigAndMdx } from '../../lib/config/loader';
 import { commonMdxComponents } from '../../lib/utils/mdxComponents';
 
 type EmailVerifiedPageProps = {
+  // biome-ignore lint/suspicious/noExplicitAny: MDX serialized source is an opaque type from next-mdx-remote
   mdxSource: any;
 };
 

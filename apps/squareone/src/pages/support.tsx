@@ -20,6 +20,7 @@ const pageDescription =
   'Get help with the Rubin Science Platform, data, and software.';
 
 type SupportPageProps = {
+  // biome-ignore lint/suspicious/noExplicitAny: MDX serialized source is an opaque type from next-mdx-remote
   mdxSource: any;
 };
 
@@ -65,7 +66,7 @@ export const getServerSideProps: GetServerSideProps<
         mdxSource,
       },
     };
-  } catch (error) {
+  } catch (_error) {
     // Fallback: load config only and provide default content
     const { loadAppConfig } = await import('../lib/config/loader');
 

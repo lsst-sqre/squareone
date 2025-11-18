@@ -14,6 +14,7 @@ type DisplaySettings = {
 type TimesSquareUrlParametersContextValue = {
   tsPageUrl: string;
   displaySettings: DisplaySettings;
+  // biome-ignore lint/suspicious/noExplicitAny: Notebook parameters from URL can be any type (string, number, boolean, etc.)
   notebookParameters: Record<string, any>;
   owner: string | null;
   repo: string | null;
@@ -63,7 +64,7 @@ export default function TimesSquareUrlParametersProvider({
   // matching the parameter schema.
   const userParameters = Object.fromEntries(
     Object.entries(router.query)
-      .filter((item) => item[0] != 'tsSlug')
+      .filter((item) => item[0] !== 'tsSlug')
       .map((item) => item)
   );
 

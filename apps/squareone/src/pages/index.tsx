@@ -6,9 +6,10 @@ import MainContent from '../components/MainContent';
 import { useAppConfig } from '../contexts/AppConfigContext';
 import { loadAppConfig } from '../lib/config/loader';
 
+// biome-ignore lint/complexity/noBannedTypes: Empty props object required for Next.js page
 type HomeProps = {};
 
-export default function Home({}: HomeProps) {
+export default function Home() {
   const appConfig = useAppConfig();
 
   return (
@@ -27,16 +28,12 @@ Home.getLayout = function getLayout(page: ReactElement): ReactNode {
 };
 
 export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
-  try {
-    // Load app configuration for context
-    const appConfig = await loadAppConfig();
+  // Load app configuration for context
+  const appConfig = await loadAppConfig();
 
-    return {
-      props: {
-        appConfig, // Still needed for _app.tsx to extract into context
-      },
-    };
-  } catch (error) {
-    throw error;
-  }
+  return {
+    props: {
+      appConfig, // Still needed for _app.tsx to extract into context
+    },
+  };
 };

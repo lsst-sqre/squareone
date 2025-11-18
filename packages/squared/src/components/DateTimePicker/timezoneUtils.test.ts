@@ -86,7 +86,7 @@ describe('timezoneUtils', () => {
       const originalDateTimeFormat = global.Intl.DateTimeFormat;
       global.Intl.DateTimeFormat = vi.fn().mockImplementation(() => {
         throw new Error('Not supported');
-      }) as any;
+      }) as unknown as typeof Intl.DateTimeFormat;
 
       const timezone = getBrowserTimezone();
       expect(timezone).toBe('UTC');

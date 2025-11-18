@@ -17,6 +17,7 @@ import type { LoginInfo } from './useLoginInfo';
 import useLoginInfo from './useLoginInfo';
 
 describe('useDeleteToken', () => {
+  // biome-ignore lint/suspicious/noExplicitAny: Test mock accepts any arguments
   let fetchMock: any;
   const mockLoginInfo: LoginInfo = {
     csrf: 'test-csrf-token',
@@ -76,6 +77,7 @@ describe('useDeleteToken', () => {
   });
 
   it('should set isDeleting to true during API call', async () => {
+    // biome-ignore lint/suspicious/noExplicitAny: Test promise resolver can accept any value
     let resolveFetch: (value: any) => void;
     const fetchPromise = new Promise((resolve) => {
       resolveFetch = resolve;
@@ -85,6 +87,7 @@ describe('useDeleteToken', () => {
 
     const { result } = renderHook(() => useDeleteToken());
 
+    // biome-ignore lint/suspicious/noExplicitAny: Test promise can resolve to any value
     let deletePromise: Promise<any>;
     act(() => {
       deletePromise = result.current.deleteToken('testuser', 'gt-token-123');
@@ -93,7 +96,7 @@ describe('useDeleteToken', () => {
     expect(result.current.isDeleting).toBe(true);
 
     await act(async () => {
-      resolveFetch!({
+      resolveFetch?.({
         ok: true,
         status: 204,
       });
@@ -112,7 +115,7 @@ describe('useDeleteToken', () => {
 
     const { result } = renderHook(() => useDeleteToken());
 
-    let error;
+    let error: unknown;
     await act(async () => {
       try {
         await result.current.deleteToken('testuser', 'gt-token-123');
@@ -140,7 +143,7 @@ describe('useDeleteToken', () => {
 
     const { result } = renderHook(() => useDeleteToken());
 
-    let error;
+    let error: unknown;
     await act(async () => {
       try {
         await result.current.deleteToken('testuser', 'gt-token-123');
@@ -169,7 +172,7 @@ describe('useDeleteToken', () => {
 
     const { result } = renderHook(() => useDeleteToken());
 
-    let error;
+    let error: unknown;
     await act(async () => {
       try {
         await result.current.deleteToken('testuser', 'gt-token-123');
@@ -197,7 +200,7 @@ describe('useDeleteToken', () => {
 
     const { result } = renderHook(() => useDeleteToken());
 
-    let error;
+    let error: unknown;
     await act(async () => {
       try {
         await result.current.deleteToken('testuser', 'gt-token-123');
@@ -225,7 +228,7 @@ describe('useDeleteToken', () => {
 
     const { result } = renderHook(() => useDeleteToken());
 
-    let error;
+    let error: unknown;
     await act(async () => {
       try {
         await result.current.deleteToken('testuser', 'invalid-key');
@@ -256,7 +259,7 @@ describe('useDeleteToken', () => {
     await act(async () => {
       try {
         await result.current.deleteToken('testuser', 'gt-token-123');
-      } catch (err) {
+      } catch (_err) {
         // Expected error
       }
     });
@@ -276,7 +279,7 @@ describe('useDeleteToken', () => {
 
     const { result } = renderHook(() => useDeleteToken());
 
-    let error;
+    let error: unknown;
     await act(async () => {
       try {
         await result.current.deleteToken('testuser', 'gt-token-123');
@@ -299,7 +302,7 @@ describe('useDeleteToken', () => {
 
     const { result } = renderHook(() => useDeleteToken());
 
-    let error;
+    let error: unknown;
     await act(async () => {
       try {
         await result.current.deleteToken('testuser', 'gt-token-123');
@@ -356,7 +359,7 @@ describe('useDeleteToken', () => {
     await act(async () => {
       try {
         await result.current.deleteToken('testuser', 'gt-token-1');
-      } catch (err) {
+      } catch (_err) {
         // Expected error
       }
     });
@@ -432,7 +435,7 @@ describe('useDeleteToken', () => {
     await act(async () => {
       try {
         await result.current.deleteToken('testuser', 'gt-token-123');
-      } catch (err) {
+      } catch (_err) {
         // Expected error
       }
     });

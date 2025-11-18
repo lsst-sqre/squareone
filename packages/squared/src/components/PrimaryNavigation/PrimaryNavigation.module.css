@@ -125,7 +125,7 @@
   background-color: var(
     --rsd-component-header-nav-menulist-selected-background-color
   );
-  color: white !important;
+  color: white;
 }
 
 /* Navigation menu viewport container styles */

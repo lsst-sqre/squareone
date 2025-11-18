@@ -13,7 +13,7 @@ This is a JavaScript/TypeScript front-end monorepo supporting multiple Rubin Obs
 - [`@lsst-sqre/squared`](../packages/squared) - React component library (TypeScript, CSS Modules, **NO BUILD STEP**)
 - [`@lsst-sqre/global-css`](../packages/global-css) - Base CSS and design token application
 - [`@lsst-sqre/rubin-style-dictionary`](../packages/rubin-style-dictionary) - Design tokens built with style-dictionary
-- [`@lsst-sqre/eslint-config`](../packages/eslint-config) - Shared ESLint configuration
+- [`@lsst-sqre/eslint-config`](../packages/eslint-config) - Shared ESLint configuration (runs alongside Biome)
 - [`@lsst-sqre/tsconfig`](../packages/tsconfig) - Shared TypeScript configuration
 
 ## Package management
@@ -21,6 +21,15 @@ This is a JavaScript/TypeScript front-end monorepo supporting multiple Rubin Obs
 - pnpm is used for package management with workspaces
 - Turborepo is used for task running and build orchestration with remote caching. See [`turbo.json`](../turbo.json) for configuration
 - Use Changesets for versioning and releasing packages (see [`.changeset/`](../.changeset/))
+
+## Code quality tools
+
+The monorepo uses **Biome** as the primary tool for linting and formatting:
+- **Biome** - Fast, modern linting and formatting for JS/TS/JSON/CSS (see [`biome.json`](../biome.json))
+- **ESLint** - Comprehensive rule coverage, framework-specific rules (runs via Turborepo)
+- **Prettier** - YAML formatting only (Biome doesn't support YAML)
+
+Both Biome and ESLint run in CI for thorough code quality validation
 
 ## Coding conventions
 
@@ -159,15 +168,33 @@ Times Square is the notebook execution system integrated into squareone:
 ### Main commands
 
 ```bash
+# Development
 pnpm dev              # Start development servers for all apps
+pnpm storybook        # Start Storybook for all packages
+
+# Building
 pnpm build            # Build all packages and apps
-pnpm lint             # Run ESLint across all packages
+
+# Linting and Formatting
+pnpm biome:format     # Format code with Biome (JS/TS/JSON/CSS)
+pnpm biome:format:check  # Check formatting without fixing
+pnpm biome:lint       # Lint with Biome (allows warnings, fails on errors)
+pnpm lint             # Lint with ESLint (via Turborepo)
+pnpm prettier:yaml    # Format YAML files with Prettier
 pnpm type-check       # Run TypeScript type checking
-pnpm format           # Format code with Prettier
+
+# Testing
 pnpm test             # Run vitest tests
 pnpm test-storybook   # Run Storybook tests
-pnpm storybook        # Start Storybook for all packages
+
+# Validation
+pnpm localci          # Run full CI pipeline locally (formatting, linting, tests, build, Docker validation)
+pnpm validate-docker  # Validate Dockerfile versions match package.json
+
+# Documentation
 pnpm docs             # Generate Sphinx documentation
+
+# Versioning
 npx changeset         # Create a changeset for versioning
 ```
 

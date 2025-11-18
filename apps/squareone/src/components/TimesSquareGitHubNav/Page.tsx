@@ -1,3 +1,4 @@
+import React from 'react';
 /* A "Page" filesystem tree item, which links to a single page.
  *
  * This is based on a Josh Comeau blog post:
@@ -6,7 +7,6 @@
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Link from 'next/link';
-import React from 'react';
 import styled from 'styled-components';
 
 type PageProps = {

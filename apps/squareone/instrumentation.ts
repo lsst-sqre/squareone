@@ -15,4 +15,6 @@ export async function register() {
 }
 
 // Type assertion for captureRequestError to handle version differences
-export const onRequestError = (Sentry as any).captureRequestError;
+export const onRequestError = (
+  Sentry as unknown as { captureRequestError: unknown }
+).captureRequestError;

@@ -1,3 +1,4 @@
+import React from 'react';
 /* Menu for a user profile and settings. */
 
 import {
@@ -19,7 +20,7 @@ export default function UserMenu({ pageUrl }: UserMenuProps) {
   // User data should be available when this component is rendered
   // since Login component handles the hydration logic
   if (!user) {
-    return <></>;
+    return null;
   }
 
   return (

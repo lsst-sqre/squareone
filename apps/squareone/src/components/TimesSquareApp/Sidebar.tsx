@@ -1,10 +1,11 @@
+import React from 'react';
 /*
  * The navigational sidebar for Times Square.
  */
 
 import { IconPill } from '@lsst-sqre/squared';
 import Link from 'next/link';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import styled from 'styled-components';
 import { useAppConfig } from '../../contexts/AppConfigContext';
 import { getDocsUrl } from '../../lib/utils/docsUrls';

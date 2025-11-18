@@ -306,7 +306,7 @@ const configWithSessionsVisible = {
 };
 
 // Mock user data for testing user context
-const mockUser = {
+const _mockUser = {
   username: 'jdoe',
   name: 'Jane Doe',
   email: 'jane.doe@example.com',
@@ -315,7 +315,7 @@ const mockUser = {
 };
 
 // Create a mock for the useGafaelfawrUser hook
-const mockUseGafaelfawrUser = (userData: any) => ({
+const _mockUseGafaelfawrUser = (userData: unknown) => ({
   user: userData,
   isLoading: false,
   isValidating: false,

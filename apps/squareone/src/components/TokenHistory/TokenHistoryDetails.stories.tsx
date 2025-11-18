@@ -1,4 +1,3 @@
-import React from 'react';
 import type { TokenChangeHistoryEntry } from '../../hooks/useTokenChangeHistory';
 import { TokenHistoryDetails } from './TokenHistoryDetails';
 

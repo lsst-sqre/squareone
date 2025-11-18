@@ -1,5 +1,6 @@
 import * as RadixNavigationMenu from '@radix-ui/react-navigation-menu';
-import React, { forwardRef, useEffect, useRef } from 'react';
+import type React from 'react';
+import { forwardRef, useEffect, useRef } from 'react';
 import styles from './PrimaryNavigation.module.css';
 import { mergeReferences } from './utils';
 

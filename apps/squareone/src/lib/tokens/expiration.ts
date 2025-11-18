@@ -71,6 +71,7 @@ export function formatExpiration(value: ExpirationValue): string | null {
     return calculateExpirationDate(value.value).toISOString();
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: Need to access type property on unknown expiration value for error message
   throw new Error(`Unknown expiration type: ${(value as any).type}`);
 }
 

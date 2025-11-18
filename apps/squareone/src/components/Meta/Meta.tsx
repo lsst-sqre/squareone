@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import React from 'react';
 import { useAppConfig } from '../../contexts/AppConfigContext';
 
 const Meta = () => {

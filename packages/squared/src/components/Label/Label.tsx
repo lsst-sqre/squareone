@@ -1,5 +1,6 @@
 import * as LabelPrimitive from '@radix-ui/react-label';
-import React, { forwardRef } from 'react';
+import type React from 'react';
+import { forwardRef } from 'react';
 import styles from './Label.module.css';
 
 export type LabelProps = {

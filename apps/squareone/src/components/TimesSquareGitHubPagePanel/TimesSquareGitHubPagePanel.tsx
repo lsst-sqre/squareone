@@ -1,3 +1,4 @@
+import React from 'react';
 /*
  * TimesSquareGitHubPagePanel with dynamic import to prevent SSR issues
  * Uses client-only component to handle SWR hooks safely.

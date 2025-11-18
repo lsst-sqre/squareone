@@ -10,9 +10,9 @@ import { useAppConfig } from '../contexts/AppConfigContext';
 import { loadAppConfig } from '../lib/config/loader';
 
 // Define prop types (can be empty if no additional props needed)
-type PageProps = {};
+type PageProps = Record<string, never>;
 
-export default function MyPage({}: PageProps) {
+export default function MyPage(_props: PageProps) {
   // Access configuration via hook
   const appConfig = useAppConfig();
 
@@ -47,17 +47,12 @@ MyPage.getLayout = function getLayout(page: ReactElement): ReactNode {
 
 // REQUIRED: getServerSideProps to load configuration
 export const getServerSideProps: GetServerSideProps<PageProps> = async () => {
-  try {
-    // Load app configuration from filesystem
-    const appConfig = await loadAppConfig();
+  // Load app configuration from filesystem
+  const appConfig = await loadAppConfig();
 
-    return {
-      props: {
-        appConfig, // Required: _app.tsx extracts this into AppConfigProvider
-      },
-    };
-  } catch (error) {
-    // Re-throw to trigger Next.js error page
-    throw error;
-  }
+  return {
+    props: {
+      appConfig, // Required: _app.tsx extracts this into AppConfigProvider
+    },
+  };
 };

@@ -1,5 +1,5 @@
 import React from 'react';
-import useUserTokens, { type TokenInfo } from '../../hooks/useUserTokens';
+import useUserTokens from '../../hooks/useUserTokens';
 import SessionTokenItem from './SessionTokenItem';
 import styles from './SessionTokensView.module.css';
 

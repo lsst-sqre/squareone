@@ -1,10 +1,10 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { useAppConfig } from '../../contexts/AppConfigContext';
 import BroadcastBannerStack from '../BroadcastBannerStack';
 import Footer from '../Footer';
 import Header from '../Header';
-import MainContent from '../MainContent';
 import Meta from '../Meta';
 
 type PageProps = {

@@ -48,29 +48,82 @@ From the monorepo root, you can start up the Storybook server for all apps and p
 
    pnpm storybook
 
-Manual linting and formatting
------------------------------
+Linting and formatting
+======================
 
-Typically linting is run by your IDE while you develop and again when you commit code (via Husky).
-You can also manually lint and format code.
+The monorepo uses Biome_ as the primary tool for code formatting and linting, with ESLint providing additional comprehensive rule coverage.
+Prettier_ is still used specifically for YAML files.
+These tools run automatically in your IDE and when you commit code (via Husky pre-commit hooks), but you can also run them manually.
 
-Lint JavaScript (e.g. with `next lint`_ for Next.js apps):
+Format code with Biome
+----------------------
+
+Check code formatting for JavaScript, TypeScript, JSON, and CSS:
+
+.. code-block:: bash
+
+   pnpm biome:format:check
+
+Automatically format and fix files:
+
+.. code-block:: bash
+
+   pnpm biome:format
+
+Lint code with Biome
+--------------------
+
+Biome provides fast linting for correctness, accessibility, performance, security, and code style issues.
+This command allows warnings but fails on errors:
+
+.. code-block:: bash
+
+   pnpm biome:lint
+
+Comprehensive linting with ESLint
+----------------------------------
+
+ESLint runs via Turborepo and provides comprehensive rule coverage across all packages.
+This is the same linting that runs in CI:
 
 .. code-block:: bash
 
    pnpm lint
 
-Check formatting with Prettier_:
+Format YAML files
+-----------------
+
+YAML files are formatted with Prettier (Biome doesn't support YAML):
 
 .. code-block:: bash
 
-   pnpm format:check
+   pnpm prettier:yaml
 
-Or automatically fix files with Prettier_:
+Running local CI validation
+----------------------------
+
+You can run the complete CI pipeline locally to catch issues before pushing.
+This validates formatting, linting, type checking, tests, builds, and Docker version synchronization:
 
 .. code-block:: bash
 
-   pnpm format
+   pnpm localci
+
+This command runs all the same checks as the GitHub Actions CI workflow, including:
+
+- Docker version validation (ensures Dockerfile versions match package.json)
+- Biome format checking
+- YAML formatting with Prettier
+- ESLint linting
+- TypeScript type checking
+- Unit and Storybook tests
+- Production builds
+- Biome linting
+
+.. tip::
+
+   Run ``pnpm localci`` before pushing to ensure your changes will pass CI.
+   It's faster to catch issues locally than to wait for the GitHub Actions workflow.
 
 Create a production build
 =========================

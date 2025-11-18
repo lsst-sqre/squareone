@@ -80,7 +80,6 @@ export default function TokenHistoryList({
       {hasMore && (
         <div className={styles.loadMoreContainer}>
           <Button
-            role="secondary"
             onClick={onLoadMore}
             disabled={isLoadingMore}
             loading={isLoadingMore}

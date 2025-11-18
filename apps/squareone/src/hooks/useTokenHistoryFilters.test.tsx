@@ -1,5 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
 import { useRouter } from 'next/router';
+import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import useTokenHistoryFilters from './useTokenHistoryFilters';
 
@@ -10,6 +11,7 @@ vi.mock('next/router', () => ({
 
 describe('useTokenHistoryFilters', () => {
   let mockPush: ReturnType<typeof vi.fn>;
+  // biome-ignore lint/suspicious/noExplicitAny: Test router mock accepts any methods
   let mockRouter: any;
 
   beforeEach(() => {
@@ -277,6 +279,7 @@ describe('useTokenHistoryFilters', () => {
     const { result } = renderHook(() => useTokenHistoryFilters());
 
     act(() => {
+      // biome-ignore lint/suspicious/noExplicitAny: Test validates null handling with any cast
       result.current.setFilter('token', null as any);
     });
 

@@ -4,7 +4,7 @@
  * page, usually the page viewer, or a markdown view of the GitHub repository.
  */
 
-import React, { ReactNode } from 'react';
+import React, { type ReactNode } from 'react';
 import styled from 'styled-components';
 import TimesSquareGitHubPagePanel from '../TimesSquareGitHubPagePanel/TimesSquareGitHubPagePanel';
 import TimesSquareMainGitHubNav from '../TimesSquareMainGitHubNav';
@@ -33,8 +33,9 @@ export default function TimesSquareApp({
   children,
   pageNav: providedPageNav,
 }: TimesSquareAppProps) {
-  const { tsSlug, owner, repo, commit, githubSlug, urlQueryString } =
-    React.useContext(TimesSquareUrlParametersContext);
+  const { tsSlug, owner, repo, commit, githubSlug } = React.useContext(
+    TimesSquareUrlParametersContext
+  );
 
   const defaultPageNav = commit ? (
     <TimesSquarePrGitHubNav owner={owner} repo={repo} commitSha={commit} />

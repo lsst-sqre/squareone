@@ -109,19 +109,19 @@
 /* Calendar styles */
 .calendar {
   margin: 0;
-  margin-bottom: 0 !important;
+  margin-bottom: 0;
 }
 
 /* Override react-day-picker month grid bottom margin */
 .calendar :global(.rdp-month_grid) {
-  margin-bottom: 0 !important;
+  margin-bottom: 0;
 }
 
 /* Override react-day-picker caption height and line-height */
 .calendar :global(.rdp-month_caption) {
-  height: auto !important;
-  line-height: 1 !important;
-  min-height: 0 !important;
+  height: auto;
+  line-height: 1;
+  min-height: 0;
 }
 
 .calendarMonths {
@@ -319,13 +319,13 @@
 }
 
 .calendarDaySelected button {
-  background: var(--rsd-color-primary-600) !important;
-  color: white !important;
+  background: var(--rsd-color-primary-600);
+  color: white;
   font-weight: 600;
 }
 
 .calendarDaySelected button:hover {
-  background: var(--rsd-color-primary-700) !important;
+  background: var(--rsd-color-primary-700);
 }
 
 .calendarDayToday {
@@ -357,7 +357,7 @@
 .calendarDayDisabled button {
   opacity: 0.3;
   cursor: not-allowed;
-  background: none !important;
+  background: none;
 }
 
 .calendarDayHidden {
@@ -419,7 +419,7 @@
   }
 
   .calendarDaySelected button {
-    border: 2px solid var(--rsd-color-primary-800) !important;
+    border: 2px solid var(--rsd-color-primary-800);
   }
 }
 
@@ -429,8 +429,8 @@
   .calendarNavButton,
   .calendarDay button,
   .calendarButton {
-    animation: none !important;
-    transition: none !important;
+    animation: none;
+    transition: none;
   }
 }
 

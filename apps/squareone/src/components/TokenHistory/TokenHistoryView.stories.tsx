@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import type { TokenChangeHistoryEntry } from '../../hooks/useTokenChangeHistory';
 import TokenHistoryFilters from './TokenHistoryFilters';
 import TokenHistoryList from './TokenHistoryList';
@@ -213,7 +213,7 @@ export const Loading = {
 /**
  * Error state with retry option
  */
-export const Error = {
+export const ErrorState = {
   render: () => (
     <TokenHistoryViewWrapper
       entries={[]}

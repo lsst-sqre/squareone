@@ -9,9 +9,10 @@ import { loadAppConfig } from '../lib/config/loader';
 const pageDescription =
   'Learn about the Rubin Science Platform Acceptable Use Policy';
 
+// biome-ignore lint/complexity/noBannedTypes: Empty props object required for Next.js page
 type AupPageProps = {};
 
-export default function AupPage({}: AupPageProps) {
+export default function AupPage() {
   const appConfig = useAppConfig();
 
   return (
@@ -55,16 +56,12 @@ AupPage.getLayout = function getLayout(page: ReactElement): ReactNode {
 export const getServerSideProps: GetServerSideProps<
   AupPageProps
 > = async () => {
-  try {
-    // Load app configuration for context
-    const appConfig = await loadAppConfig();
+  // Load app configuration for context
+  const appConfig = await loadAppConfig();
 
-    return {
-      props: {
-        appConfig, // Still needed for _app.tsx to extract into context
-      },
-    };
-  } catch (error) {
-    throw error;
-  }
+  return {
+    props: {
+      appConfig, // Still needed for _app.tsx to extract into context
+    },
+  };
 };

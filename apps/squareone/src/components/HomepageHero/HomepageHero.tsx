@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import React from 'react';
 import styled from 'styled-components';
 import { useAppConfig } from '../../contexts/AppConfigContext';
 import { ContentMaxWidth } from '../../styles/sizes';

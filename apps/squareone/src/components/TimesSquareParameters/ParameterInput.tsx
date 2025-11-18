@@ -1,4 +1,5 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
 type ParameterSchema = {
@@ -19,25 +20,23 @@ export default function ParameterInput({
   children,
   paramName,
   paramSchema,
-  touched,
+  touched: _touched,
   errors,
 }: ParameterInputProps) {
   const errorMessage = computeErrorMessage(errors, paramSchema);
   return (
-    <>
-      <label htmlFor={`${paramName}`}>
-        <ParameterName>{paramName}</ParameterName>
-        {children}
-        {errorMessage && (
-          <ErrorMessage id={`tsparam-${paramName}-error`} aria-live="polite">
-            {errorMessage}
-          </ErrorMessage>
-        )}
-        <Description id={`tsparam-${paramName}-description`}>
-          {paramSchema.description}
-        </Description>
-      </label>
-    </>
+    <label htmlFor={`${paramName}`}>
+      <ParameterName>{paramName}</ParameterName>
+      {children}
+      {errorMessage && (
+        <ErrorMessage id={`tsparam-${paramName}-error`} aria-live="polite">
+          {errorMessage}
+        </ErrorMessage>
+      )}
+      <Description id={`tsparam-${paramName}-description`}>
+        {paramSchema.description}
+      </Description>
+    </label>
   );
 }
 

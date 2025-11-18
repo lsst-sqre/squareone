@@ -77,7 +77,7 @@ export const WithDescription: Story = {
 
 export const WithoutLabel: Story = {
   args: {},
-  render: (args: any) => (
+  render: (args: React.ComponentProps<typeof Checkbox>) => (
     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
       <Checkbox {...args} id="unlabeled-checkbox" />
       <label htmlFor="unlabeled-checkbox">External label element</label>
@@ -286,7 +286,12 @@ export const ReactHookFormIntegration: Story = {
 
     const preferences = watch('preferences') || [];
 
-    const onSubmit = async (data: any) => {
+    const onSubmit = async (data: {
+      terms: boolean;
+      newsletter: boolean;
+      preferences: string[];
+      marketing: boolean;
+    }) => {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
       alert(`Form submitted with data: ${JSON.stringify(data, null, 2)}`);
@@ -380,20 +385,10 @@ export const ReactHookFormIntegration: Story = {
         </FormField>
 
         <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <Button
-            type="submit"
-            role="primary"
-            size="md"
-            disabled={isSubmitting}
-          >
+          <Button type="submit" size="md" disabled={isSubmitting}>
             {isSubmitting ? 'Submitting...' : 'Submit Form'}
           </Button>
-          <Button
-            type="button"
-            role="secondary"
-            size="md"
-            onClick={() => reset()}
-          >
+          <Button type="button" size="md" onClick={() => reset()}>
             Reset Form
           </Button>
         </div>
@@ -584,7 +579,7 @@ export const AccessibilityTest: Story = {
     label: 'Accessibility Test Checkbox',
     description: 'This tests ARIA attributes',
   },
-  render: (args: any) => (
+  render: (args: React.ComponentProps<typeof Checkbox>) => (
     <FormField
       error="This field is required"
       description="Choose to accept the terms"

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import type { TokenChangeHistoryEntry } from '../../hooks/useTokenChangeHistory';
 import TokenHistoryList from './TokenHistoryList';
 
@@ -116,7 +116,7 @@ export const WithExpandAllControl = {
     return (
       <div>
         <div style={{ marginBottom: '16px' }}>
-          <button onClick={() => setExpandAll(!expandAll)}>
+          <button type="button" onClick={() => setExpandAll(!expandAll)}>
             {expandAll ? 'Collapse All' : 'Expand All'}
           </button>
           <span
@@ -226,6 +226,7 @@ export const ManyEntries = {
       createEntry({
         token: `token${i}${Math.random().toString(36).substring(7)}`,
         token_name: `Token ${i + 1}`,
+        // biome-ignore lint/suspicious/noExplicitAny: Array indexing may return undefined, cast to ensure action type
         action: ['create', 'edit', 'revoke', 'expire'][i % 4] as any,
         event_time: Date.now() / 1000 - 3600 * i,
       })

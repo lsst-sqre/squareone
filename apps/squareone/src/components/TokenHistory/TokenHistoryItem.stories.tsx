@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import type { TokenChangeHistoryEntry } from '../../hooks/useTokenChangeHistory';
 import TokenHistoryItem from './TokenHistoryItem';
 
@@ -62,7 +62,7 @@ export const ControlledCollapsed = {
     return (
       <div>
         <p>External controls:</p>
-        <button onClick={() => setIsExpanded(!isExpanded)}>
+        <button type="button" onClick={() => setIsExpanded(!isExpanded)}>
           {isExpanded ? 'Collapse' : 'Expand'} (controlled)
         </button>
         <TokenHistoryItem
@@ -81,7 +81,7 @@ export const ControlledExpanded = {
     return (
       <div>
         <p>External controls:</p>
-        <button onClick={() => setIsExpanded(!isExpanded)}>
+        <button type="button" onClick={() => setIsExpanded(!isExpanded)}>
           {isExpanded ? 'Collapse' : 'Expand'} (controlled)
         </button>
         <TokenHistoryItem
@@ -303,7 +303,7 @@ export const ExpandCollapseAll = {
     return (
       <div>
         <div style={{ marginBottom: '16px' }}>
-          <button onClick={() => setExpandAll(!expandAll)}>
+          <button type="button" onClick={() => setExpandAll(!expandAll)}>
             {expandAll ? 'Collapse All' : 'Expand All'}
           </button>
         </div>

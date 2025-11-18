@@ -19,24 +19,50 @@ This is a **monorepo** for Rubin Observatory front-end applications managed with
 - **`@lsst-sqre/squared`** - React component library (TypeScript, CSS Modules, no build step)
 - **`@lsst-sqre/global-css`** - Base CSS and design token application
 - **`@lsst-sqre/rubin-style-dictionary`** - Design tokens built with style-dictionary
-- **`@lsst-sqre/eslint-config`** - Shared ESLint configuration
+- **`@lsst-sqre/eslint-config`** - Shared ESLint configuration (runs alongside Biome)
 - **`@lsst-sqre/tsconfig`** - Shared TypeScript configuration
+
+### Code Quality Tools
+
+The monorepo uses **Biome** as the primary tool for linting and formatting:
+- **Biome** - Fast, modern linting and formatting for JS/TS/JSON/CSS (see `biome.json`)
+- **ESLint** - Comprehensive rule coverage, framework-specific rules (runs via Turborepo)
+- **Prettier** - YAML formatting only (Biome doesn't support YAML)
+
+Both Biome and ESLint run in CI for thorough code quality validation.
 
 ## Development Commands
 
 ### Main Commands (run from repository root)
 
 ```bash
+# Development
 pnpm dev              # Start development servers
+pnpm storybook        # Start Storybook
+
+# Building
 pnpm build            # Build all packages and apps
-pnpm lint             # Run ESLint
+
+# Linting and Formatting
+pnpm biome:format     # Format code with Biome (JS/TS/JSON/CSS)
+pnpm biome:format:check  # Check formatting without fixing
+pnpm biome:lint       # Lint with Biome (allows warnings, fails on errors)
+pnpm lint             # Lint with ESLint (via Turborepo)
+pnpm prettier:yaml    # Format YAML files with Prettier
 pnpm type-check       # Run TypeScript type checking
-pnpm format           # Format code with Prettier
+
+# Testing
 pnpm test             # Run vitest tests
 pnpm test-storybook   # Run Storybook tests
-pnpm storybook        # Start Storybook
-pnpm docs             # Generate Sphinx documentation
+
+# Validation
+pnpm localci          # Run full CI pipeline locally (formatting, linting, tests, build, Docker validation)
 pnpm validate-docker  # Validate Dockerfile versions match package.json
+
+# Documentation
+pnpm docs             # Generate Sphinx documentation
+
+# Versioning
 npx changeset         # Create changeset for versioning
 ```
 
@@ -141,6 +167,7 @@ These skills automatically activate when relevant or can be referenced explicitl
 
 ## Configuration Files
 
+- **`biome.json`** - Biome linting and formatting configuration
 - **`turbo.json`** - Turborepo build pipeline configuration
 - **`pnpm-workspace.yaml`** - pnpm workspace configuration
 - **`apps/squareone/squareone.config.yaml`** - Public runtime configuration (client-accessible)
@@ -148,6 +175,7 @@ These skills automatically activate when relevant or can be referenced explicitl
 - **`apps/squareone/squareone.config.schema.json`** - JSON schema for public config validation
 - **`apps/squareone/next.config.js`** - Next.js configuration (no runtime config, only build config)
 - **`apps/squareone/src/content/pages/`** - Development MDX content files
+- **`packages/eslint-config/`** - Shared ESLint configuration
 - **`.github/copilot-instructions.md`** - Contains detailed coding patterns and conventions
 
 ## Important Development Notes

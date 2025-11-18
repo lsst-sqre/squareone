@@ -20,7 +20,6 @@
       "outputLogs": "errors-only"
     },
     "type-check": {
-      "dependsOn": ["^build"],
       "outputLogs": "errors-only"
     },
     "dev": {
@@ -53,6 +52,12 @@
     },
     "//#biome:format": {
       "cache": false,
+      "outputLogs": "errors-only"
+    },
+    "//#biome:lint": {
+      "outputLogs": "errors-only"
+    },
+    "//#prettier:yaml": {
       "outputLogs": "errors-only"
     }
   }

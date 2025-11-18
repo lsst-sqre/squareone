@@ -27,7 +27,7 @@ const meta: Meta<typeof Button> = {
       options: ['primary', 'secondary', 'tertiary', 'danger'],
       description: 'Semantic variation of the button',
     },
-    role: {
+    variant: {
       control: 'select',
       options: [undefined, 'primary', 'secondary', 'danger'],
       description: 'Shorthand for common appearance + tone combinations',
@@ -59,21 +59,21 @@ type Story = StoryObj<typeof meta>;
 export const Primary: Story = {
   args: {
     children: 'Primary Button',
-    role: 'primary',
+    variant: 'primary',
   },
 };
 
 export const Secondary: Story = {
   args: {
     children: 'Secondary Button',
-    role: 'secondary',
+    variant: 'secondary',
   },
 };
 
 export const Danger: Story = {
   args: {
     children: 'Delete',
-    role: 'danger',
+    variant: 'danger',
   },
 };
 
@@ -301,7 +301,7 @@ export const ComplexComposition: Story = {
 export const ClickTest: Story = {
   args: {
     children: 'Click me',
-    role: 'primary',
+    variant: 'primary',
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -361,7 +361,7 @@ export const LoadingInteractionTest: Story = {
 export const FocusTest: Story = {
   args: {
     children: 'Focus me',
-    role: 'primary',
+    variant: 'primary',
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);

@@ -29,6 +29,7 @@ export default defineConfig({
             tags: {
               include: ['test'],
             },
+            // biome-ignore lint/suspicious/noExplicitAny: Vitest loader plugin type is opaque
           }) as any,
         ],
         test: {

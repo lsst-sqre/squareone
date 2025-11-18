@@ -1,4 +1,4 @@
-import useSWR, { Fetcher } from 'swr';
+import useSWR, { type Fetcher } from 'swr';
 import fetch from 'unfetch';
 
 type GafaelfawrGroup = {
@@ -49,7 +49,7 @@ const useGafaelfawrUser = () => {
     fetcher
   );
 
-  const isLoggedIn = !error && data && data.hasOwnProperty('username');
+  const isLoggedIn = !error && data && Object.hasOwn(data, 'username');
 
   return {
     user: data,

@@ -76,6 +76,7 @@ function parseLinkHeader(linkHeader: string | null): string | null {
  * Normalize API response to ensure null values for optional fields
  * Gafaelfawr API may omit null/optional fields from JSON responses
  */
+// biome-ignore lint/suspicious/noExplicitAny: Raw API response structure is untyped before normalization
 function normalizeEntry(entry: any): TokenChangeHistoryEntry {
   return {
     token: entry.token,

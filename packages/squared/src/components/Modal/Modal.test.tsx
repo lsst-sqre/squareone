@@ -346,14 +346,14 @@ describe('Modal', () => {
 
       render(
         <div>
-          <button>Outside button</button>
+          <button type="button">Outside button</button>
           <Modal
             open={true}
             onOpenChange={vi.fn()}
             title="Modal"
             description="Test description"
           >
-            <button>Inside button</button>
+            <button type="button">Inside button</button>
           </Modal>
         </div>
       );

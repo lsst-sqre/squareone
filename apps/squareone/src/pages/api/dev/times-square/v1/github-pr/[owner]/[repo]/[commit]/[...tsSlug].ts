@@ -11,7 +11,7 @@ export default async function handler(
   res: NextApiResponse
 ) {
   try {
-    const { tsSlug } = req.query;
+    const { tsSlug: _tsSlug } = req.query;
     const page = 'demo';
     const appConfig = await loadAppConfig();
     const { timesSquareUrl } = appConfig;
