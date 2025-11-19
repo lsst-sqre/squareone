@@ -4,6 +4,7 @@ import type { ReactElement, ReactNode } from 'react';
 
 import MainContent from '../components/MainContent';
 import { useAppConfig } from '../contexts/AppConfigContext';
+import { loadFooterMdx } from '../lib/config/footerLoader';
 import { loadAppConfig } from '../lib/config/loader';
 
 const pageDescription =
@@ -58,10 +59,12 @@ export const getServerSideProps: GetServerSideProps<
 > = async () => {
   // Load app configuration for context
   const appConfig = await loadAppConfig();
+  const footerMdxSource = await loadFooterMdx(appConfig);
 
   return {
     props: {
       appConfig, // Still needed for _app.tsx to extract into context
+      footerMdxSource,
     },
   };
 };

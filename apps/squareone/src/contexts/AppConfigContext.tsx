@@ -20,6 +20,7 @@ export interface AppConfigContextValue {
   showPreview: boolean;
   previewLink?: string;
   mdxDir: string;
+  footerMdxPath?: string;
   sentryDsn?: string;
   sentryTracesSampleRate?: number;
   sentryReplaysSessionSampleRate?: number;

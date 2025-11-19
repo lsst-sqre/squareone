@@ -16,6 +16,7 @@ const ENABLE_CACHING =
 // Module-level caches
 let cachedAppConfig: AppConfig | null = null;
 const mdxContentCache = new Map<string, string>();
+const missingMdxFiles = new Set<string>(); // Track files that don't exist to avoid repeated checks
 
 export interface AppConfig {
   siteName: string;
@@ -150,8 +151,15 @@ export async function loadMdxContent(
     }
   }
 
+  // Check if file is known to be missing (avoids repeated filesystem checks)
+  if (missingMdxFiles.has(cacheKey)) {
+    throw new Error(`MDX file not found: ${fullPath}`);
+  }
+
   // Validate file exists before reading
   if (!fs.existsSync(fullPath)) {
+    // Cache the missing file state to avoid repeated checks
+    missingMdxFiles.add(cacheKey);
     throw new Error(`MDX file not found: ${fullPath}`);
   }
 

@@ -6,6 +6,7 @@ import TimesSquareApp from '../../components/TimesSquareApp';
 import TimesSquareUrlParametersProvider from '../../components/TimesSquareUrlParametersProvider';
 import WideContentLayout from '../../components/WideContentLayout';
 import { useAppConfig } from '../../contexts/AppConfigContext';
+import { loadFooterMdx } from '../../lib/config/footerLoader';
 import { loadAppConfig } from '../../lib/config/loader';
 
 // biome-ignore lint/complexity/noBannedTypes: Empty props object required for Next.js page
@@ -124,6 +125,7 @@ export const getServerSideProps: GetServerSideProps<
 > = async () => {
   try {
     const appConfig = await loadAppConfig();
+    const footerMdxSource = await loadFooterMdx(appConfig);
 
     // Make the page return a 404 if Times Square is not configured
     const notFound = !appConfig.timesSquareUrl;
@@ -132,6 +134,7 @@ export const getServerSideProps: GetServerSideProps<
       notFound,
       props: {
         appConfig,
+        footerMdxSource,
       },
     };
   } catch (_error) {
