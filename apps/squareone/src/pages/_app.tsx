@@ -38,8 +38,8 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   // Otherwise, the page itself is used as the content area layout container.
   const getLayout = Component.getLayout || ((page) => page);
 
-  // Extract appConfig from pageProps (provided by getServerSideProps)
-  const { appConfig, ...otherPageProps } = pageProps;
+  // Extract appConfig and footerMdxSource from pageProps (provided by getServerSideProps)
+  const { appConfig, footerMdxSource, ...otherPageProps } = pageProps;
 
   // If no appConfig is provided (e.g., API routes, error pages), provide a minimal fallback
   const fallbackConfig: AppConfigContextValue = {
@@ -67,7 +67,9 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const coreApp = (
     <AppConfigProvider config={config}>
       <ThemeProvider defaultTheme="system">
-        <Page>{getLayout(<Component {...otherPageProps} />)}</Page>
+        <Page footerMdxSource={footerMdxSource}>
+          {getLayout(<Component {...otherPageProps} />)}
+        </Page>
       </ThemeProvider>
     </AppConfigProvider>
   );

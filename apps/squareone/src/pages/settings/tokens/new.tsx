@@ -14,6 +14,7 @@ import useLoginInfo from '../../../hooks/useLoginInfo';
 import useTokenCreation from '../../../hooks/useTokenCreation';
 import useTokenTemplateUrl from '../../../hooks/useTokenTemplateUrl';
 import useUserTokens, { extractTokenNames } from '../../../hooks/useUserTokens';
+import { loadFooterMdx } from '../../../lib/config/footerLoader';
 import { loadAppConfig } from '../../../lib/config/loader';
 import {
   formatExpiration,
@@ -220,6 +221,7 @@ export const getServerSideProps: GetServerSideProps<
   NewTokenPageProps
 > = async ({ query }) => {
   const appConfig = await loadAppConfig();
+  const footerMdxSource = await loadFooterMdx(appConfig);
 
   // Parse query parameters for form prefilling
   const queryParams = parseTokenQueryParams(query);
@@ -227,6 +229,7 @@ export const getServerSideProps: GetServerSideProps<
   return {
     props: {
       appConfig, // Required for AppConfigProvider in _app.tsx
+      footerMdxSource,
       initialValues:
         Object.keys(queryParams).length > 0 ? queryParams : undefined,
     },

@@ -5,6 +5,7 @@ import type { ReactElement } from 'react';
 import { getLayout } from '../../../components/SettingsLayout';
 import { TokenHistoryView } from '../../../components/TokenHistory';
 import { useAppConfig } from '../../../contexts/AppConfigContext';
+import { loadFooterMdx } from '../../../lib/config/footerLoader';
 import { loadAppConfig } from '../../../lib/config/loader';
 
 type NextPageWithLayout = {
@@ -71,10 +72,12 @@ TokensHistoryPage.getLayout = getLayout;
 // REQUIRED: Load appConfig for AppConfigProvider in _app.tsx
 export const getServerSideProps: GetServerSideProps = async () => {
   const appConfig = await loadAppConfig();
+  const footerMdxSource = await loadFooterMdx(appConfig);
 
   return {
     props: {
       appConfig, // Required for AppConfigProvider in _app.tsx
+      footerMdxSource,
     },
   };
 };

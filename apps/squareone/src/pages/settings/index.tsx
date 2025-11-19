@@ -63,25 +63,33 @@ export const getServerSideProps: GetServerSideProps<
     // Serialize MDX content directly in getServerSideProps
     const mdxSource = await serialize(mdxContent);
 
+    // Load footer MDX
+    const { loadFooterMdx } = await import('../../lib/config/footerLoader');
+    const footerMdxSource = await loadFooterMdx(appConfig);
+
     return {
       props: {
         appConfig, // Required for AppConfigProvider in _app.tsx
         mdxSource,
+        footerMdxSource,
       },
     };
   } catch (_error) {
     // Fallback: load config only and provide default content
     const { loadAppConfig } = await import('../../lib/config/loader');
+    const { loadFooterMdx } = await import('../../lib/config/footerLoader');
 
     const appConfig = await loadAppConfig();
     const fallbackMdx = await serialize(
       '# Account settings\n\nContent temporarily unavailable.'
     );
+    const footerMdxSource = await loadFooterMdx(appConfig);
 
     return {
       props: {
         appConfig, // Required for AppConfigProvider in _app.tsx
         mdxSource: fallbackMdx,
+        footerMdxSource,
       },
     };
   }

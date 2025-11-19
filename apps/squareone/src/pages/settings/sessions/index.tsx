@@ -13,6 +13,7 @@ import SessionTokensView from '@/components/SessionTokensView';
 import { Lede } from '@/components/Typography';
 import { getLayout } from '../../../components/SettingsLayout';
 import { useAppConfig } from '../../../contexts/AppConfigContext';
+import { loadFooterMdx } from '../../../lib/config/footerLoader';
 import { loadAppConfig } from '../../../lib/config/loader';
 
 type NextPageWithLayout = {
@@ -160,10 +161,12 @@ export const getServerSideProps: GetServerSideProps<
   SessionTokensPageProps
 > = async () => {
   const appConfig = await loadAppConfig();
+  const footerMdxSource = await loadFooterMdx(appConfig);
 
   return {
     props: {
       appConfig, // Required for AppConfigProvider in _app.tsx
+      footerMdxSource,
       // Add any page-specific data here
     },
   };

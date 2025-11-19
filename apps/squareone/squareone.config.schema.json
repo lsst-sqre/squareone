@@ -61,6 +61,12 @@
       "description": "Directory path where MDX content files are located. Can be relative (development) or absolute (production with ConfigMap).",
       "default": "src/content/pages"
     },
+    "footerMdxPath": {
+      "type": "string",
+      "title": "Footer MDX content path",
+      "description": "Path to MDX file for footer content, relative to mdxDir. If not provided, uses default hardcoded footer content.",
+      "default": "footer.mdx"
+    },
     "sentryTracesSampleRate": {
       "type": "number",
       "title": "Sentry traces sample rate",

@@ -59,25 +59,33 @@ export const getServerSideProps: GetServerSideProps<
     // Serialize MDX content directly in getServerSideProps using ES import
     const mdxSource = await serialize(mdxContent);
 
+    // Load footer MDX
+    const { loadFooterMdx } = await import('../lib/config/footerLoader');
+    const footerMdxSource = await loadFooterMdx(appConfig);
+
     return {
       props: {
         appConfig, // Still needed for _app.tsx to extract into context
         mdxSource,
+        footerMdxSource,
       },
     };
   } catch (_error) {
     // Fallback: load config only and provide default content
     const { loadAppConfig } = await import('../lib/config/loader');
+    const { loadFooterMdx } = await import('../lib/config/footerLoader');
 
     const appConfig = await loadAppConfig();
     const fallbackMdx = await serialize(
       '# Rubin Science Platform APIs\n\nContent temporarily unavailable.'
     );
+    const footerMdxSource = await loadFooterMdx(appConfig);
 
     return {
       props: {
         appConfig, // Still needed for _app.tsx to extract into context
         mdxSource: fallbackMdx,
+        footerMdxSource,
       },
     };
   }
