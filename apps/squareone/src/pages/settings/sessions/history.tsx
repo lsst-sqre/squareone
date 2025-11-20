@@ -6,6 +6,7 @@ import type { ReactElement } from 'react';
 import { getLayout } from '../../../components/SettingsLayout';
 import { TokenHistoryView } from '../../../components/TokenHistory';
 import { useAppConfig } from '../../../contexts/AppConfigContext';
+import { loadFooterMdx } from '../../../lib/config/footerLoader';
 import { loadAppConfig } from '../../../lib/config/loader';
 
 type NextPageWithLayout = {
@@ -138,10 +139,12 @@ export const getServerSideProps: GetServerSideProps<
   SessionTokensHistoryPageProps
 > = async () => {
   const appConfig = await loadAppConfig();
+  const footerMdxSource = await loadFooterMdx(appConfig);
 
   return {
     props: {
       appConfig, // Required for AppConfigProvider in _app.tsx
+      footerMdxSource,
       // Add any page-specific data here
     },
   };
