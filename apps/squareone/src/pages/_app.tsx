@@ -59,6 +59,12 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     sentryReplaysSessionSampleRate: 0,
     sentryReplaysOnErrorSampleRate: 1.0,
     sentryDebug: false,
+    headerLogoUrl: undefined,
+    headerLogoData: undefined,
+    headerLogoMimeType: undefined,
+    headerLogoHeight: 50,
+    headerLogoWidth: undefined,
+    headerLogoAlt: 'Logo',
   };
 
   const config = appConfig || fallbackConfig;

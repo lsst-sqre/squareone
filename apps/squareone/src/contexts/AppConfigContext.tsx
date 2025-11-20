@@ -26,6 +26,12 @@ export interface AppConfigContextValue {
   sentryReplaysSessionSampleRate?: number;
   sentryReplaysOnErrorSampleRate?: number;
   sentryDebug?: boolean;
+  headerLogoUrl?: string;
+  headerLogoData?: string;
+  headerLogoMimeType?: string;
+  headerLogoHeight?: number;
+  headerLogoWidth?: number;
+  headerLogoAlt?: string;
 }
 
 const AppConfigContext = createContext<AppConfigContextValue | null>(null);
