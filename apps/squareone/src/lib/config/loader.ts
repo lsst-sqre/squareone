@@ -42,6 +42,12 @@ export interface AppConfig {
   sentryReplaysSessionSampleRate?: number;
   sentryReplaysOnErrorSampleRate?: number;
   sentryDebug?: boolean;
+  headerLogoUrl?: string;
+  headerLogoData?: string;
+  headerLogoMimeType?: string;
+  headerLogoHeight?: number;
+  headerLogoWidth?: number;
+  headerLogoAlt?: string;
 }
 
 // Migrated from next.config.js - YAML loading with Ajv validation

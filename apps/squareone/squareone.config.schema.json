@@ -131,6 +131,49 @@
       "title": "Preview badge link URL",
       "description": "URL for the preview badge link",
       "default": "https://rsp.lsst.io/roadmap.html"
+    },
+    "headerLogoUrl": {
+      "type": "string",
+      "title": "Header logo URL",
+      "description": "HTTPS URL to an external logo image. Takes priority over headerLogoData if both are set. If neither URL nor data is provided, uses the default Rubin Observatory logo. When using this option, headerLogoWidth must also be provided.",
+      "pattern": "^https://"
+    },
+    "headerLogoData": {
+      "type": "string",
+      "title": "Header logo base64 data",
+      "description": "Base64-encoded image data (without the data URL prefix). Must be used together with headerLogoMimeType and headerLogoWidth. Used only if headerLogoUrl is not provided."
+    },
+    "headerLogoMimeType": {
+      "type": "string",
+      "title": "Header logo MIME type",
+      "description": "MIME type for the base64-encoded logo data (e.g., 'image/png', 'image/jpeg', 'image/svg+xml'). Required when headerLogoData is provided.",
+      "enum": [
+        "image/png",
+        "image/jpeg",
+        "image/jpg",
+        "image/svg+xml",
+        "image/webp",
+        "image/gif"
+      ]
+    },
+    "headerLogoHeight": {
+      "type": "number",
+      "title": "Header logo height",
+      "description": "Height of the header logo in pixels.",
+      "default": 50,
+      "minimum": 1
+    },
+    "headerLogoWidth": {
+      "type": "number",
+      "title": "Header logo width",
+      "description": "Width of the header logo in pixels. Required when using headerLogoUrl or headerLogoData to ensure correct aspect ratio.",
+      "minimum": 1
+    },
+    "headerLogoAlt": {
+      "type": "string",
+      "title": "Header logo alt text",
+      "description": "Alternative text for the header logo for accessibility.",
+      "default": "Logo"
     }
   }
 }
