@@ -75,7 +75,7 @@
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.6",
     "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^5.1.0",
+    "@vitejs/plugin-react": "^5.1.1",
     "@vitest/browser": "^3.2.4",
     "eslint": "^8.46.0",
     "eslint-plugin-storybook": "^10.0.8",
