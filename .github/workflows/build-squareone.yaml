@@ -30,7 +30,7 @@ permissions:
 
 jobs:
   build:
-    uses: lsst-sqre/multiplatform-build-and-push/.github/workflows/build.yaml@v2
+    uses: lsst-sqre/multiplatform-build-and-push/.github/workflows/build.yaml@v3
     with:
       images: ghcr.io/${{ github.repository }}
       dockerfile: apps/squareone/Dockerfile
