@@ -47,7 +47,7 @@ jobs:
           GH_TOKEN: ${{ steps.generate_token.outputs.token }}
 
       - name: Checkout PR branch
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.ref }}
