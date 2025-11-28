@@ -1,5 +1,0 @@
----
-"squareone": patch
----
-
-Bump actions/checkout from 5 to 6
