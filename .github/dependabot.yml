@@ -32,7 +32,7 @@ updates:
         patterns:
           - '*'
 
-      # React ecosystem - must update together (CRITICAL)
+      # React ecosystem
       react:
         patterns:
           - 'react'
@@ -48,113 +48,106 @@ updates:
           - 'next-*'
           - 'eslint-config-next'
 
-      # Storybook ecosystem (CRITICAL - version lock)
+      # Storybook ecosystem
       storybook:
         patterns:
           - 'storybook'
           - '@storybook/*'
           - 'eslint-plugin-storybook'
+          - 'msw'
           - 'msw-storybook-addon'
 
-      # Vitest testing framework (CRITICAL)
-      vitest:
-        patterns:
-          - 'vitest'
-          - '@vitest/*'
-
-      # Testing Library ecosystem
-      testing-library:
-        patterns:
-          - '@testing-library/*'
-
-      # TypeScript and type definitions
-      typescript:
-        patterns:
-          - 'typescript'
-          - '@types/*'
-          - 'typescript-plugin-*'
-        exclude-patterns:
-          - '@types/react'
-          - '@types/react-dom'
-
-      # Turborepo build orchestration
-      turborepo:
-        patterns:
-          - 'turbo'
-          - '@turbo/*'
-          - 'eslint-config-turbo'
-
-      # ESLint ecosystem
-      eslint:
-        patterns:
-          - 'eslint'
-          - 'eslint-config-*'
-          - 'eslint-plugin-*'
-        exclude-patterns:
-          - 'eslint-config-next'
-          - 'eslint-config-turbo'
-          - 'eslint-plugin-storybook'
-
-      # Radix UI component primitives
-      radix-ui:
-        patterns:
-          - '@radix-ui/*'
-
-      # FontAwesome icon library
-      fontawesome:
-        patterns:
-          - '@fortawesome/*'
-
-      # Date handling libraries
-      date-handling:
-        patterns:
-          - 'date-fns'
-          - 'date-fns-*'
-          - 'react-day-picker'
-
-      # Markdown/MDX processing
-      markdown:
-        patterns:
-          - 'remark'
-          - 'remark-*'
-          - 'next-mdx-remote'
-
-      # CSS build tools
-      css-tools:
-        patterns:
-          - 'lightningcss'
-          - 'lightningcss-*'
-
-      # Changesets versioning
-      changesets:
-        patterns:
-          - '@changesets/*'
-
-      # Design system and styling
-      styling:
-        patterns:
-          - 'styled-components'
-          - '@types/styled-components'
-          - 'style-dictionary'
-          - 'style-dictionary-*'
-
-      # Build and bundler tools
-      build-tools:
-        patterns:
-          - 'vite'
-          - '@vitejs/*'
-          - 'tsup'
-
       # Playwright browser testing
+      # (grouped to ensure GitHub Actions is also updated)
       playwright:
         patterns:
           - 'playwright'
           - '@playwright/*'
 
-      # Sentry monitoring
-      sentry:
+      # Monorepo infrastructure (Turborepo + Changesets)
+      monorepo-infra:
         patterns:
+          - 'turbo'
+          - '@turbo/*'
+          - 'eslint-config-turbo'
+          - '@changesets/*'
+
+      # Runtime dependencies (UI, utilities, monitoring)
+      runtime:
+        patterns:
+          - '@radix-ui/*'
+          - '@fortawesome/*'
+          - '@fontsource/*'
+          - 'date-fns'
+          - 'date-fns-*'
+          - 'react-day-picker'
+          - 'remark'
+          - 'remark-*'
+          - 'next-mdx-remote'
           - '@sentry/*'
+          - 'styled-components'
+          - 'swr'
+          - 'react-hook-form'
+          - 'formik'
+          - 'react-feather'
+          - 'ajv'
+          - 'ajv-formats'
+          - 'js-yaml'
+          - 'react-a11y-disclosure'
+          - 'unfetch'
+          - '@microsoft/fetch-event-source'
+
+      # Dev dependencies (testing, build, lint, types)
+      dev:
+        patterns:
+          - 'vitest'
+          - '@vitest/*'
+          - '@testing-library/*'
+          - 'vite'
+          - '@vitejs/*'
+          - 'tsup'
+          - 'lightningcss'
+          - 'lightningcss-*'
+          - 'typescript'
+          - '@types/*'
+          - 'typescript-plugin-*'
+          - 'eslint'
+          - 'eslint-config-*'
+          - 'eslint-plugin-*'
+          - 'style-dictionary'
+          - 'style-dictionary-*'
+          - '@types/styled-components'
+          - '@biomejs/biome'
+          - 'husky'
+          - 'lint-staged'
+          - 'prettier'
+          - 'jsdom'
+          - 'chromatic'
+          - 'babel-loader'
+          - 'glob'
+          - 'chokidar-cli'
+          - 'dotenv'
+          - 'lodash'
+          - 'yaml'
+          - 'new-component'
+        exclude-patterns:
+          - '@types/react'
+          - '@types/react-dom'
+          - 'eslint-config-next'
+          - 'eslint-config-turbo'
+          - 'eslint-plugin-storybook'
+
+      # Catchall for any unlisted development dependencies
+      misc-dev:
+        dependency-type: 'development'
+        patterns:
+          - '*'
+
+      # Catchall for any unlisted runtime dependencies
+      misc:
+        dependency-type: 'production'
+        patterns:
+          - '*'
 
   # GitHub Actions updates
   - package-ecosystem: 'github-actions'
