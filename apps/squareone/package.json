@@ -71,7 +71,7 @@
     "@testing-library/user-event": "^14.6.1",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^24.10.1",
-    "@types/react": "^19.2.6",
+    "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@types/styled-components": "^5.1.36",
     "@vitest/browser": "^3.2.4",
