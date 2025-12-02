@@ -20,11 +20,18 @@ export interface AppConfigContextValue {
   showPreview: boolean;
   previewLink?: string;
   mdxDir: string;
+  footerMdxPath?: string;
   sentryDsn?: string;
   sentryTracesSampleRate?: number;
   sentryReplaysSessionSampleRate?: number;
   sentryReplaysOnErrorSampleRate?: number;
   sentryDebug?: boolean;
+  headerLogoUrl?: string;
+  headerLogoData?: string;
+  headerLogoMimeType?: string;
+  headerLogoHeight?: number;
+  headerLogoWidth?: number;
+  headerLogoAlt?: string;
 }
 
 const AppConfigContext = createContext<AppConfigContextValue | null>(null);

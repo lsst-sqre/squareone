@@ -6,6 +6,7 @@ import { type FormEvent, useState } from 'react';
 import MainContent from '../components/MainContent';
 import type { AppConfigContextValue } from '../contexts/AppConfigContext';
 import useCurrentUrl from '../hooks/useCurrentUrl';
+import { loadFooterMdx } from '../lib/config/footerLoader';
 import { loadAppConfig } from '../lib/config/loader';
 import sleep from '../lib/utils/sleep';
 import { getDevLoginEndpoint } from '../lib/utils/url';
@@ -67,10 +68,12 @@ type LoginProps = {
 export const getServerSideProps: GetServerSideProps<LoginProps> = async () => {
   try {
     const appConfig = await loadAppConfig();
+    const footerMdxSource = await loadFooterMdx(appConfig);
 
     return {
       props: {
         appConfig,
+        footerMdxSource,
       },
     };
   } catch (_error) {
@@ -88,10 +91,12 @@ export const getServerSideProps: GetServerSideProps<LoginProps> = async () => {
       showPreview: false,
       mdxDir: 'src/content/pages',
     };
+    const footerMdxSource = await loadFooterMdx(fallbackConfig);
 
     return {
       props: {
         appConfig: fallbackConfig,
+        footerMdxSource,
       },
     };
   }

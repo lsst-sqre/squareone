@@ -4,6 +4,7 @@ import type { ReactElement, ReactNode } from 'react';
 import HomepageHero from '../components/HomepageHero';
 import MainContent from '../components/MainContent';
 import { useAppConfig } from '../contexts/AppConfigContext';
+import { loadFooterMdx } from '../lib/config/footerLoader';
 import { loadAppConfig } from '../lib/config/loader';
 
 // biome-ignore lint/complexity/noBannedTypes: Empty props object required for Next.js page
@@ -30,10 +31,12 @@ Home.getLayout = function getLayout(page: ReactElement): ReactNode {
 export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
   // Load app configuration for context
   const appConfig = await loadAppConfig();
+  const footerMdxSource = await loadFooterMdx(appConfig);
 
   return {
     props: {
-      appConfig, // Still needed for _app.tsx to extract into context
+      appConfig, // Provided to _app.tsx which extracts into context
+      footerMdxSource,
     },
   };
 };

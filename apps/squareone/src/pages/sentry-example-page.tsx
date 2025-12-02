@@ -2,6 +2,7 @@ import * as Sentry from '@sentry/nextjs';
 import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import type { MouseEvent } from 'react';
+import { loadFooterMdx } from '../lib/config/footerLoader';
 import { loadAppConfig } from '../lib/config/loader';
 
 export default function Page() {
@@ -88,9 +89,11 @@ export default function Page() {
 
 export const getServerSideProps: GetServerSideProps = async () => {
   const appConfig = await loadAppConfig();
+  const footerMdxSource = await loadFooterMdx(appConfig);
   return {
     props: {
       appConfig,
+      footerMdxSource,
     },
   };
 };

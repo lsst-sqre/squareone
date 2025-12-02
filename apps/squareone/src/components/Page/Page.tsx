@@ -9,6 +9,8 @@ import Meta from '../Meta';
 
 type PageProps = {
   children?: ReactNode;
+  // biome-ignore lint/suspicious/noExplicitAny: MDX serialized source is an opaque type from next-mdx-remote
+  footerMdxSource?: any;
 };
 
 /*
@@ -37,7 +39,7 @@ const StyledLayout = styled.div`
  * Page wrapper component that provides the default layout of navigation,
  * content, and footer.
  */
-export default function Page({ children }: PageProps) {
+export default function Page({ children, footerMdxSource }: PageProps) {
   const config = useAppConfig();
 
   return (
@@ -49,7 +51,7 @@ export default function Page({ children }: PageProps) {
         {children}
       </div>
       <div className="sticky-footer-container">
-        <Footer />
+        <Footer mdxSource={footerMdxSource} />
       </div>
     </StyledLayout>
   );

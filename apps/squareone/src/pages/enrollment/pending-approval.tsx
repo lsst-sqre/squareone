@@ -6,6 +6,7 @@ import type { ReactElement, ReactNode } from 'react';
 
 import MainContent from '../../components/MainContent';
 import { useAppConfig } from '../../contexts/AppConfigContext';
+import { loadFooterMdx } from '../../lib/config/footerLoader';
 import { loadConfigAndMdx } from '../../lib/config/loader';
 import { commonMdxComponents } from '../../lib/utils/mdxComponents';
 
@@ -58,11 +59,13 @@ export const getServerSideProps: GetServerSideProps<
 
     // Serialize MDX content directly in getServerSideProps using ES import
     const mdxSource = await serialize(mdxContent);
+    const footerMdxSource = await loadFooterMdx(appConfig);
 
     return {
       props: {
         appConfig, // Still needed for _app.tsx to extract into context
         mdxSource,
+        footerMdxSource,
       },
     };
   } catch (error) {
@@ -75,11 +78,13 @@ export const getServerSideProps: GetServerSideProps<
     const fallbackMdx = await serialize(
       '# Account pending approval\\n\\nContent temporarily unavailable.'
     );
+    const footerMdxSource = await loadFooterMdx(appConfig);
 
     return {
       props: {
         appConfig, // Still needed for _app.tsx to extract into context
         mdxSource: fallbackMdx,
+        footerMdxSource,
       },
     };
   }
