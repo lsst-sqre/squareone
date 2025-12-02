@@ -9,6 +9,8 @@ If you want to learn how to contribute to the Squareone codebase itself, see the
    :maxdepth: 1
    :caption: Configuration
 
+   branding
    writing-mdx
+   footer-customization
    comanage-landing-pages
    config-ref
