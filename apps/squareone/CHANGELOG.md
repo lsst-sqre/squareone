@@ -1,5 +1,69 @@
 # squareone
 
+## 0.29.0
+
+### Minor Changes
+
+- [#302](https://github.com/lsst-sqre/squareone/pull/302) [`f2a2796`](https://github.com/lsst-sqre/squareone/commit/f2a27965161c3c2bd22aaed7cb278ed767f6bfdb) Thanks [@jonathansick](https://github.com/jonathansick)! - Add MDX-configurable footer
+
+  The page footer can now be customized using MDX content. This enables deployments to customize footer content (contact information, legal notices, institutional links) without code changes. The new `footerMdxPath` configuration sets the path to the footer MDX file relative to `mdxDir` (defaults to `footer.mdx`).
+
+- [#302](https://github.com/lsst-sqre/squareone/pull/302) [`8fa6d87`](https://github.com/lsst-sqre/squareone/commit/8fa6d8704269c1c8e1bae6a046f1b253d46d0b56) Thanks [@jonathansick](https://github.com/jonathansick)! - Add runtime-configurable header logo
+
+  The header logo can now be customized at runtime through the AppConfig system, enabling per-deployment branding without code changes. The custom header can be an external image URL (`headerLogoUrl` configuration), or embedded base64-encoded image data (`headerLogoData` + `headerLogoMimeType` configurations). When using custom logos, `headerLogoWidth` and `headerLogoHeight` must be provided to ensure correct display dimensions.
+
+### Patch Changes
+
+- [#311](https://github.com/lsst-sqre/squareone/pull/311) [`4384760`](https://github.com/lsst-sqre/squareone/commit/4384760b584f9ce0016be80b135e2d3bf5a0c85a) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @biomejs/biome from 2.3.5 to 2.3.8 in the dev group
+
+- [#319](https://github.com/lsst-sqre/squareone/pull/319) [`23add82`](https://github.com/lsst-sqre/squareone/commit/23add826a9d67f5ba76fa3137a5090454f92c057) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @changesets/changelog-github from 0.5.1 to 0.5.2
+
+- [#319](https://github.com/lsst-sqre/squareone/pull/319) [`23add82`](https://github.com/lsst-sqre/squareone/commit/23add826a9d67f5ba76fa3137a5090454f92c057) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @changesets/cli from 2.29.7 to 2.29.8
+
+- [#310](https://github.com/lsst-sqre/squareone/pull/310) [`eb581d8`](https://github.com/lsst-sqre/squareone/commit/eb581d896045b19938c8a4c74f10ef2e8887e78b) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @sentry/nextjs from 10.25.0 to 10.26.0 in the sentry group
+
+- [#314](https://github.com/lsst-sqre/squareone/pull/314) [`cb29422`](https://github.com/lsst-sqre/squareone/commit/cb2942217317a43905b53d3bcb4b7eda3a81a1b2) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @sentry/node from 10.26.0 to 10.27.0 in the security-patch group across 0 directory
+
+- [#306](https://github.com/lsst-sqre/squareone/pull/306) [`c2dfea7`](https://github.com/lsst-sqre/squareone/commit/c2dfea714e28f724daa72f83aaaf19f8ac2094b0) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-a11y from 10.0.7 to 10.0.8
+
+- [#306](https://github.com/lsst-sqre/squareone/pull/306) [`c2dfea7`](https://github.com/lsst-sqre/squareone/commit/c2dfea714e28f724daa72f83aaaf19f8ac2094b0) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-docs from 10.0.7 to 10.0.8
+
+- [#306](https://github.com/lsst-sqre/squareone/pull/306) [`c2dfea7`](https://github.com/lsst-sqre/squareone/commit/c2dfea714e28f724daa72f83aaaf19f8ac2094b0) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-links from 10.0.7 to 10.0.8
+
+- [#306](https://github.com/lsst-sqre/squareone/pull/306) [`c2dfea7`](https://github.com/lsst-sqre/squareone/commit/c2dfea714e28f724daa72f83aaaf19f8ac2094b0) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-onboarding from 10.0.7 to 10.0.8
+
+- [#306](https://github.com/lsst-sqre/squareone/pull/306) [`c2dfea7`](https://github.com/lsst-sqre/squareone/commit/c2dfea714e28f724daa72f83aaaf19f8ac2094b0) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-themes from 10.0.7 to 10.0.8
+
+- [#306](https://github.com/lsst-sqre/squareone/pull/306) [`c2dfea7`](https://github.com/lsst-sqre/squareone/commit/c2dfea714e28f724daa72f83aaaf19f8ac2094b0) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-vitest from 10.0.7 to 10.0.8
+
+- [#306](https://github.com/lsst-sqre/squareone/pull/306) [`c2dfea7`](https://github.com/lsst-sqre/squareone/commit/c2dfea714e28f724daa72f83aaaf19f8ac2094b0) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/nextjs-vite from 10.0.7 to 10.0.8
+
+- [#306](https://github.com/lsst-sqre/squareone/pull/306) [`c2dfea7`](https://github.com/lsst-sqre/squareone/commit/c2dfea714e28f724daa72f83aaaf19f8ac2094b0) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/react-vite from 10.0.7 to 10.0.8
+
+- [#303](https://github.com/lsst-sqre/squareone/pull/303) [`e7230dd`](https://github.com/lsst-sqre/squareone/commit/e7230dde9790122f6a183065b5b62d678ecab58a) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @types/react from 19.2.3 to 19.2.7 in the react group
+
+- [#308](https://github.com/lsst-sqre/squareone/pull/308) [`a25b28b`](https://github.com/lsst-sqre/squareone/commit/a25b28b53676bc55a2650dcafa3daa97aeb01df0) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @types/styled-components from 5.1.35 to 5.1.36 in the styling group
+
+- [#309](https://github.com/lsst-sqre/squareone/pull/309) [`b93f4fb`](https://github.com/lsst-sqre/squareone/commit/b93f4fbb9115f01e356b312e8e8572c2c18faf6f) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @vitejs/plugin-react from 5.1.0 to 5.1.1 in the build-tools group
+
+- [#316](https://github.com/lsst-sqre/squareone/pull/316) [`ff41341`](https://github.com/lsst-sqre/squareone/commit/ff41341ad32efa624b2d5b1829181a583512db49) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump actions/checkout from 5 to 6
+
+- [#306](https://github.com/lsst-sqre/squareone/pull/306) [`c2dfea7`](https://github.com/lsst-sqre/squareone/commit/c2dfea714e28f724daa72f83aaaf19f8ac2094b0) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump eslint-plugin-storybook from 10.0.7 to 10.0.8
+
+- [#305](https://github.com/lsst-sqre/squareone/pull/305) [`0dc1a75`](https://github.com/lsst-sqre/squareone/commit/0dc1a75c72f15fe1584f695f59aad650df9c2036) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump glob from 12.0.0 to 13.0.0
+
+- [#316](https://github.com/lsst-sqre/squareone/pull/316) [`ff41341`](https://github.com/lsst-sqre/squareone/commit/ff41341ad32efa624b2d5b1829181a583512db49) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump lsst-sqre/multiplatform-build-and-push/.github/workflows/build.yaml from 2 to 3
+
+- [#312](https://github.com/lsst-sqre/squareone/pull/312) [`9d3b09a`](https://github.com/lsst-sqre/squareone/commit/9d3b09aacc78e6186555449174849f6f6e92f897) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump msw from 2.12.1 to 2.12.3
+
+- [#318](https://github.com/lsst-sqre/squareone/pull/318) [`374e3cc`](https://github.com/lsst-sqre/squareone/commit/374e3ccf1c5964ab1298d948c952edc442f28002) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump playwright from 1.56.1 to 1.57.0 in the playwright group
+
+- [#307](https://github.com/lsst-sqre/squareone/pull/307) [`8b1ab0f`](https://github.com/lsst-sqre/squareone/commit/8b1ab0f0a1735888ca29d719f2511dae1dc0bcaf) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump react-day-picker from 9.11.1 to 9.11.2 in the date-handling group
+
+- [#313](https://github.com/lsst-sqre/squareone/pull/313) [`11304c6`](https://github.com/lsst-sqre/squareone/commit/11304c6d2305ca265a4207a7fed302ec5e9c4119) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump react-hook-form from 7.66.0 to 7.66.1
+
+- [#306](https://github.com/lsst-sqre/squareone/pull/306) [`c2dfea7`](https://github.com/lsst-sqre/squareone/commit/c2dfea714e28f724daa72f83aaaf19f8ac2094b0) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump storybook from 10.0.7 to 10.0.8
+
 ## 0.28.5
 
 ### Patch Changes
