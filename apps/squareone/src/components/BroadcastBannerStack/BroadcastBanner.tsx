@@ -53,6 +53,7 @@ const StyledBroadcastContainer = styled.div<{ $category: BroadcastCategory }>`
     display: flex;
     flex-flow: row nowrap;
     justify-content: flex-start;
+    align-items: baseline;
   }
 
   .summary p {
@@ -61,7 +62,6 @@ const StyledBroadcastContainer = styled.div<{ $category: BroadcastCategory }>`
 
   .disclosure-button-area {
     margin-left: 1.5rem;
-    align-self: flex-end;
   }
 
   .disclosure {
