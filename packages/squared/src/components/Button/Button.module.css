@@ -162,8 +162,7 @@
 }
 
 .outline.tertiary:hover:not(:disabled):not(.disabled) {
-  background-color: currentColor;
-  color: var(--rsd-component-page-background-color);
+  background-color: color-mix(in srgb, currentColor 10%, transparent);
 }
 
 /* Outline + Danger */

@@ -1,7 +1,7 @@
+import { Button } from '@lsst-sqre/squared';
 import React from 'react';
 import useDisclosure from 'react-a11y-disclosure';
 import styled from 'styled-components';
-
 import { ContentMaxWidth } from '../../styles/sizes';
 
 type BroadcastCategory = 'info' | 'outage' | 'notice' | 'maintenance' | 'other';
@@ -53,6 +53,7 @@ const StyledBroadcastContainer = styled.div<{ $category: BroadcastCategory }>`
     display: flex;
     flex-flow: row nowrap;
     justify-content: flex-start;
+    align-items: baseline;
   }
 
   .summary p {
@@ -61,21 +62,6 @@ const StyledBroadcastContainer = styled.div<{ $category: BroadcastCategory }>`
 
   .disclosure-button-area {
     margin-left: 1.5rem;
-    align-self: flex-end;
-  }
-
-  .disclosure-button-area button {
-    font-size: 0.8rem;
-    cursor: pointer;
-    background-color: transparent;
-    color: white;
-    border: 1px solid white;
-    border-radius: 5px;
-    transition: 250ms;
-  }
-
-  .disclosure-button-area button:hover {
-    background-color: rgba(255, 255, 255, 0.1);
   }
 
   .disclosure {
@@ -133,9 +119,15 @@ export default function BroadcastBanner({ broadcast }: BroadcastBannerProps) {
           />
           {broadcast.body && (
             <div className="disclosure-button-area">
-              <button type="button" {...toggleProps}>
+              <Button
+                type="button"
+                appearance="outline"
+                tone="tertiary"
+                size="sm"
+                {...toggleProps}
+              >
                 {isExpanded ? 'Show less' : 'Show more'}
-              </button>
+              </Button>
             </div>
           )}
         </div>
