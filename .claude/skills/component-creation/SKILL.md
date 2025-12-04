@@ -5,6 +5,8 @@ description: Comprehensive guide for creating React components in the squared pa
 
 # Component Creation Guide
 
+> **Tip**: Use the **file-factory** CLI to scaffold new components: `pnpm file-factory component <name> --package <package>`. This creates the correct directory structure with all files (component, styles, tests, stories, index). Then follow the patterns in this guide for implementation.
+
 ## Component Structure
 
 ```
@@ -377,6 +379,7 @@ export default function MyComponent({ showExtra, data }: Props) {
 
 ## Related Skills
 
+- **file-factory** - Use `pnpm file-factory component <name>` to scaffold new components with the correct structure before implementing
 - **design-system** - Complete CSS variable and design token reference
 - **squared-package** - Understanding NO BUILD STEP architecture for squared components
 - **testing-infrastructure** - Writing tests for components

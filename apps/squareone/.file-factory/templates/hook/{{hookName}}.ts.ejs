@@ -1,0 +1,28 @@
+import { useState, useCallback } from 'react';
+
+/**
+ * <%= hookName %> hook
+ *
+ * @example
+ * ```tsx
+ * function MyComponent() {
+ *   const { value, setValue, reset } = <%= hookName %>();
+ *   // ...
+ * }
+ * ```
+ */
+export function <%= hookName %>() {
+  const [value, setValue] = useState<unknown>(null);
+
+  const reset = useCallback(() => {
+    setValue(null);
+  }, []);
+
+  return {
+    value,
+    setValue,
+    reset,
+  } as const;
+}
+
+export default <%= hookName %>;

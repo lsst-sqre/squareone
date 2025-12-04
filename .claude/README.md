@@ -21,7 +21,8 @@ This directory contains configuration for Claude Code, including specialized ski
 │   ├── data-fetching-patterns/ # SWR data fetching patterns
 │   ├── migrate-styled-components-to-css-modules/ # Migration guide
 │   ├── platform-api-integration/ # RSP API discovery & integration
-│   └── docker-version-validation/ # Dockerfile version synchronization
+│   ├── docker-version-validation/ # Dockerfile version synchronization
+│   └── file-factory/          # CLI scaffolding for components, hooks, contexts, pages
 ├── tasks/                      # Gitignored task-specific docs
 ├── projects/                   # Project-specific configurations
 ├── settings.local.json         # Local settings & permissions
@@ -253,6 +254,26 @@ Skills are modular capabilities that extend Claude's expertise with domain-speci
 
 - None (references validation script at `scripts/validate-docker-versions.js`)
 
+#### file-factory
+
+**When to use**: Creating new React components, hooks, context providers, or Next.js pages. Scaffolding new code with consistent file structure.
+
+**Covers**:
+
+- CLI tool for scaffolding (`pnpm file-factory <type> <name>`)
+- Component generation with CSS Modules, tests, stories
+- Hook generation (directory or flat file patterns)
+- Global context provider generation
+- Next.js page generation (Pages or App Router)
+- Package-specific configurations
+- Automatic barrel file updates
+
+**Supporting files**:
+
+- Feature-specific guides (components.md, hooks.md, contexts.md, pages.md)
+- Package conventions (squared.md, squareone.md)
+- Configuration reference (configuration.md)
+
 ## Agents
 
 ### test-suite-runner
@@ -293,6 +314,7 @@ Skills activate automatically when relevant. Simply describe what you want:
 
 - "Set up configuration loading for a new page" → `appconfig-system`
 - "Create a new component with CSS Modules" → `component-creation`
+- "Scaffold a new React hook" → `file-factory`
 - "What CSS variables are available for colors?" → `design-system`
 - "Why is my build slow?" → `turborepo-workflow`
 - "Write tests for my component" → `testing-infrastructure`

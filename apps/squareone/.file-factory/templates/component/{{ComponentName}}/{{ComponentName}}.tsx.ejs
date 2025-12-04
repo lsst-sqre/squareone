@@ -1,0 +1,56 @@
+<% if (styleSystem === 'css-modules') { -%>
+import styles from './<%= ComponentName %>.module.css';
+<% } else if (styleSystem === 'styled-components') { -%>
+import styled from 'styled-components';
+<% } -%>
+
+export type <%= ComponentName %>Props = {
+  /** Optional className for styling overrides */
+  className?: string;
+  children?: React.ReactNode;
+};
+
+/**
+ * <%= ComponentName %> component
+ *
+ * @example
+ * ```tsx
+ * <<%= ComponentName %>>Content</<%= ComponentName %>>
+ * ```
+ */
+export function <%= ComponentName %>({
+  className,
+  children,
+}: <%= ComponentName %>Props) {
+<% if (styleSystem === 'css-modules') { -%>
+  const rootClassName = className
+    ? `${styles.root} ${className}`
+    : styles.root;
+
+  return (
+    <div className={rootClassName}>
+      {children}
+    </div>
+  );
+<% } else if (styleSystem === 'styled-components') { -%>
+  return (
+    <Root className={className}>
+      {children}
+    </Root>
+  );
+<% } else { -%>
+  return (
+    <div className={className}>
+      {children}
+    </div>
+  );
+<% } -%>
+}
+<% if (styleSystem === 'styled-components') { -%>
+
+const Root = styled.div`
+  /* Add styles here */
+`;
+<% } -%>
+
+export default <%= ComponentName %>;

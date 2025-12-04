@@ -1,0 +1,77 @@
+<% if (styleSystem === 'css-modules') { -%>
+import styles from './<%= ComponentName %>.module.css';
+<% } else if (styleSystem === 'styled-components') { -%>
+import styled from 'styled-components';
+<% } -%>
+import { <%= ProviderName %>, use<%= baseName %> } from './<%= ComponentName %>Context';
+
+export type <%= ComponentName %>Props = {
+  /** Optional className for styling overrides */
+  className?: string;
+  children?: React.ReactNode;
+};
+
+/**
+ * <%= ComponentName %> component
+ *
+ * This component must be wrapped in a <%= ProviderName %> or use
+ * the default export which includes the provider.
+ *
+ * @example
+ * ```tsx
+ * <<%= ComponentName %>>Content</<%= ComponentName %>>
+ * ```
+ */
+export function <%= ComponentName %>Inner({
+  className,
+  children,
+}: <%= ComponentName %>Props) {
+  // Access context
+  const context = use<%= baseName %>();
+
+<% if (styleSystem === 'css-modules') { -%>
+  const rootClassName = className
+    ? `${styles.root} ${className}`
+    : styles.root;
+
+  return (
+    <div className={rootClassName}>
+      {children}
+    </div>
+  );
+<% } else if (styleSystem === 'styled-components') { -%>
+  return (
+    <Root className={className}>
+      {children}
+    </Root>
+  );
+<% } else { -%>
+  return (
+    <div className={className}>
+      {children}
+    </div>
+  );
+<% } -%>
+}
+<% if (styleSystem === 'styled-components') { -%>
+
+const Root = styled.div`
+  /* Add styles here */
+`;
+<% } -%>
+
+/**
+ * <%= ComponentName %> with its own Provider
+ *
+ * Use this when the component should manage its own state.
+ * For shared state, wrap multiple components in a single <%= ProviderName %>.
+ */
+export function <%= ComponentName %>(props: <%= ComponentName %>Props) {
+  return (
+    <<%= ProviderName %>>
+      <<%= ComponentName %>Inner {...props} />
+    </<%= ProviderName %>>
+  );
+}
+
+export default <%= ComponentName %>;

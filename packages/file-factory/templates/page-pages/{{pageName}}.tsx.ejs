@@ -1,0 +1,32 @@
+import type { NextPage, GetServerSideProps } from 'next';
+import Head from 'next/head';
+
+type <%= PageName %>PageProps = {
+  // Add props here
+};
+
+const <%= PageName %>Page: NextPage<<%= PageName %>PageProps> = (props) => {
+  return (
+    <>
+      <Head>
+        <title><%= pageTitle %></title>
+        <meta name="description" content="<%= pageDescription %>" />
+      </Head>
+      <main>
+        <h1><%= pageTitle %></h1>
+      </main>
+    </>
+  );
+};
+
+export const getServerSideProps: GetServerSideProps<<%= PageName %>PageProps> = async (
+  context
+) => {
+  return {
+    props: {
+      // Add props here
+    },
+  };
+};
+
+export default <%= PageName %>Page;

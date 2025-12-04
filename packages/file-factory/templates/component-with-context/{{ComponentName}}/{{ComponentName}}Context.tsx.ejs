@@ -1,0 +1,88 @@
+import {
+  createContext,
+  useContext,
+  useState,
+  useMemo,
+  type ReactNode,
+} from 'react';
+
+// ============================================================================
+// Types
+// ============================================================================
+
+type <%= ComponentName %>ContextState = {
+  // Add state properties specific to <%= ComponentName %>
+};
+
+type <%= ComponentName %>ContextActions = {
+  // Add actions specific to <%= ComponentName %>
+};
+
+export type <%= ComponentName %>ContextValue =
+  <%= ComponentName %>ContextState & <%= ComponentName %>ContextActions;
+
+export type <%= ProviderName %>Props = {
+  children: ReactNode;
+};
+
+// ============================================================================
+// Context (internal - use the hook instead)
+// ============================================================================
+
+const <%= ComponentName %>Context = createContext<<%= ComponentName %>ContextValue | null>(null);
+<%= ComponentName %>Context.displayName = '<%= ComponentName %>Context';
+
+// ============================================================================
+// Provider
+// ============================================================================
+
+/**
+ * Provides <%= ComponentName %> state to child components
+ *
+ * @example
+ * ```tsx
+ * <<%= ProviderName %>>
+ *   <<%= ComponentName %>Inner />
+ * </<%= ProviderName %>>
+ * ```
+ */
+export function <%= ProviderName %>({ children }: <%= ProviderName %>Props) {
+  const [state, setState] = useState<<%= ComponentName %>ContextState>({
+    // Initial state
+  });
+
+  const value = useMemo<<%= ComponentName %>ContextValue>(
+    () => ({
+      ...state,
+      // Add actions
+    }),
+    [state]
+  );
+
+  return (
+    <<%= ComponentName %>Context.Provider value={value}>
+      {children}
+    </<%= ComponentName %>Context.Provider>
+  );
+}
+
+// ============================================================================
+// Hook
+// ============================================================================
+
+/**
+ * Access <%= ComponentName %> context
+ *
+ * Must be used within a <%= ProviderName %>
+ */
+export function use<%= baseName %>(): <%= ComponentName %>ContextValue {
+  const context = useContext(<%= ComponentName %>Context);
+
+  if (context === null) {
+    throw new Error(
+      'use<%= baseName %> must be used within a <%= ProviderName %>'
+    );
+  }
+
+  return context;
+}

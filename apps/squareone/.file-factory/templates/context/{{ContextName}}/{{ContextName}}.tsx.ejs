@@ -1,0 +1,103 @@
+import {
+  createContext,
+  useContext,
+  useState,
+  useMemo,
+  type ReactNode,
+} from 'react';
+
+// ============================================================================
+// Types
+// ============================================================================
+
+type <%= ContextName %>State = {
+  // Add state properties here
+};
+
+type <%= ContextName %>Actions = {
+  // Add action methods here
+};
+
+export type <%= ContextName %>Value = <%= ContextName %>State & <%= ContextName %>Actions;
+
+export type <%= ProviderName %>Props = {
+  children: ReactNode;
+  /** Optional initial state override */
+  initialState?: Partial<<%= ContextName %>State>;
+};
+
+// ============================================================================
+// Context (internal - use the hook instead)
+// ============================================================================
+
+const <%= ContextName %> = createContext<<%= ContextName %>Value | null>(null);
+<%= ContextName %>.displayName = '<%= ContextName %>';
+
+// ============================================================================
+// Provider
+// ============================================================================
+
+/**
+ * <%= ProviderName %> - Provides <%= contextDisplayName %> state to the app
+ *
+ * @example
+ * ```tsx
+ * // In your app root
+ * <<%= ProviderName %>>
+ *   <App />
+ * </<%= ProviderName %>>
+ * ```
+ */
+export function <%= ProviderName %>({
+  children,
+  initialState = {},
+}: <%= ProviderName %>Props) {
+  const [state, setState] = useState<<%= ContextName %>State>({
+    // Default state
+    ...initialState,
+  });
+
+  const value = useMemo<<%= ContextName %>Value>(
+    () => ({
+      ...state,
+      // Add actions here
+    }),
+    [state]
+  );
+
+  return (
+    <<%= ContextName %>.Provider value={value}>
+      {children}
+    </<%= ContextName %>.Provider>
+  );
+}
+
+// ============================================================================
+// Hook
+// ============================================================================
+
+/**
+ * <%= consumerHookName %> - Access <%= contextDisplayName %> state
+ *
+ * Must be used within a <%= ProviderName %>
+ *
+ * @example
+ * ```tsx
+ * function MyComponent() {
+ *   const { someValue } = <%= consumerHookName %>();
+ *   // ...
+ * }
+ * ```
+ */
+export function <%= consumerHookName %>(): <%= ContextName %>Value {
+  const context = useContext(<%= ContextName %>);
+
+  if (context === null) {
+    throw new Error(
+      '<%= consumerHookName %> must be used within a <%= ProviderName %>. ' +
+      'Wrap your component tree with <<%= ProviderName %>> to fix this error.'
+    );
+  }
+
+  return context;
+}

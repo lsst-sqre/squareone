@@ -1,0 +1,15 @@
+<% if (appRouterBarrel) { -%>
+// App Router compatible barrel
+export { default } from './<%= ComponentName %>';
+export type { <%= ComponentName %>Props } from './<%= ComponentName %>';
+<% } else { -%>
+export * from './<%= ComponentName %>';
+export { default } from './<%= ComponentName %>';
+<% } -%>
+
+// Context exports
+export { <%= ProviderName %>, use<%= baseName %> } from './<%= ComponentName %>Context';
+export type {
+  <%= ComponentName %>ContextValue,
+  <%= ProviderName %>Props,
+} from './<%= ComponentName %>Context';

@@ -1,0 +1,64 @@
+{
+  "name": "@lsst-sqre/file-factory",
+  "version": "0.1.0",
+  "description": "CLI tool to scaffold React components, hooks, contexts, and pages in the Squareone monorepo",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "file-factory": "./dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./config": {
+      "types": "./dist/config/index.d.ts",
+      "import": "./dist/config/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "templates"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "cli",
+    "scaffold",
+    "react",
+    "component",
+    "generator",
+    "squareone",
+    "rubin"
+  ],
+  "author": "Association of Universities for Research in Astronomy (AURA), Inc.",
+  "license": "MIT",
+  "dependencies": {
+    "@inquirer/prompts": "^7.2.1",
+    "chalk": "^5.4.1",
+    "commander": "^13.0.0",
+    "ejs": "^3.1.10",
+    "fast-glob": "^3.3.3",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@lsst-sqre/tsconfig": "workspace:*",
+    "@types/ejs": "^3.1.5",
+    "@types/node": "^22.10.1",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

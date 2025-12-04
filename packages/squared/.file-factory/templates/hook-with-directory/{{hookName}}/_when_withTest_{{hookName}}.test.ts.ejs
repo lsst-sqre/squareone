@@ -1,0 +1,10 @@
+import { describe, expect, it } from 'vitest';
+import { renderHook } from '@testing-library/react';
+import { <%= hookName %> } from './<%= hookName %>';
+
+describe('<%= hookName %>', () => {
+  it('returns expected initial value', () => {
+    const { result } = renderHook(() => <%= hookName %>());
+    expect(result.current).toBeDefined();
+  });
+});
