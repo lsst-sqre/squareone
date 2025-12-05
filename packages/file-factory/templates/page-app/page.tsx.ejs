@@ -1,0 +1,22 @@
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: '<%= pageTitle %>',
+  description: '<%= pageDescription %>',
+};
+
+type <%= PageName %>PageProps = {
+  params: Promise<{ /* Add route params here */ }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
+
+export default async function <%= PageName %>Page({
+  params,
+  searchParams,
+}: <%= PageName %>PageProps) {
+  return (
+    <main>
+      <h1><%= pageTitle %></h1>
+    </main>
+  );
+}

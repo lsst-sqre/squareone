@@ -3,6 +3,7 @@
   "scripts": {
     "localci": "node scripts/validate-docker-versions.js && node scripts/turbo-wrapper.js run biome:format:check prettier:yaml lint type-check test build && pnpm run biome:lint",
     "build": "node scripts/turbo-wrapper.js run build",
+    "file-factory": "node packages/file-factory/dist/cli.js",
     "dev": "node scripts/turbo-wrapper.js run dev",
     "test": "node scripts/turbo-wrapper.js run test",
     "storybook": "node scripts/turbo-wrapper.js run storybook",

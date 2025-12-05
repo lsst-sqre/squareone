@@ -1,0 +1,20 @@
+import React from 'react';
+import { describe, expect, it } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import { <%= ProviderName %>, <%= consumerHookName %> } from './<%= ContextName %>';
+
+function TestConsumer() {
+  const value = <%= consumerHookName %>();
+  return <div data-testid="value">{JSON.stringify(value)}</div>;
+}
+
+describe('<%= ContextName %>', () => {
+  it('provides value to consumers', () => {
+    render(
+      <<%= ProviderName %>>
+        <TestConsumer />
+      </<%= ProviderName %>>
+    );
+    expect(screen.getByTestId('value')).toBeInTheDocument();
+  });
+});

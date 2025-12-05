@@ -162,6 +162,7 @@ For detailed guidance on specific topics, Claude has access to specialized skill
 - **platform-api-integration** - OpenAPI specs, API discovery, hook patterns, authentication
 - **migrate-styled-components-to-css-modules** - Converting styled-components to CSS Modules
 - **docker-version-validation** - Dockerfile version synchronization, validation rules, troubleshooting
+- **file-factory** - CLI scaffolding for components, hooks, contexts, pages with consistent structure
 
 These skills automatically activate when relevant or can be referenced explicitly. See `.claude/README.md` for complete skill documentation.
 

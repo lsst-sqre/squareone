@@ -1,0 +1,8 @@
+<% if (appRouterBarrel) { -%>
+// App Router compatible barrel (no wildcard exports)
+export { default } from './<%= ComponentName %>';
+export type { <%= ComponentName %>Props } from './<%= ComponentName %>';
+<% } else { -%>
+export * from './<%= ComponentName %>';
+export { default } from './<%= ComponentName %>';
+<% } -%>

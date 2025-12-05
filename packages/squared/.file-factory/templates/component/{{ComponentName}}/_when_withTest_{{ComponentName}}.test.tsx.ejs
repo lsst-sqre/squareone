@@ -1,0 +1,11 @@
+import React from 'react';
+import { describe, expect, it, vi } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import <%= ComponentName %> from './<%= ComponentName %>';
+
+describe('<%= ComponentName %>', () => {
+  it('renders', () => {
+    render(<<%= ComponentName %>>Content</<%= ComponentName %>>);
+    expect(screen.getByText('Content')).toBeInTheDocument();
+  });
+});
