@@ -1,5 +1,13 @@
 # @lsst-sqre/squared
 
+## 0.11.2
+
+### Patch Changes
+
+- [#323](https://github.com/lsst-sqre/squareone/pull/323) [`2bb920e`](https://github.com/lsst-sqre/squareone/commit/2bb920e5408659f061490d306d36770686debe3c) Thanks [@jonathansick](https://github.com/jonathansick)! - Fix outline+tertiary Button hover state readability
+
+  The `appearance="outline" tone="tertiary"` Button hover state now uses a subtle 10% opacity background instead of a solid background that made the label illegible on hover. This hover style works dynamically across any context (white text on blue, red, orange backgrounds).
+
 ## 0.11.1
 
 ### Patch Changes
