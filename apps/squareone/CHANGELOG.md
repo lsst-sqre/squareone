@@ -1,5 +1,20 @@
 # squareone
 
+## 0.30.0
+
+### Minor Changes
+
+- [#323](https://github.com/lsst-sqre/squareone/pull/323) [`e033943`](https://github.com/lsst-sqre/squareone/commit/e033943623ef1e0f6fc0171f16f40d819ba3b7a9) Thanks [@jonathansick](https://github.com/jonathansick)! - Migrate BroadcastBanner button to squared Button component
+
+### Patch Changes
+
+- [#323](https://github.com/lsst-sqre/squareone/pull/323) [`f767cf1`](https://github.com/lsst-sqre/squareone/commit/f767cf1d622d7800419fa0ebe0fbf56cea4c1182) Thanks [@jonathansick](https://github.com/jonathansick)! - Fix BroadcastBanner button baseline alignment
+
+- [#321](https://github.com/lsst-sqre/squareone/pull/321) [`24c8c39`](https://github.com/lsst-sqre/squareone/commit/24c8c39195c9c8726ca3564535a4eddbdcf6f688) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump next from 15.5.6 to 15.5.7
+
+- Updated dependencies [[`2bb920e`](https://github.com/lsst-sqre/squareone/commit/2bb920e5408659f061490d306d36770686debe3c)]:
+  - @lsst-sqre/squared@0.11.2
+
 ## 0.29.0
 
 ### Minor Changes
