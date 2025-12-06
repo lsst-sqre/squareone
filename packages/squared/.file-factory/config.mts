@@ -9,10 +9,7 @@ export default {
     postCreationMessage: {
       message: `Add the component to the package exports:
 
-1. In src/components/index.ts, add:
-   export * from './{{ComponentName}}';
-
-2. In src/index.ts, add:
+In src/index.ts, add:
    export * from './components/{{ComponentName}}';`,
     },
   },
