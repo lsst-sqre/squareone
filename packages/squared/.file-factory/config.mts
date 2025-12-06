@@ -6,45 +6,35 @@ export default {
     withTest: true,
     withStory: true, // Generate Storybook stories
     appRouterBarrel: false, // Library doesn't use App Router
-    updateBarrels: [
-      {
-        file: 'src/components/index.ts',
-        template: "export * from './{{ComponentName}}';\n",
-        position: 'alphabetical',
-      },
-      {
-        file: 'src/index.ts',
-        template: "export * from './components/{{ComponentName}}';\n",
-        position: 'alphabetical',
-      },
-    ],
+    postCreationMessage: {
+      message: `Add the component to the package exports:
+
+In src/index.ts, add:
+   export * from './components/{{ComponentName}}';`,
+    },
   },
   hook: {
     directory: 'src/hooks',
     withTest: true,
     useDirectory: true, // Hooks in their own directories
-    updateBarrels: [
-      {
-        file: 'src/hooks/index.ts',
-        template: "export { {{hookName}} } from './{{hookName}}';\n",
-        position: 'alphabetical',
-      },
-      {
-        file: 'src/index.ts',
-        template: "export { {{hookName}} } from './hooks/{{hookName}}';\n",
-        position: 'alphabetical',
-      },
-    ],
+    postCreationMessage: {
+      message: `Add the hook to the package exports:
+
+1. In src/hooks/index.ts, add:
+   export { {{hookName}} } from './{{hookName}}';
+
+2. In src/index.ts, add:
+   export { {{hookName}} } from './hooks/{{hookName}}';`,
+    },
   },
   context: {
     directory: 'src/contexts',
     withTest: true,
-    updateBarrels: [
-      {
-        file: 'src/index.ts',
-        template: "export * from './contexts/{{ContextName}}';\n",
-        position: 'alphabetical',
-      },
-    ],
+    postCreationMessage: {
+      message: `Add the context to the package exports:
+
+In src/index.ts, add:
+   export * from './contexts/{{ContextName}}';`,
+    },
   },
 };

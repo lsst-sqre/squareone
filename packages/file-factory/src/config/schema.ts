@@ -18,19 +18,14 @@ export const RouterSchema = z.enum(['app', 'pages']);
 export type Router = z.infer<typeof RouterSchema>;
 
 /**
- * Configuration for updating barrel/index files after generation
+ * Post-creation message configuration
+ * Displayed after artifact creation to provide instructions for manual steps
  */
-export const BarrelUpdateSchema = z.object({
-  /** Path to the barrel file relative to package root */
-  file: z.string(),
-  /** Template string for the export line. Variables: {{ComponentName}}, {{hookName}}, etc. */
-  template: z.string(),
-  /** Insert position: 'append' (default), 'prepend', or 'alphabetical' */
-  position: z.enum(['append', 'prepend', 'alphabetical']).default('append'),
-  /** Skip if this export already exists */
-  skipIfExists: z.boolean().default(true),
+export const PostCreationMessageSchema = z.object({
+  /** Message to display. Supports {{VariableName}} placeholders. */
+  message: z.string(),
 });
-export type BarrelUpdate = z.infer<typeof BarrelUpdateSchema>;
+export type PostCreationMessage = z.infer<typeof PostCreationMessageSchema>;
 
 /**
  * Component generation configuration
@@ -46,8 +41,8 @@ export const ComponentConfigSchema = z.object({
   withStory: z.boolean().default(false),
   /** Use App Router barrel pattern (export { default } only, no export *) */
   appRouterBarrel: z.boolean().default(true),
-  /** Files to update after generation */
-  updateBarrels: z.array(BarrelUpdateSchema).default([]),
+  /** Post-creation message with instructions for manual steps */
+  postCreationMessage: PostCreationMessageSchema.optional(),
 });
 export type ComponentConfig = z.infer<typeof ComponentConfigSchema>;
 
@@ -61,8 +56,8 @@ export const HookConfigSchema = z.object({
   withTest: z.boolean().default(true),
   /** Whether hooks get their own directory (default: true) */
   useDirectory: z.boolean().default(true),
-  /** Files to update after generation */
-  updateBarrels: z.array(BarrelUpdateSchema).default([]),
+  /** Post-creation message with instructions for manual steps */
+  postCreationMessage: PostCreationMessageSchema.optional(),
 });
 export type HookConfig = z.infer<typeof HookConfigSchema>;
 
@@ -74,8 +69,8 @@ export const ContextConfigSchema = z.object({
   directory: z.string().default('src/contexts'),
   /** Generate test file */
   withTest: z.boolean().default(false),
-  /** Files to update after generation */
-  updateBarrels: z.array(BarrelUpdateSchema).default([]),
+  /** Post-creation message with instructions for manual steps */
+  postCreationMessage: PostCreationMessageSchema.optional(),
 });
 export type ContextConfig = z.infer<typeof ContextConfigSchema>;
 
@@ -87,6 +82,8 @@ export const PageConfigSchema = z.object({
   directory: z.string().default('src/pages'),
   /** Next.js router type */
   router: RouterSchema.default('pages'),
+  /** Post-creation message with instructions for manual steps */
+  postCreationMessage: PostCreationMessageSchema.optional(),
 });
 export type PageConfig = z.infer<typeof PageConfigSchema>;
 

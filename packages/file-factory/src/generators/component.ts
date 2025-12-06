@@ -1,4 +1,4 @@
-import type { BarrelUpdate, StyleSystem } from '../config/schema.js';
+import type { PostCreationMessage, StyleSystem } from '../config/schema.js';
 import { getComponentNames, getContextNames } from '../utils/naming.js';
 import { BaseGenerator, type GeneratorOptions } from './base.js';
 
@@ -117,11 +117,11 @@ export class ComponentGenerator extends BaseGenerator {
     };
   }
 
-  getBarrelUpdates(): BarrelUpdate[] {
-    return this.options.config.component.updateBarrels;
+  getPostCreationMessage(): PostCreationMessage | undefined {
+    return this.options.config.component.postCreationMessage;
   }
 
-  override getBarrelVariables(): Record<string, string> {
+  override getMessageVariables(): Record<string, string> {
     const componentNames = getComponentNames(this.options.name);
     const contextNames = getContextNames(this.options.name);
 

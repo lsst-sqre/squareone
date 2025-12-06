@@ -84,9 +84,8 @@ export class PageGenerator extends BaseGenerator {
     };
   }
 
-  getBarrelUpdates(): never[] {
-    // Pages don't have barrel updates
-    return [];
+  getPostCreationMessage() {
+    return this.options.config.page.postCreationMessage;
   }
 
   /**

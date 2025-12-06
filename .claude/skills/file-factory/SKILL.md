@@ -5,7 +5,7 @@ description: How to use the file-factory CLI to create new React components, hoo
 
 # File Factory Skill
 
-This skill describes how to create new React components, hooks, context providers, and Next.js pages in the Squareone monorepo using the `@lsst-sqre/file-factory` CLI tool. **ALWAYS use this tool instead of manually creating new components/hooks/context providers/pages.** It ensures consistent file structure, barrel files, CSS modules, and automatic barrel file updates.
+This skill describes how to create new React components, hooks, context providers, and Next.js pages in the Squareone monorepo using the `@lsst-sqre/file-factory` CLI tool. **ALWAYS use this tool instead of manually creating new components/hooks/context providers/pages.** It ensures consistent file structure, local barrel files, and CSS modules. After creation, the tool displays instructions for any manual steps needed (like updating root barrel files).
 
 ## Tool Calling
 
@@ -41,7 +41,7 @@ Reference these pages for CLI command documentation:
 1. **Always use the tool** - Never manually create component directories
 2. **Component-scoped contexts** - Use `--with-context`, not the `context` command
 3. **Global contexts** - Use the `context` command for app-wide state
-4. **Barrel updates** - For squared package, exports are automatically added to `src/index.ts`
+4. **Post-creation messages** - For squared package, follow the displayed instructions to add exports to root barrel files
 5. **Naming conventions**:
    - Components: PascalCase (Button, DataTable)
    - Hooks: camelCase with `use` prefix (useDebounce)
@@ -54,7 +54,7 @@ Reference these pages for CLI command documentation:
 ```bash
 pnpm file-factory component Alert --package squared --with-story
 # Creates: packages/squared/src/components/Alert/
-# Auto-updates: src/components/index.ts and src/index.ts with exports
+# Displays instructions to add exports to src/components/index.ts and src/index.ts
 ```
 
 ### Adding a complex component with state to squareone:
