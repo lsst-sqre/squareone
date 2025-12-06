@@ -1,4 +1,4 @@
-import type { BarrelUpdate } from '../config/schema.js';
+import type { PostCreationMessage } from '../config/schema.js';
 import { getContextNames } from '../utils/naming.js';
 import { BaseGenerator, type GeneratorOptions } from './base.js';
 
@@ -75,11 +75,11 @@ export class ContextGenerator extends BaseGenerator {
     };
   }
 
-  getBarrelUpdates(): BarrelUpdate[] {
-    return this.options.config.context.updateBarrels;
+  getPostCreationMessage(): PostCreationMessage | undefined {
+    return this.options.config.context.postCreationMessage;
   }
 
-  override getBarrelVariables(): Record<string, string> {
+  override getMessageVariables(): Record<string, string> {
     return {
       ContextName: this.contextNames.ContextName,
       ProviderName: this.contextNames.ProviderName,

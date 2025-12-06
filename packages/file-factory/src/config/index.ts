@@ -13,19 +13,18 @@ export {
 } from './loader.js';
 export type {
   ArtifactCreationResult,
-  BarrelUpdate,
   ComponentConfig,
   ContextConfig,
   FileFactoryConfig,
   HookConfig,
   HooksConfig,
   PageConfig,
+  PostCreationMessage,
   Router,
   StyleSystem,
 } from './schema.js';
 export {
   ArtifactCreationResultSchema,
-  BarrelUpdateSchema,
   ComponentConfigSchema,
   ContextConfigSchema,
   defineConfig,
@@ -33,6 +32,7 @@ export {
   HookConfigSchema,
   HooksConfigSchema,
   PageConfigSchema,
+  PostCreationMessageSchema,
   parseConfig,
   RouterSchema,
   StyleSystemSchema,

@@ -3,11 +3,11 @@ import chalk from 'chalk';
 import { findTemplatesDir, type LoadConfigResult } from '../config/loader.js';
 import type {
   ArtifactCreationResult,
-  BarrelUpdate,
   FileFactoryConfig,
+  PostCreationMessage,
 } from '../config/schema.js';
-import { updateBarrels } from '../hooks/barrel-updater.js';
 import { runHooks } from '../hooks/runner.js';
+import { interpolate } from '../utils/interpolate.js';
 import { getBuiltInTemplatesDir, pathExists } from '../utils/paths.js';
 import { processTemplates } from '../utils/templates.js';
 
@@ -92,14 +92,14 @@ export abstract class BaseGenerator {
   abstract getConditionalFlags(): Record<string, boolean>;
 
   /**
-   * Get barrel updates configuration
+   * Get post-creation message configuration (if any)
    */
-  abstract getBarrelUpdates(): BarrelUpdate[];
+  abstract getPostCreationMessage(): PostCreationMessage | undefined;
 
   /**
-   * Get variables for barrel update template interpolation
+   * Get variables for post-creation message interpolation
    */
-  getBarrelVariables(): Record<string, string> {
+  getMessageVariables(): Record<string, string> {
     return this.getFilenameVariables();
   }
 
@@ -214,29 +214,17 @@ export abstract class BaseGenerator {
       result.files = processResult.createdFiles;
       result.directories = processResult.createdDirectories;
 
-      // Update barrel files
-      const barrelUpdates = this.getBarrelUpdates();
-      if (barrelUpdates.length > 0) {
-        this.log('Updating barrel files...');
-        const barrelResults = await updateBarrels(
-          barrelUpdates,
-          this.getBarrelVariables(),
-          this.options.packageRoot,
-          this.options.dryRun
-        );
-
-        for (const barrelResult of barrelResults) {
-          if (barrelResult.created) {
-            this.log(`  Created: ${barrelResult.filePath}`);
-            result.files.push(barrelResult.filePath);
-          } else if (barrelResult.updated) {
-            this.log(`  Updated: ${barrelResult.filePath}`);
-          } else if (barrelResult.skipped) {
-            this.log(
-              `  Skipped: ${barrelResult.filePath} (export already exists)`
-            );
-          }
-        }
+      // Display post-creation message if configured
+      const postCreationMessage = this.getPostCreationMessage();
+      if (postCreationMessage) {
+        const variables = this.getMessageVariables();
+        const message = interpolate(postCreationMessage.message, variables);
+        console.log('');
+        console.log(chalk.cyan('📝 Next steps:'));
+        console.log(chalk.gray('─'.repeat(40)));
+        console.log(message);
+        console.log(chalk.gray('─'.repeat(40)));
+        console.log('');
       }
 
       // Run lifecycle hooks
