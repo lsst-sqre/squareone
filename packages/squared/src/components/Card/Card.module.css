@@ -1,0 +1,34 @@
+/**
+ * Card styles
+ *
+ * A documentation/content card with hover interaction when wrapped in links.
+ */
+
+.card {
+  width: 100%;
+  border-radius: 0.5rem;
+  box-shadow:
+    0 1px 3px 0 rgba(0, 0, 0, 0.1),
+    0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  padding: 1rem;
+  margin-left: -1rem;
+  border: solid 1px transparent;
+  color: var(--rsd-component-text-color);
+  background-color: var(--sqo-doc-card-background-color);
+  transition: border-color 0.15s ease-in-out;
+}
+
+/* Reset heading and paragraph margins inside cards */
+.card h3 {
+  margin-top: 0;
+}
+
+.card p:last-child {
+  margin-bottom: 0;
+}
+
+/* Hover/focus state when card is inside a link */
+a:hover .card,
+a:focus .card {
+  border-color: var(--rsd-color-primary-600);
+}
