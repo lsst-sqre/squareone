@@ -15,6 +15,8 @@ export {
   type ButtonTone,
   type ButtonVariant,
 } from './components/Button';
+export { Card, type CardProps } from './components/Card';
+export { CardGroup, type CardGroupProps } from './components/CardGroup';
 export type { CheckboxProps } from './components/Checkbox';
 export { Checkbox } from './components/Checkbox';
 export type { CheckboxGroupProps } from './components/CheckboxGroup';
@@ -45,6 +47,7 @@ export type { LabelProps } from './components/Label';
 export { default as Label } from './components/Label';
 export type { ModalProps, ModalSize } from './components/Modal';
 export { Modal } from './components/Modal';
+export { Note, type NoteProps, type NoteType } from './components/Note';
 export {
   default as PrimaryNavigation,
   type PrimaryNavigationType as PrimaryNavigationComponent,

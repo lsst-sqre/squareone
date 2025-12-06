@@ -1,0 +1,14 @@
+/**
+ * CardGroup styles
+ *
+ * A responsive grid container for Card components.
+ */
+
+.cardGroup {
+  display: grid;
+  grid-template-columns: repeat(
+      auto-fill,
+      minmax(var(--card-group-min-width, 20rem), 1fr)
+    );
+  gap: var(--card-group-gap, 1rem);
+}
