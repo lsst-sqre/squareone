@@ -1,0 +1,54 @@
+/**
+ * Note styles
+ *
+ * A callout/note container with type indicator badge.
+ */
+
+.note {
+  margin: 1rem 0 0;
+  padding: 0.5rem;
+  border-radius: 1rem;
+  box-shadow:
+    0 1px 3px 0 rgba(0, 0, 0, 0.1),
+    0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  border: solid 0.5px var(--note-color, var(--rsd-color-red-500));
+  background-color: var(--sqr-note-background-color);
+}
+
+.note p {
+  margin-top: 0;
+}
+
+/* Title bubble - floating badge in corner */
+.titleBubble {
+  background-color: var(--note-color, var(--rsd-color-red-500));
+  margin: -0.5rem 0.5rem 0.5rem -0.5rem;
+  padding: 0.5rem;
+  float: left;
+  width: auto;
+  border-radius: 0.5rem 0 0.5rem 0;
+}
+
+.titleBubble span {
+  text-transform: uppercase;
+  font-weight: 700;
+  color: white;
+  font-size: 0.9rem;
+}
+
+/* Type variants */
+
+/* Warning (orange/amber) */
+.warning {
+  --note-color: var(--rsd-color-orange-500);
+}
+
+/* Tip (green) */
+.tip {
+  --note-color: var(--rsd-color-green-500);
+}
+
+/* Info (blue) */
+.info {
+  --note-color: var(--rsd-color-blue-500);
+}
