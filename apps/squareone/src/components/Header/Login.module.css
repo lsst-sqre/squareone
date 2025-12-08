@@ -1,6 +1,4 @@
 .loginNavItem {
-  margin-left: auto !important;
-  margin-right: 0 !important;
   margin-top: 0;
   margin-bottom: 0;
 
@@ -9,6 +7,13 @@
   flex-shrink: 0;
 
   color: var(--rsd-component-header-nav-text-color);
+}
+
+/* Use doubled selector for higher specificity (0,2,0) to override
+   PrimaryNavigation.Item's .item class (0,1,0) without !important */
+.loginNavItem.loginNavItem {
+  margin-left: auto;
+  margin-right: 0;
 }
 
 .loginNavItem a {
