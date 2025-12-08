@@ -1,0 +1,140 @@
+/* Skip link for screen readers and keyboard navigation */
+.skipLink {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: var(--rsd-color-primary-700, #0c4a47);
+  color: white;
+  padding: 8px;
+  z-index: 1000;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.skipLink:focus {
+  top: 6px;
+  outline: 2px solid var(--rsd-color-primary-100, #e6f3ff);
+  outline-offset: 2px;
+}
+
+/* Mobile layout: vertical stacking with flexbox */
+.layoutContainer {
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--size-screen-padding-min);
+}
+
+/* Desktop layout: CSS Grid with sidebar and content columns */
+@media (min-width: 60rem) {
+  .layoutContainer {
+    display: grid;
+    grid-template-columns: 18rem 1fr;
+    gap: 2rem;
+    max-width: 60rem;
+    margin: 0 auto;
+    padding: 0;
+  }
+}
+
+/* Mobile: navigation with disclosure animation - closed state */
+.sidebarContainerClosed {
+  overflow: hidden;
+  transition:
+    max-height 0.3s ease,
+    visibility 0.3s ease;
+  max-height: 0;
+}
+
+/* Mobile: navigation with disclosure animation - open state */
+.sidebarContainerOpen {
+  overflow: hidden;
+  transition:
+    max-height 0.3s ease,
+    visibility 0.3s ease;
+  max-height: 100vh;
+}
+
+/* When content is hidden via aria, ensure it's also visually hidden */
+.sidebarContainerClosed[aria-hidden="true"] {
+  visibility: hidden;
+}
+
+.sidebarContainerClosed[hidden] {
+  max-height: 0;
+}
+
+/* Desktop: sidebar styling - always visible */
+@media (min-width: 60rem) {
+  .sidebarContainerClosed,
+  .sidebarContainerOpen {
+    max-height: none;
+    overflow: visible;
+  }
+
+  /* Ensure desktop sidebar is never hidden */
+  .sidebarContainerClosed[hidden],
+  .sidebarContainerOpen[hidden] {
+    display: block;
+    max-height: none;
+  }
+
+  /* Desktop sidebar should never have aria-hidden */
+  .sidebarContainerClosed[aria-hidden="true"],
+  .sidebarContainerOpen[aria-hidden="true"] {
+    visibility: visible;
+  }
+}
+
+/* Mobile: sticky header with title and toggle */
+.mobileHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  background: white;
+  border-bottom: 1px solid var(--rsd-color-gray-200, #e5e7eb);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* Desktop: completely hidden */
+@media (min-width: 60rem) {
+  .mobileHeader {
+    display: none;
+  }
+}
+
+.mobileHeaderTitle {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: bold;
+  color: inherit;
+}
+
+.mobileHeaderTitleLink {
+  color: inherit;
+  text-decoration: none;
+}
+
+.mobileHeaderTitleLink:hover {
+  text-decoration: underline;
+}
+
+.mobileHeaderTitleLink:focus {
+  outline: 2px solid var(--rsd-color-primary-600, #0066cc);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Full-width content areas with appropriate structure for mobile/desktop */
+.mainContentContainer {
+  padding-bottom: 2rem;
+}
+
+@media (min-width: 60rem) {
+  .mainContentContainer {
+    padding-bottom: 3rem;
+  }
+}
