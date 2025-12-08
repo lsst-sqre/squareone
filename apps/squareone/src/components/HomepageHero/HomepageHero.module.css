@@ -1,0 +1,99 @@
+.contentContainer {
+  margin: 0 auto;
+  max-width: 60rem;
+  padding: 2rem var(--size-screen-padding-min);
+  color: var(--c-component-text-reverse-color);
+}
+
+@media (min-width: 60rem) {
+  .contentContainer {
+    padding: 2rem 0;
+  }
+}
+
+.heroTitle {
+  color: var(--c-component-text-reverse-color);
+  text-align: center;
+  font-size: 3rem;
+  margin: 0;
+}
+
+.titleContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+}
+
+.previewBadge {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--rsd-color-primary-600);
+  border-radius: 0.5rem;
+  color: var(--c-component-text-reverse-color);
+  background-color: color-mix(
+    in srgb,
+    var(--rsd-color-primary-600) 20%,
+    transparent
+  );
+  backdrop-filter: blur(1px);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  transition:
+    background-color 0.2s ease,
+    backdrop-filter 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.previewBadge:hover {
+  background-color: var(--rsd-color-primary-600);
+  color: var(--rsd-component-text-color);
+}
+
+.serviceCardContainer {
+  width: 100%;
+  display: grid;
+  row-gap: 1em;
+  column-gap: 1em;
+  grid-template-columns: repeat(auto-fit, minmax(min(18em, 100%), 1fr));
+}
+
+.serviceCard {
+  min-width: 5rem;
+  border-radius: 0.5rem;
+  background-color: var(--rsd-component-service-card-background-color);
+  color: var(--rsd-component-service-card-text-color);
+  padding: 1rem;
+
+  /* Flexbox for the sticky footer */
+  display: flex;
+  flex-direction: column;
+}
+
+.serviceCardTitle {
+  margin-top: 0.5rem;
+}
+
+.serviceCardSubtitle {
+  color: var(--rsd-component-text-color);
+}
+
+.serviceCardUpperContainer {
+  flex: 1 0 auto;
+}
+
+.serviceCardStickyFooterContainer {
+  flex-shrink: 0;
+  margin-top: 2rem;
+}
+
+.aspectIllustration {
+  width: 100%;
+  height: auto;
+  padding: 2rem;
+}
