@@ -1,0 +1,17 @@
+/*
+ * Layout wrapper for sticky footer pattern.
+ * See https://css-tricks.com/couple-takes-sticky-footer/
+ */
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.upperContainer {
+  flex: 1 0 auto;
+}
+
+.stickyFooterContainer {
+  flex-shrink: 0;
+}

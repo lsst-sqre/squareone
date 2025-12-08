@@ -1,0 +1,11 @@
+.main {
+  margin: 0 auto;
+  max-width: 60rem;
+  padding: 0 var(--size-screen-padding-min);
+}
+
+@media (min-width: 60rem) {
+  .main {
+    padding: 0;
+  }
+}

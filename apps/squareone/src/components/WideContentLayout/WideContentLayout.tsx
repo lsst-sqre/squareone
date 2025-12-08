@@ -1,14 +1,10 @@
-import React from 'react';
-import styled from 'styled-components';
+import type { ReactNode } from 'react';
+
+import styles from './WideContentLayout.module.css';
 
 type WideContentLayoutProps = {
-  children?: React.ReactNode;
+  children?: ReactNode;
 };
-
-const StyledContainer = styled.div`
-  margin: 0 auto 0 0;
-  // padding: 0 var(--size-screen-padding-min);
-`;
 
 /*
  * A <main> content layout wrapper that provides a wide layout for apps like
@@ -17,5 +13,5 @@ const StyledContainer = styled.div`
 export default function WideContentLayout({
   children,
 }: WideContentLayoutProps) {
-  return <StyledContainer>{children}</StyledContainer>;
+  return <div className={styles.container}>{children}</div>;
 }
