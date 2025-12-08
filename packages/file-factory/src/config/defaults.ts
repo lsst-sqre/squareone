@@ -13,18 +13,15 @@ export const defaultConfig: FileFactoryConfig = {
     withTest: true,
     withStory: false,
     appRouterBarrel: true,
-    updateBarrels: [],
   },
   hook: {
     directory: 'src/hooks',
     withTest: true,
     useDirectory: false,
-    updateBarrels: [],
   },
   context: {
     directory: 'src/contexts',
     withTest: false,
-    updateBarrels: [],
   },
   page: {
     directory: 'src/pages',

@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import {
-  BarrelUpdateSchema,
   ComponentConfigSchema,
   ContextConfigSchema,
   defineConfig,
   FileFactoryConfigSchema,
   HookConfigSchema,
   PageConfigSchema,
+  PostCreationMessageSchema,
   parseConfig,
   RouterSchema,
   StyleSystemSchema,
@@ -40,29 +40,17 @@ describe('RouterSchema', () => {
   });
 });
 
-describe('BarrelUpdateSchema', () => {
-  it('parses minimal barrel update config', () => {
-    const result = BarrelUpdateSchema.parse({
-      file: 'src/index.ts',
-      template: "export * from './{{ComponentName}}';",
+describe('PostCreationMessageSchema', () => {
+  it('parses post-creation message config', () => {
+    const result = PostCreationMessageSchema.parse({
+      message: 'Add export to src/index.ts',
     });
 
-    expect(result.file).toBe('src/index.ts');
-    expect(result.template).toBe("export * from './{{ComponentName}}';");
-    expect(result.position).toBe('append');
-    expect(result.skipIfExists).toBe(true);
+    expect(result.message).toBe('Add export to src/index.ts');
   });
 
-  it('parses full barrel update config', () => {
-    const result = BarrelUpdateSchema.parse({
-      file: 'src/components/index.ts',
-      template: "export { {{ComponentName}} } from './{{ComponentName}}';",
-      position: 'alphabetical',
-      skipIfExists: false,
-    });
-
-    expect(result.position).toBe('alphabetical');
-    expect(result.skipIfExists).toBe(false);
+  it('requires message field', () => {
+    expect(() => PostCreationMessageSchema.parse({})).toThrow();
   });
 });
 
@@ -75,7 +63,7 @@ describe('ComponentConfigSchema', () => {
     expect(result.withTest).toBe(true);
     expect(result.withStory).toBe(false);
     expect(result.appRouterBarrel).toBe(true);
-    expect(result.updateBarrels).toEqual([]);
+    expect(result.postCreationMessage).toBeUndefined();
   });
 
   it('accepts custom values', () => {
@@ -92,6 +80,18 @@ describe('ComponentConfigSchema', () => {
     expect(result.withTest).toBe(false);
     expect(result.withStory).toBe(true);
     expect(result.appRouterBarrel).toBe(false);
+  });
+
+  it('accepts postCreationMessage', () => {
+    const result = ComponentConfigSchema.parse({
+      postCreationMessage: {
+        message: 'Add export to src/index.ts',
+      },
+    });
+
+    expect(result.postCreationMessage?.message).toBe(
+      'Add export to src/index.ts'
+    );
   });
 });
 

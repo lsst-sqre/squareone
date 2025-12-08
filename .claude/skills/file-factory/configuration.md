@@ -33,13 +33,16 @@ export default {
     withTest: true,
     withStory: true,
     appRouterBarrel: false,
-    updateBarrels: [
-      {
-        file: "src/index.ts",
-        template: "export * from './components/{{ComponentName}}';\n",
-        position: "alphabetical",
-      },
-    ],
+    // Display instructions after creation (optional)
+    postCreationMessage: {
+      message: `Add the component to the package exports:
+
+1. In src/components/index.ts, add:
+   export * from './{{ComponentName}}';
+
+2. In src/index.ts, add:
+   export * from './components/{{ComponentName}}';`,
+    },
   },
   hook: {
     directory: "src/hooks",
@@ -55,3 +58,17 @@ export default {
   },
 };
 ```
+
+## Post-Creation Messages
+
+The `postCreationMessage` option allows packages to display custom instructions after file creation. This is useful for:
+
+- Instructing users to add exports to root barrel files
+- Reminding about additional setup steps
+- Providing package-specific guidance
+
+The message supports `{{VariableName}}` placeholders that get replaced with:
+- **Components**: `{{ComponentName}}`, `{{componentName}}`, `{{component-name}}`
+- **Hooks**: `{{hookName}}`, `{{hook-name}}`
+- **Contexts**: `{{ContextName}}`, `{{ProviderName}}`, `{{consumerHookName}}`
+- **Pages**: `{{pageName}}`, `{{PageName}}`, `{{pagePath}}`

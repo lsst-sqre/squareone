@@ -1,5 +1,5 @@
 import * as path from 'node:path';
-import type { BarrelUpdate } from '../config/schema.js';
+import type { PostCreationMessage } from '../config/schema.js';
 import { normalizeHookName, toKebabCase } from '../utils/naming.js';
 import { pathExists } from '../utils/paths.js';
 import { BaseGenerator, type GeneratorOptions } from './base.js';
@@ -86,11 +86,11 @@ export class HookGenerator extends BaseGenerator {
     };
   }
 
-  getBarrelUpdates(): BarrelUpdate[] {
-    return this.options.config.hook.updateBarrels;
+  getPostCreationMessage(): PostCreationMessage | undefined {
+    return this.options.config.hook.postCreationMessage;
   }
 
-  override getBarrelVariables(): Record<string, string> {
+  override getMessageVariables(): Record<string, string> {
     return {
       hookName: this.normalizedName,
       'hook-name': toKebabCase(this.normalizedName),

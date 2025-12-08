@@ -8,7 +8,6 @@
 export { defaultConfig } from './config/defaults.js';
 export type {
   ArtifactCreationResult,
-  BarrelUpdate,
   ComponentConfig,
   ContextConfig,
   FileFactoryConfig,
@@ -17,6 +16,7 @@ export type {
   LoadConfigOptions,
   LoadConfigResult,
   PageConfig,
+  PostCreationMessage,
   Router,
   StyleSystem,
 } from './config/index.js';
@@ -50,9 +50,8 @@ export {
   HookGenerator,
   PageGenerator,
 } from './generators/index.js';
-export type { UpdateBarrelOptions, UpdateBarrelResult } from './hooks/index.js';
 // Hooks
-export { runHooks, updateBarrel, updateBarrels } from './hooks/index.js';
+export { runHooks } from './hooks/index.js';
 export type {
   ProcessTemplatesOptions,
   ProcessTemplatesResult,
