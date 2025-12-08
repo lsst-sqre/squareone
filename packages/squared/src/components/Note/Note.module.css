@@ -15,8 +15,15 @@
   background-color: var(--sqr-note-background-color);
 }
 
-.note p {
+/* Strip margins from first and last children for visual balance */
+.note > *:first-child:not(.titleBubble) {
   margin-top: 0;
+  padding-top: 0;
+}
+
+.note > *:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
 /* Title bubble - floating badge in corner */
