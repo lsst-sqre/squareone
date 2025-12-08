@@ -1,0 +1,59 @@
+.link {
+  display: block;
+  padding: 0.25rem 0.75rem;
+  margin-left: -0.75rem;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 0.5rem;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+  position: relative;
+}
+
+.link:hover {
+  background-color: var(--rsd-color-primary-100, #e6f3ff);
+  text-decoration: none;
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--rsd-color-primary-600, #0066cc);
+  outline-offset: -2px;
+}
+
+/* Active/current page state */
+.linkActive {
+  display: block;
+  padding: 0.25rem 0.75rem;
+  margin-left: -0.75rem;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 0 0.5rem 0.5rem 0;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+  position: relative;
+  font-weight: bold;
+}
+
+.linkActive:hover {
+  background-color: var(--rsd-color-primary-100, #e6f3ff);
+  text-decoration: none;
+}
+
+.linkActive:focus-visible {
+  outline: 2px solid var(--rsd-color-primary-600, #0066cc);
+  outline-offset: -2px;
+}
+
+/* Left bar indicator for active state */
+.linkActive::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: var(--rsd-color-primary-600, #0066cc);
+  border-radius: 2px;
+}
