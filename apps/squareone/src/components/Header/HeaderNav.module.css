@@ -1,0 +1,23 @@
+.nav {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  font-size: 1.2rem;
+}
+
+.navItem {
+  margin: 0 1em;
+  color: var(--rsd-component-header-nav-text-color);
+}
+
+.navItem:first-of-type {
+  margin-left: 0;
+}
+
+.navItem a {
+  color: var(--rsd-component-header-nav-text-color);
+}
+
+.navItem a:hover {
+  color: var(--rsd-component-header-nav-text-hover-color);
+}

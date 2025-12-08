@@ -1,11 +1,12 @@
 import LogoImage from '@lsst-sqre/rubin-style-dictionary/assets/triad-horizontal/triad-horizontal-color-dark.png';
 import Image from 'next/legacy/image';
 import Link from 'next/link';
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import { useAppConfig } from '@/contexts/AppConfigContext';
+import { useState } from 'react';
 
-const PreLogo = () => {
+import { useAppConfig } from '@/contexts/AppConfigContext';
+import styles from './PreHeader.module.css';
+
+export default function PreLogo() {
   const config = useAppConfig();
   const [imageError, setImageError] = useState(false);
 
@@ -63,11 +64,11 @@ const PreLogo = () => {
 
   // Don't render anything if image failed to load
   if (imageError) {
-    return <PreLogoContainer />;
+    return <div className={styles.logoContainer} />;
   }
 
   return (
-    <PreLogoContainer>
+    <div className={styles.logoContainer}>
       <Link href="/" aria-label={`Homepage of ${config.siteName}`}>
         <Image
           src={logoSrc}
@@ -77,13 +78,6 @@ const PreLogo = () => {
           onError={handleImageError}
         />
       </Link>
-    </PreLogoContainer>
+    </div>
   );
-};
-
-const PreLogoContainer = styled.div`
-  width: 100%;
-  margin-bottom: 0.5rem;
-`;
-
-export default PreLogo;
+}
