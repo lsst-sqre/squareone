@@ -2,70 +2,9 @@ import AgencyLogos from '@lsst-sqre/rubin-style-dictionary/assets/partner-logos/
 import Image from 'next/legacy/image';
 import Link from 'next/link';
 import { MDXRemote } from 'next-mdx-remote';
-import React from 'react';
-import styled from 'styled-components';
 
 import { footerMdxComponents } from '../../lib/utils/mdxComponents';
-import { ContentMaxWidth } from '../../styles/sizes';
-
-const StyledFooter = styled.footer`
-  // Full-with in a constrained parent
-  // https://css-tricks.com/full-width-containers-limited-width-parents/
-  width: 100vw;
-  position: relative;
-  left: 50%;
-  right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
-  margin-top: 0;
-
-  background-color: var(--rsd-component-footer-background-color);
-
-  .content {
-    margin: 0 auto;
-    max-width: ${ContentMaxWidth};
-    padding: 2rem var(--size-screen-padding-min);
-  }
-
-  @media (min-width: ${ContentMaxWidth}) {
-    .content {
-      padding: 2rem 0;
-    }
-  }
-
-  /* Link styling */
-  a {
-    color: var(--rsd-component-text-link-color);
-    text-decoration: none;
-  }
-
-  a:hover {
-    color: var(--rsd-component-text-link-hover-color);
-    text-decoration: underline;
-  }
-
-  /* Dark mode override - use primary-300 for better contrast on teal background */
-  [data-theme='dark'] & a {
-    color: var(--rsd-color-primary-300);
-  }
-
-  [data-theme='dark'] & a:hover {
-    color: var(--rsd-color-primary-300);
-    text-decoration: underline;
-  }
-`;
-
-const PartnerLogoContainer = styled.div`
-  margin: 1rem 0;
-`;
-
-const FundingNotice = styled.div`
-  font-size: 0.8rem;
-`;
-
-const FooterNav = styled.nav`
-  margin-bottom: 2rem;
-`;
+import styles from './Footer.module.css';
 
 type FooterProps = {
   // biome-ignore lint/suspicious/noExplicitAny: MDX serialized source is an opaque type from next-mdx-remote
@@ -80,16 +19,16 @@ type FooterProps = {
  */
 export default function Footer({ mdxSource }: FooterProps) {
   return (
-    <StyledFooter>
-      <div className="content">
+    <footer className={styles.footer}>
+      <div className={styles.content}>
         {mdxSource ? (
           <MDXRemote {...mdxSource} components={footerMdxComponents} />
         ) : (
           <>
-            <FooterNav>
+            <nav className={styles.footerNav}>
               <Link href="/terms">Acceptable use policy</Link>
-            </FooterNav>
-            <FundingNotice>
+            </nav>
+            <div className={styles.fundingNotice}>
               <p>
                 The U.S. National Science Foundation (
                 <a href="https://www.nsf.gov/">NSF</a>) and the U.S. Department
@@ -117,17 +56,17 @@ export default function Footer({ mdxSource }: FooterProps) {
                 is working to address some of the most pressing challenges of
                 our time.
               </p>
-            </FundingNotice>
-            <PartnerLogoContainer>
+            </div>
+            <div className={styles.partnerLogoContainer}>
               <Image
                 className="u-invertable-image"
                 src={AgencyLogos}
                 alt="Logos of the Vera C. Rubin Observatory, NSF, US DOE, NOIRLab, AURA, and SLAC."
               />
-            </PartnerLogoContainer>
+            </div>
           </>
         )}
       </div>
-    </StyledFooter>
+    </footer>
   );
 }
