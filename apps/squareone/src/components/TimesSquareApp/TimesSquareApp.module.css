@@ -1,0 +1,10 @@
+.layout {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  height: 100%;
+}
+
+.layout main {
+  width: 100%;
+}

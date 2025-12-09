@@ -5,29 +5,17 @@
  */
 
 import React, { type ReactNode } from 'react';
-import styled from 'styled-components';
 import TimesSquareGitHubPagePanel from '../TimesSquareGitHubPagePanel/TimesSquareGitHubPagePanel';
 import TimesSquareMainGitHubNav from '../TimesSquareMainGitHubNav';
 import TimesSquarePrGitHubNav from '../TimesSquarePrGitHubNav';
 import { TimesSquareUrlParametersContext } from '../TimesSquareUrlParametersProvider';
 import Sidebar from './Sidebar';
+import styles from './TimesSquareApp.module.css';
 
 type TimesSquareAppProps = {
   children: ReactNode;
   pageNav?: ReactNode;
 };
-
-const StyledLayout = styled.div`
-  display: flex;
-  flex-direction: row;
-  gap: 2rem;
-  height: 100%;
-
-  // main content
-  main {
-    width: 100%;
-  }
-`;
 
 export default function TimesSquareApp({
   children,
@@ -46,12 +34,12 @@ export default function TimesSquareApp({
   const pageNav = providedPageNav || defaultPageNav;
 
   return (
-    <StyledLayout>
+    <div className={styles.layout}>
       <Sidebar
         pageNav={pageNav}
         pagePanel={tsSlug ? <TimesSquareGitHubPagePanel /> : null}
       />
       <main>{children}</main>
-    </StyledLayout>
+    </div>
   );
 }
