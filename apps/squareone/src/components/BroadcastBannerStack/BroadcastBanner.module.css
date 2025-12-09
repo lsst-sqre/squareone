@@ -1,0 +1,63 @@
+.container {
+  width: 100%;
+  margin: 0;
+  padding: 0.5em;
+  background-color: var(--banner-bg, var(--rsd-color-gray-500));
+  color: white;
+}
+
+.aside {
+  margin: 0.5rem auto;
+  max-width: 60rem;
+  padding: 0 var(--size-screen-padding-min);
+}
+
+@media (min-width: 60rem) {
+  .aside {
+    padding: 0;
+  }
+}
+
+.summary {
+  width: 100%;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-start;
+  align-items: baseline;
+}
+
+.summary p {
+  margin: 0;
+}
+
+.disclosureButtonArea {
+  margin-left: 1.5rem;
+}
+
+.disclosure {
+  transition: 250ms;
+  margin-top: 0.5em;
+  max-height: 15em;
+  overflow-y: auto;
+  padding-right: 0.5em;
+}
+
+.disclosure[aria-hidden="true"] {
+  height: 0;
+  max-height: 0;
+  opacity: 0;
+  margin-top: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  visibility: hidden;
+  background-color: transparent;
+}
+
+.container a {
+  color: white;
+  text-decoration: underline;
+}
+
+.container a:hover {
+  color: #dddddd;
+}

@@ -1,25 +1,14 @@
-import React from 'react';
-import styled from 'styled-components';
+import type { ReactNode } from 'react';
 
-import { ContentMaxWidth } from '../../styles/sizes';
+import styles from './MainContent.module.css';
 
 type MainContentProps = {
-  children?: React.ReactNode;
+  children?: ReactNode;
 };
-
-const StyledMain = styled.main`
-  margin: 0 auto;
-  max-width: ${ContentMaxWidth};
-  padding: 0 var(--size-screen-padding-min);
-
-  @media (min-width: ${ContentMaxWidth}) {
-    padding: 0;
-  }
-`;
 
 /*
  * Main content wrapper (contained within a Page component).
  */
 export default function MainContent({ children }: MainContentProps) {
-  return <StyledMain>{children}</StyledMain>;
+  return <main className={styles.main}>{children}</main>;
 }

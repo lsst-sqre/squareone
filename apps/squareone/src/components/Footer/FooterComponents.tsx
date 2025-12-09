@@ -1,7 +1,12 @@
 import AgencyLogos from '@lsst-sqre/rubin-style-dictionary/assets/partner-logos/rubin-partners.png';
 import Image from 'next/legacy/image';
-import React from 'react';
-import styled from 'styled-components';
+import type { ReactNode } from 'react';
+
+import styles from './FooterComponents.module.css';
+
+type FooterNavProps = {
+  children: ReactNode;
+};
 
 /**
  * Navigation section for footer links.
@@ -14,9 +19,13 @@ import styled from 'styled-components';
  * </FooterNav>
  * ```
  */
-export const FooterNav = styled.nav`
-  margin-bottom: 2rem;
-`;
+export function FooterNav({ children }: FooterNavProps) {
+  return <nav className={styles.footerNav}>{children}</nav>;
+}
+
+type FundingNoticeProps = {
+  children: ReactNode;
+};
 
 /**
  * Container for funding and legal notices.
@@ -28,17 +37,9 @@ export const FooterNav = styled.nav`
  * </FundingNotice>
  * ```
  */
-export const FundingNotice = styled.div`
-  font-size: 0.8rem;
-`;
-
-/**
- * Container for partner logos.
- * This is just a styled div wrapper.
- */
-const PartnerLogoContainer = styled.div`
-  margin: 1rem 0;
-`;
+export function FundingNotice({ children }: FundingNoticeProps) {
+  return <div className={styles.fundingNotice}>{children}</div>;
+}
 
 /**
  * Partner logos component that can be used in MDX.
@@ -70,8 +71,8 @@ export function PartnerLogos({
   const imageSrc = src || AgencyLogos;
 
   return (
-    <PartnerLogoContainer>
+    <div className={styles.partnerLogoContainer}>
       <Image className="u-invertable-image" src={imageSrc} alt={alt} />
-    </PartnerLogoContainer>
+    </div>
   );
 }

@@ -1,0 +1,59 @@
+/*
+ * Full-width in a constrained parent
+ * https://css-tricks.com/full-width-containers-limited-width-parents/
+ */
+.footer {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  margin-top: 0;
+  background-color: var(--rsd-component-footer-background-color);
+}
+
+.content {
+  margin: 0 auto;
+  max-width: 60rem;
+  padding: 2rem var(--size-screen-padding-min);
+}
+
+@media (min-width: 60rem) {
+  .content {
+    padding: 2rem 0;
+  }
+}
+
+/* Link styling */
+.footer a {
+  color: var(--rsd-component-text-link-color);
+  text-decoration: none;
+}
+
+.footer a:hover {
+  color: var(--rsd-component-text-link-hover-color);
+  text-decoration: underline;
+}
+
+/* Dark mode override - use primary-300 for better contrast on teal background */
+:global([data-theme="dark"]) .footer a {
+  color: var(--rsd-color-primary-300);
+}
+
+:global([data-theme="dark"]) .footer a:hover {
+  color: var(--rsd-color-primary-300);
+  text-decoration: underline;
+}
+
+.partnerLogoContainer {
+  margin: 1rem 0;
+}
+
+.fundingNotice {
+  font-size: 0.8rem;
+}
+
+.footerNav {
+  margin-bottom: 2rem;
+}

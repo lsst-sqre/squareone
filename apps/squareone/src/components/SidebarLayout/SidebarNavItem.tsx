@@ -1,54 +1,15 @@
 import Link from 'next/link';
+import type { KeyboardEvent, MouseEvent } from 'react';
 import React, { useRef } from 'react';
-import styled from 'styled-components';
 
 import type { NavItem } from './SidebarLayout';
+import styles from './SidebarNavItem.module.css';
 
 export type SidebarNavItemProps = {
   item: NavItem;
   isActive: boolean;
-  onNavigate: (e?: React.MouseEvent | React.KeyboardEvent) => void;
+  onNavigate: (e?: MouseEvent | KeyboardEvent) => void;
 };
-
-const NavigationLink = styled(Link)<{ $isActive: boolean }>`
-  display: block;
-  padding: 0.25rem 0.75rem;
-  margin-left: -0.75rem;
-  color: inherit;
-  text-decoration: none;
-  border-radius: 0.5rem;
-  transition: background-color 0.2s ease, color 0.2s ease;
-  position: relative;
-
-  &:hover {
-    background-color: var(--rsd-color-primary-100, #e6f3ff);
-    text-decoration: none;
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--rsd-color-primary-600, #0066cc);
-    outline-offset: -2px;
-  }
-
-  /* Active/current page state - using pseudo-element for left bar */
-  ${({ $isActive }) =>
-    $isActive &&
-    `
-    font-weight: bold;
-    border-radius: 0 0.5rem 0.5rem 0;
-    
-    &::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 4px;
-      background-color: var(--rsd-color-primary-600, #0066cc);
-      border-radius: 2px;
-    }
-  `}
-`;
 
 /*
  * Individual navigation item component that renders a single navigation link
@@ -62,11 +23,11 @@ export default function SidebarNavItem({
 }: SidebarNavItemProps) {
   const linkRef = useRef<HTMLAnchorElement>(null);
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleClick = (e: MouseEvent) => {
     onNavigate(e);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       // Let Next.js Link handle navigation, only call onNavigate for side effects
       onNavigate(e);
@@ -74,16 +35,16 @@ export default function SidebarNavItem({
   };
 
   return (
-    <NavigationLink
+    <Link
       ref={linkRef}
       href={item.href}
+      className={isActive ? styles.linkActive : styles.link}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       aria-current={isActive ? 'page' : undefined}
-      $isActive={isActive}
       data-testid="sidebar-nav-item"
     >
       {item.label}
-    </NavigationLink>
+    </Link>
   );
 }

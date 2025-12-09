@@ -1,0 +1,30 @@
+.section {
+  margin-bottom: 1rem;
+}
+
+.section:last-child {
+  margin-bottom: 0;
+}
+
+.label {
+  margin: 1rem 0 0.25rem 0;
+  font-size: 0.875rem;
+  font-weight: bold;
+  color: var(--rsd-color-gray-600, #6b7280);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.label:first-child {
+  margin-top: 0;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.item {
+  margin-bottom: 0;
+}

@@ -1,16 +1,17 @@
 import { PrimaryNavigation } from '@lsst-sqre/squared';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
-import React from 'react';
-import styled from 'styled-components';
+import type { ReactNode } from 'react';
+
 import { useAppConfig } from '../../contexts/AppConfigContext';
 import useCurrentUrl from '../../hooks/useCurrentUrl';
 import AppsMenu from './AppsMenu';
+import styles from './HeaderNav.module.css';
 import Login from './Login';
 
 type InternalTriggerLinkProps = {
   href: string;
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
 /*
@@ -21,73 +22,49 @@ export default function HeaderNav() {
   const { enableAppsMenu } = useAppConfig();
 
   return (
-    <StyledNav>
-      <NavItem>
+    <PrimaryNavigation className={styles.nav}>
+      <PrimaryNavigation.Item className={styles.navItem}>
         <PrimaryNavigation.TriggerLink href="/portal/app">
           Portal
         </PrimaryNavigation.TriggerLink>
-      </NavItem>
+      </PrimaryNavigation.Item>
 
-      <NavItem>
+      <PrimaryNavigation.Item className={styles.navItem}>
         <PrimaryNavigation.TriggerLink href="/nb/hub">
           Notebooks
         </PrimaryNavigation.TriggerLink>
-      </NavItem>
+      </PrimaryNavigation.Item>
 
-      <NavItem>
+      <PrimaryNavigation.Item className={styles.navItem}>
         <InternalTriggerLink href="/api-aspect">APIs</InternalTriggerLink>
-      </NavItem>
+      </PrimaryNavigation.Item>
 
       {enableAppsMenu && (
-        <NavItem>
+        <PrimaryNavigation.Item className={styles.navItem}>
           <AppsMenu />
-        </NavItem>
+        </PrimaryNavigation.Item>
       )}
 
-      <NavItem>
+      <PrimaryNavigation.Item className={styles.navItem}>
         <InternalTriggerLink href="/docs">Documentation</InternalTriggerLink>
-      </NavItem>
+      </PrimaryNavigation.Item>
 
-      <NavItem>
+      <PrimaryNavigation.Item className={styles.navItem}>
         <InternalTriggerLink href="/support">Support</InternalTriggerLink>
-      </NavItem>
+      </PrimaryNavigation.Item>
 
-      <NavItem>
+      <PrimaryNavigation.Item className={styles.navItem}>
         <PrimaryNavigation.TriggerLink href="https://community.lsst.org">
           Community
         </PrimaryNavigation.TriggerLink>
-      </NavItem>
+      </PrimaryNavigation.Item>
 
       <Login pageUrl={currentUrl} />
-    </StyledNav>
+    </PrimaryNavigation>
   );
 }
 
-const StyledNav = styled(PrimaryNavigation)`
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  font-size: 1.2rem;
-`;
-
-const NavItem = styled(PrimaryNavigation.Item)`
-  margin: 0 1em;
-
-  &:first-of-type {
-    margin-left: 0;
-  }
-
-  color: var(--rsd-component-header-nav-text-color);
-  a {
-    color: var(--rsd-component-header-nav-text-color);
-  }
-
-  a:hover {
-    color: var(--rsd-component-header-nav-text-hover-color);
-  }
-`;
-
-const InternalTriggerLink = ({ href, children }: InternalTriggerLinkProps) => {
+function InternalTriggerLink({ href, children }: InternalTriggerLinkProps) {
   const router = useRouter();
   const _isActive = href === router.pathname;
 
@@ -96,4 +73,4 @@ const InternalTriggerLink = ({ href, children }: InternalTriggerLinkProps) => {
       <PrimaryNavigation.TriggerLink>{children}</PrimaryNavigation.TriggerLink>
     </NextLink>
   );
-};
+}

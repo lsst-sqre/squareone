@@ -1,10 +1,10 @@
-import React from 'react';
 /* Login component with proper hydration handling */
 
 import { getLoginUrl, PrimaryNavigation } from '@lsst-sqre/squared';
 import { useEffect, useState } from 'react';
-import styled from 'styled-components';
+
 import useUserInfo from '../../hooks/useUserInfo';
+import styles from './Login.module.css';
 import UserMenu from './UserMenu';
 
 type LoginProps = {
@@ -23,59 +23,39 @@ export default function Login({ pageUrl }: LoginProps) {
   // to avoid hydration mismatch
   if (!hasMounted) {
     return (
-      <LoginNavItem>
+      <PrimaryNavigation.Item className={styles.loginNavItem}>
         <PrimaryNavigation.TriggerLink href={getLoginUrl(pageUrl.toString())}>
           Log in
         </PrimaryNavigation.TriggerLink>
-      </LoginNavItem>
+      </PrimaryNavigation.Item>
     );
   }
 
   // After hydration, check loading state first
   if (isLoading) {
     return (
-      <LoginNavItem>
+      <PrimaryNavigation.Item className={styles.loginNavItem}>
         <PrimaryNavigation.TriggerLink href={getLoginUrl(pageUrl.toString())}>
           Log in
         </PrimaryNavigation.TriggerLink>
-      </LoginNavItem>
+      </PrimaryNavigation.Item>
     );
   }
 
   // Show appropriate content based on login status
   if (isLoggedIn === true) {
     return (
-      <LoginNavItem>
+      <PrimaryNavigation.Item className={styles.loginNavItem}>
         <UserMenu pageUrl={pageUrl} />
-      </LoginNavItem>
+      </PrimaryNavigation.Item>
     );
   }
 
   return (
-    <LoginNavItem>
+    <PrimaryNavigation.Item className={styles.loginNavItem}>
       <PrimaryNavigation.TriggerLink href={getLoginUrl(pageUrl.toString())}>
         Log in
       </PrimaryNavigation.TriggerLink>
-    </LoginNavItem>
+    </PrimaryNavigation.Item>
   );
 }
-
-const LoginNavItem = styled(PrimaryNavigation.Item)`
-  margin-left: auto !important;
-  margin-right: 0 !important;
-  margin-top: 0;
-  margin-bottom: 0;
-
-  /* Ensure consistent width to prevent layout shifts */
-  min-width: fit-content;
-  flex-shrink: 0;
-
-  color: var(--rsd-component-header-nav-text-color);
-  a {
-    color: var(--rsd-component-header-nav-text-color);
-  }
-
-  a:hover {
-    color: var(--rsd-component-header-nav-text-hover-color);
-  }
-`;

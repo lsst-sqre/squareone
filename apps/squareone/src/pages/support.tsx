@@ -3,16 +3,15 @@ import Head from 'next/head';
 import { MDXRemote } from 'next-mdx-remote';
 import { serialize } from 'next-mdx-remote/serialize';
 import type { ReactElement, ReactNode } from 'react';
-import styled from 'styled-components';
 
 import MainContent from '../components/MainContent';
 import { useAppConfig } from '../contexts/AppConfigContext';
 import { loadConfigAndMdx } from '../lib/config/loader';
 import { commonMdxComponents } from '../lib/utils/mdxComponents';
 
-const Section = styled.section`
-  margin-bottom: 2rem;
-`;
+function Section({ children }: { children: React.ReactNode }) {
+  return <section style={{ marginBottom: '2rem' }}>{children}</section>;
+}
 
 const mdxComponents = { ...commonMdxComponents, Section };
 
