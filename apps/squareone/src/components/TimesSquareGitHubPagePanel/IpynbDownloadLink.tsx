@@ -1,6 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React from 'react';
-import styled from 'styled-components';
+import styles from './IpynbDownloadLink.module.css';
 
 type IpynbDownloadLinkProps = {
   url: string;
@@ -15,19 +14,11 @@ export default function IpynbDownloadLink({
   const filename = sourcePath ? sourcePath.split('/').pop() : undefined;
 
   return (
-    <StyledP>
+    <p className={styles.paragraph}>
       <a href={url} title={filename} download={filename}>
-        <StyledFontAwesomeIcon icon="download" /> Download notebook
+        <FontAwesomeIcon icon="download" className={styles.icon} /> Download
+        notebook
       </a>
-    </StyledP>
+    </p>
   );
 }
-
-const StyledP = styled.p`
-  margin-top: 2rem;
-`;
-
-const StyledFontAwesomeIcon = styled(FontAwesomeIcon)`
-  margin-right: 0.2em;
-  font-size: 1em;
-`;
