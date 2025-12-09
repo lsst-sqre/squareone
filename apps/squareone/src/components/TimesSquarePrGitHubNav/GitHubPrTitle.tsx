@@ -1,6 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React from 'react';
-import styled from 'styled-components';
+import styles from './GitHubPrTitle.module.css';
 
 type GitHubPrTitleProps = {
   /**
@@ -26,53 +25,19 @@ export default function GitHubPrTitle({
   commit,
 }: GitHubPrTitleProps) {
   return (
-    <StyledHeader>
-      <p className="subtitle">PR Preview</p>
+    <header className={styles.header}>
+      <p className={styles.subtitle}>PR Preview</p>
 
       <h2>
-        <HiddenLink
+        <a
+          className={styles.hiddenLink}
           href={`https://github.com/${owner}/${repo}/`}
-        >{`${owner}/${repo}`}</HiddenLink>
+        >{`${owner}/${repo}`}</a>
       </h2>
       <p>
-        <StyledFontAwesomeIcon icon="code-commit" /> {commit?.slice(0, 7)}
+        <FontAwesomeIcon icon="code-commit" className={styles.icon} />{' '}
+        {commit?.slice(0, 7)}
       </p>
-    </StyledHeader>
+    </header>
   );
 }
-
-const StyledHeader = styled.header`
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-
-  p,
-  h2 {
-    margin: 0;
-  }
-
-  h2 {
-    line-height: 1.2;
-    font-size: 1.1rem;
-  }
-
-  .subtitle {
-    font-size: 0.8rem;
-    font-weight: bold;
-    text-transform: uppercase;
-  }
-`;
-
-const HiddenLink = styled.a`
-  color: inherit;
-  text-decoration: none;
-
-  :hover {
-    color: inherit;
-    text-decoration: underline;
-  }
-`;
-
-const StyledFontAwesomeIcon = styled(FontAwesomeIcon)`
-  margin-right: 0.2em;
-`;
