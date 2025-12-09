@@ -1,4 +1,3 @@
-import React from 'react';
 /* A "Page" filesystem tree item, which links to a single page.
  *
  * This is based on a Josh Comeau blog post:
@@ -6,8 +5,9 @@ import React from 'react';
  */
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import clsx from 'clsx';
 import Link from 'next/link';
-import styled from 'styled-components';
+import styles from './Page.module.css';
 
 type PageProps = {
   title: string;
@@ -17,29 +17,13 @@ type PageProps = {
 
 function Page({ title, path, current }: PageProps) {
   return (
-    <Wrapper $current={current}>
-      <StyledFontAwesomeIcon icon="file" />
+    <div className={clsx(styles.wrapper, current && styles.wrapperCurrent)}>
+      <FontAwesomeIcon icon="file" className={styles.icon} />
       <Link href={path} legacyBehavior>
         {title}
       </Link>
-    </Wrapper>
+    </div>
   );
 }
-
-const Wrapper = styled.div<{ $current: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  min-height: var(--row-height);
-  color: inherit;
-  font-weight: ${(props) => (props.$current ? 'bold' : 'normal')};
-`;
-
-const StyledFontAwesomeIcon = styled(FontAwesomeIcon)`
-  margin-right: 0.25em;
-  font-size: 0.8em;
-  opacity: 0.9;
-  display: block;
-`;
 
 export default Page;
