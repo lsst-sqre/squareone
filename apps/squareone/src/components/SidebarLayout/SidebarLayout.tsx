@@ -130,7 +130,6 @@ export default function SidebarLayout({
       >
         Skip to main content
       </a>
-
       <header className={styles.mobileHeader} data-testid="mobile-header">
         <h2 className={styles.mobileHeaderTitle}>
           <a
@@ -148,7 +147,6 @@ export default function SidebarLayout({
           onClick={handleMobileMenuToggle}
         />
       </header>
-
       <div
         className={
           isExpanded
@@ -167,7 +165,6 @@ export default function SidebarLayout({
           disclosureAriaLabelledby={contentProps['aria-labelledby']}
         />
       </div>
-
       <main
         className={styles.mainContentContainer}
         ref={mainContentRef}

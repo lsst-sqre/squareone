@@ -1,5 +1,5 @@
 import LogoImage from '@lsst-sqre/rubin-style-dictionary/assets/triad-horizontal/triad-horizontal-color-dark.png';
-import Image from 'next/legacy/image';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -76,6 +76,11 @@ export default function PreLogo() {
           width={logoWidth}
           alt={logoAlt}
           onError={handleImageError}
+          style={{
+            maxWidth: '100%',
+            width: 'auto',
+            height: 'auto',
+          }}
         />
       </Link>
     </div>
