@@ -5,10 +5,10 @@
  * Updated to handle undefined context gracefully.
  */
 
+import { Button } from '@lsst-sqre/squared';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import React from 'react';
 import styled from 'styled-components';
-import { GhostButton } from '../Button';
 import { TimesSquareHtmlEventsContext } from '../TimesSquareHtmlEventsProvider';
 
 export default function ExecStats() {
@@ -55,7 +55,9 @@ export default function ExecStats() {
           </time>{' '}
           in {formattedDuration} seconds.
         </StyledContent>
-        <GhostButton onClick={handleRecompute}>Recompute</GhostButton>
+        <Button appearance="outline" tone="primary" onClick={handleRecompute}>
+          Recompute
+        </Button>
       </StyledContainer>
     );
   }

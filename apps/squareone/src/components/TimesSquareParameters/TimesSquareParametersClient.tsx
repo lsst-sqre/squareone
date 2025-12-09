@@ -3,6 +3,7 @@
  * This component handles the useTimesSquarePage hook on the client side only.
  */
 
+import { Button } from '@lsst-sqre/squared';
 import Ajv, { type ValidateFunction } from 'ajv';
 import addFormats from 'ajv-formats';
 import { Field, Formik, type FormikHelpers } from 'formik';
@@ -10,7 +11,6 @@ import { useRouter } from 'next/router';
 import React, { type ChangeEvent, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import useTimesSquarePage from '../../hooks/useTimesSquarePage';
-import Button, { RedGhostButton } from '../Button';
 import { TimesSquareUrlParametersContext } from '../TimesSquareUrlParametersProvider';
 import ParameterInput from './ParameterInput';
 import StringInput from './StringInput';
@@ -198,13 +198,16 @@ export default function TimesSquareParametersClient() {
             <Button type="submit" disabled={isSubmitting || !dirty}>
               Update
             </Button>
-            <ResetButton
+            <Button
               type="reset"
+              appearance="outline"
+              tone="danger"
+              size="sm"
               onClick={handleReset}
               disabled={isSubmitting || !dirty}
             >
               Reset
-            </ResetButton>
+            </Button>
           </ButtonGroup>
         </form>
       )}
@@ -228,8 +231,4 @@ const ButtonGroup = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-`;
-
-const ResetButton = styled(RedGhostButton)`
-  font-size: 0.8rem;
 `;
