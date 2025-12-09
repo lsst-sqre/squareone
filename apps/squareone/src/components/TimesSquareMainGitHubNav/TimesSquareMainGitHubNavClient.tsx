@@ -1,13 +1,12 @@
-import React from 'react';
 /*
  * Client-only TimesSquareMainGitHubNav component - uses SWR without SSR conflicts
  * This component handles the useGitHubContentsListing hook on the client side only.
  */
 
 import { useEffect, useState } from 'react';
-import styled from 'styled-components';
 import { useAppConfig } from '../../contexts/AppConfigContext';
 import TimesSquareGitHubNav from '../TimesSquareGitHubNav';
+import styles from './TimesSquareMainGitHubNavClient.module.css';
 import useGitHubContentsListing from './useGitHubContentsListing';
 
 type TimesSquareMainGitHubNavClientProps = {
@@ -36,18 +35,14 @@ function TimesSquareMainGitHubNavClient({
   }
 
   return (
-    <StyledContainer>
+    <div className={styles.container}>
       <TimesSquareGitHubNav
         contentNodes={githubContents.contents}
         pagePath={pagePath}
         pagePathRoot="/times-square/github"
       />
-    </StyledContainer>
+    </div>
   );
 }
 
 export default TimesSquareMainGitHubNavClient;
-
-const StyledContainer = styled.div`
-  margin-top: 2rem;
-`;

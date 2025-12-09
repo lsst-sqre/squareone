@@ -1,16 +1,15 @@
-import React from 'react';
 /*
  * Client-only TimesSquarePrGitHubNav component - uses SWR without SSR conflicts
  * This component handles the useGitHubPrContentsListing hook on the client side only.
  */
 
 import { useEffect, useState } from 'react';
-import styled from 'styled-components';
 import { useAppConfig } from '../../contexts/AppConfigContext';
 import TimesSquareGitHubNav from '../TimesSquareGitHubNav';
 import GitHubCheckBadge from './GitHubCheckBadge';
 import GitHubPrBadge from './GitHubPrBadge';
 import GitHubPrTitle from './GitHubPrTitle';
+import styles from './TimesSquarePrGitHubNavClient.module.css';
 import useGitHubPrContentsListing from './useGitHubPrContentsListing';
 
 type TimesSquarePrGitHubNavClientProps = {
@@ -49,12 +48,12 @@ function TimesSquarePrGitHubNavClient({
     const { nbCheck, yamlCheck } = githubContents;
 
     return (
-      <StyledSection>
+      <section className={styles.section}>
         {showPrDetails && (
           <>
             <GitHubPrTitle owner={owner} repo={repo} commit={commitSha} />
 
-            <ItemList>
+            <ul className={styles.itemList}>
               {githubContents.pullRequests.map((pr) => (
                 <li key={`pr-${pr.number}`}>
                   <GitHubPrBadge
@@ -68,9 +67,9 @@ function TimesSquarePrGitHubNavClient({
                   />
                 </li>
               ))}
-            </ItemList>
+            </ul>
 
-            <ItemList>
+            <ul className={styles.itemList}>
               {nbCheck && (
                 <li>
                   <GitHubCheckBadge
@@ -91,7 +90,7 @@ function TimesSquarePrGitHubNavClient({
                   />
                 </li>
               )}
-            </ItemList>
+            </ul>
           </>
         )}
 
@@ -101,7 +100,7 @@ function TimesSquarePrGitHubNavClient({
           pagePathRoot="/times-square/github-pr"
           pagePath={null}
         />
-      </StyledSection>
+      </section>
     );
   }
 
@@ -109,13 +108,3 @@ function TimesSquarePrGitHubNavClient({
 }
 
 export default TimesSquarePrGitHubNavClient;
-
-const ItemList = styled.ul`
-  list-style: none;
-  margin: 1rem 0 1rem;
-  padding-left: 0;
-`;
-
-const StyledSection = styled.section`
-  margin-top: 2rem;
-`;
