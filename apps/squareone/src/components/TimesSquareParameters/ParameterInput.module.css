@@ -1,0 +1,18 @@
+.parameterName {
+  margin-bottom: 0.2em;
+  font-weight: normal;
+  font-family:
+    SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+    monospace;
+}
+
+.errorMessage {
+  color: red;
+  margin-top: 0.2em;
+  margin-bottom: 0.2em;
+}
+
+.description {
+  font-size: 0.8rem;
+  margin-top: 0.2rem;
+}
