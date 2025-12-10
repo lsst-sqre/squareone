@@ -55,7 +55,6 @@
     "remark": "^14.0.2",
     "remark-gfm": "^3.0.1",
     "remark-html": "^15.0.1",
-    "styled-components": "^6.1.19",
     "swr": "^2.3.6"
   },
   "devDependencies": {
@@ -74,7 +73,6 @@
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
-    "@types/styled-components": "^5.1.36",
     "@vitest/browser": "^3.2.4",
     "@vitest/coverage-v8": "^3.2.4",
     "babel-loader": "^9.1.2",
