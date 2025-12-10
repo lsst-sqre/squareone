@@ -66,12 +66,11 @@ export default function HeaderNav() {
 
 function InternalTriggerLink({ href, children }: InternalTriggerLinkProps) {
   const router = useRouter();
-  const _isActive = href === router.pathname;
+  const isActive = href === router.pathname;
 
   return (
-    <NextLink href={href}>
-      {/* @next-codemod-error This Link previously used the now removed `legacyBehavior` prop, and has a child that might not be an anchor. The codemod bailed out of lifting the child props to the Link. Check that the child component does not render an anchor, and potentially move the props manually to Link. */}
-      <PrimaryNavigation.TriggerLink>{children}</PrimaryNavigation.TriggerLink>
-    </NextLink>
+    <PrimaryNavigation.TriggerLink asChild active={isActive}>
+      <NextLink href={href}>{children}</NextLink>
+    </PrimaryNavigation.TriggerLink>
   );
 }
