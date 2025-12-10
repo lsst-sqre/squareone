@@ -1,0 +1,17 @@
+.checkboxLabel {
+  display: flex;
+  flex-direction: row;
+  gap: var(--sqo-space-xs);
+  align-items: baseline;
+}
+
+.parameterList {
+  list-style: none;
+  padding-left: 0;
+}
+
+.buttonGroup {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}

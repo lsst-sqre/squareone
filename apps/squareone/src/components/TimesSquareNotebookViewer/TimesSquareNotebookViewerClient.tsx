@@ -4,15 +4,9 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
 import { TimesSquareUrlParametersContext } from '../TimesSquareUrlParametersProvider';
+import styles from './TimesSquareNotebookViewerClient.module.css';
 import useHtmlStatus from './useHtmlStatus';
-
-const StyledIframe = styled.iframe`
-  border: 0px solid black;
-  width: 100%;
-  height: 100%;
-`;
 
 export default function TimesSquareNotebookViewerClient() {
   const [isClient, setIsClient] = useState(false);
@@ -56,9 +50,11 @@ export default function TimesSquareNotebookViewerClient() {
   }
 
   return (
-    <StyledIframe
+    <iframe
+      className={styles.iframe}
       src={htmlStatus.htmlUrl}
       key={htmlStatus.iframeKey}
-    ></StyledIframe>
+      title="Notebook viewer"
+    />
   );
 }

@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React from 'react';
-import styled from 'styled-components';
+import type React from 'react';
+import styles from './GitHubCheckBadge.module.css';
 
 type GitHubCheckStatus = 'queued' | 'in_progress' | 'completed';
 
@@ -48,33 +48,37 @@ export default function GitHubCheckBadge({
   if (status === 'completed') {
     if (conclusion === 'success') {
       icon = (
-        <StyledFontAwesomeIcon
+        <FontAwesomeIcon
           icon="circle-check"
-          $color="var(--rsd-color-green-500)"
+          className={styles.icon}
+          style={{ color: 'var(--rsd-color-green-500)' }}
         />
       );
     } else if (conclusion === 'failure') {
       icon = (
-        <StyledFontAwesomeIcon
+        <FontAwesomeIcon
           icon="circle-xmark"
-          $color="var(--rsd-color-red-500)"
+          className={styles.icon}
+          style={{ color: 'var(--rsd-color-red-500)' }}
         />
       );
     } else {
       // some other conclusion than success/failure
       icon = (
-        <StyledFontAwesomeIcon
+        <FontAwesomeIcon
           icon="circle-minus"
-          $color="var(--rsd-color-yellow-500)"
+          className={styles.icon}
+          style={{ color: 'var(--rsd-color-yellow-500)' }}
         />
       );
     }
   } else {
     // no result yet
     icon = (
-      <StyledFontAwesomeIcon
+      <FontAwesomeIcon
         icon="circle-minus"
-        $color="var(--rsd-color-gray-500)"
+        className={styles.icon}
+        style={{ color: 'var(--rsd-color-gray-500)' }}
       />
     );
   }
@@ -84,9 +88,3 @@ export default function GitHubCheckBadge({
     </a>
   );
 }
-
-const StyledFontAwesomeIcon = styled(FontAwesomeIcon)<{ $color?: string }>`
-  margin-right: 0.2em;
-  font-size: 1em;
-  color: ${(props) => props.$color || 'inherit'};
-`;

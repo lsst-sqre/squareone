@@ -3,7 +3,6 @@ import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import type { ReactElement, ReactNode } from 'react';
-import styled from 'styled-components';
 
 import TimesSquareApp from '../../../../../components/TimesSquareApp';
 import TimesSquarePrGitHubNav from '../../../../../components/TimesSquarePrGitHubNav';
@@ -14,6 +13,7 @@ import WideContentLayout from '../../../../../components/WideContentLayout';
 import { useAppConfig } from '../../../../../contexts/AppConfigContext';
 import { loadFooterMdx } from '../../../../../lib/config/footerLoader';
 import { loadAppConfig } from '../../../../../lib/config/loader';
+import styles from './commit.module.css';
 
 // biome-ignore lint/complexity/noBannedTypes: Empty props object required for Next.js page
 type GitHubPrLandingPageProps = {};
@@ -45,7 +45,7 @@ export default function GitHubPrLandingPage() {
     const { nbCheck, yamlCheck } = githubContents;
     prDetails = (
       <>
-        <ItemList>
+        <ul className={styles.itemList}>
           {githubContents.pullRequests.map((pr) => (
             <li key={`pr-${pr.number}`}>
               <GitHubPrBadge
@@ -59,9 +59,9 @@ export default function GitHubPrLandingPage() {
               />
             </li>
           ))}
-        </ItemList>
+        </ul>
 
-        <ItemList>
+        <ul className={styles.itemList}>
           {nbCheck && (
             <li>
               <GitHubCheckBadge
@@ -82,7 +82,7 @@ export default function GitHubPrLandingPage() {
               />
             </li>
           )}
-        </ItemList>
+        </ul>
       </>
     );
   } else {
@@ -98,18 +98,18 @@ export default function GitHubPrLandingPage() {
         </title>
       </Head>
 
-      <StyledHeader>
+      <header className={styles.header}>
         <p className="subtitle">Pull Request Preview</p>
         <h1>
           {`${Array.isArray(owner) ? owner[0] : owner}/${
             Array.isArray(repo) ? repo[0] : repo
           }`}{' '}
-          <CommitSpan>
-            <FontAwesomeIcon icon="code-commit" />{' '}
+          <span className={styles.commitSpan}>
+            <FontAwesomeIcon icon="code-commit" className={styles.commitIcon} />{' '}
             {(Array.isArray(commit) ? commit[0] : commit || '').slice(0, 7)}
-          </CommitSpan>
+          </span>
         </h1>
-      </StyledHeader>
+      </header>
 
       {prDetails}
     </TimesSquareApp>
@@ -151,26 +151,3 @@ export const getServerSideProps: GetServerSideProps<
     };
   }
 };
-
-const StyledHeader = styled.header`
-  .subtitle {
-    font-size: 1.2rem;
-    color: var(--rsd-component-text-color);
-    text-transform: uppercase;
-    font-weight: bold;
-  }
-`;
-
-const CommitSpan = styled.span`
-  display: inline-block;
-
-  .commit-icon {
-    margin-right: 0.2rem;
-  }
-`;
-
-const ItemList = styled.ul`
-  list-style: none;
-  margin: 1rem 0 1rem;
-  padding-left: 0;
-`;

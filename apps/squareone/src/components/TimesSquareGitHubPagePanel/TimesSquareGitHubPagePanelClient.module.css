@@ -1,0 +1,13 @@
+.container {
+  padding: 1em;
+  margin-right: calc(-1 * var(--size-screen-padding-min));
+  border-radius: 15px 0 0 15px;
+  margin-top: 1em;
+  border: 1px solid var(--rsd-color-primary-600);
+  border-right: none;
+  box-shadow: var(--sqo-elevation-base);
+}
+
+.pageTitle {
+  margin-top: 0;
+}

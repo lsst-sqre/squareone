@@ -1,0 +1,12 @@
+.input {
+  border-width: 2px;
+  border-style: solid;
+  border-color: var(--rsd-color-gray-500);
+  padding: 5px 10px;
+  border-radius: 5px;
+  appearance: none;
+}
+
+.inputError {
+  border-color: var(--rsd-color-red-500);
+}

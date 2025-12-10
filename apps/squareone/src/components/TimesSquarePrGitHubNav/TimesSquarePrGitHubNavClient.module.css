@@ -1,0 +1,9 @@
+.itemList {
+  list-style: none;
+  margin: 1rem 0 1rem;
+  padding-left: 0;
+}
+
+.section {
+  margin-top: 2rem;
+}

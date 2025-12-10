@@ -1,0 +1,14 @@
+.sidebar {
+  border-right: 1px solid var(--rsd-color-primary-600);
+  padding: 0 var(--size-screen-padding-min) 2rem 0.5rem;
+  width: 18rem;
+}
+
+.appTitle {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  margin-top: 0.67em;
+  font-weight: bold;
+  color: var(--rsd-component-text-headline-color);
+  text-transform: uppercase;
+}

@@ -6,8 +6,9 @@
  */
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import clsx from 'clsx';
 import React from 'react';
-import styled from 'styled-components';
+import styles from './Directory.module.css';
 
 type DirectoryProps = {
   title: string;
@@ -17,36 +18,14 @@ type DirectoryProps = {
 
 function Directory({ title, current, children }: DirectoryProps) {
   return (
-    <Wrapper>
-      <Header $current={current}>
-        <StyledFontAwesomeIcon icon="angle-down" />
+    <div>
+      <div className={clsx(styles.header, current && styles.headerCurrent)}>
+        <FontAwesomeIcon icon="angle-down" className={styles.icon} />
         {title}
-      </Header>
-      <Contents $current={current}>{children}</Contents>
-    </Wrapper>
+      </div>
+      <div className={styles.contents}>{children}</div>
+    </div>
   );
 }
-
-const Wrapper = styled.div``;
-
-const Header = styled.div<{ $current: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  min-height: var(--row-height);
-  color: inherit;
-  font-weight: ${(props) => (props.$current ? 'bold' : 'normal')};
-`;
-
-const Contents = styled.div<{ $current: boolean }>`
-  padding-left: calc(16px + 4px);
-`;
-
-const StyledFontAwesomeIcon = styled(FontAwesomeIcon)`
-  margin-right: 0.25em;
-  font-size: 0.8em;
-  opacity: 0.9;
-  display: block;
-`;
 
 export default Directory;

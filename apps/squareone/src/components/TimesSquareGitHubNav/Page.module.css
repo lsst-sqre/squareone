@@ -1,0 +1,19 @@
+.wrapper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: var(--row-height);
+  color: inherit;
+  font-weight: normal;
+}
+
+.wrapperCurrent {
+  font-weight: bold;
+}
+
+.icon {
+  margin-right: 0.25em;
+  font-size: 0.8em;
+  opacity: 0.9;
+  display: block;
+}

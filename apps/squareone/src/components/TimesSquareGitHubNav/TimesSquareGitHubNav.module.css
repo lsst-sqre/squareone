@@ -1,0 +1,9 @@
+.contentsWrapper {
+  --row-height: 1.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0;
+  margin-top: -0.25rem;
+  line-height: 1.3;
+}

@@ -6,7 +6,6 @@
 import NextError from 'next/error';
 import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
 import { useAppConfig } from '../../contexts/AppConfigContext';
 import useTimesSquarePage from '../../hooks/useTimesSquarePage';
 import TimesSquareParameters from '../TimesSquareParameters';
@@ -14,6 +13,7 @@ import { TimesSquareUrlParametersContext } from '../TimesSquareUrlParametersProv
 import ExecStats from './ExecStats';
 import GitHubEditLink from './GitHubEditLink';
 import IpynbDownloadLink from './IpynbDownloadLink';
+import styles from './TimesSquareGitHubPagePanelClient.module.css';
 
 export default function TimesSquareGitHubPagePanelClient() {
   const [isClient, setIsClient] = useState(false);
@@ -35,17 +35,17 @@ export default function TimesSquareGitHubPagePanelClient() {
   // Show loading state until client-side hydration
   if (!isClient) {
     return (
-      <PagePanelContainer>
+      <div className={styles.container}>
         <p>Loading...</p>
-      </PagePanelContainer>
+      </div>
     );
   }
 
   if (pageData.loading) {
     return (
-      <PagePanelContainer>
+      <div className={styles.container}>
         <p>Loading...</p>
-      </PagePanelContainer>
+      </div>
     );
   }
   if (pageData.error) {
@@ -57,14 +57,14 @@ export default function TimesSquareGitHubPagePanelClient() {
   const ipynbDownloadUrl = `${pageData.renderedIpynbUrl}?${urlQueryString}`;
 
   return (
-    <PagePanelContainer>
+    <div className={styles.container}>
       <Head>
         <title>{`${title} | ${siteName}`}</title>
       </Head>
       <div>
-        <PageTitle>{title}</PageTitle>
+        <h1 className={styles.pageTitle}>{title}</h1>
         {description && (
-          <div dangerouslySetInnerHTML={{ __html: description.html }}></div>
+          <div dangerouslySetInnerHTML={{ __html: description.html }} />
         )}
         <GitHubEditLink
           owner={pageData.github.owner}
@@ -81,20 +81,6 @@ export default function TimesSquareGitHubPagePanelClient() {
 
         <ExecStats />
       </div>
-    </PagePanelContainer>
+    </div>
   );
 }
-
-const PagePanelContainer = styled.div`
-  padding: 1em;
-  margin-right: calc(-1 * var(--size-screen-padding-min));
-  border-radius: 15px 0 0 15px;
-  margin-top: 1em;
-  border: 1px solid var(--rsd-color-primary-600);
-  border-right: none;
-  box-shadow: var(--sqo-elevation-base);
-`;
-
-const PageTitle = styled.h1`
-  margin-top: 0;
-`;

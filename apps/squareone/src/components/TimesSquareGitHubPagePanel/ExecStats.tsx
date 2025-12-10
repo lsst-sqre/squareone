@@ -5,11 +5,11 @@
  * Updated to handle undefined context gracefully.
  */
 
+import { Button } from '@lsst-sqre/squared';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import React from 'react';
-import styled from 'styled-components';
-import { GhostButton } from '../Button';
 import { TimesSquareHtmlEventsContext } from '../TimesSquareHtmlEventsProvider';
+import styles from './ExecStats.module.css';
 
 export default function ExecStats() {
   const htmlEvent = React.useContext(TimesSquareHtmlEventsContext);
@@ -44,8 +44,8 @@ export default function ExecStats() {
     const dateFinished = parseISO(htmlEvent.dateFinished);
     const formattedDuration = Number(htmlEvent.executionDuration).toFixed(1);
     return (
-      <StyledContainer>
-        <StyledContent>
+      <div className={styles.container}>
+        <p className={styles.content}>
           Computed{' '}
           <time
             dateTime={htmlEvent.dateFinished}
@@ -54,31 +54,21 @@ export default function ExecStats() {
             {formatDistanceToNow(dateFinished, { addSuffix: true })}
           </time>{' '}
           in {formattedDuration} seconds.
-        </StyledContent>
-        <GhostButton onClick={handleRecompute}>Recompute</GhostButton>
-      </StyledContainer>
+        </p>
+        <Button appearance="outline" tone="primary" onClick={handleRecompute}>
+          Recompute
+        </Button>
+      </div>
     );
   }
 
   if (htmlEvent.executionStatus === 'in_progress') {
     return (
-      <StyledContainer>
+      <div className={styles.container}>
         <p>Computing…</p>
-      </StyledContainer>
+      </div>
     );
   }
 
   return null;
 }
-
-const StyledContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-top: 2rem;
-`;
-
-const StyledContent = styled.p`
-  font-size: 0.8rem;
-  margin-bottom: 0;
-`;

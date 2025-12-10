@@ -3,17 +3,18 @@
  * This component handles the useTimesSquarePage hook on the client side only.
  */
 
+import { Button } from '@lsst-sqre/squared';
 import Ajv, { type ValidateFunction } from 'ajv';
 import addFormats from 'ajv-formats';
 import { Field, Formik, type FormikHelpers } from 'formik';
 import { useRouter } from 'next/router';
-import React, { type ChangeEvent, useEffect, useState } from 'react';
-import styled from 'styled-components';
+import type { ChangeEvent } from 'react';
+import React, { useEffect, useState } from 'react';
 import useTimesSquarePage from '../../hooks/useTimesSquarePage';
-import Button, { RedGhostButton } from '../Button';
 import { TimesSquareUrlParametersContext } from '../TimesSquareUrlParametersProvider';
 import ParameterInput from './ParameterInput';
 import StringInput from './StringInput';
+import styles from './TimesSquareParametersClient.module.css';
 
 type ParameterSchema = {
   type: string;
@@ -169,7 +170,7 @@ export default function TimesSquareParametersClient() {
         dirty,
       }) => (
         <form onSubmit={handleSubmit} onReset={handleReset}>
-          <StyledParameterList>
+          <ul className={styles.parameterList}>
             {parameters &&
               Object.entries(parameters).map(([paramName, paramSchema]) => {
                 const inputProps: InputFactoryProps = {
@@ -185,51 +186,32 @@ export default function TimesSquareParametersClient() {
                 };
                 return <li key={paramName}>{inputFactory(inputProps)}</li>;
               })}
-          </StyledParameterList>
-          <StyledParameterList>
+          </ul>
+          <ul className={styles.parameterList}>
             <li>
-              <CheckboxLabel htmlFor="tsHideCode">
+              <label className={styles.checkboxLabel} htmlFor="tsHideCode">
                 <Field type="checkbox" name="tsHideCode" />
                 <span className="label">Hide code cells</span>
-              </CheckboxLabel>
+              </label>
             </li>
-          </StyledParameterList>
-          <ButtonGroup>
+          </ul>
+          <div className={styles.buttonGroup}>
             <Button type="submit" disabled={isSubmitting || !dirty}>
               Update
             </Button>
-            <ResetButton
+            <Button
               type="reset"
+              appearance="outline"
+              tone="danger"
+              size="sm"
               onClick={handleReset}
               disabled={isSubmitting || !dirty}
             >
               Reset
-            </ResetButton>
-          </ButtonGroup>
+            </Button>
+          </div>
         </form>
       )}
     </Formik>
   );
 }
-
-const CheckboxLabel = styled.label`
-  display: flex;
-  flex-direction: row;
-  gap: var(--sqo-space-xs);
-  align-items: baseline;
-`;
-
-const StyledParameterList = styled.ul`
-  list-style: none;
-  padding-left: 0;
-`;
-
-const ButtonGroup = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-`;
-
-const ResetButton = styled(RedGhostButton)`
-  font-size: 0.8rem;
-`;

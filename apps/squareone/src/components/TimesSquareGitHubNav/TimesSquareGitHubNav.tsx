@@ -6,10 +6,10 @@
  */
 
 import React from 'react';
-import styled from 'styled-components';
 
 import Directory from './Directory';
 import Page from './Page';
+import styles from './TimesSquareGitHubNav.module.css';
 
 type ContentNode = {
   node_type: 'owner' | 'repo' | 'dir' | 'page';
@@ -71,21 +71,8 @@ export default function TimesSquareGitHubNav({
   const children = generateChildren(contentNodes, pagePath, pagePathRoot, {});
 
   return (
-    <NavWrapper>
-      <ContentsWrapper>{children}</ContentsWrapper>
-    </NavWrapper>
+    <nav>
+      <div className={styles.contentsWrapper}>{children}</div>
+    </nav>
   );
 }
-
-// FIXME these mostly come from Comeau's example
-const ContentsWrapper = styled.div`
-  --row-height: 1.6rem;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 0;
-  margin-top: -0.25rem;
-  line-height: 1.3;
-`;
-
-const NavWrapper = styled.nav``;
