@@ -24,7 +24,7 @@ Squareone is a monorepo for [Rubin Observatory](https://rubinobservatory.org) Da
 
 - The apps are built with [Next.js](https://nextjs.org) and [React](https://reactjs.org). Next.js allows the site to be dynamically configured for different Science Platform deployments.
 
-- Styling is done through [styled-components](https://styled-components.com) (along with global CSS).
+- Styling is done through CSS Modules (along with global CSS).
 
 ## Development
 

@@ -50,7 +50,7 @@ Both Biome and ESLint run in CI for thorough code quality validation
 
 2. **Squared Package NO BUILD STEP Architecture**
    - Squared exports **TypeScript source directly** - no transpilation/build step
-   - **CSS Modules only** in squared package - no styled-components
+   - **CSS Modules** for all styling
    - Apps consuming squared **must configure** `transpilePackages: ['@lsst-sqre/squared']` in next.config.js
    - See `packages/squared/package.json` - exports point to `src/index.ts`
 
@@ -86,16 +86,13 @@ Both Biome and ESLint run in CI for thorough code quality validation
 
 ### Styling
 
-⚠️ **Different styling approaches per package:**
-
-- **Squared package**: Use **CSS Modules only** (`.module.css` files) - no styled-components
-- **Squareone app**: Use **styled-components** (legacy pattern, gradually migrating to CSS Modules)
+- **CSS Modules** - Use CSS Modules (`.module.css` files) for all component styling
 - Use [`@lsst-sqre/global-css`](../packages/global-css) for global stylesheets
 - **Always reference design tokens** from [@lsst-sqre/rubin-style-dictionary](../packages/rubin-style-dictionary) via CSS custom properties
 - Design tokens available via CSS variables (e.g., `var(--rsd-color-primary-500)`)
 - Use Font Awesome icons consistently
 
-#### CSS Modules pattern (squared package)
+#### CSS Modules pattern
 
 ```typescript
 import styles from './Component.module.css';
@@ -103,14 +100,6 @@ import styles from './Component.module.css';
 export default function Component() {
   return <div className={styles.container}>...</div>;
 }
-```
-
-#### styled-components pattern (squareone app - legacy)
-
-```typescript
-const StyledComponent = styled.div`
-  color: var(--rsd-color-primary-500);
-`;
 ```
 
 ### File organization
@@ -245,5 +234,4 @@ For comprehensive patterns and detailed guidance:
   - `times-square-integration` - Context providers, hooks, SSE, GitHub PR previews
   - `data-fetching-patterns` - SWR patterns, custom hooks, error handling
   - `platform-api-integration` - OpenAPI specs, API discovery, authentication
-  - `migrate-styled-components-to-css-modules` - Migration guide
 - **`docs/dev/`** - Developer documentation including remote cache setup
