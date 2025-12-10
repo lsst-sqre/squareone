@@ -383,4 +383,3 @@ export default function MyComponent({ showExtra, data }: Props) {
 - **design-system** - Complete CSS variable and design token reference
 - **squared-package** - Understanding NO BUILD STEP architecture for squared components
 - **testing-infrastructure** - Writing tests for components
-- **migrate-styled-components-to-css-modules** - Converting legacy styled-components
