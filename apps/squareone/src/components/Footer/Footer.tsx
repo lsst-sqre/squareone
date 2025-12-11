@@ -1,5 +1,5 @@
 import AgencyLogos from '@lsst-sqre/rubin-style-dictionary/assets/partner-logos/rubin-partners.png';
-import Image from 'next/legacy/image';
+import Image from 'next/image';
 import Link from 'next/link';
 import { MDXRemote } from 'next-mdx-remote';
 
@@ -62,6 +62,11 @@ export default function Footer({ mdxSource }: FooterProps) {
                 className="u-invertable-image"
                 src={AgencyLogos}
                 alt="Logos of the Vera C. Rubin Observatory, NSF, US DOE, NOIRLab, AURA, and SLAC."
+                style={{
+                  maxWidth: '100%',
+                  width: 'auto',
+                  height: 'auto',
+                }}
               />
             </div>
           </>

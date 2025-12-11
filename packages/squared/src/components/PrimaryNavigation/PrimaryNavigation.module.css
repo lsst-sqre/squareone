@@ -32,6 +32,12 @@
   color: var(--rsd-component-header-nav-text-hover-color);
 }
 
+.triggerLink[data-active] {
+  color: var(--rsd-component-header-nav-text-hover-color);
+  text-decoration: underline;
+  text-decoration-color: var(--rsd-component-header-nav-text-hover-color);
+}
+
 .triggerLink:focus {
   outline: 1px solid var(--rsd-color-primary-500);
 }

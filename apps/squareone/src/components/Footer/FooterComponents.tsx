@@ -1,5 +1,5 @@
 import AgencyLogos from '@lsst-sqre/rubin-style-dictionary/assets/partner-logos/rubin-partners.png';
-import Image from 'next/legacy/image';
+import Image from 'next/image';
 import type { ReactNode } from 'react';
 
 import styles from './FooterComponents.module.css';
@@ -72,7 +72,16 @@ export function PartnerLogos({
 
   return (
     <div className={styles.partnerLogoContainer}>
-      <Image className="u-invertable-image" src={imageSrc} alt={alt} />
+      <Image
+        className="u-invertable-image"
+        src={imageSrc}
+        alt={alt}
+        style={{
+          maxWidth: '100%',
+          width: 'auto',
+          height: 'auto',
+        }}
+      />
     </div>
   );
 }

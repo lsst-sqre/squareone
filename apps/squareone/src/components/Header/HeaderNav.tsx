@@ -66,11 +66,11 @@ export default function HeaderNav() {
 
 function InternalTriggerLink({ href, children }: InternalTriggerLinkProps) {
   const router = useRouter();
-  const _isActive = href === router.pathname;
+  const isActive = href === router.pathname;
 
   return (
-    <NextLink href={href} passHref legacyBehavior>
-      <PrimaryNavigation.TriggerLink>{children}</PrimaryNavigation.TriggerLink>
-    </NextLink>
+    <PrimaryNavigation.TriggerLink asChild active={isActive}>
+      <NextLink href={href}>{children}</NextLink>
+    </PrimaryNavigation.TriggerLink>
   );
 }

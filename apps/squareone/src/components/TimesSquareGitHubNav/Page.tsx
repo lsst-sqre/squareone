@@ -19,9 +19,7 @@ function Page({ title, path, current }: PageProps) {
   return (
     <div className={clsx(styles.wrapper, current && styles.wrapperCurrent)}>
       <FontAwesomeIcon icon="file" className={styles.icon} />
-      <Link href={path} legacyBehavior>
-        {title}
-      </Link>
+      <Link href={path}>{title}</Link>
     </div>
   );
 }
