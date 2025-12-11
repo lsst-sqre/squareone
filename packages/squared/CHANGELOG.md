@@ -1,5 +1,34 @@
 # @lsst-sqre/squared
 
+## 0.12.0
+
+### Minor Changes
+
+- [#325](https://github.com/lsst-sqre/squareone/pull/325) [`7109e44`](https://github.com/lsst-sqre/squareone/commit/7109e444364f0a049fdb231da517970958ceb401) Thanks [@jonathansick](https://github.com/jonathansick)! - Add Card, CardGroup, and Note components to squared package
+
+  New components for documentation and content display:
+
+  - **Card**: A content card with shadow and hover border when wrapped in links. Uses CSS Modules with design tokens.
+  - **CardGroup**: A responsive CSS Grid container for Card components with configurable `minCardWidth` and `gap` props.
+  - **Note**: A callout/note container with floating badge. Supports four types with distinct colors: `note` (red), `warning` (orange), `tip` (green), and `info` (blue).
+
+  The squareone docs page now imports these components from squared instead of using local styled-components implementations. This is part of the ongoing styled-components to CSS Modules migration.
+
+### Patch Changes
+
+- [#323](https://github.com/lsst-sqre/squareone/pull/323) [`2bb920e`](https://github.com/lsst-sqre/squareone/commit/2bb920e5408659f061490d306d36770686debe3c) Thanks [@jonathansick](https://github.com/jonathansick)! - Fix outline+tertiary Button hover state readability
+
+  The `appearance="outline" tone="tertiary"` Button hover state now uses a subtle 10% opacity background instead of a solid background that made the label illegible on hover. This hover style works dynamically across any context (white text on blue, red, orange backgrounds).
+
+- [#334](https://github.com/lsst-sqre/squareone/pull/334) [`611bf95`](https://github.com/lsst-sqre/squareone/commit/611bf95b36bed119cc15ac7a0c20fdf6557a3337) Thanks [@jonathansick](https://github.com/jonathansick)! - Add active state styling to PrimaryNavigation.TriggerLink
+
+  Added CSS styles for the `[data-active]` attribute on `TriggerLink` components. When a navigation link is marked as active, it now displays with:
+
+  - Highlighted text color matching the hover state
+  - Underline decoration for visual distinction
+
+  This enables applications to visually indicate the current page in the primary navigation by passing `active={true}` to `TriggerLink`.
+
 ## 0.11.1
 
 ### Patch Changes
