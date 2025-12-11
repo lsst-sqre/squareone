@@ -18,6 +18,20 @@ let cachedAppConfig: AppConfig | null = null;
 const mdxContentCache = new Map<string, string>();
 const missingMdxFiles = new Set<string>(); // Track files that don't exist to avoid repeated checks
 
+/**
+ * Sentry configuration for client-side initialization.
+ * This interface is used both in AppConfig and for injecting Sentry config
+ * into the browser via _document.tsx.
+ */
+export interface SentryConfig {
+  dsn?: string;
+  environment?: string;
+  tracesSampleRate?: number;
+  replaysSessionSampleRate?: number;
+  replaysOnErrorSampleRate?: number;
+  baseUrl?: string;
+}
+
 export interface AppConfig {
   siteName: string;
   baseUrl: string;
