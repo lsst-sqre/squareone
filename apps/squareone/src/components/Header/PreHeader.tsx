@@ -79,7 +79,7 @@ export default function PreLogo() {
           style={{
             maxWidth: '100%',
             width: 'auto',
-            height: 'auto',
+            height: logoHeight,
           }}
         />
       </Link>
