@@ -8,15 +8,20 @@ import MainContent from '../components/MainContent';
 import { useAppConfig } from '../contexts/AppConfigContext';
 import { loadConfigAndMdx } from '../lib/config/loader';
 import { commonMdxComponents } from '../lib/utils/mdxComponents';
+import styles from './support.module.css';
 
 function Section({ children }: { children: React.ReactNode }) {
-  return <section style={{ marginBottom: '2rem' }}>{children}</section>;
+  return <section className={styles.section}>{children}</section>;
 }
 
 const mdxComponents = { ...commonMdxComponents, Section };
 
 const pageDescription =
   'Get help with the Rubin Science Platform, data, and software.';
+
+// Fallback MDX content for temporary unavailability
+const FALLBACK_SUPPORT_MDX =
+  '# Get help with the Rubin Science Platform\\n\\nContent temporarily unavailable.';
 
 type SupportPageProps = {
   // biome-ignore lint/suspicious/noExplicitAny: MDX serialized source is an opaque type from next-mdx-remote
@@ -70,15 +75,14 @@ export const getServerSideProps: GetServerSideProps<
         footerMdxSource,
       },
     };
-  } catch (_error) {
+    // biome-ignore lint/correctness/noUnusedVariables: Error parameter kept for debugging purposes
+  } catch (error) {
     // Fallback: load config only and provide default content
     const { loadAppConfig } = await import('../lib/config/loader');
     const { loadFooterMdx } = await import('../lib/config/footerLoader');
 
     const appConfig = await loadAppConfig();
-    const fallbackMdx = await serialize(
-      '# Get help with the Rubin Science Platform\\n\\nContent temporarily unavailable.'
-    );
+    const fallbackMdx = await serialize(FALLBACK_SUPPORT_MDX);
     const footerMdxSource = await loadFooterMdx(appConfig);
 
     return {
