@@ -48,8 +48,8 @@ export default function QuotasView({ quota }: QuotasViewProps) {
         <section id="rate-limit" className={styles.section}>
           <h2 className={styles.sectionTitle}>Rate limits</h2>
           <p className={styles.sectionDescription}>
-            APIs limit the number of requests you can make in a 15 minute
-            window. Your request count resets every 15 minutes.
+            APIs limit the number of requests you can make in a 60 second
+            window. Your request count resets every minute.
           </p>
           <KeyValueList items={getApiItems(quota.api)} />
         </section>
