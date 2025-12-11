@@ -1,5 +1,214 @@
 # squareone
 
+## 0.30.0
+
+### Minor Changes
+
+- [#323](https://github.com/lsst-sqre/squareone/pull/323) [`e033943`](https://github.com/lsst-sqre/squareone/commit/e033943623ef1e0f6fc0171f16f40d819ba3b7a9) Thanks [@jonathansick](https://github.com/jonathansick)! - Migrate BroadcastBanner button to squared Button component
+
+- [#325](https://github.com/lsst-sqre/squareone/pull/325) [`7109e44`](https://github.com/lsst-sqre/squareone/commit/7109e444364f0a049fdb231da517970958ceb401) Thanks [@jonathansick](https://github.com/jonathansick)! - Add Card, CardGroup, and Note components to squared package
+
+  New components for documentation and content display:
+
+  - **Card**: A content card with shadow and hover border when wrapped in links. Uses CSS Modules with design tokens.
+  - **CardGroup**: A responsive CSS Grid container for Card components with configurable `minCardWidth` and `gap` props.
+  - **Note**: A callout/note container with floating badge. Supports four types with distinct colors: `note` (red), `warning` (orange), `tip` (green), and `info` (blue).
+
+  The squareone docs page now imports these components from squared instead of using local styled-components implementations. This is part of the ongoing styled-components to CSS Modules migration.
+
+- [#331](https://github.com/lsst-sqre/squareone/pull/331) [`b71c274`](https://github.com/lsst-sqre/squareone/commit/b71c2747282ace95872b71edde87c75be17d47a3) Thanks [@jonathansick](https://github.com/jonathansick)! - Migrate static page components from styled-components to CSS Modules
+
+  This change converts the following component groups to CSS Modules styling:
+
+  **Layout Core Components**
+
+  - `Page` - Main page wrapper component
+  - `MainContent` - Content area wrapper
+  - `WideContentLayout` - Full-width content layout
+
+  **Header Components**
+
+  - `Header` - Main site header
+  - `HeaderNav` - Navigation links in header
+  - `PreHeader` - Above-header section
+  - `Login` - User login/logout controls
+
+  **Footer Components**
+
+  - `Footer` - Main site footer
+  - `FooterComponents` - Footer sub-components (social links, copyright)
+
+  **Sidebar Components**
+
+  - `Sidebar` - Sidebar container
+  - `SidebarLayout` - Layout with sidebar
+  - `SidebarNavItem` - Individual navigation items
+  - `SidebarNavSection` - Navigation section groupings
+  - `MobileMenuToggle` - Mobile menu hamburger button
+
+  **Homepage Components**
+
+  - `HomepageHero` - Landing page hero section
+  - `FullBleedBackgroundImageSection` - Full-width background image sections
+
+  **Typography Components**
+
+  - `Typography` - Text styling components
+
+  **Static Page Components**
+
+  - `Section` - Content section component used in docs and support pages
+
+  This migration moves the squareone app closer to eliminating styled-components in favor of CSS Modules with design tokens, improving consistency with the squared component library architecture.
+
+- [#332](https://github.com/lsst-sqre/squareone/pull/332) [`d61c458`](https://github.com/lsst-sqre/squareone/commit/d61c45840fdfd28d7ab27818e7f16bdab70898dc) Thanks [@jonathansick](https://github.com/jonathansick)! - Migrate Times Square components from styled-components to CSS Modules
+
+  This change completes the CSS Modules migration for all Times Square notebook execution components, replacing styled-components with CSS Modules and design tokens.
+
+  **Times Square App Layout**
+
+  - `TimesSquareApp` - Main app layout wrapper
+  - `Sidebar` - Times Square sidebar with navigation
+
+  **GitHub Navigation Components**
+
+  - `TimesSquareGitHubNav` - File tree navigation
+  - `Directory` - Directory entries with expandable folders
+  - `Page` - Notebook page entries with current state highlighting
+  - `TimesSquareMainGitHubNavClient` - Main branch navigation container
+  - `TimesSquarePrGitHubNavClient` - PR preview navigation container
+
+  **GitHub PR Badge Components**
+
+  - `GitHubPrBadge` - PR state badges with dynamic colors
+  - `GitHubPrTitle` - PR header with title and subtitle
+  - `GitHubCheckBadge` - CI check status badges
+
+  **Notebook Viewer Components**
+
+  - `TimesSquareNotebookViewerClient` - Notebook iframe viewer
+  - `ParameterInput` - Form input wrapper with labels
+  - `StringInput` - Text input with error state styling
+  - `TimesSquareParametersClient` - Parameter form container
+
+  **Page Panel Components**
+
+  - `TimesSquareGitHubPagePanel` - Page info container
+  - `TimesSquareGitHubPagePanelClient` - Client-side page panel
+  - `ExecStats` - Execution statistics and recompute button
+  - `GitHubEditLink` - Link to edit notebook on GitHub
+  - `IpynbDownloadLink` - Notebook download link
+
+  **Page Files**
+
+  - GitHub PR landing page (`[commit].tsx`)
+
+  **Button Migration**
+
+  Replaced the custom `Button` component with `@lsst-sqre/squared` Button component, using appropriate variants (`appearance="outline"`, `tone="danger"`, `size="sm"`). The old `Button/` component directory has been deleted.
+
+  **Dynamic Styling Patterns**
+
+  - Uses `clsx` for conditional classes (current page highlighting, error states)
+  - Uses CSS custom properties for dynamic colors (PR state colors)
+  - Uses inline styles for computed color values (check badge colors)
+
+### Patch Changes
+
+- [#329](https://github.com/lsst-sqre/squareone/pull/329) [`8f01ffc`](https://github.com/lsst-sqre/squareone/commit/8f01ffc2ce706d37dc8e54fc6bee0e2b4393d7a1) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-a11y from 10.0.8 to 10.1.3
+
+- [#329](https://github.com/lsst-sqre/squareone/pull/329) [`8f01ffc`](https://github.com/lsst-sqre/squareone/commit/8f01ffc2ce706d37dc8e54fc6bee0e2b4393d7a1) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-docs from 10.0.8 to 10.1.3
+
+- [#329](https://github.com/lsst-sqre/squareone/pull/329) [`8f01ffc`](https://github.com/lsst-sqre/squareone/commit/8f01ffc2ce706d37dc8e54fc6bee0e2b4393d7a1) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-links from 10.0.8 to 10.1.3
+
+- [#329](https://github.com/lsst-sqre/squareone/pull/329) [`8f01ffc`](https://github.com/lsst-sqre/squareone/commit/8f01ffc2ce706d37dc8e54fc6bee0e2b4393d7a1) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-onboarding from 10.0.8 to 10.1.3
+
+- [#329](https://github.com/lsst-sqre/squareone/pull/329) [`8f01ffc`](https://github.com/lsst-sqre/squareone/commit/8f01ffc2ce706d37dc8e54fc6bee0e2b4393d7a1) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-themes from 10.0.8 to 10.1.3
+
+- [#329](https://github.com/lsst-sqre/squareone/pull/329) [`8f01ffc`](https://github.com/lsst-sqre/squareone/commit/8f01ffc2ce706d37dc8e54fc6bee0e2b4393d7a1) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-vitest from 10.0.8 to 10.1.3
+
+- [#330](https://github.com/lsst-sqre/squareone/pull/330) [`2a03f41`](https://github.com/lsst-sqre/squareone/commit/2a03f41ac06781be85dcd304b0107333dc8f17c1) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @turbo/gen from 2.6.1 to 2.6.3
+
+- [#339](https://github.com/lsst-sqre/squareone/pull/339) [`827d024`](https://github.com/lsst-sqre/squareone/commit/827d024ad17de517381851440365d1d0126f6fdc) Thanks [@jonathansick](https://github.com/jonathansick)! - Fix API rate limit time window description
+
+  Updated the rate limit description in QuotasView to correctly state that API rate limits are measured over a 60 second window (reset every minute) instead of the previous incorrect 15 minute window description.
+
+- [#323](https://github.com/lsst-sqre/squareone/pull/323) [`f767cf1`](https://github.com/lsst-sqre/squareone/commit/f767cf1d622d7800419fa0ebe0fbf56cea4c1182) Thanks [@jonathansick](https://github.com/jonathansick)! - Fix BroadcastBanner button baseline alignment
+
+- [#328](https://github.com/lsst-sqre/squareone/pull/328) [`8001bac`](https://github.com/lsst-sqre/squareone/commit/8001bacaa33b308e07536e9992db29c551f392a7) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump eslint-config-next from 15.5.6 to 15.5.7 in the nextjs group
+
+- [#330](https://github.com/lsst-sqre/squareone/pull/330) [`2a03f41`](https://github.com/lsst-sqre/squareone/commit/2a03f41ac06781be85dcd304b0107333dc8f17c1) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump eslint-config-turbo from 2.6.1 to 2.6.3
+
+- [#334](https://github.com/lsst-sqre/squareone/pull/334) [`3fc5955`](https://github.com/lsst-sqre/squareone/commit/3fc59553ee9907512e76cffc047a1acffdc05637) Thanks [@jonathansick](https://github.com/jonathansick)! - Migrate from next/legacy/image to next/image
+
+  Upgraded the remaining Image components from the legacy `next/legacy/image` import to the modern `next/image` component. This is part of the Next.js 15 upgrade to remove deprecated APIs.
+
+  **Components updated:**
+
+  - `PreHeader` - Header logo image
+  - `Footer` - Agency partner logos
+  - `FooterComponents` - PartnerLogos MDX component
+
+  **Changes:**
+
+  - Replaced `import Image from 'next/legacy/image'` with `import Image from 'next/image'`
+  - Added responsive styling with `style={{ maxWidth: '100%', width: 'auto', height: 'auto' }}` to maintain aspect ratios
+  - Both `width` and `height` set to `'auto'` to satisfy Next.js 13+ Image component requirements
+
+  The SidebarLayout component had minor whitespace cleanup.
+
+- [#334](https://github.com/lsst-sqre/squareone/pull/334) [`611bf95`](https://github.com/lsst-sqre/squareone/commit/611bf95b36bed119cc15ac7a0c20fdf6557a3337) Thanks [@jonathansick](https://github.com/jonathansick)! - Migrate to modern next/Link behavior
+
+  Removed the `legacyBehavior` prop from Next.js Link components across the application. This is part of the Next.js 15 upgrade to use the modern Link API.
+
+  **Components updated:**
+
+  - `HeaderNav` - Internal navigation trigger links
+  - `TimesSquareGitHubNav/Page` - Page links in the GitHub navigation sidebar
+
+  **Changes:**
+
+  - Removed `legacyBehavior` and `passHref` props from Link components
+  - Updated `InternalTriggerLink` to use `PrimaryNavigation.TriggerLink` with `asChild` pattern, passing the `active` state to support active link styling
+
+- [#321](https://github.com/lsst-sqre/squareone/pull/321) [`24c8c39`](https://github.com/lsst-sqre/squareone/commit/24c8c39195c9c8726ca3564535a4eddbdcf6f688) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump next from 15.5.6 to 15.5.7
+
+- [#327](https://github.com/lsst-sqre/squareone/pull/327) [`2cd11b4`](https://github.com/lsst-sqre/squareone/commit/2cd11b4c1486a5140384ed727bb27d06f5a5fc41) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump react-dom from 19.2.0 to 19.2.1
+
+- [#327](https://github.com/lsst-sqre/squareone/pull/327) [`2cd11b4`](https://github.com/lsst-sqre/squareone/commit/2cd11b4c1486a5140384ed727bb27d06f5a5fc41) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump react from 19.2.0 to 19.2.1
+
+- [#333](https://github.com/lsst-sqre/squareone/pull/333) [`b603d1e`](https://github.com/lsst-sqre/squareone/commit/b603d1e8030dda45ce38b522261c392bbcd788ba) Thanks [@jonathansick](https://github.com/jonathansick)! - Remove deprecated amp config inherited from defaultConfig
+
+  The Next.js config was spreading `defaultConfig` which included the deprecated `amp` configuration option. This caused deprecation warnings during builds. The fix removes the unnecessary `defaultConfig` spread since Next.js applies sensible defaults automatically, and we only need to specify our custom configuration options.
+
+- [#335](https://github.com/lsst-sqre/squareone/pull/335) [`6085ca2`](https://github.com/lsst-sqre/squareone/commit/6085ca20d97f32c5cb42df346501d89116b3eb5c) Thanks [@jonathansick](https://github.com/jonathansick)! - Remove styled-components dependency from squareone
+
+  This completes the CSS Modules migration by removing all styled-components configuration, dependencies, and documentation references from the monorepo.
+
+  **Code Changes**
+
+  - Remove `ServerStyleSheet` SSR configuration from `_document.tsx` (Sentry config injection retained)
+  - Remove `styledComponents: true` compiler option from `next.config.js`
+  - Remove styled-components module declaration from `src/types/index.d.ts`
+  - Remove `styled-components` and `@types/styled-components` dependencies from package.json
+
+  **Documentation Updates**
+
+  - Update CLAUDE.md, README.md, and `.github/copilot-instructions.md` to reflect CSS Modules as the standard styling approach
+  - Remove styled-components RST reference from docs epilog
+
+  **Development Tooling**
+
+  - Remove styled-components VS Code extension from `.devcontainer/devcontainer.json`
+  - Update Storybook decorator comment (GlobalStyles is CSS-based, not styled-components)
+
+  All styling in both the squared package and squareone app now uses CSS Modules.
+
+- [#330](https://github.com/lsst-sqre/squareone/pull/330) [`2a03f41`](https://github.com/lsst-sqre/squareone/commit/2a03f41ac06781be85dcd304b0107333dc8f17c1) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump turbo from 2.6.1 to 2.6.3
+
+- Updated dependencies [[`2bb920e`](https://github.com/lsst-sqre/squareone/commit/2bb920e5408659f061490d306d36770686debe3c), [`7109e44`](https://github.com/lsst-sqre/squareone/commit/7109e444364f0a049fdb231da517970958ceb401), [`611bf95`](https://github.com/lsst-sqre/squareone/commit/611bf95b36bed119cc15ac7a0c20fdf6557a3337)]:
+  - @lsst-sqre/squared@0.12.0
+
 ## 0.29.0
 
 ### Minor Changes
