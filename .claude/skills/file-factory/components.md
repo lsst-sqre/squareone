@@ -13,8 +13,8 @@ pnpm file-factory component Card --with-story --package squared
 # Without test file
 pnpm file-factory component Modal --no-test --package squareone
 
-# Override style system
-pnpm file-factory component Modal --style styled-components --package squared
+# Explicitly specify CSS Modules (default)
+pnpm file-factory component Modal --style css-modules --package squared
 ```
 
 ## Command reference
@@ -26,7 +26,7 @@ pnpm file-factory component Modal --style styled-components --package squared
 | `--no-test`            | Exclude test file                                             |
 | `--with-story`         | Include Storybook story                                       |
 | `--no-story`           | Exclude Storybook story                                       |
-| `--style <system>`     | Style system: `css-modules`, `styled-components`, `tailwind`, `none` |
+| `--style <system>`     | Style system: `css-modules` (default), `tailwind`, `none` |
 | `-p, --package <name>` | Target package (e.g., `squared`, `squareone`)                 |
 | `--dry-run`            | Show what would be created without writing files              |
 | `-v, --verbose`        | Verbose output                                                |

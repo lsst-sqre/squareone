@@ -4,9 +4,6 @@
 module.exports = () => {
   const config = {
     transpilePackages: ['@lsst-sqre/squared'],
-    compiler: {
-      styledComponents: true,
-    },
     async rewrites() {
       return [
         // Mock Gafaelfawr (this is never triggered by a production ingress)

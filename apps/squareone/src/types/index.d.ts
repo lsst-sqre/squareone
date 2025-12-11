@@ -7,13 +7,6 @@ export * from './mdx';
 
 // Global type definitions for the application
 
-// Styled components theme extensions
-declare module 'styled-components' {
-  export interface DefaultTheme {
-    [key: string]: any;
-  }
-}
-
 // Common utility types for the application
 export type Maybe<T> = T | null | undefined;
 export type Nullable<T> = T | null;

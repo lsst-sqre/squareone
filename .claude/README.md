@@ -19,7 +19,6 @@ This directory contains configuration for Claude Code, including specialized ski
 │   ├── testing-infrastructure/ # Testing patterns & tools
 │   ├── times-square-integration/ # Times Square notebook system
 │   ├── data-fetching-patterns/ # SWR data fetching patterns
-│   ├── migrate-styled-components-to-css-modules/ # Migration guide
 │   ├── platform-api-integration/ # RSP API discovery & integration
 │   ├── docker-version-validation/ # Dockerfile version synchronization
 │   └── file-factory/          # CLI scaffolding for components, hooks, contexts, pages
@@ -101,7 +100,6 @@ Skills are modular capabilities that extend Claude's expertise with domain-speci
 
 - package.json and vitest.config.ts
 - Consuming app setup guide
-- Styled-components migration guide
 
 #### design-system
 
@@ -197,25 +195,6 @@ Skills are modular capabilities that extend Claude's expertise with domain-speci
 - Hook templates
 - Error handling patterns
 - Mock data setup
-
-#### migrate-styled-components-to-css-modules
-
-**When to use**: Converting styled-components to CSS Modules, refactoring legacy styled code, modernizing component styling, preparing squared components for NO BUILD STEP
-
-**Covers**:
-
-- Step-by-step component conversion
-- Design token replacement
-- Dynamic styles (data attributes, conditional classes)
-- Test updates
-- Compound component migration
-- Both squared package (required) and squareone app (optional) patterns
-
-**Supporting files**:
-
-- Component template with comprehensive patterns
-- Before/after examples
-- Migration checklist
 
 #### platform-api-integration
 

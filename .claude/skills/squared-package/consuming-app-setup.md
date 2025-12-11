@@ -103,15 +103,6 @@ Tokens are automatically available after importing `@lsst-sqre/global-css`.
 
 See `@lsst-sqre/rubin-style-dictionary` package for complete token reference.
 
-## Styled-Components in Apps
-
-**Note**: The `squareone` app uses styled-components for its own components (legacy pattern), but this is separate from squared components.
-
-Apps can use styled-components, but:
-- Squared components use CSS Modules (not styled-components)
-- New app components should prefer CSS Modules
-- Styled-components require SSR configuration in Next.js
-
 ## Common Issues
 
 ### Error: "Unexpected token" or "Module parse failed"

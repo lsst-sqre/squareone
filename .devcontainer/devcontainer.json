@@ -25,7 +25,6 @@
       "extensions": [
         "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
-        "styled-components.vscode-styled-components",
         "csstools.postcss",
         "unifiedjs.vscode-mdx",
         "vitest.explorer",

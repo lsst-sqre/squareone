@@ -86,8 +86,7 @@ pnpm test --filter @lsst-sqre/squared
 - **Avoid `React.FC`** - type props directly in function parameters
 - **Component directories** with index files for clean exports
 - **Default exports** for components
-- **CSS Modules** for styling in squared package
-- **styled-components** for styling in squareone app (legacy)
+- **CSS Modules** for styling in both squared package and squareone app
 
 ### Import Order
 
@@ -123,7 +122,7 @@ See **appconfig-system** skill for complete patterns.
 
 ⚠️ **Critical**: Squared has NO BUILD STEP - exports TypeScript source directly.
 
-- **CSS Modules only** - No styled-components in squared
+- **CSS Modules** - All styling uses CSS Modules
 - **Apps must transpile** - Configure `transpilePackages: ['@lsst-sqre/squared']`
 - **Direct source exports** - package.json points to `src/index.ts`
 - **Testing with Vitest** - Both unit tests and Storybook tests
@@ -160,7 +159,6 @@ For detailed guidance on specific topics, Claude has access to specialized skill
 - **times-square-integration** - Context providers, hooks, SSE, GitHub PR previews
 - **data-fetching-patterns** - SWR patterns, custom hooks, error handling, mock data
 - **platform-api-integration** - OpenAPI specs, API discovery, hook patterns, authentication
-- **migrate-styled-components-to-css-modules** - Converting styled-components to CSS Modules
 - **docker-version-validation** - Dockerfile version synchronization, validation rules, troubleshooting
 - **file-factory** - CLI scaffolding for components, hooks, contexts, pages with consistent structure
 
@@ -197,7 +195,7 @@ These skills automatically activate when relevant or can be referenced explicitl
 
 3. **Squared Package**
    - **NO BUILD STEP** - exports TypeScript source directly
-   - **CSS Modules only** - No styled-components in squared
+   - **CSS Modules** - All styling uses CSS Modules
    - Apps must configure `transpilePackages: ['@lsst-sqre/squared']`
    - See **squared-package** skill for complete architecture
 

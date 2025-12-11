@@ -344,19 +344,6 @@ Run with: `pnpm test-storybook --filter @lsst-sqre/squared`
 6. Write Storybook stories
 7. Write tests
 
-## Migration from Styled-Components
-
-**If you encounter styled-components in squared**, they need to be migrated to CSS Modules.
-
-See the **migrate-styled-components-to-css-modules** skill for complete step-by-step migration guidance, including:
-- Component conversion patterns
-- Design token usage
-- Dynamic styles handling
-- Test updates
-- Before/after examples
-
-**Note**: The squareone app still uses styled-components (legacy), but new squared components must use CSS Modules.
-
 ## Troubleshooting
 
 ### Build Errors: "Unexpected token"
@@ -440,7 +427,6 @@ pnpm test-storybook --filter @lsst-sqre/squared -- --grep "MyComponent"
 
 - **design-system** - Complete CSS variable and design token reference
 - **component-creation** - Creating new components with CSS Modules
-- **migrate-styled-components-to-css-modules** - Converting legacy styled-components
 - **testing-infrastructure** - Testing patterns and tools
 
 ## Package Scripts

@@ -535,7 +535,6 @@ Add to Global CSS:
 
 - **component-creation** - Using design tokens in new components
 - **squared-package** - CSS Modules and design token integration
-- **migrate-styled-components-to-css-modules** - Converting to token-based styling
 
 ## References
 
