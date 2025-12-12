@@ -1,5 +1,13 @@
 # squareone
 
+## 0.30.1
+
+### Patch Changes
+
+- [#341](https://github.com/lsst-sqre/squareone/pull/341) [`dda7c4b`](https://github.com/lsst-sqre/squareone/commit/dda7c4b018b70f842757f6a77200f0689661ea81) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump next from 15.5.7 to 15.5.9
+
+- [#336](https://github.com/lsst-sqre/squareone/pull/336) [`bf8e71a`](https://github.com/lsst-sqre/squareone/commit/bf8e71a27eb92749dd59ccccd494a5e3993788ff) Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! - Add TypeScript interfaces for Sentry configuration type safety. Introduces a shared `SentryConfig` interface in the config loader and uses it in `_document.tsx` to replace `any` types, improving type safety and removing biome-ignore lint suppressions.
+
 ## 0.30.0
 
 ### Minor Changes
