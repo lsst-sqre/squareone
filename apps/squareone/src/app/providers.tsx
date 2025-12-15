@@ -26,7 +26,7 @@ type ProvidersProps = {
  */
 export default function Providers({ children }: ProvidersProps) {
   return (
-    <ThemeProvider defaultTheme="system" attribute="class">
+    <ThemeProvider defaultTheme="system" attribute="data-theme">
       {children}
     </ThemeProvider>
   );
