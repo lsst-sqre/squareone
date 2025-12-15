@@ -73,3 +73,7 @@ apps/squareone/.env
 
 # Playwright MCP screenshots
 .playwright-mcp/
+
+# Local issue planning files
+.issues/*
+!.issues/.gitkeep
