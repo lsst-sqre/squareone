@@ -1,3 +1,5 @@
+'use client';
+
 import AgencyLogos from '@lsst-sqre/rubin-style-dictionary/assets/partner-logos/rubin-partners.png';
 import Image from 'next/image';
 import Link from 'next/link';

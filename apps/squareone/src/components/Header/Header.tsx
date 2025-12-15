@@ -1,3 +1,5 @@
+'use client';
+
 import styles from './Header.module.css';
 import HeaderNav from './HeaderNav';
 import PreHeader from './PreHeader';

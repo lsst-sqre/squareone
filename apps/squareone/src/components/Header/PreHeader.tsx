@@ -1,3 +1,5 @@
+'use client';
+
 import LogoImage from '@lsst-sqre/rubin-style-dictionary/assets/triad-horizontal/triad-horizontal-color-dark.png';
 import Image from 'next/image';
 import Link from 'next/link';
