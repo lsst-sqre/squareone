@@ -52,10 +52,10 @@
     "date-fns": "^3.6.0",
     "date-fns-tz": "^3.2.0",
     "react": "^19.2.3",
-    "react-day-picker": "^9.11.2",
+    "react-day-picker": "^9.12.0",
     "react-dom": "^19.2.3",
     "react-feather": "^2.0.10",
-    "swr": "^2.3.6",
+    "swr": "^2.3.7",
     "unfetch": "^4.2.0"
   },
   "devDependencies": {
@@ -85,7 +85,7 @@
     "new-component": "^5.0.2",
     "next": "^15.5.9",
     "playwright": "^1.57.0",
-    "react-hook-form": "^7.66.1",
+    "react-hook-form": "^7.68.0",
     "storybook": "10.1.4",
     "typescript": "^5.9.3",
     "typescript-plugin-css-modules": "^5.0.1",
