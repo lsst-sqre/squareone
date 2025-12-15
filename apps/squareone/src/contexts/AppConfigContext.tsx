@@ -1,3 +1,5 @@
+'use client';
+
 import React, { createContext, useContext } from 'react';
 
 // Configuration interface for app-level configuration consumed by components
