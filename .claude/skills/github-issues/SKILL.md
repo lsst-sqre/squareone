@@ -204,9 +204,12 @@ Convert to multi-phase when:
 ### Parent-Child Linking
 
 When syncing parent issues with sub-issues:
-- Sub-issues include "Part of #X" in body
-- Parent body includes task list with sub-issue links
-- Links update automatically on sync
+1. Create all sub-issues first (they need issue IDs)
+2. Create the parent issue
+3. Link sub-issues to parent using the Sub-Issues REST API
+4. Parent body includes task list with sub-issue links
+
+**Important**: GitHub's sub-issues feature uses the issue's internal `id` (a large integer like `3731549400`), not the issue `number` (like `#346`).
 
 ## gh CLI Reference
 
@@ -266,6 +269,94 @@ gh issue reopen 123 --repo org/repo
 ```bash
 gh issue list --repo org/repo --json number,title,state,labels
 ```
+
+## Sub-Issues REST API
+
+GitHub's sub-issues feature allows hierarchical issue organization. The `gh` CLI doesn't have built-in sub-issue commands, so use the REST API via `gh api`.
+
+### Get Issue ID
+
+Sub-issues API requires the issue's internal `id`, not the `number`. Get it from the issue JSON:
+
+```bash
+# Get the internal id for issue #123
+gh api repos/org/repo/issues/123 --jq '.id'
+# Returns: 3731549400
+```
+
+### Add Sub-Issue to Parent
+
+Link a sub-issue to a parent issue:
+
+```bash
+# Get the sub-issue's internal id first
+SUB_ISSUE_ID=$(gh api repos/org/repo/issues/456 --jq '.id')
+
+# Add as sub-issue to parent #123
+gh api repos/org/repo/issues/123/sub_issues \
+  -X POST \
+  --input - <<< "{\"sub_issue_id\": $SUB_ISSUE_ID}"
+```
+
+**Important**: The `sub_issue_id` must be an integer, not a string. Use `--input` with JSON to ensure correct typing (the `-f` flag sends strings).
+
+### List Sub-Issues
+
+```bash
+gh api repos/org/repo/issues/123/sub_issues --jq '.[].number'
+```
+
+### Remove Sub-Issue
+
+```bash
+SUB_ISSUE_ID=$(gh api repos/org/repo/issues/456 --jq '.id')
+
+gh api repos/org/repo/issues/123/sub_issues/$SUB_ISSUE_ID -X DELETE
+```
+
+### Get Parent Issue
+
+Check if an issue has a parent:
+
+```bash
+gh api repos/org/repo/issues/456/parent --jq '.number'
+```
+
+### Sync Workflow for Multi-Phase Projects
+
+When syncing a directory with parent and sub-issues:
+
+1. **Create sub-issues first** (in order):
+   ```bash
+   for file in 01-*.md 02-*.md 03-*.md; do
+     gh issue create --repo org/repo --title "..." --body "..."
+   done
+   ```
+
+2. **Create parent issue**:
+   ```bash
+   gh issue create --repo org/repo --title "..." --body "..."
+   ```
+
+3. **Link sub-issues to parent**:
+   ```bash
+   PARENT_NUM=123
+
+   for SUB_NUM in 124 125 126; do
+     SUB_ID=$(gh api repos/org/repo/issues/$SUB_NUM --jq '.id')
+     gh api repos/org/repo/issues/$PARENT_NUM/sub_issues \
+       -X POST \
+       --input - <<< "{\"sub_issue_id\": $SUB_ID}"
+   done
+   ```
+
+4. **Update local frontmatter** with issue numbers and set `state: open`
+
+### Sub-Issues Limits
+
+- Maximum 100 sub-issues per parent
+- Maximum 8 levels of nesting
+- Sub-issues can be in different repositories (cross-repo)
 
 ## Troubleshooting
 
