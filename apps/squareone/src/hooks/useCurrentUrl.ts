@@ -1,9 +1,9 @@
 import { usePathname } from 'next/navigation';
-import { useAppConfig } from '../contexts/AppConfigContext';
+import { useStaticConfig } from './useStaticConfig';
 
 /* Hook to get the current URL. */
 function useCurrentUrl(): URL {
-  const { baseUrl } = useAppConfig();
+  const { baseUrl } = useStaticConfig();
   const pathname = usePathname();
   return new URL(pathname, baseUrl);
 }

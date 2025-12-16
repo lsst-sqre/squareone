@@ -2,10 +2,10 @@
 
 import Head from 'next/head';
 import React from 'react';
-import { useAppConfig } from '../../contexts/AppConfigContext';
+import { useStaticConfig } from '../../hooks/useStaticConfig';
 
 const Meta = () => {
-  const { siteName, siteDescription } = useAppConfig();
+  const { siteName, siteDescription } = useStaticConfig();
 
   return (
     <Head>
