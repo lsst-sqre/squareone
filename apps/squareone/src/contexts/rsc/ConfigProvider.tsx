@@ -16,7 +16,8 @@ import { createContext, type ReactNode, use, useContext } from 'react';
 import type { StaticConfig } from '../../lib/config/rsc';
 
 // Context holds a Promise that resolves to StaticConfig
-const ConfigContext = createContext<Promise<StaticConfig> | null>(null);
+// Exported for use by useStaticConfig unified hook
+export const ConfigContext = createContext<Promise<StaticConfig> | null>(null);
 
 type ConfigProviderProps = {
   children: ReactNode;
