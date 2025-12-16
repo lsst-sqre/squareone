@@ -5,11 +5,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 
-import { useAppConfig } from '@/contexts/AppConfigContext';
+import { useStaticConfig } from '@/hooks/useStaticConfig';
 import styles from './PreHeader.module.css';
 
 export default function PreLogo() {
-  const config = useAppConfig();
+  const config = useStaticConfig();
   const [imageError, setImageError] = useState(false);
 
   // Determine logo source based on configuration priority

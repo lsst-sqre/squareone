@@ -4,7 +4,7 @@ import { PrimaryNavigation } from '@lsst-sqre/squared';
 import { usePathname, useRouter } from 'next/navigation';
 import React from 'react';
 import { ChevronDown } from 'react-feather';
-import { useAppConfig } from '../../contexts/AppConfigContext';
+import { useStaticConfig } from '../../hooks/useStaticConfig';
 
 type LinkProps = {
   href: string;
@@ -13,7 +13,7 @@ type LinkProps = {
 };
 
 export default function AppsMenu() {
-  const { appLinks } = useAppConfig();
+  const { appLinks } = useStaticConfig();
 
   return (
     <>

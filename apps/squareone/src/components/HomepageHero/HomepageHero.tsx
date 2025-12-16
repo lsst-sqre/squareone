@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import React from 'react';
 
-import { useAppConfig } from '../../contexts/AppConfigContext';
+import { useStaticConfig } from '../../hooks/useStaticConfig';
 import FullBleedBackgroundImageSection from '../FullBleedBackgroundImageSection';
 import styles from './HomepageHero.module.css';
 
@@ -12,7 +12,7 @@ import styles from './HomepageHero.module.css';
  * aspects) that's featured on the homepage.
  */
 export default function HomepageHero() {
-  const { showPreview, previewLink, docsBaseUrl, siteName } = useAppConfig();
+  const { showPreview, previewLink, docsBaseUrl, siteName } = useStaticConfig();
 
   return (
     <FullBleedBackgroundImageSection

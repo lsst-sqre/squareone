@@ -3,7 +3,6 @@ import BroadcastBannerStack from '../components/BroadcastBannerStack';
 import Header from '../components/Header';
 import Meta from '../components/Meta';
 import styles from '../components/Page/Page.module.css';
-import { AppConfigProvider } from '../contexts/AppConfigContext';
 import { getStaticConfig, type StaticConfig } from '../lib/config/rsc';
 import { compileFooterMdxForRsc } from '../lib/mdx/rsc';
 import FooterRsc from './FooterRsc';
@@ -21,9 +20,8 @@ type PageShellProps = {
  * main content area, and Footer. This is the RSC equivalent of the Pages
  * Router's Page component.
  *
- * The shell wraps children with AppConfigProvider so that existing components
- * (Header, Footer, etc.) that use useAppConfig() continue to work without
- * modification.
+ * Client components (Header, Meta, etc.) access configuration via
+ * useStaticConfig(), which reads from the root layout's ConfigProvider.
  *
  * @example
  * ```tsx
@@ -47,18 +45,16 @@ export default async function PageShell({ children, config }: PageShellProps) {
   const footerMdxContent = await compileFooterMdxForRsc();
 
   return (
-    <AppConfigProvider config={staticConfig}>
-      <div className={styles.layout}>
-        <Meta />
-        <div className={styles.upperContainer}>
-          <Header />
-          <BroadcastBannerStack semaphoreUrl={staticConfig.semaphoreUrl} />
-          {children}
-        </div>
-        <div className={styles.stickyFooterContainer}>
-          <FooterRsc mdxContent={footerMdxContent} />
-        </div>
+    <div className={styles.layout}>
+      <Meta />
+      <div className={styles.upperContainer}>
+        <Header />
+        <BroadcastBannerStack semaphoreUrl={staticConfig.semaphoreUrl} />
+        {children}
       </div>
-    </AppConfigProvider>
+      <div className={styles.stickyFooterContainer}>
+        <FooterRsc mdxContent={footerMdxContent} />
+      </div>
+    </div>
   );
 }
