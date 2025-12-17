@@ -1,6 +1,11 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
+// Force dynamic rendering so config is loaded at request time.
+// This is required because SENTRY_DSN and other config values are only
+// available at runtime (via Kubernetes ConfigMaps), not at build time.
+export const dynamic = 'force-dynamic';
+
 // Global CSS imports (must match _app.tsx and .storybook/preview.js)
 import '@fontsource/source-sans-pro/400.css';
 import '@fontsource/source-sans-pro/400-italic.css';
