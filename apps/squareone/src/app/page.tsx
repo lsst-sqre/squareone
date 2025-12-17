@@ -3,7 +3,6 @@ import type { Metadata } from 'next';
 import HomepageHero from '../components/HomepageHero';
 import MainContent from '../components/MainContent';
 import { getStaticConfig } from '../lib/config/rsc';
-import PageShell from './PageShell';
 
 /**
  * Generate metadata for the home page.
@@ -27,15 +26,13 @@ export async function generateMetadata(): Promise<Metadata> {
  *
  * Displays the HomepageHero component with service cards for Portal,
  * Notebooks, and APIs.
+ *
+ * The page shell (Header, Footer) is provided by the root layout.
  */
-export default async function HomePage() {
-  const config = await getStaticConfig();
-
+export default function HomePage() {
   return (
-    <PageShell config={config}>
-      <MainContent>
-        <HomepageHero />
-      </MainContent>
-    </PageShell>
+    <MainContent>
+      <HomepageHero />
+    </MainContent>
   );
 }

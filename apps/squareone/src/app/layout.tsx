@@ -9,8 +9,13 @@ import '@fortawesome/fontawesome-svg-core/styles.css';
 import '@lsst-sqre/global-css/dist/next.css';
 import '../styles/icons';
 
+import BroadcastBannerStack from '../components/BroadcastBannerStack';
+import Header from '../components/Header';
+import styles from '../components/Page/Page.module.css';
 import { ConfigProvider } from '../contexts/rsc';
 import { getStaticConfig } from '../lib/config/rsc';
+import { compileFooterMdxForRsc } from '../lib/mdx/rsc';
+import FooterRsc from './FooterRsc';
 import PlausibleWrapper from './PlausibleWrapper';
 import Providers from './providers';
 import SentryConfigScript from './SentryConfigScript';
@@ -40,21 +45,24 @@ type RootLayoutProps = {
  * 2. Loads configuration server-side
  * 3. Injects Sentry config for client-side error tracking
  * 4. Sets up provider hierarchy (Plausible, Config, Theme)
+ * 5. Renders the page shell (Header, BroadcastBannerStack, Footer)
  *
  * Provider hierarchy matches _app.tsx:
  * PlausibleWrapper (conditional)
  *   └─ ConfigProvider
  *        └─ Providers (ThemeProvider)
- *             └─ {children}
+ *             └─ Page shell (Header, content, Footer)
  *
- * Note: Unlike Pages Router, the Page shell (Header, Footer) is NOT included
- * here. Each page route should include its own page structure to allow for
- * different layouts (e.g., sidebar layouts, full-width pages).
+ * The page shell uses a sticky footer pattern so the footer stays at the
+ * bottom of the viewport even on short pages.
  */
 export default async function RootLayout({ children }: RootLayoutProps) {
   // Load config on server - Promise passed to client provider
   const configPromise = getStaticConfig();
   const config = await configPromise;
+
+  // Compile footer MDX once at layout level
+  const footerMdxContent = await compileFooterMdxForRsc();
 
   return (
     <html lang="en" dir="ltr" suppressHydrationWarning>
@@ -64,7 +72,18 @@ export default async function RootLayout({ children }: RootLayoutProps) {
       <body>
         <PlausibleWrapper domain={config.plausibleDomain}>
           <ConfigProvider configPromise={getStaticConfig()}>
-            <Providers>{children}</Providers>
+            <Providers>
+              <div className={styles.layout}>
+                <div className={styles.upperContainer}>
+                  <Header />
+                  <BroadcastBannerStack semaphoreUrl={config.semaphoreUrl} />
+                  {children}
+                </div>
+                <div className={styles.stickyFooterContainer}>
+                  <FooterRsc mdxContent={footerMdxContent} />
+                </div>
+              </div>
+            </Providers>
           </ConfigProvider>
         </PlausibleWrapper>
       </body>
