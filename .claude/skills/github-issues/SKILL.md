@@ -1,7 +1,7 @@
 ---
 name: github-issues
 description: |
-  Local-first GitHub issue planning and synchronization system. Use this skill when planning projects locally, creating issue files in .issues/, working with the /plan-issue, /update-issue, /sync-issue, or /list-issues commands, or synchronizing local plans with GitHub issues. Covers frontmatter schema, file structure conventions, sub-issue management, and gh CLI operations.
+  Local-first GitHub issue planning and synchronization system. Use this skill when planning projects locally, creating issue files in .issues/, working with the /plan-issue, /update-issue, /sync-issue, /list-issues, or /work-issue commands, or synchronizing local plans with GitHub issues. Covers frontmatter schema, file structure conventions, sub-issue management, and gh CLI operations.
 ---
 
 # GitHub Issues Planning System
@@ -18,6 +18,7 @@ A local-first system for planning projects and synchronizing with GitHub issues.
 | `/update-issue <path> <prompt>` | Update existing plan |
 | `/sync-issue <path>` | Sync local ↔ GitHub |
 | `/list-issues` | List all local issue plans |
+| `/work-issue <path> <prompt>` | Set up context to work on an issue |
 
 ### File Locations
 
