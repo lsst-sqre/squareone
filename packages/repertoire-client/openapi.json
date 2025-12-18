@@ -1,0 +1,536 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Repertoire",
+    "description": "Service discovery for the Rubin Science Platform",
+    "version": "0.6.1"
+  },
+  "paths": {
+    "/repertoire/": {
+      "get": {
+        "summary": "Application metadata",
+        "operationId": "get_root_repertoire__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Index" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/repertoire/discovery": {
+      "get": {
+        "summary": "Discovery information",
+        "operationId": "get_discovery_repertoire_discovery_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Discovery" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/repertoire/discovery/influxdb": {
+      "get": {
+        "summary": "List InfluxDB connection details",
+        "description": "Returns a dictionary of InfluxDB database labels to connection information, with credentials, for all databases the user has access to.",
+        "operationId": "list_influxdb_repertoire_discovery_influxdb_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/InfluxDatabaseWithCredentials"
+                  },
+                  "type": "object",
+                  "title": "Response List Influxdb Repertoire Discovery Influxdb Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/repertoire/discovery/influxdb/{database}": {
+      "get": {
+        "summary": "InfluxDB connection information",
+        "operationId": "get_influxdb_repertoire_discovery_influxdb__database__get",
+        "parameters": [
+          {
+            "name": "database",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Database" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InfluxDatabaseWithCredentials"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApiVersion": {
+        "properties": {
+          "url": {
+            "type": "string",
+            "maxLength": 2083,
+            "minLength": 1,
+            "format": "uri",
+            "title": "Service URL",
+            "description": "Access URL for that version of the service",
+            "examples": ["https://example.org/api/cutout/sync"]
+          },
+          "ivoa_standard_id": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "IVOA standardID",
+            "description": "IVOA standardID used in service registrations",
+            "examples": ["ivo://ivoa.net/std/SODA#async-1.0"]
+          }
+        },
+        "type": "object",
+        "required": ["url"],
+        "title": "ApiVersion",
+        "description": "One version of a REST API."
+      },
+      "DataService": {
+        "properties": {
+          "url": {
+            "type": "string",
+            "maxLength": 2083,
+            "minLength": 1,
+            "format": "uri",
+            "title": "Service URL",
+            "description": "Default access URL for the service",
+            "examples": ["https://example.org/api/cutout"]
+          },
+          "openapi": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2083,
+                "minLength": 1,
+                "format": "uri"
+              },
+              { "type": "null" }
+            ],
+            "title": "OpenAPI schema",
+            "description": "URL to the OpenAPI schema for the service if available",
+            "examples": ["https://example.org/api/cutout/openapi.json"]
+          },
+          "versions": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ApiVersion"
+            },
+            "type": "object",
+            "title": "API versions",
+            "description": "Discovery information for each API version, if the service may have multiple versions",
+            "default": {}
+          }
+        },
+        "type": "object",
+        "required": ["url"],
+        "title": "DataService",
+        "description": "A user-facing API service tied to a particular dataset."
+      },
+      "Dataset": {
+        "properties": {
+          "butler_config": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2083,
+                "minLength": 1,
+                "format": "uri"
+              },
+              { "type": "null" }
+            ],
+            "title": "Butler config URL",
+            "description": "URL of Butler configuration to access this dataset, if it is available via a Butler server",
+            "examples": ["https://example.org/api/butler/repo/dp02/butler.yaml"]
+          },
+          "description": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Description",
+            "description": "Long description of the dataset",
+            "examples": [
+              "Data Preview 1 contains the first image data from the telescope during commissioning"
+            ]
+          },
+          "docs_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2083,
+                "minLength": 1,
+                "format": "uri"
+              },
+              { "type": "null" }
+            ],
+            "title": "Documentation URL",
+            "description": "URL to more detailed documentation about the dataset",
+            "examples": ["https://dp1.example.com/"]
+          },
+          "services": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/DataService"
+            },
+            "type": "object",
+            "title": "Data services",
+            "description": "Mapping of service names to service information. These are the API services used directly by users for data access.",
+            "default": {},
+            "examples": [
+              {
+                "cutout": {
+                  "openapi": "https://example.org/api/cutout/openapi",
+                  "url": "https://example.org/api/cutout/dp02"
+                }
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "title": "Dataset",
+        "description": "Discovery information about a single dataset."
+      },
+      "Discovery": {
+        "properties": {
+          "applications": {
+            "items": { "type": "string" },
+            "type": "array",
+            "title": "Phalanx applications",
+            "description": "Names of all Phalanx applications enabled in the local environment",
+            "default": [],
+            "examples": [
+              ["argocd", "gafaelfawr", "hips", "mobu", "nublado", "wobbly"]
+            ]
+          },
+          "datasets": {
+            "additionalProperties": { "$ref": "#/components/schemas/Dataset" },
+            "type": "object",
+            "title": "Datasets",
+            "description": "All datasets available in the local environment",
+            "default": {}
+          },
+          "influxdb_databases": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/InfluxDatabaseWithPointer"
+            },
+            "type": "object",
+            "title": "Available InfluxDB databases",
+            "description": "Mapping of short names of InfluxDB databases accessible from this Phalanx environment to connection information",
+            "default": {}
+          },
+          "services": {
+            "$ref": "#/components/schemas/Services",
+            "title": "Service URLs",
+            "description": "URLs to services available in the local environment"
+          }
+        },
+        "type": "object",
+        "title": "Discovery",
+        "description": "Service discovery information."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": { "$ref": "#/components/schemas/ValidationError" },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "Index": {
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata",
+            "title": "Package metadata"
+          }
+        },
+        "type": "object",
+        "required": ["metadata"],
+        "title": "Index",
+        "description": "Metadata returned by the external root URL of the application."
+      },
+      "InfluxDatabaseWithCredentials": {
+        "properties": {
+          "url": {
+            "type": "string",
+            "maxLength": 2083,
+            "minLength": 1,
+            "format": "uri",
+            "title": "InfluxDB URL",
+            "description": "URL to InfluxDB service",
+            "examples": ["https://example.org/influxdb/"]
+          },
+          "database": {
+            "type": "string",
+            "title": "Name of InfluxDB database",
+            "description": "Name of database to include in queries",
+            "examples": ["efd", "lsst.square.metrics"]
+          },
+          "schema_registry": {
+            "type": "string",
+            "maxLength": 2083,
+            "minLength": 1,
+            "format": "uri",
+            "title": "Schema registry URL",
+            "description": "URL of corresponding Confluent schema registry",
+            "examples": ["https://example.org/schema-registry"]
+          },
+          "username": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Client username",
+            "description": "Username to send for authentication",
+            "examples": ["efdreader"]
+          },
+          "password": {
+            "anyOf": [
+              { "type": "string", "format": "password", "writeOnly": true },
+              { "type": "null" }
+            ],
+            "title": "Client password",
+            "description": "Password to send for authentication",
+            "examples": ["password"]
+          }
+        },
+        "type": "object",
+        "required": [
+          "url",
+          "database",
+          "schema_registry",
+          "username",
+          "password"
+        ],
+        "title": "InfluxDatabaseWithCredentials",
+        "description": "InfluxDB database connection information with credentials."
+      },
+      "InfluxDatabaseWithPointer": {
+        "properties": {
+          "url": {
+            "type": "string",
+            "maxLength": 2083,
+            "minLength": 1,
+            "format": "uri",
+            "title": "InfluxDB URL",
+            "description": "URL to InfluxDB service",
+            "examples": ["https://example.org/influxdb/"]
+          },
+          "database": {
+            "type": "string",
+            "title": "Name of InfluxDB database",
+            "description": "Name of database to include in queries",
+            "examples": ["efd", "lsst.square.metrics"]
+          },
+          "schema_registry": {
+            "type": "string",
+            "maxLength": 2083,
+            "minLength": 1,
+            "format": "uri",
+            "title": "Schema registry URL",
+            "description": "URL of corresponding Confluent schema registry",
+            "examples": ["https://example.org/schema-registry"]
+          },
+          "credentials_url": {
+            "type": "string",
+            "maxLength": 2083,
+            "minLength": 1,
+            "format": "uri",
+            "title": "URL for credentials",
+            "description": "Authenticated endpoint that will return full connection information including authentication credentials",
+            "examples": ["https://example.com/discovery/influxdb/efd"]
+          }
+        },
+        "type": "object",
+        "required": ["url", "database", "schema_registry", "credentials_url"],
+        "title": "InfluxDatabaseWithPointer",
+        "description": "InfluxDB database connection information with credential pointer.\n\nThis is returned by the unauthenticated discovery route and contains a\npointer to the authenticated endpoint to get credential information."
+      },
+      "InternalService": {
+        "properties": {
+          "url": {
+            "type": "string",
+            "maxLength": 2083,
+            "minLength": 1,
+            "format": "uri",
+            "title": "Service URL",
+            "description": "Default access URL for the service",
+            "examples": ["https://example.org/api/cutout"]
+          },
+          "openapi": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2083,
+                "minLength": 1,
+                "format": "uri"
+              },
+              { "type": "null" }
+            ],
+            "title": "OpenAPI schema",
+            "description": "URL to the OpenAPI schema for the service if available",
+            "examples": ["https://example.org/api/cutout/openapi.json"]
+          },
+          "versions": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ApiVersion"
+            },
+            "type": "object",
+            "title": "API versions",
+            "description": "Discovery information for each API version, if the service may have multiple versions",
+            "default": {}
+          }
+        },
+        "type": "object",
+        "required": ["url"],
+        "title": "InternalService",
+        "description": "An internal API service not tied to a particular dataset."
+      },
+      "Metadata": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Application name",
+            "examples": ["myapp"]
+          },
+          "version": {
+            "type": "string",
+            "title": "Version",
+            "examples": ["1.0.0"]
+          },
+          "description": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Description",
+            "examples": ["Some package description"]
+          },
+          "repository_url": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Repository URL",
+            "examples": ["https://example.com/"]
+          },
+          "documentation_url": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Documentation URL",
+            "examples": ["https://example.com/"]
+          }
+        },
+        "type": "object",
+        "required": ["name", "version"],
+        "title": "Metadata",
+        "description": "Metadata about a package."
+      },
+      "Services": {
+        "properties": {
+          "internal": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/InternalService"
+            },
+            "type": "object",
+            "title": "Internal service",
+            "description": "Mapping of service name to service information for internal services. These are used by other services and generally won't be used directly by users.",
+            "default": {},
+            "examples": [
+              {
+                "gafaelfawr": {
+                  "openapi": "https://example.org/auth/openapi.json",
+                  "url": "https://example.org/auth/api/v1"
+                },
+                "wobbly": {
+                  "openapi": "https://example.org/wobbly/openapi.json",
+                  "url": "https://example.org/wobbly"
+                }
+              }
+            ]
+          },
+          "ui": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/UiService"
+            },
+            "type": "object",
+            "title": "User interfaces",
+            "description": "Mapping of service name to service information for user interfaces intended for access by a user using a web browser.",
+            "default": {},
+            "examples": [
+              {
+                "argocd": { "url": "https://example.org/argo-cd" },
+                "nublado": { "url": "https://nb.example.org/nb" }
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "title": "Services",
+        "description": "Mappings of service names to service information."
+      },
+      "UiService": {
+        "properties": {
+          "url": {
+            "type": "string",
+            "maxLength": 2083,
+            "minLength": 1,
+            "format": "uri",
+            "title": "Service URL",
+            "description": "Default access URL for the service",
+            "examples": ["https://example.org/api/cutout"]
+          }
+        },
+        "type": "object",
+        "required": ["url"],
+        "title": "UiService",
+        "description": "A user interface service."
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": { "anyOf": [{ "type": "string" }, { "type": "integer" }] },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": { "type": "string", "title": "Message" },
+          "type": { "type": "string", "title": "Error Type" }
+        },
+        "type": "object",
+        "required": ["loc", "msg", "type"],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

@@ -41,6 +41,11 @@
       "title": "Semaphore URL",
       "description": "URL prefix of the Semaphore API service for obtaining notifications and broadcasts. Does not end in /. Omit or set as null to disable Semaphore features."
     },
+    "repertoireUrl": {
+      "type": "string",
+      "title": "Repertoire API URL",
+      "description": "URL prefix of the Repertoire service discovery API. Does not end in /. Omit or set as null to disable service discovery."
+    },
     "timesSquareUrl": {
       "type": "string",
       "title": "Times Square API URL",

@@ -3,13 +3,18 @@
 
 module.exports = () => {
   const config = {
-    transpilePackages: ['@lsst-sqre/squared'],
+    transpilePackages: ['@lsst-sqre/squared', '@lsst-sqre/repertoire-client'],
     async rewrites() {
       return [
         // Mock Gafaelfawr (this is never triggered by a production ingress)
         {
           source: '/auth/api/v1/user-info',
           destination: '/api/dev/user-info',
+        },
+        // Mock Repertoire (this is never triggered by a production ingress)
+        {
+          source: '/repertoire/discovery',
+          destination: '/api/dev/repertoire/discovery',
         },
         // Mock Times Square (this is never triggered by a production ingress)
         {
