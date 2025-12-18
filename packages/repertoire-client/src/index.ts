@@ -30,9 +30,3 @@ export {
   ServicesSchema,
   UiServiceSchema,
 } from './schemas';
-// Test utilities
-export {
-  generateRandomDataset,
-  generateRandomDiscovery,
-  generators,
-} from './test-utils';
