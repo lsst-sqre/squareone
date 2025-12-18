@@ -3,7 +3,7 @@
 
 module.exports = () => {
   const config = {
-    transpilePackages: ['@lsst-sqre/squared'],
+    transpilePackages: ['@lsst-sqre/squared', '@lsst-sqre/repertoire-client'],
     async rewrites() {
       return [
         // Mock Gafaelfawr (this is never triggered by a production ingress)
