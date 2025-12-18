@@ -36,6 +36,7 @@ export interface AppConfig {
   siteName: string;
   baseUrl: string;
   semaphoreUrl?: string;
+  repertoireUrl?: string;
   plausibleDomain?: string;
   environmentName: string;
   siteDescription: string;
