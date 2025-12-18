@@ -86,7 +86,7 @@
     "next": "^15.5.9",
     "playwright": "^1.57.0",
     "react-hook-form": "^7.68.0",
-    "storybook": "10.1.7",
+    "storybook": "10.1.10",
     "typescript": "^5.9.3",
     "typescript-plugin-css-modules": "^5.0.1",
     "vitest": "^3.2.4"
