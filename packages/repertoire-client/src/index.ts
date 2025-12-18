@@ -1,12 +1,38 @@
-// Main package exports
-// Types
-
 // Core client
-export * from './client';
+export {
+  fetchServiceDiscovery,
+  getEmptyDiscovery,
+  RepertoireError,
+} from './client';
 // Mock data for development
 export { mockDiscovery } from './mock-discovery';
-
 // TanStack Query integration
 export * from './query';
 export * from './query-options';
-export * from './types';
+// Types (re-exported from schemas)
+export type {
+  ApiVersion,
+  DataService,
+  Dataset,
+  InfluxDatabase,
+  InternalService,
+  ServiceDiscovery,
+  Services,
+  UiService,
+} from './schemas';
+export {
+  ApiVersionSchema,
+  DataServiceSchema,
+  DatasetSchema,
+  DiscoverySchema,
+  InfluxDatabaseSchema,
+  InternalServiceSchema,
+  ServicesSchema,
+  UiServiceSchema,
+} from './schemas';
+// Test utilities
+export {
+  generateRandomDataset,
+  generateRandomDiscovery,
+  generators,
+} from './test-utils';

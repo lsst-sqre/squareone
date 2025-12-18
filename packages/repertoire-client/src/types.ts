@@ -1,10 +1,11 @@
-// Service discovery types - placeholder
-export type ServiceDiscovery = {
-  applications: string[];
-  datasets: Record<string, unknown>;
-  services: {
-    internal: Record<string, unknown>;
-    ui: Record<string, unknown>;
-  };
-  influxdb_databases: Record<string, unknown>;
-};
+// Re-export types from schemas for clean imports
+export type {
+  ApiVersion,
+  DataService,
+  Dataset,
+  InfluxDatabase,
+  InternalService,
+  ServiceDiscovery,
+  Services,
+  UiService,
+} from './schemas';
