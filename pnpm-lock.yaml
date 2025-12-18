@@ -62,6 +62,9 @@ importers:
       '@lsst-sqre/global-css':
         specifier: workspace:*
         version: link:../../packages/global-css
+      '@lsst-sqre/repertoire-client':
+        specifier: workspace:*
+        version: link:../../packages/repertoire-client
       '@lsst-sqre/rubin-style-dictionary':
         specifier: workspace:*
         version: link:../../packages/rubin-style-dictionary
@@ -74,6 +77,9 @@ importers:
       '@sentry/nextjs':
         specifier: ^10.32.1
         version: 10.32.1(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(next@15.5.9(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(sass@1.91.0))(react@19.2.3)(webpack@5.101.3(esbuild@0.27.2))
+      '@tanstack/react-query':
+        specifier: ^5.62.0
+        version: 5.90.12(react@19.2.3)
       ajv:
         specifier: ^8.11.0
         version: 8.17.1
