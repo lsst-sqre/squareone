@@ -11,6 +11,11 @@ module.exports = () => {
           source: '/auth/api/v1/user-info',
           destination: '/api/dev/user-info',
         },
+        // Mock Repertoire (this is never triggered by a production ingress)
+        {
+          source: '/repertoire/discovery',
+          destination: '/api/dev/repertoire/discovery',
+        },
         // Mock Times Square (this is never triggered by a production ingress)
         {
           source: '/times-square/api/v1/pages',
