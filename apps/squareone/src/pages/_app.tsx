@@ -19,6 +19,7 @@ import {
   type AppConfigContextValue,
   AppConfigProvider,
 } from '../contexts/AppConfigContext';
+import { QueryProvider } from '../contexts/QueryProvider';
 
 type NextPageWithLayout = NextPage & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -55,6 +56,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     showPreview: false,
     mdxDir: 'src/content/pages',
     sentryDsn: undefined,
+    repertoireUrl: undefined,
     sentryTracesSampleRate: 0,
     sentryReplaysSessionSampleRate: 0,
     sentryReplaysOnErrorSampleRate: 1.0,
@@ -72,11 +74,13 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   /* eslint-disable react/jsx-props-no-spreading */
   const coreApp = (
     <AppConfigProvider config={config}>
-      <ThemeProvider defaultTheme="system">
-        <Page footerMdxSource={footerMdxSource}>
-          {getLayout(<Component {...otherPageProps} />)}
-        </Page>
-      </ThemeProvider>
+      <QueryProvider>
+        <ThemeProvider defaultTheme="system">
+          <Page footerMdxSource={footerMdxSource}>
+            {getLayout(<Component {...otherPageProps} />)}
+          </Page>
+        </ThemeProvider>
+      </QueryProvider>
     </AppConfigProvider>
   );
   /* eslint-enable react/jsx-props-no-spreading */

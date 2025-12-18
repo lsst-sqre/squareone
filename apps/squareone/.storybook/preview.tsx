@@ -4,6 +4,7 @@ import { withThemeByDataAttribute } from '@storybook/addon-themes';
 import type { Preview } from '@storybook/nextjs-vite';
 import { INITIAL_VIEWPORTS } from 'storybook/viewport';
 import { AppConfigProvider } from '../src/contexts/AppConfigContext';
+import { QueryProvider } from '../src/contexts/QueryProvider';
 
 // Load global CSS and icons; same as how _app.js loads these resources.
 // Next can't load global CSS from anywhere _but_ _app.js, so there isn't a way
@@ -77,7 +78,9 @@ const preview: Preview = {
     }),
     (Story) => (
       <AppConfigProvider config={mockAppConfig}>
-        <Story />
+        <QueryProvider>
+          <Story />
+        </QueryProvider>
       </AppConfigProvider>
     ),
   ],
