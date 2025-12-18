@@ -22,13 +22,19 @@
     "test": "vitest run",
     "type-check": "tsc --noEmit",
     "lint": "eslint . --ext .ts,.tsx",
-    "clean": "rm -rf node_modules"
+    "clean": "rm -rf node_modules",
+    "fetch-openapi": "curl -o openapi.json https://data.lsst.cloud/repertoire/openapi.json"
+  },
+  "dependencies": {
+    "zod": "^3.24.0"
   },
   "peerDependencies": {
     "@tanstack/react-query": "^5",
     "react": "^18 || ^19"
   },
   "devDependencies": {
+    "@anatine/zod-mock": "^3.13.0",
+    "@faker-js/faker": "^9.0.0",
     "@lsst-sqre/eslint-config": "workspace:*",
     "@lsst-sqre/tsconfig": "workspace:*",
     "@tanstack/react-query": "^5.62.0",
