@@ -1,4 +1,3 @@
-// TanStack Query options factory - placeholder
 import { queryOptions } from '@tanstack/react-query';
 import { fetchServiceDiscovery, getEmptyDiscovery } from './client';
 import type { ServiceDiscovery } from './types';
@@ -14,6 +13,7 @@ export const discoveryQueryOptions = (repertoireUrl: string) =>
         return getEmptyDiscovery();
       }
     },
+    enabled: !!repertoireUrl,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   });

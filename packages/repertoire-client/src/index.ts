@@ -4,6 +4,8 @@ export {
   getEmptyDiscovery,
   RepertoireError,
 } from './client';
+// React hooks
+export { useServiceDiscovery } from './hooks/useServiceDiscovery';
 // Mock data for development
 export { mockDiscovery } from './mock-discovery';
 // TanStack Query integration
