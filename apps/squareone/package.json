@@ -37,7 +37,7 @@
     "@lsst-sqre/rubin-style-dictionary": "workspace:*",
     "@lsst-sqre/squared": "workspace:*",
     "@microsoft/fetch-event-source": "^2.0.1",
-    "@sentry/nextjs": "^10.29.0",
+    "@sentry/nextjs": "^10.31.0",
     "ajv": "^8.11.0",
     "ajv-formats": "^3.0.1",
     "clsx": "^2.1.1",
@@ -55,7 +55,7 @@
     "remark": "^14.0.2",
     "remark-gfm": "^3.0.1",
     "remark-html": "^15.0.1",
-    "swr": "^2.3.7"
+    "swr": "^2.3.8"
   },
   "devDependencies": {
     "@lsst-sqre/tsconfig": "workspace:*",
