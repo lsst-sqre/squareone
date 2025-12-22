@@ -1,5 +1,57 @@
 # squareone
 
+## 0.30.1
+
+### Patch Changes
+
+- [#361](https://github.com/lsst-sqre/squareone/pull/361) [`3914272`](https://github.com/lsst-sqre/squareone/commit/39142723cc43696f25f887f428ae3c84d9a9fefc) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @biomejs/biome from 2.3.8 to 2.3.10
+
+- [#345](https://github.com/lsst-sqre/squareone/pull/345) [`df80f21`](https://github.com/lsst-sqre/squareone/commit/df80f21c4c540d96f0d208155b9ec7c1b06607b1) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @sentry/nextjs from 10.27.0 to 10.31.0
+
+- [#344](https://github.com/lsst-sqre/squareone/pull/344) [`a9c0c82`](https://github.com/lsst-sqre/squareone/commit/a9c0c8264ea25f0f5e972fa29568d78fa7216af7) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-a11y from 10.1.4 to 10.1.10
+
+- [#344](https://github.com/lsst-sqre/squareone/pull/344) [`a9c0c82`](https://github.com/lsst-sqre/squareone/commit/a9c0c8264ea25f0f5e972fa29568d78fa7216af7) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-docs from 10.1.4 to 10.1.10
+
+- [#344](https://github.com/lsst-sqre/squareone/pull/344) [`a9c0c82`](https://github.com/lsst-sqre/squareone/commit/a9c0c8264ea25f0f5e972fa29568d78fa7216af7) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-links from 10.1.4 to 10.1.10
+
+- [#344](https://github.com/lsst-sqre/squareone/pull/344) [`a9c0c82`](https://github.com/lsst-sqre/squareone/commit/a9c0c8264ea25f0f5e972fa29568d78fa7216af7) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-onboarding from 10.1.4 to 10.1.10
+
+- [#344](https://github.com/lsst-sqre/squareone/pull/344) [`a9c0c82`](https://github.com/lsst-sqre/squareone/commit/a9c0c8264ea25f0f5e972fa29568d78fa7216af7) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-themes from 10.1.4 to 10.1.10
+
+- [#344](https://github.com/lsst-sqre/squareone/pull/344) [`a9c0c82`](https://github.com/lsst-sqre/squareone/commit/a9c0c8264ea25f0f5e972fa29568d78fa7216af7) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-vitest from 10.1.4 to 10.1.10
+
+- [#359](https://github.com/lsst-sqre/squareone/pull/359) [`f0010d1`](https://github.com/lsst-sqre/squareone/commit/f0010d1473ea2639f1126ca715daaf1544a518af) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/nextjs-vite from 10.1.7 to 10.1.10
+
+- [#344](https://github.com/lsst-sqre/squareone/pull/344) [`a9c0c82`](https://github.com/lsst-sqre/squareone/commit/a9c0c8264ea25f0f5e972fa29568d78fa7216af7) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/react-vite from 10.1.4 to 10.1.10
+
+- [#361](https://github.com/lsst-sqre/squareone/pull/361) [`3914272`](https://github.com/lsst-sqre/squareone/commit/39142723cc43696f25f887f428ae3c84d9a9fefc) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @testing-library/react from 16.3.0 to 16.3.1
+
+- [#361](https://github.com/lsst-sqre/squareone/pull/361) [`3914272`](https://github.com/lsst-sqre/squareone/commit/39142723cc43696f25f887f428ae3c84d9a9fefc) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @types/node from 22.19.1 to 22.19.3
+
+- [#361](https://github.com/lsst-sqre/squareone/pull/361) [`3914272`](https://github.com/lsst-sqre/squareone/commit/39142723cc43696f25f887f428ae3c84d9a9fefc) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @vitejs/plugin-react from 5.1.1 to 5.1.2
+
+- [#343](https://github.com/lsst-sqre/squareone/pull/343) [`73cd26e`](https://github.com/lsst-sqre/squareone/commit/73cd26e183caa8f5d51270c0c4f1ca50f32391b1) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump eslint-config-next from 15.5.7 to 15.5.9 in the nextjs group
+
+- [#344](https://github.com/lsst-sqre/squareone/pull/344) [`a9c0c82`](https://github.com/lsst-sqre/squareone/commit/a9c0c8264ea25f0f5e972fa29568d78fa7216af7) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump eslint-plugin-storybook from 10.1.4 to 10.1.10
+
+- [#341](https://github.com/lsst-sqre/squareone/pull/341) [`dda7c4b`](https://github.com/lsst-sqre/squareone/commit/dda7c4b018b70f842757f6a77200f0689661ea81) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump next from 15.5.7 to 15.5.9
+
+- [#345](https://github.com/lsst-sqre/squareone/pull/345) [`df80f21`](https://github.com/lsst-sqre/squareone/commit/df80f21c4c540d96f0d208155b9ec7c1b06607b1) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump react-day-picker from 9.11.2 to 9.12.0
+
+- [#342](https://github.com/lsst-sqre/squareone/pull/342) [`4c8991c`](https://github.com/lsst-sqre/squareone/commit/4c8991ce4a614e8a07a816a3e7024f65a549eb40) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump react-dom from 19.2.1 to 19.2.3
+
+- [#345](https://github.com/lsst-sqre/squareone/pull/345) [`df80f21`](https://github.com/lsst-sqre/squareone/commit/df80f21c4c540d96f0d208155b9ec7c1b06607b1) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump react-hook-form from 7.66.1 to 7.68.0
+
+- [#342](https://github.com/lsst-sqre/squareone/pull/342) [`4c8991c`](https://github.com/lsst-sqre/squareone/commit/4c8991ce4a614e8a07a816a3e7024f65a549eb40) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump react from 19.2.1 to 19.2.3
+
+- [#336](https://github.com/lsst-sqre/squareone/pull/336) [`bf8e71a`](https://github.com/lsst-sqre/squareone/commit/bf8e71a27eb92749dd59ccccd494a5e3993788ff) Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! - Add TypeScript interfaces for Sentry configuration type safety. Introduces a shared `SentryConfig` interface in the config loader and uses it in `_document.tsx` to replace `any` types, improving type safety and removing biome-ignore lint suppressions.
+
+- [#344](https://github.com/lsst-sqre/squareone/pull/344) [`a9c0c82`](https://github.com/lsst-sqre/squareone/commit/a9c0c8264ea25f0f5e972fa29568d78fa7216af7) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump storybook from 10.1.4 to 10.1.10 in the security-patch group across 1 directory
+
+- [#345](https://github.com/lsst-sqre/squareone/pull/345) [`df80f21`](https://github.com/lsst-sqre/squareone/commit/df80f21c4c540d96f0d208155b9ec7c1b06607b1) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump swr from 2.3.6 to 2.3.8
+
+- [#361](https://github.com/lsst-sqre/squareone/pull/361) [`3914272`](https://github.com/lsst-sqre/squareone/commit/39142723cc43696f25f887f428ae3c84d9a9fefc) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump yaml from 2.8.1 to 2.8.2
+
 ## 0.30.0
 
 ### Minor Changes
