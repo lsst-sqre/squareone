@@ -1,8 +1,10 @@
+'use client';
+
 import { PrimaryNavigation } from '@lsst-sqre/squared';
-import { useRouter } from 'next/router';
+import { usePathname, useRouter } from 'next/navigation';
 import React from 'react';
 import { ChevronDown } from 'react-feather';
-import { useAppConfig } from '../../contexts/AppConfigContext';
+import { useStaticConfig } from '../../hooks/useStaticConfig';
 
 type LinkProps = {
   href: string;
@@ -11,7 +13,7 @@ type LinkProps = {
 };
 
 export default function AppsMenu() {
-  const { appLinks } = useAppConfig();
+  const { appLinks } = useStaticConfig();
 
   return (
     <>
@@ -33,7 +35,8 @@ export default function AppsMenu() {
 
 const Link = ({ href, internal, children }: LinkProps) => {
   const router = useRouter();
-  const isActive = href === router.pathname;
+  const pathname = usePathname();
+  const isActive = href === pathname;
 
   // For internal links, we need to handle navigation without breaking
   // keyboard focus. We use PrimaryNavigation.Link with onClick handler

@@ -1,30 +1,31 @@
-'use client';
-
 import AgencyLogos from '@lsst-sqre/rubin-style-dictionary/assets/partner-logos/rubin-partners.png';
 import Image from 'next/image';
 import Link from 'next/link';
-import { MDXRemote } from 'next-mdx-remote';
+import type { ReactElement } from 'react';
 
-import { footerMdxComponents } from '../../lib/utils/mdxComponents';
-import styles from './Footer.module.css';
+import styles from '../components/Footer/Footer.module.css';
 
-type FooterProps = {
-  // biome-ignore lint/suspicious/noExplicitAny: MDX serialized source is an opaque type from next-mdx-remote
-  mdxSource?: any;
+type FooterRscProps = {
+  /** Pre-compiled MDX content as a React element */
+  mdxContent?: ReactElement | null;
 };
 
 /**
- * Footer component (contained within a Page component).
+ * Footer component for App Router.
  *
- * Accepts optional MDX source for custom footer content. If custom MDX content is
- * available, renders it; otherwise displays default Rubin Observatory footer.
+ * Unlike the Pages Router Footer which uses MDXRemote with serialized MDX,
+ * this component accepts pre-compiled MDX content as a React element
+ * (from compileMdxForRsc).
+ *
+ * If no custom MDX content is available, displays the default Rubin
+ * Observatory footer with funding notices and partner logos.
  */
-export default function Footer({ mdxSource }: FooterProps) {
+export default function FooterRsc({ mdxContent }: FooterRscProps) {
   return (
     <footer className={styles.footer}>
       <div className={styles.content}>
-        {mdxSource ? (
-          <MDXRemote {...mdxSource} components={footerMdxComponents} />
+        {mdxContent ? (
+          mdxContent
         ) : (
           <>
             <nav className={styles.footerNav}>
