@@ -7,8 +7,11 @@
 
 import * as Sentry from '@sentry/nextjs';
 
-// Get configuration injected by _document.tsx from server-side AppConfig
-const config = typeof window !== 'undefined' ? window.__SENTRY_CONFIG__ : {};
+// Get configuration injected by SentryConfigScript from server-side AppConfig.
+// Use defensive check: window.__SENTRY_CONFIG__ may be undefined if Sentry
+// is not configured (no SENTRY_DSN environment variable).
+const config =
+  (typeof window !== 'undefined' && window.__SENTRY_CONFIG__) || {};
 
 Sentry.init({
   dsn: config.dsn || undefined,

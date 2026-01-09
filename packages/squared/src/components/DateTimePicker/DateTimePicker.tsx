@@ -1,3 +1,5 @@
+'use client';
+
 import * as PopoverPrimitive from '@radix-ui/react-popover';
 import type React from 'react';
 import { forwardRef, useCallback, useMemo, useRef, useState } from 'react';

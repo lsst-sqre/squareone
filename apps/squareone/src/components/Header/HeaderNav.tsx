@@ -1,10 +1,11 @@
+'use client';
+
 import { PrimaryNavigation } from '@lsst-sqre/squared';
 import NextLink from 'next/link';
-import { useRouter } from 'next/router';
+import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
-
-import { useAppConfig } from '../../contexts/AppConfigContext';
 import useCurrentUrl from '../../hooks/useCurrentUrl';
+import { useStaticConfig } from '../../hooks/useStaticConfig';
 import AppsMenu from './AppsMenu';
 import styles from './HeaderNav.module.css';
 import Login from './Login';
@@ -19,7 +20,7 @@ type InternalTriggerLinkProps = {
  */
 export default function HeaderNav() {
   const currentUrl = useCurrentUrl();
-  const { enableAppsMenu } = useAppConfig();
+  const { enableAppsMenu } = useStaticConfig();
 
   return (
     <PrimaryNavigation className={styles.nav}>
@@ -65,8 +66,8 @@ export default function HeaderNav() {
 }
 
 function InternalTriggerLink({ href, children }: InternalTriggerLinkProps) {
-  const router = useRouter();
-  const isActive = href === router.pathname;
+  const pathname = usePathname();
+  const isActive = href === pathname;
 
   return (
     <PrimaryNavigation.TriggerLink asChild active={isActive}>

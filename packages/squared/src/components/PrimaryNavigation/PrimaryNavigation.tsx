@@ -1,3 +1,5 @@
+'use client';
+
 import * as RadixNavigationMenu from '@radix-ui/react-navigation-menu';
 import type React from 'react';
 import { forwardRef, useEffect, useRef } from 'react';
