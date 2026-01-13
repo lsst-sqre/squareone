@@ -85,7 +85,7 @@
     "new-component": "^5.0.2",
     "next": "^15.5.9",
     "playwright": "^1.57.0",
-    "react-hook-form": "^7.69.0",
+    "react-hook-form": "^7.70.0",
     "storybook": "10.1.11",
     "typescript": "^5.9.3",
     "typescript-plugin-css-modules": "^5.0.1",
