@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "eslint-config-next": "^15.5.9",
-    "eslint-config-turbo": "^2.6.3",
+    "eslint-config-turbo": "^2.7.3",
     "eslint-plugin-react": "^7.33.1"
   }
 }
