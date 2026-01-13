@@ -51,7 +51,7 @@
     "react": "^19.2.3",
     "react-a11y-disclosure": "^0.2.0",
     "react-dom": "^19.2.3",
-    "react-hook-form": "^7.69.0",
+    "react-hook-form": "^7.70.0",
     "remark": "^14.0.2",
     "remark-gfm": "^3.0.1",
     "remark-html": "^15.0.1",
