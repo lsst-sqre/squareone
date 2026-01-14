@@ -1,3 +1,5 @@
+'use client';
+
 import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import { Check, Clipboard } from 'react-feather';
 import { copyToClipboard } from '../../utils/clipboard';

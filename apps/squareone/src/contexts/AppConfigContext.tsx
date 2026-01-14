@@ -1,3 +1,5 @@
+'use client';
+
 import React, { createContext, useContext } from 'react';
 
 // Configuration interface for app-level configuration consumed by components
@@ -34,7 +36,10 @@ export interface AppConfigContextValue {
   headerLogoAlt?: string;
 }
 
-const AppConfigContext = createContext<AppConfigContextValue | null>(null);
+// Exported for use by useStaticConfig unified hook
+export const AppConfigContext = createContext<AppConfigContextValue | null>(
+  null
+);
 
 type AppConfigProviderProps = {
   children: React.ReactNode;

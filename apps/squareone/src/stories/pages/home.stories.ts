@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import Home from '../../pages/index';
+import HomepageHero from '../../components/HomepageHero';
 
-const meta: Meta<typeof Home> = {
+const meta: Meta<typeof HomepageHero> = {
   title: 'Pages/Homepage',
-  component: Home,
+  component: HomepageHero,
 };
 
 export default meta;
