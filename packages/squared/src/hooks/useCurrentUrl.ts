@@ -1,13 +1,15 @@
-import { useRouter } from 'next/router';
+'use client';
 
-/** Get the current absolute URL of the current page with next/router.
+import { usePathname } from 'next/navigation';
+
+/** Get the current absolute URL of the current page with next/navigation.
  *
  * @param baseUrl The base URL of the site, e.g. https://example.com
  * @returns currentUrl The URL of the current page endpoint.
  */
 function useCurrentUrl(baseUrl: string): import('url').URL {
-  const router = useRouter();
-  return new URL(router.pathname, baseUrl);
+  const pathname = usePathname();
+  return new URL(pathname, baseUrl);
 }
 
 export default useCurrentUrl;

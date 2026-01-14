@@ -1,3 +1,5 @@
+'use client';
+
 import type React from 'react';
 import { forwardRef, useCallback, useRef } from 'react';
 // @ts-ignore - ChevronUp is missing from react-feather type definitions
