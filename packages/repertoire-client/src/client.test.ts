@@ -24,11 +24,16 @@ describe('fetchServiceDiscovery', () => {
     });
     vi.stubGlobal('fetch', mockFetch);
 
-    const result = await fetchServiceDiscovery('https://example.com/discovery');
+    const result = await fetchServiceDiscovery(
+      'https://example.com/repertoire'
+    );
 
-    expect(mockFetch).toHaveBeenCalledWith('https://example.com/discovery', {
-      cache: 'no-store',
-    });
+    expect(mockFetch).toHaveBeenCalledWith(
+      'https://example.com/repertoire/discovery',
+      {
+        cache: 'no-store',
+      }
+    );
     expect(result).toEqual(mockDiscovery);
     expect(result.applications).toContain('portal');
   });
@@ -42,11 +47,11 @@ describe('fetchServiceDiscovery', () => {
     vi.stubGlobal('fetch', mockFetch);
 
     await expect(
-      fetchServiceDiscovery('https://example.com/discovery')
+      fetchServiceDiscovery('https://example.com/repertoire')
     ).rejects.toThrow(RepertoireError);
 
     await expect(
-      fetchServiceDiscovery('https://example.com/discovery')
+      fetchServiceDiscovery('https://example.com/repertoire')
     ).rejects.toMatchObject({
       message: 'Repertoire API error: 404 Not Found',
       statusCode: 404,
@@ -62,11 +67,11 @@ describe('fetchServiceDiscovery', () => {
     vi.stubGlobal('fetch', mockFetch);
 
     await expect(
-      fetchServiceDiscovery('https://example.com/discovery')
+      fetchServiceDiscovery('https://example.com/repertoire')
     ).rejects.toThrow(RepertoireError);
 
     await expect(
-      fetchServiceDiscovery('https://example.com/discovery')
+      fetchServiceDiscovery('https://example.com/repertoire')
     ).rejects.toMatchObject({
       message: 'Repertoire API error: 500 Internal Server Error',
       statusCode: 500,
@@ -91,7 +96,7 @@ describe('fetchServiceDiscovery', () => {
     vi.stubGlobal('fetch', mockFetch);
 
     await expect(
-      fetchServiceDiscovery('https://example.com/discovery')
+      fetchServiceDiscovery('https://example.com/repertoire')
     ).rejects.toThrow(ZodError);
   });
 
@@ -107,7 +112,7 @@ describe('fetchServiceDiscovery', () => {
     vi.stubGlobal('fetch', mockFetch);
 
     await expect(
-      fetchServiceDiscovery('https://example.com/discovery')
+      fetchServiceDiscovery('https://example.com/repertoire')
     ).rejects.toThrow(ZodError);
   });
 
@@ -117,7 +122,7 @@ describe('fetchServiceDiscovery', () => {
     vi.stubGlobal('fetch', mockFetch);
 
     await expect(
-      fetchServiceDiscovery('https://example.com/discovery')
+      fetchServiceDiscovery('https://example.com/repertoire')
     ).rejects.toThrow('Network request failed');
   });
 });

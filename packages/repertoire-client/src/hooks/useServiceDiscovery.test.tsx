@@ -42,7 +42,7 @@ describe('useServiceDiscovery', () => {
       vi.stubGlobal('fetch', mockFetch);
 
       const { result } = renderHook(
-        () => useServiceDiscovery('https://example.com/discovery'),
+        () => useServiceDiscovery('https://example.com/repertoire'),
         { wrapper: createWrapper() }
       );
 
@@ -63,7 +63,7 @@ describe('useServiceDiscovery', () => {
       vi.stubGlobal('fetch', mockFetch);
 
       const { result } = renderHook(
-        () => useServiceDiscovery('https://example.com/discovery'),
+        () => useServiceDiscovery('https://example.com/repertoire'),
         { wrapper: createWrapper() }
       );
 
@@ -92,7 +92,7 @@ describe('useServiceDiscovery', () => {
       vi.stubGlobal('fetch', mockFetch);
 
       const { result } = renderHook(
-        () => useServiceDiscovery('https://example.com/discovery'),
+        () => useServiceDiscovery('https://example.com/repertoire'),
         { wrapper: createWrapper() }
       );
 
@@ -124,7 +124,7 @@ describe('useServiceDiscovery', () => {
       vi.stubGlobal('fetch', mockFetch);
 
       const { result } = renderHook(
-        () => useServiceDiscovery('https://example.com/discovery'),
+        () => useServiceDiscovery('https://example.com/repertoire'),
         { wrapper: createWrapper() }
       );
 
@@ -157,7 +157,7 @@ describe('useServiceDiscovery', () => {
         .mockImplementation(() => {});
 
       const { result } = renderHook(
-        () => useServiceDiscovery('https://example.com/discovery'),
+        () => useServiceDiscovery('https://example.com/repertoire'),
         { wrapper: createWrapper() }
       );
 
@@ -185,7 +185,7 @@ describe('useServiceDiscovery', () => {
         .mockImplementation(() => {});
 
       const { result } = renderHook(
-        () => useServiceDiscovery('https://example.com/discovery'),
+        () => useServiceDiscovery('https://example.com/repertoire'),
         { wrapper: createWrapper() }
       );
 
@@ -216,7 +216,7 @@ describe('useServiceDiscovery', () => {
         .mockImplementation(() => {});
 
       const { result } = renderHook(
-        () => useServiceDiscovery('https://example.com/discovery'),
+        () => useServiceDiscovery('https://example.com/repertoire'),
         { wrapper: createWrapper() }
       );
 
@@ -240,7 +240,7 @@ describe('useServiceDiscovery', () => {
       vi.stubGlobal('fetch', mockFetch);
 
       const { result } = renderHook(
-        () => useServiceDiscovery('https://example.com/discovery'),
+        () => useServiceDiscovery('https://example.com/repertoire'),
         { wrapper: createWrapper() }
       );
 
@@ -263,7 +263,7 @@ describe('useServiceDiscovery', () => {
       vi.stubGlobal('fetch', mockFetch);
 
       const { result } = renderHook(
-        () => useServiceDiscovery('https://example.com/discovery'),
+        () => useServiceDiscovery('https://example.com/repertoire'),
         { wrapper: createWrapper() }
       );
 
@@ -291,7 +291,7 @@ describe('useServiceDiscovery', () => {
       vi.stubGlobal('fetch', mockFetch);
 
       const { result } = renderHook(
-        () => useServiceDiscovery('https://example.com/discovery'),
+        () => useServiceDiscovery('https://example.com/repertoire'),
         { wrapper: createWrapper() }
       );
 
@@ -314,7 +314,7 @@ describe('useServiceDiscovery', () => {
       vi.stubGlobal('fetch', mockFetch);
 
       const { result } = renderHook(
-        () => useServiceDiscovery('https://example.com/discovery'),
+        () => useServiceDiscovery('https://example.com/repertoire'),
         { wrapper: createWrapper() }
       );
 
@@ -333,7 +333,7 @@ describe('useServiceDiscovery', () => {
       vi.stubGlobal('fetch', mockFetch);
 
       const { result } = renderHook(
-        () => useServiceDiscovery('https://example.com/discovery'),
+        () => useServiceDiscovery('https://example.com/repertoire'),
         { wrapper: createWrapper() }
       );
 
@@ -361,7 +361,7 @@ describe('useServiceDiscovery', () => {
       const { result, rerender } = renderHook(
         ({ url }: { url: string }) => useServiceDiscovery(url),
         {
-          initialProps: { url: 'https://example.com/discovery1' },
+          initialProps: { url: 'https://example.com/repertoire1' },
           wrapper: createWrapper(),
         }
       );
@@ -371,16 +371,16 @@ describe('useServiceDiscovery', () => {
       });
 
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://example.com/discovery1',
+        'https://example.com/repertoire1/discovery',
         expect.any(Object)
       );
 
       // Change URL
-      rerender({ url: 'https://example.com/discovery2' });
+      rerender({ url: 'https://example.com/repertoire2' });
 
       await waitFor(() => {
         expect(mockFetch).toHaveBeenCalledWith(
-          'https://example.com/discovery2',
+          'https://example.com/repertoire2/discovery',
           expect.any(Object)
         );
       });
@@ -396,7 +396,7 @@ describe('useServiceDiscovery', () => {
       vi.stubGlobal('fetch', mockFetch);
 
       const { result } = renderHook(
-        () => useServiceDiscovery('https://example.com/discovery'),
+        () => useServiceDiscovery('https://example.com/repertoire'),
         { wrapper: createWrapper() }
       );
 

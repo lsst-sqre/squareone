@@ -31,31 +31,31 @@ describe('discoveryQueryOptions', () => {
 
   describe('query key structure', () => {
     it('creates query key with service-discovery prefix and URL', () => {
-      const options = discoveryQueryOptions('https://example.com/discovery');
+      const options = discoveryQueryOptions('https://example.com/repertoire');
 
       expect(options.queryKey).toEqual([
         'service-discovery',
-        'https://example.com/discovery',
+        'https://example.com/repertoire',
       ]);
     });
 
     it('creates different keys for different URLs', () => {
       const options1 = discoveryQueryOptions(
-        'https://data.lsst.cloud/discovery'
+        'https://data.lsst.cloud/repertoire'
       );
       const options2 = discoveryQueryOptions(
-        'https://usdf.slac.stanford.edu/discovery'
+        'https://usdf.slac.stanford.edu/repertoire'
       );
 
       expect(options1.queryKey).not.toEqual(options2.queryKey);
-      expect(options1.queryKey[1]).toBe('https://data.lsst.cloud/discovery');
+      expect(options1.queryKey[1]).toBe('https://data.lsst.cloud/repertoire');
       expect(options2.queryKey[1]).toBe(
-        'https://usdf.slac.stanford.edu/discovery'
+        'https://usdf.slac.stanford.edu/repertoire'
       );
     });
 
     it('query key is readonly (as const)', () => {
-      const options = discoveryQueryOptions('https://example.com/discovery');
+      const options = discoveryQueryOptions('https://example.com/repertoire');
 
       // TypeScript ensures this is readonly, but we can verify the structure
       expect(options.queryKey[0]).toBe('service-discovery');
@@ -64,19 +64,19 @@ describe('discoveryQueryOptions', () => {
 
   describe('options configuration', () => {
     it('has staleTime of 5 minutes', () => {
-      const options = discoveryQueryOptions('https://example.com/discovery');
+      const options = discoveryQueryOptions('https://example.com/repertoire');
 
       expect(options.staleTime).toBe(5 * 60 * 1000);
     });
 
     it('has gcTime of 10 minutes', () => {
-      const options = discoveryQueryOptions('https://example.com/discovery');
+      const options = discoveryQueryOptions('https://example.com/repertoire');
 
       expect(options.gcTime).toBe(10 * 60 * 1000);
     });
 
     it('has a queryFn defined', () => {
-      const options = discoveryQueryOptions('https://example.com/discovery');
+      const options = discoveryQueryOptions('https://example.com/repertoire');
 
       expect(options.queryFn).toBeDefined();
       expect(typeof options.queryFn).toBe('function');
@@ -84,20 +84,23 @@ describe('discoveryQueryOptions', () => {
   });
 
   describe('query function behavior', () => {
-    it('fetches from the provided URL', async () => {
+    it('fetches from the provided URL with /discovery appended', async () => {
       const mockFetch = vi.fn().mockResolvedValue({
         ok: true,
         json: () => Promise.resolve(mockDiscovery),
       });
       vi.stubGlobal('fetch', mockFetch);
 
-      const url = 'https://example.com/discovery';
+      const url = 'https://example.com/repertoire';
       const queryFn = getQueryFn(url);
       await queryFn(createMockContext(url));
 
-      expect(mockFetch).toHaveBeenCalledWith('https://example.com/discovery', {
-        cache: 'no-store',
-      });
+      expect(mockFetch).toHaveBeenCalledWith(
+        'https://example.com/repertoire/discovery',
+        {
+          cache: 'no-store',
+        }
+      );
     });
 
     it('returns discovery data on successful fetch', async () => {
@@ -107,7 +110,7 @@ describe('discoveryQueryOptions', () => {
       });
       vi.stubGlobal('fetch', mockFetch);
 
-      const url = 'https://example.com/discovery';
+      const url = 'https://example.com/repertoire';
       const queryFn = getQueryFn(url);
       const result = await queryFn(createMockContext(url));
 
@@ -130,7 +133,7 @@ describe('discoveryQueryOptions', () => {
         .spyOn(console, 'error')
         .mockImplementation(() => {});
 
-      const url = 'https://example.com/discovery';
+      const url = 'https://example.com/repertoire';
       const queryFn = getQueryFn(url);
       const result = await queryFn(createMockContext(url));
 
@@ -151,7 +154,7 @@ describe('discoveryQueryOptions', () => {
         .spyOn(console, 'error')
         .mockImplementation(() => {});
 
-      const url = 'https://example.com/discovery';
+      const url = 'https://example.com/repertoire';
       const queryFn = getQueryFn(url);
       const result = await queryFn(createMockContext(url));
 
@@ -177,7 +180,7 @@ describe('discoveryQueryOptions', () => {
         .spyOn(console, 'error')
         .mockImplementation(() => {});
 
-      const url = 'https://example.com/discovery';
+      const url = 'https://example.com/repertoire';
       const queryFn = getQueryFn(url);
       const result = await queryFn(createMockContext(url));
 
@@ -197,7 +200,7 @@ describe('discoveryQueryOptions', () => {
         .spyOn(console, 'error')
         .mockImplementation(() => {});
 
-      const url = 'https://example.com/discovery';
+      const url = 'https://example.com/repertoire';
       const queryFn = getQueryFn(url);
       await queryFn(createMockContext(url));
 
@@ -218,7 +221,7 @@ describe('discoveryQueryOptions', () => {
       });
       vi.stubGlobal('fetch', mockFetch);
 
-      const options = discoveryQueryOptions('https://example.com/discovery');
+      const options = discoveryQueryOptions('https://example.com/repertoire');
 
       // Simulate how TanStack Query would use this
       expect(options).toMatchObject({

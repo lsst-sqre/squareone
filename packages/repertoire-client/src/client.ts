@@ -13,7 +13,14 @@ export class RepertoireError extends Error {
 export async function fetchServiceDiscovery(
   repertoireUrl: string
 ): Promise<ServiceDiscovery> {
-  const response = await fetch(repertoireUrl, { cache: 'no-store' });
+  // Remove trailing slashes if present, then append /discovery
+  let baseUrl = repertoireUrl;
+  while (baseUrl.endsWith('/')) {
+    baseUrl = baseUrl.slice(0, -1);
+  }
+  const discoveryUrl = `${baseUrl}/discovery`;
+
+  const response = await fetch(discoveryUrl, { cache: 'no-store' });
 
   if (!response.ok) {
     throw new RepertoireError(
