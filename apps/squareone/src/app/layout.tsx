@@ -78,9 +78,20 @@ export default async function RootLayout({ children }: RootLayoutProps) {
   const queryClient = new QueryClient();
 
   // Prefetch service discovery if Repertoire URL is configured
+  console.log('[Layout] repertoireUrl from config:', config.repertoireUrl);
   if (config.repertoireUrl) {
+    console.log('[Layout] Prefetching service discovery...');
     await queryClient.prefetchQuery(
       discoveryQueryOptions(config.repertoireUrl)
+    );
+    const cachedData = queryClient.getQueryData([
+      'service-discovery',
+      config.repertoireUrl,
+    ]);
+    console.log('[Layout] Prefetch complete, cached data:', cachedData);
+  } else {
+    console.log(
+      '[Layout] No repertoireUrl configured, skipping service discovery'
     );
   }
 

@@ -205,7 +205,7 @@ describe('discoveryQueryOptions', () => {
       await queryFn(createMockContext(url));
 
       expect(consoleError).toHaveBeenCalledWith(
-        '[Discovery] Failed to fetch:',
+        expect.stringMatching(/^\[Discovery:[a-z0-9]+\] Failed to fetch:$/),
         expect.any(Error)
       );
 

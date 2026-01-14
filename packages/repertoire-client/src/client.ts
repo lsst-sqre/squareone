@@ -11,8 +11,11 @@ export class RepertoireError extends Error {
 }
 
 export async function fetchServiceDiscovery(
-  repertoireUrl: string
+  repertoireUrl: string,
+  requestId?: string
 ): Promise<ServiceDiscovery> {
+  const logPrefix = requestId ? `[Repertoire:${requestId}]` : '[Repertoire]';
+
   // Remove trailing slashes if present, then append /discovery
   let baseUrl = repertoireUrl;
   while (baseUrl.endsWith('/')) {
@@ -20,7 +23,15 @@ export async function fetchServiceDiscovery(
   }
   const discoveryUrl = `${baseUrl}/discovery`;
 
+  const startTime = Date.now();
+  console.log(`${logPrefix} Starting network fetch from:`, discoveryUrl);
+
   const response = await fetch(discoveryUrl, { cache: 'no-store' });
+
+  const fetchDuration = Date.now() - startTime;
+  console.log(
+    `${logPrefix} Network fetch completed in ${fetchDuration}ms, status: ${response.status}`
+  );
 
   if (!response.ok) {
     throw new RepertoireError(
@@ -30,7 +41,20 @@ export async function fetchServiceDiscovery(
   }
 
   const data = await response.json();
-  return DiscoverySchema.parse(data); // Validates and returns typed response
+  console.log(`${logPrefix} Raw response:`, JSON.stringify(data, null, 2));
+
+  const parsed = DiscoverySchema.parse(data);
+  console.log(`${logPrefix} Parsed discovery:`, {
+    applications: parsed.applications,
+    uiServices: Object.keys(parsed.services.ui),
+    internalServices: Object.keys(parsed.services.internal),
+    hasPortalUi: 'portal' in parsed.services.ui,
+    hasNubladoUi: 'nublado' in parsed.services.ui,
+    portalUrl: parsed.services.ui.portal?.url,
+    nubladoUrl: parsed.services.ui.nublado?.url,
+  });
+
+  return parsed;
 }
 
 export function getEmptyDiscovery(): ServiceDiscovery {
