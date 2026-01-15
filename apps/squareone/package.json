@@ -33,6 +33,7 @@
     "@fortawesome/free-brands-svg-icons": "^6.5.2",
     "@fortawesome/free-solid-svg-icons": "^6.3.0",
     "@fortawesome/react-fontawesome": "^0.2.2",
+    "@lsst-sqre/gafaelfawr-client": "workspace:*",
     "@lsst-sqre/global-css": "workspace:*",
     "@lsst-sqre/rubin-style-dictionary": "workspace:*",
     "@lsst-sqre/repertoire-client": "workspace:*",
