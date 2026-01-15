@@ -1,79 +1,85 @@
-import type { GetServerSideProps } from 'next';
-import Head from 'next/head';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
-import type { ReactElement } from 'react';
-import { useState } from 'react';
-import { Lede } from '@/components/Typography/Typography';
-import { getLayout } from '../../../components/SettingsLayout';
-import { TokenCreationErrorDisplay } from '../../../components/TokenCreationErrorDisplay';
-import { TokenForm, type TokenFormValues } from '../../../components/TokenForm';
-import TokenSuccessModal from '../../../components/TokenSuccessModal';
-import { useAppConfig } from '../../../contexts/AppConfigContext';
-import useLoginInfo from '../../../hooks/useLoginInfo';
-import useTokenCreation from '../../../hooks/useTokenCreation';
-import useTokenTemplateUrl from '../../../hooks/useTokenTemplateUrl';
-import useUserTokens, { extractTokenNames } from '../../../hooks/useUserTokens';
-import { loadFooterMdx } from '../../../lib/config/footerLoader';
-import { loadAppConfig } from '../../../lib/config/loader';
+'use client';
+
 import {
-  formatExpiration,
+  extractTokenNames,
+  useCreateToken,
+  useLoginInfo,
+  useUserTokens,
+} from '@lsst-sqre/gafaelfawr-client';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useState } from 'react';
+
+import AuthRequired from '../../../../components/AuthRequired';
+import { TokenCreationErrorDisplay } from '../../../../components/TokenCreationErrorDisplay';
+import {
+  TokenForm,
+  type TokenFormValues,
+} from '../../../../components/TokenForm';
+import TokenSuccessModal from '../../../../components/TokenSuccessModal';
+import { Lede } from '../../../../components/Typography';
+import { useRepertoireUrl } from '../../../../hooks/useRepertoireUrl';
+import useTokenTemplateUrl from '../../../../hooks/useTokenTemplateUrl';
+import {
+  calculateExpirationDate,
   parseExpirationFromQuery,
-} from '../../../lib/tokens/expiration';
-import { parseTokenQueryParams } from '../../../lib/tokens/queryParams';
+} from '../../../../lib/tokens/expiration';
 
-type NextPageWithLayout = {
-  getLayout?: (page: ReactElement) => ReactElement;
-};
+export default function NewTokenPageClient() {
+  return (
+    <AuthRequired>
+      <NewTokenContent />
+    </AuthRequired>
+  );
+}
 
-type NewTokenPageProps = {
-  initialValues?: {
-    name?: string;
-    scopes?: string[];
-    expiration?: string;
-  };
-};
-
-const NewTokenPage: NextPageWithLayout &
-  ((props: NewTokenPageProps) => ReactElement) = ({ initialValues }) => {
-  const appConfig = useAppConfig();
+function NewTokenContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const repertoireUrl = useRepertoireUrl();
+
   const {
     loginInfo,
     error: loginError,
     isLoading: loginLoading,
-  } = useLoginInfo();
+  } = useLoginInfo(repertoireUrl);
+
   const {
     createToken,
     isCreating,
     error: creationError,
     reset,
-  } = useTokenCreation();
+  } = useCreateToken(repertoireUrl);
+
   const {
     tokens,
     error: tokensError,
     isLoading: tokensLoading,
-    mutate: mutateTokens,
-  } = useUserTokens(loginInfo?.username);
+    invalidate: invalidateTokens,
+  } = useUserTokens(loginInfo?.username, repertoireUrl);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [createdToken, setCreatedToken] = useState<string | null>(null);
   const [tokenFormValues, setTokenFormValues] =
     useState<TokenFormValues | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Prepare form initial values
+  // Parse query parameters for form prefilling
   const formInitialValues: Partial<TokenFormValues> = {};
 
-  if (initialValues?.name) {
-    formInitialValues.name = initialValues.name;
+  const nameParam = searchParams.get('name');
+  if (nameParam) {
+    formInitialValues.name = nameParam;
   }
 
-  if (initialValues?.scopes && Array.isArray(initialValues.scopes)) {
-    formInitialValues.scopes = initialValues.scopes;
+  const scopesParam = searchParams.get('scopes');
+  if (scopesParam) {
+    formInitialValues.scopes = scopesParam.split(',').filter(Boolean);
   }
 
-  if (initialValues?.expiration) {
-    const parsedExpiration = parseExpirationFromQuery(initialValues.expiration);
+  const expirationParam = searchParams.get('expiration');
+  if (expirationParam) {
+    const parsedExpiration = parseExpirationFromQuery(expirationParam);
     if (parsedExpiration) {
       formInitialValues.expiration = parsedExpiration;
     }
@@ -86,11 +92,14 @@ const NewTokenPage: NextPageWithLayout &
     reset();
 
     try {
-      const expires = formatExpiration(values.expiration);
+      // Convert expiration to Date for the new API
+      let expires: Date | null = null;
+      if (values.expiration.type === 'preset') {
+        expires = calculateExpirationDate(values.expiration.value);
+      }
 
       const response = await createToken({
         username: loginInfo.username,
-        csrf: loginInfo.csrf,
         tokenName: values.name,
         scopes: values.scopes,
         expires,
@@ -101,7 +110,7 @@ const NewTokenPage: NextPageWithLayout &
       setIsModalOpen(true);
 
       // Refresh the token list to include the newly created token
-      mutateTokens();
+      invalidateTokens();
     } catch (error) {
       console.error('Token creation failed:', error);
     } finally {
@@ -136,7 +145,7 @@ const NewTokenPage: NextPageWithLayout &
   let content: React.ReactNode;
 
   if (loginLoading || tokensLoading) {
-    content = <p>Loading…</p>;
+    content = <p>Loading...</p>;
   } else if (loginError || !loginInfo) {
     content = (
       <p>
@@ -162,8 +171,11 @@ const NewTokenPage: NextPageWithLayout &
         {creationError && <TokenCreationErrorDisplay error={creationError} />}
 
         <TokenForm
-          availableScopes={loginInfo.config.scopes.filter((scope) =>
-            loginInfo.scopes.includes(scope.name)
+          availableScopes={loginInfo.config.scopes.filter(
+            (scope): scope is { name: string; description: string } =>
+              scope.name !== undefined &&
+              scope.description !== undefined &&
+              loginInfo.scopes.includes(scope.name)
           )}
           initialValues={formInitialValues}
           onSubmit={handleSubmit}
@@ -177,25 +189,6 @@ const NewTokenPage: NextPageWithLayout &
 
   return (
     <>
-      <Head>
-        <title key="title">{`Create an RSP access token | ${appConfig.siteName}`}</title>
-        <meta
-          name="description"
-          key="description"
-          content="Create a new API access token for programmatic access to the Rubin Science Platform"
-        />
-        <meta
-          property="og:title"
-          key="ogtitle"
-          content="Create an RSP access token"
-        />
-        <meta
-          property="og:description"
-          key="ogdescription"
-          content="Create a new API access token for programmatic access"
-        />
-      </Head>
-
       <h1>Create an RSP access token</h1>
       {content}
 
@@ -212,28 +205,4 @@ const NewTokenPage: NextPageWithLayout &
       )}
     </>
   );
-};
-
-NewTokenPage.getLayout = getLayout;
-
-// REQUIRED: Load appConfig and parse query parameters for form prefilling
-export const getServerSideProps: GetServerSideProps<
-  NewTokenPageProps
-> = async ({ query }) => {
-  const appConfig = await loadAppConfig();
-  const footerMdxSource = await loadFooterMdx(appConfig);
-
-  // Parse query parameters for form prefilling
-  const queryParams = parseTokenQueryParams(query);
-
-  return {
-    props: {
-      appConfig, // Required for AppConfigProvider in _app.tsx
-      footerMdxSource,
-      initialValues:
-        Object.keys(queryParams).length > 0 ? queryParams : undefined,
-    },
-  };
-};
-
-export default NewTokenPage;
+}

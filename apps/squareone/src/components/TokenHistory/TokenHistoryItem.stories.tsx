@@ -1,5 +1,6 @@
+import type { TokenChangeHistoryEntry } from '@lsst-sqre/gafaelfawr-client';
 import { useState } from 'react';
-import type { TokenChangeHistoryEntry } from '../../hooks/useTokenChangeHistory';
+
 import TokenHistoryItem from './TokenHistoryItem';
 
 export default {
