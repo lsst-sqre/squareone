@@ -1,4 +1,5 @@
-import type { TokenChangeHistoryEntry } from '../../hooks/useTokenChangeHistory';
+import type { TokenChangeHistoryEntry } from '@lsst-sqre/gafaelfawr-client';
+
 import { TokenHistoryDetails } from './TokenHistoryDetails';
 
 export default {

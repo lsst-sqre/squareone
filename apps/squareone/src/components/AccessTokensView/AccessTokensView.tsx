@@ -1,5 +1,7 @@
+import { useUserTokens } from '@lsst-sqre/gafaelfawr-client';
 import React from 'react';
-import useUserTokens from '../../hooks/useUserTokens';
+
+import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
 import AccessTokenItem from './AccessTokenItem';
 import styles from './AccessTokensView.module.css';
 
@@ -8,7 +10,8 @@ type AccessTokensViewProps = {
 };
 
 export default function AccessTokensView({ username }: AccessTokensViewProps) {
-  const { tokens, error, isLoading } = useUserTokens(username);
+  const repertoireUrl = useRepertoireUrl();
+  const { tokens, error, isLoading } = useUserTokens(username, repertoireUrl);
 
   // Filter to user tokens only and sort by created (most recent first)
   const userTokens = tokens

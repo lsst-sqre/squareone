@@ -1,20 +1,25 @@
+import type { TokenInfo } from '@lsst-sqre/gafaelfawr-client';
+import * as gafaelfawrClient from '@lsst-sqre/gafaelfawr-client';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { TokenInfo } from '../../hooks/useUserTokens';
 
-// Mock the hooks
-vi.mock('../../hooks/useUserTokens', () => ({
-  default: vi.fn(),
-}));
+import * as useRepertoireUrlModule from '../../hooks/useRepertoireUrl';
 
-vi.mock('../../hooks/useDeleteToken', () => ({
-  default: vi.fn(() => ({
-    deleteToken: vi.fn(),
-    isDeleting: false,
-    error: undefined,
-  })),
-}));
+// Mock hooks
+vi.mock('@lsst-sqre/gafaelfawr-client', async (importOriginal) => {
+  const actual = await importOriginal<typeof gafaelfawrClient>();
+  return {
+    ...actual,
+    useUserTokens: vi.fn(),
+    useDeleteToken: vi.fn(() => ({
+      deleteToken: vi.fn(),
+      isDeleting: false,
+      error: null,
+    })),
+  };
+});
+vi.mock('../../hooks/useRepertoireUrl');
 
 vi.mock('./tokenDateFormatters', () => ({
   formatTokenExpiration: vi.fn((expires) => {
@@ -37,10 +42,10 @@ vi.mock('./tokenDateFormatters', () => ({
   }),
 }));
 
-import useUserTokens from '../../hooks/useUserTokens';
 import AccessTokensView from './AccessTokensView';
 
-const mockUseUserTokens = vi.mocked(useUserTokens);
+const mockUseUserTokens = vi.mocked(gafaelfawrClient.useUserTokens);
+const mockUseRepertoireUrl = vi.mocked(useRepertoireUrlModule.useRepertoireUrl);
 
 describe('AccessTokensView', () => {
   const now = Math.floor(Date.now() / 1000);
@@ -89,14 +94,20 @@ describe('AccessTokensView', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+
+    // Mock useRepertoireUrl to return undefined (default behavior)
+    mockUseRepertoireUrl.mockReturnValue(undefined);
   });
 
   it('renders loading state', () => {
     mockUseUserTokens.mockReturnValue({
       tokens: undefined,
-      error: undefined,
+      error: null,
       isLoading: true,
-      mutate: vi.fn(),
+      isPending: true,
+      query: null,
+      refetch: vi.fn(),
+      invalidate: vi.fn(),
     });
 
     render(<AccessTokensView username="testuser" />);
@@ -110,7 +121,10 @@ describe('AccessTokensView', () => {
       tokens: undefined,
       error,
       isLoading: false,
-      mutate: vi.fn(),
+      isPending: false,
+      query: null,
+      refetch: vi.fn(),
+      invalidate: vi.fn(),
     });
 
     render(<AccessTokensView username="testuser" />);
@@ -123,9 +137,12 @@ describe('AccessTokensView', () => {
   it('renders user tokens', () => {
     mockUseUserTokens.mockReturnValue({
       tokens: mockUserTokens,
-      error: undefined,
+      error: null,
       isLoading: false,
-      mutate: vi.fn(),
+      isPending: false,
+      query: null,
+      refetch: vi.fn(),
+      invalidate: vi.fn(),
     });
 
     render(<AccessTokensView username="testuser" />);
@@ -138,9 +155,12 @@ describe('AccessTokensView', () => {
     const mixedTokens = [...mockUserTokens, ...mockSessionTokens];
     mockUseUserTokens.mockReturnValue({
       tokens: mixedTokens,
-      error: undefined,
+      error: null,
       isLoading: false,
-      mutate: vi.fn(),
+      isPending: false,
+      query: null,
+      refetch: vi.fn(),
+      invalidate: vi.fn(),
     });
 
     render(<AccessTokensView username="testuser" />);
@@ -156,9 +176,12 @@ describe('AccessTokensView', () => {
   it('sorts tokens by created date (most recent first)', () => {
     mockUseUserTokens.mockReturnValue({
       tokens: mockUserTokens,
-      error: undefined,
+      error: null,
       isLoading: false,
-      mutate: vi.fn(),
+      isPending: false,
+      query: null,
+      refetch: vi.fn(),
+      invalidate: vi.fn(),
     });
 
     const { container } = render(<AccessTokensView username="testuser" />);
@@ -176,9 +199,12 @@ describe('AccessTokensView', () => {
   it('renders nothing when there are no user tokens', () => {
     mockUseUserTokens.mockReturnValue({
       tokens: [],
-      error: undefined,
+      error: null,
       isLoading: false,
-      mutate: vi.fn(),
+      isPending: false,
+      query: null,
+      refetch: vi.fn(),
+      invalidate: vi.fn(),
     });
 
     const { container } = render(<AccessTokensView username="testuser" />);
@@ -189,9 +215,12 @@ describe('AccessTokensView', () => {
   it('renders nothing when there are only non-user tokens', () => {
     mockUseUserTokens.mockReturnValue({
       tokens: mockSessionTokens,
-      error: undefined,
+      error: null,
       isLoading: false,
-      mutate: vi.fn(),
+      isPending: false,
+      query: null,
+      refetch: vi.fn(),
+      invalidate: vi.fn(),
     });
 
     const { container } = render(<AccessTokensView username="testuser" />);
@@ -213,9 +242,12 @@ describe('AccessTokensView', () => {
 
     mockUseUserTokens.mockReturnValue({
       tokens: tokensWithoutCreated,
-      error: undefined,
+      error: null,
       isLoading: false,
-      mutate: vi.fn(),
+      isPending: false,
+      query: null,
+      refetch: vi.fn(),
+      invalidate: vi.fn(),
     });
 
     render(<AccessTokensView username="testuser" />);
@@ -248,9 +280,12 @@ describe('AccessTokensView', () => {
 
     mockUseUserTokens.mockReturnValue({
       tokens: tokensWithMixedDates,
-      error: undefined,
+      error: null,
       isLoading: false,
-      mutate: vi.fn(),
+      isPending: false,
+      query: null,
+      refetch: vi.fn(),
+      invalidate: vi.fn(),
     });
 
     const { container } = render(<AccessTokensView username="testuser" />);
@@ -268,9 +303,12 @@ describe('AccessTokensView', () => {
   it('passes username to AccessTokenItem components', () => {
     mockUseUserTokens.mockReturnValue({
       tokens: mockUserTokens,
-      error: undefined,
+      error: null,
       isLoading: false,
-      mutate: vi.fn(),
+      isPending: false,
+      query: null,
+      refetch: vi.fn(),
+      invalidate: vi.fn(),
     });
 
     render(<AccessTokensView username="testuser" />);

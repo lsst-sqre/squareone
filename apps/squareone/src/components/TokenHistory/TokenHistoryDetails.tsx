@@ -1,6 +1,7 @@
+import type { TokenChangeHistoryEntry } from '@lsst-sqre/gafaelfawr-client';
 import Link from 'next/link';
 import React from 'react';
-import type { TokenChangeHistoryEntry } from '../../hooks/useTokenChangeHistory';
+
 import { formatExpirationTimestamp } from '../TokenDate/formatters';
 import styles from './TokenHistoryDetails.module.css';
 import { TokenScopeBadge } from './TokenScopeBadge';

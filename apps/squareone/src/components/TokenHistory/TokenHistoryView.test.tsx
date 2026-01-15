@@ -1,9 +1,11 @@
+import type { TokenChangeHistoryEntry } from '@lsst-sqre/gafaelfawr-client';
+import * as gafaelfawrClient from '@lsst-sqre/gafaelfawr-client';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { TokenChangeHistoryEntry } from '../../hooks/useTokenChangeHistory';
-import * as useTokenChangeHistoryModule from '../../hooks/useTokenChangeHistory';
+
+import * as useRepertoireUrlModule from '../../hooks/useRepertoireUrl';
 import * as useTokenHistoryFiltersModule from '../../hooks/useTokenHistoryFilters';
 import TokenHistoryView from './TokenHistoryView';
 
@@ -17,12 +19,20 @@ vi.mock('next/router', () => ({
 }));
 
 // Mock hooks
-vi.mock('../../hooks/useTokenChangeHistory');
+vi.mock('@lsst-sqre/gafaelfawr-client', async (importOriginal) => {
+  const actual = await importOriginal<typeof gafaelfawrClient>();
+  return {
+    ...actual,
+    useTokenChangeHistory: vi.fn(),
+  };
+});
+vi.mock('../../hooks/useRepertoireUrl');
 vi.mock('../../hooks/useTokenHistoryFilters');
 
 const mockUseTokenChangeHistory = vi.mocked(
-  useTokenChangeHistoryModule.default
+  gafaelfawrClient.useTokenChangeHistory
 );
+const mockUseRepertoireUrl = vi.mocked(useRepertoireUrlModule.useRepertoireUrl);
 const mockUseTokenHistoryFilters = vi.mocked(
   useTokenHistoryFiltersModule.default
 );
@@ -52,6 +62,8 @@ describe('TokenHistoryView', () => {
     vi.clearAllMocks();
 
     // Default mock implementations
+    mockUseRepertoireUrl.mockReturnValue(undefined);
+
     mockUseTokenHistoryFilters.mockReturnValue({
       filters: {},
       setFilter: vi.fn(),
@@ -63,12 +75,13 @@ describe('TokenHistoryView', () => {
     mockUseTokenChangeHistory.mockReturnValue({
       entries: mockEntries,
       isLoading: false,
-      error: undefined,
+      isFetching: false,
+      error: null,
       hasMore: false,
       totalCount: 1,
       loadMore: vi.fn(),
       isLoadingMore: false,
-      mutate: vi.fn(),
+      refetch: vi.fn(),
     });
   });
 
@@ -76,12 +89,13 @@ describe('TokenHistoryView', () => {
     mockUseTokenChangeHistory.mockReturnValue({
       entries: undefined,
       isLoading: true,
-      error: undefined,
+      isFetching: true,
+      error: null,
       hasMore: false,
-      totalCount: undefined,
+      totalCount: null,
       loadMore: vi.fn(),
       isLoadingMore: false,
-      mutate: vi.fn(),
+      refetch: vi.fn(),
     });
 
     render(<TokenHistoryView username="testuser" />);
@@ -94,12 +108,13 @@ describe('TokenHistoryView', () => {
     mockUseTokenChangeHistory.mockReturnValue({
       entries: undefined,
       isLoading: false,
+      isFetching: false,
       error: mockError,
       hasMore: false,
-      totalCount: undefined,
+      totalCount: null,
       loadMore: vi.fn(),
       isLoadingMore: false,
-      mutate: vi.fn(),
+      refetch: vi.fn(),
     });
 
     render(<TokenHistoryView username="testuser" />);
@@ -115,12 +130,13 @@ describe('TokenHistoryView', () => {
     mockUseTokenChangeHistory.mockReturnValue({
       entries: [],
       isLoading: false,
-      error: undefined,
+      isFetching: false,
+      error: null,
       hasMore: false,
       totalCount: 0,
       loadMore: vi.fn(),
       isLoadingMore: false,
-      mutate: vi.fn(),
+      refetch: vi.fn(),
     });
 
     render(<TokenHistoryView username="testuser" />);
@@ -164,13 +180,17 @@ describe('TokenHistoryView', () => {
       />
     );
 
-    expect(mockUseTokenChangeHistory).toHaveBeenCalledWith('testuser', {
-      tokenType: undefined,
-      token: tokenKey,
-      since: undefined,
-      until: undefined,
-      ipAddress: undefined,
-    });
+    expect(mockUseTokenChangeHistory).toHaveBeenCalledWith(
+      'testuser',
+      {
+        tokenType: undefined,
+        token: tokenKey,
+        since: undefined,
+        until: undefined,
+        ipAddress: undefined,
+      },
+      undefined
+    );
   });
 
   it('passes initialTokenType to hook', () => {
@@ -180,7 +200,8 @@ describe('TokenHistoryView', () => {
       'testuser',
       expect.objectContaining({
         tokenType: 'user',
-      })
+      }),
+      undefined
     );
   });
 
@@ -188,12 +209,13 @@ describe('TokenHistoryView', () => {
     mockUseTokenChangeHistory.mockReturnValue({
       entries: mockEntries,
       isLoading: false,
-      error: undefined,
+      isFetching: false,
+      error: null,
       hasMore: false,
       totalCount: 42,
       loadMore: vi.fn(),
       isLoadingMore: false,
-      mutate: vi.fn(),
+      refetch: vi.fn(),
     });
 
     render(<TokenHistoryView username="testuser" />);
@@ -266,12 +288,13 @@ describe('TokenHistoryView', () => {
     mockUseTokenChangeHistory.mockReturnValue({
       entries: mockEntries,
       isLoading: false,
-      error: undefined,
+      isFetching: false,
+      error: null,
       hasMore: true,
       totalCount: 100,
       loadMore: mockLoadMore,
       isLoadingMore: false,
-      mutate: vi.fn(),
+      refetch: vi.fn(),
     });
 
     render(<TokenHistoryView username="testuser" />);

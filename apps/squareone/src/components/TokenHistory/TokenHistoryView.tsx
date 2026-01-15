@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
-import useTokenChangeHistory, {
+import {
   type TokenType,
-} from '../../hooks/useTokenChangeHistory';
+  useTokenChangeHistory,
+} from '@lsst-sqre/gafaelfawr-client';
+import React, { useState } from 'react';
+
+import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
 import useTokenHistoryFilters from '../../hooks/useTokenHistoryFilters';
 import TokenHistoryFilters from './TokenHistoryFilters';
 import TokenHistoryList from './TokenHistoryList';
@@ -29,13 +32,19 @@ export default function TokenHistoryView({
   token,
 }: TokenHistoryViewProps) {
   const [expandAll, setExpandAll] = useState(false);
+  const repertoireUrl = useRepertoireUrl();
 
   // URL-based filter state management
   const { filters, setFilter, clearAllFilters } = useTokenHistoryFilters();
 
   // Merge URL filters with props (token prop takes precedence)
+  // Convert initialTokenType to single string for gafaelfawr-client API
+  const tokenTypeFilter = Array.isArray(initialTokenType)
+    ? initialTokenType[0]
+    : initialTokenType;
+
   const effectiveFilters = {
-    tokenType: initialTokenType,
+    tokenType: tokenTypeFilter,
     token: token || filters.token,
     since: filters.since,
     until: filters.until,
@@ -51,7 +60,7 @@ export default function TokenHistoryView({
     totalCount,
     loadMore,
     isLoadingMore,
-  } = useTokenChangeHistory(username, effectiveFilters);
+  } = useTokenChangeHistory(username, effectiveFilters, repertoireUrl);
 
   const handleToggleExpandAll = () => {
     setExpandAll((prev) => !prev);
