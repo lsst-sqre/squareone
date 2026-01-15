@@ -14,7 +14,9 @@ export const discoveryQueryOptions = (repertoireUrl: string) =>
         repertoireUrl
       );
       try {
-        const result = await fetchServiceDiscovery(repertoireUrl, requestId);
+        const result = await fetchServiceDiscovery(repertoireUrl, {
+          requestId,
+        });
         console.log(
           `[Discovery:${requestId}] Successfully fetched, applications:`,
           result.applications

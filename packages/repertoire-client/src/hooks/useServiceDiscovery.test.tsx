@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { getEmptyDiscovery } from '../client';
+import { clearDiscoveryCache, getEmptyDiscovery } from '../client';
 import { mockDiscovery } from '../mock-discovery';
 import { ServiceDiscoveryQuery } from '../query';
 import { useServiceDiscovery } from './useServiceDiscovery';
@@ -26,6 +26,7 @@ const createWrapper = () => {
 describe('useServiceDiscovery', () => {
   beforeEach(() => {
     vi.stubGlobal('fetch', vi.fn());
+    clearDiscoveryCache(); // Clear cache before each test
   });
 
   afterEach(() => {
@@ -342,6 +343,9 @@ describe('useServiceDiscovery', () => {
       });
 
       const initialCallCount = mockFetch.mock.calls.length;
+
+      // Clear module-level cache to ensure refetch makes a network request
+      clearDiscoveryCache();
 
       // Trigger refetch
       await result.current.refetch();

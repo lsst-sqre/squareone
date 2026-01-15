@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { getEmptyDiscovery } from './client';
+import { clearDiscoveryCache, getEmptyDiscovery } from './client';
 import { mockDiscovery } from './mock-discovery';
 import { discoveryQueryOptions } from './query-options';
 
@@ -23,6 +23,7 @@ function getQueryFn(url: string) {
 describe('discoveryQueryOptions', () => {
   beforeEach(() => {
     vi.stubGlobal('fetch', vi.fn());
+    clearDiscoveryCache(); // Clear cache before each test
   });
 
   afterEach(() => {

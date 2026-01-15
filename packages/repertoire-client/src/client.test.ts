@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ZodError } from 'zod';
 import {
+  clearDiscoveryCache,
   fetchServiceDiscovery,
   getEmptyDiscovery,
   RepertoireError,
@@ -11,6 +12,7 @@ import { DiscoverySchema } from './schemas';
 describe('fetchServiceDiscovery', () => {
   beforeEach(() => {
     vi.stubGlobal('fetch', vi.fn());
+    clearDiscoveryCache(); // Clear cache before each test
   });
 
   afterEach(() => {
