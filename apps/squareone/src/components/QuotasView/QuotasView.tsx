@@ -1,14 +1,9 @@
-import {
-  type GafaelfawrQuota,
-  type GafaelfawrTapQuota,
-  KeyValueList,
-  type KeyValueListItem,
-} from '@lsst-sqre/squared';
-import React from 'react';
+import type { NotebookQuota, Quota } from '@lsst-sqre/gafaelfawr-client';
+import { KeyValueList, type KeyValueListItem } from '@lsst-sqre/squared';
 import styles from './QuotasView.module.css';
 
 type QuotasViewProps = {
-  quota: GafaelfawrQuota;
+  quota: Quota;
 };
 
 export default function QuotasView({ quota }: QuotasViewProps) {
@@ -61,9 +56,7 @@ export default function QuotasView({ quota }: QuotasViewProps) {
 /**
  * Convert notebook quota to KeyValueList items
  */
-function getNotebookItems(
-  notebook: NonNullable<GafaelfawrQuota['notebook']>
-): KeyValueListItem[] {
+function getNotebookItems(notebook: NotebookQuota): KeyValueListItem[] {
   const items: KeyValueListItem[] = [
     {
       key: 'CPU',
@@ -89,7 +82,8 @@ function getNotebookItems(
 /**
  * Convert API quota to KeyValueList items
  */
-function getApiItems(api: GafaelfawrQuota['api']): KeyValueListItem[] {
+function getApiItems(api: Quota['api']): KeyValueListItem[] {
+  if (!api) return [];
   return Object.entries(api)
     .sort(([a], [b]) => a.localeCompare(b)) // Sort alphabetically by service name
     .map(([service, limit]) => ({
@@ -101,10 +95,11 @@ function getApiItems(api: GafaelfawrQuota['api']): KeyValueListItem[] {
 /**
  * Convert TAP quota to KeyValueList items
  */
-function getTapItems(tap: GafaelfawrQuota['tap']): KeyValueListItem[] {
+function getTapItems(tap: Quota['tap']): KeyValueListItem[] {
+  if (!tap) return [];
   return Object.entries(tap)
     .sort(([a], [b]) => a.localeCompare(b)) // Sort alphabetically by service name
-    .map(([service, quotaObj]: [string, GafaelfawrTapQuota]) => ({
+    .map(([service, quotaObj]) => ({
       key: service,
       value: `${quotaObj.concurrent} concurrent ${
         quotaObj.concurrent === 1 ? 'query' : 'queries'
