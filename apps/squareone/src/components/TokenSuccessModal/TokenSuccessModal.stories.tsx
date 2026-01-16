@@ -10,10 +10,9 @@ const meta = {
   parameters: {
     layout: 'centered',
     nextjs: {
-      router: {
+      appDirectory: true,
+      navigation: {
         pathname: '/settings/tokens/new',
-        asPath: '/settings/tokens/new',
-        query: {},
       },
     },
   },
