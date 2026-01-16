@@ -5,6 +5,7 @@ siteDescription: |
   The site description.
 docsBaseUrl: 'https://rsp.lsst.io'
 semaphoreUrl: 'https://data-dev.lsst.cloud/semaphore'
+repertoireUrl: 'http://localhost:3000/repertoire'
 timesSquareUrl: 'http://localhost:3000/times-square/api'
 coManageRegistryUrl: 'https://id.lsst.cloud'
 enableAppsMenu: true

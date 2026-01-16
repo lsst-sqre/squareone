@@ -1,3 +1,9 @@
+import { discoveryQueryOptions } from '@lsst-sqre/repertoire-client';
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from '@tanstack/react-query';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
@@ -48,15 +54,17 @@ type RootLayoutProps = {
  * This layout:
  * 1. Imports global CSS (fonts, icons, design system)
  * 2. Loads configuration server-side
- * 3. Injects Sentry config for client-side error tracking
- * 4. Sets up provider hierarchy (Plausible, Config, Theme)
- * 5. Renders the page shell (Header, BroadcastBannerStack, Footer)
+ * 3. Prefetches service discovery data from Repertoire API
+ * 4. Injects Sentry config for client-side error tracking
+ * 5. Sets up provider hierarchy (Plausible, Config, Theme, Query)
+ * 6. Renders the page shell (Header, BroadcastBannerStack, Footer)
  *
  * Provider hierarchy matches _app.tsx:
  * PlausibleWrapper (conditional)
  *   └─ ConfigProvider
- *        └─ Providers (ThemeProvider)
- *             └─ Page shell (Header, content, Footer)
+ *        └─ Providers (QueryProvider, ThemeProvider)
+ *             └─ HydrationBoundary (prefetched query data)
+ *                  └─ Page shell (Header, content, Footer)
  *
  * The page shell uses a sticky footer pattern so the footer stays at the
  * bottom of the viewport even on short pages.
@@ -65,6 +73,27 @@ export default async function RootLayout({ children }: RootLayoutProps) {
   // Load config on server - Promise passed to client provider
   const configPromise = getStaticConfig();
   const config = await configPromise;
+
+  // Create QueryClient for server-side prefetching
+  const queryClient = new QueryClient();
+
+  // Prefetch service discovery if Repertoire URL is configured
+  console.log('[Layout] repertoireUrl from config:', config.repertoireUrl);
+  if (config.repertoireUrl) {
+    console.log('[Layout] Prefetching service discovery...');
+    await queryClient.prefetchQuery(
+      discoveryQueryOptions(config.repertoireUrl)
+    );
+    const cachedData = queryClient.getQueryData([
+      'service-discovery',
+      config.repertoireUrl,
+    ]);
+    console.log('[Layout] Prefetch complete, cached data:', cachedData);
+  } else {
+    console.log(
+      '[Layout] No repertoireUrl configured, skipping service discovery'
+    );
+  }
 
   // Compile footer MDX once at layout level
   const footerMdxContent = await compileFooterMdxForRsc();
@@ -78,16 +107,18 @@ export default async function RootLayout({ children }: RootLayoutProps) {
         <PlausibleWrapper domain={config.plausibleDomain}>
           <ConfigProvider configPromise={getStaticConfig()}>
             <Providers>
-              <div className={styles.layout}>
-                <div className={styles.upperContainer}>
-                  <Header />
-                  <BroadcastBannerStack semaphoreUrl={config.semaphoreUrl} />
-                  {children}
+              <HydrationBoundary state={dehydrate(queryClient)}>
+                <div className={styles.layout}>
+                  <div className={styles.upperContainer}>
+                    <Header />
+                    <BroadcastBannerStack semaphoreUrl={config.semaphoreUrl} />
+                    {children}
+                  </div>
+                  <div className={styles.stickyFooterContainer}>
+                    <FooterRsc mdxContent={footerMdxContent} />
+                  </div>
                 </div>
-                <div className={styles.stickyFooterContainer}>
-                  <FooterRsc mdxContent={footerMdxContent} />
-                </div>
-              </div>
+              </HydrationBoundary>
             </Providers>
           </ConfigProvider>
         </PlausibleWrapper>

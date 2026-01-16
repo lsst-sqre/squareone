@@ -1,4 +1,5 @@
-import useSWR, { type Fetcher } from 'swr';
+import type { Fetcher } from 'swr';
+import useSWR from 'swr';
 import fetch from 'unfetch';
 
 type GafaelfawrGroup = {
