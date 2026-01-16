@@ -1,8 +1,8 @@
+import type { TokenInfo } from '@lsst-sqre/gafaelfawr-client';
 import type { BadgeColor } from '@lsst-sqre/squared';
 import { Badge, Button } from '@lsst-sqre/squared';
 import Link from 'next/link';
 import { useState } from 'react';
-import type { TokenInfo } from '../../hooks/useUserTokens';
 import DeleteTokenModal from '../AccessTokensView/DeleteTokenModal';
 import TokenDate from '../TokenDate';
 import {

@@ -1,9 +1,8 @@
+import { type TokenInfo, useDeleteToken } from '@lsst-sqre/gafaelfawr-client';
 import type { BadgeColor } from '@lsst-sqre/squared';
 import { Badge, Button } from '@lsst-sqre/squared';
 import Link from 'next/link';
 import React, { useState } from 'react';
-import useDeleteToken from '../../hooks/useDeleteToken';
-import type { TokenInfo } from '../../hooks/useUserTokens';
 import DeleteTokenModal from '../AccessTokensView/DeleteTokenModal';
 import TokenDate from '../TokenDate';
 import { formatTokenExpiration } from '../TokenDate/formatters';
@@ -19,6 +18,7 @@ function getScopeColor(scope: string): BadgeColor {
 type SessionTokenItemProps = {
   token: TokenInfo;
   username: string;
+  repertoireUrl?: string;
   onDeleteSuccess?: () => void;
   onDeleteError?: (error: Error) => void;
 };
@@ -26,11 +26,12 @@ type SessionTokenItemProps = {
 export default function SessionTokenItem({
   token,
   username,
+  repertoireUrl,
   onDeleteSuccess,
   onDeleteError,
 }: SessionTokenItemProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { deleteToken, isDeleting, error } = useDeleteToken();
+  const { deleteToken, isDeleting, error } = useDeleteToken(repertoireUrl);
 
   const handleDeleteClick = () => {
     setIsModalOpen(true);

@@ -1,5 +1,5 @@
+import type { TokenInfo } from '@lsst-sqre/gafaelfawr-client';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import type { TokenInfo } from '../../hooks/useUserTokens';
 import AccessTokenItem from './AccessTokenItem';
 import styles from './AccessTokensView.module.css';
 

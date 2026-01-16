@@ -1,6 +1,6 @@
+import type { TokenInfo } from '@lsst-sqre/gafaelfawr-client';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { fn } from 'storybook/test';
-import type { TokenInfo } from '../../hooks/useUserTokens';
 import AccessTokenItem from './AccessTokenItem';
 
 // Mock token data
