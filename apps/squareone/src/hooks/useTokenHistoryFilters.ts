@@ -1,6 +1,6 @@
+import type { TokenType } from '@lsst-sqre/gafaelfawr-client';
 import { useRouter } from 'next/router';
 import { useCallback, useMemo } from 'react';
-import type { TokenType } from './useTokenChangeHistory';
 
 export type TokenHistoryFilters = {
   tokenType?: TokenType;

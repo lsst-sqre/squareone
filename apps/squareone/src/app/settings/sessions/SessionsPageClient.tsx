@@ -54,6 +54,7 @@ function SessionsContent() {
                 <SessionTokensView
                   username={userInfo.username}
                   tokenType="session"
+                  repertoireUrl={repertoireUrl}
                 />
               </div>
               <div style={{ marginTop: 'var(--sqo-space-lg-fixed)' }}>
@@ -73,6 +74,7 @@ function SessionsContent() {
                 <SessionTokensView
                   username={userInfo.username}
                   tokenType="notebook"
+                  repertoireUrl={repertoireUrl}
                 />
               </div>
               <div style={{ marginTop: 'var(--sqo-space-lg-fixed)' }}>
@@ -92,6 +94,7 @@ function SessionsContent() {
                 <SessionTokensView
                   username={userInfo.username}
                   tokenType="internal"
+                  repertoireUrl={repertoireUrl}
                 />
               </div>
               <div style={{ marginTop: 'var(--sqo-space-lg-fixed)' }}>

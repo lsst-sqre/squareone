@@ -1,6 +1,6 @@
+import type { TokenInfo } from '@lsst-sqre/gafaelfawr-client';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { fn } from 'storybook/test';
-import type { TokenInfo } from '../../hooks/useUserTokens';
 import SessionTokenItem from './SessionTokenItem';
 
 // Mock token data
