@@ -1,5 +1,119 @@
 # squareone
 
+## 0.31.0
+
+### Minor Changes
+
+- [#354](https://github.com/lsst-sqre/squareone/pull/354) [`2d91039`](https://github.com/lsst-sqre/squareone/commit/2d910391d908c9c573969c9246965a82debe9a49) Thanks [@jonathansick](https://github.com/jonathansick)! - Migrated four pages from Pages Router to App Router:
+
+  - Home page (`/`)
+  - Docs page (`/docs`)
+  - Support page (`/support`)
+  - API Aspect page (`/api-aspect`)
+
+  Created the App Router foundation:
+
+  - Root layout (`src/app/layout.tsx`) with PageShell integration
+  - Providers wrapper (`src/app/providers.tsx`) for theme and config contexts
+  - Force dynamic rendering to support runtime configuration loading
+
+- [#354](https://github.com/lsst-sqre/squareone/pull/354) [`2d91039`](https://github.com/lsst-sqre/squareone/commit/2d910391d908c9c573969c9246965a82debe9a49) Thanks [@jonathansick](https://github.com/jonathansick)! - New React Server Components-compatible utilities for loading server-side configuration and MDX content
+
+  - **Config loading** (`src/lib/config/rsc/loader.ts`): Server-side configuration loading using React's `cache()` for request deduplication
+  - **MDX compilation** (`src/lib/mdx/rsc/compiler.ts`): RSC-compatible MDX content compilation for server components
+  - **ConfigProvider** (`src/contexts/rsc/ConfigProvider.tsx`): Context provider using React 19's `use()` hook to bridge server-loaded config to client components
+  - **useStaticConfig** hook (`src/hooks/useStaticConfig.ts`) provides seamless configuration access across both router patterns
+
+  These utilities enable the same configuration and content patterns used in Pages Router while leveraging RSC benefits like reduced client bundle size.
+
+- [#357](https://github.com/lsst-sqre/squareone/pull/357) [`8d837f6`](https://github.com/lsst-sqre/squareone/commit/8d837f68b671f2f4ecafd41cc3d97ab4958c0baa) Thanks [@jonathansick](https://github.com/jonathansick)! - New `@lsst-sqre/repertoire-client` package for Rubin Science Platform service discovery
+
+  This package provides a reusable client for the Repertoire API, enabling dynamic service discovery across monorepo apps:
+
+  - **Zod schemas** for runtime validation of API responses
+  - **ServiceDiscoveryQuery** class with convenience methods for querying applications, services, and datasets
+  - **TanStack Query integration** with `discoveryQueryOptions()` for server prefetching and client-side caching
+  - **useServiceDiscovery hook** for client components with automatic hydration support
+  - **Mock data** for development and testing
+
+  Integrated into squareone:
+
+  - Added TanStack Query providers with server-side prefetching in root layout
+  - Components can now use `useServiceDiscovery()` to check service availability
+  - Service URLs dynamically discovered instead of hard-coded in configuration
+
+### Patch Changes
+
+- [#361](https://github.com/lsst-sqre/squareone/pull/361) [`3914272`](https://github.com/lsst-sqre/squareone/commit/39142723cc43696f25f887f428ae3c84d9a9fefc) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @biomejs/biome from 2.3.8 to 2.3.11
+
+- [#345](https://github.com/lsst-sqre/squareone/pull/345) [`df80f21`](https://github.com/lsst-sqre/squareone/commit/df80f21c4c540d96f0d208155b9ec7c1b06607b1) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @sentry/nextjs from 10.27.0 to 10.32.1
+
+- [#344](https://github.com/lsst-sqre/squareone/pull/344) [`a9c0c82`](https://github.com/lsst-sqre/squareone/commit/a9c0c8264ea25f0f5e972fa29568d78fa7216af7) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-a11y from 10.1.4 to 10.1.11
+
+- [#344](https://github.com/lsst-sqre/squareone/pull/344) [`a9c0c82`](https://github.com/lsst-sqre/squareone/commit/a9c0c8264ea25f0f5e972fa29568d78fa7216af7) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-docs from 10.1.4 to 10.1.11
+
+- [#344](https://github.com/lsst-sqre/squareone/pull/344) [`a9c0c82`](https://github.com/lsst-sqre/squareone/commit/a9c0c8264ea25f0f5e972fa29568d78fa7216af7) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-links from 10.1.4 to 10.1.11
+
+- [#344](https://github.com/lsst-sqre/squareone/pull/344) [`a9c0c82`](https://github.com/lsst-sqre/squareone/commit/a9c0c8264ea25f0f5e972fa29568d78fa7216af7) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-onboarding from 10.1.4 to 10.1.11
+
+- [#344](https://github.com/lsst-sqre/squareone/pull/344) [`a9c0c82`](https://github.com/lsst-sqre/squareone/commit/a9c0c8264ea25f0f5e972fa29568d78fa7216af7) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-themes from 10.1.4 to 10.1.11
+
+- [#344](https://github.com/lsst-sqre/squareone/pull/344) [`a9c0c82`](https://github.com/lsst-sqre/squareone/commit/a9c0c8264ea25f0f5e972fa29568d78fa7216af7) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-vitest from 10.1.4 to 10.1.11
+
+- [#359](https://github.com/lsst-sqre/squareone/pull/359) [`f0010d1`](https://github.com/lsst-sqre/squareone/commit/f0010d1473ea2639f1126ca715daaf1544a518af) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/nextjs-vite from 10.1.7 to 10.1.11
+
+- [#344](https://github.com/lsst-sqre/squareone/pull/344) [`a9c0c82`](https://github.com/lsst-sqre/squareone/commit/a9c0c8264ea25f0f5e972fa29568d78fa7216af7) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/react-vite from 10.1.4 to 10.1.11
+
+- [#361](https://github.com/lsst-sqre/squareone/pull/361) [`3914272`](https://github.com/lsst-sqre/squareone/commit/39142723cc43696f25f887f428ae3c84d9a9fefc) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @testing-library/react from 16.3.0 to 16.3.1
+
+- [#362](https://github.com/lsst-sqre/squareone/pull/362) [`b9c6ec6`](https://github.com/lsst-sqre/squareone/commit/b9c6ec6123d92ee9f51c3e8db8d24674c5a70168) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @turbo/gen from 2.6.3 to 2.7.2
+
+- [#361](https://github.com/lsst-sqre/squareone/pull/361) [`3914272`](https://github.com/lsst-sqre/squareone/commit/39142723cc43696f25f887f428ae3c84d9a9fefc) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @types/node from 22.19.1 to 22.19.5
+
+- [#365](https://github.com/lsst-sqre/squareone/pull/365) [`58052ea`](https://github.com/lsst-sqre/squareone/commit/58052eabaed4393a0d36c047a01ca8fb84706799) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @types/react from 19.2.7 to 19.2.8 in the react group
+
+- [#361](https://github.com/lsst-sqre/squareone/pull/361) [`3914272`](https://github.com/lsst-sqre/squareone/commit/39142723cc43696f25f887f428ae3c84d9a9fefc) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @vitejs/plugin-react from 5.1.1 to 5.1.2
+
+- [#354](https://github.com/lsst-sqre/squareone/pull/354) [`2d91039`](https://github.com/lsst-sqre/squareone/commit/2d910391d908c9c573969c9246965a82debe9a49) Thanks [@jonathansick](https://github.com/jonathansick)! - Add App Router error boundaries
+
+  Added error handling for the App Router migration:
+
+  - `error.tsx`: Catches errors in route segments and displays a recovery UI
+  - `global-error.tsx`: Root-level error boundary for errors in the layout itself
+
+  Both integrate with the existing design system and provide user-friendly error recovery options.
+
+- [#343](https://github.com/lsst-sqre/squareone/pull/343) [`73cd26e`](https://github.com/lsst-sqre/squareone/commit/73cd26e183caa8f5d51270c0c4f1ca50f32391b1) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump eslint-config-next from 15.5.7 to 15.5.9 in the nextjs group
+
+- [#362](https://github.com/lsst-sqre/squareone/pull/362) [`b9c6ec6`](https://github.com/lsst-sqre/squareone/commit/b9c6ec6123d92ee9f51c3e8db8d24674c5a70168) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump eslint-config-turbo from 2.6.3 to 2.7.2
+
+- [#344](https://github.com/lsst-sqre/squareone/pull/344) [`a9c0c82`](https://github.com/lsst-sqre/squareone/commit/a9c0c8264ea25f0f5e972fa29568d78fa7216af7) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump eslint-plugin-storybook from 10.1.4 to 10.1.11
+
+- [#364](https://github.com/lsst-sqre/squareone/pull/364) [`7c7123a`](https://github.com/lsst-sqre/squareone/commit/7c7123afda56a5fb6256e224a6ab3300883ca6e6) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump msw from 2.12.4 to 2.12.7
+
+- [#341](https://github.com/lsst-sqre/squareone/pull/341) [`dda7c4b`](https://github.com/lsst-sqre/squareone/commit/dda7c4b018b70f842757f6a77200f0689661ea81) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump next from 15.5.7 to 15.5.9
+
+- [#345](https://github.com/lsst-sqre/squareone/pull/345) [`df80f21`](https://github.com/lsst-sqre/squareone/commit/df80f21c4c540d96f0d208155b9ec7c1b06607b1) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump react-day-picker from 9.11.2 to 9.13.0
+
+- [#342](https://github.com/lsst-sqre/squareone/pull/342) [`4c8991c`](https://github.com/lsst-sqre/squareone/commit/4c8991ce4a614e8a07a816a3e7024f65a549eb40) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump react-dom from 19.2.1 to 19.2.3
+
+- [#345](https://github.com/lsst-sqre/squareone/pull/345) [`df80f21`](https://github.com/lsst-sqre/squareone/commit/df80f21c4c540d96f0d208155b9ec7c1b06607b1) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump react-hook-form from 7.66.1 to 7.70.0 in the runtime group
+
+- [#342](https://github.com/lsst-sqre/squareone/pull/342) [`4c8991c`](https://github.com/lsst-sqre/squareone/commit/4c8991ce4a614e8a07a816a3e7024f65a549eb40) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump react from 19.2.1 to 19.2.3
+
+- [#336](https://github.com/lsst-sqre/squareone/pull/336) [`bf8e71a`](https://github.com/lsst-sqre/squareone/commit/bf8e71a27eb92749dd59ccccd494a5e3993788ff) Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! - Add TypeScript interfaces for Sentry configuration type safety. Introduces a shared `SentryConfig` interface in the config loader and uses it in `_document.tsx` to replace `any` types, improving type safety and removing biome-ignore lint suppressions.
+
+- [#344](https://github.com/lsst-sqre/squareone/pull/344) [`a9c0c82`](https://github.com/lsst-sqre/squareone/commit/a9c0c8264ea25f0f5e972fa29568d78fa7216af7) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump storybook from 10.1.4 to 10.1.11
+
+- [#345](https://github.com/lsst-sqre/squareone/pull/345) [`df80f21`](https://github.com/lsst-sqre/squareone/commit/df80f21c4c540d96f0d208155b9ec7c1b06607b1) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump swr from 2.3.6 to 2.3.8
+
+- [#362](https://github.com/lsst-sqre/squareone/pull/362) [`b9c6ec6`](https://github.com/lsst-sqre/squareone/commit/b9c6ec6123d92ee9f51c3e8db8d24674c5a70168) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump turbo from 2.6.3 to 2.7.2
+
+- [#361](https://github.com/lsst-sqre/squareone/pull/361) [`3914272`](https://github.com/lsst-sqre/squareone/commit/39142723cc43696f25f887f428ae3c84d9a9fefc) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump yaml from 2.8.1 to 2.8.2
+
+- Updated dependencies [[`8d837f6`](https://github.com/lsst-sqre/squareone/commit/8d837f68b671f2f4ecafd41cc3d97ab4958c0baa)]:
+  - @lsst-sqre/repertoire-client@0.2.0
+
 ## 0.30.0
 
 ### Minor Changes
