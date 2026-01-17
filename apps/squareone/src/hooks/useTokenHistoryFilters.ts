@@ -1,5 +1,5 @@
 import type { TokenType } from '@lsst-sqre/gafaelfawr-client';
-import { useRouter } from 'next/router';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useMemo } from 'react';
 
 export type TokenHistoryFilters = {
@@ -24,8 +24,8 @@ type UseTokenHistoryFiltersReturn = {
 /**
  * Parse date from ISO string in URL parameter
  */
-function parseDate(value: string | string[] | undefined): Date | undefined {
-  if (!value || Array.isArray(value)) return undefined;
+function parseDate(value: string | null): Date | undefined {
+  if (!value) return undefined;
   try {
     const date = new Date(value);
     return Number.isNaN(date.getTime()) ? undefined : date;
@@ -37,10 +37,8 @@ function parseDate(value: string | string[] | undefined): Date | undefined {
 /**
  * Parse token type from URL parameter
  */
-function parseTokenType(
-  value: string | string[] | undefined
-): TokenType | undefined {
-  if (!value || Array.isArray(value)) return undefined;
+function parseTokenType(value: string | null): TokenType | undefined {
+  if (!value) return undefined;
   const validTypes: TokenType[] = [
     'session',
     'user',
@@ -57,32 +55,34 @@ function parseTokenType(
 /**
  * Parse string from URL parameter
  */
-function parseString(value: string | string[] | undefined): string | undefined {
-  if (!value || Array.isArray(value)) return undefined;
+function parseString(value: string | null): string | undefined {
+  if (!value) return undefined;
   return value;
 }
 
 /**
  * A React hook for managing token history filter state via URL query parameters.
  *
- * Uses Next.js router for URL state management with shallow routing to avoid
- * full page reloads. Serializes dates as ISO strings and handles null/undefined values.
+ * Uses Next.js App Router navigation hooks for URL state management.
+ * Serializes dates as ISO strings and handles null/undefined values.
  *
  * @returns Object containing current filters and functions to update them
  */
 export default function useTokenHistoryFilters(): UseTokenHistoryFiltersReturn {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  // Parse current filters from URL query parameters
+  // Parse current filters from URL search params
   const filters = useMemo<TokenHistoryFilters>(() => {
     return {
-      tokenType: parseTokenType(router.query.token_type),
-      token: parseString(router.query.token),
-      since: parseDate(router.query.since),
-      until: parseDate(router.query.until),
-      ipAddress: parseString(router.query.ip_address),
+      tokenType: parseTokenType(searchParams.get('token_type')),
+      token: parseString(searchParams.get('token')),
+      since: parseDate(searchParams.get('since')),
+      until: parseDate(searchParams.get('until')),
+      ipAddress: parseString(searchParams.get('ip_address')),
     };
-  }, [router.query]);
+  }, [searchParams]);
 
   /**
    * Update a single filter value in the URL
@@ -92,7 +92,7 @@ export default function useTokenHistoryFilters(): UseTokenHistoryFiltersReturn {
       key: K,
       value: TokenHistoryFilters[K]
     ) => {
-      const query = { ...router.query };
+      const params = new URLSearchParams(searchParams.toString());
 
       // Map filter key to URL parameter name
       const paramName =
@@ -104,25 +104,19 @@ export default function useTokenHistoryFilters(): UseTokenHistoryFiltersReturn {
 
       if (value === undefined || value === null) {
         // Remove parameter if value is undefined or null
-        delete query[paramName];
+        params.delete(paramName);
       } else if (value instanceof Date) {
         // Serialize Date as ISO string
-        query[paramName] = value.toISOString();
+        params.set(paramName, value.toISOString());
       } else {
         // Set as string
-        query[paramName] = String(value);
+        params.set(paramName, String(value));
       }
 
-      router.push(
-        {
-          pathname: router.pathname,
-          query,
-        },
-        undefined,
-        { shallow: true }
-      );
+      const queryString = params.toString();
+      router.push(queryString ? `${pathname}?${queryString}` : pathname);
     },
-    [router]
+    [router, pathname, searchParams]
   );
 
   /**
@@ -139,15 +133,8 @@ export default function useTokenHistoryFilters(): UseTokenHistoryFiltersReturn {
    * Clear all filters from the URL
    */
   const clearAllFilters = useCallback(() => {
-    router.push(
-      {
-        pathname: router.pathname,
-        query: {},
-      },
-      undefined,
-      { shallow: true }
-    );
-  }, [router]);
+    router.push(pathname);
+  }, [router, pathname]);
 
   /**
    * Set IP address filter and reset all other filters
@@ -155,16 +142,9 @@ export default function useTokenHistoryFilters(): UseTokenHistoryFiltersReturn {
    */
   const setIpAddressFilter = useCallback(
     (ipAddress: string) => {
-      router.push(
-        {
-          pathname: router.pathname,
-          query: { ip_address: ipAddress },
-        },
-        undefined,
-        { shallow: true }
-      );
+      router.push(`${pathname}?ip_address=${encodeURIComponent(ipAddress)}`);
     },
-    [router]
+    [router, pathname]
   );
 
   return {
