@@ -1,18 +1,20 @@
+import { useUserTokens } from '@lsst-sqre/gafaelfawr-client';
 import React from 'react';
-import useUserTokens from '../../hooks/useUserTokens';
 import SessionTokenItem from './SessionTokenItem';
 import styles from './SessionTokensView.module.css';
 
 type SessionTokensViewProps = {
   username: string;
   tokenType: 'session' | 'notebook' | 'internal';
+  repertoireUrl?: string;
 };
 
 export default function SessionTokensView({
   username,
   tokenType,
+  repertoireUrl,
 }: SessionTokensViewProps) {
-  const { tokens, error, isLoading } = useUserTokens(username);
+  const { tokens, error, isLoading } = useUserTokens(username, repertoireUrl);
 
   // Filter to specified token type and sort by created (most recent first)
   const sessionTokens = tokens
@@ -49,7 +51,12 @@ export default function SessionTokensView({
   return (
     <div className={styles.container}>
       {sessionTokens.map((token) => (
-        <SessionTokenItem key={token.token} token={token} username={username} />
+        <SessionTokenItem
+          key={token.token}
+          token={token}
+          username={username}
+          repertoireUrl={repertoireUrl}
+        />
       ))}
     </div>
   );

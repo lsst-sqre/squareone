@@ -1,17 +1,22 @@
+import type { TokenInfo } from '@lsst-sqre/gafaelfawr-client';
+import * as gafaelfawrClient from '@lsst-sqre/gafaelfawr-client';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { TokenInfo } from '../../hooks/useUserTokens';
 
-// Mock the hooks
-vi.mock('../../hooks/useTokenDetails', () => ({
-  default: vi.fn(),
-}));
+import * as useRepertoireUrlModule from '../../hooks/useRepertoireUrl';
 
-vi.mock('../../hooks/useDeleteToken', () => ({
-  default: vi.fn(),
-}));
+// Mock hooks
+vi.mock('@lsst-sqre/gafaelfawr-client', async (importOriginal) => {
+  const actual = await importOriginal<typeof gafaelfawrClient>();
+  return {
+    ...actual,
+    useTokenDetails: vi.fn(),
+    useDeleteToken: vi.fn(),
+  };
+});
+vi.mock('../../hooks/useRepertoireUrl');
 
 vi.mock('../TokenDate/formatters', () => ({
   formatTokenExpiration: vi.fn((expires) => {
@@ -43,12 +48,11 @@ vi.mock('../TokenHistory/TokenHistoryView', () => ({
   ),
 }));
 
-import useDeleteToken from '../../hooks/useDeleteToken';
-import useTokenDetails from '../../hooks/useTokenDetails';
 import TokenDetailsView from './TokenDetailsView';
 
-const mockUseTokenDetails = vi.mocked(useTokenDetails);
-const mockUseDeleteToken = vi.mocked(useDeleteToken);
+const mockUseTokenDetails = vi.mocked(gafaelfawrClient.useTokenDetails);
+const mockUseDeleteToken = vi.mocked(gafaelfawrClient.useDeleteToken);
+const mockUseRepertoireUrl = vi.mocked(useRepertoireUrlModule.useRepertoireUrl);
 
 describe('TokenDetailsView', () => {
   const baseToken: TokenInfo = {
@@ -65,21 +69,27 @@ describe('TokenDetailsView', () => {
   };
 
   const mockDeleteToken = vi.fn();
-  const mockMutate = vi.fn();
+  const mockRefetch = vi.fn();
   const mockOnDeleteSuccess = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
+
+    // Mock useRepertoireUrl to return undefined (default behavior)
+    mockUseRepertoireUrl.mockReturnValue(undefined);
+
     mockUseTokenDetails.mockReturnValue({
       token: baseToken,
-      error: undefined,
+      error: null,
       isLoading: false,
-      mutate: mockMutate,
+      isPending: false,
+      refetch: mockRefetch,
     });
     mockUseDeleteToken.mockReturnValue({
       deleteToken: mockDeleteToken,
       isDeleting: false,
-      error: undefined,
+      error: null,
+      reset: vi.fn(),
     });
   });
 
@@ -102,9 +112,10 @@ describe('TokenDetailsView', () => {
     };
     mockUseTokenDetails.mockReturnValue({
       token: tokenWithoutName,
-      error: undefined,
+      error: null,
       isLoading: false,
-      mutate: mockMutate,
+      isPending: false,
+      refetch: mockRefetch,
     });
 
     render(
@@ -123,9 +134,10 @@ describe('TokenDetailsView', () => {
     };
     mockUseTokenDetails.mockReturnValue({
       token: tokenWithParent,
-      error: undefined,
+      error: null,
       isLoading: false,
-      mutate: mockMutate,
+      isPending: false,
+      refetch: mockRefetch,
     });
 
     render(
@@ -154,9 +166,10 @@ describe('TokenDetailsView', () => {
     };
     mockUseTokenDetails.mockReturnValue({
       token: sessionToken,
-      error: undefined,
+      error: null,
       isLoading: false,
-      mutate: mockMutate,
+      isPending: false,
+      refetch: mockRefetch,
     });
 
     render(
@@ -183,9 +196,10 @@ describe('TokenDetailsView', () => {
   it('displays loading state', () => {
     mockUseTokenDetails.mockReturnValue({
       token: undefined,
-      error: undefined,
+      error: null,
       isLoading: true,
-      mutate: mockMutate,
+      isPending: true,
+      refetch: mockRefetch,
     });
 
     render(
@@ -200,7 +214,8 @@ describe('TokenDetailsView', () => {
       token: undefined,
       error: new Error('HTTP 404: Not Found'),
       isLoading: false,
-      mutate: mockMutate,
+      isPending: false,
+      refetch: mockRefetch,
     });
 
     render(
@@ -233,7 +248,8 @@ describe('TokenDetailsView', () => {
       token: undefined,
       error: new Error('Network error'),
       isLoading: false,
-      mutate: mockMutate,
+      isPending: false,
+      refetch: mockRefetch,
     });
 
     render(
@@ -321,9 +337,10 @@ describe('TokenDetailsView', () => {
     };
     mockUseTokenDetails.mockReturnValue({
       token: tokenWithoutScopes,
-      error: undefined,
+      error: null,
       isLoading: false,
-      mutate: mockMutate,
+      isPending: false,
+      refetch: mockRefetch,
     });
 
     render(

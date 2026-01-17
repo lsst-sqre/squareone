@@ -1,13 +1,21 @@
+import type { TokenInfo } from '@lsst-sqre/gafaelfawr-client';
+import * as gafaelfawrClient from '@lsst-sqre/gafaelfawr-client';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { TokenInfo } from '../../hooks/useUserTokens';
 
-// Mock the hooks
-vi.mock('../../hooks/useDeleteToken', () => ({
-  default: vi.fn(),
-}));
+import * as useRepertoireUrlModule from '../../hooks/useRepertoireUrl';
+
+// Mock hooks
+vi.mock('@lsst-sqre/gafaelfawr-client', async (importOriginal) => {
+  const actual = await importOriginal<typeof gafaelfawrClient>();
+  return {
+    ...actual,
+    useDeleteToken: vi.fn(),
+  };
+});
+vi.mock('../../hooks/useRepertoireUrl');
 
 vi.mock('../TokenDate/formatters', () => ({
   formatTokenExpiration: vi.fn((expires) => {
@@ -21,10 +29,10 @@ vi.mock('../TokenDate/formatters', () => ({
   }),
 }));
 
-import useDeleteToken from '../../hooks/useDeleteToken';
 import AccessTokenItem from './AccessTokenItem';
 
-const mockUseDeleteToken = vi.mocked(useDeleteToken);
+const mockUseDeleteToken = vi.mocked(gafaelfawrClient.useDeleteToken);
+const mockUseRepertoireUrl = vi.mocked(useRepertoireUrlModule.useRepertoireUrl);
 
 describe('AccessTokenItem', () => {
   const baseToken: TokenInfo = {
@@ -46,10 +54,15 @@ describe('AccessTokenItem', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+
+    // Mock useRepertoireUrl to return undefined (default behavior)
+    mockUseRepertoireUrl.mockReturnValue(undefined);
+
     mockUseDeleteToken.mockReturnValue({
       deleteToken: mockDeleteToken,
       isDeleting: false,
-      error: undefined,
+      error: null,
+      reset: vi.fn(),
     });
   });
 
@@ -242,6 +255,7 @@ describe('AccessTokenItem', () => {
       deleteToken: mockDeleteToken,
       isDeleting: false,
       error,
+      reset: vi.fn(),
     });
 
     render(

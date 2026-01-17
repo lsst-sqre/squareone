@@ -1,0 +1,52 @@
+{
+  "name": "@lsst-sqre/gafaelfawr-client",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Gafaelfawr authentication API client with TanStack Query integration",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./hooks": {
+      "types": "./src/hooks/index.ts",
+      "default": "./src/hooks/index.ts"
+    }
+  },
+  "files": [
+    "src/**"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "test": "vitest run",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint . --ext .ts,.tsx",
+    "clean": "rm -rf node_modules",
+    "fetch-openapi": "curl -o openapi.json https://data.lsst.cloud/auth/openapi.json"
+  },
+  "dependencies": {
+    "zod": "^3.24.0"
+  },
+  "peerDependencies": {
+    "@lsst-sqre/repertoire-client": "workspace:*",
+    "@tanstack/react-query": "^5",
+    "react": "^18 || ^19"
+  },
+  "devDependencies": {
+    "@anatine/zod-mock": "^3.13.4",
+    "@faker-js/faker": "^9.3.0",
+    "@lsst-sqre/eslint-config": "workspace:*",
+    "@lsst-sqre/repertoire-client": "workspace:*",
+    "@lsst-sqre/tsconfig": "workspace:*",
+    "@tanstack/react-query": "^5.62.8",
+    "@testing-library/react": "^16.1.0",
+    "@types/react": "^19.0.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

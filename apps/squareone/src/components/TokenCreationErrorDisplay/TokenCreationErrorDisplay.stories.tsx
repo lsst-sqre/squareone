@@ -1,4 +1,4 @@
-import type { TokenCreationError } from '../../hooks/useTokenCreation';
+import type { TokenCreationError } from '@lsst-sqre/gafaelfawr-client';
 import TokenCreationErrorDisplay from './TokenCreationErrorDisplay';
 
 export default {

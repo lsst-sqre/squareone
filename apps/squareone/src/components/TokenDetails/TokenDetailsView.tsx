@@ -1,9 +1,10 @@
+import { useDeleteToken, useTokenDetails } from '@lsst-sqre/gafaelfawr-client';
 import type { BadgeColor } from '@lsst-sqre/squared';
 import { Badge, Button } from '@lsst-sqre/squared';
 import Link from 'next/link';
 import React, { useState } from 'react';
-import useDeleteToken from '../../hooks/useDeleteToken';
-import useTokenDetails from '../../hooks/useTokenDetails';
+
+import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
 import DeleteTokenModal from '../AccessTokensView/DeleteTokenModal';
 import TokenDate from '../TokenDate';
 import {
@@ -39,8 +40,13 @@ export default function TokenDetailsView({
   onDeleteSuccess,
   returnUrl = '/settings/tokens',
 }: TokenDetailsViewProps) {
-  const { token, error, isLoading } = useTokenDetails(username, tokenKey);
-  const { deleteToken, isDeleting } = useDeleteToken();
+  const repertoireUrl = useRepertoireUrl();
+  const { token, error, isLoading } = useTokenDetails(
+    username,
+    tokenKey,
+    repertoireUrl
+  );
+  const { deleteToken, isDeleting } = useDeleteToken(repertoireUrl);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const handleDeleteClick = () => {

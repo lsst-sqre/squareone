@@ -1,5 +1,5 @@
 import { Button, ClipboardButton, Modal } from '@lsst-sqre/squared';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import React, { useEffect, useRef } from 'react';
 import type { ExpirationValue } from '../../lib/tokens/expiration';
 import styles from './TokenSuccessModal.module.css';

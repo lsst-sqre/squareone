@@ -1,8 +1,7 @@
+import { type LoginInfo, useLoginInfo } from '@lsst-sqre/gafaelfawr-client';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { TokenForm, type TokenFormValues } from '../../components/TokenForm';
-import type { LoginInfo } from '../../hooks/useLoginInfo';
-import useLoginInfo from '../../hooks/useLoginInfo';
 import { parseExpirationFromQuery } from '../../lib/tokens/expiration';
 import { parseTokenQueryParams } from '../../lib/tokens/queryParams';
 
@@ -103,11 +102,12 @@ function MockFetchProvider({
 
 function NewTokenPageSimulator() {
   const router = useRouter();
+  // Pass undefined for repertoireUrl since we mock fetch directly
   const {
     loginInfo,
     error: loginError,
     isLoading: loginLoading,
-  } = useLoginInfo();
+  } = useLoginInfo(undefined);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const queryParams = parseTokenQueryParams(router.query);
