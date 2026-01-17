@@ -1,37 +1,34 @@
 import { act, renderHook } from '@testing-library/react';
-import { useRouter } from 'next/router';
-import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import useTokenHistoryFilters from './useTokenHistoryFilters';
 
-// Mock Next.js router
-vi.mock('next/router', () => ({
-  useRouter: vi.fn(),
+// Mock Next.js App Router navigation hooks
+const mockPush = vi.fn();
+const mockPathname = '/settings/tokens/history';
+let mockSearchParams = new URLSearchParams();
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: mockPush,
+  }),
+  usePathname: () => mockPathname,
+  useSearchParams: () => mockSearchParams,
 }));
 
 describe('useTokenHistoryFilters', () => {
-  let mockPush: ReturnType<typeof vi.fn>;
-  // biome-ignore lint/suspicious/noExplicitAny: Test router mock accepts any methods
-  let mockRouter: any;
-
   beforeEach(() => {
-    mockPush = vi.fn();
-    mockRouter = {
-      pathname: '/settings/tokens/history',
-      query: {},
-      push: mockPush,
-    };
-    vi.mocked(useRouter).mockReturnValue(mockRouter);
+    mockPush.mockClear();
+    mockSearchParams = new URLSearchParams();
   });
 
   it('should parse filters from URL query parameters', () => {
-    mockRouter.query = {
+    mockSearchParams = new URLSearchParams({
       token_type: 'user',
       token: '5KVApqcVbSQWtO3VIRgOhQ',
       since: '2025-01-01T00:00:00.000Z',
       until: '2025-12-31T23:59:59.000Z',
       ip_address: '192.168.1.1',
-    };
+    });
 
     const { result } = renderHook(() => useTokenHistoryFilters());
 
@@ -47,7 +44,7 @@ describe('useTokenHistoryFilters', () => {
   });
 
   it('should return empty filters when no query parameters', () => {
-    mockRouter.query = {};
+    mockSearchParams = new URLSearchParams();
 
     const { result } = renderHook(() => useTokenHistoryFilters());
 
@@ -59,6 +56,8 @@ describe('useTokenHistoryFilters', () => {
   });
 
   it('should set a string filter', () => {
+    mockSearchParams = new URLSearchParams();
+
     const { result } = renderHook(() => useTokenHistoryFilters());
 
     act(() => {
@@ -66,16 +65,13 @@ describe('useTokenHistoryFilters', () => {
     });
 
     expect(mockPush).toHaveBeenCalledWith(
-      {
-        pathname: '/settings/tokens/history',
-        query: { token: '5KVApqcVbSQWtO3VIRgOhQ' },
-      },
-      undefined,
-      { shallow: true }
+      '/settings/tokens/history?token=5KVApqcVbSQWtO3VIRgOhQ'
     );
   });
 
   it('should set a token type filter', () => {
+    mockSearchParams = new URLSearchParams();
+
     const { result } = renderHook(() => useTokenHistoryFilters());
 
     act(() => {
@@ -83,16 +79,13 @@ describe('useTokenHistoryFilters', () => {
     });
 
     expect(mockPush).toHaveBeenCalledWith(
-      {
-        pathname: '/settings/tokens/history',
-        query: { token_type: 'user' },
-      },
-      undefined,
-      { shallow: true }
+      '/settings/tokens/history?token_type=user'
     );
   });
 
   it('should set a date filter', () => {
+    mockSearchParams = new URLSearchParams();
+
     const { result } = renderHook(() => useTokenHistoryFilters());
     const testDate = new Date('2025-01-01T00:00:00.000Z');
 
@@ -101,16 +94,13 @@ describe('useTokenHistoryFilters', () => {
     });
 
     expect(mockPush).toHaveBeenCalledWith(
-      {
-        pathname: '/settings/tokens/history',
-        query: { since: '2025-01-01T00:00:00.000Z' },
-      },
-      undefined,
-      { shallow: true }
+      '/settings/tokens/history?since=2025-01-01T00%3A00%3A00.000Z'
     );
   });
 
   it('should set an IP address filter', () => {
+    mockSearchParams = new URLSearchParams();
+
     const { result } = renderHook(() => useTokenHistoryFilters());
 
     act(() => {
@@ -118,17 +108,14 @@ describe('useTokenHistoryFilters', () => {
     });
 
     expect(mockPush).toHaveBeenCalledWith(
-      {
-        pathname: '/settings/tokens/history',
-        query: { ip_address: '192.168.1.1' },
-      },
-      undefined,
-      { shallow: true }
+      '/settings/tokens/history?ip_address=192.168.1.1'
     );
   });
 
   it('should preserve existing filters when setting a new one', () => {
-    mockRouter.query = { token: '5KVApqcVbSQWtO3VIRgOhQ' };
+    mockSearchParams = new URLSearchParams({
+      token: '5KVApqcVbSQWtO3VIRgOhQ',
+    });
 
     const { result } = renderHook(() => useTokenHistoryFilters());
 
@@ -136,24 +123,17 @@ describe('useTokenHistoryFilters', () => {
       result.current.setFilter('tokenType', 'user');
     });
 
+    // URLSearchParams preserves order, so token comes first
     expect(mockPush).toHaveBeenCalledWith(
-      {
-        pathname: '/settings/tokens/history',
-        query: {
-          token: '5KVApqcVbSQWtO3VIRgOhQ',
-          token_type: 'user',
-        },
-      },
-      undefined,
-      { shallow: true }
+      '/settings/tokens/history?token=5KVApqcVbSQWtO3VIRgOhQ&token_type=user'
     );
   });
 
   it('should clear a single filter', () => {
-    mockRouter.query = {
+    mockSearchParams = new URLSearchParams({
       token: '5KVApqcVbSQWtO3VIRgOhQ',
       token_type: 'user',
-    };
+    });
 
     const { result } = renderHook(() => useTokenHistoryFilters());
 
@@ -162,21 +142,16 @@ describe('useTokenHistoryFilters', () => {
     });
 
     expect(mockPush).toHaveBeenCalledWith(
-      {
-        pathname: '/settings/tokens/history',
-        query: { token_type: 'user' },
-      },
-      undefined,
-      { shallow: true }
+      '/settings/tokens/history?token_type=user'
     );
   });
 
   it('should clear all filters', () => {
-    mockRouter.query = {
+    mockSearchParams = new URLSearchParams({
       token: '5KVApqcVbSQWtO3VIRgOhQ',
       token_type: 'user',
       since: '2025-01-01T00:00:00.000Z',
-    };
+    });
 
     const { result } = renderHook(() => useTokenHistoryFilters());
 
@@ -184,21 +159,14 @@ describe('useTokenHistoryFilters', () => {
       result.current.clearAllFilters();
     });
 
-    expect(mockPush).toHaveBeenCalledWith(
-      {
-        pathname: '/settings/tokens/history',
-        query: {},
-      },
-      undefined,
-      { shallow: true }
-    );
+    expect(mockPush).toHaveBeenCalledWith('/settings/tokens/history');
   });
 
   it('should set IP address filter and reset all other filters', () => {
-    mockRouter.query = {
+    mockSearchParams = new URLSearchParams({
       token: '5KVApqcVbSQWtO3VIRgOhQ',
       token_type: 'user',
-    };
+    });
 
     const { result } = renderHook(() => useTokenHistoryFilters());
 
@@ -207,20 +175,15 @@ describe('useTokenHistoryFilters', () => {
     });
 
     expect(mockPush).toHaveBeenCalledWith(
-      {
-        pathname: '/settings/tokens/history',
-        query: { ip_address: '192.168.1.1' },
-      },
-      undefined,
-      { shallow: true }
+      '/settings/tokens/history?ip_address=192.168.1.1'
     );
   });
 
   it('should handle invalid date strings', () => {
-    mockRouter.query = {
+    mockSearchParams = new URLSearchParams({
       since: 'invalid-date',
       until: 'also-invalid',
-    };
+    });
 
     const { result } = renderHook(() => useTokenHistoryFilters());
 
@@ -229,31 +192,19 @@ describe('useTokenHistoryFilters', () => {
   });
 
   it('should handle invalid token types', () => {
-    mockRouter.query = {
+    mockSearchParams = new URLSearchParams({
       token_type: 'invalid_type',
-    };
+    });
 
     const { result } = renderHook(() => useTokenHistoryFilters());
 
-    expect(result.current.filters.tokenType).toBeUndefined();
-  });
-
-  it('should handle array query parameters by ignoring them', () => {
-    mockRouter.query = {
-      token: ['value1', 'value2'],
-      token_type: ['user', 'session'],
-    };
-
-    const { result } = renderHook(() => useTokenHistoryFilters());
-
-    expect(result.current.filters.token).toBeUndefined();
     expect(result.current.filters.tokenType).toBeUndefined();
   });
 
   it('should remove filter when setting to undefined', () => {
-    mockRouter.query = {
+    mockSearchParams = new URLSearchParams({
       token: '5KVApqcVbSQWtO3VIRgOhQ',
-    };
+    });
 
     const { result } = renderHook(() => useTokenHistoryFilters());
 
@@ -261,20 +212,13 @@ describe('useTokenHistoryFilters', () => {
       result.current.setFilter('token', undefined);
     });
 
-    expect(mockPush).toHaveBeenCalledWith(
-      {
-        pathname: '/settings/tokens/history',
-        query: {},
-      },
-      undefined,
-      { shallow: true }
-    );
+    expect(mockPush).toHaveBeenCalledWith('/settings/tokens/history');
   });
 
   it('should remove filter when setting to null', () => {
-    mockRouter.query = {
+    mockSearchParams = new URLSearchParams({
       token: '5KVApqcVbSQWtO3VIRgOhQ',
-    };
+    });
 
     const { result } = renderHook(() => useTokenHistoryFilters());
 
@@ -283,42 +227,7 @@ describe('useTokenHistoryFilters', () => {
       result.current.setFilter('token', null as any);
     });
 
-    expect(mockPush).toHaveBeenCalledWith(
-      {
-        pathname: '/settings/tokens/history',
-        query: {},
-      },
-      undefined,
-      { shallow: true }
-    );
-  });
-
-  it('should use shallow routing for all operations', () => {
-    const { result } = renderHook(() => useTokenHistoryFilters());
-
-    // Test setFilter
-    act(() => {
-      result.current.setFilter('token', 'test');
-    });
-    expect(mockPush).toHaveBeenLastCalledWith(expect.anything(), undefined, {
-      shallow: true,
-    });
-
-    // Test clearAllFilters
-    act(() => {
-      result.current.clearAllFilters();
-    });
-    expect(mockPush).toHaveBeenLastCalledWith(expect.anything(), undefined, {
-      shallow: true,
-    });
-
-    // Test setIpAddressFilter
-    act(() => {
-      result.current.setIpAddressFilter('192.168.1.1');
-    });
-    expect(mockPush).toHaveBeenLastCalledWith(expect.anything(), undefined, {
-      shallow: true,
-    });
+    expect(mockPush).toHaveBeenCalledWith('/settings/tokens/history');
   });
 
   it('should parse all valid token types', () => {
@@ -332,7 +241,7 @@ describe('useTokenHistoryFilters', () => {
     ];
 
     validTypes.forEach((type) => {
-      mockRouter.query = { token_type: type };
+      mockSearchParams = new URLSearchParams({ token_type: type });
       const { result } = renderHook(() => useTokenHistoryFilters());
       expect(result.current.filters.tokenType).toBe(type);
     });
