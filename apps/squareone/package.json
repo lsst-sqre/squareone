@@ -37,7 +37,7 @@
     "@lsst-sqre/rubin-style-dictionary": "workspace:*",
     "@lsst-sqre/repertoire-client": "workspace:*",
     "@lsst-sqre/squared": "workspace:*",
-    "@tanstack/react-query": "^5.62.0",
+    "@tanstack/react-query": "^5.90.18",
     "@microsoft/fetch-event-source": "^2.0.1",
     "@sentry/nextjs": "^10.33.0",
     "ajv": "^8.11.0",
