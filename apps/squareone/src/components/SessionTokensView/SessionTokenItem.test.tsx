@@ -1,13 +1,18 @@
+import type { TokenInfo } from '@lsst-sqre/gafaelfawr-client';
+import * as gafaelfawrClient from '@lsst-sqre/gafaelfawr-client';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { TokenInfo } from '../../hooks/useUserTokens';
 
-// Mock the hooks
-vi.mock('../../hooks/useDeleteToken', () => ({
-  default: vi.fn(),
-}));
+// Mock the gafaelfawr-client hooks
+vi.mock('@lsst-sqre/gafaelfawr-client', async () => {
+  const actual = await vi.importActual('@lsst-sqre/gafaelfawr-client');
+  return {
+    ...actual,
+    useDeleteToken: vi.fn(),
+  };
+});
 
 vi.mock('../TokenDate/formatters', () => ({
   formatTokenExpiration: vi.fn((expires) => {
@@ -21,10 +26,9 @@ vi.mock('../TokenDate/formatters', () => ({
   }),
 }));
 
-import useDeleteToken from '../../hooks/useDeleteToken';
 import SessionTokenItem from './SessionTokenItem';
 
-const mockUseDeleteToken = vi.mocked(useDeleteToken);
+const mockUseDeleteToken = vi.mocked(gafaelfawrClient.useDeleteToken);
 
 describe('SessionTokenItem', () => {
   const now = Math.floor(Date.now() / 1000);
@@ -74,7 +78,8 @@ describe('SessionTokenItem', () => {
     mockUseDeleteToken.mockReturnValue({
       deleteToken: mockDeleteToken,
       isDeleting: false,
-      error: undefined,
+      error: null,
+      reset: vi.fn(),
     });
   });
 
@@ -315,6 +320,7 @@ describe('SessionTokenItem', () => {
       deleteToken: mockDeleteToken,
       isDeleting: false,
       error,
+      reset: vi.fn(),
     });
 
     render(

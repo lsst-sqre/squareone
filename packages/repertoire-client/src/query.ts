@@ -153,10 +153,14 @@ export class ServiceDiscoveryQuery {
   }
 
   /**
-   * Get Gafaelfawr (auth service) URL.
+   * Get Gafaelfawr (auth service) v1 API URL.
+   * Returns the versioned v1 endpoint URL, or undefined if not available.
+   * Note: The base gafaelfawr URL is the service root, not the API endpoint,
+   * so we specifically need the v1 version URL for API calls.
    */
   getGafaelfawrUrl(): string | undefined {
-    return this.getInternalServiceUrl('gafaelfawr');
+    const service = this.getInternalService('gafaelfawr');
+    return service?.versions?.v1?.url;
   }
 
   /**

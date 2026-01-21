@@ -1,9 +1,10 @@
+import { type TokenInfo, useDeleteToken } from '@lsst-sqre/gafaelfawr-client';
 import type { BadgeColor } from '@lsst-sqre/squared';
 import { Badge, Button } from '@lsst-sqre/squared';
 import Link from 'next/link';
 import React, { useState } from 'react';
-import useDeleteToken from '../../hooks/useDeleteToken';
-import type { TokenInfo } from '../../hooks/useUserTokens';
+
+import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
 import TokenDate from '../TokenDate';
 import { formatTokenExpiration } from '../TokenDate/formatters';
 import styles from './AccessTokenItem.module.css';
@@ -30,7 +31,8 @@ export default function AccessTokenItem({
   onDeleteError,
 }: AccessTokenItemProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { deleteToken, isDeleting, error } = useDeleteToken();
+  const repertoireUrl = useRepertoireUrl();
+  const { deleteToken, isDeleting, error } = useDeleteToken(repertoireUrl);
 
   const handleDeleteClick = () => {
     setIsModalOpen(true);

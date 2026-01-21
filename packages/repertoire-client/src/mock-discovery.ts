@@ -40,9 +40,13 @@ export const mockDiscovery: ServiceDiscovery = {
   services: {
     internal: {
       gafaelfawr: {
-        url: 'https://data.lsst.cloud/auth/api/v1',
+        url: 'https://data.lsst.cloud/auth',
         openapi: 'https://data.lsst.cloud/auth/openapi.json',
-        versions: {},
+        versions: {
+          v1: {
+            url: 'https://data.lsst.cloud/auth/api/v1',
+          },
+        },
       },
       semaphore: {
         url: 'https://data.lsst.cloud/semaphore',

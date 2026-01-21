@@ -1,9 +1,10 @@
 /* Login component with proper hydration handling */
 
+import { useUserInfo } from '@lsst-sqre/gafaelfawr-client';
 import { getLoginUrl, PrimaryNavigation } from '@lsst-sqre/squared';
 import { useEffect, useState } from 'react';
 
-import useUserInfo from '../../hooks/useUserInfo';
+import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
 import styles from './Login.module.css';
 import UserMenu from './UserMenu';
 
@@ -13,7 +14,8 @@ type LoginProps = {
 
 export default function Login({ pageUrl }: LoginProps) {
   const [hasMounted, setHasMounted] = useState(false);
-  const { isLoggedIn, isLoading } = useUserInfo();
+  const repertoireUrl = useRepertoireUrl();
+  const { isLoggedIn, isLoading } = useUserInfo(repertoireUrl);
 
   useEffect(() => {
     setHasMounted(true);

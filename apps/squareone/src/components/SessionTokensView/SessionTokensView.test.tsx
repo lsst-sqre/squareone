@@ -1,20 +1,23 @@
+import type { TokenInfo } from '@lsst-sqre/gafaelfawr-client';
+import * as gafaelfawrClient from '@lsst-sqre/gafaelfawr-client';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { TokenInfo } from '../../hooks/useUserTokens';
 
-// Mock the hooks
-vi.mock('../../hooks/useUserTokens', () => ({
-  default: vi.fn(),
-}));
-
-vi.mock('../../hooks/useDeleteToken', () => ({
-  default: vi.fn(() => ({
-    deleteToken: vi.fn(),
-    isDeleting: false,
-    error: undefined,
-  })),
-}));
+// Mock the gafaelfawr-client hooks
+vi.mock('@lsst-sqre/gafaelfawr-client', async () => {
+  const actual = await vi.importActual('@lsst-sqre/gafaelfawr-client');
+  return {
+    ...actual,
+    useUserTokens: vi.fn(),
+    useDeleteToken: vi.fn(() => ({
+      deleteToken: vi.fn(),
+      isDeleting: false,
+      error: null,
+      reset: vi.fn(),
+    })),
+  };
+});
 
 vi.mock('../TokenDate/formatters', () => ({
   formatTokenExpiration: vi.fn((expires) => {
@@ -28,10 +31,9 @@ vi.mock('../TokenDate/formatters', () => ({
   }),
 }));
 
-import useUserTokens from '../../hooks/useUserTokens';
 import SessionTokensView from './SessionTokensView';
 
-const mockUseUserTokens = vi.mocked(useUserTokens);
+const mockUseUserTokens = vi.mocked(gafaelfawrClient.useUserTokens);
 
 describe('SessionTokensView', () => {
   const now = Math.floor(Date.now() / 1000);
@@ -112,7 +114,10 @@ describe('SessionTokensView', () => {
       tokens: undefined,
       error: undefined,
       isLoading: true,
-      mutate: vi.fn(),
+      query: null,
+      isPending: false,
+      refetch: vi.fn(),
+      invalidate: vi.fn(),
     });
 
     render(<SessionTokensView username="testuser" tokenType="session" />);
@@ -126,7 +131,10 @@ describe('SessionTokensView', () => {
       tokens: undefined,
       error,
       isLoading: false,
-      mutate: vi.fn(),
+      query: null,
+      isPending: false,
+      refetch: vi.fn(),
+      invalidate: vi.fn(),
     });
 
     render(<SessionTokensView username="testuser" tokenType="session" />);
@@ -141,7 +149,10 @@ describe('SessionTokensView', () => {
       tokens: mockSessionTokens,
       error: undefined,
       isLoading: false,
-      mutate: vi.fn(),
+      query: null,
+      isPending: false,
+      refetch: vi.fn(),
+      invalidate: vi.fn(),
     });
 
     render(<SessionTokensView username="testuser" tokenType="session" />);
@@ -155,7 +166,10 @@ describe('SessionTokensView', () => {
       tokens: mockNotebookTokens,
       error: undefined,
       isLoading: false,
-      mutate: vi.fn(),
+      query: null,
+      isPending: false,
+      refetch: vi.fn(),
+      invalidate: vi.fn(),
     });
 
     render(<SessionTokensView username="testuser" tokenType="notebook" />);
@@ -168,7 +182,10 @@ describe('SessionTokensView', () => {
       tokens: mockInternalTokens,
       error: undefined,
       isLoading: false,
-      mutate: vi.fn(),
+      query: null,
+      isPending: false,
+      refetch: vi.fn(),
+      invalidate: vi.fn(),
     });
 
     render(<SessionTokensView username="testuser" tokenType="internal" />);
@@ -188,7 +205,10 @@ describe('SessionTokensView', () => {
       tokens: mixedTokens,
       error: undefined,
       isLoading: false,
-      mutate: vi.fn(),
+      query: null,
+      isPending: false,
+      refetch: vi.fn(),
+      invalidate: vi.fn(),
     });
 
     render(<SessionTokensView username="testuser" tokenType="session" />);
@@ -208,7 +228,10 @@ describe('SessionTokensView', () => {
       tokens: mockSessionTokens,
       error: undefined,
       isLoading: false,
-      mutate: vi.fn(),
+      query: null,
+      isPending: false,
+      refetch: vi.fn(),
+      invalidate: vi.fn(),
     });
 
     const { container } = render(
@@ -230,7 +253,10 @@ describe('SessionTokensView', () => {
       tokens: [],
       error: undefined,
       isLoading: false,
-      mutate: vi.fn(),
+      query: null,
+      isPending: false,
+      refetch: vi.fn(),
+      invalidate: vi.fn(),
     });
 
     const { container } = render(
@@ -245,7 +271,10 @@ describe('SessionTokensView', () => {
       tokens: mockUserTokens,
       error: undefined,
       isLoading: false,
-      mutate: vi.fn(),
+      query: null,
+      isPending: false,
+      refetch: vi.fn(),
+      invalidate: vi.fn(),
     });
 
     const { container } = render(
@@ -271,7 +300,10 @@ describe('SessionTokensView', () => {
       tokens: tokensWithoutCreated,
       error: undefined,
       isLoading: false,
-      mutate: vi.fn(),
+      query: null,
+      isPending: false,
+      refetch: vi.fn(),
+      invalidate: vi.fn(),
     });
 
     render(<SessionTokensView username="testuser" tokenType="session" />);
@@ -306,7 +338,10 @@ describe('SessionTokensView', () => {
       tokens: tokensWithMixedDates,
       error: undefined,
       isLoading: false,
-      mutate: vi.fn(),
+      query: null,
+      isPending: false,
+      refetch: vi.fn(),
+      invalidate: vi.fn(),
     });
 
     const { container } = render(
@@ -328,7 +363,10 @@ describe('SessionTokensView', () => {
       tokens: mockSessionTokens,
       error: undefined,
       isLoading: false,
-      mutate: vi.fn(),
+      query: null,
+      isPending: false,
+      refetch: vi.fn(),
+      invalidate: vi.fn(),
     });
 
     render(<SessionTokensView username="testuser" tokenType="session" />);

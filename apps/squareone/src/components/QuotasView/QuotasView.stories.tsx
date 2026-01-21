@@ -1,4 +1,4 @@
-import type { GafaelfawrQuota } from '@lsst-sqre/squared';
+import type { Quota } from '@lsst-sqre/gafaelfawr-client';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import QuotasView from './QuotasView';
 
@@ -15,7 +15,7 @@ export default meta;
 type Story = StoryObj<typeof QuotasView>;
 
 // Full quota data with all sections
-const fullQuota: GafaelfawrQuota = {
+const fullQuota: Quota = {
   api: {
     datalinker: 500,
     hips: 2000,
@@ -35,7 +35,7 @@ const fullQuota: GafaelfawrQuota = {
 };
 
 // Quota with notebook spawning disabled
-const quotaWithSpawnDisabled: GafaelfawrQuota = {
+const quotaWithSpawnDisabled: Quota = {
   api: {
     datalinker: 500,
     hips: 2000,
@@ -53,7 +53,7 @@ const quotaWithSpawnDisabled: GafaelfawrQuota = {
 };
 
 // Quota with only notebook data
-const notebookOnlyQuota: GafaelfawrQuota = {
+const notebookOnlyQuota: Quota = {
   api: {},
   notebook: {
     cpu: 8,
@@ -64,7 +64,7 @@ const notebookOnlyQuota: GafaelfawrQuota = {
 };
 
 // Quota with only API data
-const apiOnlyQuota: GafaelfawrQuota = {
+const apiOnlyQuota: Quota = {
   api: {
     datalinker: 1000,
     hips: 5000,
@@ -75,7 +75,7 @@ const apiOnlyQuota: GafaelfawrQuota = {
 };
 
 // Quota with only TAP data
-const tapOnlyQuota: GafaelfawrQuota = {
+const tapOnlyQuota: Quota = {
   api: {},
   notebook: null,
   tap: {
@@ -89,7 +89,7 @@ const tapOnlyQuota: GafaelfawrQuota = {
 };
 
 // Minimal quota with no sections (edge case)
-const emptyQuota: GafaelfawrQuota = {
+const emptyQuota: Quota = {
   api: {},
   notebook: null,
   tap: {},

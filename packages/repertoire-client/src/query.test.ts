@@ -85,7 +85,7 @@ describe('ServiceDiscoveryQuery', () => {
       const query = createDiscoveryQuery(mockDiscovery);
 
       expect(query.getInternalServiceUrl('gafaelfawr')).toBe(
-        'https://data.lsst.cloud/auth/api/v1'
+        'https://data.lsst.cloud/auth'
       );
       expect(query.getInternalServiceUrl('semaphore')).toBe(
         'https://data.lsst.cloud/semaphore'
@@ -103,7 +103,7 @@ describe('ServiceDiscoveryQuery', () => {
       const gafaelfawr = query.getInternalService('gafaelfawr');
 
       expect(gafaelfawr).toBeDefined();
-      expect(gafaelfawr?.url).toBe('https://data.lsst.cloud/auth/api/v1');
+      expect(gafaelfawr?.url).toBe('https://data.lsst.cloud/auth');
       expect(gafaelfawr?.openapi).toBe(
         'https://data.lsst.cloud/auth/openapi.json'
       );

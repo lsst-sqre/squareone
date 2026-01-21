@@ -277,7 +277,7 @@ describe('useServiceDiscovery', () => {
         'https://data.lsst.cloud/portal/app'
       );
       expect(query?.getInternalServiceUrl('gafaelfawr')).toBe(
-        'https://data.lsst.cloud/auth/api/v1'
+        'https://data.lsst.cloud/auth'
       );
       expect(query?.getSemaphoreUrl()).toBe(
         'https://data.lsst.cloud/semaphore'

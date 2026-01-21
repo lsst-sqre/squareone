@@ -1,18 +1,47 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { userEvent, within } from 'storybook/test';
-import { AppConfigProvider } from '../../contexts/AppConfigContext';
-import SettingsLayout from './SettingsLayout';
+import SettingsLayoutClient from '../../app/settings/SettingsLayoutClient';
+import type { AppConfigContextValue } from '../../contexts/AppConfigContext';
 
-const meta: Meta<typeof SettingsLayout> = {
+// Default mock configuration for Storybook stories
+const defaultConfig: AppConfigContextValue = {
+  siteName: 'Rubin Science Platform',
+  siteDescription:
+    'The Rubin Science Platform (RSP) provides web-based data access and analysis tools.',
+  showPreview: true,
+  previewLink: 'https://rsp.lsst.io/roadmap.html',
+  docsBaseUrl: 'https://rsp.lsst.io',
+  enableAppsMenu: false,
+  appLinks: [],
+  baseUrl: 'http://localhost:3000',
+  coManageRegistryUrl: null,
+  timesSquareUrl: null,
+  environmentName: 'storybook',
+  sentryDsn: null,
+  semaphoreUrl: null,
+  plausibleDomain: null,
+  mdxDir: '/mock/mdx',
+};
+
+const meta: Meta<typeof SettingsLayoutClient> = {
   title: 'Components/SettingsLayout',
-  component: SettingsLayout,
+  component: SettingsLayoutClient,
   parameters: {
     layout: 'fullscreen',
+    nextjs: {
+      appDirectory: true,
+      navigation: {
+        pathname: '/settings',
+      },
+    },
+  },
+  args: {
+    config: defaultConfig,
   },
 };
 
 export default meta;
-type Story = StoryObj<typeof SettingsLayout>;
+type Story = StoryObj<typeof SettingsLayoutClient>;
 
 export const DefaultLayout: Story = {
   args: {
@@ -61,7 +90,8 @@ export const AccountPageActive: Story = {
   },
   parameters: {
     nextjs: {
-      router: {
+      appDirectory: true,
+      navigation: {
         pathname: '/settings',
       },
     },
@@ -93,7 +123,8 @@ export const AccessTokensPageActive: Story = {
   },
   parameters: {
     nextjs: {
-      router: {
+      appDirectory: true,
+      navigation: {
         pathname: '/settings/tokens',
       },
     },
@@ -127,7 +158,8 @@ export const SessionsPageActive: Story = {
   },
   parameters: {
     nextjs: {
-      router: {
+      appDirectory: true,
+      navigation: {
         pathname: '/settings/sessions',
       },
     },
@@ -159,7 +191,8 @@ export const MobileLayout: Story = {
   },
   parameters: {
     nextjs: {
-      router: {
+      appDirectory: true,
+      navigation: {
         pathname: '/settings',
       },
     },
@@ -257,7 +290,8 @@ export const LongContent: Story = {
   },
   parameters: {
     nextjs: {
-      router: {
+      appDirectory: true,
+      navigation: {
         pathname: '/settings/tokens',
       },
     },
@@ -265,66 +299,19 @@ export const LongContent: Story = {
 };
 
 // Mock configurations for testing dynamic features
-const configWithSessionsHidden = {
-  siteName: 'Rubin Science Platform',
-  siteDescription:
-    'The Rubin Science Platform (RSP) provides web-based data access and analysis tools.',
-  showPreview: true,
-  previewLink: 'https://rsp.lsst.io/roadmap.html',
-  docsBaseUrl: 'https://rsp.lsst.io',
-  enableAppsMenu: false,
-  appLinks: [],
-  baseUrl: 'http://localhost:3000',
-  coManageRegistryUrl: null,
-  timesSquareUrl: null,
-  environmentName: 'storybook',
-  sentryDsn: null,
-  semaphoreUrl: null,
-  plausibleDomain: null,
-  mdxDir: '/mock/mdx',
+const configWithSessionsHidden: AppConfigContextValue = {
+  ...defaultConfig,
   settingsSessionsVisible: false,
 };
 
-const configWithSessionsVisible = {
-  siteName: 'Rubin Science Platform',
-  siteDescription:
-    'The Rubin Science Platform (RSP) provides web-based data access and analysis tools.',
-  showPreview: true,
-  previewLink: 'https://rsp.lsst.io/roadmap.html',
-  docsBaseUrl: 'https://rsp.lsst.io',
-  enableAppsMenu: false,
-  appLinks: [],
-  baseUrl: 'http://localhost:3000',
-  coManageRegistryUrl: null,
-  timesSquareUrl: null,
-  environmentName: 'storybook',
-  sentryDsn: null,
-  semaphoreUrl: null,
-  plausibleDomain: null,
-  mdxDir: '/mock/mdx',
+const configWithSessionsVisible: AppConfigContextValue = {
+  ...defaultConfig,
   settingsSessionsVisible: true,
 };
 
-// Mock user data for testing user context
-const _mockUser = {
-  username: 'jdoe',
-  name: 'Jane Doe',
-  email: 'jane.doe@example.com',
-  uid: 12345,
-  gid: 12345,
-};
-
-// Create a mock for the useGafaelfawrUser hook
-const _mockUseGafaelfawrUser = (userData: unknown) => ({
-  user: userData,
-  isLoading: false,
-  isValidating: false,
-  isLoggedIn: !!userData,
-  error: null,
-});
-
 export const SessionsHidden: Story = {
   args: {
+    config: configWithSessionsHidden,
     children: (
       <div>
         <h1>Sessions Navigation Hidden</h1>
@@ -349,16 +336,10 @@ export const SessionsHidden: Story = {
       </div>
     ),
   },
-  decorators: [
-    (Story) => (
-      <AppConfigProvider config={configWithSessionsHidden}>
-        <Story />
-      </AppConfigProvider>
-    ),
-  ],
   parameters: {
     nextjs: {
-      router: {
+      appDirectory: true,
+      navigation: {
         pathname: '/settings',
       },
     },
@@ -367,6 +348,7 @@ export const SessionsHidden: Story = {
 
 export const SessionsVisible: Story = {
   args: {
+    config: configWithSessionsVisible,
     children: (
       <div>
         <h1>Sessions Navigation Visible</h1>
@@ -392,16 +374,10 @@ export const SessionsVisible: Story = {
       </div>
     ),
   },
-  decorators: [
-    (Story) => (
-      <AppConfigProvider config={configWithSessionsVisible}>
-        <Story />
-      </AppConfigProvider>
-    ),
-  ],
   parameters: {
     nextjs: {
-      router: {
+      appDirectory: true,
+      navigation: {
         pathname: '/settings',
       },
     },
