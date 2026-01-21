@@ -39,6 +39,7 @@
     "@lsst-sqre/repertoire-client": "workspace:*",
     "@lsst-sqre/squared": "workspace:*",
     "@tanstack/react-query": "^5.90.20",
+    "@lsst-sqre/times-square-client": "workspace:*",
     "@microsoft/fetch-event-source": "^2.0.1",
     "@sentry/nextjs": "^10.35.0",
     "ajv": "^8.11.0",

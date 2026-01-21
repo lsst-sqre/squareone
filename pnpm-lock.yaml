@@ -74,6 +74,9 @@ importers:
       '@lsst-sqre/squared':
         specifier: workspace:*
         version: link:../../packages/squared
+      '@lsst-sqre/times-square-client':
+        specifier: workspace:*
+        version: link:../../packages/times-square-client
       '@microsoft/fetch-event-source':
         specifier: ^2.0.1
         version: 2.0.1
@@ -578,13 +581,13 @@ importers:
         version: link:../tsconfig
       '@tanstack/react-query':
         specifier: ^5.62.8
-        version: 5.90.18(react@19.2.3)
+        version: 5.90.20(react@19.2.3)
       '@testing-library/react':
         specifier: ^16.1.0
-        version: 16.3.1(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.8))(@types/react@19.2.8)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.9))(@types/react@19.2.9)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@types/react':
         specifier: ^19.0.1
-        version: 19.2.8
+        version: 19.2.9
       react:
         specifier: ^19.0.0
         version: 19.2.3
@@ -596,7 +599,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^2.1.8
-        version: 2.1.9(@types/node@25.0.9)(jsdom@26.1.0)(less@4.4.1)(lightningcss@1.30.2)(msw@2.12.7(@types/node@25.0.9)(typescript@5.9.3))(sass@1.91.0)(stylus@0.62.0)(terser@5.46.0)
+        version: 2.1.9(@types/node@25.0.10)(jsdom@26.1.0)(less@4.4.1)(lightningcss@1.31.1)(msw@2.12.7(@types/node@25.0.10)(typescript@5.9.3))(sass@1.91.0)(stylus@0.62.0)(terser@5.46.0)
 
   packages/tsconfig: {}
 
