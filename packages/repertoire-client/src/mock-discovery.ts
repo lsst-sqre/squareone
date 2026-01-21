@@ -53,6 +53,15 @@ export const mockDiscovery: ServiceDiscovery = {
         openapi: null,
         versions: {},
       },
+      'times-square': {
+        url: 'https://data.lsst.cloud/times-square/api',
+        openapi: 'https://data.lsst.cloud/times-square/api/openapi.json',
+        versions: {
+          v1: {
+            url: 'https://data.lsst.cloud/times-square/api/v1',
+          },
+        },
+      },
     },
     ui: {
       // UI services only have url field per OpenAPI spec
@@ -61,9 +70,6 @@ export const mockDiscovery: ServiceDiscovery = {
       },
       nublado: {
         url: 'https://data.lsst.cloud/nb',
-      },
-      'times-square': {
-        url: 'https://data.lsst.cloud/times-square',
       },
     },
   },

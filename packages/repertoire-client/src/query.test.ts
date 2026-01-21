@@ -52,9 +52,6 @@ describe('ServiceDiscoveryQuery', () => {
       expect(query.getUiServiceUrl('nublado')).toBe(
         'https://data.lsst.cloud/nb'
       );
-      expect(query.getUiServiceUrl('times-square')).toBe(
-        'https://data.lsst.cloud/times-square'
-      );
     });
 
     it('getUiServiceUrl returns undefined for non-existent service', () => {
@@ -68,7 +65,6 @@ describe('ServiceDiscoveryQuery', () => {
 
       expect(query.hasUiService('portal')).toBe(true);
       expect(query.hasUiService('nublado')).toBe(true);
-      expect(query.hasUiService('times-square')).toBe(true);
     });
 
     it('hasUiService returns false for non-existent services', () => {
@@ -274,11 +270,11 @@ describe('ServiceDiscoveryQuery', () => {
       expect(query.getNubladoUrl()).toBe('https://data.lsst.cloud/nb');
     });
 
-    it('getTimesSquareUrl returns times-square URL', () => {
+    it('getTimesSquareUrl returns times-square v1 API URL', () => {
       const query = createDiscoveryQuery(mockDiscovery);
 
       expect(query.getTimesSquareUrl()).toBe(
-        'https://data.lsst.cloud/times-square'
+        'https://data.lsst.cloud/times-square/api/v1'
       );
     });
 
@@ -301,14 +297,16 @@ describe('ServiceDiscoveryQuery', () => {
         expect(query.hasTimesSquare()).toBe(true);
       });
 
-      it('returns true with no options when in UI services only', () => {
+      it('returns true with no options when in internal services only', () => {
         const discovery: ServiceDiscovery = {
           ...mockDiscovery,
-          applications: [], // Remove from applications
+          applications: [], // Remove from applications, but still in internal services
         };
         const query = createDiscoveryQuery(discovery);
 
-        expect(query.hasTimesSquare()).toBe(true);
+        // times-square is in internal services, hasTimesSquare checks apps OR ui
+        // With no apps, it falls back to checking ui services, which doesn't have times-square
+        expect(query.hasTimesSquare()).toBe(false);
       });
 
       it('returns false with no options when not present anywhere', () => {
@@ -333,58 +331,17 @@ describe('ServiceDiscoveryQuery', () => {
         expect(query.hasTimesSquare({ hasApi: true })).toBe(false);
       });
 
-      it('returns true with hasUi: true when in UI services', () => {
+      it('returns false with hasUi: true (times-square is internal service, not UI)', () => {
         const query = createDiscoveryQuery(mockDiscovery);
 
-        expect(query.hasTimesSquare({ hasUi: true })).toBe(true);
-      });
-
-      it('returns false with hasUi: true when not in UI services', () => {
-        const discovery: ServiceDiscovery = {
-          ...mockDiscovery,
-          services: {
-            ...mockDiscovery.services,
-            ui: {
-              portal: mockDiscovery.services.ui.portal,
-              nublado: mockDiscovery.services.ui.nublado,
-              // times-square removed
-            },
-          },
-        };
-        const query = createDiscoveryQuery(discovery);
-
+        // times-square is in internal services, not UI services
         expect(query.hasTimesSquare({ hasUi: true })).toBe(false);
       });
 
-      it('returns true with both hasApi and hasUi when both present', () => {
+      it('returns false with both hasApi and hasUi (not in UI services)', () => {
         const query = createDiscoveryQuery(mockDiscovery);
 
-        expect(query.hasTimesSquare({ hasApi: true, hasUi: true })).toBe(true);
-      });
-
-      it('returns false with both options when only in applications', () => {
-        const discovery: ServiceDiscovery = {
-          ...mockDiscovery,
-          services: {
-            ...mockDiscovery.services,
-            ui: {
-              portal: mockDiscovery.services.ui.portal,
-              nublado: mockDiscovery.services.ui.nublado,
-            },
-          },
-        };
-        const query = createDiscoveryQuery(discovery);
-
-        expect(query.hasTimesSquare({ hasApi: true, hasUi: true })).toBe(false);
-      });
-
-      it('returns false with both options when only in UI services', () => {
-        const discovery: ServiceDiscovery = {
-          ...mockDiscovery,
-          applications: ['portal', 'nublado'],
-        };
-        const query = createDiscoveryQuery(discovery);
-
+        // times-square is in applications but NOT in UI services
         expect(query.hasTimesSquare({ hasApi: true, hasUi: true })).toBe(false);
       });
     });

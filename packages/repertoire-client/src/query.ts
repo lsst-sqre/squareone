@@ -178,10 +178,14 @@ export class ServiceDiscoveryQuery {
   }
 
   /**
-   * Get Times Square URL.
+   * Get Times Square v1 API URL.
+   * Returns the versioned v1 endpoint URL, or undefined if not available.
+   * Note: The base times-square URL is the service root, not the API endpoint,
+   * so we specifically need the v1 version URL for API calls.
    */
   getTimesSquareUrl(): string | undefined {
-    return this.getUiServiceUrl('times-square');
+    const service = this.getInternalService('times-square');
+    return service?.versions?.v1?.url;
   }
 
   // === Flexible availability checks ===
