@@ -1,1 +1,1 @@
-export { default as SettingsLayout, getLayout } from './SettingsLayout';
+export { getSettingsNavigation } from './settingsNavigation';
