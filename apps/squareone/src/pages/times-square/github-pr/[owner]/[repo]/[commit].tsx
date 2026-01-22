@@ -1,4 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useGitHubPrContents } from '@lsst-sqre/times-square-client';
 import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -8,9 +9,9 @@ import TimesSquareApp from '../../../../../components/TimesSquareApp';
 import TimesSquarePrGitHubNav from '../../../../../components/TimesSquarePrGitHubNav';
 import GitHubCheckBadge from '../../../../../components/TimesSquarePrGitHubNav/GitHubCheckBadge';
 import GitHubPrBadge from '../../../../../components/TimesSquarePrGitHubNav/GitHubPrBadge';
-import useGitHubPrContentsListing from '../../../../../components/TimesSquarePrGitHubNav/useGitHubPrContentsListing';
 import WideContentLayout from '../../../../../components/WideContentLayout';
 import { useAppConfig } from '../../../../../contexts/AppConfigContext';
+import { useRepertoireUrl } from '../../../../../hooks/useRepertoireUrl';
 import { loadFooterMdx } from '../../../../../lib/config/footerLoader';
 import { loadAppConfig } from '../../../../../lib/config/loader';
 import styles from './commit.module.css';
@@ -20,33 +21,32 @@ type GitHubPrLandingPageProps = {};
 
 export default function GitHubPrLandingPage() {
   const appConfig = useAppConfig();
-  const { timesSquareUrl } = appConfig;
+  const repertoireUrl = useRepertoireUrl();
   const router = useRouter();
   const { owner, repo, commit } = router.query;
 
-  const githubContents = useGitHubPrContentsListing(
-    timesSquareUrl,
-    Array.isArray(owner) ? owner[0] : owner,
-    Array.isArray(repo) ? repo[0] : repo,
-    Array.isArray(commit) ? commit[0] : commit
-  );
+  const ownerStr = Array.isArray(owner) ? owner[0] : (owner ?? '');
+  const repoStr = Array.isArray(repo) ? repo[0] : (repo ?? '');
+  const commitStr = Array.isArray(commit) ? commit[0] : (commit ?? '');
+
+  const { pullRequests, yamlCheck, nbCheck, isLoading, error } =
+    useGitHubPrContents(ownerStr, repoStr, commitStr, { repertoireUrl });
 
   const pageNav = (
     <TimesSquarePrGitHubNav
-      owner={Array.isArray(owner) ? owner[0] : owner}
-      repo={Array.isArray(repo) ? repo[0] : repo}
-      commitSha={Array.isArray(commit) ? commit[0] : commit}
+      owner={ownerStr}
+      repo={repoStr}
+      commitSha={commitStr}
       showPrDetails={false}
     />
   );
 
   let prDetails: React.ReactNode;
-  if (!(githubContents.loading || githubContents.error)) {
-    const { nbCheck, yamlCheck } = githubContents;
+  if (!(isLoading || error)) {
     prDetails = (
       <>
         <ul className={styles.itemList}>
-          {githubContents.pullRequests.map((pr) => (
+          {pullRequests.map((pr) => (
             <li key={`pr-${pr.number}`}>
               <GitHubPrBadge
                 state={pr.state}
@@ -101,12 +101,10 @@ export default function GitHubPrLandingPage() {
       <header className={styles.header}>
         <p className="subtitle">Pull Request Preview</p>
         <h1>
-          {`${Array.isArray(owner) ? owner[0] : owner}/${
-            Array.isArray(repo) ? repo[0] : repo
-          }`}{' '}
+          {`${ownerStr}/${repoStr}`}{' '}
           <span className={styles.commitSpan}>
             <FontAwesomeIcon icon="code-commit" className={styles.commitIcon} />{' '}
-            {(Array.isArray(commit) ? commit[0] : commit || '').slice(0, 7)}
+            {commitStr.slice(0, 7)}
           </span>
         </h1>
       </header>

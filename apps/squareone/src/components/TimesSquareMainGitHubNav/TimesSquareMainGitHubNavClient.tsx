@@ -1,13 +1,12 @@
 /*
- * Client-only TimesSquareMainGitHubNav component - uses SWR without SSR conflicts
- * This component handles the useGitHubContentsListing hook on the client side only.
+ * Client-only TimesSquareMainGitHubNav component - handles GitHub nav on client side only.
  */
 
+import { useGitHubContents } from '@lsst-sqre/times-square-client';
 import { useEffect, useState } from 'react';
-import { useAppConfig } from '../../contexts/AppConfigContext';
+import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
 import TimesSquareGitHubNav from '../TimesSquareGitHubNav';
 import styles from './TimesSquareMainGitHubNavClient.module.css';
-import useGitHubContentsListing from './useGitHubContentsListing';
 
 type TimesSquareMainGitHubNavClientProps = {
   pagePath: string;
@@ -22,22 +21,22 @@ function TimesSquareMainGitHubNavClient({
     setIsClient(true);
   }, []);
 
-  const { timesSquareUrl } = useAppConfig();
-  const githubContents = useGitHubContentsListing(timesSquareUrl);
+  const repertoireUrl = useRepertoireUrl();
+  const { contents, isLoading } = useGitHubContents({ repertoireUrl });
 
   // Don't render anything until client-side hydration
   if (!isClient) {
     return null;
   }
 
-  if (!githubContents) {
+  if (isLoading || !contents) {
     return null;
   }
 
   return (
     <div className={styles.container}>
       <TimesSquareGitHubNav
-        contentNodes={githubContents.contents}
+        contentNodes={contents}
         pagePath={pagePath}
         pagePathRoot="/times-square/github"
       />

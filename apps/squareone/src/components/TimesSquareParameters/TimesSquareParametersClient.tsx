@@ -1,16 +1,16 @@
 /*
- * Client-only TimesSquareParameters component - uses SWR without SSR conflicts
- * This component handles the useTimesSquarePage hook on the client side only.
+ * Client-only TimesSquareParameters component - handles parameter form on client side only.
  */
 
 import { Button } from '@lsst-sqre/squared';
+import { useTimesSquarePage } from '@lsst-sqre/times-square-client';
 import Ajv, { type ValidateFunction } from 'ajv';
 import addFormats from 'ajv-formats';
 import { Field, Formik, type FormikHelpers } from 'formik';
 import { useRouter } from 'next/router';
 import type { ChangeEvent } from 'react';
-import React, { useEffect, useState } from 'react';
-import useTimesSquarePage from '../../hooks/useTimesSquarePage';
+import React, { useContext, useEffect, useState } from 'react';
+import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
 import { TimesSquareUrlParametersContext } from '../TimesSquareUrlParametersProvider';
 import ParameterInput from './ParameterInput';
 import StringInput from './StringInput';
@@ -68,10 +68,22 @@ export default function TimesSquareParametersClient() {
   }, []);
 
   const router = useRouter();
+  const repertoireUrl = useRepertoireUrl();
 
-  const { displaySettings, notebookParameters: userParameters } =
-    React.useContext(TimesSquareUrlParametersContext);
-  const { parameters } = useTimesSquarePage();
+  const context = useContext(TimesSquareUrlParametersContext);
+  if (!context) {
+    throw new Error(
+      'TimesSquareUrlParametersContext must be used within a provider'
+    );
+  }
+  const {
+    displaySettings,
+    notebookParameters: userParameters,
+    githubSlug,
+  } = context;
+  const { parameters } = useTimesSquarePage(githubSlug ?? '', {
+    repertoireUrl,
+  });
 
   const ajv = new Ajv({ coerceTypes: true });
   addFormats(ajv);
