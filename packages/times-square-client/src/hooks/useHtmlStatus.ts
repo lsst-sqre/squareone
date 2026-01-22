@@ -6,7 +6,10 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { DEFAULT_TIMES_SQUARE_URL } from '../client';
-import { htmlStatusQueryOptions } from '../query-options';
+import {
+  htmlStatusQueryOptions,
+  htmlStatusUrlQueryOptions,
+} from '../query-options';
 
 import { useTimesSquareUrl } from './useTimesSquareUrl';
 
@@ -16,6 +19,14 @@ import { useTimesSquareUrl } from './useTimesSquareUrl';
 export type UseHtmlStatusOptions = {
   /** Repertoire URL for service discovery */
   repertoireUrl?: string;
+  /**
+   * Direct html_status_url from page metadata.
+   *
+   * When provided, the hook will use this URL directly instead of
+   * building a URL from pageName. This is more efficient when the
+   * page metadata has already been fetched via useTimesSquarePage.
+   */
+  htmlStatusUrl?: string;
 };
 
 /**
@@ -46,13 +57,19 @@ export type UseHtmlStatusReturn = {
  * when new HTML is available, which can be used as a React key to
  * force iframe re-rendering.
  *
+ * There are two ways to use this hook:
+ *
+ * 1. **With pageName**: Builds the URL from pageName and baseUrl
+ * 2. **With htmlStatusUrl option**: Uses the URL directly (more efficient
+ *    when page metadata is already fetched)
+ *
  * @endpoint GET /times-square/v1/pages/{page}/htmlstatus
  *
- * @param pageName - Page name/slug
+ * @param pageName - Page name/slug (can be empty string when using htmlStatusUrl option)
  * @param params - Optional notebook parameters to check status for
- * @param options - Hook options
+ * @param options - Hook options including optional htmlStatusUrl
  *
- * @example
+ * @example Using with pageName
  * ```tsx
  * function NotebookViewer({ pageName, params }: Props) {
  *   const { htmlAvailable, htmlUrl, iframeKey, isLoading } = useHtmlStatus(
@@ -63,13 +80,24 @@ export type UseHtmlStatusReturn = {
  *   if (isLoading) return <div>Loading...</div>;
  *   if (!htmlAvailable) return <div>Notebook is executing...</div>;
  *
- *   return (
- *     <iframe
- *       key={iframeKey}
- *       src={htmlUrl}
- *       title="Notebook output"
- *     />
+ *   return <iframe key={iframeKey} src={htmlUrl} title="Notebook output" />;
+ * }
+ * ```
+ *
+ * @example Using with htmlStatusUrl (more efficient)
+ * ```tsx
+ * function NotebookViewer({ displayPath, params }: Props) {
+ *   // First get page metadata
+ *   const { htmlStatusUrl } = useTimesSquarePage(displayPath);
+ *
+ *   // Then poll status using the URL directly
+ *   const { htmlAvailable, htmlUrl, iframeKey } = useHtmlStatus(
+ *     '', // pageName not needed
+ *     params,
+ *     { htmlStatusUrl: htmlStatusUrl ?? undefined }
  *   );
+ *
+ *   return <iframe key={iframeKey} src={htmlUrl} title="Notebook output" />;
  * }
  * ```
  */
@@ -78,15 +106,18 @@ export function useHtmlStatus(
   params?: Record<string, string>,
   options?: UseHtmlStatusOptions
 ): UseHtmlStatusReturn {
-  const { repertoireUrl } = options ?? {};
+  const { repertoireUrl, htmlStatusUrl } = options ?? {};
   const timesSquareUrl = useTimesSquareUrl(repertoireUrl);
   const effectiveUrl = repertoireUrl
     ? timesSquareUrl
     : DEFAULT_TIMES_SQUARE_URL;
 
-  const { data, error, isLoading, refetch } = useQuery(
-    htmlStatusQueryOptions(pageName, params, effectiveUrl)
-  );
+  // Determine which query options to use based on whether htmlStatusUrl is provided
+  const queryOpts = htmlStatusUrl
+    ? htmlStatusUrlQueryOptions(htmlStatusUrl, params)
+    : htmlStatusQueryOptions(pageName, params, effectiveUrl);
+
+  const { data, error, isLoading, refetch } = useQuery(queryOpts);
 
   // Use html_hash as iframe key when available, fallback to static string
   const iframeKey = data?.html_hash ?? 'html-not-available';

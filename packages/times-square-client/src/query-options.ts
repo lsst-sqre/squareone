@@ -13,6 +13,7 @@ import {
   fetchGitHubPrContents,
   fetchGitHubPrPage,
   fetchHtmlStatus,
+  fetchHtmlStatusByUrl,
   fetchPage,
   fetchPages,
   getEmptyGitHubContents,
@@ -90,6 +91,33 @@ export const htmlStatusQueryOptions = (
     queryKey: timesSquareKeys.htmlStatusForPage(pageName, params),
     queryFn: () => fetchHtmlStatus(baseUrl, pageName, params),
     enabled: !!pageName && !!baseUrl,
+    // Poll every second to track execution progress
+    refetchInterval: 1000,
+    staleTime: 0, // Always consider stale to ensure polling works
+    gcTime: 60_000, // 1 minute
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+  });
+
+/**
+ * Query options for fetching HTML rendering status by direct URL.
+ *
+ * This is useful when you already have the html_status_url from page metadata
+ * and want to avoid an extra API call to fetch the page first.
+ *
+ * Uses polling (refetchInterval) to track notebook execution progress.
+ *
+ * @param htmlStatusUrl - Direct URL to the HTML status endpoint
+ * @param params - Optional notebook parameters to append to URL
+ */
+export const htmlStatusUrlQueryOptions = (
+  htmlStatusUrl: string,
+  params?: Record<string, string>
+) =>
+  queryOptions<HtmlStatus>({
+    queryKey: timesSquareKeys.htmlStatusByUrl(htmlStatusUrl, params),
+    queryFn: () => fetchHtmlStatusByUrl(htmlStatusUrl, params),
+    enabled: !!htmlStatusUrl,
     // Poll every second to track execution progress
     refetchInterval: 1000,
     staleTime: 0, // Always consider stale to ensure polling works

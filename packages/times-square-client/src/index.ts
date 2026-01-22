@@ -80,6 +80,7 @@ export {
   fetchGitHubPrContents,
   fetchGitHubPrPage,
   fetchHtmlStatus,
+  fetchHtmlStatusByUrl,
   fetchPage,
   fetchPages,
   getEmptyGitHubContents,
@@ -112,6 +113,7 @@ export {
   githubPrContentsQueryOptions,
   githubPrPageQueryOptions,
   htmlStatusQueryOptions,
+  htmlStatusUrlQueryOptions,
   pageQueryOptions,
   pagesQueryOptions,
 } from './query-options';

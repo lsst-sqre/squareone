@@ -61,6 +61,19 @@ export const timesSquareKeys = {
   htmlStatusForPage: (pageName: string, params?: Record<string, string>) =>
     [...timesSquareKeys.htmlStatus(), pageName, params ?? {}] as const,
 
+  /**
+   * HTML status by direct URL with parameters.
+   *
+   * Used when the html_status_url is already known from page metadata.
+   */
+  htmlStatusByUrl: (htmlStatusUrl: string, params?: Record<string, string>) =>
+    [
+      ...timesSquareKeys.htmlStatus(),
+      'url',
+      htmlStatusUrl,
+      params ?? {},
+    ] as const,
+
   // ===========================================================================
   // GitHub Contents
   // ===========================================================================

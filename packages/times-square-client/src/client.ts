@@ -294,6 +294,44 @@ export async function fetchGitHubHtmlStatus(
   return HtmlStatusSchema.parse(data);
 }
 
+/**
+ * Fetch the HTML rendering status using a direct URL.
+ *
+ * This is useful when you already have the html_status_url from page metadata
+ * and want to avoid an extra API call to fetch the page first.
+ *
+ * @param htmlStatusUrl - Direct URL to the HTML status endpoint
+ * @param params - Optional parameters to append to the URL
+ * @returns HTML status including availability and content hash
+ * @throws TimesSquareError if request fails
+ */
+export async function fetchHtmlStatusByUrl(
+  htmlStatusUrl: string,
+  params?: Record<string, string>
+): Promise<HtmlStatus> {
+  let url = htmlStatusUrl;
+
+  if (params && Object.keys(params).length > 0) {
+    const searchParams = new URLSearchParams(params);
+    const separator = url.includes('?') ? '&' : '?';
+    url = `${url}${separator}${searchParams.toString()}`;
+  }
+
+  const response = await fetch(url, {
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new TimesSquareError(
+      `Failed to fetch HTML status: ${response.status} ${response.statusText}`,
+      response.status
+    );
+  }
+
+  const data = await response.json();
+  return HtmlStatusSchema.parse(data);
+}
+
 // =============================================================================
 // Empty/Default Values
 // =============================================================================

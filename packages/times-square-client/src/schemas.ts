@@ -98,10 +98,11 @@ export const GitHubContributorSchema = z.object({
 // =============================================================================
 
 /**
- * Type interface for recursive ContentNode (needed for z.lazy).
+ * Type interface for recursive ContentNode.
+ * Explicitly typed to avoid issues with z.lazy inference.
  */
 export type ContentNode = {
-  node_type: z.infer<typeof GitHubNodeTypeSchema>;
+  node_type: 'owner' | 'repo' | 'directory' | 'page';
   path: string;
   title: string;
   contents: ContentNode[];
@@ -109,15 +110,22 @@ export type ContentNode = {
 
 /**
  * GitHub contents node (recursive tree structure).
+ *
+ * Note: Using type assertion to work around TypeScript's limitations
+ * with z.lazy() type inference in recursive schemas. The z.lazy() return type
+ * makes all properties optional internally, but we know the runtime validation
+ * will enforce required properties.
  */
-export const GitHubContentsNodeSchema: z.ZodType<ContentNode> = z.lazy(() =>
+const _GitHubContentsNodeSchema: z.ZodType<ContentNode> = z.lazy(() =>
   z.object({
     node_type: GitHubNodeTypeSchema,
     path: z.string(),
     title: z.string(),
-    contents: z.array(GitHubContentsNodeSchema),
+    contents: z.array(_GitHubContentsNodeSchema),
   })
-);
+) as z.ZodType<ContentNode>;
+
+export const GitHubContentsNodeSchema = _GitHubContentsNodeSchema;
 
 /**
  * Root of the GitHub contents tree.
