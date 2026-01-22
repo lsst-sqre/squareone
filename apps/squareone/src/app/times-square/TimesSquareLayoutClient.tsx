@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { Suspense } from 'react';
-import TimesSquareUrlParametersProviderAppRouter from '../../components/TimesSquareUrlParametersProvider/TimesSquareUrlParametersProviderAppRouter';
+import TimesSquareUrlParametersProvider from '../../components/TimesSquareUrlParametersProvider';
 import WideContentLayout from '../../components/WideContentLayout';
 
 type TimesSquareLayoutClientProps = {
@@ -14,7 +14,7 @@ type TimesSquareLayoutClientProps = {
  *
  * Provides:
  * - WideContentLayout for the full-width Times Square UI
- * - TimesSquareUrlParametersProviderAppRouter for URL state management
+ * - TimesSquareUrlParametersProvider for URL state management
  * - Suspense boundary required by useSearchParams() in the provider
  */
 export default function TimesSquareLayoutClient({
@@ -23,9 +23,9 @@ export default function TimesSquareLayoutClient({
   return (
     <WideContentLayout>
       <Suspense fallback={null}>
-        <TimesSquareUrlParametersProviderAppRouter>
+        <TimesSquareUrlParametersProvider>
           {children}
-        </TimesSquareUrlParametersProviderAppRouter>
+        </TimesSquareUrlParametersProvider>
       </Suspense>
     </WideContentLayout>
   );

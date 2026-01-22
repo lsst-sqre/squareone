@@ -1,10 +1,19 @@
 /*
  * Context provider for the current page's notebook and display parameters
  * that come from the URL path and query parameters.
+ *
+ * This provider uses Next.js App Router navigation APIs (useParams, usePathname,
+ * useSearchParams) instead of Pages Router's useRouter.
+ *
+ * Note: useSearchParams() requires a Suspense boundary. The parent App Router
+ * page/layout should provide this boundary.
  */
 
-import { useRouter } from 'next/router';
-import React from 'react';
+'use client';
+
+import { useParams, usePathname, useSearchParams } from 'next/navigation';
+import React, { type ReactNode, useMemo } from 'react';
+
 import { useStaticConfig } from '../../hooks/useStaticConfig';
 
 type DisplaySettings = {
@@ -25,7 +34,7 @@ type TimesSquareUrlParametersContextValue = {
 };
 
 type TimesSquareUrlParametersProviderProps = {
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
 export const TimesSquareUrlParametersContext = React.createContext<
@@ -36,60 +45,59 @@ export default function TimesSquareUrlParametersProvider({
   children,
 }: TimesSquareUrlParametersProviderProps) {
   const { timesSquareUrl } = useStaticConfig();
-  const router = useRouter();
+  const params = useParams();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  // Get components out of the URL path. Only /github-pr/ pages have owner,
-  // repo, and commit components in the path. In /github/ pages the owner
-  // and repo are part of tsSlug.
-  const { tsSlug, owner = null, repo = null, commit = null } = router.query;
+  const contextValue = useMemo(() => {
+    // Extract route params
+    // Route: /times-square/github/[...tsSlug]
+    // Route: /times-square/github-pr/[owner]/[repo]/[commit]/[...tsSlug]
+    const tsSlug = (params?.tsSlug as string[] | undefined) ?? null;
+    const owner = (params?.owner as string | undefined) ?? null;
+    const repo = (params?.repo as string | undefined) ?? null;
+    const commit = (params?.commit as string | undefined) ?? null;
 
-  // Since the page's path is a [...tsSlug], we need to join the parts of the
-  // path to get the full slug. This combines the owner, repo, directory, and
-  // notebook name for regular /github/ pages, or just the directory and
-  // notebook name for /github-pr/ pages.
-  const githubSlug = tsSlug ? (tsSlug as string[]).join('/') : null;
+    // Join the slug parts to get the full GitHub slug
+    // For /github/ pages: owner/repo/directory/notebook
+    // For /github-pr/ pages: directory/notebook (owner/repo/commit are separate params)
+    const githubSlug = tsSlug ? tsSlug.join('/') : null;
 
-  // Construct the URL for the Times Square API endpoint that gives information
-  // about the page. GitHub PR pages (github-pr) have different API URLs than
-  // regular GitHub pages.
-  const tsPageUrl = router.pathname.startsWith('/times-square/github-pr')
-    ? `${timesSquareUrl}/v1/github-pr/${owner}/${repo}/${commit}/${githubSlug}`
-    : `${timesSquareUrl}/v1/github/${githubSlug}`;
+    // Determine page type from pathname
+    const isPrPage = pathname?.startsWith('/times-square/github-pr') ?? false;
 
-  // Get the user query parameters from the URL. In next 13 we can use the
-  // useSearchParams hook (https://nextjs.org/docs/app/api-reference/functions/use-search-params)
-  // to get these directly, but for now we have to filter them out of the
-  // router.query object. Even if path components leak in, we can still filter
-  // them out in the UI for setting parameters because we only show parameters
-  // matching the parameter schema.
-  const userParameters = Object.fromEntries(
-    Object.entries(router.query)
-      .filter((item) => item[0] !== 'tsSlug')
-      .map((item) => item)
-  );
+    // Construct the URL for the Times Square API endpoint
+    const tsPageUrl = isPrPage
+      ? `${timesSquareUrl}/v1/github-pr/${owner}/${repo}/${commit}/${githubSlug}`
+      : `${timesSquareUrl}/v1/github/${githubSlug}`;
 
-  const queryString = new URLSearchParams(
-    userParameters as Record<string, string>
-  ).toString();
+    // Extract query parameters from searchParams
+    // In App Router, searchParams only contains query string params (not path params)
+    const userParameters: Record<string, string> = {};
+    searchParams?.forEach((value, key) => {
+      userParameters[key] = value;
+    });
 
-  // pop display settings from the user parameters and to also separate out
-  // the notebook parameters.
-  const { ts_hide_code = '1', ...notebookParameters } = userParameters;
-  const displaySettings: DisplaySettings = {
-    ts_hide_code: ts_hide_code as string,
-  };
+    const queryString = searchParams?.toString() ?? '';
 
-  const contextValue: TimesSquareUrlParametersContextValue = {
-    tsPageUrl,
-    displaySettings,
-    notebookParameters,
-    owner: owner as string | null,
-    repo: repo as string | null,
-    commit: commit as string | null,
-    tsSlug: tsSlug as string[] | null,
-    githubSlug,
-    urlQueryString: queryString,
-  };
+    // Separate display settings from notebook parameters
+    const { ts_hide_code = '1', ...notebookParameters } = userParameters;
+    const displaySettings = {
+      ts_hide_code,
+    };
+
+    return {
+      tsPageUrl,
+      displaySettings,
+      notebookParameters,
+      owner,
+      repo,
+      commit,
+      tsSlug,
+      githubSlug,
+      urlQueryString: queryString,
+    };
+  }, [params, pathname, searchParams, timesSquareUrl]);
 
   return (
     <TimesSquareUrlParametersContext.Provider value={contextValue}>
