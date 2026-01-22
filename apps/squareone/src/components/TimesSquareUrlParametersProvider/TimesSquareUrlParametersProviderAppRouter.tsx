@@ -14,7 +14,7 @@
 import { useParams, usePathname, useSearchParams } from 'next/navigation';
 import React, { type ReactNode, useMemo } from 'react';
 
-import { useAppConfig } from '../../contexts/AppConfigContext';
+import { useStaticConfig } from '../../hooks/useStaticConfig';
 import { TimesSquareUrlParametersContext } from './TimesSquareUrlParametersProvider';
 
 type TimesSquareUrlParametersProviderAppRouterProps = {
@@ -24,7 +24,7 @@ type TimesSquareUrlParametersProviderAppRouterProps = {
 export default function TimesSquareUrlParametersProviderAppRouter({
   children,
 }: TimesSquareUrlParametersProviderAppRouterProps) {
-  const { timesSquareUrl } = useAppConfig();
+  const { timesSquareUrl } = useStaticConfig();
   const params = useParams();
   const pathname = usePathname();
   const searchParams = useSearchParams();

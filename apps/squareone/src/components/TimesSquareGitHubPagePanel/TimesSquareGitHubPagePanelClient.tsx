@@ -6,8 +6,8 @@ import { useTimesSquarePage } from '@lsst-sqre/times-square-client';
 import NextError from 'next/error';
 import Head from 'next/head';
 import { useContext, useEffect, useState } from 'react';
-import { useAppConfig } from '../../contexts/AppConfigContext';
 import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
+import { useStaticConfig } from '../../hooks/useStaticConfig';
 import TimesSquareParameters from '../TimesSquareParameters';
 import { TimesSquareUrlParametersContext } from '../TimesSquareUrlParametersProvider';
 import ExecStats from './ExecStats';
@@ -22,7 +22,7 @@ export default function TimesSquareGitHubPagePanelClient() {
     setIsClient(true);
   }, []);
 
-  const { siteName } = useAppConfig();
+  const { siteName } = useStaticConfig();
   const repertoireUrl = useRepertoireUrl();
   const context = useContext(TimesSquareUrlParametersContext);
   if (!context) {

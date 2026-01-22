@@ -5,7 +5,7 @@
 import { IconPill } from '@lsst-sqre/squared';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { useAppConfig } from '../../contexts/AppConfigContext';
+import { useStaticConfig } from '../../hooks/useStaticConfig';
 import { getDocsUrl } from '../../lib/utils/docsUrls';
 import styles from './Sidebar.module.css';
 
@@ -15,7 +15,7 @@ type SidebarProps = {
 };
 
 export default function Sidebar({ pageNav, pagePanel }: SidebarProps) {
-  const { docsBaseUrl } = useAppConfig();
+  const { docsBaseUrl } = useStaticConfig();
   const docsUrl = getDocsUrl(docsBaseUrl, '/guides/times-square/index.html');
 
   return (
