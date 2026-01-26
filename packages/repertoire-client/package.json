@@ -38,7 +38,7 @@
     "@lsst-sqre/eslint-config": "workspace:*",
     "@lsst-sqre/tsconfig": "workspace:*",
     "@tanstack/react-query": "^5.90.18",
-    "@testing-library/react": "^16.3.0",
+    "@testing-library/react": "^16.3.2",
     "@types/react": "^19.2.9",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
