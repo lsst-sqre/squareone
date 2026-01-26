@@ -2,4 +2,4 @@
 "squareone": patch
 ---
 
-Bump @sentry/nextjs from 10.27.0 to 10.33.0
+Bump @sentry/nextjs from 10.27.0 to 10.35.0 in the runtime group
