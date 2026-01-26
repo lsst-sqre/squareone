@@ -9,7 +9,7 @@
     "assets"
   ],
   "devDependencies": {
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "style-dictionary": "^3.7.1",
     "yaml": "^2.8.2"
   },
