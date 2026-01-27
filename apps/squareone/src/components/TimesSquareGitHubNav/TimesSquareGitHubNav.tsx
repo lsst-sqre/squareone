@@ -12,7 +12,7 @@ import Page from './Page';
 import styles from './TimesSquareGitHubNav.module.css';
 
 type ContentNode = {
-  node_type: 'owner' | 'repo' | 'dir' | 'page';
+  node_type: 'owner' | 'repo' | 'directory' | 'page';
   title: string;
   path: string;
   contents: ContentNode[];

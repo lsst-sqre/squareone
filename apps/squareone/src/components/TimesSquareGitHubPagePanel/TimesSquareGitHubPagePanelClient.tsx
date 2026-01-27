@@ -1,13 +1,13 @@
 /*
- * Client-only TimesSquareGitHubPagePanel component - uses SWR without SSR conflicts
- * This component handles the useTimesSquarePage hook on the client side only.
+ * Client-only TimesSquareGitHubPagePanel component - handles page panel on client side only.
  */
 
+import { useTimesSquarePage } from '@lsst-sqre/times-square-client';
 import NextError from 'next/error';
 import Head from 'next/head';
-import React, { useEffect, useState } from 'react';
-import { useAppConfig } from '../../contexts/AppConfigContext';
-import useTimesSquarePage from '../../hooks/useTimesSquarePage';
+import { useContext, useEffect, useState } from 'react';
+import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
+import { useStaticConfig } from '../../hooks/useStaticConfig';
 import TimesSquareParameters from '../TimesSquareParameters';
 import { TimesSquareUrlParametersContext } from '../TimesSquareUrlParametersProvider';
 import ExecStats from './ExecStats';
@@ -22,15 +22,17 @@ export default function TimesSquareGitHubPagePanelClient() {
     setIsClient(true);
   }, []);
 
-  const { siteName } = useAppConfig();
-  const context = React.useContext(TimesSquareUrlParametersContext);
+  const { siteName } = useStaticConfig();
+  const repertoireUrl = useRepertoireUrl();
+  const context = useContext(TimesSquareUrlParametersContext);
   if (!context) {
     throw new Error(
       'TimesSquareUrlParametersContext must be used within a provider'
     );
   }
-  const { urlQueryString } = context;
-  const pageData = useTimesSquarePage();
+  const { urlQueryString, githubSlug } = context;
+  const { title, description, renderedUrl, github, isLoading, error } =
+    useTimesSquarePage(githubSlug ?? '', { repertoireUrl });
 
   // Show loading state until client-side hydration
   if (!isClient) {
@@ -41,20 +43,18 @@ export default function TimesSquareGitHubPagePanelClient() {
     );
   }
 
-  if (pageData.loading) {
+  if (isLoading) {
     return (
       <div className={styles.container}>
         <p>Loading...</p>
       </div>
     );
   }
-  if (pageData.error) {
+  if (error) {
     return <NextError statusCode={404} />;
   }
 
-  const { title, description } = pageData;
-
-  const ipynbDownloadUrl = `${pageData.renderedIpynbUrl}?${urlQueryString}`;
+  const ipynbDownloadUrl = `${renderedUrl}?${urlQueryString}`;
 
   return (
     <div className={styles.container}>
@@ -67,16 +67,16 @@ export default function TimesSquareGitHubPagePanelClient() {
           <div dangerouslySetInnerHTML={{ __html: description.html }} />
         )}
         <GitHubEditLink
-          owner={pageData.github.owner}
-          repository={pageData.github.repository}
-          sourcePath={pageData.github.sourcePath}
+          owner={github?.owner ?? null}
+          repository={github?.repository ?? null}
+          sourcePath={github?.source_path ?? null}
         />
 
         <TimesSquareParameters />
 
         <IpynbDownloadLink
           url={ipynbDownloadUrl}
-          sourcePath={pageData.github.sourcePath}
+          sourcePath={github?.source_path ?? null}
         />
 
         <ExecStats />

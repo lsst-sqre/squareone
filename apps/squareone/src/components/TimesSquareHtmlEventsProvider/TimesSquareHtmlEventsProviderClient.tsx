@@ -1,12 +1,18 @@
 /*
- * Client-only TimesSquareHtmlEventsProvider component - uses SWR without SSR conflicts
- * This component handles the useTimesSquarePage hook on the client side only.
+ * Client-only TimesSquareHtmlEventsProvider component - handles SSE events on client side only.
  */
 
+import { useTimesSquarePage } from '@lsst-sqre/times-square-client';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
-import React, { useEffect, useState } from 'react';
+import {
+  type ReactNode,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
-import useTimesSquarePage from '../../hooks/useTimesSquarePage';
+import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
 import { TimesSquareUrlParametersContext } from '../TimesSquareUrlParametersProvider';
 import {
   TimesSquareHtmlEventsContext,
@@ -24,29 +30,30 @@ type HtmlEvent = {
 };
 
 type TimesSquareHtmlEventsProviderClientProps = {
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
 export default function TimesSquareHtmlEventsProviderClient({
   children,
 }: TimesSquareHtmlEventsProviderClientProps) {
   const [isClient, setIsClient] = useState(false);
-  const [htmlEvent, setHtmlEvent] = React.useState<HtmlEvent | null>(null);
+  const [htmlEvent, setHtmlEvent] = useState<HtmlEvent | null>(null);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  const urlParameters = React.useContext(TimesSquareUrlParametersContext);
-  const timesSquarePage = useTimesSquarePage();
+  const repertoireUrl = useRepertoireUrl();
+  const urlParameters = useContext(TimesSquareUrlParametersContext);
+  const githubSlug = urlParameters?.githubSlug ?? '';
+  const { htmlEventsUrl } = useTimesSquarePage(githubSlug, { repertoireUrl });
 
   const urlQueryString = urlParameters?.urlQueryString;
-  const htmlEventsUrl = timesSquarePage.htmlEventsUrl;
   const fullHtmlEventsUrl = htmlEventsUrl
     ? `${htmlEventsUrl}?${urlQueryString}`
     : null;
 
-  React.useEffect(() => {
+  useEffect(() => {
     // Don't run SSE on server side
     if (!isClient) return () => {};
 
@@ -96,7 +103,7 @@ export default function TimesSquareHtmlEventsProviderClient({
     };
   }, [fullHtmlEventsUrl, htmlEventsUrl, isClient]);
 
-  const contextValue = React.useMemo(
+  const contextValue = useMemo(
     (): TimesSquareHtmlEventsContextValue => ({
       dateSubmitted: htmlEvent ? htmlEvent.date_submitted : null,
       dateStarted: htmlEvent ? htmlEvent.date_started : null,

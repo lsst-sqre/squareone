@@ -1,16 +1,16 @@
 /*
- * Client-only TimesSquareParameters component - uses SWR without SSR conflicts
- * This component handles the useTimesSquarePage hook on the client side only.
+ * Client-only TimesSquareParameters component - handles parameter form on client side only.
  */
 
 import { Button } from '@lsst-sqre/squared';
+import { useTimesSquarePage } from '@lsst-sqre/times-square-client';
 import Ajv, { type ValidateFunction } from 'ajv';
 import addFormats from 'ajv-formats';
 import { Field, Formik, type FormikHelpers } from 'formik';
-import { useRouter } from 'next/router';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import type { ChangeEvent } from 'react';
-import React, { useEffect, useState } from 'react';
-import useTimesSquarePage from '../../hooks/useTimesSquarePage';
+import React, { useContext, useEffect, useState } from 'react';
+import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
 import { TimesSquareUrlParametersContext } from '../TimesSquareUrlParametersProvider';
 import ParameterInput from './ParameterInput';
 import StringInput from './StringInput';
@@ -68,10 +68,24 @@ export default function TimesSquareParametersClient() {
   }, []);
 
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const repertoireUrl = useRepertoireUrl();
 
-  const { displaySettings, notebookParameters: userParameters } =
-    React.useContext(TimesSquareUrlParametersContext);
-  const { parameters } = useTimesSquarePage();
+  const context = useContext(TimesSquareUrlParametersContext);
+  if (!context) {
+    throw new Error(
+      'TimesSquareUrlParametersContext must be used within a provider'
+    );
+  }
+  const {
+    displaySettings,
+    notebookParameters: userParameters,
+    githubSlug,
+  } = context;
+  const { parameters } = useTimesSquarePage(githubSlug ?? '', {
+    repertoireUrl,
+  });
 
   const ajv = new Ajv({ coerceTypes: true });
   addFormats(ajv);
@@ -113,28 +127,20 @@ export default function TimesSquareParametersClient() {
     values: FormValues,
     { setSubmitting }: FormikHelpers<FormValues>
   ) => {
-    // 1. Get an object with the existing query from the router. This gives us
-    // any existing path parameters for dynamic routing or misc query parameters
-    // unrelated to page parameters.
-    const query = Object.assign({}, router.query);
+    // 1. Create URLSearchParams from existing search params to preserve any
+    // query parameters unrelated to page parameters.
+    const newSearchParams = new URLSearchParams(searchParams?.toString());
 
-    // 2. Update object with form's `values`
+    // 2. Update with form's `values`
     if (parameters) {
       Object.keys(parameters).forEach((paramName) => {
-        query[paramName] = values[paramName];
+        newSearchParams.set(paramName, values[paramName]);
       });
     }
 
-    if (values.tsHideCode) {
-      query.ts_hide_code = '1';
-    } else {
-      query.ts_hide_code = '0';
-    }
+    newSearchParams.set('ts_hide_code', values.tsHideCode ? '1' : '0');
 
-    router.push({ pathname: router.pathname, query: query }, undefined, {
-      shallow: true,
-    });
-
+    router.push(`${pathname}?${newSearchParams.toString()}`);
     setSubmitting(false);
   };
 

@@ -1,16 +1,15 @@
 /*
- * Client-only TimesSquarePrGitHubNav component - uses SWR without SSR conflicts
- * This component handles the useGitHubPrContentsListing hook on the client side only.
+ * Client-only TimesSquarePrGitHubNav component - handles PR GitHub nav on client side only.
  */
 
+import { useGitHubPrContents } from '@lsst-sqre/times-square-client';
 import { useEffect, useState } from 'react';
-import { useAppConfig } from '../../contexts/AppConfigContext';
+import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
 import TimesSquareGitHubNav from '../TimesSquareGitHubNav';
 import GitHubCheckBadge from './GitHubCheckBadge';
 import GitHubPrBadge from './GitHubPrBadge';
 import GitHubPrTitle from './GitHubPrTitle';
 import styles from './TimesSquarePrGitHubNavClient.module.css';
-import useGitHubPrContentsListing from './useGitHubPrContentsListing';
 
 type TimesSquarePrGitHubNavClientProps = {
   owner: string;
@@ -31,22 +30,16 @@ function TimesSquarePrGitHubNavClient({
     setIsClient(true);
   }, []);
 
-  const { timesSquareUrl } = useAppConfig();
-  const githubContents = useGitHubPrContentsListing(
-    timesSquareUrl,
-    owner,
-    repo,
-    commitSha
-  );
+  const repertoireUrl = useRepertoireUrl();
+  const { contents, pullRequests, yamlCheck, nbCheck, isLoading, error } =
+    useGitHubPrContents(owner, repo, commitSha, { repertoireUrl });
 
   // Don't render anything until client-side hydration
   if (!isClient) {
     return null;
   }
 
-  if (!(githubContents.loading || githubContents.error)) {
-    const { nbCheck, yamlCheck } = githubContents;
-
+  if (!(isLoading || error)) {
     return (
       <section className={styles.section}>
         {showPrDetails && (
@@ -54,7 +47,7 @@ function TimesSquarePrGitHubNavClient({
             <GitHubPrTitle owner={owner} repo={repo} commit={commitSha} />
 
             <ul className={styles.itemList}>
-              {githubContents.pullRequests.map((pr) => (
+              {pullRequests.map((pr) => (
                 <li key={`pr-${pr.number}`}>
                   <GitHubPrBadge
                     state={pr.state}
@@ -96,7 +89,7 @@ function TimesSquarePrGitHubNavClient({
 
         <h3>Notebooks</h3>
         <TimesSquareGitHubNav
-          contentNodes={githubContents.contents}
+          contentNodes={contents}
           pagePathRoot="/times-square/github-pr"
           pagePath={null}
         />
