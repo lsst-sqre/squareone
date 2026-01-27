@@ -7,6 +7,7 @@ module.exports = () => {
       '@lsst-sqre/squared',
       '@lsst-sqre/repertoire-client',
       '@lsst-sqre/gafaelfawr-client',
+      '@lsst-sqre/semaphore-client',
       '@lsst-sqre/times-square-client',
     ],
     async rewrites() {

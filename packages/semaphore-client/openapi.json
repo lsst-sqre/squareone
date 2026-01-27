@@ -1,0 +1,200 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "Semaphore",
+    "description": "Semaphore is the user message and notification system for the Rubin Science Platform.\n\nYou can find Semaphore's user and developer documentation at [https://semaphore.lsst.io](https://semaphore.lsst.io). Semaphore is developed at [https://github.com/lsst-sqre/semaphore](https://github.com/lsst-sqre/semaphore)",
+    "version": "0.5.0"
+  },
+  "paths": {
+    "/": {
+      "get": {
+        "tags": ["internal"],
+        "summary": "Health check",
+        "description": "Returns metadata about the running application. Can also be used as a health check. This route is not exposed outside the cluster and therefore cannot be used by external clients.",
+        "operationId": "get_index__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Metadata" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/semaphore/": {
+      "get": {
+        "tags": ["internal"],
+        "summary": "Application metadata",
+        "description": "Semaphore's API entrypoint provides metadata about the service version and configuration information.",
+        "operationId": "get_index_semaphore__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Index" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/semaphore/github/webhook": {
+      "post": {
+        "tags": ["internal"],
+        "summary": "GitHub App webhook",
+        "description": "This endpoint receives webhook events from GitHub",
+        "operationId": "post_github_webhook_semaphore_github_webhook_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          }
+        }
+      }
+    },
+    "/semaphore/v1/broadcasts": {
+      "get": {
+        "tags": ["broadcasts"],
+        "summary": "Get broadcasts",
+        "description": "List broadcast messages.",
+        "operationId": "get_broadcasts_semaphore_v1_broadcasts_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Get Broadcasts Semaphore V1 Broadcasts Get",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BroadcastMessageModel"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BroadcastCategory": {
+        "title": "BroadcastCategory",
+        "enum": ["outage", "info", "notice"],
+        "type": "string",
+        "description": "Broadcast message categories."
+      },
+      "BroadcastMessageModel": {
+        "title": "BroadcastMessageModel",
+        "required": ["id", "summary", "active", "enabled", "stale", "category"],
+        "type": "object",
+        "properties": {
+          "id": { "title": "The message's identifier", "type": "string" },
+          "summary": {
+            "title": "The message summary",
+            "allOf": [{ "$ref": "#/components/schemas/FormattedText" }]
+          },
+          "body": {
+            "title": "The body content (optional).",
+            "allOf": [{ "$ref": "#/components/schemas/FormattedText" }]
+          },
+          "active": {
+            "title": "Whether the message should be displayed",
+            "type": "boolean",
+            "description": "True if the message should be broadcast based on its schedule and being enabled."
+          },
+          "enabled": {
+            "title": "Toggle for whether the message is enabled",
+            "type": "boolean",
+            "description": "When false, the message isn't shown even if it is scheduled"
+          },
+          "stale": {
+            "title": "Flag indicated the message is stable",
+            "type": "boolean",
+            "description": "True if the message has no future scheduled broadcast events."
+          },
+          "category": {
+            "title": "Category of the message.",
+            "allOf": [{ "$ref": "#/components/schemas/BroadcastCategory" }]
+          }
+        },
+        "description": "A broadcast message."
+      },
+      "FormattedText": {
+        "title": "FormattedText",
+        "required": ["gfm", "html"],
+        "type": "object",
+        "properties": {
+          "gfm": {
+            "title": "The GitHub-flavored Markdown-formatted text.",
+            "type": "string"
+          },
+          "html": { "title": "The HTML-formatted text.", "type": "string" }
+        },
+        "description": "Text that is formatted in both markdown and HTML."
+      },
+      "Index": {
+        "title": "Index",
+        "required": [
+          "metadata",
+          "github_app_enabled",
+          "api_docs_path",
+          "openapi_path"
+        ],
+        "type": "object",
+        "properties": {
+          "metadata": {
+            "title": "Package metadata",
+            "allOf": [{ "$ref": "#/components/schemas/Metadata" }]
+          },
+          "github_app_id": { "title": "Github App Id", "type": "string" },
+          "github_app_enabled": {
+            "title": "Github App Enabled",
+            "type": "boolean"
+          },
+          "api_docs_path": { "title": "Api Docs Path", "type": "string" },
+          "openapi_path": { "title": "Openapi Path", "type": "string" }
+        },
+        "description": "The application's root response, including metadata and information\nabout the APIs."
+      },
+      "Metadata": {
+        "title": "Metadata",
+        "required": ["name", "version"],
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "Application name",
+            "type": "string",
+            "example": "myapp"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string",
+            "example": "1.0.0"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string",
+            "example": "string"
+          },
+          "repository_url": {
+            "title": "Repository URL",
+            "type": "string",
+            "example": "https://example.com/"
+          },
+          "documentation_url": {
+            "title": "Documentation URL",
+            "type": "string",
+            "example": "https://example.com/"
+          }
+        },
+        "description": "Metadata about a package."
+      }
+    }
+  }
+}
