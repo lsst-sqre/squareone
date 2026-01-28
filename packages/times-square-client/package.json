@@ -1,6 +1,6 @@
 {
   "name": "@lsst-sqre/times-square-client",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "private": true,
   "description": "Times Square notebook execution API client with TanStack Query integration",
   "main": "./src/index.ts",
