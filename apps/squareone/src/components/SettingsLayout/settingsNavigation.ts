@@ -1,4 +1,4 @@
-import type { AppConfigContextValue } from '../../contexts/AppConfigContext';
+import type { AppConfigContextValue } from '../../hooks/useStaticConfig';
 import type { NavSection } from '../SidebarLayout';
 
 /**

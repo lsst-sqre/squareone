@@ -57,13 +57,13 @@ Both Biome and ESLint run in CI for thorough code quality validation
 3. **AppConfig System (squareone app)**
    - **NEVER use `next/config` or `getConfig()`** - deprecated pattern
    - Use **filesystem-based configuration** via YAML files (`squareone.config.yaml`, `squareone.serverconfig.yaml`)
-   - Server-side: `loadAppConfig()` in `getServerSideProps`
-   - Client-side: `useAppConfig()` hook from React Context
+   - Server components: `getStaticConfig()` from `src/lib/config/rsc`
+   - Client components: `useStaticConfig()` hook from `src/hooks/useStaticConfig`
    - Kubernetes-ready configuration supporting runtime ConfigMap mounting
 
 ### Next.js apps
 
-- Use Next.js for applications (currently using Next.js 14 with App Router consideration for future)
+- Use Next.js for applications (App Router only, no Pages Router)
 - Configure with `next.config.js` for **build-time settings only** (not runtime config)
 - Use **AppConfig system** for runtime configuration (YAML files, not next/config)
 - Must transpile squared package: `transpilePackages: ['@lsst-sqre/squared']`
@@ -135,7 +135,7 @@ import SubComponent from './SubComponent';
 
 ### API and data patterns
 
-- Use **SWR** for data fetching and caching
+- Use **TanStack Query** for data fetching and caching
 - Create **custom hooks** for API interactions (e.g., `useUserInfo`, `useTimesSquarePage`)
 - Handle loading and error states consistently
 - Use proper TypeScript types for API responses
@@ -232,6 +232,6 @@ For comprehensive patterns and detailed guidance:
   - `component-creation` - TypeScript patterns, CSS Modules, Storybook, tests
   - `testing-infrastructure` - Vitest, React Testing Library, Storybook tests
   - `times-square-integration` - Context providers, hooks, SSE, GitHub PR previews
-  - `data-fetching-patterns` - SWR patterns, custom hooks, error handling
+  - `data-fetching-patterns` - TanStack Query patterns, custom hooks, error handling
   - `platform-api-integration` - OpenAPI specs, API discovery, authentication
 - **`docs/dev/`** - Developer documentation including remote cache setup

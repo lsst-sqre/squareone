@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import type { AppConfigContextValue } from '../../contexts/AppConfigContext';
+import type { AppConfigContextValue } from '../../hooks/useStaticConfig';
 import { getSettingsNavigation } from './settingsNavigation';
 
 // Mock AppConfig configurations for testing

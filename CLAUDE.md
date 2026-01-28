@@ -108,11 +108,11 @@ import SubComponent from './SubComponent';
 
 ### Next.js App (squareone)
 
+- **App Router only** — all pages use the Next.js App Router (no Pages Router)
 - **Filesystem-based configuration** via YAML files (`squareone.config.yaml`, `squareone.serverconfig.yaml`)
-- **AppConfig system** replaces `next/config` for runtime configuration
-- **Server-side configuration loading** via `loadAppConfig()` in `getServerSideProps`
-- **React Context-based** configuration access via `useAppConfig()` hook
-- **MDX content** loaded from filesystem, configurable via `mdxDir`
+- **Server-side configuration** via `getStaticConfig()` (RSC cached loader) in server components
+- **Client-side configuration** via `useStaticConfig()` hook (resolves config from `ConfigProvider`)
+- **MDX content** compiled via `compileMdxForRsc()` for server components
 - **Transpiles squared package** via `transpilePackages: ['@lsst-sqre/squared']`
 - **Kubernetes-ready** configuration that supports runtime ConfigMap mounting
 
@@ -131,7 +131,7 @@ See **squared-package** skill for complete architecture.
 
 ### Data Fetching
 
-- **SWR** for data fetching and caching
+- **TanStack Query** for data fetching and caching
 - **Custom hooks** for API interactions (e.g., `useUserInfo`, `useTimesSquarePage`)
 - **Mock data** in `src/lib/mocks/` for development
 
@@ -142,7 +142,7 @@ See **data-fetching-patterns** skill for complete patterns.
 - **TimesSquareUrlParametersContext** for URL-based state management
 - **TimesSquareHtmlEventsContext** for real-time SSE updates
 - **GitHub PR preview support** at `/times-square/github-pr/:owner/:repo/:commit`
-- **Mock API endpoints** in `/pages/api/dev/times-square/` for development
+- **Mock API endpoints** in `/app/api/dev/times-square/` for development
 
 See **times-square-integration** skill for complete patterns.
 
@@ -157,7 +157,7 @@ For detailed guidance on specific topics, Claude has access to specialized skill
 - **component-creation** - TypeScript patterns, CSS Modules with design tokens, Storybook, tests
 - **testing-infrastructure** - Vitest, React Testing Library, Storybook tests, CI pipeline
 - **times-square-integration** - Context providers, hooks, SSE, GitHub PR previews
-- **data-fetching-patterns** - SWR patterns, custom hooks, error handling, mock data
+- **data-fetching-patterns** - TanStack Query patterns, custom hooks, error handling, mock data
 - **platform-api-integration** - OpenAPI specs, API discovery, hook patterns, authentication
 - **docker-version-validation** - Dockerfile version synchronization, validation rules, troubleshooting
 - **file-factory** - CLI scaffolding for components, hooks, contexts, pages with consistent structure
@@ -188,9 +188,9 @@ These skills automatically activate when relevant or can be referenced explicitl
    - See **turborepo-workflow** skill for complete details
 
 2. **Configuration System**
-   - **NEVER use `next/config` or `getConfig()`** - Use AppConfig system instead
-   - Server-side: `loadAppConfig()` in `getServerSideProps`
-   - Client-side: `useAppConfig()` hook
+   - **NEVER use `next/config` or `getConfig()`** - Use the RSC config system instead
+   - Server components: `getStaticConfig()` from `src/lib/config/rsc`
+   - Client components: `useStaticConfig()` hook from `src/hooks/useStaticConfig`
    - See **appconfig-system** skill for complete patterns
 
 3. **Squared Package**
