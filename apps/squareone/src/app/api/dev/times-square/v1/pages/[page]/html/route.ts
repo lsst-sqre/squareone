@@ -2,6 +2,10 @@
  * Mock Times Square API endpoint: /times-square/v1/pages/[page]/html (App Router version)
  */
 
+import { createRouteLogger } from '@/lib/logger';
+
+const log = createRouteLogger('times-square/pages/[page]/html');
+
 const htmlContent = `
 <!doctype html>
 <html class="no-js" lang="">
@@ -23,7 +27,7 @@ export async function GET(
   { params }: { params: Promise<{ page: string }> }
 ) {
   const { page: _page } = await params;
-  console.log(request.url);
+  log.debug({ url: request.url }, 'Serving HTML content');
 
   return new Response(htmlContent, {
     status: 200,

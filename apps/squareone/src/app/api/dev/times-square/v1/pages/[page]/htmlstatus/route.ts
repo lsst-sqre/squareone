@@ -6,6 +6,9 @@
 import { NextResponse } from 'next/server';
 
 import { loadAppConfig } from '@/lib/config/loader';
+import { createRouteLogger } from '@/lib/logger';
+
+const log = createRouteLogger('times-square/pages/[page]/htmlstatus');
 
 export async function GET(
   request: Request,
@@ -27,15 +30,11 @@ export async function GET(
       html_hash: a !== '2' ? '12345' : null,
     };
 
-    console.log(content);
-    console.log('Pinged status');
+    log.debug({ content }, 'Pinged status');
 
     return NextResponse.json(content);
   } catch (error) {
-    console.error(
-      'Failed to load configuration in Times Square htmlstatus API:',
-      error
-    );
+    log.error({ err: error }, 'Failed to load configuration');
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

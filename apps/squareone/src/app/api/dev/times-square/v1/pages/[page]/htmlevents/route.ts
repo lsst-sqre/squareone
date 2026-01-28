@@ -5,6 +5,9 @@
  */
 
 import { loadAppConfig } from '@/lib/config/loader';
+import { createRouteLogger } from '@/lib/logger';
+
+const log = createRouteLogger('times-square/pages/[page]/htmlevents');
 
 export async function GET(
   request: Request,
@@ -62,10 +65,7 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error(
-      'Failed to load configuration in Times Square htmlevents API:',
-      error
-    );
+    log.error({ err: error }, 'Failed to load configuration');
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
