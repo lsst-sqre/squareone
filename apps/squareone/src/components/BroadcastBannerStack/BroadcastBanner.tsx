@@ -1,38 +1,21 @@
+import type { Broadcast } from '@lsst-sqre/semaphore-client';
 import { Button } from '@lsst-sqre/squared';
 import type React from 'react';
 import useDisclosure from 'react-a11y-disclosure';
 
 import styles from './BroadcastBanner.module.css';
 
-type BroadcastCategory = 'info' | 'outage' | 'notice' | 'maintenance' | 'other';
-
-type BroadcastContent = {
-  gfm: string;
-  html: string;
-};
-
-type Broadcast = {
-  id: string;
-  summary: BroadcastContent;
-  body?: BroadcastContent;
-  active: boolean;
-  enabled: boolean;
-  stale: boolean;
-  category: BroadcastCategory;
-};
-
 type BroadcastBannerProps = {
   broadcast?: Broadcast;
 };
 
-function getCategoryColor(category: BroadcastCategory): string {
+function getCategoryColor(category: Broadcast['category']): string {
   switch (category) {
     case 'info':
       return 'var(--rsd-color-primary-600)';
     case 'outage':
       return 'var(--rsd-color-red-500)';
     case 'notice':
-    case 'maintenance':
       return 'var(--rsd-color-orange-500)';
     default:
       return 'var(--rsd-color-gray-500)';
@@ -60,7 +43,7 @@ export default function BroadcastBanner({ broadcast }: BroadcastBannerProps) {
       className={styles.container}
       style={
         {
-          '--banner-bg': getCategoryColor(broadcast.category || 'other'),
+          '--banner-bg': getCategoryColor(broadcast.category),
         } as React.CSSProperties
       }
     >

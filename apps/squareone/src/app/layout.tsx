@@ -1,4 +1,9 @@
-import { discoveryQueryOptions } from '@lsst-sqre/repertoire-client';
+import {
+  createDiscoveryQuery,
+  discoveryQueryOptions,
+  fetchServiceDiscovery,
+} from '@lsst-sqre/repertoire-client';
+import { broadcastsQueryOptions } from '@lsst-sqre/semaphore-client';
 import {
   dehydrate,
   HydrationBoundary,
@@ -89,6 +94,23 @@ export default async function RootLayout({ children }: RootLayoutProps) {
       config.repertoireUrl,
     ]);
     console.log('[Layout] Prefetch complete, cached data:', cachedData);
+
+    // Prefetch broadcasts from Semaphore (URL from service discovery)
+    try {
+      const discovery = await fetchServiceDiscovery(config.repertoireUrl);
+      const discoveryQuery = createDiscoveryQuery(discovery);
+      const semaphoreUrl = discoveryQuery.getSemaphoreUrl();
+
+      if (semaphoreUrl) {
+        await queryClient.prefetchQuery(
+          broadcastsQueryOptions(semaphoreUrl, {
+            refetchInterval: 0, // Server-side: no polling
+          })
+        );
+      }
+    } catch (error) {
+      console.error('[Layout] Failed to prefetch broadcasts:', error);
+    }
   } else {
     console.log(
       '[Layout] No repertoireUrl configured, skipping service discovery'
@@ -111,7 +133,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
                 <div className={styles.layout}>
                   <div className={styles.upperContainer}>
                     <Header />
-                    <BroadcastBannerStack semaphoreUrl={config.semaphoreUrl} />
+                    <BroadcastBannerStack />
                     {children}
                   </div>
                   <div className={styles.stickyFooterContainer}>

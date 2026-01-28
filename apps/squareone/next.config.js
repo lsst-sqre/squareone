@@ -7,6 +7,7 @@ module.exports = () => {
       '@lsst-sqre/squared',
       '@lsst-sqre/repertoire-client',
       '@lsst-sqre/gafaelfawr-client',
+      '@lsst-sqre/semaphore-client',
       '@lsst-sqre/times-square-client',
     ],
     async rewrites() {
@@ -20,6 +21,11 @@ module.exports = () => {
         {
           source: '/repertoire/discovery',
           destination: '/api/dev/repertoire/discovery',
+        },
+        // Mock Semaphore (this is never triggered by a production ingress)
+        {
+          source: '/semaphore/v1/broadcasts',
+          destination: '/api/dev/semaphore/v1/broadcasts',
         },
         // Mock Times Square (this is never triggered by a production ingress)
         {

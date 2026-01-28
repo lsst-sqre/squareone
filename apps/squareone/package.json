@@ -37,6 +37,7 @@
     "@lsst-sqre/global-css": "workspace:*",
     "@lsst-sqre/rubin-style-dictionary": "workspace:*",
     "@lsst-sqre/repertoire-client": "workspace:*",
+    "@lsst-sqre/semaphore-client": "workspace:*",
     "@lsst-sqre/squared": "workspace:*",
     "@tanstack/react-query": "^5.90.20",
     "@lsst-sqre/times-square-client": "workspace:*",

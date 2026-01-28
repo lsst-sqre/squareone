@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 
-import { useAppConfig } from '../../contexts/AppConfigContext';
 import BroadcastBannerStack from '../BroadcastBannerStack';
 import Footer from '../Footer';
 import Header from '../Header';
@@ -23,14 +22,12 @@ type PageProps = {
  * https://css-tricks.com/couple-takes-sticky-footer/
  */
 export default function Page({ children, footerMdxSource }: PageProps) {
-  const config = useAppConfig();
-
   return (
     <div className={styles.layout}>
       <Meta />
       <div className={styles.upperContainer}>
         <Header />
-        <BroadcastBannerStack semaphoreUrl={config.semaphoreUrl} />
+        <BroadcastBannerStack />
         {children}
       </div>
       <div className={styles.stickyFooterContainer}>

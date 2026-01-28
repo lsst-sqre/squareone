@@ -1,23 +1,26 @@
 'use client';
 
-import dynamic from 'next/dynamic';
-import React from 'react';
+import { useServiceDiscovery } from '@lsst-sqre/repertoire-client';
+import { useBroadcasts } from '@lsst-sqre/semaphore-client';
+import { useRepertoireUrl } from '@/hooks/useRepertoireUrl';
+import BroadcastBanner from './BroadcastBanner';
 
-type BroadcastBannerStackProps = {
-  semaphoreUrl?: string;
-};
+export default function BroadcastBannerStack() {
+  const repertoireUrl = useRepertoireUrl();
+  const { query: discoveryQuery } = useServiceDiscovery(repertoireUrl ?? '');
+  const semaphoreUrl = discoveryQuery?.getSemaphoreUrl();
 
-// Dynamic import with SSR disabled to prevent SWR hook issues
-const BroadcastBannerStackClient = dynamic(
-  () => import('./BroadcastBannerStackClient'),
-  {
-    ssr: false,
-    loading: () => <></>, // No loading state needed for broadcasts
+  const { broadcasts, isPending, isError } = useBroadcasts(semaphoreUrl ?? '');
+
+  if (!semaphoreUrl || isPending || isError || !broadcasts.length) {
+    return null;
   }
-);
 
-export default function BroadcastBannerStack({
-  semaphoreUrl,
-}: BroadcastBannerStackProps) {
-  return <BroadcastBannerStackClient semaphoreUrl={semaphoreUrl} />;
+  return (
+    <>
+      {broadcasts.map((broadcast) => (
+        <BroadcastBanner broadcast={broadcast} key={broadcast.id} />
+      ))}
+    </>
+  );
 }
