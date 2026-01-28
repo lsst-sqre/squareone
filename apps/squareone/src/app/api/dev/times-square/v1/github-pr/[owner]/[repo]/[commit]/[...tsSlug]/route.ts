@@ -1,25 +1,18 @@
-/*
- * Mock Times Square API endpoint: /times-square/v1/pages/:page
+/**
+ * Mock Times Square API for a PR preview page:
+ * /times-square/v1/github-pr/:owner/:repo/:commit/:slug (App Router version)
  */
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { loadAppConfig } from '../../../../../../lib/config/loader';
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+import { NextResponse } from 'next/server';
+
+import { loadAppConfig } from '@/lib/config/loader';
+
+export async function GET() {
   try {
-    const { page } = req.query;
+    const page = 'demo';
     const appConfig = await loadAppConfig();
     const { timesSquareUrl } = appConfig;
     const pageBaseUrl = `${timesSquareUrl}/v1/pages/${page}`;
-
-    if (page === 'not-found') {
-      // simulate a page that doesn't exist in the backend
-      res.statusCode = 404;
-      res.end();
-      return;
-    }
 
     const content = {
       name: page,
@@ -44,16 +37,15 @@ export default async function handler(
       },
     };
 
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(content));
+    return NextResponse.json(content);
   } catch (error) {
     console.error(
-      'Failed to load configuration in Times Square page API:',
+      'Failed to load configuration in Times Square github-pr API:',
       error
     );
-    res.statusCode = 500;
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify({ error: 'Internal server error' }));
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }

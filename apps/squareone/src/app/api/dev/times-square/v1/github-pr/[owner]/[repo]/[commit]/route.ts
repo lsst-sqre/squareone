@@ -1,13 +1,11 @@
-/*
+/**
  * Mock Times Square GitHub PR contents API endpoint:
- * /times-square/v1/github-pr/:owner/:repo/:commit
+ * /times-square/v1/github-pr/:owner/:repo/:commit (App Router version)
  */
 
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { NextResponse } from 'next/server';
 
-export default function handler(_req: NextApiRequest, res: NextApiResponse) {
-  // const { owner, repo, commit, tsSlug } = req.query;
-
+export async function GET() {
   const data = {
     contents: [
       {
@@ -90,7 +88,5 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
     ],
   };
 
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'application/json');
-  res.end(JSON.stringify(data));
+  return NextResponse.json(data);
 }

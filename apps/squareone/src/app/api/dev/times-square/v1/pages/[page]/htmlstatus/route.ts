@@ -1,15 +1,21 @@
-/*
+/**
  * Mock Times Square API endpoint: /times-square/api/v1/pages/:page/htmlstatus
+ * (App Router version)
  */
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { loadAppConfig } from '../../../../../../../lib/config/loader';
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
+import { NextResponse } from 'next/server';
+
+import { loadAppConfig } from '@/lib/config/loader';
+
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ page: string }> }
 ) {
   try {
-    const { page, a } = req.query;
+    const { page } = await params;
+    const url = new URL(request.url);
+    const a = url.searchParams.get('a') ?? '1';
+
     const appConfig = await loadAppConfig();
     const { timesSquareUrl } = appConfig;
 
@@ -22,19 +28,17 @@ export default async function handler(
     };
 
     console.log(content);
-
     console.log('Pinged status');
 
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(content));
+    return NextResponse.json(content);
   } catch (error) {
     console.error(
       'Failed to load configuration in Times Square htmlstatus API:',
       error
     );
-    res.statusCode = 500;
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify({ error: 'Internal server error' }));
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }

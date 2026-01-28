@@ -1,29 +1,24 @@
-/*
+/**
  * Mock Times Square API endpoint: /times-square/v1/pages/:page/htmlevents
  * Server-Sent Events (SSE) endpoint for execution status updates
+ * (App Router version)
  */
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { loadAppConfig } from '../../../../../../../lib/config/loader';
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
+import { loadAppConfig } from '@/lib/config/loader';
+
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ page: string }> }
 ) {
   try {
-    const { page, a } = req.query;
+    const { page } = await params;
+    const url = new URL(request.url);
+    const a = url.searchParams.get('a') ?? '1';
+
     const appConfig = await loadAppConfig();
     const { timesSquareUrl } = appConfig;
 
     const pageBaseUrl = `${timesSquareUrl}/v1/pages/${page}`;
-
-    // Set up Server-Sent Events headers
-    res.writeHead(200, {
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache',
-      Connection: 'keep-alive',
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Headers': 'Cache-Control',
-    });
 
     // Mock execution data based on the parameter 'a'
     const executionStatus = a === '2' ? 'in_progress' : 'complete';
@@ -44,19 +39,36 @@ export default async function handler(
       html_url: `${pageBaseUrl}/html?a=${a}`,
     };
 
-    // Send the event data
-    res.write(`data: ${JSON.stringify(eventData)}\n\n`);
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      start(controller) {
+        // Send the event data
+        controller.enqueue(
+          encoder.encode(`data: ${JSON.stringify(eventData)}\n\n`)
+        );
+        // Close the stream after sending one event
+        // In real implementation, this would stay open and send updates
+        controller.close();
+      },
+    });
 
-    // For demo purposes, close the connection after sending one event
-    // In real implementation, this would stay open and send updates
-    res.end();
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        Connection: 'keep-alive',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Cache-Control',
+      },
+    });
   } catch (error) {
     console.error(
       'Failed to load configuration in Times Square htmlevents API:',
       error
     );
-    res.statusCode = 500;
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify({ error: 'Internal server error' }));
+    return new Response(JSON.stringify({ error: 'Internal server error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 }
