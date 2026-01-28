@@ -6,6 +6,11 @@
 import { NextResponse } from 'next/server';
 
 import { loadAppConfig } from '@/lib/config/loader';
+import { createRouteLogger } from '@/lib/logger';
+
+const log = createRouteLogger(
+  'times-square/github-pr/[owner]/[repo]/[commit]/[...tsSlug]'
+);
 
 export async function GET() {
   try {
@@ -39,10 +44,7 @@ export async function GET() {
 
     return NextResponse.json(content);
   } catch (error) {
-    console.error(
-      'Failed to load configuration in Times Square github-pr API:',
-      error
-    );
+    log.error({ err: error }, 'Failed to load configuration');
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

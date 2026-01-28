@@ -1,5 +1,7 @@
 // Server-side configuration loader with Ajv validation (migrated from next.config.js)
 // Using require() for server-side modules to avoid dynamic import issues in production builds
+import logger from '../logger';
+
 const fs = require('node:fs');
 const path = require('node:path');
 const yaml = require('js-yaml');
@@ -86,7 +88,7 @@ function readYamlConfig(configPath: string, schemaPath: string): any {
 
     return data;
   } catch (err) {
-    console.error(`Configuration (${configPath}) could not be read.`, err);
+    logger.error({ err, configPath }, 'Configuration could not be read');
     process.exit(1);
   }
 }
@@ -95,7 +97,7 @@ function readYamlConfig(configPath: string, schemaPath: string): any {
 function readPublicYamlConfig(): any {
   const p = process.env.SQUAREONE_CONFIG_PATH || 'squareone.config.yaml';
   const configPath = path.isAbsolute(p) ? p : path.join(process.cwd(), p);
-  console.log(`Reading public squareone config from ${configPath}`);
+  logger.debug({ configPath }, 'Reading public squareone config');
   const schemaPath = path.join(process.cwd(), 'squareone.config.schema.json');
   return readYamlConfig(configPath, schemaPath);
 }
@@ -105,7 +107,7 @@ function readServerYamlConfig(): any {
   const p =
     process.env.SQUAREONE_SERVER_CONFIG_PATH || 'squareone.serverconfig.yaml';
   const configPath = path.isAbsolute(p) ? p : path.join(process.cwd(), p);
-  console.log(`Reading server-side squareone config from ${configPath}`);
+  logger.debug({ configPath }, 'Reading server-side squareone config');
   const schemaPath = path.join(
     process.cwd(),
     'squareone.serverconfig.schema.json'
@@ -119,7 +121,7 @@ export async function loadAppConfig(): Promise<AppConfig> {
     return cachedAppConfig;
   }
 
-  console.log('Loading app configuration from filesystem...');
+  logger.debug('Loading app configuration from filesystem');
   const publicConfig = readPublicYamlConfig();
   const serverConfig = readServerYamlConfig();
   const sentryDsn = process.env.SENTRY_DSN;
@@ -138,7 +140,7 @@ export async function loadAppConfig(): Promise<AppConfig> {
   // Cache the config if caching is enabled
   if (ENABLE_CACHING) {
     cachedAppConfig = config;
-    console.log('App configuration cached');
+    logger.debug('App configuration cached');
   }
 
   return config;
@@ -183,13 +185,13 @@ export async function loadMdxContent(
     throw new Error(`MDX file not found: ${fullPath}`);
   }
 
-  console.log('Loading MDX content from filesystem:', fullPath);
+  logger.debug({ fullPath }, 'Loading MDX content from filesystem');
   const fileContents = fs.readFileSync(fullPath, 'utf8');
 
   // Cache the content if caching is enabled
   if (ENABLE_CACHING) {
     mdxContentCache.set(cacheKey, fileContents);
-    console.log('MDX content cached', contentPath);
+    logger.debug({ contentPath }, 'MDX content cached');
   }
 
   return fileContents;
