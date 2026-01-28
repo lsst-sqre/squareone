@@ -1,35 +1,26 @@
 'use client';
 
 /**
- * Unified hook for accessing static configuration.
+ * Hook for accessing static configuration in client components.
  *
- * This hook provides a seamless way to access configuration in components
- * that are shared between App Router and Pages Router:
- *
- * - **App Router**: Uses ConfigProvider (RSC pattern with React 19's use() hook)
- * - **Pages Router**: Falls back to AppConfigProvider (synchronous pattern)
- *
- * This enables gradual migration from Pages Router to App Router without
- * duplicating components or creating conditional logic in each component.
+ * Uses ConfigProvider (RSC pattern with React 19's use() hook) to resolve
+ * the configuration promise provided by the App Router layout.
  */
 
 import { use, useContext } from 'react';
 
-import {
-  AppConfigContext,
-  type AppConfigContextValue,
-} from '../contexts/AppConfigContext';
 import { ConfigContext } from '../contexts/rsc/ConfigProvider';
+import type { AppConfig } from '../lib/config/loader';
+
+export type { AppConfig as AppConfigContextValue } from '../lib/config/loader';
 
 /**
  * Hook to access static configuration in client components.
  *
- * Works with both router patterns:
- * - App Router: Suspends until config promise resolves (via ConfigProvider)
- * - Pages Router: Returns already-resolved config (via AppConfigProvider)
+ * Suspends until config promise resolves (via ConfigProvider).
  *
  * @returns The static configuration object
- * @throws Error if used outside of both ConfigProvider and AppConfigProvider
+ * @throws Error if used outside of ConfigProvider
  *
  * @example
  * ```tsx
@@ -43,27 +34,15 @@ import { ConfigContext } from '../contexts/rsc/ConfigProvider';
  * }
  * ```
  */
-export function useStaticConfig(): AppConfigContextValue {
-  // Try RSC ConfigProvider first (App Router)
+export function useStaticConfig(): AppConfig {
   const rscConfigPromise = useContext(ConfigContext);
 
-  // Try AppConfigProvider (Pages Router)
-  const appConfig = useContext(AppConfigContext);
-
   if (rscConfigPromise) {
-    // App Router - use React 19's use() to resolve promise
-    // Note: use() can be called conditionally (unlike other hooks)
     return use(rscConfigPromise);
   }
 
-  if (appConfig) {
-    // Pages Router - return already-resolved config
-    return appConfig;
-  }
-
   throw new Error(
-    'useStaticConfig must be used within ConfigProvider (App Router) ' +
-      'or AppConfigProvider (Pages Router). ' +
-      'Make sure your component is wrapped in the appropriate provider.'
+    'useStaticConfig must be used within ConfigProvider. ' +
+      'Make sure your component is wrapped in <ConfigProvider>.'
   );
 }
