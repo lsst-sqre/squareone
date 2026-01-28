@@ -4,7 +4,6 @@ const fs = require('node:fs');
 const path = require('node:path');
 const yaml = require('js-yaml');
 const Ajv = require('ajv');
-// Removed serialize - now handled in individual page getServerSideProps
 
 // Caching for production optimization
 // In production, config and content files are read once and cached
@@ -193,17 +192,5 @@ export async function loadMdxContent(
     console.log('MDX content cached', contentPath);
   }
 
-  // Return raw MDX content - serialization will be done in getServerSideProps
   return fileContents;
-}
-
-// Convenience function to load both config and raw MDX content
-export async function loadConfigAndMdx(contentPath: string): Promise<{
-  config: AppConfig;
-  mdxContent: string;
-}> {
-  const config = await loadAppConfig();
-  const mdxContent = await loadMdxContent(contentPath, config);
-
-  return { config, mdxContent };
 }
