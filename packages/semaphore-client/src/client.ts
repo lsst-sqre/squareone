@@ -10,11 +10,13 @@ export class SemaphoreError extends Error {
   }
 }
 
-// Module-level cache for cross-request caching (server-side)
+// Module-level cache for deduplication (applies to both server and client contexts)
 let cachedBroadcasts: BroadcastsResponse | null = null;
 let cacheTimestamp = 0;
 let cachedUrl: string | null = null;
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+// Cache TTL must align with TanStack Query's refetchInterval (60s) to allow
+// client-side polling to trigger actual network requests
+const CACHE_TTL = 60 * 1000;
 
 /**
  * Clear the module-level cache. Primarily for testing.
