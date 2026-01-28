@@ -1,25 +1,11 @@
+import type { Broadcast } from '@lsst-sqre/semaphore-client';
 import { Button } from '@lsst-sqre/squared';
 import type React from 'react';
 import useDisclosure from 'react-a11y-disclosure';
 
 import styles from './BroadcastBanner.module.css';
 
-type BroadcastCategory = 'info' | 'outage' | 'notice' | 'maintenance' | 'other';
-
-type BroadcastContent = {
-  gfm: string;
-  html: string;
-};
-
-type Broadcast = {
-  id: string;
-  summary: BroadcastContent;
-  body?: BroadcastContent;
-  active: boolean;
-  enabled: boolean;
-  stale: boolean;
-  category: BroadcastCategory;
-};
+type BroadcastCategory = Broadcast['category'] | 'maintenance' | 'other';
 
 type BroadcastBannerProps = {
   broadcast?: Broadcast;
