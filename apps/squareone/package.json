@@ -35,14 +35,14 @@
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@lsst-sqre/gafaelfawr-client": "workspace:*",
     "@lsst-sqre/global-css": "workspace:*",
-    "@lsst-sqre/rubin-style-dictionary": "workspace:*",
     "@lsst-sqre/repertoire-client": "workspace:*",
+    "@lsst-sqre/rubin-style-dictionary": "workspace:*",
     "@lsst-sqre/semaphore-client": "workspace:*",
     "@lsst-sqre/squared": "workspace:*",
-    "@tanstack/react-query": "^5.90.20",
     "@lsst-sqre/times-square-client": "workspace:*",
     "@microsoft/fetch-event-source": "^2.0.1",
     "@sentry/nextjs": "^10.35.0",
+    "@tanstack/react-query": "^5.90.20",
     "ajv": "^8.11.0",
     "ajv-formats": "^3.0.1",
     "clsx": "^2.1.1",
@@ -59,8 +59,7 @@
     "react-hook-form": "^7.71.1",
     "remark": "^14.0.2",
     "remark-gfm": "^3.0.1",
-    "remark-html": "^15.0.1",
-    "swr": "^2.3.8"
+    "remark-html": "^15.0.1"
   },
   "devDependencies": {
     "@lsst-sqre/tsconfig": "workspace:*",
