@@ -22,6 +22,11 @@ module.exports = () => {
           source: '/repertoire/discovery',
           destination: '/api/dev/repertoire/discovery',
         },
+        // Mock Semaphore (this is never triggered by a production ingress)
+        {
+          source: '/semaphore/v1/broadcasts',
+          destination: '/api/dev/semaphore/v1/broadcasts',
+        },
         // Mock Times Square (this is never triggered by a production ingress)
         {
           source: '/times-square/api/v1/pages',
