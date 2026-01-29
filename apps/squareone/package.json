@@ -9,7 +9,6 @@
     "test:unit": "vitest run --project=unit",
     "test:unit:watch": "vitest watch --project=unit",
     "start": "next start -p 3000",
-    "lint": "next lint",
     "type-check": "tsc --noEmit",
     "storybook": "storybook dev -p 6007",
     "build-storybook": "storybook build",
