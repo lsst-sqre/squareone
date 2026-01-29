@@ -10,7 +10,8 @@ export default function QuotasView({ quota }: QuotasViewProps) {
   // Check if we have any quota data to display
   const hasNotebookQuota =
     quota.notebook !== null && quota.notebook !== undefined;
-  const hasApiQuota = quota.api && Object.keys(quota.api).length > 0;
+  const apiItems = getApiItems(quota.api);
+  const hasApiQuota = apiItems.length > 0;
   const hasTapQuota = quota.tap && Object.keys(quota.tap).length > 0;
 
   return (
@@ -46,7 +47,7 @@ export default function QuotasView({ quota }: QuotasViewProps) {
             APIs limit the number of requests you can make in a 60 second
             window. Your request count resets every minute.
           </p>
-          <KeyValueList items={getApiItems(quota.api)} />
+          <KeyValueList items={apiItems} />
         </section>
       )}
     </div>
@@ -86,6 +87,7 @@ function getApiItems(api: Quota['api']): KeyValueListItem[] {
   if (!api) return [];
   return Object.entries(api)
     .sort(([a], [b]) => a.localeCompare(b)) // Sort alphabetically by service name
+    .filter(([service]) => !service.startsWith('muster-'))
     .map(([service, limit]) => ({
       key: service,
       value: `${limit} ${limit === 1 ? 'request' : 'requests'}`,
