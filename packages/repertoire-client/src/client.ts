@@ -1,5 +1,21 @@
 import { DiscoverySchema, type ServiceDiscovery } from './schemas';
 
+/**
+ * Minimal logger interface compatible with pino's calling convention.
+ * Accepts an optional logger; defaults to console-based output.
+ */
+export type Logger = {
+  debug: (obj: Record<string, unknown>, msg: string) => void;
+  warn: (obj: Record<string, unknown>, msg: string) => void;
+  error: (obj: Record<string, unknown>, msg: string) => void;
+};
+
+const defaultLogger: Logger = {
+  debug: (obj, msg) => console.log(msg, obj),
+  warn: (obj, msg) => console.warn(msg, obj),
+  error: (obj, msg) => console.error(msg, obj),
+};
+
 export class RepertoireError extends Error {
   constructor(
     message: string,
@@ -29,15 +45,19 @@ export function clearDiscoveryCache(): void {
 export type FetchOptions = {
   requestId?: string;
   forceRefresh?: boolean;
+  logger?: Logger;
 };
 
 export async function fetchServiceDiscovery(
   repertoireUrl: string,
   options?: FetchOptions
 ): Promise<ServiceDiscovery> {
-  const { requestId, forceRefresh = false } = options ?? {};
+  const {
+    requestId,
+    forceRefresh = false,
+    logger: log = defaultLogger,
+  } = options ?? {};
 
-  const logPrefix = requestId ? `[Repertoire:${requestId}]` : '[Repertoire]';
   const now = Date.now();
 
   // Check module-level cache (server-side cross-request caching)
@@ -49,7 +69,7 @@ export async function fetchServiceDiscovery(
     now - cacheTimestamp < CACHE_TTL
   ) {
     const cacheAge = Math.round((now - cacheTimestamp) / 1000);
-    console.log(`${logPrefix} Using cached discovery (age: ${cacheAge}s)`);
+    log.debug({ requestId, cacheAge }, 'Using cached discovery');
     return cachedDiscovery;
   }
 
@@ -61,13 +81,14 @@ export async function fetchServiceDiscovery(
   const discoveryUrl = `${baseUrl}/discovery`;
 
   const startTime = Date.now();
-  console.log(`${logPrefix} Starting network fetch from:`, discoveryUrl);
+  log.debug({ requestId, discoveryUrl }, 'Starting network fetch');
 
   const response = await fetch(discoveryUrl, { cache: 'no-store' });
 
   const fetchDuration = Date.now() - startTime;
-  console.log(
-    `${logPrefix} Network fetch completed in ${fetchDuration}ms, status: ${response.status}`
+  log.debug(
+    { requestId, fetchDuration, status: response.status },
+    'Network fetch completed'
   );
 
   if (!response.ok) {
@@ -78,18 +99,18 @@ export async function fetchServiceDiscovery(
   }
 
   const data = await response.json();
-  console.log(`${logPrefix} Raw response:`, JSON.stringify(data, null, 2));
+  log.debug({ requestId, rawResponse: data }, 'Raw response received');
 
   const parsed = DiscoverySchema.parse(data);
-  console.log(`${logPrefix} Parsed discovery:`, {
-    applications: parsed.applications,
-    uiServices: Object.keys(parsed.services.ui),
-    internalServices: Object.keys(parsed.services.internal),
-    hasPortalUi: 'portal' in parsed.services.ui,
-    hasNubladoUi: 'nublado' in parsed.services.ui,
-    portalUrl: parsed.services.ui.portal?.url,
-    nubladoUrl: parsed.services.ui.nublado?.url,
-  });
+  log.debug(
+    {
+      requestId,
+      applications: parsed.applications,
+      uiServices: Object.keys(parsed.services.ui),
+      internalServices: Object.keys(parsed.services.internal),
+    },
+    'Parsed discovery'
+  );
 
   // Update module-level cache
   cachedDiscovery = parsed;

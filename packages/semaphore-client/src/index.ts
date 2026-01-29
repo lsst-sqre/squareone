@@ -1,4 +1,6 @@
 // Core client
+
+export type { Logger } from './client';
 export {
   clearBroadcastsCache,
   fetchBroadcasts,

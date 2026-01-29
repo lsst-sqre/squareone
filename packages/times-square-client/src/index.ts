@@ -107,6 +107,7 @@ export { type TimesSquareQueryKeys, timesSquareKeys } from './query-keys';
 // Query Options
 // =============================================================================
 
+export type { Logger } from './query-options';
 export {
   githubContentsQueryOptions,
   githubPageQueryOptions,

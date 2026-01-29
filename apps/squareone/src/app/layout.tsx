@@ -91,7 +91,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
   if (config.repertoireUrl) {
     logger.debug('Prefetching service discovery');
     await queryClient.prefetchQuery(
-      discoveryQueryOptions(config.repertoireUrl)
+      discoveryQueryOptions(config.repertoireUrl, { logger })
     );
     const cachedData = queryClient.getQueryData([
       'service-discovery',
@@ -101,7 +101,9 @@ export default async function RootLayout({ children }: RootLayoutProps) {
 
     // Prefetch broadcasts from Semaphore (URL from service discovery)
     try {
-      const discovery = await fetchServiceDiscovery(config.repertoireUrl);
+      const discovery = await fetchServiceDiscovery(config.repertoireUrl, {
+        logger,
+      });
       const discoveryQuery = createDiscoveryQuery(discovery);
       const semaphoreUrl = discoveryQuery.getSemaphoreUrl();
 
@@ -109,6 +111,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
         await queryClient.prefetchQuery(
           broadcastsQueryOptions(semaphoreUrl, {
             refetchInterval: 0, // Server-side: no polling
+            logger,
           })
         );
       }

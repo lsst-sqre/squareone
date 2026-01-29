@@ -1,5 +1,5 @@
 import { queryOptions } from '@tanstack/react-query';
-import { fetchBroadcasts, getEmptyBroadcasts } from './client';
+import { fetchBroadcasts, getEmptyBroadcasts, type Logger } from './client';
 import type { BroadcastsResponse } from './schemas';
 
 export type BroadcastsQueryConfig = {
@@ -8,9 +8,10 @@ export type BroadcastsQueryConfig = {
   refetchInterval?: number;
   refetchOnWindowFocus?: boolean;
   refetchOnReconnect?: boolean;
+  logger?: Logger;
 };
 
-const defaultConfig: Required<BroadcastsQueryConfig> = {
+const defaultConfig: Required<Omit<BroadcastsQueryConfig, 'logger'>> = {
   staleTime: 60 * 1000, // 60s
   gcTime: 10 * 60 * 1000, // 10 min
   refetchInterval: 60 * 1000, // 60s polling
@@ -28,18 +29,26 @@ export const broadcastsQueryOptions = (
     refetchInterval,
     refetchOnWindowFocus,
     refetchOnReconnect,
+    logger: log,
   } = {
     ...defaultConfig,
     ...config,
   };
 
+  const defaultLog: Logger = {
+    debug: (obj, msg) => console.log(msg, obj),
+    warn: (obj, msg) => console.warn(msg, obj),
+    error: (obj, msg) => console.error(msg, obj),
+  };
+  const logger = log ?? defaultLog;
+
   return queryOptions({
     queryKey: ['broadcasts', semaphoreUrl] as const,
     queryFn: async (): Promise<BroadcastsResponse> => {
       try {
-        return await fetchBroadcasts(semaphoreUrl);
+        return await fetchBroadcasts(semaphoreUrl, { logger });
       } catch (error) {
-        console.error('[Semaphore] Failed to fetch broadcasts:', error);
+        logger.error({ err: error }, 'Failed to fetch broadcasts');
         return getEmptyBroadcasts();
       }
     },

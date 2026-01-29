@@ -6,6 +6,21 @@
  */
 import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query';
 
+/**
+ * Minimal logger interface compatible with pino's calling convention.
+ */
+export type Logger = {
+  debug: (obj: Record<string, unknown>, msg: string) => void;
+  warn: (obj: Record<string, unknown>, msg: string) => void;
+  error: (obj: Record<string, unknown>, msg: string) => void;
+};
+
+const defaultLogger: Logger = {
+  debug: (obj, msg) => console.log(msg, obj),
+  warn: (obj, msg) => console.warn(msg, obj),
+  error: (obj, msg) => console.error(msg, obj),
+};
+
 import {
   DEFAULT_GAFAELFAWR_URL,
   fetchLoginInfo,
@@ -31,9 +46,12 @@ import type { TokenHistoryFilters, TokenHistoryPage } from './types';
  * @param baseUrl - Gafaelfawr API base URL
  */
 export const userInfoQueryOptions = (
-  baseUrl: string = DEFAULT_GAFAELFAWR_URL
-) =>
-  queryOptions<UserInfo>({
+  baseUrl: string = DEFAULT_GAFAELFAWR_URL,
+  options?: { logger?: Logger }
+) => {
+  const log = options?.logger ?? defaultLogger;
+
+  return queryOptions<UserInfo>({
     queryKey: gafaelfawrKeys.userInfo(),
     queryFn: async () => {
       try {
@@ -41,7 +59,7 @@ export const userInfoQueryOptions = (
       } catch (error) {
         // Return empty user info for unauthenticated users
         // This allows components to check isLoggedIn without handling errors
-        console.error('[Gafaelfawr] Failed to fetch user info:', error);
+        log.error({ err: error }, 'Failed to fetch user info');
         return getEmptyUserInfo();
       }
     },
@@ -50,6 +68,7 @@ export const userInfoQueryOptions = (
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
   });
+};
 
 // =============================================================================
 // Login Info Query
@@ -61,15 +80,18 @@ export const userInfoQueryOptions = (
  * @param baseUrl - Gafaelfawr API base URL
  */
 export const loginInfoQueryOptions = (
-  baseUrl: string = DEFAULT_GAFAELFAWR_URL
-) =>
-  queryOptions<LoginInfo | null>({
+  baseUrl: string = DEFAULT_GAFAELFAWR_URL,
+  options?: { logger?: Logger }
+) => {
+  const log = options?.logger ?? defaultLogger;
+
+  return queryOptions<LoginInfo | null>({
     queryKey: gafaelfawrKeys.loginInfo(),
     queryFn: async () => {
       try {
         return await fetchLoginInfo(baseUrl);
       } catch (error) {
-        console.error('[Gafaelfawr] Failed to fetch login info:', error);
+        log.error({ err: error }, 'Failed to fetch login info');
         return null;
       }
     },
@@ -78,6 +100,7 @@ export const loginInfoQueryOptions = (
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
   });
+};
 
 // =============================================================================
 // Token List Query

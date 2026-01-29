@@ -6,6 +6,21 @@
  */
 import { queryOptions } from '@tanstack/react-query';
 
+/**
+ * Minimal logger interface compatible with pino's calling convention.
+ */
+export type Logger = {
+  debug: (obj: Record<string, unknown>, msg: string) => void;
+  warn: (obj: Record<string, unknown>, msg: string) => void;
+  error: (obj: Record<string, unknown>, msg: string) => void;
+};
+
+const defaultLogger: Logger = {
+  debug: (obj, msg) => console.log(msg, obj),
+  warn: (obj, msg) => console.warn(msg, obj),
+  error: (obj, msg) => console.error(msg, obj),
+};
+
 import {
   DEFAULT_TIMES_SQUARE_URL,
   fetchGitHubContents,
@@ -138,15 +153,18 @@ export const htmlStatusUrlQueryOptions = (
  * @param baseUrl - Times Square base URL
  */
 export const githubContentsQueryOptions = (
-  baseUrl: string = DEFAULT_TIMES_SQUARE_URL
-) =>
-  queryOptions<GitHubContentsRoot>({
+  baseUrl: string = DEFAULT_TIMES_SQUARE_URL,
+  options?: { logger?: Logger }
+) => {
+  const log = options?.logger ?? defaultLogger;
+
+  return queryOptions<GitHubContentsRoot>({
     queryKey: timesSquareKeys.githubContents(),
     queryFn: async () => {
       try {
         return await fetchGitHubContents(baseUrl);
       } catch (error) {
-        console.error('[TimesSquare] Failed to fetch GitHub contents:', error);
+        log.error({ err: error }, 'Failed to fetch GitHub contents');
         return getEmptyGitHubContents();
       }
     },
@@ -156,6 +174,7 @@ export const githubContentsQueryOptions = (
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
   });
+};
 
 /**
  * Query options for fetching a GitHub page by display path.
@@ -195,17 +214,20 @@ export const githubPrContentsQueryOptions = (
   owner: string,
   repo: string,
   commit: string,
-  baseUrl: string = DEFAULT_TIMES_SQUARE_URL
-) =>
-  queryOptions<GitHubPrContents>({
+  baseUrl: string = DEFAULT_TIMES_SQUARE_URL,
+  options?: { logger?: Logger }
+) => {
+  const log = options?.logger ?? defaultLogger;
+
+  return queryOptions<GitHubPrContents>({
     queryKey: timesSquareKeys.githubPrContents(owner, repo, commit),
     queryFn: async () => {
       try {
         return await fetchGitHubPrContents(baseUrl, owner, repo, commit);
       } catch (error) {
-        console.error(
-          '[TimesSquare] Failed to fetch GitHub PR contents:',
-          error
+        log.error(
+          { err: error, owner, repo, commit },
+          'Failed to fetch GitHub PR contents'
         );
         return getEmptyGitHubPrContents();
       }
@@ -216,6 +238,7 @@ export const githubPrContentsQueryOptions = (
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
   });
+};
 
 /**
  * Query options for fetching a GitHub PR page.

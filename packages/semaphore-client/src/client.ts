@@ -1,5 +1,20 @@
 import { type BroadcastsResponse, BroadcastsResponseSchema } from './schemas';
 
+/**
+ * Minimal logger interface compatible with pino's calling convention.
+ */
+export type Logger = {
+  debug: (obj: Record<string, unknown>, msg: string) => void;
+  warn: (obj: Record<string, unknown>, msg: string) => void;
+  error: (obj: Record<string, unknown>, msg: string) => void;
+};
+
+const defaultLogger: Logger = {
+  debug: (obj, msg) => console.log(msg, obj),
+  warn: (obj, msg) => console.warn(msg, obj),
+  error: (obj, msg) => console.error(msg, obj),
+};
+
 export class SemaphoreError extends Error {
   constructor(
     message: string,
@@ -30,6 +45,7 @@ export function clearBroadcastsCache(): void {
 export type FetchOptions = {
   requestId?: string;
   forceRefresh?: boolean;
+  logger?: Logger;
 };
 
 /**
@@ -39,9 +55,12 @@ export async function fetchBroadcasts(
   semaphoreUrl: string,
   options?: FetchOptions
 ): Promise<BroadcastsResponse> {
-  const { requestId, forceRefresh = false } = options ?? {};
+  const {
+    requestId,
+    forceRefresh = false,
+    logger: log = defaultLogger,
+  } = options ?? {};
 
-  const logPrefix = requestId ? `[Semaphore:${requestId}]` : '[Semaphore]';
   const now = Date.now();
 
   // Check module-level cache
@@ -52,7 +71,7 @@ export async function fetchBroadcasts(
     now - cacheTimestamp < CACHE_TTL
   ) {
     const cacheAge = Math.round((now - cacheTimestamp) / 1000);
-    console.log(`${logPrefix} Using cached broadcasts (age: ${cacheAge}s)`);
+    log.debug({ requestId, cacheAge }, 'Using cached broadcasts');
     return cachedBroadcasts;
   }
 
@@ -64,13 +83,14 @@ export async function fetchBroadcasts(
   const broadcastsUrl = `${baseUrl}/v1/broadcasts`;
 
   const startTime = Date.now();
-  console.log(`${logPrefix} Starting network fetch from:`, broadcastsUrl);
+  log.debug({ requestId, broadcastsUrl }, 'Starting network fetch');
 
   const response = await fetch(broadcastsUrl, { cache: 'no-store' });
 
   const fetchDuration = Date.now() - startTime;
-  console.log(
-    `${logPrefix} Network fetch completed in ${fetchDuration}ms, status: ${response.status}`
+  log.debug(
+    { requestId, fetchDuration, status: response.status },
+    'Network fetch completed'
   );
 
   if (!response.ok) {

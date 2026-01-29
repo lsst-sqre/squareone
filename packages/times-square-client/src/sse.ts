@@ -7,6 +7,7 @@
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 
 import { buildUrlWithParams } from './client';
+import type { Logger } from './query-options';
 import { type HtmlEvent, HtmlEventSchema } from './schemas';
 
 /**
@@ -33,6 +34,8 @@ export type SubscribeOptions = {
   signal?: AbortSignal;
   /** Whether to auto-abort when execution completes (default: true) */
   autoAbortOnComplete?: boolean;
+  /** Optional structured logger */
+  logger?: Logger;
 };
 
 /**
@@ -75,6 +78,7 @@ export function subscribeToHtmlEvents(
     onComplete,
     signal,
     autoAbortOnComplete = true,
+    logger: log,
   } = options ?? { onEvent: () => {} };
 
   const abortController = new AbortController();
@@ -117,7 +121,11 @@ export function subscribeToHtmlEvents(
       // Validate with Zod schema
       const result = HtmlEventSchema.safeParse(parsedData);
       if (!result.success) {
-        console.warn('[TimesSquare SSE] Invalid event data:', result.error);
+        if (log) {
+          log.warn({ zodError: result.error }, 'Invalid SSE event data');
+        } else {
+          console.warn('[TimesSquare SSE] Invalid event data:', result.error);
+        }
         return;
       }
 
