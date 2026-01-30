@@ -1,7 +1,7 @@
 'use client';
 
+import { Check, Clipboard } from 'lucide-react';
 import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
-import { Check, Clipboard } from 'react-feather';
 import { copyToClipboard } from '../../utils/clipboard';
 import Button, { type ButtonProps } from '../Button/Button';
 import styles from './ClipboardButton.module.css';

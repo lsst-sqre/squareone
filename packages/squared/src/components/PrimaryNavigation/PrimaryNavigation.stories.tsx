@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { ChevronDown } from 'react-feather';
+import { ChevronDown } from 'lucide-react';
 import { expect, screen, userEvent, within } from 'storybook/test';
 
 import { PrimaryNavigation } from './PrimaryNavigation';

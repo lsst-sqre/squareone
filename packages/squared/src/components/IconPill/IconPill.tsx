@@ -1,12 +1,11 @@
-import type { IconName, IconPrefix } from '@fortawesome/fontawesome-svg-core';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import type { LucideIcon } from 'lucide-react';
 import type React from 'react';
 import styles from './IconPill.module.css';
 
 export type IconPillProps = {
   text: string;
   url: string;
-  icon: [IconPrefix, IconName];
+  icon: LucideIcon;
   backgroundColor?: string;
   hoverBackgroundColor?: string;
   textColor?: string;
@@ -17,7 +16,7 @@ export type IconPillProps = {
  *
  * @component
  * @param {Object} props - The component props
- * @param {IconDefinition} props.icon - The FontAwesome icon to display
+ * @param {LucideIcon} props.icon - The Lucide icon component to display
  * @param {string} props.text - The text to display next to the icon
  * @param {string} props.url - The URL that the pill links to
  * @param {string} [props.backgroundColor='var(--sqo-primary-button-background-color)'] - The background color of the pill
@@ -26,7 +25,7 @@ export type IconPillProps = {
  * @returns {JSX.Element} A pill-shaped button containing an icon and text that links to a URL
  */
 export const IconPill = ({
-  icon,
+  icon: Icon,
   text,
   url,
   backgroundColor = 'var(--sqo-primary-button-background-color)',
@@ -42,7 +41,7 @@ export const IconPill = ({
   return (
     <span className={styles.pill} style={pillStyle}>
       <a href={url} className={styles.link}>
-        <FontAwesomeIcon icon={icon} className={styles.icon} />
+        <Icon className={styles.icon} size={16} />
         {text}
       </a>
     </span>

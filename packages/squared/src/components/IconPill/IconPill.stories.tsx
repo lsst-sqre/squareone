@@ -1,10 +1,6 @@
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faBook } from '@fortawesome/free-solid-svg-icons';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { BookOpen } from 'lucide-react';
 import { IconPill } from './IconPill';
-
-// Add icons to the global Font Awesome library
-library.add(faBook);
 
 const meta: Meta<typeof IconPill> = {
   title: 'Components/IconPill',
@@ -20,7 +16,7 @@ type Story = StoryObj<typeof IconPill>;
 
 export const Default: Story = {
   args: {
-    icon: ['fas', 'book'],
+    icon: BookOpen,
     text: 'Documentation',
     url: '#',
     textColor: '#ffffff',
