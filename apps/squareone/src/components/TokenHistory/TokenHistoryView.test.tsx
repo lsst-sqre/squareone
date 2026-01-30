@@ -9,13 +9,18 @@ import * as useRepertoireUrlModule from '../../hooks/useRepertoireUrl';
 import * as useTokenHistoryFiltersModule from '../../hooks/useTokenHistoryFilters';
 import TokenHistoryView from './TokenHistoryView';
 
-// Mock Next.js router
-vi.mock('next/router', () => ({
+// Mock Next.js navigation
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: vi.fn(),
-    pathname: '/test',
-    query: {},
+    replace: vi.fn(),
+    back: vi.fn(),
+    forward: vi.fn(),
+    refresh: vi.fn(),
+    prefetch: vi.fn(),
   }),
+  usePathname: () => '/test',
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 // Mock hooks

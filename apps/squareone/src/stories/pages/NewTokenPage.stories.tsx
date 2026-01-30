@@ -1,5 +1,5 @@
 import { type LoginInfo, useLoginInfo } from '@lsst-sqre/gafaelfawr-client';
-import { useRouter } from 'next/router';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { TokenForm, type TokenFormValues } from '../../components/TokenForm';
 import { parseExpirationFromQuery } from '../../lib/tokens/expiration';
@@ -101,7 +101,7 @@ function MockFetchProvider({
 }
 
 function NewTokenPageSimulator() {
-  const router = useRouter();
+  const searchParams = useSearchParams();
   // Pass undefined for repertoireUrl since we mock fetch directly
   const {
     loginInfo,
@@ -110,7 +110,19 @@ function NewTokenPageSimulator() {
   } = useLoginInfo(undefined);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const queryParams = parseTokenQueryParams(router.query);
+  // Convert URLSearchParams to ParsedUrlQuery-like object for parseTokenQueryParams
+  const query: Record<string, string | string[]> = {};
+  for (const [key, value] of searchParams.entries()) {
+    const existing = query[key];
+    if (existing) {
+      query[key] = Array.isArray(existing)
+        ? [...existing, value]
+        : [existing, value];
+    } else {
+      query[key] = value;
+    }
+  }
+  const queryParams = parseTokenQueryParams(query);
   const formInitialValues: Partial<TokenFormValues> = {};
 
   if (queryParams?.name) {
@@ -194,9 +206,9 @@ export default {
 export const Default = {
   parameters: {
     nextjs: {
-      router: {
+      appDirectory: true,
+      navigation: {
         pathname: '/settings/tokens/new',
-        query: {},
       },
     },
   },
@@ -205,11 +217,10 @@ export const Default = {
 export const WithNamePrefilled = {
   parameters: {
     nextjs: {
-      router: {
+      appDirectory: true,
+      navigation: {
         pathname: '/settings/tokens/new',
-        query: {
-          name: 'My API Token',
-        },
+        searchParams: { name: 'My API Token' },
       },
     },
   },
@@ -218,11 +229,10 @@ export const WithNamePrefilled = {
 export const WithSingleScope = {
   parameters: {
     nextjs: {
-      router: {
+      appDirectory: true,
+      navigation: {
         pathname: '/settings/tokens/new',
-        query: {
-          scope: 'read:all',
-        },
+        searchParams: { scope: 'read:all' },
       },
     },
   },
@@ -231,11 +241,10 @@ export const WithSingleScope = {
 export const WithCommaDelimitedScopes = {
   parameters: {
     nextjs: {
-      router: {
+      appDirectory: true,
+      navigation: {
         pathname: '/settings/tokens/new',
-        query: {
-          scope: 'read:all,user:token',
-        },
+        searchParams: { scope: 'read:all,user:token' },
       },
     },
   },
@@ -244,11 +253,14 @@ export const WithCommaDelimitedScopes = {
 export const WithRepeatedScopeParameters = {
   parameters: {
     nextjs: {
-      router: {
+      appDirectory: true,
+      navigation: {
         pathname: '/settings/tokens/new',
-        query: {
-          scope: ['read:all', 'user:token', 'exec:notebook'],
-        },
+        searchParams: [
+          ['scope', 'read:all'],
+          ['scope', 'user:token'],
+          ['scope', 'exec:notebook'],
+        ],
       },
     },
   },
@@ -257,11 +269,13 @@ export const WithRepeatedScopeParameters = {
 export const WithMixedScopeFormats = {
   parameters: {
     nextjs: {
-      router: {
+      appDirectory: true,
+      navigation: {
         pathname: '/settings/tokens/new',
-        query: {
-          scope: ['read:all,user:token', 'exec:notebook'],
-        },
+        searchParams: [
+          ['scope', 'read:all,user:token'],
+          ['scope', 'exec:notebook'],
+        ],
       },
     },
   },
@@ -270,11 +284,10 @@ export const WithMixedScopeFormats = {
 export const WithExpirationPrefilled = {
   parameters: {
     nextjs: {
-      router: {
+      appDirectory: true,
+      navigation: {
         pathname: '/settings/tokens/new',
-        query: {
-          expiration: '30d',
-        },
+        searchParams: { expiration: '30d' },
       },
     },
   },
@@ -283,13 +296,15 @@ export const WithExpirationPrefilled = {
 export const WithAllParametersCombined = {
   parameters: {
     nextjs: {
-      router: {
+      appDirectory: true,
+      navigation: {
         pathname: '/settings/tokens/new',
-        query: {
-          name: 'Complete Token',
-          scope: ['read:all', 'user:token'],
-          expiration: '7d',
-        },
+        searchParams: [
+          ['name', 'Complete Token'],
+          ['scope', 'read:all'],
+          ['scope', 'user:token'],
+          ['expiration', '7d'],
+        ],
       },
     },
   },
@@ -298,9 +313,10 @@ export const WithAllParametersCombined = {
 export const WithInvalidParameters = {
   parameters: {
     nextjs: {
-      router: {
+      appDirectory: true,
+      navigation: {
         pathname: '/settings/tokens/new',
-        query: {
+        searchParams: {
           name: 'Valid Name',
           scope: 'read:all',
           expiration: 'invalid-expiration',
@@ -314,11 +330,10 @@ export const WithInvalidParameters = {
 export const WithEmptyScopeValues = {
   parameters: {
     nextjs: {
-      router: {
+      appDirectory: true,
+      navigation: {
         pathname: '/settings/tokens/new',
-        query: {
-          scope: 'read:all,,user:token',
-        },
+        searchParams: { scope: 'read:all,,user:token' },
       },
     },
   },
@@ -327,11 +342,10 @@ export const WithEmptyScopeValues = {
 export const WithWhitespaceInScopes = {
   parameters: {
     nextjs: {
-      router: {
+      appDirectory: true,
+      navigation: {
         pathname: '/settings/tokens/new',
-        query: {
-          scope: ' read:all , user:token ',
-        },
+        searchParams: { scope: ' read:all , user:token ' },
       },
     },
   },
@@ -348,9 +362,9 @@ export const LoadingState = {
   ],
   parameters: {
     nextjs: {
-      router: {
+      appDirectory: true,
+      navigation: {
         pathname: '/settings/tokens/new',
-        query: {},
       },
     },
   },
@@ -367,9 +381,9 @@ export const ErrorState = {
   ],
   parameters: {
     nextjs: {
-      router: {
+      appDirectory: true,
+      navigation: {
         pathname: '/settings/tokens/new',
-        query: {},
       },
     },
   },
@@ -455,9 +469,9 @@ export const LimitedScopes = {
   ],
   parameters: {
     nextjs: {
-      router: {
+      appDirectory: true,
+      navigation: {
         pathname: '/settings/tokens/new',
-        query: {},
       },
     },
   },

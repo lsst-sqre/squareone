@@ -30,6 +30,7 @@ import Header from '../components/Header';
 import styles from '../components/Page/Page.module.css';
 import { ConfigProvider } from '../contexts/rsc';
 import { getStaticConfig } from '../lib/config/rsc';
+import logger from '../lib/logger';
 import { compileFooterMdxForRsc } from '../lib/mdx/rsc';
 import FooterRsc from './FooterRsc';
 import PlausibleWrapper from './PlausibleWrapper';
@@ -83,21 +84,26 @@ export default async function RootLayout({ children }: RootLayoutProps) {
   const queryClient = new QueryClient();
 
   // Prefetch service discovery if Repertoire URL is configured
-  console.log('[Layout] repertoireUrl from config:', config.repertoireUrl);
+  logger.debug(
+    { repertoireUrl: config.repertoireUrl },
+    'Layout repertoireUrl from config'
+  );
   if (config.repertoireUrl) {
-    console.log('[Layout] Prefetching service discovery...');
+    logger.debug('Prefetching service discovery');
     await queryClient.prefetchQuery(
-      discoveryQueryOptions(config.repertoireUrl)
+      discoveryQueryOptions(config.repertoireUrl, { logger })
     );
     const cachedData = queryClient.getQueryData([
       'service-discovery',
       config.repertoireUrl,
     ]);
-    console.log('[Layout] Prefetch complete, cached data:', cachedData);
+    logger.debug({ cachedData }, 'Prefetch complete');
 
     // Prefetch broadcasts from Semaphore (URL from service discovery)
     try {
-      const discovery = await fetchServiceDiscovery(config.repertoireUrl);
+      const discovery = await fetchServiceDiscovery(config.repertoireUrl, {
+        logger,
+      });
       const discoveryQuery = createDiscoveryQuery(discovery);
       const semaphoreUrl = discoveryQuery.getSemaphoreUrl();
 
@@ -105,16 +111,15 @@ export default async function RootLayout({ children }: RootLayoutProps) {
         await queryClient.prefetchQuery(
           broadcastsQueryOptions(semaphoreUrl, {
             refetchInterval: 0, // Server-side: no polling
+            logger,
           })
         );
       }
     } catch (error) {
-      console.error('[Layout] Failed to prefetch broadcasts:', error);
+      logger.error({ err: error }, 'Failed to prefetch broadcasts');
     }
   } else {
-    console.log(
-      '[Layout] No repertoireUrl configured, skipping service discovery'
-    );
+    logger.debug('No repertoireUrl configured, skipping service discovery');
   }
 
   // Compile footer MDX once at layout level

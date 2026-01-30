@@ -206,8 +206,8 @@ describe('discoveryQueryOptions', () => {
       await queryFn(createMockContext(url));
 
       expect(consoleError).toHaveBeenCalledWith(
-        expect.stringMatching(/^\[Discovery:[a-z0-9]+\] Failed to fetch:$/),
-        expect.any(Error)
+        'Failed to fetch discovery',
+        expect.objectContaining({ err: expect.any(Error) })
       );
 
       consoleError.mockRestore();

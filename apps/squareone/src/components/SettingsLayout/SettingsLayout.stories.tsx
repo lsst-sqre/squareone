@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { userEvent, within } from 'storybook/test';
 import SettingsLayoutClient from '../../app/settings/SettingsLayoutClient';
-import type { AppConfigContextValue } from '../../contexts/AppConfigContext';
+import type { AppConfigContextValue } from '../../hooks/useStaticConfig';
 
 // Default mock configuration for Storybook stories
 const defaultConfig: AppConfigContextValue = {

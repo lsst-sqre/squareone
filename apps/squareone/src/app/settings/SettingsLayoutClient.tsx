@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation';
 import { type ReactNode, useMemo } from 'react';
 import { getSettingsNavigation } from '../../components/SettingsLayout/settingsNavigation';
 import { SidebarLayout } from '../../components/SidebarLayout';
-import type { AppConfigContextValue } from '../../contexts/AppConfigContext';
+import type { AppConfigContextValue } from '../../hooks/useStaticConfig';
 
 type SettingsLayoutClientProps = {
   children: ReactNode;
