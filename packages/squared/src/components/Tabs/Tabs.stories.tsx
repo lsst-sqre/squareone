@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { Bell, Home, Settings, User } from 'lucide-react';
 import React from 'react';
-import { Bell, Home, Settings, User } from 'react-feather';
 import { expect, userEvent, within } from 'storybook/test';
 import { Button } from '../Button';
 import Tabs from './Tabs';

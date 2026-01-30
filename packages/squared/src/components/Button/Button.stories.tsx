@@ -1,11 +1,5 @@
-import {
-  faChevronRight,
-  faDownload,
-  faHome,
-  faUser,
-} from '@fortawesome/free-solid-svg-icons';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { ArrowRight, Download, Home, User } from 'react-feather';
+import { ArrowRight, ChevronRight, Download, Home, User } from 'lucide-react';
 import { expect, userEvent, within } from 'storybook/test';
 import Button from './Button';
 
@@ -117,28 +111,12 @@ export const Sizes: Story = {
   ),
 };
 
-// With FontAwesome icons
-export const WithFontAwesomeIcons: Story = {
-  render: () => (
-    <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-      <Button leadingIcon={faHome}>Home</Button>
-      <Button trailingIcon={faChevronRight}>Next</Button>
-      <Button leadingIcon={faUser} trailingIcon={faChevronRight}>
-        Profile
-      </Button>
-      <Button appearance="outline" tone="secondary" leadingIcon={faDownload}>
-        Download
-      </Button>
-    </div>
-  ),
-};
-
-// With Feather icons
-export const WithFeatherIcons: Story = {
+// With icons
+export const WithIcons: Story = {
   render: () => (
     <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
       <Button leadingIcon={Home}>Home</Button>
-      <Button trailingIcon={ArrowRight}>Next</Button>
+      <Button trailingIcon={ChevronRight}>Next</Button>
       <Button leadingIcon={User} trailingIcon={ArrowRight}>
         Profile
       </Button>

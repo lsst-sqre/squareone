@@ -1,7 +1,6 @@
 import * as SelectPrimitive from '@radix-ui/react-select';
+import { Check, ChevronDown, ChevronUp } from 'lucide-react';
 import React, { forwardRef } from 'react';
-// @ts-ignore - ChevronUp is missing from react-feather type definitions
-import { Check, ChevronDown, ChevronUp } from 'react-feather';
 import styles from './Select.module.css';
 
 export type SelectProps = {

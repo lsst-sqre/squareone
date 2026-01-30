@@ -29,9 +29,9 @@
   color: inherit;
 }
 
-/* FontAwesome icon styles */
+/* Icon styles */
 .icon {
   display: inline-block;
   margin-right: 0.4em;
-  font-size: 0.9em;
+  vertical-align: text-bottom;
 }
