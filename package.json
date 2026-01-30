@@ -46,7 +46,7 @@
     "@changesets/cli": "^2.29.8",
     "@turbo/gen": "^2.7.5",
     "dotenv": "^17.2.3",
-    "eslint": "^8.46.0",
+    "eslint": "^9.26.0",
     "husky": "^8.0.3",
     "lint-staged": "^13.2.3",
     "playwright": "^1.57.0",
