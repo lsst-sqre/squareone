@@ -1,6 +1,6 @@
 {
   "name": "@lsst-sqre/gafaelfawr-client",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "private": true,
   "description": "Gafaelfawr authentication API client with TanStack Query integration",
   "main": "./src/index.ts",
