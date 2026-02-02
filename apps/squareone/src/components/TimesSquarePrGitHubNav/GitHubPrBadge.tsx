@@ -1,4 +1,4 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { CircleX, GitMerge, GitPullRequest } from 'lucide-react';
 import type React from 'react';
 import styles from './GitHubPrBadge.module.css';
 
@@ -81,11 +81,11 @@ function getStateColour(state?: GitHubPrState): string {
 function PrStatusIcon({ state, url }: PrStatusIconProps) {
   let icon: React.ReactElement;
   if (state === 'closed') {
-    icon = <FontAwesomeIcon icon="circle-xmark" className={styles.icon} />;
+    icon = <CircleX className={styles.icon} />;
   } else if (state === 'merged') {
-    icon = <FontAwesomeIcon icon="code-merge" className={styles.icon} />;
+    icon = <GitMerge className={styles.icon} />;
   } else {
-    icon = <FontAwesomeIcon icon="code-pull-request" className={styles.icon} />;
+    icon = <GitPullRequest className={styles.icon} />;
   }
 
   return (

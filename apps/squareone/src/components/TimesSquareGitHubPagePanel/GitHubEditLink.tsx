@@ -1,4 +1,4 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import GitHubIcon from '../icons/GitHubIcon';
 import styles from './GitHubEditLink.module.css';
 
 type GitHubEditLinkProps = {
@@ -20,8 +20,8 @@ export default function GitHubEditLink({
 
   return (
     <p>
-      <a href={editUrl}>
-        <FontAwesomeIcon icon={['fab', 'github']} className={styles.icon} />
+      <a href={editUrl} className={styles.link}>
+        <GitHubIcon className={styles.icon} size={16} />
         {owner}/{repository}
       </a>
     </p>
