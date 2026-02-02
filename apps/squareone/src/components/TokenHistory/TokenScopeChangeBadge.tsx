@@ -1,6 +1,5 @@
-import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import type { BadgeSize } from '@lsst-sqre/squared';
+import { Minus, Plus } from 'lucide-react';
 import React from 'react';
 import { TokenScopeBadge } from './TokenScopeBadge';
 
@@ -35,12 +34,12 @@ export function TokenScopeChangeBadge({
   scope,
   size = 'sm',
 }: TokenScopeChangeBadgeProps) {
-  const icon = type === 'added' ? faPlus : faMinus;
+  const Icon = type === 'added' ? Plus : Minus;
   const variant = type === 'added' ? 'soft' : 'outline';
 
   return (
     <TokenScopeBadge scope={scope} variant={variant} size={size}>
-      <FontAwesomeIcon icon={icon} /> {scope}
+      <Icon size={12} /> {scope}
     </TokenScopeBadge>
   );
 }

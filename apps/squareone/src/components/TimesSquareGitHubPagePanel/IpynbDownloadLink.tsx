@@ -1,4 +1,4 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Download } from 'lucide-react';
 import styles from './IpynbDownloadLink.module.css';
 
 type IpynbDownloadLinkProps = {
@@ -15,9 +15,13 @@ export default function IpynbDownloadLink({
 
   return (
     <p className={styles.paragraph}>
-      <a href={url} title={filename} download={filename}>
-        <FontAwesomeIcon icon="download" className={styles.icon} /> Download
-        notebook
+      <a
+        href={url}
+        title={filename}
+        download={filename}
+        className={styles.link}
+      >
+        <Download className={styles.icon} size={16} /> Download notebook
       </a>
     </p>
   );

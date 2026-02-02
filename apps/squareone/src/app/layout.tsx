@@ -21,9 +21,7 @@ export const dynamic = 'force-dynamic';
 import '@fontsource/source-sans-pro/400.css';
 import '@fontsource/source-sans-pro/400-italic.css';
 import '@fontsource/source-sans-pro/700.css';
-import '@fortawesome/fontawesome-svg-core/styles.css';
 import '@lsst-sqre/global-css/dist/next.css';
-import '../styles/icons';
 
 import BroadcastBannerStack from '../components/BroadcastBannerStack';
 import Header from '../components/Header';

@@ -1,6 +1,6 @@
-import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import type { TokenChangeHistoryEntry } from '@lsst-sqre/gafaelfawr-client';
 import { Button } from '@lsst-sqre/squared';
+import { LoaderCircle } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 
 import TokenHistoryItem from './TokenHistoryItem';
@@ -84,7 +84,7 @@ export default function TokenHistoryList({
             onClick={onLoadMore}
             disabled={isLoadingMore}
             loading={isLoadingMore}
-            leadingIcon={isLoadingMore ? faSpinner : undefined}
+            leadingIcon={isLoadingMore ? LoaderCircle : undefined}
           >
             Load More
           </Button>
