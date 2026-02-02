@@ -8,7 +8,7 @@
     "access": "public"
   },
   "dependencies": {
-    "eslint-config-next": "^15.5.9",
+    "eslint-config-next": "^15.5.11",
     "eslint-config-turbo": "^2.7.6",
     "eslint-plugin-react": "^7.33.1"
   }
