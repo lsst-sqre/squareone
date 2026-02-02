@@ -144,6 +144,9 @@ importers:
         specifier: ^15.0.1
         version: 15.0.2
     devDependencies:
+      '@eslint/eslintrc':
+        specifier: ^3.3.3
+        version: 3.3.3
       '@lsst-sqre/tsconfig':
         specifier: workspace:*
         version: link:../../packages/tsconfig
@@ -240,6 +243,10 @@ importers:
       eslint-plugin-react:
         specifier: ^7.33.1
         version: 7.37.5(eslint@9.39.2)
+    devDependencies:
+      '@eslint/eslintrc':
+        specifier: ^3.3.3
+        version: 3.3.3
 
   packages/file-factory:
     dependencies:

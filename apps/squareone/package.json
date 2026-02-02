@@ -13,18 +13,8 @@
     "storybook": "storybook dev -p 6007",
     "build-storybook": "storybook build",
     "test-storybook": "vitest run --project=storybook",
-    "test-storybook:watch": "vitest watch --project=storybook"
-  },
-  "eslintConfig": {
-    "extends": [
-      "next/core-web-vitals",
-      "plugin:storybook/recommended"
-    ],
-    "rules": {
-      "import/no-anonymous-default-export": "off",
-      "react/no-unescaped-entities": "off",
-      "react/prop-types": "off"
-    }
+    "test-storybook:watch": "vitest watch --project=storybook",
+    "lint": "eslint \"src/**/*.ts*\""
   },
   "dependencies": {
     "@fontsource/source-sans-pro": "^4.5.11",
@@ -62,6 +52,7 @@
     "remark-html": "^15.0.1"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.3",
     "@lsst-sqre/tsconfig": "workspace:*",
     "@storybook/addon-a11y": "10.1.11",
     "@storybook/addon-docs": "10.1.11",

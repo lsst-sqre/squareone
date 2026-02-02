@@ -2,7 +2,7 @@
   "name": "@lsst-sqre/eslint-config",
   "version": "0.2.1",
   "private": true,
-  "main": "index.js",
+  "main": "index.mjs",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
@@ -11,5 +11,8 @@
     "eslint-config-next": "^15.5.9",
     "eslint-config-turbo": "^2.7.5",
     "eslint-plugin-react": "^7.33.1"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.3"
   }
 }
