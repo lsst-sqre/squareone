@@ -1,4 +1,4 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { GitCommitHorizontal } from 'lucide-react';
 import styles from './GitHubPrTitle.module.css';
 
 type GitHubPrTitleProps = {
@@ -34,9 +34,8 @@ export default function GitHubPrTitle({
           href={`https://github.com/${owner}/${repo}/`}
         >{`${owner}/${repo}`}</a>
       </h2>
-      <p>
-        <FontAwesomeIcon icon="code-commit" className={styles.icon} />{' '}
-        {commit?.slice(0, 7)}
+      <p className={styles.commitLine}>
+        <GitCommitHorizontal className={styles.icon} /> {commit?.slice(0, 7)}
       </p>
     </header>
   );

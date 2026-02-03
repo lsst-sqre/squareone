@@ -5,8 +5,8 @@
  * https://www.joshwcomeau.com/react/file-structure/
  */
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import clsx from 'clsx';
+import { ChevronDown } from 'lucide-react';
 import React from 'react';
 import styles from './Directory.module.css';
 
@@ -20,7 +20,7 @@ function Directory({ title, current, children }: DirectoryProps) {
   return (
     <div>
       <div className={clsx(styles.header, current && styles.headerCurrent)}>
-        <FontAwesomeIcon icon="angle-down" className={styles.icon} />
+        <ChevronDown className={styles.icon} />
         {title}
       </div>
       <div className={styles.contents}>{children}</div>

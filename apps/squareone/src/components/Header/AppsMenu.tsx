@@ -1,9 +1,9 @@
 'use client';
 
 import { PrimaryNavigation } from '@lsst-sqre/squared';
+import { ChevronDown } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import React from 'react';
-import { ChevronDown } from 'react-feather';
 import { useStaticConfig } from '../../hooks/useStaticConfig';
 
 type LinkProps = {

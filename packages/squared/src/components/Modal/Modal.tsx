@@ -1,6 +1,6 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
-import { X } from 'react-feather';
+import { X } from 'lucide-react';
 import styles from './Modal.module.css';
 
 export type ModalSize = 'small' | 'medium' | 'large';

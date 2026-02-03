@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Eye, EyeOff, Mail, Search, User } from 'react-feather';
+import { Eye, EyeOff, Mail, Search, User } from 'lucide-react';
 import { expect, userEvent, within } from 'storybook/test';
 import TextInput from './TextInput';
 
