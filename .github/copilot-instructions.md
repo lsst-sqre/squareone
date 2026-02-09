@@ -90,7 +90,7 @@ Both Biome and ESLint run in CI for thorough code quality validation
 - Use [`@lsst-sqre/global-css`](../packages/global-css) for global stylesheets
 - **Always reference design tokens** from [@lsst-sqre/rubin-style-dictionary](../packages/rubin-style-dictionary) via CSS custom properties
 - Design tokens available via CSS variables (e.g., `var(--rsd-color-primary-500)`)
-- Use Font Awesome icons consistently
+- Use Lucide React icons consistently
 
 #### CSS Modules pattern
 
