@@ -2,4 +2,4 @@
 "squareone": patch
 ---
 
-Bump eslint-config-next from 15.5.7 to 15.5.11
+Bump eslint-config-next from 15.5.7 to 15.5.12
