@@ -16,11 +16,6 @@ vi.mock('next/navigation', () => ({
   useParams: () => ({}),
 }));
 
-// Mock FontAwesome icons
-vi.mock('@fortawesome/react-fontawesome', () => ({
-  FontAwesomeIcon: vi.fn(() => null),
-}));
-
 // Mock ResizeObserver
 global.ResizeObserver = vi.fn().mockImplementation(() => ({
   observe: vi.fn(),

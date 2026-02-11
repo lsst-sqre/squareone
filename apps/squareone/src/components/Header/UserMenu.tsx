@@ -6,8 +6,8 @@ import {
   PrimaryNavigation,
   useGafaelfawrUser,
 } from '@lsst-sqre/squared';
+import { ChevronDown } from 'lucide-react';
 import NextLink from 'next/link';
-import { ChevronDown } from 'react-feather';
 
 type UserMenuProps = {
   pageUrl: URL;

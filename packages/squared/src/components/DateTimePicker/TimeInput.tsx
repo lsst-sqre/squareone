@@ -1,9 +1,8 @@
 'use client';
 
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import type React from 'react';
 import { forwardRef, useCallback, useRef } from 'react';
-// @ts-ignore - ChevronUp is missing from react-feather type definitions
-import { ChevronDown, ChevronUp } from 'react-feather';
 import styles from './TimeInput.module.css';
 
 export type TimeInputProps = {

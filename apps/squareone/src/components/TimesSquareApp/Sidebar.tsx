@@ -3,6 +3,7 @@
  */
 
 import { IconPill } from '@lsst-sqre/squared';
+import { BookOpen } from 'lucide-react';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { useStaticConfig } from '../../hooks/useStaticConfig';
@@ -24,7 +25,7 @@ export default function Sidebar({ pageNav, pagePanel }: SidebarProps) {
         <p className={styles.appTitle}>Times Square</p>
       </Link>
       <IconPill
-        icon={['fas', 'book']}
+        icon={BookOpen}
         text="Documentation"
         url={docsUrl}
         textColor="#ffffff"

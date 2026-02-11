@@ -1,11 +1,10 @@
 'use client';
 
 import * as PopoverPrimitive from '@radix-ui/react-popover';
+import { Calendar } from 'lucide-react';
 import type React from 'react';
 import { forwardRef, useCallback, useMemo, useRef, useState } from 'react';
 import { DayPicker } from 'react-day-picker';
-// @ts-expect-error - Calendar icon exists but is missing from react-feather type definitions
-import { Calendar } from 'react-feather';
 import { TextInput } from '../TextInput';
 import { CalendarCaption } from './CalendarCaption';
 import styles from './DateTimePicker.module.css';

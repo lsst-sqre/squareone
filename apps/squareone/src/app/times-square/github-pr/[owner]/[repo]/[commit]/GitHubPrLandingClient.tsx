@@ -1,7 +1,7 @@
 'use client';
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useGitHubPrContents } from '@lsst-sqre/times-square-client';
+import { GitCommitHorizontal } from 'lucide-react';
 import { useParams } from 'next/navigation';
 
 import TimesSquareApp from '../../../../../../components/TimesSquareApp';
@@ -98,7 +98,7 @@ export default function GitHubPrLandingClient() {
         <h1>
           {`${ownerStr}/${repoStr}`}{' '}
           <span className={styles.commitSpan}>
-            <FontAwesomeIcon icon="code-commit" className={styles.commitIcon} />{' '}
+            <GitCommitHorizontal className={styles.commitIcon} />{' '}
             {commitStr.slice(0, 7)}
           </span>
         </h1>

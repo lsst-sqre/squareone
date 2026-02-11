@@ -1,9 +1,5 @@
-import {
-  faChevronDown,
-  faChevronUp,
-  faXmark,
-} from '@fortawesome/free-solid-svg-icons';
 import { Button, DateTimePicker, TextInput } from '@lsst-sqre/squared';
+import { ChevronDown, ChevronUp, X } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import type { TokenHistoryFilters as FilterType } from '../../hooks/useTokenHistoryFilters';
 import styles from './TokenHistoryFilters.module.css';
@@ -174,7 +170,7 @@ export default function TokenHistoryFilters({
         appearance="outline"
         tone="secondary"
         size="sm"
-        leadingIcon={expandAll ? faChevronUp : faChevronDown}
+        leadingIcon={expandAll ? ChevronUp : ChevronDown}
         onClick={onToggleExpandAll}
         aria-label={expandAll ? 'Collapse all entries' : 'Expand all entries'}
       >
@@ -185,7 +181,7 @@ export default function TokenHistoryFilters({
         appearance="outline"
         tone="secondary"
         size="sm"
-        leadingIcon={faXmark}
+        leadingIcon={X}
         onClick={onClearFilters}
         aria-label="Clear all filters"
       >

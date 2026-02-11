@@ -1,5 +1,4 @@
-import { faBars } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Menu } from 'lucide-react';
 import React, { forwardRef } from 'react';
 
 import styles from './MobileMenuToggle.module.css';
@@ -28,7 +27,7 @@ const MobileMenuToggle = forwardRef<HTMLButtonElement, MobileMenuToggleProps>(
         aria-label={isOpen ? 'Close navigation menu' : 'Open navigation menu'}
         data-testid="mobile-menu-toggle"
       >
-        <FontAwesomeIcon icon={faBars} />
+        <Menu />
       </button>
     );
   }

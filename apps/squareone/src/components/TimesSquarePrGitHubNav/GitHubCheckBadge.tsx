@@ -1,4 +1,4 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { CircleCheck, CircleMinus, CircleX } from 'lucide-react';
 import type React from 'react';
 import styles from './GitHubCheckBadge.module.css';
 
@@ -48,16 +48,14 @@ export default function GitHubCheckBadge({
   if (status === 'completed') {
     if (conclusion === 'success') {
       icon = (
-        <FontAwesomeIcon
-          icon="circle-check"
+        <CircleCheck
           className={styles.icon}
           style={{ color: 'var(--rsd-color-green-500)' }}
         />
       );
     } else if (conclusion === 'failure') {
       icon = (
-        <FontAwesomeIcon
-          icon="circle-xmark"
+        <CircleX
           className={styles.icon}
           style={{ color: 'var(--rsd-color-red-500)' }}
         />
@@ -65,8 +63,7 @@ export default function GitHubCheckBadge({
     } else {
       // some other conclusion than success/failure
       icon = (
-        <FontAwesomeIcon
-          icon="circle-minus"
+        <CircleMinus
           className={styles.icon}
           style={{ color: 'var(--rsd-color-yellow-500)' }}
         />
@@ -75,15 +72,14 @@ export default function GitHubCheckBadge({
   } else {
     // no result yet
     icon = (
-      <FontAwesomeIcon
-        icon="circle-minus"
+      <CircleMinus
         className={styles.icon}
         style={{ color: 'var(--rsd-color-gray-500)' }}
       />
     );
   }
   return (
-    <a href={url}>
+    <a href={url} className={styles.link}>
       {icon} {title}
     </a>
   );

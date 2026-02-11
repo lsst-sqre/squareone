@@ -30,6 +30,14 @@
   text-decoration: underline;
 }
 
+.commitLine {
+  display: flex;
+  align-items: center;
+  gap: 0.25em;
+}
+
 .icon {
-  margin-right: 0.2em;
+  width: 1em;
+  height: 1em;
+  flex-shrink: 0;
 }

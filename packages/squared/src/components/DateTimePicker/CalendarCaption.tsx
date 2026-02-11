@@ -1,10 +1,9 @@
 'use client';
 
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type React from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { MonthCaptionProps } from 'react-day-picker';
-// @ts-expect-error - ChevronLeft and ChevronRight exist but are missing from react-feather type definitions
-import { ChevronLeft, ChevronRight } from 'react-feather';
 import styles from './DateTimePicker.module.css';
 
 const MONTHS = [

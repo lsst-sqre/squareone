@@ -4,8 +4,8 @@
  * https://www.joshwcomeau.com/react/file-structure/
  */
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import clsx from 'clsx';
+import { File } from 'lucide-react';
 import Link from 'next/link';
 import styles from './Page.module.css';
 
@@ -18,7 +18,7 @@ type PageProps = {
 function Page({ title, path, current }: PageProps) {
   return (
     <div className={clsx(styles.wrapper, current && styles.wrapperCurrent)}>
-      <FontAwesomeIcon icon="file" className={styles.icon} />
+      <File className={styles.icon} />
       <Link href={path}>{title}</Link>
     </div>
   );

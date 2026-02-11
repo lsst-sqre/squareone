@@ -256,8 +256,7 @@ These use workspace protocol: `"@lsst-sqre/global-css": "workspace:*"`
 
 - **React 19** - Component framework (peer dependency)
 - **Radix UI** - Unstyled UI primitives
-- **react-feather** - Icon library
-- **Font Awesome** - Additional icons
+- **lucide-react** - Icon library (tree-shakeable, SSR-compatible)
 - **date-fns** - Date manipulation
 - **react-day-picker** - Date picker component
 

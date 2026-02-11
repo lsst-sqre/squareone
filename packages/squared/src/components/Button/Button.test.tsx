@@ -1,6 +1,5 @@
-import { faHome } from '@fortawesome/free-solid-svg-icons';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { Home } from 'react-feather';
+import { Home } from 'lucide-react';
 import { describe, expect, it, vi } from 'vitest';
 import Button from './Button';
 
@@ -102,27 +101,21 @@ describe('Button', () => {
   });
 
   describe('Icons', () => {
-    it('renders FontAwesome leading icon', () => {
-      render(<Button leadingIcon={faHome}>Home</Button>);
-      const icon = document.querySelector('.leadingIcon svg');
-      expect(icon).toBeInTheDocument();
-    });
-
-    it('renders FontAwesome trailing icon', () => {
-      render(<Button trailingIcon={faHome}>Home</Button>);
-      const icon = document.querySelector('.trailingIcon svg');
-      expect(icon).toBeInTheDocument();
-    });
-
-    it('renders Feather leading icon', () => {
+    it('renders leading icon', () => {
       render(<Button leadingIcon={Home}>Home</Button>);
       const icon = document.querySelector('.leadingIcon svg');
       expect(icon).toBeInTheDocument();
     });
 
+    it('renders trailing icon', () => {
+      render(<Button trailingIcon={Home}>Home</Button>);
+      const icon = document.querySelector('.trailingIcon svg');
+      expect(icon).toBeInTheDocument();
+    });
+
     it('renders both leading and trailing icons', () => {
       render(
-        <Button leadingIcon={faHome} trailingIcon={Home}>
+        <Button leadingIcon={Home} trailingIcon={Home}>
           Both Icons
         </Button>
       );
@@ -154,7 +147,7 @@ describe('Button', () => {
 
     it('hides icons when loading', () => {
       render(
-        <Button loading leadingIcon={faHome} trailingIcon={Home}>
+        <Button loading leadingIcon={Home} trailingIcon={Home}>
           Loading
         </Button>
       );
