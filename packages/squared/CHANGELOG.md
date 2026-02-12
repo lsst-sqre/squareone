@@ -1,5 +1,38 @@
 # @lsst-sqre/squared
 
+## 0.13.0
+
+### Minor Changes
+
+- [#391](https://github.com/lsst-sqre/squareone/pull/391) [`643b9cb`](https://github.com/lsst-sqre/squareone/commit/643b9cb90c89203bbe57e9562ef3bd2c7825ad56) Thanks [@jonathansick](https://github.com/jonathansick)! - Migrate icons from FontAwesome and react-feather to lucide-react
+
+  **squared package:**
+
+  - Replaced `@fortawesome/fontawesome-svg-core`, `@fortawesome/free-solid-svg-icons`, `@fortawesome/react-fontawesome`, and `react-feather` with `lucide-react` as the unified icon library
+  - Updated all components (IconPill, Button, ClipboardButton, DateTimePicker, Modal, Select) to use Lucide icon components
+  - Fixed IconPill icon vertical alignment by replacing `font-size: 0.9em` with `vertical-align: text-bottom` for proper SVG baseline alignment
+  - Updated component prop types from FontAwesome `[IconPrefix, IconName]` tuples to `LucideIcon` component references
+  - Updated Storybook stories and tests to use Lucide icons
+
+  **squareone app:**
+
+  - Migrated all components from FontAwesome and react-feather imports to lucide-react
+  - Removed FontAwesome library initialization (`styles/icons.ts`) and CSS import from root layout
+  - Removed `react-feather` type declarations
+  - Added a custom `GitHubIcon` SVG component for the GitHub logo (not available in lucide-react)
+  - Updated icon CSS from `font-size`/`margin-right` patterns to `width`/`height`/flexbox for proper SVG alignment
+  - Removed FontAwesome mock from test setup
+
+### Patch Changes
+
+- [#386](https://github.com/lsst-sqre/squareone/pull/386) [`dd3a96b`](https://github.com/lsst-sqre/squareone/commit/dd3a96b5eaa205db856f2591f94547b88cbcb006) Thanks [@dependabot](https://github.com/apps/dependabot)! - Migrate ESLint configuration to v9 flat config format
+
+  - Replace legacy `.eslintrc.js` files with `eslint.config.mjs` across all packages and apps
+  - Convert shared `@lsst-sqre/eslint-config` to export a flat config array using `eslint-config-turbo/flat` and `FlatCompat` for `eslint-config-next`
+  - Add `@eslint/eslintrc` dependency for FlatCompat bridging where native flat config is not yet available
+  - Remove inline `eslintConfig` from squareone's `package.json` in favor of a standalone `eslint.config.mjs`
+  - Add explicit `lint` script to squareone
+
 ## 0.12.0
 
 ### Minor Changes
