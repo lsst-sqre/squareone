@@ -5,7 +5,7 @@ updates:
   - package-ecosystem: 'npm'
     directory: '/'
     schedule:
-      interval: 'weekly'
+      interval: 'monthly'
       day: 'monday'
       time: '03:00'
     open-pull-requests-limit: 15
@@ -88,79 +88,14 @@ updates:
           - 'eslint-config-turbo'
           - '@changesets/*'
 
-      # Runtime dependencies (UI, utilities, monitoring)
-      runtime:
-        patterns:
-          - '@radix-ui/*'
-          - '@fortawesome/*'
-          - '@fontsource/*'
-          - 'date-fns'
-          - 'date-fns-*'
-          - 'react-day-picker'
-          - 'remark'
-          - 'remark-*'
-          - 'next-mdx-remote'
-          - '@sentry/*'
-          - 'styled-components'
-          - 'swr'
-          - 'react-hook-form'
-          - 'formik'
-          - 'react-feather'
-          - 'ajv'
-          - 'ajv-formats'
-          - 'js-yaml'
-          - 'react-a11y-disclosure'
-          - 'unfetch'
-          - '@microsoft/fetch-event-source'
-
-      # Dev dependencies (testing, build, lint, types)
-      dev:
-        patterns:
-          - 'vitest'
-          - '@vitest/*'
-          - '@testing-library/*'
-          - 'vite'
-          - '@vitejs/*'
-          - 'tsup'
-          - 'lightningcss'
-          - 'lightningcss-*'
-          - 'typescript'
-          - '@types/*'
-          - 'typescript-plugin-*'
-          - 'eslint'
-          - 'eslint-config-*'
-          - 'eslint-plugin-*'
-          - 'style-dictionary'
-          - 'style-dictionary-*'
-          - '@types/styled-components'
-          - '@biomejs/biome'
-          - 'husky'
-          - 'lint-staged'
-          - 'prettier'
-          - 'jsdom'
-          - 'chromatic'
-          - 'babel-loader'
-          - 'glob'
-          - 'chokidar-cli'
-          - 'dotenv'
-          - 'lodash'
-          - 'yaml'
-          - 'new-component'
-        exclude-patterns:
-          - '@types/react'
-          - '@types/react-dom'
-          - 'eslint-config-next'
-          - 'eslint-config-turbo'
-          - 'eslint-plugin-storybook'
-
-      # Catchall for any unlisted development dependencies
-      misc-dev:
+      # Catchall for development dependencies
+      development:
         dependency-type: 'development'
         patterns:
           - '*'
 
-      # Catchall for any unlisted runtime dependencies
-      misc:
+      # Catchall for runtime dependencies
+      runtime:
         dependency-type: 'production'
         patterns:
           - '*'
@@ -170,6 +105,7 @@ updates:
     directory: '/'
     schedule:
       interval: 'monthly'
+      day: 'tuesday'
     rebase-strategy: 'auto'
     groups:
       actions:
@@ -180,14 +116,16 @@ updates:
   - package-ecosystem: 'pip'
     directory: '/'
     schedule:
-      interval: 'weekly'
+      interval: 'monthly'
+      day: 'wednesday'
     rebase-strategy: 'auto'
 
   # Docker base images
   - package-ecosystem: 'docker'
     directory: '/'
     schedule:
-      interval: 'weekly'
+      interval: 'monthly'
+      day: 'wednesday'
     rebase-strategy: 'auto'
 
 registries:
