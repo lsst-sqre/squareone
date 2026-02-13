@@ -44,7 +44,7 @@
     "@lsst-sqre/tsconfig": "workspace:*",
     "@tanstack/react-query": "^5.62.8",
     "@testing-library/react": "^16.1.0",
-    "@types/react": "^19.2.13",
+    "@types/react": "^19.2.14",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "typescript": "^5.7.2",
