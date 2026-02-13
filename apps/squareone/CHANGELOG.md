@@ -1,5 +1,23 @@
 # squareone
 
+## 0.31.1
+
+### Patch Changes
+
+- [#405](https://github.com/lsst-sqre/squareone/pull/405) [`1fe8816`](https://github.com/lsst-sqre/squareone/commit/1fe8816b415a23cf1b18e05517e291afbbfd441e) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @biomejs/biome from 2.3.12 to 2.3.14
+
+- [#405](https://github.com/lsst-sqre/squareone/pull/405) [`1fe8816`](https://github.com/lsst-sqre/squareone/commit/1fe8816b415a23cf1b18e05517e291afbbfd441e) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @types/node from 22.19.7 to 22.19.11
+
+- [#400](https://github.com/lsst-sqre/squareone/pull/400) [`f935c90`](https://github.com/lsst-sqre/squareone/commit/f935c902c98913adbe853bcd086124448b9498b2) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @types/react from 19.2.13 to 19.2.14 in the react group
+
+- [#405](https://github.com/lsst-sqre/squareone/pull/405) [`1fe8816`](https://github.com/lsst-sqre/squareone/commit/1fe8816b415a23cf1b18e05517e291afbbfd441e) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @vitejs/plugin-react from 5.1.2 to 5.1.4
+
+- [#405](https://github.com/lsst-sqre/squareone/pull/405) [`1fe8816`](https://github.com/lsst-sqre/squareone/commit/1fe8816b415a23cf1b18e05517e291afbbfd441e) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump dotenv from 17.2.3 to 17.2.4
+
+- [#405](https://github.com/lsst-sqre/squareone/pull/405) [`1fe8816`](https://github.com/lsst-sqre/squareone/commit/1fe8816b415a23cf1b18e05517e291afbbfd441e) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump glob from 13.0.1 to 13.0.2
+
+- [#399](https://github.com/lsst-sqre/squareone/pull/399) [`36a7ebe`](https://github.com/lsst-sqre/squareone/commit/36a7ebe62e8469a9ba31a1138543ead1203b84e2) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump imjasonh/setup-crane from 0.4 to 0.5 in the actions group
+
 ## 0.31.0
 
 ### Minor Changes
