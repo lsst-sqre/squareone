@@ -76,7 +76,7 @@
     "@vitest/browser": "^3.2.4",
     "eslint": "^9.26.0",
     "eslint-plugin-storybook": "^10.2.7",
-    "glob": "^13.0.2",
+    "glob": "^13.0.3",
     "msw": "^2.12.8",
     "msw-storybook-addon": "^2.0.6",
     "new-component": "^5.0.2",
