@@ -27,8 +27,13 @@ Squareone uses a combination of standalone and reusable workflows:
    dependabot-changesets.yaml
    └─→ Auto-generates changesets for Dependabot PRs
 
+   dependabot-label.yaml
+   └─→ Applies a dependencies-{major,minor,patch} label to Dependabot PRs
+       (via dependabot/fetch-metadata)
+
    dependabot-auto-merge.yaml (triggered by ci.yaml)
    └─→ Enables auto-merge for Dependabot PRs after CI passes
+       (reads the dependencies-* label as a fail-closed allowlist)
 
    codeql-analysis.yaml
    └─→ Security scanning (weekly + on main)
@@ -357,6 +362,48 @@ Without these Dependabot secrets configured, the workflow will fail with an erro
 
 For more information, see GitHub's documentation on `Automating Dependabot with GitHub Actions <https://docs.github.com/en/code-security/dependabot/working-with-dependabot/automating-dependabot-with-github-actions>`__ and `Managing encrypted secrets for Dependabot <https://docs.github.com/en/code-security/dependabot/working-with-dependabot/managing-encrypted-secrets-for-dependabot>`__.
 
+Labeling Dependabot update types — dependabot-label.yaml
+========================================================
+
+The ``dependabot-label.yaml`` workflow applies a ``dependencies-{major,minor,patch}`` label to each Dependabot pull request, recording the authoritative update type so that ``dependabot-auto-merge.yaml`` can make a safe merge decision.
+
+**Triggers:**
+
+- ``pull_request``: ``opened``, ``synchronize``, ``reopened``
+- Runs only for PRs authored by ``dependabot[bot]``
+
+Why a separate workflow
+-----------------------
+
+The update type is determined with the `dependabot/fetch-metadata <https://github.com/dependabot/fetch-metadata>`__ action, which is the authoritative source (it reads Dependabot's own metadata rather than parsing the PR title).
+``fetch-metadata`` only works in ``pull_request`` context, where the ``GITHUB_TOKEN`` is scoped to the PR.
+The ``dependabot-auto-merge.yaml`` workflow runs in ``workflow_run`` context for security and therefore cannot run ``fetch-metadata`` itself — instead it reads the label this workflow applies.
+
+Keeping labeling in its own workflow (and job) ensures that a labeling hiccup never fails the required ``dependabot-changesets`` check or blocks the changeset push.
+
+For grouped updates, ``fetch-metadata`` reports the group's **highest** semver change, so a group that contains any major bump is labeled ``dependencies-major``.
+
+Behavior
+--------
+
+1. Runs ``dependabot/fetch-metadata`` to obtain the ``update-type`` output (e.g. ``version-update:semver-major``).
+2. Derives the label name (``dependencies-major``, ``dependencies-minor``, or ``dependencies-patch``).
+3. Idempotently creates the label if it doesn't exist yet (``gh label create --force``), then adds it to the PR.
+
+If ``fetch-metadata`` returns no update type, the workflow exits without labeling.
+Because the auto-merge gate is fail-closed, an unlabeled PR is simply not auto-merged (manual merge required) — it can never wrongly auto-merge.
+
+Permissions and authentication
+------------------------------
+
+This workflow uses only the default ``GITHUB_TOKEN`` (no GitHub App token or Dependabot secrets are required).
+The ``permissions:`` block elevates the token for this workflow:
+
+- ``pull-requests: write`` — add the label to the PR
+- ``issues: write`` — create the label if it doesn't exist yet
+
+GitHub supports elevating the default token for Dependabot ``pull_request`` events; this is GitHub's documented auto-label pattern.
+
 Auto-merging Dependabot PRs — dependabot-auto-merge.yaml
 ========================================================
 
@@ -376,7 +423,7 @@ The workflow follows these steps to safely enable auto-merge:
 
 1. **Extract PR information** from the workflow run event
 2. **Verify PR author** is ``dependabot[bot]`` using secure identity checking
-3. **Fetch Dependabot metadata** to determine the semantic version update type
+3. **Read the** ``dependencies-*`` **label** applied by ``dependabot-label.yaml`` to determine the semantic version update type
 4. **Check for changeset file** to ensure the PR has versioning information
 5. **Enable auto-merge** with squash strategy if all conditions are met
 6. **Comment on PR** for visibility and audit trail
@@ -384,17 +431,20 @@ The workflow follows these steps to safely enable auto-merge:
 Auto-merge conditions
 ^^^^^^^^^^^^^^^^^^^^^
 
-Auto-merge is enabled only when ALL of the following conditions are met:
+Auto-merge is enabled only when ALL of the following conditions are met (a **fail-closed allowlist**):
 
 - ✅ PR is authored by ``dependabot[bot]``
 - ✅ CI workflow completed successfully
-- ✅ Update type is NOT a major version update (``version-update:semver-major``)
+- ✅ A ``dependencies-patch`` or ``dependencies-minor`` label is present (fail-closed: no label or a ``dependencies-major`` label ⇒ skipped)
 - ✅ Changeset file exists in the PR (created by ``dependabot-changesets.yaml``)
 
 **Excluded updates:**
 
-- ❌ Major version updates (e.g., ``v1.x.x`` → ``v2.0.0``) - These require manual review due to potential breaking changes
+- ❌ Major version updates (``dependencies-major`` label) - These require manual review due to potential breaking changes
+- ❌ Updates with no ``dependencies-*`` label - If ``dependabot-label.yaml`` did not apply a label (e.g. labeling failed or is still pending), auto-merge stays disabled and a manual merge is required
 - ❌ PRs without changesets - The workflow waits for ``dependabot-changesets.yaml`` to complete first
+
+For grouped updates, ``dependabot/fetch-metadata`` reports the group's **highest** semver change, so a group containing any major bump is labeled ``dependencies-major`` and excluded.
 
 Merge strategy
 ^^^^^^^^^^^^^^
@@ -448,6 +498,10 @@ The ``dependabot-auto-merge.yaml`` workflow is designed to run after both the ``
       ├─→ Creates changeset file
       └─→ Commits to PR
       ↓
+   2b. dependabot-label.yaml runs (pull_request trigger)
+      ├─→ Reads update type via dependabot/fetch-metadata
+      └─→ Applies dependencies-{major,minor,patch} label to the PR
+      ↓
    3. ci.yaml runs (pull_request trigger, includes new changeset)
       ├─→ Runs tests
       ├─→ Runs linting
@@ -456,7 +510,7 @@ The ``dependabot-auto-merge.yaml`` workflow is designed to run after both the ``
       ↓
    4. dependabot-auto-merge.yaml runs (workflow_run trigger)
       ├─→ Verifies changeset exists
-      ├─→ Checks update type
+      ├─→ Reads the dependencies-* label (fail-closed allowlist)
       └─→ Enables auto-merge if all conditions met
       ↓
    5. GitHub auto-merges when branch protection satisfied
@@ -473,15 +527,15 @@ Workflow outputs and visibility
 The workflow adds a comment to the PR with details:
 
 - ✅ Confirmation that auto-merge was enabled
-- 📋 Update type (e.g., ``version-update:semver-minor``)
-- 📦 List of updated dependencies
+- 📋 Update type (e.g., ``dependencies-minor``)
 - ℹ️ Explanation of next steps (waiting for branch protection)
 
 **When auto-merge is skipped:**
 
 The workflow logs the skip reason to the GitHub Actions console:
 
-- Major version update requiring manual review
+- Major version update requiring manual review (``dependencies-major`` label)
+- No ``dependencies-*`` label found (fail-closed; labeling may have failed or be pending)
 - Changeset not yet created (workflow may retry on next push)
 
 **Example comment:**
@@ -493,8 +547,7 @@ The workflow logs the skip reason to the GitHub Actions console:
    This Dependabot PR has been configured for auto-merge with squash strategy:
    - ✅ CI passed
    - ✅ Changeset detected
-   - ✅ Update type: `version-update:semver-patch`
-   - 📦 Dependencies: @types/react, @types/react-dom
+   - ✅ Update type: `dependencies-patch`
 
    The PR will automatically merge once all branch protection requirements are satisfied.
 
@@ -505,11 +558,11 @@ This workflow respects the Dependabot configuration in :file:`.github/dependabot
 
 **Major version blocking:**
 
-The Dependabot configuration already blocks major version updates with ``open-pull-requests-limit: 0`` for major updates. The workflow adds an additional safety layer by checking ``update-type`` and explicitly skipping major updates even if they somehow bypass the Dependabot configuration.
+The Dependabot configuration already blocks major version updates globally with an ``ignore`` rule for ``version-update:semver-major``. The auto-merge workflow adds an independent safety layer: its fail-closed allowlist only merges PRs carrying a ``dependencies-patch`` or ``dependencies-minor`` label, so a major update that somehow bypasses the Dependabot configuration (e.g. a security update) is never auto-merged.
 
 **Grouped updates:**
 
-When Dependabot creates grouped update PRs (e.g., "Update React ecosystem"), the workflow treats the group as a single PR and applies auto-merge if ALL updates in the group meet the criteria (no major versions in the group).
+When Dependabot creates grouped update PRs (e.g., "Update React ecosystem"), ``dependabot/fetch-metadata`` reports the group's highest semver change. ``dependabot-label.yaml`` labels the PR with that single highest type, so the group is auto-merged only when its highest bump is a minor or patch (no major versions in the group).
 
 Disabling auto-merge
 ---------------------
