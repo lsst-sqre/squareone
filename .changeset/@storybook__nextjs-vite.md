@@ -2,4 +2,4 @@
 "squareone": patch
 ---
 
-Bump @storybook/nextjs-vite from 10.2.7 to 10.4.1
+Bump @storybook/nextjs-vite from 10.2.7 to 10.2.8
