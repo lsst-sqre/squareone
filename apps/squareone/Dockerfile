@@ -14,7 +14,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN pnpm dlx turbo@2.8.3 prune --scope=squareone --docker
+RUN pnpm dlx turbo@2.9.14 prune --scope=squareone --docker
 
 
 FROM base AS installer
