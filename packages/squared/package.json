@@ -86,7 +86,7 @@
     "storybook": "10.4.1",
     "typescript": "^5.9.3",
     "typescript-plugin-css-modules": "^5.0.1",
-    "vitest": "^3.2.4"
+    "vitest": "^4.1.0"
   },
   "peerDependencies": {
     "next": "15",
