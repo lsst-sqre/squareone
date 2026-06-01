@@ -30,7 +30,7 @@ permissions:
 
 jobs:
   build:
-    uses: lsst-sqre/multiplatform-build-and-push/.github/workflows/build.yaml@v3
+    uses: lsst-sqre/multiplatform-build-and-push/.github/workflows/build.yaml@v4
     with:
       images: ghcr.io/${{ github.repository }}
       dockerfile: apps/squareone/Dockerfile
@@ -58,7 +58,7 @@ jobs:
           echo "${{ secrets.GITHUB_TOKEN }}" | crane auth login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Get image sizes per platform
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const { execSync } = require('child_process');
