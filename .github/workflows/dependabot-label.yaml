@@ -1,0 +1,56 @@
+name: Label Dependabot Update Type
+
+# Applies a `dependencies-{major,minor,patch}` label to Dependabot PRs based on
+# the authoritative update type reported by dependabot/fetch-metadata.
+#
+# Why a separate workflow:
+# - fetch-metadata only works in `pull_request` context (it reads the
+#   Dependabot-authored commit metadata), where the GITHUB_TOKEN is scoped to
+#   the PR. The auto-merge workflow runs in `workflow_run` context (for security)
+#   and cannot use fetch-metadata, so it reads the label this workflow applies.
+# - Kept as a separate workflow/job so a labeling hiccup never fails the required
+#   `dependabot-changesets` check or blocks the changeset push.
+#
+# The label is the input to dependabot-auto-merge.yaml's fail-closed allowlist:
+# only `dependencies-patch` / `dependencies-minor` enable auto-merge. No label
+# (e.g. labeling failed) or `dependencies-major` ⇒ no auto-merge.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  pull-requests: write # add label to the PR
+  issues: write # create the label if it doesn't exist yet
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    steps:
+      - name: Fetch Dependabot metadata
+        id: meta
+        uses: dependabot/fetch-metadata@v3 # github-token defaults to github.token
+
+      - name: Apply semver label (fail-closed)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          UPDATE_TYPE: ${{ steps.meta.outputs.update-type }} # e.g. version-update:semver-major
+        run: |
+          if [ -z "$UPDATE_TYPE" ]; then
+            echo "No update-type from fetch-metadata; not labeling (auto-merge stays disabled)."
+            exit 0
+          fi
+          SEMVER="${UPDATE_TYPE##*semver-}"   # major | minor | patch
+          LABEL="dependencies-$SEMVER"
+          case "$SEMVER" in
+            major) COLOR=D93F0B ;;
+            minor) COLOR=FBCA04 ;;
+            patch) COLOR=0E8A16 ;;
+            *)     COLOR=BFD4F2 ;;
+          esac
+          # idempotent create-if-missing, then add to PR
+          gh label create "$LABEL" --repo "$GITHUB_REPOSITORY" \
+            --color "$COLOR" --description "Dependabot semver update type" --force || true
+          gh pr edit "$PR_URL" --add-label "$LABEL"
