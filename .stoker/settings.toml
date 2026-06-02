@@ -1,0 +1,15 @@
+[profile]
+source = "github.com/lsst-sqre/rubin-stoker//profile@main"
+
+[sandbox]
+repo = "lsst-sqre/squareone"
+
+[sandbox.env]
+TURBO_API = "https://roundtable.lsst.cloud/turborepo-cache"
+TURBO_TEAM = "lsst-sqre"
+TURBO_TOKEN = "$secret:turbo_token"
+
+[secrets_required.turbo_token]
+description = "Gafaelfawr token with write:turborepo scope"
+example = "op://Employee/Turborepo Remote Cache/token"
+optional = false

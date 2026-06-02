@@ -11,3 +11,6 @@ out/
 **/dist/
 **/storybook-static/
 .turbo
+
+# devcontainer config files are JSONC (comments + stoker-managed sentinels)
+.devcontainer/

@@ -7,7 +7,13 @@
     "defaultBranch": "main"
   },
   "files": {
-    "includes": ["**", "!!**/package.json", "!**/*.ejs", "!**/next-env.d.ts"]
+    "includes": [
+      "**",
+      "!!**/package.json",
+      "!**/*.ejs",
+      "!**/next-env.d.ts",
+      "!**/.devcontainer/**/*.json"
+    ]
   },
   "formatter": {
     "enabled": true,
