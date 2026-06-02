@@ -9,10 +9,29 @@
  * - Not needed (Docker production builds)
  *
  * Environment variables checked (in priority order):
- * 1. PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 - Explicit skip signal
- * 2. PLAYWRIGHT_BROWSERS_PATH - Browsers available at custom path
- * 3. CI - Running in CI/Docker environment
+ * 1. STOKER_SANDBOX / STOKER_REPO_NAME - Running inside the stoker sandbox
+ * 2. PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 - Explicit skip signal
+ * 3. PLAYWRIGHT_BROWSERS_PATH - Browsers available at custom path
+ * 4. CI - Running in CI/Docker environment
  */
+
+// In the stoker sandbox the egress firewall is already up during this
+// `pnpm install` (it runs in postCreate), but the cdn.playwright.dev
+// allowlist entry isn't live yet — firewall extras only propagate after the
+// container finishes coming up. Auto-downloading here would fail and abort
+// the whole postCreate, so skip it. The CDN is allowlisted in
+// .stoker/settings.toml ([sandbox.firewall_extra_domains]), so browsers can
+// be installed on demand once the sandbox is up. STOKER_REPO_NAME is part of
+// the derived devcontainer's containerEnv, so it's reliably set in-sandbox.
+if (process.env.STOKER_SANDBOX || process.env.STOKER_REPO_NAME) {
+  console.log(
+    '⏭️  Skipping Playwright browser installation (stoker sandbox detected)'
+  );
+  console.log(
+    '   Install on demand with: pnpm exec playwright install chromium'
+  );
+  process.exit(0);
+}
 
 // Check if we should skip installation
 if (
