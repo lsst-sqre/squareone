@@ -62,14 +62,9 @@ export default function FooterRsc({ mdxContent }: FooterRscProps) {
             </div>
             <div className={styles.partnerLogoContainer}>
               <Image
-                className="u-invertable-image"
+                className="u-invertable-image u-responsive-image"
                 src={AgencyLogos}
                 alt="Logos of the Vera C. Rubin Observatory, NSF, US DOE, NOIRLab, AURA, and SLAC."
-                style={{
-                  maxWidth: '100%',
-                  width: 'auto',
-                  height: 'auto',
-                }}
               />
             </div>
           </>
