@@ -1,6 +1,6 @@
 {
   "name": "Squareone Monorepo",
-  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm",
+  "image": "mcr.microsoft.com/devcontainers/base:bookworm",
 
   "features": {
     "ghcr.io/devcontainers/features/git:1": {},
@@ -16,7 +16,7 @@
     }
   },
 
-  "remoteUser": "node",
+  "remoteUser": "vscode",
 
   "postCreateCommand": "corepack install && corepack enable && pnpm install && pip install uv",
 
@@ -69,7 +69,7 @@
   ],
 
   "remoteEnv": {
-    "PNPM_HOME": "/home/node/.local/share/pnpm",
+    "PNPM_HOME": "/home/vscode/.local/share/pnpm",
     "COREPACK_ENABLE_DOWNLOAD_PROMPT": "0",
     "TURBO_API": "https://roundtable.lsst.cloud/turborepo-cache"
   }

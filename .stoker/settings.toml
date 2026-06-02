@@ -9,6 +9,19 @@ TURBO_API = "https://roundtable.lsst.cloud/turborepo-cache"
 TURBO_TEAM = "lsst-sqre"
 TURBO_TOKEN = "$secret:turbo_token"
 
+# Additive entries for the sandbox egress firewall. Playwright fetches its
+# browser binaries (Chromium, used by the Storybook browser tests) from
+# cdn.playwright.dev (default host) with playwright.download.prss.microsoft.com
+# as the Microsoft mirror. The firewall rejects everything not allowlisted, so
+# without these `pnpm exec playwright install chromium` is blocked. These take
+# effect once the sandbox is up (extras propagate after postCreate), enabling
+# on-demand browser installs; see scripts/install-playwright.js.
+[sandbox.firewall_extra_domains]
+domains = [
+  "cdn.playwright.dev",
+  "playwright.download.prss.microsoft.com",
+]
+
 [secrets_required.turbo_token]
 description = "Gafaelfawr token with write:turborepo scope"
 example = "op://Employee/Turborepo Remote Cache/token"
