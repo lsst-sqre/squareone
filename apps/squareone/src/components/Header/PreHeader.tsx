@@ -49,9 +49,12 @@ export default function PreLogo() {
     // Use explicitly configured width
     logoWidth = config.headerLogoWidth;
   } else if (!isConfiguredLogo) {
-    // Calculate width from default logo's aspect ratio
+    // Calculate width from default logo's aspect ratio. Round to an integer so
+    // it matches the rendered (integer) width — a fractional width attribute can
+    // never equal the rounded rendered width, which trips next/image's
+    // aspect-ratio warning.
     const { width, height } = LogoImage;
-    logoWidth = (logoHeight * width) / height;
+    logoWidth = Math.round((logoHeight * width) / height);
   }
   // For configured logos without explicit width, leave undefined to maintain aspect ratio
 
@@ -73,16 +76,12 @@ export default function PreLogo() {
     <div className={styles.logoContainer}>
       <Link href="/" aria-label={`Homepage of ${config.siteName}`}>
         <Image
+          className={styles.logoImage}
           src={logoSrc}
           height={logoHeight}
           width={logoWidth}
           alt={logoAlt}
           onError={handleImageError}
-          style={{
-            maxWidth: '100%',
-            width: 'auto',
-            height: logoHeight,
-          }}
         />
       </Link>
     </div>

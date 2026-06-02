@@ -2,3 +2,16 @@
   width: 100%;
   margin-bottom: 0.5rem;
 }
+
+/*
+ * The logo renders at its `width`/`height` props (a controlled height) on wide
+ * viewports. `height: auto` lets the height follow the width down on narrow
+ * viewports (where `max-width: 100%` clamps the width), keeping the aspect ratio
+ * intact and avoiding next/image's "width or height modified" warning. Width is
+ * intentionally left to the prop rather than `auto` so the logo keeps its
+ * intended size instead of expanding to the source image's natural width.
+ */
+.logoImage {
+  max-width: 100%;
+  height: auto;
+}

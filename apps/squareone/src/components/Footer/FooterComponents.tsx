@@ -73,14 +73,9 @@ export function PartnerLogos({
   return (
     <div className={styles.partnerLogoContainer}>
       <Image
-        className="u-invertable-image"
+        className="u-invertable-image u-responsive-image"
         src={imageSrc}
         alt={alt}
-        style={{
-          maxWidth: '100%',
-          width: 'auto',
-          height: 'auto',
-        }}
       />
     </div>
   );

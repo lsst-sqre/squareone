@@ -81,6 +81,16 @@ img.u-invertable-image {
 }
 
 /*
+ * Preserve a next/image's aspect ratio when CSS resizes it (Next.js requires
+ * pairing an auto width with an auto height). See next/image docs.
+ */
+img.u-responsive-image {
+  max-width: 100%;
+  width: auto;
+  height: auto;
+}
+
+/*
  * Design token overrides for dark theme.
  */
 [data-theme="dark"] body {
