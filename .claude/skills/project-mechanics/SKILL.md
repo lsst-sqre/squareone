@@ -22,6 +22,21 @@ validation).
   add `-t '<name>'` to narrow to one test, or `--project=unit` to skip
   the storybook project)
 - `complete_test`: `pnpm test`
+- `setup_browser_tests` (one-time per fresh sandbox): `pnpm exec playwright install --with-deps chromium`
+
+`pnpm test` and `pnpm test-storybook` include the `storybook` vitest
+project, which renders stories in real Chromium via Playwright. In the
+stoker sandbox the browser and its OS libraries are **not** preinstalled:
+the egress firewall blocks the browser CDN during container creation, so the
+auto-download is skipped (`scripts/install-playwright.js`) and installs are
+on-demand. Run `setup_browser_tests` once before the first `pnpm test` /
+`pnpm test-storybook` in a fresh sandbox — it pulls Chromium from
+`cdn.playwright.dev` (allowlisted via `.stoker/settings.toml`) and the system
+libraries via apt (`deb.debian.org`), and is a fast no-op when already
+present. If the browser can't be provisioned, fall back to unit-only with
+`--project=unit` (e.g.
+`pnpm --filter @lsst-sqre/squared exec vitest run --project=unit`), which
+skips the storybook project at the cost of coverage.
 
 ## Lint
 
@@ -56,9 +71,10 @@ and leave them running while you iterate.
 
 End-of-task validation runs `pnpm test` + `lint_all` (the
 `biome:format:check && prettier:yaml && biome:lint && lint` chain
-above) + `pnpm type-check`, in that order. For UI-affecting changes,
-also validate rendering and interactions per **Visual & interaction
-validation** above.
+above) + `pnpm type-check`, in that order. `pnpm test` drives Chromium for the
+storybook project, so in a fresh sandbox run `setup_browser_tests` first
+(see **Test commands**). For UI-affecting changes, also validate rendering
+and interactions per **Visual & interaction validation** above.
 
 Extras, run only when the change touches the relevant area:
 
