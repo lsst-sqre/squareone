@@ -9,7 +9,7 @@ import AuthRequired from '../AuthRequired';
 import styles from './AdminRequired.module.css';
 
 /** Gafaelfawr scope required to access the admin section. */
-const ADMIN_SCOPE = 'exec:admin';
+export const ADMIN_SCOPE = 'exec:admin';
 
 type AdminRequiredProps = {
   children: ReactNode;

@@ -11,9 +11,7 @@ import { ChevronDown } from 'lucide-react';
 import NextLink from 'next/link';
 
 import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
-
-/** Gafaelfawr scope that unlocks the admin section. */
-const ADMIN_SCOPE = 'exec:admin';
+import { ADMIN_SCOPE } from '../AdminRequired';
 
 type UserMenuProps = {
   pageUrl: URL;
