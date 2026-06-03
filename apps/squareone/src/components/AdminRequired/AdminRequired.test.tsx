@@ -86,6 +86,26 @@ describe('AdminRequired', () => {
     expect(screen.queryByText('Admin Content')).not.toBeInTheDocument();
   });
 
+  test('renders an unauthorized state when the login-info fetch fails (query is null)', () => {
+    vi.mocked(useUserInfo).mockReturnValue(mockAuthenticated());
+    vi.mocked(useLoginInfo).mockReturnValue({
+      loginInfo: null,
+      query: null,
+      csrfToken: null,
+      isLoading: false,
+      isPending: false,
+      error: null,
+      refetch: vi.fn(),
+    });
+
+    render(<AdminRequired>Admin Content</AdminRequired>);
+
+    expect(
+      screen.getByRole('heading', { name: /unauthorized/i })
+    ).toBeInTheDocument();
+    expect(screen.queryByText('Admin Content')).not.toBeInTheDocument();
+  });
+
   test('renders a loading state while login info is loading', () => {
     vi.mocked(useUserInfo).mockReturnValue(mockAuthenticated());
     vi.mocked(useLoginInfo).mockReturnValue(mockLoginInfoWithScopes([], true));
