@@ -95,6 +95,18 @@
       "description": "Setting this option to true will print useful information to the console while you're setting up Sentry.",
       "default": false
     },
+    "sentryOrg": {
+      "type": "string",
+      "title": "Sentry organization slug",
+      "description": "Sentry organization slug used to build the Sentry dashboard link on the admin page. The dashboard link is shown only when both sentryOrg and sentryProject are set.",
+      "default": "rubin-observatory"
+    },
+    "sentryProject": {
+      "type": "string",
+      "title": "Sentry project slug",
+      "description": "Sentry project slug used to build the Sentry dashboard link on the admin page. The dashboard link is shown only when both sentryOrg and sentryProject are set.",
+      "default": "squareone"
+    },
     "enableAppsMenu": {
       "type": "boolean",
       "title": "Enable the Apps menu",

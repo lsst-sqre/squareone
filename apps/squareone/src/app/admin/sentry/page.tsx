@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 
+import SentryConfigInfo from '../../../components/SentryConfigInfo';
 import SentryTestButtons from '../../../components/SentryTestButtons';
 import { getStaticConfig } from '../../../lib/config/rsc';
 
@@ -20,9 +21,9 @@ export async function generateMetadata(): Promise<Metadata> {
 /**
  * Sentry admin page.
  *
- * Renders the Sentry test buttons that exercise the error-reporting pipeline.
- * The read-only Sentry configuration and dashboard link are added in a parallel
- * slice.
+ * Renders the Sentry test buttons that exercise the error-reporting pipeline,
+ * plus a read-only summary of the runtime Sentry configuration (and a link to
+ * the Sentry dashboard when the org/project are configured).
  */
 export default function SentryAdminPage() {
   return (
@@ -33,6 +34,7 @@ export default function SentryAdminPage() {
         should appear in the Sentry project.
       </p>
       <SentryTestButtons />
+      <SentryConfigInfo />
     </div>
   );
 }
