@@ -21,16 +21,17 @@ function formatSampleRate(rate: number | undefined): string {
  *
  * Reads the resolved app config via {@link useStaticConfig} and displays the
  * enabled status (whether a DSN is present), environment name, traces/replay
- * sample rates, and the app base URL. When both `sentryOrg` and `sentryProject`
- * are configured it also renders a link to the project's Sentry dashboard; the
- * link is hidden when either slug is unset.
+ * sample rates, and the app base URL. When Sentry is enabled (a DSN is present)
+ * and both `sentryOrg` and `sentryProject` are configured it also renders a link
+ * to the project's Sentry dashboard; the link is hidden when Sentry is disabled
+ * or either slug is unset.
  */
 export default function SentryConfigInfo() {
   const config = useStaticConfig();
 
   const enabled = Boolean(config.sentryDsn);
   const dashboardUrl =
-    config.sentryOrg && config.sentryProject
+    enabled && config.sentryOrg && config.sentryProject
       ? getSentryDashboardUrl(config.sentryOrg, config.sentryProject)
       : null;
 

@@ -100,4 +100,19 @@ describe('SentryConfigInfo', () => {
       screen.queryByRole('link', { name: /sentry dashboard/i })
     ).not.toBeInTheDocument();
   });
+
+  test('hides the dashboard link when Sentry is disabled even though sentryOrg and sentryProject are set', () => {
+    vi.mocked(useStaticConfig).mockReturnValue(
+      makeConfig({
+        sentryDsn: undefined,
+        sentryOrg: 'rubin-observatory',
+        sentryProject: 'squareone',
+      })
+    );
+    render(<SentryConfigInfo />);
+    expect(screen.getByText('Disabled')).toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: /sentry dashboard/i })
+    ).not.toBeInTheDocument();
+  });
 });

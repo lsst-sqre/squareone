@@ -84,3 +84,28 @@ export const Disabled: Story = {
     ).not.toBeInTheDocument();
   },
 };
+
+// Disabled but with org/project still set (their config defaults): status reads
+// "Disabled" and the dashboard link stays hidden because Sentry is not enabled,
+// even though the slugs that build the URL are populated.
+export const DisabledWithOrgProject: Story = {
+  render: () => (
+    <ConfigProvider
+      configPromise={Promise.resolve({
+        ...baseConfig,
+        sentryOrg: 'rubin-observatory',
+        sentryProject: 'squareone',
+      })}
+    >
+      <SentryConfigInfo />
+    </ConfigProvider>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await expect(await canvas.findByText('Disabled')).toBeInTheDocument();
+    await expect(
+      canvas.queryByRole('link', { name: /sentry dashboard/i })
+    ).not.toBeInTheDocument();
+  },
+};
