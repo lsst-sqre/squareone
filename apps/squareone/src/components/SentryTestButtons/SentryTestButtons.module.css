@@ -1,0 +1,9 @@
+/**
+ * SentryTestButtons styles
+ */
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sqo-space-sm);
+}

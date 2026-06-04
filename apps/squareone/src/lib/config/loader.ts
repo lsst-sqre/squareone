@@ -58,6 +58,8 @@ export interface AppConfig {
   sentryReplaysSessionSampleRate?: number;
   sentryReplaysOnErrorSampleRate?: number;
   sentryDebug?: boolean;
+  sentryOrg?: string;
+  sentryProject?: string;
   headerLogoUrl?: string;
   headerLogoData?: string;
   headerLogoMimeType?: string;

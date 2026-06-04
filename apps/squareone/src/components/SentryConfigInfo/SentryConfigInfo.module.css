@@ -1,0 +1,41 @@
+/**
+ * SentryConfigInfo styles
+ *
+ * A two-column definition list (label / value), mirroring the metadata-list
+ * layout used elsewhere in the app (e.g. TokenHistoryDetails).
+ */
+
+.root {
+  margin-top: var(--sqo-space-lg);
+}
+
+.list {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--sqo-space-xs) var(--sqo-space-md);
+  margin: var(--sqo-space-sm) 0;
+}
+
+.label {
+  color: var(--rsd-color-gray-500);
+  font-weight: 500;
+  margin: 0;
+}
+
+.value {
+  color: var(--rsd-component-text-color);
+  margin: 0;
+  word-break: break-word;
+}
+
+.dashboard {
+  margin: 0;
+}
+
+.link {
+  color: var(--rsd-component-text-link-color);
+}
+
+.link:hover {
+  text-decoration: underline;
+}
