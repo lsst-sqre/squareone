@@ -32,6 +32,14 @@ Add the `/admin/service-token` admin page for creating Gafaelfawr service tokens
   template" action when omitted) and `redirectUrl` (defaults to the user token
   list; the service-token page passes `null` to stay on the page), so it can be
   reused for service tokens without changing the user-token flow.
-
-The manage-existing-tokens section remains a placeholder, filled in by a later
-task.
+- Manage-existing-tokens section (`ManageServiceTokens`): a `bot-` username
+  lookup (validated with the same `validateBotUsername` helper as the creation
+  form) drives a service-scoped `AccessTokensView` to list that bot user's
+  service tokens, each revocable via the existing `DeleteTokenModal` +
+  `useDeleteToken` (the list refreshes automatically through query
+  invalidation). An invalid or non-`bot-` username is rejected with a clear
+  message and issues no request. Listing is always per looked-up bot username
+  because Gafaelfawr exposes no global token enumeration. `AccessTokensView`
+  gains optional `tokenType` (default `'user'`) and `emptyState` props so it can
+  list `service` tokens and show a message when a looked-up user has none,
+  without changing the user-token settings page.

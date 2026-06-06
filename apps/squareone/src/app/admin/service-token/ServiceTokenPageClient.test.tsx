@@ -98,6 +98,15 @@ describe('ServiceTokenPageClient', () => {
     ).toBeInTheDocument();
   });
 
+  test('renders the manage-existing-tokens lookup form', () => {
+    render(<ServiceTokenPageClient />);
+
+    expect(screen.getByLabelText('Bot user')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /look up tokens/i })
+    ).toBeInTheDocument();
+  });
+
   test('offers the full configured scope list, not just the admin scopes', () => {
     render(<ServiceTokenPageClient />);
 

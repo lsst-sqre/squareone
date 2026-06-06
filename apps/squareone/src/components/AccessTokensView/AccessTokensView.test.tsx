@@ -92,6 +92,21 @@ describe('AccessTokensView', () => {
     },
   ];
 
+  const mockServiceTokens: TokenInfo[] = [
+    {
+      username: 'bot-ci',
+      token_type: 'service',
+      service: null,
+      scopes: ['read:tap'],
+      token: 'gt-service-token',
+      token_name: 'service-token',
+      created: now - 7200,
+      expires: null,
+      last_used: null,
+      parent: null,
+    },
+  ];
+
   beforeEach(() => {
     vi.clearAllMocks();
 
@@ -226,6 +241,51 @@ describe('AccessTokensView', () => {
     const { container } = render(<AccessTokensView username="testuser" />);
 
     expect(container.firstChild).toBeNull();
+  });
+
+  it('lists only service tokens when tokenType is "service"', () => {
+    const mixedTokens = [...mockUserTokens, ...mockServiceTokens];
+    mockUseUserTokens.mockReturnValue({
+      tokens: mixedTokens,
+      error: null,
+      isLoading: false,
+      isPending: false,
+      query: null,
+      refetch: vi.fn(),
+      invalidate: vi.fn(),
+    });
+
+    render(<AccessTokensView username="bot-ci" tokenType="service" />);
+
+    // The service token is listed.
+    expect(screen.getByText('service-token')).toBeInTheDocument();
+    // User tokens are filtered out under the service variant.
+    expect(screen.queryByText('recent-token')).not.toBeInTheDocument();
+    expect(screen.queryByText('old-token')).not.toBeInTheDocument();
+  });
+
+  it('renders the emptyState node when there are no matching tokens', () => {
+    mockUseUserTokens.mockReturnValue({
+      tokens: mockUserTokens, // no service tokens
+      error: null,
+      isLoading: false,
+      isPending: false,
+      query: null,
+      refetch: vi.fn(),
+      invalidate: vi.fn(),
+    });
+
+    render(
+      <AccessTokensView
+        username="bot-ci"
+        tokenType="service"
+        emptyState={<p>No service tokens for this user.</p>}
+      />
+    );
+
+    expect(
+      screen.getByText('No service tokens for this user.')
+    ).toBeInTheDocument();
   });
 
   it('handles tokens without created date', () => {

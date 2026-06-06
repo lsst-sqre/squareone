@@ -1,5 +1,6 @@
-import type { TokenInfo } from '@lsst-sqre/gafaelfawr-client';
+import type { TokenInfo, TokenType } from '@lsst-sqre/gafaelfawr-client';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import type { ReactNode } from 'react';
 import AccessTokenItem from './AccessTokenItem';
 import styles from './AccessTokensView.module.css';
 
@@ -57,12 +58,40 @@ const mockSessionTokens: TokenInfo[] = [
   },
 ];
 
+// Service tokens for a bot user (the admin manage-existing-tokens variant)
+const mockServiceTokens: TokenInfo[] = [
+  {
+    username: 'bot-ci',
+    token_type: 'service',
+    service: null,
+    scopes: ['read:tap', 'read:image'],
+    token: 'pQ6rS9tUvWxY1zA2bC3dE4',
+    token_name: 'ci-pipeline',
+    created: now - 86400 * 2,
+    expires: null,
+    parent: null,
+  },
+  {
+    username: 'bot-ci',
+    token_type: 'service',
+    service: null,
+    scopes: ['exec:notebook'],
+    token: 'fG5hJ7kL9mN1pQ3rS5tU7v',
+    token_name: 'nightly-build',
+    created: now - 86400 * 10,
+    expires: now + 86400 * 30,
+    parent: null,
+  },
+];
+
 // Wrapper component for Storybook that doesn't use the SWR hook
 type AccessTokensViewWrapperProps = {
   tokens: TokenInfo[];
   isLoading?: boolean;
   error?: string;
   username: string;
+  tokenType?: TokenType;
+  emptyState?: ReactNode;
 };
 
 function AccessTokensViewWrapper({
@@ -70,10 +99,12 @@ function AccessTokensViewWrapper({
   isLoading = false,
   error,
   username,
+  tokenType = 'user',
+  emptyState = null,
 }: AccessTokensViewWrapperProps) {
-  // Filter to user tokens only and sort by created (most recent first)
-  const userTokens = tokens
-    .filter((token) => token.token_type === 'user')
+  // Filter to the requested token type and sort by created (most recent first)
+  const matchingTokens = tokens
+    .filter((token) => token.token_type === tokenType)
     .sort((a, b) => {
       const aCreated = a.created ?? 0;
       const bCreated = b.created ?? 0;
@@ -96,14 +127,14 @@ function AccessTokensViewWrapper({
     );
   }
 
-  // Don't render if there are no user tokens
-  if (userTokens.length === 0) {
-    return null;
+  // No matching tokens: render the caller's empty state (default: nothing).
+  if (matchingTokens.length === 0) {
+    return <>{emptyState}</>;
   }
 
   return (
     <div className={styles.container}>
-      {userTokens.map((token) => (
+      {matchingTokens.map((token) => (
         <AccessTokenItem key={token.token} token={token} username={username} />
       ))}
     </div>
@@ -165,6 +196,25 @@ export const OnlySessionTokens: Story = {
 export const SingleToken: Story = {
   args: {
     tokens: [mockUserTokens[0]],
+  },
+};
+
+// The service-scoped variant used by the admin manage-existing-tokens section:
+// lists only `service` tokens for a looked-up bot user.
+export const ServiceTokens: Story = {
+  args: {
+    username: 'bot-ci',
+    tokenType: 'service',
+    tokens: mockServiceTokens,
+  },
+};
+
+export const ServiceTokensEmpty: Story = {
+  args: {
+    username: 'bot-ci',
+    tokenType: 'service',
+    tokens: mockUserTokens, // no service tokens for this user
+    emptyState: <p>No service tokens found for bot-ci.</p>,
   },
 };
 

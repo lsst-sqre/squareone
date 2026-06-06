@@ -14,6 +14,7 @@ import { TokenCreationErrorDisplay } from '../../../components/TokenCreationErro
 import TokenSuccessModal from '../../../components/TokenSuccessModal';
 import { useRepertoireUrl } from '../../../hooks/useRepertoireUrl';
 import { calculateExpirationDate } from '../../../lib/tokens/expiration';
+import ManageServiceTokens from './ManageServiceTokens';
 
 /**
  * Gafaelfawr scope required to create service tokens via the admin
@@ -24,8 +25,9 @@ const TOKEN_ADMIN_SCOPE = 'admin:token';
 /**
  * Client component for the `/admin/service-token` admin page.
  *
- * Renders the creation form (wired to {@link useCreateServiceToken}) and keeps a
- * placeholder for the manage-existing-tokens section (filled in by a later task).
+ * Renders the creation form (wired to {@link useCreateServiceToken}) and the
+ * manage-existing-tokens section ({@link ManageServiceTokens}) for looking up and
+ * revoking a bot user's service tokens.
  * The created token secret is revealed exactly once via {@link TokenSuccessModal},
  * and API errors surface through {@link TokenCreationErrorDisplay}. The page sits
  * behind the `exec:admin` gate inherited from the admin layout, and additionally
@@ -143,9 +145,7 @@ export default function ServiceTokenPageClient() {
 
       <section>
         <h2>Manage existing tokens</h2>
-        <p>
-          Look up and revoke an existing bot user&rsquo;s service tokens here.
-        </p>
+        <ManageServiceTokens />
       </section>
 
       {createdToken && submittedValues && (
