@@ -222,4 +222,17 @@ describe('ServiceTokenForm', () => {
       screen.getByRole('button', { name: /create service token/i })
     ).toBeDisabled();
   });
+
+  it('disables every field and the submit button when disabled is set', () => {
+    render(<ServiceTokenForm {...defaultProps} disabled={true} />);
+
+    expect(screen.getByLabelText(/bot username/i)).toBeDisabled();
+    expect(screen.getByLabelText(/token name/i)).toBeDisabled();
+    expect(screen.getByLabelText('Name')).toBeDisabled();
+    expect(screen.getByLabelText('UID')).toBeDisabled();
+    expect(screen.getByLabelText('Groups')).toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: /create service token/i })
+    ).toBeDisabled();
+  });
 });

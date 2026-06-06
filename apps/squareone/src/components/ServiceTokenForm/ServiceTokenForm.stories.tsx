@@ -58,6 +58,19 @@ export const Submitting: Story = {
   },
 };
 
+export const Disabled: Story = {
+  args: {
+    disabled: true,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByLabelText(/bot username/i)).toBeDisabled();
+    await expect(
+      canvas.getByRole('button', { name: /create service token/i })
+    ).toBeDisabled();
+  },
+};
+
 export const RejectsInvalidUsername: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);

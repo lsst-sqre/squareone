@@ -4,6 +4,7 @@ import {
   useCreateServiceToken,
   useLoginInfo,
 } from '@lsst-sqre/gafaelfawr-client';
+import { Note } from '@lsst-sqre/squared';
 import React, { useState } from 'react';
 
 import ServiceTokenForm, {
@@ -15,13 +16,22 @@ import { useRepertoireUrl } from '../../../hooks/useRepertoireUrl';
 import { calculateExpirationDate } from '../../../lib/tokens/expiration';
 
 /**
+ * Gafaelfawr scope required to create service tokens via the admin
+ * `POST /auth/api/v1/tokens` endpoint.
+ */
+const TOKEN_ADMIN_SCOPE = 'admin:token';
+
+/**
  * Client component for the `/admin/service-token` admin page.
  *
  * Renders the creation form (wired to {@link useCreateServiceToken}) and keeps a
  * placeholder for the manage-existing-tokens section (filled in by a later task).
  * The created token secret is revealed exactly once via {@link TokenSuccessModal},
  * and API errors surface through {@link TokenCreationErrorDisplay}. The page sits
- * behind the `exec:admin` gate inherited from the admin layout.
+ * behind the `exec:admin` gate inherited from the admin layout, and additionally
+ * checks `loginInfo.scopes` for `admin:token` — without it, an explanatory banner
+ * is shown and the form is disabled rather than letting a submit fail with a
+ * silent 403.
  */
 export default function ServiceTokenPageClient() {
   const repertoireUrl = useRepertoireUrl();
@@ -84,8 +94,24 @@ export default function ServiceTokenPageClient() {
       </p>
     );
   } else {
+    // The page stays inside the `exec:admin` admin section, but creating a
+    // service token additionally requires the `admin:token` scope. When it is
+    // absent we explain why and disable the form rather than letting a submit
+    // fail with a silent 403.
+    const hasAdminToken = loginInfo.scopes.includes(TOKEN_ADMIN_SCOPE);
+
     createContent = (
       <>
+        {!hasAdminToken && (
+          <Note type="warning">
+            <p>
+              You do not have the <code>{TOKEN_ADMIN_SCOPE}</code> scope, which
+              is required to create service tokens. The form below is disabled.
+              Ask an administrator to grant you the{' '}
+              <code>{TOKEN_ADMIN_SCOPE}</code> scope.
+            </p>
+          </Note>
+        )}
         {creationError && <TokenCreationErrorDisplay error={creationError} />}
         <ServiceTokenForm
           // The full configured scope list (not filtered to the admin's own
@@ -97,6 +123,7 @@ export default function ServiceTokenPageClient() {
           )}
           onSubmit={handleSubmit}
           isSubmitting={isCreating}
+          disabled={!hasAdminToken}
         />
       </>
     );

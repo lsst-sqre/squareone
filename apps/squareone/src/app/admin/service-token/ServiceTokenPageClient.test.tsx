@@ -186,4 +186,32 @@ describe('ServiceTokenPageClient', () => {
     ).toBeInTheDocument();
     expect(screen.queryByLabelText(/bot username/i)).not.toBeInTheDocument();
   });
+
+  test('shows a banner and disables the form when admin:token is absent', () => {
+    mockLogin({
+      loginInfo: { ...mockLoginInfo, scopes: ['exec:admin'] },
+    });
+    render(<ServiceTokenPageClient />);
+
+    expect(
+      screen.getByText(/required to create service tokens/i)
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText(/bot username/i)).toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: /create service token/i })
+    ).toBeDisabled();
+  });
+
+  test('enables the form and shows no banner when admin:token is present', () => {
+    // The default mock login info includes `admin:token`.
+    render(<ServiceTokenPageClient />);
+
+    expect(
+      screen.queryByText(/required to create service tokens/i)
+    ).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/bot username/i)).toBeEnabled();
+    expect(
+      screen.getByRole('button', { name: /create service token/i })
+    ).toBeEnabled();
+  });
 });

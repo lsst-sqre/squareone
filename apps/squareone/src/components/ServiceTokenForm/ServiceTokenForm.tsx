@@ -43,6 +43,12 @@ export type ServiceTokenFormProps = {
   initialValues?: Partial<Omit<ServiceTokenFormValues, 'metadata'>>;
   onSubmit: (values: ServiceTokenFormValues) => Promise<void>;
   isSubmitting?: boolean;
+  /**
+   * Disable every field and the submit button. Used to gate the form when the
+   * signed-in admin lacks the `admin:token` scope required to create service
+   * tokens, so submission is blocked rather than failing with a silent 403.
+   */
+  disabled?: boolean;
 };
 
 const EMPTY_METADATA_INPUT: ServiceTokenMetadataInput = {
@@ -70,7 +76,13 @@ export default function ServiceTokenForm({
   initialValues,
   onSubmit,
   isSubmitting = false,
+  disabled = false,
 }: ServiceTokenFormProps) {
+  // Fields are disabled both while a submission is in flight and when the form
+  // is gated (e.g. the admin lacks `admin:token`); the button stays disabled in
+  // either case but only shows the loading spinner while actually submitting.
+  const isDisabled = isSubmitting || disabled;
+
   const {
     control,
     register,
@@ -112,7 +124,7 @@ export default function ServiceTokenForm({
           <FormField.TextInput
             id="service-token-username"
             placeholder="bot-example"
-            disabled={isSubmitting}
+            disabled={isDisabled}
             autoComplete="off"
             data-1p-ignore
             data-form-type="other"
@@ -130,7 +142,7 @@ export default function ServiceTokenForm({
           <FormField.TextInput
             id="service-token-name"
             placeholder="A descriptive name to recognize this token later."
-            disabled={isSubmitting}
+            disabled={isDisabled}
             autoComplete="off"
             data-1p-ignore
             data-form-type="other"
@@ -158,7 +170,7 @@ export default function ServiceTokenForm({
                 scopes={availableScopes}
                 selectedScopes={field.value}
                 onChange={field.onChange}
-                disabled={isSubmitting}
+                disabled={isDisabled}
                 name="scopes"
               />
             )}
@@ -176,7 +188,7 @@ export default function ServiceTokenForm({
             <ExpirationSelector
               value={field.value}
               onChange={field.onChange}
-              disabled={isSubmitting}
+              disabled={isDisabled}
               name="expiration"
               required
             />
@@ -202,7 +214,7 @@ export default function ServiceTokenForm({
               <FormField.TextInput
                 id="service-token-meta-name"
                 placeholder="Human-readable name for the bot user"
-                disabled={isSubmitting}
+                disabled={isDisabled}
                 autoComplete="off"
                 {...register('metadata.name')}
               />
@@ -216,7 +228,7 @@ export default function ServiceTokenForm({
               <FormField.TextInput
                 id="service-token-meta-email"
                 placeholder="bot@example.com"
-                disabled={isSubmitting}
+                disabled={isDisabled}
                 autoComplete="off"
                 {...register('metadata.email')}
               />
@@ -231,7 +243,7 @@ export default function ServiceTokenForm({
                 id="service-token-meta-uid"
                 inputMode="numeric"
                 placeholder="e.g. 90000"
-                disabled={isSubmitting}
+                disabled={isDisabled}
                 autoComplete="off"
                 {...register('metadata.uid', {
                   validate: (value) => validateIdField(value, 'UID') ?? true,
@@ -248,7 +260,7 @@ export default function ServiceTokenForm({
                 id="service-token-meta-gid"
                 inputMode="numeric"
                 placeholder="e.g. 90001"
-                disabled={isSubmitting}
+                disabled={isDisabled}
                 autoComplete="off"
                 {...register('metadata.gid', {
                   validate: (value) => validateIdField(value, 'GID') ?? true,
@@ -268,7 +280,7 @@ export default function ServiceTokenForm({
                 id="service-token-meta-groups"
                 rows={3}
                 placeholder={'g_developers:1001\ng_ops:1002'}
-                disabled={isSubmitting}
+                disabled={isDisabled}
                 {...register('metadata.groups', {
                   validate: (value) => validateGroupsField(value) ?? true,
                 })}
@@ -280,7 +292,7 @@ export default function ServiceTokenForm({
 
       {/* Form actions */}
       <div className={styles.actions}>
-        <Button type="submit" loading={isSubmitting} disabled={isSubmitting}>
+        <Button type="submit" loading={isSubmitting} disabled={isDisabled}>
           Create service token
         </Button>
       </div>

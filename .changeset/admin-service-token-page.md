@@ -22,6 +22,12 @@ Add the `/admin/service-token` admin page for creating Gafaelfawr service tokens
 - `ServiceTokenPageClient` wires the form to `useCreateServiceToken()`, reveals
   the new token secret once via `TokenSuccessModal`, and surfaces API errors via
   `TokenCreationErrorDisplay`.
+- `admin:token` capability check: although the page sits behind the `exec:admin`
+  gate, creating a service token also requires the `admin:token` scope. When the
+  signed-in admin lacks it, `ServiceTokenPageClient` reads `loginInfo.scopes`,
+  shows an explanatory warning banner, and disables the creation form (via a new
+  `ServiceTokenForm` `disabled` prop) instead of letting a submit fail with a
+  silent 403.
 - `TokenSuccessModal` gains optional `templateUrl` (hides the "Copy token
   template" action when omitted) and `redirectUrl` (defaults to the user token
   list; the service-token page passes `null` to stay on the page), so it can be
