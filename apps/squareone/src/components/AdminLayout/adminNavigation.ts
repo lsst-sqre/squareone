@@ -15,7 +15,10 @@ export function getAdminNavigation(
 ): NavSection[] {
   const navigation: NavSection[] = [
     {
-      items: [{ href: '/admin/sentry', label: 'Sentry' }],
+      items: [
+        { href: '/admin/sentry', label: 'Sentry' },
+        { href: '/admin/service-token', label: 'Service tokens' },
+      ],
     },
   ];
 

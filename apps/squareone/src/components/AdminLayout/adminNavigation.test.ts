@@ -17,12 +17,34 @@ const baseConfig: AppConfigContextValue = {
   mdxDir: 'src/content/pages',
 };
 
-test('generates a single flat section with the Sentry item', () => {
+test('generates a single flat section with the Sentry and service-token items', () => {
   const navigation = getAdminNavigation(baseConfig);
 
   expect(navigation).toHaveLength(1);
   expect(navigation[0]).toEqual({
-    items: [{ href: '/admin/sentry', label: 'Sentry' }],
+    items: [
+      { href: '/admin/sentry', label: 'Sentry' },
+      { href: '/admin/service-token', label: 'Service tokens' },
+    ],
+  });
+});
+
+test('includes the service-token admin item', () => {
+  const navigation = getAdminNavigation(baseConfig);
+  const items = navigation.flatMap((section) => section.items);
+
+  expect(items).toContainEqual({
+    href: '/admin/service-token',
+    label: 'Service tokens',
+  });
+});
+
+test('keeps Sentry first so the /admin index redirect target is unchanged', () => {
+  const navigation = getAdminNavigation(baseConfig);
+
+  expect(navigation[0].items[0]).toEqual({
+    href: '/admin/sentry',
+    label: 'Sentry',
   });
 });
 
