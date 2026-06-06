@@ -71,3 +71,23 @@ export type CreateTokenVariables = {
   csrfToken: string;
   baseUrl: string;
 };
+
+/**
+ * Variables for create service token mutation (admin endpoint).
+ *
+ * `username` is the target bot user; the optional metadata fields
+ * (name/email/uid/gid/groups) are sent only when supplied.
+ */
+export type CreateServiceTokenVariables = {
+  username: string;
+  tokenName: string;
+  scopes: string[];
+  expires: Date | null;
+  name?: string | null;
+  email?: string | null;
+  uid?: number | null;
+  gid?: number | null;
+  groups?: import('./schemas').Group[];
+  csrfToken: string;
+  baseUrl: string;
+};

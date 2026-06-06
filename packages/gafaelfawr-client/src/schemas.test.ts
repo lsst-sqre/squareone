@@ -10,6 +10,7 @@ import {
   mockUserInfo,
 } from './mock-data';
 import {
+  AdminTokenRequestSchema,
   CreateTokenRequestSchema,
   CreateTokenResponseSchema,
   ErrorResponseSchema,
@@ -218,6 +219,84 @@ describe('CreateTokenRequestSchema', () => {
       CreateTokenRequestSchema.parse({
         token_name: 'a'.repeat(65),
         scopes: [],
+      })
+    ).toThrow();
+  });
+});
+
+describe('AdminTokenRequestSchema', () => {
+  it('accepts a minimal valid service-token request', () => {
+    const result = AdminTokenRequestSchema.parse({
+      username: 'bot-example',
+      token_type: 'service',
+      token_name: 'CI token',
+      scopes: ['read:tap'],
+    });
+    expect(result.username).toBe('bot-example');
+    expect(result.token_type).toBe('service');
+    expect(result.token_name).toBe('CI token');
+    expect(result.scopes).toEqual(['read:tap']);
+  });
+
+  it('accepts a request including optional metadata', () => {
+    const result = AdminTokenRequestSchema.parse({
+      username: 'bot-example',
+      token_type: 'service',
+      token_name: 'CI token',
+      scopes: ['read:tap', 'read:image'],
+      expires: 1700000000,
+      name: 'Example Bot',
+      email: 'bot@example.com',
+      uid: 90000,
+      gid: 90000,
+      groups: [{ name: 'bots', id: 90000 }],
+    });
+    expect(result.expires).toBe(1700000000);
+    expect(result.name).toBe('Example Bot');
+    expect(result.email).toBe('bot@example.com');
+    expect(result.uid).toBe(90000);
+    expect(result.gid).toBe(90000);
+    expect(result.groups).toEqual([{ name: 'bots', id: 90000 }]);
+  });
+
+  it('accepts null expiration', () => {
+    const result = AdminTokenRequestSchema.parse({
+      username: 'bot-example',
+      token_type: 'service',
+      token_name: 'CI token',
+      scopes: [],
+      expires: null,
+    });
+    expect(result.expires).toBeNull();
+  });
+
+  it('rejects a missing username', () => {
+    expect(() =>
+      AdminTokenRequestSchema.parse({
+        token_type: 'service',
+        token_name: 'CI token',
+        scopes: ['read:tap'],
+      })
+    ).toThrow();
+  });
+
+  it('rejects a missing token name', () => {
+    expect(() =>
+      AdminTokenRequestSchema.parse({
+        username: 'bot-example',
+        token_type: 'service',
+        scopes: ['read:tap'],
+      })
+    ).toThrow();
+  });
+
+  it('rejects a non-service token type', () => {
+    expect(() =>
+      AdminTokenRequestSchema.parse({
+        username: 'bot-example',
+        token_type: 'user',
+        token_name: 'CI token',
+        scopes: ['read:tap'],
       })
     ).toThrow();
   });
