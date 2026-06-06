@@ -57,6 +57,9 @@ export default function ServiceTokenPageClient() {
       tokenName: values.name,
       scopes: values.scopes,
       expires,
+      // Only the metadata fields the operator supplied are present, so omitted
+      // fields stay absent from the request body.
+      ...values.metadata,
     });
 
     setCreatedToken(response.token);

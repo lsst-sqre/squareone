@@ -70,3 +70,15 @@ export const RejectsInvalidUsername: Story = {
     ).toBeInTheDocument();
   },
 };
+
+export const AdvancedMetadata: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    // The metadata section is collapsed by default; expand it to reveal the
+    // optional identity fields.
+    await userEvent.click(canvas.getByText(/advanced metadata/i));
+    await expect(canvas.getByLabelText('Name')).toBeVisible();
+    await expect(canvas.getByLabelText('UID')).toBeVisible();
+    await expect(canvas.getByLabelText('Groups')).toBeVisible();
+  },
+};

@@ -130,6 +130,34 @@ describe('ServiceTokenPageClient', () => {
     expect(await screen.findByText('gt-new-secret')).toBeInTheDocument();
   });
 
+  test('forwards supplied advanced metadata to createServiceToken', async () => {
+    const user = userEvent.setup({ delay: 10 });
+    const createServiceToken = mockCreate();
+    render(<ServiceTokenPageClient />);
+
+    await user.type(screen.getByLabelText(/bot username/i), 'bot-ci');
+    await user.type(screen.getByLabelText(/token name/i), 'CI token');
+    await user.click(screen.getByLabelText(/read:tap/i));
+    await user.type(screen.getByLabelText('Name'), 'CI Bot');
+    await user.type(screen.getByLabelText('UID'), '90000');
+    await user.type(screen.getByLabelText('Groups'), 'g_developers:1001');
+    await user.click(
+      screen.getByRole('button', { name: /create service token/i })
+    );
+
+    await waitFor(() => {
+      expect(createServiceToken).toHaveBeenCalledWith({
+        username: 'bot-ci',
+        tokenName: 'CI token',
+        scopes: ['read:tap'],
+        expires: null,
+        name: 'CI Bot',
+        uid: 90000,
+        groups: [{ name: 'g_developers', id: 1001 }],
+      });
+    });
+  });
+
   test('surfaces a creation error via TokenCreationErrorDisplay', () => {
     mockCreate({
       error: { status: 422, message: 'Validation failed: bad scope' },

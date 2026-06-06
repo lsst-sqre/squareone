@@ -11,6 +11,29 @@
   gap: var(--rsd-space-3x, 1.5rem);
 }
 
+.advanced {
+  border: 1px solid var(--rsd-color-gray-300, #d1d5db);
+  border-radius: var(--rsd-radius-1, 0.25rem);
+  padding: var(--rsd-space-2x, 0.75rem);
+}
+
+.advancedSummary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.advancedContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rsd-space-3x, 1.5rem);
+  margin-top: var(--rsd-space-3x, 1.5rem);
+}
+
+.advancedHint {
+  margin: 0;
+  color: var(--rsd-color-gray-600, #4b5563);
+}
+
 .actions {
   display: flex;
   gap: var(--rsd-space-2x, 0.75rem);

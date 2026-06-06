@@ -136,8 +136,81 @@ describe('ServiceTokenForm', () => {
         name: 'CI token',
         scopes: ['read:tap'],
         expiration: { type: 'never' },
+        // No advanced metadata supplied, so the metadata object is empty.
+        metadata: {},
       });
     });
+  });
+
+  it('renders a collapsible Advanced metadata section, collapsed by default', () => {
+    render(<ServiceTokenForm {...defaultProps} />);
+
+    const summary = screen.getByText(/advanced metadata/i);
+    expect(summary).toBeInTheDocument();
+    expect(summary.closest('details')).not.toHaveAttribute('open');
+  });
+
+  it('renders the optional metadata fields', () => {
+    render(<ServiceTokenForm {...defaultProps} />);
+
+    expect(screen.getByLabelText('Name')).toBeInTheDocument();
+    expect(screen.getByLabelText('Email')).toBeInTheDocument();
+    expect(screen.getByLabelText('UID')).toBeInTheDocument();
+    expect(screen.getByLabelText('GID')).toBeInTheDocument();
+    expect(screen.getByLabelText('Groups')).toBeInTheDocument();
+  });
+
+  it('includes supplied advanced metadata in the submitted values', async () => {
+    const user = userEvent.setup({ delay: 10 });
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    render(<ServiceTokenForm {...defaultProps} onSubmit={onSubmit} />);
+
+    await user.type(screen.getByLabelText(/bot username/i), 'bot-ci');
+    await user.type(screen.getByLabelText(/token name/i), 'CI token');
+    await user.click(screen.getByLabelText(/read:tap/i));
+    await user.type(screen.getByLabelText('Name'), 'CI Bot');
+    await user.type(screen.getByLabelText('Email'), 'ci@example.com');
+    await user.type(screen.getByLabelText('UID'), '90000');
+    await user.type(screen.getByLabelText('GID'), '90001');
+    await user.type(screen.getByLabelText('Groups'), 'g_developers:1001');
+    await user.click(
+      screen.getByRole('button', { name: /create service token/i })
+    );
+
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith({
+        username: 'bot-ci',
+        name: 'CI token',
+        scopes: ['read:tap'],
+        expiration: { type: 'never' },
+        metadata: {
+          name: 'CI Bot',
+          email: 'ci@example.com',
+          uid: 90000,
+          gid: 90001,
+          groups: [{ name: 'g_developers', id: 1001 }],
+        },
+      });
+    });
+  });
+
+  it('rejects malformed groups metadata before submit', async () => {
+    const user = userEvent.setup({ delay: 10 });
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    render(<ServiceTokenForm {...defaultProps} onSubmit={onSubmit} />);
+
+    await user.type(screen.getByLabelText(/bot username/i), 'bot-ci');
+    await user.type(screen.getByLabelText(/token name/i), 'CI token');
+    await user.click(screen.getByLabelText(/read:tap/i));
+    await user.type(screen.getByLabelText('Groups'), 'g_developers');
+    await user.click(
+      screen.getByRole('button', { name: /create service token/i })
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/each group must be/i)).toBeInTheDocument();
+    });
+    expect(onSubmit).not.toHaveBeenCalled();
   });
 
   it('disables the form while submitting', () => {

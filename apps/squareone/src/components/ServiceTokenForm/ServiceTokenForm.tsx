@@ -3,6 +3,13 @@ import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { validateBotUsername } from '../../lib/tokens/botUsername';
 import type { ExpirationValue } from '../../lib/tokens/expiration';
+import {
+  parseServiceTokenMetadata,
+  type ServiceTokenMetadata,
+  type ServiceTokenMetadataInput,
+  validateGroupsField,
+  validateIdField,
+} from '../../lib/tokens/serviceTokenMetadata';
 import { ExpirationSelector, type Scope, ScopeSelector } from '../TokenForm';
 import styles from './ServiceTokenForm.module.css';
 
@@ -11,6 +18,19 @@ export type ServiceTokenFormValues = {
   name: string;
   scopes: string[];
   expiration: ExpirationValue;
+  /**
+   * Parsed optional identity metadata. Only fields the operator supplied are
+   * present, so omitted fields stay out of the request body.
+   */
+  metadata: ServiceTokenMetadata;
+};
+
+/**
+ * Internal react-hook-form field shape: the advanced-metadata inputs are raw
+ * strings until {@link parseServiceTokenMetadata} converts them on submit.
+ */
+type ServiceTokenFormFields = Omit<ServiceTokenFormValues, 'metadata'> & {
+  metadata: ServiceTokenMetadataInput;
 };
 
 export type ServiceTokenFormProps = {
@@ -20,9 +40,17 @@ export type ServiceTokenFormProps = {
    * complete `loginInfo.config.scopes` list rather than the admin's own scopes.
    */
   availableScopes: Scope[];
-  initialValues?: Partial<ServiceTokenFormValues>;
+  initialValues?: Partial<Omit<ServiceTokenFormValues, 'metadata'>>;
   onSubmit: (values: ServiceTokenFormValues) => Promise<void>;
   isSubmitting?: boolean;
+};
+
+const EMPTY_METADATA_INPUT: ServiceTokenMetadataInput = {
+  name: '',
+  email: '',
+  uid: '',
+  gid: '',
+  groups: '',
 };
 
 /**
@@ -32,6 +60,10 @@ export type ServiceTokenFormProps = {
  * Gafaelfawr username rules via {@link validateBotUsername}) and defaults the
  * expiration to "never". The scope picker is fed the full configured scope list
  * because an `admin:token` holder can grant any scope to a service token.
+ *
+ * A collapsible "Advanced metadata" section (collapsed by default) collects the
+ * optional `name`/`email`/`uid`/`gid`/`groups` identity fields. Only the values
+ * that are actually supplied are forwarded in the submitted `metadata` object.
  */
 export default function ServiceTokenForm({
   availableScopes,
@@ -44,18 +76,25 @@ export default function ServiceTokenForm({
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ServiceTokenFormValues>({
+  } = useForm<ServiceTokenFormFields>({
     defaultValues: {
       username: initialValues?.username || '',
       name: initialValues?.name || '',
       scopes: initialValues?.scopes || [],
       expiration: initialValues?.expiration || { type: 'never' },
+      metadata: EMPTY_METADATA_INPUT,
     },
   });
 
-  const handleFormSubmit = async (data: ServiceTokenFormValues) => {
+  const handleFormSubmit = async (data: ServiceTokenFormFields) => {
     try {
-      await onSubmit(data);
+      await onSubmit({
+        username: data.username,
+        name: data.name,
+        scopes: data.scopes,
+        expiration: data.expiration,
+        metadata: parseServiceTokenMetadata(data.metadata),
+      });
     } catch (error) {
       // Error handling is managed by the parent component.
       console.error('Service token form submission error:', error);
@@ -143,6 +182,100 @@ export default function ServiceTokenForm({
             />
           )}
         />
+
+        {/* Advanced metadata (collapsed by default) */}
+        <details className={styles.advanced}>
+          <summary className={styles.advancedSummary}>
+            Advanced metadata
+          </summary>
+          <div className={styles.advancedContent}>
+            <p className={styles.advancedHint}>
+              Optional identity metadata for the bot user. Leave any field blank
+              to omit it from the request.
+            </p>
+
+            {/* Name field */}
+            <FormField error={errors.metadata?.name?.message}>
+              <FormField.Label htmlFor="service-token-meta-name">
+                Name
+              </FormField.Label>
+              <FormField.TextInput
+                id="service-token-meta-name"
+                placeholder="Human-readable name for the bot user"
+                disabled={isSubmitting}
+                autoComplete="off"
+                {...register('metadata.name')}
+              />
+            </FormField>
+
+            {/* Email field */}
+            <FormField error={errors.metadata?.email?.message}>
+              <FormField.Label htmlFor="service-token-meta-email">
+                Email
+              </FormField.Label>
+              <FormField.TextInput
+                id="service-token-meta-email"
+                placeholder="bot@example.com"
+                disabled={isSubmitting}
+                autoComplete="off"
+                {...register('metadata.email')}
+              />
+            </FormField>
+
+            {/* UID field */}
+            <FormField error={errors.metadata?.uid?.message}>
+              <FormField.Label htmlFor="service-token-meta-uid">
+                UID
+              </FormField.Label>
+              <FormField.TextInput
+                id="service-token-meta-uid"
+                inputMode="numeric"
+                placeholder="e.g. 90000"
+                disabled={isSubmitting}
+                autoComplete="off"
+                {...register('metadata.uid', {
+                  validate: (value) => validateIdField(value, 'UID') ?? true,
+                })}
+              />
+            </FormField>
+
+            {/* GID field */}
+            <FormField error={errors.metadata?.gid?.message}>
+              <FormField.Label htmlFor="service-token-meta-gid">
+                GID
+              </FormField.Label>
+              <FormField.TextInput
+                id="service-token-meta-gid"
+                inputMode="numeric"
+                placeholder="e.g. 90001"
+                disabled={isSubmitting}
+                autoComplete="off"
+                {...register('metadata.gid', {
+                  validate: (value) => validateIdField(value, 'GID') ?? true,
+                })}
+              />
+            </FormField>
+
+            {/* Groups field */}
+            <FormField
+              error={errors.metadata?.groups?.message}
+              description='One group per line as "name:id" (e.g. g_developers:1001).'
+            >
+              <FormField.Label htmlFor="service-token-meta-groups">
+                Groups
+              </FormField.Label>
+              <FormField.TextArea
+                id="service-token-meta-groups"
+                rows={3}
+                placeholder={'g_developers:1001\ng_ops:1002'}
+                disabled={isSubmitting}
+                {...register('metadata.groups', {
+                  validate: (value) => validateGroupsField(value) ?? true,
+                })}
+              />
+            </FormField>
+          </div>
+        </details>
       </div>
 
       {/* Form actions */}
