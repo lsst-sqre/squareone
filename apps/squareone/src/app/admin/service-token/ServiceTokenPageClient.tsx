@@ -1,19 +1,104 @@
 'use client';
 
-import React from 'react';
+import {
+  useCreateServiceToken,
+  useLoginInfo,
+} from '@lsst-sqre/gafaelfawr-client';
+import React, { useState } from 'react';
+
+import ServiceTokenForm, {
+  type ServiceTokenFormValues,
+} from '../../../components/ServiceTokenForm';
+import { TokenCreationErrorDisplay } from '../../../components/TokenCreationErrorDisplay';
+import TokenSuccessModal from '../../../components/TokenSuccessModal';
+import { useRepertoireUrl } from '../../../hooks/useRepertoireUrl';
+import { calculateExpirationDate } from '../../../lib/tokens/expiration';
 
 /**
  * Client component for the `/admin/service-token` admin page.
  *
- * Renders the page heading, an introductory lede, and placeholder sections for
- * the two pieces of functionality the page will offer: creating a Gafaelfawr
- * service token for a `bot-` user, and looking up / revoking an existing bot
- * user's tokens. The placeholder sections are filled in by later tasks (the
- * creation form and the manage section); this slice establishes the route and
- * its layout so it appears in the admin sidebar and loads behind the
- * `exec:admin` gate inherited from the admin layout.
+ * Renders the creation form (wired to {@link useCreateServiceToken}) and keeps a
+ * placeholder for the manage-existing-tokens section (filled in by a later task).
+ * The created token secret is revealed exactly once via {@link TokenSuccessModal},
+ * and API errors surface through {@link TokenCreationErrorDisplay}. The page sits
+ * behind the `exec:admin` gate inherited from the admin layout.
  */
 export default function ServiceTokenPageClient() {
+  const repertoireUrl = useRepertoireUrl();
+
+  const {
+    loginInfo,
+    error: loginError,
+    isLoading: loginLoading,
+  } = useLoginInfo(repertoireUrl);
+
+  const {
+    createServiceToken,
+    isCreating,
+    error: creationError,
+    reset,
+  } = useCreateServiceToken(repertoireUrl);
+
+  const [createdToken, setCreatedToken] = useState<string | null>(null);
+  const [submittedValues, setSubmittedValues] =
+    useState<ServiceTokenFormValues | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleSubmit = async (values: ServiceTokenFormValues) => {
+    reset();
+
+    let expires: Date | null = null;
+    if (values.expiration.type === 'preset') {
+      expires = calculateExpirationDate(values.expiration.value);
+    }
+
+    const response = await createServiceToken({
+      username: values.username,
+      tokenName: values.name,
+      scopes: values.scopes,
+      expires,
+    });
+
+    setCreatedToken(response.token);
+    setSubmittedValues(values);
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setCreatedToken(null);
+    setSubmittedValues(null);
+  };
+
+  let createContent: React.ReactNode;
+  if (loginLoading) {
+    createContent = <p>Loading…</p>;
+  } else if (loginError || !loginInfo) {
+    createContent = (
+      <p>
+        Failed to load authentication information. Please refresh the page or
+        log in again.
+      </p>
+    );
+  } else {
+    createContent = (
+      <>
+        {creationError && <TokenCreationErrorDisplay error={creationError} />}
+        <ServiceTokenForm
+          // The full configured scope list (not filtered to the admin's own
+          // scopes): an `admin:token` holder can grant any scope to a service
+          // token. Malformed entries with missing name/description are dropped.
+          availableScopes={loginInfo.config.scopes.filter(
+            (scope): scope is { name: string; description: string } =>
+              scope.name !== undefined && scope.description !== undefined
+          )}
+          onSubmit={handleSubmit}
+          isSubmitting={isCreating}
+        />
+      </>
+    );
+  }
+
   return (
     <div>
       <h1>Service tokens</h1>
@@ -23,7 +108,7 @@ export default function ServiceTokenPageClient() {
 
       <section>
         <h2>Create a service token</h2>
-        <p>The service-token creation form will appear here.</p>
+        {createContent}
       </section>
 
       <section>
@@ -32,6 +117,18 @@ export default function ServiceTokenPageClient() {
           Look up and revoke an existing bot user&rsquo;s service tokens here.
         </p>
       </section>
+
+      {createdToken && submittedValues && (
+        <TokenSuccessModal
+          open={isModalOpen}
+          onClose={handleModalClose}
+          token={createdToken}
+          tokenName={submittedValues.name}
+          scopes={submittedValues.scopes}
+          expiration={submittedValues.expiration}
+          redirectUrl={null}
+        />
+      )}
     </div>
   );
 }
