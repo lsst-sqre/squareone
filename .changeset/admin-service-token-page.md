@@ -12,10 +12,17 @@ Add the `/admin/service-tokens` admin pages for creating and managing Gafaelfawr
   inside the admin section, so it inherits the `AdminRequired` / `exec:admin`
   gate from the admin layout. The UI mirrors the user-token landing/list +
   `/new` split rather than stacking token creation and lookup under one client.
-- Landing page (`/admin/service-tokens`): the `Service tokens` heading, a
-  "Create a service token" button linking to `/admin/service-tokens/new`, and the
-  manage-existing-tokens section (`ManageServiceTokens`). It carries no creation
-  form and needs no login info.
+- Landing page (`/admin/service-tokens`): the `Service tokens` heading, a `Lede`
+  + explanatory paragraphs (reusing the `Lede` typography component, as
+  `/settings/tokens` does) describing service tokens as **machine** access that
+  is not tied to a user account (a `bot-` identity) and steering services
+  deployed inside the RSP's Kubernetes environment to provision a
+  `GafaelfawrServiceToken` resource — linked to the external
+  [Gafaelfawr docs](https://gafaelfawr.lsst.io/user-guide/service-tokens.html) —
+  rather than using this form (which is primarily for granting RSP access to
+  external services), a "Create a service token" button linking to
+  `/admin/service-tokens/new`, and the manage-existing-tokens section
+  (`ManageServiceTokens`). It carries no creation form and needs no login info.
 - New `app/admin/service-tokens/new/` page (server `page.tsx` →
   `NewServiceTokenPageClient`) holds the creation flow: `useLoginInfo` + the
   `admin:token` capability gate, the `ServiceTokenForm`,

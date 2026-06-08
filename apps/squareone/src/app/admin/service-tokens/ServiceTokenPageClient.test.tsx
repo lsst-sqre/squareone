@@ -17,12 +17,44 @@ vi.mock('next/link', () => ({
 }));
 
 describe('ServiceTokenPageClient', () => {
-  test('renders the page heading and intro', () => {
+  test('renders the page heading', () => {
     render(<ServiceTokenPageClient />);
 
     expect(
       screen.getByRole('heading', { level: 1, name: 'Service tokens' })
     ).toBeInTheDocument();
+  });
+
+  test('renders a Lede introducing service tokens as machine access', () => {
+    render(<ServiceTokenPageClient />);
+
+    expect(
+      screen.getByText(
+        'Service tokens provide machine access to the Rubin Science Platform.'
+      )
+    ).toBeInTheDocument();
+  });
+
+  test('explains that a service token is not tied to a user account', () => {
+    render(<ServiceTokenPageClient />);
+
+    expect(
+      screen.getByText(/not tied to a specific user account/i)
+    ).toBeInTheDocument();
+  });
+
+  test('links the GafaelfawrServiceToken resource to the external docs', () => {
+    render(<ServiceTokenPageClient />);
+
+    const link = screen.getByRole('link', {
+      name: 'GafaelfawrServiceToken resource',
+    });
+    expect(link).toHaveAttribute(
+      'href',
+      'https://gafaelfawr.lsst.io/user-guide/service-tokens.html'
+    );
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noreferrer');
   });
 
   test('renders a Create a service token link to the /new page', () => {

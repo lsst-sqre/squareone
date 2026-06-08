@@ -4,6 +4,7 @@ import { Button } from '@lsst-sqre/squared';
 import Link from 'next/link';
 import React from 'react';
 
+import { Lede } from '../../../components/Typography';
 import ManageServiceTokens from './ManageServiceTokens';
 
 /**
@@ -22,8 +23,26 @@ export default function ServiceTokenPageClient() {
   return (
     <div>
       <h1>Service tokens</h1>
+      <Lede>
+        Service tokens provide machine access to the Rubin Science Platform.
+      </Lede>
       <p>
-        Create and manage Gafaelfawr service tokens for <code>bot-</code> users.
+        Unlike user access tokens, a service token is not tied to a specific
+        user account; it represents a <code>bot-</code> identity used by an
+        automated client or external service.
+      </p>
+      <p>
+        Services deployed inside the RSP&rsquo;s Kubernetes environment should
+        provision their tokens with a{' '}
+        <a
+          href="https://gafaelfawr.lsst.io/user-guide/service-tokens.html"
+          target="_blank"
+          rel="noreferrer"
+        >
+          GafaelfawrServiceToken resource
+        </a>{' '}
+        rather than this form. Use the form here primarily to grant RSP access
+        to external services that run outside the cluster.
       </p>
 
       <Button as={Link} href="/admin/service-tokens/new">

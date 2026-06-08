@@ -153,6 +153,14 @@ export const Default: Story = {
     await expect(
       await canvas.findByRole('heading', { level: 1, name: 'Service tokens' })
     ).toBeInTheDocument();
+    // The intro steers admins to a GafaelfawrServiceToken resource for in-cluster
+    // services via an external docs link.
+    await expect(
+      canvas.getByRole('link', { name: 'GafaelfawrServiceToken resource' })
+    ).toHaveAttribute(
+      'href',
+      'https://gafaelfawr.lsst.io/user-guide/service-tokens.html'
+    );
     // The landing page links to the creation flow rather than embedding the
     // form (which now lives on /admin/service-tokens/new).
     await expect(
