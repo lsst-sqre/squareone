@@ -85,6 +85,48 @@ describe('ServiceTokenForm', () => {
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
+  it('shows the bot username error on blur, before submit', async () => {
+    const user = userEvent.setup({ delay: 10 });
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    render(<ServiceTokenForm {...defaultProps} onSubmit={onSubmit} />);
+
+    await user.type(screen.getByLabelText(/bot username/i), 'alice');
+    // Move focus off the field to trigger on-blur validation.
+    await user.tab();
+
+    await waitFor(() => {
+      expect(screen.getByText(/must start with "bot-"/i)).toBeInTheDocument();
+    });
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('trims surrounding whitespace from the username without a spurious error', async () => {
+    const user = userEvent.setup({ delay: 10 });
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    render(<ServiceTokenForm {...defaultProps} onSubmit={onSubmit} />);
+
+    await user.type(screen.getByLabelText(/bot username/i), '  bot-ci  ');
+    await user.tab();
+
+    // The stray whitespace must not produce a confusing regex error.
+    await waitFor(() => {
+      expect(
+        screen.queryByText(/only lowercase letters, digits, and single/i)
+      ).not.toBeInTheDocument();
+    });
+
+    await user.click(screen.getByLabelText(/read:tap/i));
+    await user.click(
+      screen.getByRole('button', { name: /create service token/i })
+    );
+
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({ username: 'bot-ci' })
+      );
+    });
+  });
+
   it('requires at least one scope', async () => {
     const user = userEvent.setup({ delay: 10 });
     const onSubmit = vi.fn().mockResolvedValue(undefined);
@@ -125,10 +167,10 @@ describe('ServiceTokenForm', () => {
     });
   });
 
-  it('renders a collapsible Advanced metadata section, collapsed by default', () => {
+  it('renders a collapsible Advanced settings section, collapsed by default', () => {
     render(<ServiceTokenForm {...defaultProps} />);
 
-    const summary = screen.getByText(/advanced metadata/i);
+    const summary = screen.getByText(/advanced settings/i);
     expect(summary).toBeInTheDocument();
     expect(summary.closest('details')).not.toHaveAttribute('open');
   });
@@ -141,6 +183,16 @@ describe('ServiceTokenForm', () => {
     expect(screen.getByLabelText('UID')).toBeInTheDocument();
     expect(screen.getByLabelText('GID')).toBeInTheDocument();
     expect(screen.getByLabelText('Groups')).toBeInTheDocument();
+  });
+
+  it('renders the Groups textarea full-width so it fills its column', () => {
+    render(<ServiceTokenForm {...defaultProps} />);
+
+    // The squared TextArea container is inline-block by default and only fills
+    // its column (display:block; width:100%) via the fullWidth prop, so the
+    // textarea no longer overflows. The container is the textarea's parent.
+    const groups = screen.getByLabelText('Groups');
+    expect(groups.parentElement?.className).toMatch(/fullWidth/i);
   });
 
   it('includes supplied advanced metadata in the submitted values', async () => {

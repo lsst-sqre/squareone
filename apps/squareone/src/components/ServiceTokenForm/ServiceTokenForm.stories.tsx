@@ -81,12 +81,12 @@ export const RejectsInvalidUsername: Story = {
   },
 };
 
-export const AdvancedMetadata: Story = {
+export const AdvancedSettings: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    // The metadata section is collapsed by default; expand it to reveal the
+    // The advanced section is collapsed by default; expand it to reveal the
     // optional identity fields.
-    await userEvent.click(canvas.getByText(/advanced metadata/i));
+    await userEvent.click(canvas.getByText(/advanced settings/i));
     await expect(canvas.getByLabelText('Name')).toBeVisible();
     await expect(canvas.getByLabelText('UID')).toBeVisible();
     await expect(canvas.getByLabelText('Groups')).toBeVisible();

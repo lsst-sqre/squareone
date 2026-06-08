@@ -66,7 +66,7 @@ const EMPTY_METADATA_INPUT: ServiceTokenMetadataInput = {
  * expiration to "never". The scope picker is fed the full configured scope list
  * because an `admin:token` holder can grant any scope to a service token.
  *
- * A collapsible "Advanced metadata" section (collapsed by default) collects the
+ * A collapsible "Advanced settings" section (collapsed by default) collects the
  * optional `name`/`email`/`uid`/`gid`/`groups` identity fields. Only the values
  * that are actually supplied are forwarded in the submitted `metadata` object.
  */
@@ -88,6 +88,10 @@ export default function ServiceTokenForm({
     handleSubmit,
     formState: { errors },
   } = useForm<ServiceTokenFormFields>({
+    // Validate fields on blur (matching the squared FormField/TextArea
+    // convention) so the bot-username and metadata validators report errors as
+    // soon as a field loses focus, before submit.
+    mode: 'onBlur',
     defaultValues: {
       username: initialValues?.username || '',
       scopes: initialValues?.scopes || [],
@@ -126,6 +130,9 @@ export default function ServiceTokenForm({
             data-1p-ignore
             data-form-type="other"
             {...register('username', {
+              // Trim before validate + submit so stray whitespace doesn't
+              // produce a confusing username regex error.
+              setValueAs: (value) => value.trim(),
               validate: (value) => validateBotUsername(value) ?? true,
             })}
           />
@@ -170,10 +177,10 @@ export default function ServiceTokenForm({
           )}
         />
 
-        {/* Advanced metadata (collapsed by default) */}
+        {/* Advanced settings (collapsed by default) */}
         <details className={styles.advanced}>
           <summary className={styles.advancedSummary}>
-            Advanced metadata
+            Advanced settings
           </summary>
           <div className={styles.advancedContent}>
             <p className={styles.advancedHint}>
@@ -191,6 +198,7 @@ export default function ServiceTokenForm({
                 placeholder="Human-readable name for the bot user"
                 disabled={isDisabled}
                 autoComplete="off"
+                fullWidth
                 {...register('metadata.name')}
               />
             </FormField>
@@ -205,6 +213,7 @@ export default function ServiceTokenForm({
                 placeholder="bot@example.com"
                 disabled={isDisabled}
                 autoComplete="off"
+                fullWidth
                 {...register('metadata.email')}
               />
             </FormField>
@@ -220,6 +229,7 @@ export default function ServiceTokenForm({
                 placeholder="e.g. 90000"
                 disabled={isDisabled}
                 autoComplete="off"
+                fullWidth
                 {...register('metadata.uid', {
                   validate: (value) => validateIdField(value, 'UID') ?? true,
                 })}
@@ -237,6 +247,7 @@ export default function ServiceTokenForm({
                 placeholder="e.g. 90001"
                 disabled={isDisabled}
                 autoComplete="off"
+                fullWidth
                 {...register('metadata.gid', {
                   validate: (value) => validateIdField(value, 'GID') ?? true,
                 })}
@@ -256,6 +267,7 @@ export default function ServiceTokenForm({
                 rows={3}
                 placeholder={'g_developers:1001\ng_ops:1002'}
                 disabled={isDisabled}
+                fullWidth
                 {...register('metadata.groups', {
                   validate: (value) => validateGroupsField(value) ?? true,
                 })}

@@ -14,7 +14,7 @@ Add the `/admin/service-token` admin page for creating Gafaelfawr service tokens
   Gafaelfawr username rules, enforcing the `bot-` prefix), a token-name field,
   a scope picker fed the **full** configured scope list (an `admin:token` holder
   can grant any scope to a service token), an expiration selector defaulting
-  to never, and a collapsible "Advanced metadata" section (collapsed by default)
+  to never, and a collapsible "Advanced settings" section (collapsed by default)
   for the optional `name`/`email`/`uid`/`gid`/`groups` identity fields. Only the
   metadata fields the operator supplies are sent in the request body; omitted
   fields are absent. Reuses the squared `FormField`/`Button` primitives and the
