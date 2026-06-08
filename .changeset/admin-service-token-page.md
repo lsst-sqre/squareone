@@ -28,6 +28,17 @@ Add the `/admin/service-tokens` admin pages for creating and managing Gafaelfawr
   `admin:token` capability gate, the `ServiceTokenForm`,
   `TokenCreationErrorDisplay`, and `TokenSuccessModal`, which returns to
   `/admin/service-tokens` on Done; Cancel returns there too.
+- `/admin/service-tokens/new` is query-parameter fillable, mirroring
+  `/settings/tokens/new`: `NewServiceTokenPageClient` reads `useSearchParams()`
+  to pre-fill the form from `?username=`, `?scopes=<comma-list>`, and
+  `?expiration=` (via `parseExpirationFromQuery`, so an invalid value is ignored
+  and falls back to the "never" default), extended to the Advanced-settings
+  metadata via `?name=`, `?email=`, `?uid=`, `?gid=`, and `?groups=<comma-list>`
+  (the comma list normalised into the textarea's one-group-per-line format).
+  Only supplied params populate fields; omitted ones keep the form's defaults.
+  `ServiceTokenForm`'s `initialValues` accepts the optional metadata seed, and
+  the page is wrapped in a `<Suspense>` boundary as the App Router requires for
+  `useSearchParams()`.
 - New `ServiceTokenForm` component: a bot-username field (validated against the
   Gafaelfawr username rules, enforcing the `bot-` prefix), a scope picker fed the
   **full** configured scope list (an `admin:token` holder can grant any scope to

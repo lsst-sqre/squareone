@@ -227,6 +227,63 @@ describe('ServiceTokenForm', () => {
     });
   });
 
+  it('pre-fills the core fields from initialValues', () => {
+    render(
+      <ServiceTokenForm
+        {...defaultProps}
+        initialValues={{
+          username: 'bot-seed',
+          scopes: ['read:tap'],
+          expiration: { type: 'preset', value: '7d' },
+        }}
+      />
+    );
+
+    expect(screen.getByLabelText(/bot username/i)).toHaveValue('bot-seed');
+    expect(screen.getByLabelText(/read:tap/i)).toBeChecked();
+    expect(screen.getByRole('combobox')).toHaveTextContent(/7 days/i);
+  });
+
+  it('pre-fills the Advanced-settings fields from initialValues.metadata', () => {
+    render(
+      <ServiceTokenForm
+        {...defaultProps}
+        initialValues={{
+          metadata: {
+            name: 'CI Bot',
+            email: 'ci@example.com',
+            uid: '90000',
+            gid: '90001',
+            groups: 'g_developers:1001\ng_ops:1002',
+          },
+        }}
+      />
+    );
+
+    expect(screen.getByLabelText('Name')).toHaveValue('CI Bot');
+    expect(screen.getByLabelText('Email')).toHaveValue('ci@example.com');
+    expect(screen.getByLabelText('UID')).toHaveValue('90000');
+    expect(screen.getByLabelText('GID')).toHaveValue('90001');
+    expect(screen.getByLabelText('Groups')).toHaveValue(
+      'g_developers:1001\ng_ops:1002'
+    );
+  });
+
+  it('leaves metadata fields omitted from initialValues at their empty defaults', () => {
+    render(
+      <ServiceTokenForm
+        {...defaultProps}
+        initialValues={{ metadata: { name: 'Only Name' } }}
+      />
+    );
+
+    expect(screen.getByLabelText('Name')).toHaveValue('Only Name');
+    expect(screen.getByLabelText('Email')).toHaveValue('');
+    expect(screen.getByLabelText('UID')).toHaveValue('');
+    expect(screen.getByLabelText('GID')).toHaveValue('');
+    expect(screen.getByLabelText('Groups')).toHaveValue('');
+  });
+
   it('rejects malformed groups metadata before submit', async () => {
     const user = userEvent.setup({ delay: 10 });
     const onSubmit = vi.fn().mockResolvedValue(undefined);

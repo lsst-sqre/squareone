@@ -25,8 +25,10 @@ vi.mock('../../../../hooks/useRepertoireUrl', () => ({
 }));
 
 const mockPush = vi.fn();
+let mockSearchParams = new URLSearchParams();
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
+  useSearchParams: () => mockSearchParams,
 }));
 
 // The admin's own scopes are a strict subset of the full configured list, so a
@@ -77,6 +79,7 @@ function mockCreate(
 describe('NewServiceTokenPageClient', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockSearchParams = new URLSearchParams();
     mockLogin();
     mockCreate();
   });
@@ -235,5 +238,52 @@ describe('NewServiceTokenPageClient', () => {
     expect(
       screen.getByRole('button', { name: /create service token/i })
     ).toBeEnabled();
+  });
+
+  describe('query-parameter prefilling', () => {
+    test('pre-fills username, scopes, and expiration from query params', () => {
+      mockSearchParams = new URLSearchParams(
+        'username=bot-foo&scopes=read:tap,exec:notebook&expiration=30d'
+      );
+      render(<NewServiceTokenPageClient />);
+
+      expect(screen.getByLabelText(/bot username/i)).toHaveValue('bot-foo');
+      expect(screen.getByLabelText(/read:tap/i)).toBeChecked();
+      expect(screen.getByLabelText(/exec:notebook/i)).toBeChecked();
+      expect(screen.getByRole('combobox')).toHaveTextContent(/30 days/i);
+    });
+
+    test('pre-fills the Advanced-settings metadata fields from query params', () => {
+      mockSearchParams = new URLSearchParams(
+        'name=CI+Bot&email=ci@example.com&uid=90000&gid=90001&groups=g_developers:1001,g_ops:1002'
+      );
+      render(<NewServiceTokenPageClient />);
+
+      expect(screen.getByLabelText('Name')).toHaveValue('CI Bot');
+      expect(screen.getByLabelText('Email')).toHaveValue('ci@example.com');
+      expect(screen.getByLabelText('UID')).toHaveValue('90000');
+      expect(screen.getByLabelText('GID')).toHaveValue('90001');
+      // The comma-separated query list is normalised into the textarea's
+      // one-group-per-line format.
+      expect(screen.getByLabelText('Groups')).toHaveValue(
+        'g_developers:1001\ng_ops:1002'
+      );
+    });
+
+    test('leaves defaults when no query params are present', () => {
+      render(<NewServiceTokenPageClient />);
+
+      expect(screen.getByLabelText(/bot username/i)).toHaveValue('');
+      expect(screen.getByRole('combobox')).toHaveTextContent(/never/i);
+      expect(screen.getByLabelText('Name')).toHaveValue('');
+      expect(screen.getByLabelText('Groups')).toHaveValue('');
+    });
+
+    test('ignores an invalid expiration param, keeping the never default', () => {
+      mockSearchParams = new URLSearchParams('expiration=bogus');
+      render(<NewServiceTokenPageClient />);
+
+      expect(screen.getByRole('combobox')).toHaveTextContent(/never/i);
+    });
   });
 });

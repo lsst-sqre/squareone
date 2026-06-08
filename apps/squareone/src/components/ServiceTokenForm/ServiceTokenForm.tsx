@@ -32,6 +32,23 @@ type ServiceTokenFormFields = Omit<ServiceTokenFormValues, 'metadata'> & {
   metadata: ServiceTokenMetadataInput;
 };
 
+/**
+ * Shape accepted by {@link ServiceTokenForm}'s `initialValues` prop.
+ *
+ * The core `username`/`scopes`/`expiration` fields mirror the parsed
+ * {@link ServiceTokenFormValues}, but the optional Advanced-settings metadata is
+ * provided as the raw *input* strings the text inputs hold (`uid`/`gid` as
+ * strings, `groups` as the textarea string) rather than the parsed
+ * {@link ServiceTokenMetadata}. These initial values originate from string query
+ * parameters and seed the raw-string fields directly. Only the keys actually
+ * supplied populate fields; omitted ones keep the form's empty defaults.
+ */
+export type ServiceTokenFormInitialValues = Partial<
+  Omit<ServiceTokenFormValues, 'metadata'>
+> & {
+  metadata?: Partial<ServiceTokenMetadataInput>;
+};
+
 export type ServiceTokenFormProps = {
   /**
    * The full set of scopes that can be granted to a service token. An
@@ -39,7 +56,7 @@ export type ServiceTokenFormProps = {
    * complete `loginInfo.config.scopes` list rather than the admin's own scopes.
    */
   availableScopes: Scope[];
-  initialValues?: Partial<Omit<ServiceTokenFormValues, 'metadata'>>;
+  initialValues?: ServiceTokenFormInitialValues;
   onSubmit: (values: ServiceTokenFormValues) => Promise<void>;
   /**
    * Called when the user clicks the Cancel button. When omitted, no Cancel
@@ -103,7 +120,9 @@ export default function ServiceTokenForm({
       username: initialValues?.username || '',
       scopes: initialValues?.scopes || [],
       expiration: initialValues?.expiration || { type: 'never' },
-      metadata: EMPTY_METADATA_INPUT,
+      // Seed every metadata input with an empty default, then overlay only the
+      // fields supplied via initialValues so omitted ones keep their defaults.
+      metadata: { ...EMPTY_METADATA_INPUT, ...initialValues?.metadata },
     },
   });
 

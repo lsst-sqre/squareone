@@ -5,16 +5,20 @@ import {
   useLoginInfo,
 } from '@lsst-sqre/gafaelfawr-client';
 import { Note } from '@lsst-sqre/squared';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useState } from 'react';
 
 import ServiceTokenForm, {
+  type ServiceTokenFormInitialValues,
   type ServiceTokenFormValues,
 } from '../../../../components/ServiceTokenForm';
 import { TokenCreationErrorDisplay } from '../../../../components/TokenCreationErrorDisplay';
 import TokenSuccessModal from '../../../../components/TokenSuccessModal';
 import { useRepertoireUrl } from '../../../../hooks/useRepertoireUrl';
-import { calculateExpirationDate } from '../../../../lib/tokens/expiration';
+import {
+  calculateExpirationDate,
+  parseExpirationFromQuery,
+} from '../../../../lib/tokens/expiration';
 
 /**
  * Gafaelfawr scope required to create service tokens via the admin
@@ -43,6 +47,7 @@ const LANDING_URL = '/admin/service-tokens';
  */
 export default function NewServiceTokenPageClient() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const repertoireUrl = useRepertoireUrl();
 
   const {
@@ -62,6 +67,64 @@ export default function NewServiceTokenPageClient() {
   const [submittedValues, setSubmittedValues] =
     useState<ServiceTokenFormValues | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Parse query parameters for form prefilling, mirroring `/settings/tokens/new`
+  // and extending it to the Advanced-settings metadata fields. Only the params
+  // actually present populate fields; omitted ones keep the form's defaults, and
+  // an unparseable expiration is ignored (falls back to the "never" default).
+  const formInitialValues: ServiceTokenFormInitialValues = {};
+
+  const usernameParam = searchParams.get('username');
+  if (usernameParam) {
+    formInitialValues.username = usernameParam;
+  }
+
+  const scopesParam = searchParams.get('scopes');
+  if (scopesParam) {
+    formInitialValues.scopes = scopesParam.split(',').filter(Boolean);
+  }
+
+  const expirationParam = searchParams.get('expiration');
+  if (expirationParam) {
+    const parsedExpiration = parseExpirationFromQuery(expirationParam);
+    if (parsedExpiration) {
+      formInitialValues.expiration = parsedExpiration;
+    }
+  }
+
+  // The Advanced-settings inputs are raw strings, so each metadata param is
+  // passed through verbatim — uid/gid as their string text and groups split from
+  // the comma-separated query list into the textarea's one-per-line format.
+  const metadata: NonNullable<ServiceTokenFormInitialValues['metadata']> = {};
+
+  const nameParam = searchParams.get('name');
+  if (nameParam) {
+    metadata.name = nameParam;
+  }
+
+  const emailParam = searchParams.get('email');
+  if (emailParam) {
+    metadata.email = emailParam;
+  }
+
+  const uidParam = searchParams.get('uid');
+  if (uidParam) {
+    metadata.uid = uidParam;
+  }
+
+  const gidParam = searchParams.get('gid');
+  if (gidParam) {
+    metadata.gid = gidParam;
+  }
+
+  const groupsParam = searchParams.get('groups');
+  if (groupsParam) {
+    metadata.groups = groupsParam.split(',').filter(Boolean).join('\n');
+  }
+
+  if (Object.keys(metadata).length > 0) {
+    formInitialValues.metadata = metadata;
+  }
 
   const handleSubmit = async (values: ServiceTokenFormValues) => {
     reset();
@@ -133,6 +196,7 @@ export default function NewServiceTokenPageClient() {
             (scope): scope is { name: string; description: string } =>
               scope.name !== undefined && scope.description !== undefined
           )}
+          initialValues={formInitialValues}
           onSubmit={handleSubmit}
           onCancel={handleCancel}
           isSubmitting={isCreating}
