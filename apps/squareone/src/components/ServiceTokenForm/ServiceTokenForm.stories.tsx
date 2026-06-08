@@ -81,6 +81,22 @@ export const RejectsInvalidUsername: Story = {
   },
 };
 
+export const WithCancel: Story = {
+  args: {
+    onCancel: () => {},
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    // When onCancel is provided, a secondary Cancel button sits beside submit.
+    await expect(
+      canvas.getByRole('button', { name: /create service token/i })
+    ).toBeInTheDocument();
+    await expect(
+      canvas.getByRole('button', { name: /cancel/i })
+    ).toBeInTheDocument();
+  },
+};
+
 export const AdvancedSettings: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);

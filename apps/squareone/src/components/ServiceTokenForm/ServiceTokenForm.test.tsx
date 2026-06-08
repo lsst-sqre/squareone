@@ -265,4 +265,26 @@ describe('ServiceTokenForm', () => {
       screen.getByRole('button', { name: /create service token/i })
     ).toBeDisabled();
   });
+
+  it('does not render a Cancel button when onCancel is omitted', () => {
+    render(<ServiceTokenForm {...defaultProps} />);
+
+    expect(
+      screen.queryByRole('button', { name: /cancel/i })
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders a Cancel button that calls onCancel when provided', async () => {
+    const user = userEvent.setup({ delay: 10 });
+    const onCancel = vi.fn();
+    render(<ServiceTokenForm {...defaultProps} onCancel={onCancel} />);
+
+    const cancelButton = screen.getByRole('button', { name: /cancel/i });
+    expect(cancelButton).toBeInTheDocument();
+    // A type="button" Cancel must not submit the form.
+    expect(cancelButton).toHaveAttribute('type', 'button');
+
+    await user.click(cancelButton);
+    expect(onCancel).toHaveBeenCalledTimes(1);
+  });
 });

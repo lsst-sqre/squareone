@@ -41,6 +41,12 @@ export type ServiceTokenFormProps = {
   availableScopes: Scope[];
   initialValues?: Partial<Omit<ServiceTokenFormValues, 'metadata'>>;
   onSubmit: (values: ServiceTokenFormValues) => Promise<void>;
+  /**
+   * Called when the user clicks the Cancel button. When omitted, no Cancel
+   * button is rendered. The `/admin/service-tokens/new` page passes a handler
+   * that navigates back to the service-tokens landing page.
+   */
+  onCancel?: () => void;
   isSubmitting?: boolean;
   /**
    * Disable every field and the submit button. Used to gate the form when the
@@ -74,6 +80,7 @@ export default function ServiceTokenForm({
   availableScopes,
   initialValues,
   onSubmit,
+  onCancel,
   isSubmitting = false,
   disabled = false,
 }: ServiceTokenFormProps) {
@@ -282,6 +289,16 @@ export default function ServiceTokenForm({
         <Button type="submit" loading={isSubmitting} disabled={isDisabled}>
           Create service token
         </Button>
+        {onCancel && (
+          <Button
+            type="button"
+            onClick={onCancel}
+            disabled={isSubmitting}
+            variant="secondary"
+          >
+            Cancel
+          </Button>
+        )}
       </div>
     </form>
   );

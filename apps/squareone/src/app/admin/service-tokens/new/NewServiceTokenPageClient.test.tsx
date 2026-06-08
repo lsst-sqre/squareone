@@ -8,7 +8,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
-import ServiceTokenPageClient from './ServiceTokenPageClient';
+import NewServiceTokenPageClient from './NewServiceTokenPageClient';
 
 vi.mock('@lsst-sqre/gafaelfawr-client', async (importOriginal) => {
   const actual =
@@ -20,7 +20,7 @@ vi.mock('@lsst-sqre/gafaelfawr-client', async (importOriginal) => {
   };
 });
 
-vi.mock('../../../hooks/useRepertoireUrl', () => ({
+vi.mock('../../../../hooks/useRepertoireUrl', () => ({
   useRepertoireUrl: (): string | undefined => undefined,
 }));
 
@@ -74,41 +74,33 @@ function mockCreate(
   return createServiceToken;
 }
 
-describe('ServiceTokenPageClient', () => {
+describe('NewServiceTokenPageClient', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockLogin();
     mockCreate();
   });
 
-  test('renders the page heading and both sections', () => {
-    render(<ServiceTokenPageClient />);
+  test('renders the create-a-service-token heading and form', () => {
+    render(<NewServiceTokenPageClient />);
 
     expect(
-      screen.getByRole('heading', { level: 1, name: 'Service tokens' })
+      screen.getByRole('heading', { level: 1, name: 'Create a service token' })
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole('heading', { level: 2, name: /create a service token/i })
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('heading', {
-        level: 2,
-        name: /manage existing tokens/i,
-      })
-    ).toBeInTheDocument();
+    expect(screen.getByLabelText(/bot username/i)).toBeInTheDocument();
   });
 
-  test('renders the manage-existing-tokens lookup form', () => {
-    render(<ServiceTokenPageClient />);
+  test('does not render a manage-existing-tokens section', () => {
+    render(<NewServiceTokenPageClient />);
 
-    expect(screen.getByLabelText('Bot user')).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: /look up tokens/i })
-    ).toBeInTheDocument();
+      screen.queryByRole('heading', { name: /manage existing tokens/i })
+    ).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Bot user')).not.toBeInTheDocument();
   });
 
   test('offers the full configured scope list, not just the admin scopes', () => {
-    render(<ServiceTokenPageClient />);
+    render(<NewServiceTokenPageClient />);
 
     // read:tap is configured but NOT one of the admin's own scopes.
     expect(screen.getByLabelText(/read:tap/i)).toBeInTheDocument();
@@ -118,7 +110,7 @@ describe('ServiceTokenPageClient', () => {
   test('creates a service token and reveals the secret once', async () => {
     const user = userEvent.setup({ delay: 10 });
     const createServiceToken = mockCreate();
-    render(<ServiceTokenPageClient />);
+    render(<NewServiceTokenPageClient />);
 
     await user.type(screen.getByLabelText(/bot username/i), 'bot-ci');
     await user.click(screen.getByLabelText(/read:tap/i));
@@ -140,7 +132,7 @@ describe('ServiceTokenPageClient', () => {
   test('forwards supplied advanced metadata to createServiceToken', async () => {
     const user = userEvent.setup({ delay: 10 });
     const createServiceToken = mockCreate();
-    render(<ServiceTokenPageClient />);
+    render(<NewServiceTokenPageClient />);
 
     await user.type(screen.getByLabelText(/bot username/i), 'bot-ci');
     await user.click(screen.getByLabelText(/read:tap/i));
@@ -163,11 +155,36 @@ describe('ServiceTokenPageClient', () => {
     });
   });
 
+  test('navigates back to the landing page when the success modal is closed', async () => {
+    const user = userEvent.setup({ delay: 10 });
+    mockCreate();
+    render(<NewServiceTokenPageClient />);
+
+    await user.type(screen.getByLabelText(/bot username/i), 'bot-ci');
+    await user.click(screen.getByLabelText(/read:tap/i));
+    await user.click(
+      screen.getByRole('button', { name: /create service token/i })
+    );
+
+    await user.click(await screen.findByRole('button', { name: /done/i }));
+
+    expect(mockPush).toHaveBeenCalledWith('/admin/service-tokens');
+  });
+
+  test('navigates back to the landing page when Cancel is clicked', async () => {
+    const user = userEvent.setup({ delay: 10 });
+    render(<NewServiceTokenPageClient />);
+
+    await user.click(screen.getByRole('button', { name: /cancel/i }));
+
+    expect(mockPush).toHaveBeenCalledWith('/admin/service-tokens');
+  });
+
   test('surfaces a creation error via TokenCreationErrorDisplay', () => {
     mockCreate({
       error: { status: 422, message: 'Validation failed: bad scope' },
     });
-    render(<ServiceTokenPageClient />);
+    render(<NewServiceTokenPageClient />);
 
     const alert = screen.getByRole('alert');
     expect(alert).toHaveTextContent(/error creating token/i);
@@ -176,7 +193,7 @@ describe('ServiceTokenPageClient', () => {
 
   test('shows a loading state while login info loads', () => {
     mockLogin({ loginInfo: null, isLoading: true });
-    render(<ServiceTokenPageClient />);
+    render(<NewServiceTokenPageClient />);
 
     expect(screen.getByText(/loading/i)).toBeInTheDocument();
     expect(screen.queryByLabelText(/bot username/i)).not.toBeInTheDocument();
@@ -184,7 +201,7 @@ describe('ServiceTokenPageClient', () => {
 
   test('shows an auth failure message when login info fails to load', () => {
     mockLogin({ loginInfo: null, error: new Error('boom') });
-    render(<ServiceTokenPageClient />);
+    render(<NewServiceTokenPageClient />);
 
     expect(
       screen.getByText(/failed to load authentication information/i)
@@ -196,7 +213,7 @@ describe('ServiceTokenPageClient', () => {
     mockLogin({
       loginInfo: { ...mockLoginInfo, scopes: ['exec:admin'] },
     });
-    render(<ServiceTokenPageClient />);
+    render(<NewServiceTokenPageClient />);
 
     expect(
       screen.getByText(/required to create service tokens/i)
@@ -209,7 +226,7 @@ describe('ServiceTokenPageClient', () => {
 
   test('enables the form and shows no banner when admin:token is present', () => {
     // The default mock login info includes `admin:token`.
-    render(<ServiceTokenPageClient />);
+    render(<NewServiceTokenPageClient />);
 
     expect(
       screen.queryByText(/required to create service tokens/i)

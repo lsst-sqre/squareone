@@ -17,7 +17,7 @@ export function getAdminNavigation(
     {
       items: [
         { href: '/admin/sentry', label: 'Sentry' },
-        { href: '/admin/service-token', label: 'Service tokens' },
+        { href: '/admin/service-tokens', label: 'Service tokens' },
       ],
     },
   ];

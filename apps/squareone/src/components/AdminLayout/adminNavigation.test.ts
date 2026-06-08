@@ -24,7 +24,7 @@ test('generates a single flat section with the Sentry and service-token items', 
   expect(navigation[0]).toEqual({
     items: [
       { href: '/admin/sentry', label: 'Sentry' },
-      { href: '/admin/service-token', label: 'Service tokens' },
+      { href: '/admin/service-tokens', label: 'Service tokens' },
     ],
   });
 });
@@ -34,7 +34,7 @@ test('includes the service-token admin item', () => {
   const items = navigation.flatMap((section) => section.items);
 
   expect(items).toContainEqual({
-    href: '/admin/service-token',
+    href: '/admin/service-tokens',
     label: 'Service tokens',
   });
 });

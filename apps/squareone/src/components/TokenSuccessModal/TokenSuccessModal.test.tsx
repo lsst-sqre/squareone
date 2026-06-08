@@ -98,13 +98,16 @@ describe('TokenSuccessModal', () => {
   it('navigates to a custom redirectUrl when provided', async () => {
     const user = userEvent.setup();
     render(
-      <TokenSuccessModal {...defaultProps} redirectUrl="/admin/service-token" />
+      <TokenSuccessModal
+        {...defaultProps}
+        redirectUrl="/admin/service-tokens"
+      />
     );
 
     const doneButton = screen.getByRole('button', { name: 'Done' });
     await user.click(doneButton);
 
-    expect(mockPush).toHaveBeenCalledWith('/admin/service-token');
+    expect(mockPush).toHaveBeenCalledWith('/admin/service-tokens');
   });
 
   it('hides the template button when templateUrl is omitted', () => {

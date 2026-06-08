@@ -5,16 +5,16 @@ import {
   useLoginInfo,
 } from '@lsst-sqre/gafaelfawr-client';
 import { Note } from '@lsst-sqre/squared';
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 
 import ServiceTokenForm, {
   type ServiceTokenFormValues,
-} from '../../../components/ServiceTokenForm';
-import { TokenCreationErrorDisplay } from '../../../components/TokenCreationErrorDisplay';
-import TokenSuccessModal from '../../../components/TokenSuccessModal';
-import { useRepertoireUrl } from '../../../hooks/useRepertoireUrl';
-import { calculateExpirationDate } from '../../../lib/tokens/expiration';
-import ManageServiceTokens from './ManageServiceTokens';
+} from '../../../../components/ServiceTokenForm';
+import { TokenCreationErrorDisplay } from '../../../../components/TokenCreationErrorDisplay';
+import TokenSuccessModal from '../../../../components/TokenSuccessModal';
+import { useRepertoireUrl } from '../../../../hooks/useRepertoireUrl';
+import { calculateExpirationDate } from '../../../../lib/tokens/expiration';
 
 /**
  * Gafaelfawr scope required to create service tokens via the admin
@@ -23,19 +23,26 @@ import ManageServiceTokens from './ManageServiceTokens';
 const TOKEN_ADMIN_SCOPE = 'admin:token';
 
 /**
- * Client component for the `/admin/service-token` admin page.
- *
- * Renders the creation form (wired to {@link useCreateServiceToken}) and the
- * manage-existing-tokens section ({@link ManageServiceTokens}) for looking up and
- * revoking a bot user's service tokens.
- * The created token secret is revealed exactly once via {@link TokenSuccessModal},
- * and API errors surface through {@link TokenCreationErrorDisplay}. The page sits
- * behind the `exec:admin` gate inherited from the admin layout, and additionally
- * checks `loginInfo.scopes` for `admin:token` — without it, an explanatory banner
- * is shown and the form is disabled rather than letting a submit fail with a
- * silent 403.
+ * Where to return after a successful creation or a cancel. Mirrors the
+ * `/settings/tokens/new` → `/settings/tokens` relationship.
  */
-export default function ServiceTokenPageClient() {
+const LANDING_URL = '/admin/service-tokens';
+
+/**
+ * Client component for the `/admin/service-tokens/new` admin page.
+ *
+ * Renders the service-token creation form (wired to {@link useCreateServiceToken})
+ * and reveals the new token secret exactly once via {@link TokenSuccessModal};
+ * closing the modal (or cancelling the form) returns to the service-tokens
+ * landing page. API errors surface through {@link TokenCreationErrorDisplay}.
+ *
+ * The page sits behind the `exec:admin` gate inherited from the admin layout, and
+ * additionally checks `loginInfo.scopes` for `admin:token` — without it, an
+ * explanatory banner is shown and the form is disabled rather than letting a
+ * submit fail with a silent 403.
+ */
+export default function NewServiceTokenPageClient() {
+  const router = useRouter();
   const repertoireUrl = useRepertoireUrl();
 
   const {
@@ -78,17 +85,21 @@ export default function ServiceTokenPageClient() {
     setIsModalOpen(true);
   };
 
+  const handleCancel = () => {
+    router.push(LANDING_URL);
+  };
+
   const handleModalClose = () => {
     setIsModalOpen(false);
     setCreatedToken(null);
     setSubmittedValues(null);
   };
 
-  let createContent: React.ReactNode;
+  let content: React.ReactNode;
   if (loginLoading) {
-    createContent = <p>Loading…</p>;
+    content = <p>Loading…</p>;
   } else if (loginError || !loginInfo) {
-    createContent = (
+    content = (
       <p>
         Failed to load authentication information. Please refresh the page or
         log in again.
@@ -101,7 +112,7 @@ export default function ServiceTokenPageClient() {
     // fail with a silent 403.
     const hasAdminToken = loginInfo.scopes.includes(TOKEN_ADMIN_SCOPE);
 
-    createContent = (
+    content = (
       <>
         {!hasAdminToken && (
           <Note type="warning">
@@ -123,6 +134,7 @@ export default function ServiceTokenPageClient() {
               scope.name !== undefined && scope.description !== undefined
           )}
           onSubmit={handleSubmit}
+          onCancel={handleCancel}
           isSubmitting={isCreating}
           disabled={!hasAdminToken}
         />
@@ -132,20 +144,16 @@ export default function ServiceTokenPageClient() {
 
   return (
     <div>
-      <h1>Service tokens</h1>
+      <h1>Create a service token</h1>
       <p>
-        Create and manage Gafaelfawr service tokens for <code>bot-</code> users.
+        Create a Gafaelfawr service token for a <code>bot-</code> user. Choose
+        the scopes the token should carry; an <code>admin:token</code> holder
+        may grant any configured scope. Optionally set an expiration and
+        identity metadata under Advanced settings. The token secret is revealed
+        only once after creation.
       </p>
 
-      <section>
-        <h2>Create a service token</h2>
-        {createContent}
-      </section>
-
-      <section>
-        <h2>Manage existing tokens</h2>
-        <ManageServiceTokens />
-      </section>
+      {content}
 
       {createdToken && submittedValues && (
         <TokenSuccessModal
@@ -154,7 +162,7 @@ export default function ServiceTokenPageClient() {
           token={createdToken}
           scopes={submittedValues.scopes}
           expiration={submittedValues.expiration}
-          redirectUrl={null}
+          redirectUrl={LANDING_URL}
         />
       )}
     </div>

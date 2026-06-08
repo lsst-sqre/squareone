@@ -2,7 +2,8 @@ import type { TokenInfo } from '@lsst-sqre/gafaelfawr-client';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { useEffect } from 'react';
 import { expect, userEvent, within } from 'storybook/test';
-import ServiceTokenPageClient from '../../app/admin/service-token/ServiceTokenPageClient';
+import ServiceTokenPageClient from '../../app/admin/service-tokens/ServiceTokenPageClient';
+import { useStaticConfig } from '../../hooks/useStaticConfig';
 
 // Mock login info exposing a full configured scope list that is a superset of
 // the signed-in admin's own scopes, so the form demonstrates offering every
@@ -106,6 +107,19 @@ function MockFetchProvider({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+// Reads config at mount so the single config-promise suspend (`use()` in
+// useStaticConfig) happens once, up front, before any interaction. In the real
+// app the admin layout/nav consume config at startup, so it is always resolved
+// by the time a user interacts; the landing page itself reads no config. This
+// keeps the isolated story faithful: without it, AccessTokensView is the first
+// config consumer and its mount-time suspend would unwind to the page-level
+// Suspense boundary, unmounting the manage section and resetting its looked-up
+// username before the token list can render.
+function ConfigWarmer({ children }: { children: React.ReactNode }) {
+  useStaticConfig();
+  return <>{children}</>;
+}
+
 const meta: Meta<typeof ServiceTokenPageClient> = {
   title: 'Pages/Admin/ServiceTokenPage',
   component: ServiceTokenPageClient,
@@ -113,7 +127,9 @@ const meta: Meta<typeof ServiceTokenPageClient> = {
     // biome-ignore lint/suspicious/noExplicitAny: Storybook decorator accepts any Story component
     (Story: any) => (
       <MockFetchProvider>
-        <Story />
+        <ConfigWarmer>
+          <Story />
+        </ConfigWarmer>
       </MockFetchProvider>
     ),
   ],
@@ -121,7 +137,7 @@ const meta: Meta<typeof ServiceTokenPageClient> = {
     nextjs: {
       appDirectory: true,
       navigation: {
-        pathname: '/admin/service-token',
+        pathname: '/admin/service-tokens',
       },
     },
   },
@@ -137,12 +153,13 @@ export const Default: Story = {
     await expect(
       await canvas.findByRole('heading', { level: 1, name: 'Service tokens' })
     ).toBeInTheDocument();
-    // The creation form appears once login info resolves.
+    // The landing page links to the creation flow rather than embedding the
+    // form (which now lives on /admin/service-tokens/new).
     await expect(
-      await canvas.findByLabelText(/bot username/i)
+      canvas.getByRole('link', { name: 'Create a service token' })
     ).toBeInTheDocument();
-    // A scope the admin doesn't personally hold is still offered.
-    await expect(canvas.getByLabelText(/read:tap/i)).toBeInTheDocument();
+    // No creation form is rendered on the landing page.
+    await expect(canvas.queryByLabelText(/bot username/i)).toBeNull();
     await expect(
       canvas.getByRole('heading', { name: /manage existing tokens/i })
     ).toBeInTheDocument();
