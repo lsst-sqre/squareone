@@ -59,14 +59,26 @@ Add the `/admin/service-tokens` admin pages for creating and managing Gafaelfawr
   template" action when omitted) and `redirectUrl` (defaults to the user token
   list; the new-service-token page passes `/admin/service-tokens`), so it can be
   reused for service tokens without changing the user-token flow.
-- Manage-existing-tokens section (`ManageServiceTokens`): a `bot-` username
-  lookup (validated with the same `validateBotUsername` helper as the creation
-  form) drives a service-scoped `AccessTokensView` to list that bot user's
-  service tokens, each revocable via the existing `DeleteTokenModal` +
-  `useDeleteToken` (the list refreshes automatically through query
-  invalidation). An invalid or non-`bot-` username is rejected with a clear
-  message and issues no request. Listing is always per looked-up bot username
-  because Gafaelfawr exposes no global token enumeration. `AccessTokensView`
-  gains optional `tokenType` (default `'user'`) and `emptyState` props so it can
-  list `service` tokens and show a message when a looked-up user has none,
-  without changing the user-token settings page.
+- Token lookup lives on a dedicated, URL-driven `app/admin/service-tokens/search/`
+  page (server `page.tsx` with `generateMetadata` → tab title
+  `Look up service tokens | <siteName>`, plus a `<Suspense>`-wrapped
+  `SearchServiceTokensPageClient` reading `useSearchParams()`), so a lookup can
+  be bookmarked, shared, and back-navigated. `?q=` is the single source of truth:
+  the search box is seeded from it (and re-synced on navigation), and submitting
+  the box `router.push`es a new `?q=` history entry. Results derive from `q`
+  (validated with the same `validateBotUsername` helper as the creation form) — an
+  empty `q` prompts for a username and issues no request, an invalid / non-`bot-`
+  `q` shows an inline error and issues no request, and a valid `q` lists that bot
+  user's `service` tokens via a service-scoped `AccessTokensView`
+  (`showDetailsLink={false}`, since the `/settings/tokens/<key>` details route does
+  not resolve for service tokens), each revocable via the existing
+  `DeleteTokenModal` + `useDeleteToken` (the list refreshes automatically through
+  query invalidation). The intro links to `/admin/service-tokens/new`, carrying
+  `?username=<q>` to pre-fill the creation form when `q` is a valid bot username.
+  Listing is always per looked-up bot username because Gafaelfawr exposes no
+  global token enumeration. The landing's `ManageServiceTokens` box keeps the
+  "Look up tokens" entry point but now just redirects to the `/search` page
+  (`?q=<trimmed>`) instead of rendering an inline list. `AccessTokensView` gains
+  optional `tokenType` (default `'user'`) and `emptyState` props so it can list
+  `service` tokens and show a message when a looked-up user has none, without
+  changing the user-token settings page.

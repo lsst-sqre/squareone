@@ -1,5 +1,6 @@
 import type { TokenInfo } from '@lsst-sqre/gafaelfawr-client';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { getRouter } from '@storybook/nextjs-vite/navigation.mock';
 import { useEffect } from 'react';
 import { expect, userEvent, within } from 'storybook/test';
 import ServiceTokenPageClient from '../../app/admin/service-tokens/ServiceTokenPageClient';
@@ -174,8 +175,10 @@ export const Default: Story = {
   },
 };
 
-// Exercises the manage-existing-tokens lookup: enter a bot username and list
-// that user's service tokens, each with a Delete (revoke) control.
+// The landing's lookup box is a quick entry point that hands off to the
+// dedicated `/search` page; the token list itself lives there. Entering a bot
+// username and submitting navigates to `/admin/service-tokens/search?q=<bot>`
+// rather than listing tokens inline.
 export const ManageTokens: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -186,12 +189,8 @@ export const ManageTokens: Story = {
       canvas.getByRole('button', { name: /look up tokens/i })
     );
 
-    // The looked-up bot user's service tokens are listed.
-    await expect(await canvas.findByText('ci-pipeline')).toBeInTheDocument();
-    await expect(canvas.getByText('nightly-build')).toBeInTheDocument();
-    // Each listed token offers a revoke control.
-    await expect(
-      canvas.getAllByRole('button', { name: /delete/i }).length
-    ).toBeGreaterThan(0);
+    await expect(getRouter().push).toHaveBeenCalledWith(
+      '/admin/service-tokens/search?q=bot-ci'
+    );
   },
 };
