@@ -121,7 +121,6 @@ describe('ServiceTokenPageClient', () => {
     render(<ServiceTokenPageClient />);
 
     await user.type(screen.getByLabelText(/bot username/i), 'bot-ci');
-    await user.type(screen.getByLabelText(/token name/i), 'CI token');
     await user.click(screen.getByLabelText(/read:tap/i));
     await user.click(
       screen.getByRole('button', { name: /create service token/i })
@@ -130,7 +129,6 @@ describe('ServiceTokenPageClient', () => {
     await waitFor(() => {
       expect(createServiceToken).toHaveBeenCalledWith({
         username: 'bot-ci',
-        tokenName: 'CI token',
         scopes: ['read:tap'],
         expires: null,
       });
@@ -145,7 +143,6 @@ describe('ServiceTokenPageClient', () => {
     render(<ServiceTokenPageClient />);
 
     await user.type(screen.getByLabelText(/bot username/i), 'bot-ci');
-    await user.type(screen.getByLabelText(/token name/i), 'CI token');
     await user.click(screen.getByLabelText(/read:tap/i));
     await user.type(screen.getByLabelText('Name'), 'CI Bot');
     await user.type(screen.getByLabelText('UID'), '90000');
@@ -157,7 +154,6 @@ describe('ServiceTokenPageClient', () => {
     await waitFor(() => {
       expect(createServiceToken).toHaveBeenCalledWith({
         username: 'bot-ci',
-        tokenName: 'CI token',
         scopes: ['read:tap'],
         expires: null,
         name: 'CI Bot',

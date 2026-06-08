@@ -66,7 +66,6 @@ export default function ServiceTokenPageClient() {
 
     const response = await createServiceToken({
       username: values.username,
-      tokenName: values.name,
       scopes: values.scopes,
       expires,
       // Only the metadata fields the operator supplied are present, so omitted
@@ -153,7 +152,6 @@ export default function ServiceTokenPageClient() {
           open={isModalOpen}
           onClose={handleModalClose}
           token={createdToken}
-          tokenName={submittedValues.name}
           scopes={submittedValues.scopes}
           expiration={submittedValues.expiration}
           redirectUrl={null}

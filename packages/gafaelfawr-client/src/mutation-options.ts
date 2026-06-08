@@ -66,7 +66,7 @@ export const createTokenMutationConfig = {
  * const mutation = useMutation({
  *   mutationFn: createServiceTokenMutationConfig.mutationFn,
  * });
- * mutation.mutate({ username, tokenName, scopes, expires, csrfToken, baseUrl });
+ * mutation.mutate({ username, scopes, expires, csrfToken, baseUrl });
  * ```
  */
 export const createServiceTokenMutationConfig = {
@@ -75,7 +75,6 @@ export const createServiceTokenMutationConfig = {
   ): Promise<CreateTokenResponse> => {
     const {
       username,
-      tokenName,
       scopes,
       expires,
       name,
@@ -93,7 +92,6 @@ export const createServiceTokenMutationConfig = {
     const request: AdminTokenRequest = {
       username,
       token_type: 'service',
-      token_name: tokenName,
       scopes,
       expires: expiresEpoch,
       // Only forward optional metadata that was explicitly supplied.

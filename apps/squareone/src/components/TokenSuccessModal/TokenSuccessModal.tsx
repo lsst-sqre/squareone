@@ -8,7 +8,12 @@ export type TokenSuccessModalProps = {
   open: boolean;
   onClose: () => void;
   token: string;
-  tokenName: string;
+  /**
+   * Optional display name for the token. The service-token flow omits it
+   * (Gafaelfawr's service path has no token name); it is currently unused in
+   * the rendered output.
+   */
+  tokenName?: string;
   scopes: string[];
   expiration: ExpirationValue;
   /**

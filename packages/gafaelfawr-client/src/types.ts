@@ -76,11 +76,11 @@ export type CreateTokenVariables = {
  * Variables for create service token mutation (admin endpoint).
  *
  * `username` is the target bot user; the optional metadata fields
- * (name/email/uid/gid/groups) are sent only when supplied.
+ * (name/email/uid/gid/groups) are sent only when supplied. There is no
+ * `tokenName` — Gafaelfawr's service path rejects a `token_name`.
  */
 export type CreateServiceTokenVariables = {
   username: string;
-  tokenName: string;
   scopes: string[];
   expires: Date | null;
   name?: string | null;

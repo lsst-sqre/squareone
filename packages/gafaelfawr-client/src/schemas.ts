@@ -153,11 +153,13 @@ export const CreateTokenRequestSchema = z.object({
  * (the admin endpoint is not scoped to a username path segment), and optional
  * identity metadata (name/email/uid/gid/groups) may be supplied for the bot
  * user.
+ *
+ * Note: unlike the user-token request, there is no `token_name` — Gafaelfawr's
+ * service path rejects it (`Tokens of type service cannot have a name`).
  */
 export const AdminTokenRequestSchema = z.object({
   username: z.string().min(1).max(64),
   token_type: z.literal('service'),
-  token_name: z.string().min(1).max(64),
   scopes: z.array(z.string()),
   expires: z.number().int().nullable().optional(),
   name: z.string().nullable().optional(),

@@ -28,7 +28,6 @@ export const Default: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.getByLabelText(/bot username/i)).toBeInTheDocument();
-    await expect(canvas.getByLabelText(/token name/i)).toBeInTheDocument();
     await expect(
       canvas.getByRole('button', { name: /create service token/i })
     ).toBeInTheDocument();
@@ -39,7 +38,6 @@ export const Prefilled: Story = {
   args: {
     initialValues: {
       username: 'bot-example',
-      name: 'CI pipeline token',
       scopes: ['read:tap', 'exec:notebook'],
       expiration: { type: 'never' },
     },
@@ -50,7 +48,6 @@ export const Submitting: Story = {
   args: {
     initialValues: {
       username: 'bot-example',
-      name: 'CI pipeline token',
       scopes: ['read:tap'],
       expiration: { type: 'never' },
     },

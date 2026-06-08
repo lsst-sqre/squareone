@@ -20,8 +20,6 @@ import { useLoginInfo } from './useLoginInfo';
 export type CreateServiceTokenParams = {
   /** Target bot username to create the service token for */
   username: string;
-  /** User-friendly name for the token */
-  tokenName: string;
   /** Scopes to grant the token */
   scopes: string[];
   /** Expiration date (null for no expiration) */
@@ -78,7 +76,6 @@ export type UseCreateServiceTokenReturn = {
  *   const handleSubmit = async () => {
  *     const response = await createServiceToken({
  *       username: 'bot-example',
- *       tokenName: 'CI token',
  *       scopes: ['read:tap'],
  *       expires: null,
  *     });
@@ -138,7 +135,6 @@ export function useCreateServiceToken(
 
       return mutation.mutateAsync({
         username: params.username,
-        tokenName: params.tokenName,
         scopes: params.scopes,
         expires: params.expires,
         name: params.name,

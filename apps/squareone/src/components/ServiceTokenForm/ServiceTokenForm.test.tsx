@@ -18,16 +18,21 @@ const defaultProps = {
 };
 
 describe('ServiceTokenForm', () => {
-  it('renders the username, name, scope, and expiration fields', () => {
+  it('renders the username, scope, and expiration fields', () => {
     render(<ServiceTokenForm {...defaultProps} />);
 
     expect(screen.getByLabelText(/bot username/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/token name/i)).toBeInTheDocument();
     expect(screen.getByText(/token scopes/i)).toBeInTheDocument();
     expect(screen.getByText(/token expiration/i)).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: /create service token/i })
     ).toBeInTheDocument();
+  });
+
+  it('does not render a token name field (the service path rejects it)', () => {
+    render(<ServiceTokenForm {...defaultProps} />);
+
+    expect(screen.queryByLabelText(/token name/i)).not.toBeInTheDocument();
   });
 
   it('offers every configured scope, not just a subset', () => {
@@ -50,7 +55,6 @@ describe('ServiceTokenForm', () => {
     render(<ServiceTokenForm {...defaultProps} onSubmit={onSubmit} />);
 
     await user.type(screen.getByLabelText(/bot username/i), 'alice');
-    await user.type(screen.getByLabelText(/token name/i), 'CI token');
     await user.click(screen.getByLabelText(/read:tap/i));
     await user.click(
       screen.getByRole('button', { name: /create service token/i })
@@ -68,7 +72,6 @@ describe('ServiceTokenForm', () => {
     render(<ServiceTokenForm {...defaultProps} onSubmit={onSubmit} />);
 
     await user.type(screen.getByLabelText(/bot username/i), 'bot-Bad');
-    await user.type(screen.getByLabelText(/token name/i), 'CI token');
     await user.click(screen.getByLabelText(/read:tap/i));
     await user.click(
       screen.getByRole('button', { name: /create service token/i })
@@ -88,7 +91,6 @@ describe('ServiceTokenForm', () => {
     render(<ServiceTokenForm {...defaultProps} onSubmit={onSubmit} />);
 
     await user.type(screen.getByLabelText(/bot username/i), 'bot-ci');
-    await user.type(screen.getByLabelText(/token name/i), 'CI token');
     await user.click(
       screen.getByRole('button', { name: /create service token/i })
     );
@@ -101,30 +103,12 @@ describe('ServiceTokenForm', () => {
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
-  it('requires a token name', async () => {
-    const user = userEvent.setup({ delay: 10 });
-    const onSubmit = vi.fn().mockResolvedValue(undefined);
-    render(<ServiceTokenForm {...defaultProps} onSubmit={onSubmit} />);
-
-    await user.type(screen.getByLabelText(/bot username/i), 'bot-ci');
-    await user.click(screen.getByLabelText(/read:tap/i));
-    await user.click(
-      screen.getByRole('button', { name: /create service token/i })
-    );
-
-    await waitFor(() => {
-      expect(screen.getByText(/token name is required/i)).toBeInTheDocument();
-    });
-    expect(onSubmit).not.toHaveBeenCalled();
-  });
-
   it('submits the entered values with a never expiration by default', async () => {
     const user = userEvent.setup({ delay: 10 });
     const onSubmit = vi.fn().mockResolvedValue(undefined);
     render(<ServiceTokenForm {...defaultProps} onSubmit={onSubmit} />);
 
     await user.type(screen.getByLabelText(/bot username/i), 'bot-ci');
-    await user.type(screen.getByLabelText(/token name/i), 'CI token');
     await user.click(screen.getByLabelText(/read:tap/i));
     await user.click(
       screen.getByRole('button', { name: /create service token/i })
@@ -133,7 +117,6 @@ describe('ServiceTokenForm', () => {
     await waitFor(() => {
       expect(onSubmit).toHaveBeenCalledWith({
         username: 'bot-ci',
-        name: 'CI token',
         scopes: ['read:tap'],
         expiration: { type: 'never' },
         // No advanced metadata supplied, so the metadata object is empty.
@@ -166,7 +149,6 @@ describe('ServiceTokenForm', () => {
     render(<ServiceTokenForm {...defaultProps} onSubmit={onSubmit} />);
 
     await user.type(screen.getByLabelText(/bot username/i), 'bot-ci');
-    await user.type(screen.getByLabelText(/token name/i), 'CI token');
     await user.click(screen.getByLabelText(/read:tap/i));
     await user.type(screen.getByLabelText('Name'), 'CI Bot');
     await user.type(screen.getByLabelText('Email'), 'ci@example.com');
@@ -180,7 +162,6 @@ describe('ServiceTokenForm', () => {
     await waitFor(() => {
       expect(onSubmit).toHaveBeenCalledWith({
         username: 'bot-ci',
-        name: 'CI token',
         scopes: ['read:tap'],
         expiration: { type: 'never' },
         metadata: {
@@ -200,7 +181,6 @@ describe('ServiceTokenForm', () => {
     render(<ServiceTokenForm {...defaultProps} onSubmit={onSubmit} />);
 
     await user.type(screen.getByLabelText(/bot username/i), 'bot-ci');
-    await user.type(screen.getByLabelText(/token name/i), 'CI token');
     await user.click(screen.getByLabelText(/read:tap/i));
     await user.type(screen.getByLabelText('Groups'), 'g_developers');
     await user.click(
@@ -217,7 +197,6 @@ describe('ServiceTokenForm', () => {
     render(<ServiceTokenForm {...defaultProps} isSubmitting={true} />);
 
     expect(screen.getByLabelText(/bot username/i)).toBeDisabled();
-    expect(screen.getByLabelText(/token name/i)).toBeDisabled();
     expect(
       screen.getByRole('button', { name: /create service token/i })
     ).toBeDisabled();
@@ -227,7 +206,6 @@ describe('ServiceTokenForm', () => {
     render(<ServiceTokenForm {...defaultProps} disabled={true} />);
 
     expect(screen.getByLabelText(/bot username/i)).toBeDisabled();
-    expect(screen.getByLabelText(/token name/i)).toBeDisabled();
     expect(screen.getByLabelText('Name')).toBeDisabled();
     expect(screen.getByLabelText('UID')).toBeDisabled();
     expect(screen.getByLabelText('Groups')).toBeDisabled();

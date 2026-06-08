@@ -25,7 +25,6 @@ describe('createServiceTokenMutationConfig', () => {
     const expires = new Date('2024-01-01T00:00:00Z');
     const result = await createServiceTokenMutationConfig.mutationFn({
       username: 'bot-example',
-      tokenName: 'CI token',
       scopes: ['read:tap'],
       expires,
       csrfToken: 'csrf-token',
@@ -43,10 +42,11 @@ describe('createServiceTokenMutationConfig', () => {
     expect(body).toEqual({
       username: 'bot-example',
       token_type: 'service',
-      token_name: 'CI token',
       scopes: ['read:tap'],
       expires: Math.floor(expires.getTime() / 1000),
     });
+    // Gafaelfawr's service path rejects a token_name; it must not be sent.
+    expect(body).not.toHaveProperty('token_name');
   });
 
   it('includes optional metadata when supplied', async () => {
@@ -58,7 +58,6 @@ describe('createServiceTokenMutationConfig', () => {
 
     await createServiceTokenMutationConfig.mutationFn({
       username: 'bot-example',
-      tokenName: 'CI token',
       scopes: [],
       expires: null,
       name: 'Example Bot',
@@ -88,7 +87,6 @@ describe('createServiceTokenMutationConfig', () => {
 
     await createServiceTokenMutationConfig.mutationFn({
       username: 'bot-example',
-      tokenName: 'CI token',
       scopes: [],
       expires: null,
       csrfToken: 'csrf-token',

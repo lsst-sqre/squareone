@@ -391,7 +391,6 @@ describe('createServiceToken', () => {
       {
         username: 'bot-example',
         token_type: 'service',
-        token_name: 'CI token',
         scopes: ['read:tap'],
         expires: 1700000000,
       },
@@ -409,11 +408,15 @@ describe('createServiceToken', () => {
       body: JSON.stringify({
         username: 'bot-example',
         token_type: 'service',
-        token_name: 'CI token',
         scopes: ['read:tap'],
         expires: 1700000000,
       }),
     });
+    // Gafaelfawr's service path rejects a token_name; it must not be sent.
+    const sentBody = JSON.parse(
+      (mockFetch.mock.calls[0][1] as RequestInit).body as string
+    );
+    expect(sentBody).not.toHaveProperty('token_name');
     expect(result.token).toBe('gt-new-service-token');
   });
 
@@ -428,7 +431,6 @@ describe('createServiceToken', () => {
       {
         username: 'bot-example',
         token_type: 'service',
-        token_name: 'CI token',
         scopes: [],
       },
       'csrf-token',
@@ -460,7 +462,6 @@ describe('createServiceToken', () => {
         {
           username: '',
           token_type: 'service',
-          token_name: 'CI token',
           scopes: [],
         },
         'csrf',

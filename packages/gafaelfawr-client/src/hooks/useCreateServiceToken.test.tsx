@@ -87,7 +87,6 @@ describe('useCreateServiceToken', () => {
     await act(async () => {
       const response = await result.current.createServiceToken({
         username: 'bot-example',
-        tokenName: 'CI token',
         scopes: ['read:tap'],
         expires: null,
       });
@@ -107,6 +106,8 @@ describe('useCreateServiceToken', () => {
     const body = JSON.parse(init.body as string);
     expect(body.token_type).toBe('service');
     expect(body.username).toBe('bot-example');
+    // Gafaelfawr's service path rejects a token_name; it must not be sent.
+    expect(body).not.toHaveProperty('token_name');
   });
 
   it("invalidates the bot user's token list on success", async () => {
@@ -124,7 +125,6 @@ describe('useCreateServiceToken', () => {
     await act(async () => {
       await result.current.createServiceToken({
         username: 'bot-example',
-        tokenName: 'CI token',
         scopes: ['read:tap'],
         expires: null,
       });

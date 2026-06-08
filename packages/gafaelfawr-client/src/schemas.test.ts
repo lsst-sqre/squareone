@@ -229,20 +229,29 @@ describe('AdminTokenRequestSchema', () => {
     const result = AdminTokenRequestSchema.parse({
       username: 'bot-example',
       token_type: 'service',
-      token_name: 'CI token',
       scopes: ['read:tap'],
     });
     expect(result.username).toBe('bot-example');
     expect(result.token_type).toBe('service');
-    expect(result.token_name).toBe('CI token');
     expect(result.scopes).toEqual(['read:tap']);
+  });
+
+  it('does not carry a token_name (the service path rejects it)', () => {
+    // Gafaelfawr's service path 422s on `token_name`, so the schema no longer
+    // defines it; any supplied value is stripped rather than forwarded.
+    const result = AdminTokenRequestSchema.parse({
+      username: 'bot-example',
+      token_type: 'service',
+      token_name: 'CI token',
+      scopes: ['read:tap'],
+    });
+    expect(result).not.toHaveProperty('token_name');
   });
 
   it('accepts a request including optional metadata', () => {
     const result = AdminTokenRequestSchema.parse({
       username: 'bot-example',
       token_type: 'service',
-      token_name: 'CI token',
       scopes: ['read:tap', 'read:image'],
       expires: 1700000000,
       name: 'Example Bot',
@@ -263,7 +272,6 @@ describe('AdminTokenRequestSchema', () => {
     const result = AdminTokenRequestSchema.parse({
       username: 'bot-example',
       token_type: 'service',
-      token_name: 'CI token',
       scopes: [],
       expires: null,
     });
@@ -273,17 +281,6 @@ describe('AdminTokenRequestSchema', () => {
   it('rejects a missing username', () => {
     expect(() =>
       AdminTokenRequestSchema.parse({
-        token_type: 'service',
-        token_name: 'CI token',
-        scopes: ['read:tap'],
-      })
-    ).toThrow();
-  });
-
-  it('rejects a missing token name', () => {
-    expect(() =>
-      AdminTokenRequestSchema.parse({
-        username: 'bot-example',
         token_type: 'service',
         scopes: ['read:tap'],
       })
@@ -295,7 +292,6 @@ describe('AdminTokenRequestSchema', () => {
       AdminTokenRequestSchema.parse({
         username: 'bot-example',
         token_type: 'user',
-        token_name: 'CI token',
         scopes: ['read:tap'],
       })
     ).toThrow();

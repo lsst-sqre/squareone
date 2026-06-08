@@ -15,7 +15,6 @@ import styles from './ServiceTokenForm.module.css';
 
 export type ServiceTokenFormValues = {
   username: string;
-  name: string;
   scopes: string[];
   expiration: ExpirationValue;
   /**
@@ -91,7 +90,6 @@ export default function ServiceTokenForm({
   } = useForm<ServiceTokenFormFields>({
     defaultValues: {
       username: initialValues?.username || '',
-      name: initialValues?.name || '',
       scopes: initialValues?.scopes || [],
       expiration: initialValues?.expiration || { type: 'never' },
       metadata: EMPTY_METADATA_INPUT,
@@ -102,7 +100,6 @@ export default function ServiceTokenForm({
     try {
       await onSubmit({
         username: data.username,
-        name: data.name,
         scopes: data.scopes,
         expiration: data.expiration,
         metadata: parseServiceTokenMetadata(data.metadata),
@@ -130,28 +127,6 @@ export default function ServiceTokenForm({
             data-form-type="other"
             {...register('username', {
               validate: (value) => validateBotUsername(value) ?? true,
-            })}
-          />
-        </FormField>
-
-        {/* Token name field */}
-        <FormField error={errors.name?.message} required>
-          <FormField.Label htmlFor="service-token-name">
-            Token name
-          </FormField.Label>
-          <FormField.TextInput
-            id="service-token-name"
-            placeholder="A descriptive name to recognize this token later."
-            disabled={isDisabled}
-            autoComplete="off"
-            data-1p-ignore
-            data-form-type="other"
-            {...register('name', {
-              required: 'Token name is required',
-              maxLength: {
-                value: 64,
-                message: 'Token name must be 64 characters or less',
-              },
             })}
           />
         </FormField>
