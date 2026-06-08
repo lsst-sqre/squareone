@@ -20,12 +20,20 @@ type AccessTokensViewProps = {
    * feedback.
    */
   emptyState?: React.ReactNode;
+  /**
+   * Whether each item links its token key to the `/settings/tokens/<key>`
+   * details page. Defaults to `true` (the user-token settings page); listings
+   * where that route does not resolve (e.g. service tokens) pass `false` to
+   * render the key as plain text.
+   */
+  showDetailsLink?: boolean;
 };
 
 export default function AccessTokensView({
   username,
   tokenType = 'user',
   emptyState = null,
+  showDetailsLink = true,
 }: AccessTokensViewProps) {
   const repertoireUrl = useRepertoireUrl();
   const { tokens, error, isLoading } = useUserTokens(username, repertoireUrl);
@@ -65,7 +73,12 @@ export default function AccessTokensView({
   return (
     <div className={styles.container}>
       {matchingTokens.map((token) => (
-        <AccessTokenItem key={token.token} token={token} username={username} />
+        <AccessTokenItem
+          key={token.token}
+          token={token}
+          username={username}
+          showDetailsLink={showDetailsLink}
+        />
       ))}
     </div>
   );

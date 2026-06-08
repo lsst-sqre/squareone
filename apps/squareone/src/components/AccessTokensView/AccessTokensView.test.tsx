@@ -21,6 +21,24 @@ vi.mock('@lsst-sqre/gafaelfawr-client', async (importOriginal) => {
 });
 vi.mock('../../hooks/useRepertoireUrl');
 
+// Mock Next.js Link so token keys rendered by AccessTokenItem have a
+// deterministic anchor when the details link is shown.
+vi.mock('next/link', () => ({
+  default: ({
+    href,
+    children,
+    className,
+  }: {
+    href: string;
+    children: React.ReactNode;
+    className?: string;
+  }) => (
+    <a href={href} className={className}>
+      {children}
+    </a>
+  ),
+}));
+
 vi.mock('./tokenDateFormatters', () => ({
   formatTokenExpiration: vi.fn((expires) => {
     if (expires === null) {
@@ -358,6 +376,41 @@ describe('AccessTokensView', () => {
     expect(tokenKeys[0].textContent).toBe('gt-newest');
     expect(tokenKeys[1].textContent).toBe('gt-recent');
     expect(tokenKeys[2].textContent).toBe('gt-very-old');
+  });
+
+  it('renders token keys as details links by default', () => {
+    mockUseUserTokens.mockReturnValue({
+      tokens: mockUserTokens,
+      error: null,
+      isLoading: false,
+      isPending: false,
+      query: null,
+      refetch: vi.fn(),
+      invalidate: vi.fn(),
+    });
+
+    render(<AccessTokensView username="testuser" />);
+
+    expect(
+      screen.getByRole('link', { name: 'gt-recent-token' })
+    ).toHaveAttribute('href', '/settings/tokens/gt-recent-token');
+  });
+
+  it('forwards showDetailsLink={false} so token keys render as plain text', () => {
+    mockUseUserTokens.mockReturnValue({
+      tokens: mockUserTokens,
+      error: null,
+      isLoading: false,
+      isPending: false,
+      query: null,
+      refetch: vi.fn(),
+      invalidate: vi.fn(),
+    });
+
+    render(<AccessTokensView username="testuser" showDetailsLink={false} />);
+
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    expect(screen.getByText('gt-recent-token').tagName).toBe('SPAN');
   });
 
   it('passes username to AccessTokenItem components', () => {

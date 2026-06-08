@@ -92,6 +92,7 @@ type AccessTokensViewWrapperProps = {
   username: string;
   tokenType?: TokenType;
   emptyState?: ReactNode;
+  showDetailsLink?: boolean;
 };
 
 function AccessTokensViewWrapper({
@@ -101,6 +102,7 @@ function AccessTokensViewWrapper({
   username,
   tokenType = 'user',
   emptyState = null,
+  showDetailsLink = true,
 }: AccessTokensViewWrapperProps) {
   // Filter to the requested token type and sort by created (most recent first)
   const matchingTokens = tokens
@@ -135,7 +137,12 @@ function AccessTokensViewWrapper({
   return (
     <div className={styles.container}>
       {matchingTokens.map((token) => (
-        <AccessTokenItem key={token.token} token={token} username={username} />
+        <AccessTokenItem
+          key={token.token}
+          token={token}
+          username={username}
+          showDetailsLink={showDetailsLink}
+        />
       ))}
     </div>
   );
@@ -215,6 +222,15 @@ export const ServiceTokensEmpty: Story = {
     tokenType: 'service',
     tokens: mockUserTokens, // no service tokens for this user
     emptyState: <p>No service tokens found for bot-ci.</p>,
+  },
+};
+
+// Listings without a `/settings/tokens/<key>` details route pass
+// `showDetailsLink={false}`, so each token key renders as plain text.
+export const WithoutDetailsLinks: Story = {
+  args: {
+    tokens: mockUserTokens,
+    showDetailsLink: false,
   },
 };
 
