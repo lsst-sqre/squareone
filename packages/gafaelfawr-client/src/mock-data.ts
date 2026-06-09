@@ -62,6 +62,7 @@ export const mockLoginInfo: LoginInfo = {
       { name: 'exec:notebook', description: 'Run notebooks in Nublado' },
       { name: 'read:image', description: 'Read images from the archive' },
       { name: 'admin:token', description: 'Administer user tokens' },
+      { name: 'exec:admin', description: 'Administer the Science Platform' },
       { name: 'exec:portal', description: 'Use the Firefly portal' },
     ],
   },

@@ -98,7 +98,7 @@ describe('LoginInfoSchema', () => {
     expect(result.csrf).toBe(mockLoginInfo.csrf);
     expect(result.username).toBe('testuser');
     expect(result.scopes).toHaveLength(3);
-    expect(result.config.scopes).toHaveLength(5);
+    expect(result.config.scopes).toHaveLength(6);
   });
 
   it('requires all fields', () => {
