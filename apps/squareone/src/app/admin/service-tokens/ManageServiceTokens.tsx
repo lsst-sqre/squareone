@@ -4,6 +4,8 @@ import { Button, FormField } from '@lsst-sqre/squared';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 
+import styles from './ManageServiceTokens.module.css';
+
 /**
  * Bot-username lookup that hands off to the dedicated `/search` page.
  *
@@ -36,17 +38,20 @@ export default function ManageServiceTokens() {
       <form onSubmit={handleSubmit}>
         <FormField>
           <FormField.Label htmlFor="manage-bot-user">Bot user</FormField.Label>
-          <FormField.TextInput
-            id="manage-bot-user"
-            placeholder="bot-example"
-            value={inputValue}
-            onChange={(event) => setInputValue(event.target.value)}
-            autoComplete="off"
-            data-1p-ignore
-            data-form-type="other"
-          />
+          <div className={styles.inputRow}>
+            <FormField.TextInput
+              id="manage-bot-user"
+              className={styles.input}
+              placeholder="bot-example"
+              value={inputValue}
+              onChange={(event) => setInputValue(event.target.value)}
+              autoComplete="off"
+              data-1p-ignore
+              data-form-type="other"
+            />
+            <Button type="submit">Look up tokens</Button>
+          </div>
         </FormField>
-        <Button type="submit">Look up tokens</Button>
       </form>
     </div>
   );

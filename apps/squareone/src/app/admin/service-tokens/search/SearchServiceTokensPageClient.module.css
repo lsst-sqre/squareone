@@ -1,0 +1,17 @@
+/* Separate the lookup form from the results list below it. */
+.form {
+  margin-bottom: var(--sqo-space-md);
+}
+
+/* Lay the text input and its submit button out side by side, with the button
+   inline to the right of the box and matching its height. */
+.inputRow {
+  display: flex;
+  align-items: stretch;
+  gap: var(--sqo-space-xs);
+}
+
+/* Let the text input take the remaining width beside the button. */
+.input {
+  flex: 1;
+}

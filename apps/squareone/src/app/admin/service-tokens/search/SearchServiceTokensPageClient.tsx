@@ -7,6 +7,7 @@ import React, { useEffect, useState } from 'react';
 
 import AccessTokensView from '../../../../components/AccessTokensView';
 import { validateBotUsername } from '../../../../lib/tokens/botUsername';
+import styles from './SearchServiceTokensPageClient.module.css';
 
 const LANDING_URL = '/admin/service-tokens';
 const NEW_URL = `${LANDING_URL}/new`;
@@ -90,20 +91,23 @@ export default function SearchServiceTokensPageClient() {
         <Link href={createHref}>create a new service token</Link>.
       </p>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className={styles.form}>
         <FormField error={qError ?? undefined}>
           <FormField.Label htmlFor="search-bot-user">Bot user</FormField.Label>
-          <FormField.TextInput
-            id="search-bot-user"
-            placeholder="bot-example"
-            value={inputValue}
-            onChange={(event) => setInputValue(event.target.value)}
-            autoComplete="off"
-            data-1p-ignore
-            data-form-type="other"
-          />
+          <div className={styles.inputRow}>
+            <FormField.TextInput
+              id="search-bot-user"
+              className={styles.input}
+              placeholder="bot-example"
+              value={inputValue}
+              onChange={(event) => setInputValue(event.target.value)}
+              autoComplete="off"
+              data-1p-ignore
+              data-form-type="other"
+            />
+            <Button type="submit">Look up tokens</Button>
+          </div>
         </FormField>
-        <Button type="submit">Look up tokens</Button>
       </form>
 
       {results}
