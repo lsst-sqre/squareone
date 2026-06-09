@@ -226,7 +226,7 @@ export const ServiceTokensEmpty: Story = {
 };
 
 // Listings without a `/settings/tokens/<key>` details route pass
-// `showDetailsLink={false}`, so each token key renders as plain text.
+// `showDetailsLink={false}`, so each token key line is omitted.
 export const WithoutDetailsLinks: Story = {
   args: {
     tokens: mockUserTokens,

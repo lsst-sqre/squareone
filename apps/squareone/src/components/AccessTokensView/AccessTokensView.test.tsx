@@ -396,7 +396,7 @@ describe('AccessTokensView', () => {
     ).toHaveAttribute('href', '/settings/tokens/gt-recent-token');
   });
 
-  it('forwards showDetailsLink={false} so token keys render as plain text', () => {
+  it('forwards showDetailsLink={false} so token key lines are omitted', () => {
     mockUseUserTokens.mockReturnValue({
       tokens: mockUserTokens,
       error: null,
@@ -410,7 +410,7 @@ describe('AccessTokensView', () => {
     render(<AccessTokensView username="testuser" showDetailsLink={false} />);
 
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
-    expect(screen.getByText('gt-recent-token').tagName).toBe('SPAN');
+    expect(screen.queryByText('gt-recent-token')).not.toBeInTheDocument();
   });
 
   it('passes username to AccessTokenItem components', () => {

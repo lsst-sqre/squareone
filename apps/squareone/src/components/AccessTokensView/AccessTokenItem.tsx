@@ -24,7 +24,8 @@ type AccessTokenItemProps = {
    * Whether the token key links to its `/settings/tokens/<key>` details page.
    * Defaults to `true` (the user-token settings listing). Pass `false` for
    * listings where that route does not resolve (e.g. the admin service-token
-   * view), which renders the key as plain text instead.
+   * view), which omits the key line entirely — the key already appears as the
+   * bold heading for keyless service tokens.
    */
   showDetailsLink?: boolean;
   onDeleteSuccess?: () => void;
@@ -72,15 +73,13 @@ export default function AccessTokenItem({
           <div className={styles.tokenName}>
             {token.token_name || token.token}
           </div>
-          {showDetailsLink ? (
+          {showDetailsLink && (
             <Link
               href={`/settings/tokens/${token.token}`}
               className={styles.tokenKey}
             >
               {token.token}
             </Link>
-          ) : (
-            <span className={styles.tokenKey}>{token.token}</span>
           )}
           {sortedScopes.length > 0 ? (
             <div className={styles.scopesBadges}>

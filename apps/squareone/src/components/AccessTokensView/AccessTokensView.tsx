@@ -24,7 +24,7 @@ type AccessTokensViewProps = {
    * Whether each item links its token key to the `/settings/tokens/<key>`
    * details page. Defaults to `true` (the user-token settings page); listings
    * where that route does not resolve (e.g. service tokens) pass `false` to
-   * render the key as plain text.
+   * omit the key line entirely.
    */
   showDetailsLink?: boolean;
 };

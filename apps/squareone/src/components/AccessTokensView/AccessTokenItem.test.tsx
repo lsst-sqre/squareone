@@ -436,7 +436,7 @@ describe('AccessTokenItem', () => {
     expect(link).toHaveAttribute('href', '/settings/tokens/gt-abc123def456');
   });
 
-  it('renders the token key as plain text when showDetailsLink is false', () => {
+  it('omits the token key line when showDetailsLink is false', () => {
     render(
       <AccessTokenItem
         token={baseToken}
@@ -448,8 +448,6 @@ describe('AccessTokenItem', () => {
     expect(
       screen.queryByRole('link', { name: 'gt-abc123def456' })
     ).not.toBeInTheDocument();
-
-    const tokenKey = screen.getByText('gt-abc123def456');
-    expect(tokenKey.tagName).toBe('SPAN');
+    expect(screen.queryByText('gt-abc123def456')).not.toBeInTheDocument();
   });
 });
