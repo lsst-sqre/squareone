@@ -40,11 +40,17 @@ export default function DeleteTokenModal({
       onInteractOutside={handleInteractOutside}
     >
       <div className={styles.buttons}>
-        <Button type="button" onClick={onCancel} disabled={isDeleting}>
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={onCancel}
+          disabled={isDeleting}
+        >
           Cancel
         </Button>
         <Button
           type="button"
+          variant="danger"
           onClick={onConfirm}
           loading={isDeleting}
           disabled={isDeleting}
