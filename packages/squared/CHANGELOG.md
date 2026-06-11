@@ -1,5 +1,12 @@
 # @lsst-sqre/squared
 
+## 0.13.1
+
+### Patch Changes
+
+- Updated dependencies [[`5304900`](https://github.com/lsst-sqre/squareone/commit/5304900ba8a3e86461c1a3449f651de896cc8cf8)]:
+  - @lsst-sqre/global-css@0.2.5
+
 ## 0.13.0
 
 ### Minor Changes
