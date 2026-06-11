@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { useEffect } from 'react';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, within } from 'storybook/test';
 import NewServiceTokenPageClient from '../../app/admin/service-tokens/new/NewServiceTokenPageClient';
 
 // Mock login info exposing a full configured scope list that is a superset of

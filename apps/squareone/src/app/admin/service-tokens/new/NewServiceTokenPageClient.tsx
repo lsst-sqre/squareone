@@ -191,7 +191,10 @@ export default function NewServiceTokenPageClient() {
         <ServiceTokenForm
           // The full configured scope list (not filtered to the admin's own
           // scopes): an `admin:token` holder can grant any scope to a service
-          // token. Malformed entries with missing name/description are dropped.
+          // token. The type guard is required because this app sets
+          // `strictNullChecks: false`, which makes Zod infer `Scope`'s
+          // name/description as optional; it narrows them back to the
+          // required-field `Scope` the form expects.
           availableScopes={loginInfo.config.scopes.filter(
             (scope): scope is { name: string; description: string } =>
               scope.name !== undefined && scope.description !== undefined

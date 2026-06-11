@@ -1,5 +1,5 @@
 ---
-"squareone": patch
+"squareone": minor
 ---
 
 Add the `/admin/service-tokens` admin pages for creating and managing Gafaelfawr service tokens.
