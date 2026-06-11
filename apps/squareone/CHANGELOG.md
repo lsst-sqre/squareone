@@ -1,5 +1,143 @@
 # squareone
 
+## 0.32.0
+
+### Minor Changes
+
+- [#443](https://github.com/lsst-sqre/squareone/pull/443) [`e02d0df`](https://github.com/lsst-sqre/squareone/commit/e02d0dfd742322bbb061deaee8331b575c541f75) Thanks [@jonathansick](https://github.com/jonathansick)! - Add `/admin/service-tokens` admin pages for creating and managing Gafaelfawr service tokens. The pages live in the admin section, so they inherit its `exec:admin` gate.
+
+  - **Landing** (`/admin/service-tokens`) explains service tokens — machine access not tied to a user account — links to the [Gafaelfawr docs](https://gafaelfawr.lsst.io/user-guide/service-tokens.html), and offers entry points to create or look up tokens.
+  - **Create** (`/admin/service-tokens/new`) provides a form for the bot username, scopes, expiration, and optional identity metadata (name/email/uid/gid/groups) under collapsible Advanced settings. The form is pre-fillable from query parameters (e.g. `?username=`, `?scopes=`, `?expiration=`). Creating a token also requires the `admin:token` scope; an admin without it sees a warning and a disabled form rather than a silent failure.
+  - **Look up** (`/admin/service-tokens/search`) is URL-driven via `?q=<bot-username>`, listing that bot user's service tokens (each revocable) so a lookup can be bookmarked and shared.
+
+### Patch Changes
+
+- [#405](https://github.com/lsst-sqre/squareone/pull/405) [`1fe8816`](https://github.com/lsst-sqre/squareone/commit/1fe8816b415a23cf1b18e05517e291afbbfd441e) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @biomejs/biome from 2.3.12 to 2.3.14
+
+- [#402](https://github.com/lsst-sqre/squareone/pull/402) [`538614a`](https://github.com/lsst-sqre/squareone/commit/538614a425f26b7a289be29fc2b77861bd6bbacb) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-a11y from 10.2.7 to 10.4.1
+
+- [#402](https://github.com/lsst-sqre/squareone/pull/402) [`538614a`](https://github.com/lsst-sqre/squareone/commit/538614a425f26b7a289be29fc2b77861bd6bbacb) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-docs from 10.2.7 to 10.4.1
+
+- [#402](https://github.com/lsst-sqre/squareone/pull/402) [`538614a`](https://github.com/lsst-sqre/squareone/commit/538614a425f26b7a289be29fc2b77861bd6bbacb) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-links from 10.2.7 to 10.4.1
+
+- [#402](https://github.com/lsst-sqre/squareone/pull/402) [`538614a`](https://github.com/lsst-sqre/squareone/commit/538614a425f26b7a289be29fc2b77861bd6bbacb) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-onboarding from 10.2.7 to 10.4.1
+
+- [#402](https://github.com/lsst-sqre/squareone/pull/402) [`538614a`](https://github.com/lsst-sqre/squareone/commit/538614a425f26b7a289be29fc2b77861bd6bbacb) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-themes from 10.2.7 to 10.2.8
+
+- [#402](https://github.com/lsst-sqre/squareone/pull/402) [`538614a`](https://github.com/lsst-sqre/squareone/commit/538614a425f26b7a289be29fc2b77861bd6bbacb) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-vitest from 10.2.7 to 10.2.8
+
+- [#402](https://github.com/lsst-sqre/squareone/pull/402) [`538614a`](https://github.com/lsst-sqre/squareone/commit/538614a425f26b7a289be29fc2b77861bd6bbacb) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/nextjs-vite from 10.2.7 to 10.2.8
+
+- [#402](https://github.com/lsst-sqre/squareone/pull/402) [`538614a`](https://github.com/lsst-sqre/squareone/commit/538614a425f26b7a289be29fc2b77861bd6bbacb) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/react-vite from 10.2.7 to 10.2.8
+
+- [#405](https://github.com/lsst-sqre/squareone/pull/405) [`1fe8816`](https://github.com/lsst-sqre/squareone/commit/1fe8816b415a23cf1b18e05517e291afbbfd441e) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @types/node from 22.19.7 to 22.19.11
+
+- [#400](https://github.com/lsst-sqre/squareone/pull/400) [`f935c90`](https://github.com/lsst-sqre/squareone/commit/f935c902c98913adbe853bcd086124448b9498b2) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @types/react from 19.2.13 to 19.2.14 in the react group
+
+- [#405](https://github.com/lsst-sqre/squareone/pull/405) [`1fe8816`](https://github.com/lsst-sqre/squareone/commit/1fe8816b415a23cf1b18e05517e291afbbfd441e) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @vitejs/plugin-react from 5.1.2 to 5.1.4
+
+- [#443](https://github.com/lsst-sqre/squareone/pull/443) [`0d60843`](https://github.com/lsst-sqre/squareone/commit/0d60843b01f5918f56446d82d9b8f5735eb51486) Thanks [@jonathansick](https://github.com/jonathansick)! - Make the token-key details link optional in `AccessTokenItem` /
+  `AccessTokensView`.
+
+  `AccessTokenItem` gains a `showDetailsLink?: boolean` prop (default `true`).
+  When `true` it keeps rendering the existing `/settings/tokens/<key>` details
+  link on the token key; when `false` it renders the key as plain text (same
+  styling, no anchor) for listings where that route does not resolve — such as
+  service tokens. `AccessTokensView` gains the matching `showDetailsLink?:
+boolean` prop (default `true`) and forwards it to each item, so the
+  `/settings/tokens` user-token listing is unchanged.
+
+- [#410](https://github.com/lsst-sqre/squareone/pull/410) [`0c414fc`](https://github.com/lsst-sqre/squareone/commit/0c414fc78a227473d0133c0599b2fa559269b62b) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump actions/create-github-app-token from 2 to 3
+
+- [#410](https://github.com/lsst-sqre/squareone/pull/410) [`0c414fc`](https://github.com/lsst-sqre/squareone/commit/0c414fc78a227473d0133c0599b2fa559269b62b) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump actions/github-script from 8 to 9
+
+- [#429](https://github.com/lsst-sqre/squareone/pull/429) [`6a28eb4`](https://github.com/lsst-sqre/squareone/commit/6a28eb4cd7e0502e3c3ea41094d7acf080a32247) Thanks [@jonathansick](https://github.com/jonathansick)! - Add the reusable `/admin` section scaffold, mirroring the `/settings`
+  sidebar-layout pattern.
+
+  - New `app/admin/layout.tsx` (server, loads config) → `AdminLayoutClient.tsx`
+    (client, `usePathname()`) → shared `<SidebarLayout sidebarTitle="Admin">`,
+    driven by a new flat `getAdminNavigation()` (a single `/admin/sentry` item, no
+    categories).
+  - New reusable `getFirstNavItemHref(navSections)` helper in the `SidebarLayout`
+    module (exported from its `index.ts`): returns the first nav item's href, or
+    `null` as a safe fallback for an empty nav.
+  - `app/admin/page.tsx` index route redirects to the first sidebar nav item via
+    that helper (currently `/admin/sentry`); reordering the nav changes the target
+    with no other code change. An empty nav renders a fallback instead of
+    redirecting.
+  - Minimal `app/admin/sentry/page.tsx` placeholder so the redirect resolves.
+
+  No access gating in this slice; the Phalanx ingress remains the deployment-time
+  enforcement.
+
+- [#406](https://github.com/lsst-sqre/squareone/pull/406) [`0d6b970`](https://github.com/lsst-sqre/squareone/commit/0d6b970e6ab9442bef073a0305ecc06838011e3f) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump ajv from 8.17.1 to 8.18.0 in the security-patch group across 1 directory
+
+- [#443](https://github.com/lsst-sqre/squareone/pull/443) [`f40b6ab`](https://github.com/lsst-sqre/squareone/commit/f40b6ab39d69ed892a68a4e285092ffce79a603e) Thanks [@jonathansick](https://github.com/jonathansick)! - Add a dev-only `/dev` auth control panel (login/persona/scope toggles), mock `/auth/api/v1/login`, and exclude all dev mocks from production builds via `.dev` route files.
+
+- [#418](https://github.com/lsst-sqre/squareone/pull/418) [`e6c0f92`](https://github.com/lsst-sqre/squareone/commit/e6c0f92e9ec92deacefb5aebac496a172494edb9) Thanks [@jonathansick](https://github.com/jonathansick)! - Fix the dev-mode Repertoire `/discovery` mock to return absolute service URLs so
+  they pass URL-schema validation and are fetchable from server components.
+
+  - The dev mock route previously overrode internal service URLs (gafaelfawr,
+    semaphore, times-square) with bare relative paths (`/auth`, `/semaphore`, …).
+    Those failed the repertoire-client `z.string().url()` schema, so
+    `DiscoverySchema.parse()` threw a `ZodError` and the app silently fell back to
+    empty discovery (no Semaphore broadcasts, etc.).
+  - Relative paths are also unfetchable during server-side prefetch in
+    `RootLayout`, where there is no document origin.
+  - The mock now prefixes each overridden internal URL with the dev server's own
+    origin (derived from the incoming request, so it stays port-agnostic). The
+    pathnames are unchanged, so the existing `next.config.js` rewrites still route
+    them to the local mock handlers.
+
+- [#410](https://github.com/lsst-sqre/squareone/pull/410) [`0c414fc`](https://github.com/lsst-sqre/squareone/commit/0c414fc78a227473d0133c0599b2fa559269b62b) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump dorny/paths-filter from 3 to 4
+
+- [#405](https://github.com/lsst-sqre/squareone/pull/405) [`1fe8816`](https://github.com/lsst-sqre/squareone/commit/1fe8816b415a23cf1b18e05517e291afbbfd441e) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump dotenv from 17.2.3 to 17.2.4
+
+- [#402](https://github.com/lsst-sqre/squareone/pull/402) [`538614a`](https://github.com/lsst-sqre/squareone/commit/538614a425f26b7a289be29fc2b77861bd6bbacb) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump eslint-plugin-storybook from 10.2.7 to 10.2.8
+
+- [#405](https://github.com/lsst-sqre/squareone/pull/405) [`1fe8816`](https://github.com/lsst-sqre/squareone/commit/1fe8816b415a23cf1b18e05517e291afbbfd441e) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump glob from 13.0.1 to 13.0.2
+
+- [#399](https://github.com/lsst-sqre/squareone/pull/399) [`36a7ebe`](https://github.com/lsst-sqre/squareone/commit/36a7ebe62e8469a9ba31a1138543ead1203b84e2) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump imjasonh/setup-crane from 0.4 to 0.6 in the actions group
+
+- [#412](https://github.com/lsst-sqre/squareone/pull/412) [`b4d0f20`](https://github.com/lsst-sqre/squareone/commit/b4d0f208a198e8493cac48eb55025c0dd0df9423) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump lodash from 4.17.23 to 4.18.1
+
+- [#410](https://github.com/lsst-sqre/squareone/pull/410) [`0c414fc`](https://github.com/lsst-sqre/squareone/commit/0c414fc78a227473d0133c0599b2fa559269b62b) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump lsst-sqre/multiplatform-build-and-push/.github/workflows/build.yaml from 3 to 4
+
+- [#402](https://github.com/lsst-sqre/squareone/pull/402) [`538614a`](https://github.com/lsst-sqre/squareone/commit/538614a425f26b7a289be29fc2b77861bd6bbacb) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump msw from 2.12.8 to 2.12.9
+
+- [#407](https://github.com/lsst-sqre/squareone/pull/407) [`fe784ae`](https://github.com/lsst-sqre/squareone/commit/fe784ae354a42b25f4b9dbc81e2804cc94dfa691) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump next-mdx-remote from 5.0.0 to 6.0.0 in /apps/squareone in the npm_and_yarn group across 1 directory
+
+- [#384](https://github.com/lsst-sqre/squareone/pull/384) [`119fd30`](https://github.com/lsst-sqre/squareone/commit/119fd3019442fa6feca5ff9f8ccef2d77705190e) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump next from 15.5.9 to 16.2.7
+
+- [#403](https://github.com/lsst-sqre/squareone/pull/403) [`618ebd5`](https://github.com/lsst-sqre/squareone/commit/618ebd5d8cee3fd2ff4895e4d1823b51571b2603) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump playwright from 1.58.1 to 1.60.0 in the playwright group
+
+- [#410](https://github.com/lsst-sqre/squareone/pull/410) [`0c414fc`](https://github.com/lsst-sqre/squareone/commit/0c414fc78a227473d0133c0599b2fa559269b62b) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump pnpm/action-setup from 4 to 6
+
+- [#384](https://github.com/lsst-sqre/squareone/pull/384) [`5304900`](https://github.com/lsst-sqre/squareone/commit/5304900ba8a3e86461c1a3449f651de896cc8cf8) Thanks [@dependabot](https://github.com/apps/dependabot)! - Fix the `next/image` aspect-ratio warning ("width or height modified, but not the
+  other") surfaced under Next.js 16, and the latent logo distortion behind it.
+
+  - Footer partner logos now use a new `img.u-responsive-image` global utility
+    (`max-width: 100%; width: auto; height: auto;`) so both dimensions scale together
+    as the image fills its container.
+  - The header triad logo keeps its controlled height: its computed width is now
+    rounded to an integer (a fractional width attribute can never equal the rounded
+    rendered width, which tripped the warning) and it uses `height: auto` so it scales
+    proportionally on narrow viewports without expanding to the source image's natural
+    size.
+
+- [#402](https://github.com/lsst-sqre/squareone/pull/402) [`538614a`](https://github.com/lsst-sqre/squareone/commit/538614a425f26b7a289be29fc2b77861bd6bbacb) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump storybook from 10.2.10 to 10.2.10
+
+- [#412](https://github.com/lsst-sqre/squareone/pull/412) [`b4d0f20`](https://github.com/lsst-sqre/squareone/commit/b4d0f208a198e8493cac48eb55025c0dd0df9423) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump turbo from 2.8.3 to 2.9.14
+
+- [#415](https://github.com/lsst-sqre/squareone/pull/415) [`962305d`](https://github.com/lsst-sqre/squareone/commit/962305de7fe8e1290dcbbd539d7a970459c79995) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump vitest from 2.1.9 to 4.1.0
+
+- [#412](https://github.com/lsst-sqre/squareone/pull/412) [`b4d0f20`](https://github.com/lsst-sqre/squareone/commit/b4d0f208a198e8493cac48eb55025c0dd0df9423) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump yaml from 2.8.2 to 2.8.3
+
+- Updated dependencies [[`3ee4d61`](https://github.com/lsst-sqre/squareone/commit/3ee4d61e65f0a49fa0f2fa093528e6629564d140), [`5304900`](https://github.com/lsst-sqre/squareone/commit/5304900ba8a3e86461c1a3449f651de896cc8cf8)]:
+  - @lsst-sqre/gafaelfawr-client@1.1.0
+  - @lsst-sqre/global-css@0.2.5
+  - @lsst-sqre/squared@0.13.1
+
 ## 0.31.0
 
 ### Minor Changes
