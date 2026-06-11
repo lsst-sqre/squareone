@@ -210,11 +210,7 @@ export default function NewServiceTokenPageClient() {
     <div>
       <h1>Create a service token</h1>
       <p>
-        Create a Gafaelfawr service token for a <code>bot-</code> user. Choose
-        the scopes the token should carry; an <code>admin:token</code> holder
-        may grant any configured scope. Optionally set an expiration and
-        identity metadata under Advanced settings. The token secret is revealed
-        only once after creation.
+        Create a Gafaelfawr service token for a <code>bot-</code> user.
       </p>
 
       {content}

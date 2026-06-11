@@ -40,9 +40,10 @@ export default function ServiceTokenPageClient() {
           rel="noreferrer"
         >
           GafaelfawrServiceToken resource
-        </a>{' '}
-        rather than this form. Use the form here primarily to grant RSP access
-        to external services that run outside the cluster.
+        </a>
+        {'. '}
+        Use this page to manage service tokens for cluster-external services or
+        applications that generally aren't Kubernetes-aware.
       </p>
 
       <Button as={Link} href="/admin/service-tokens/new">
