@@ -1,8 +1,22 @@
 // next.config.js
 // https://nextjs.org/docs/api-reference/next.config.js/introduction
 
-module.exports = () => {
+const { PHASE_DEVELOPMENT_SERVER } = require('next/constants');
+
+module.exports = (phase) => {
+  // Dev-only tooling (the `/dev` control panel and every `/api/dev/*` mock) is
+  // built into the app exclusively when running the development server. The
+  // matching route files use a `.dev.tsx` / `.dev.ts` suffix; production builds
+  // omit those extensions from `pageExtensions`, so Next.js does not recognize
+  // them as routes and they never enter `.next/` or the Docker image. The dev
+  // rewrites that point real RSP API paths at the mock handlers are likewise
+  // gated off in production builds.
+  const isDev = phase === PHASE_DEVELOPMENT_SERVER;
+
   const config = {
+    pageExtensions: isDev
+      ? ['dev.tsx', 'dev.ts', 'tsx', 'ts', 'jsx', 'js']
+      : ['tsx', 'ts', 'jsx', 'js'],
     transpilePackages: [
       '@lsst-sqre/squared',
       '@lsst-sqre/repertoire-client',
@@ -11,11 +25,19 @@ module.exports = () => {
       '@lsst-sqre/times-square-client',
     ],
     async rewrites() {
+      // No dev rewrites in production builds: the mock handlers do not exist in
+      // the production bundle, so there is nothing to route to.
+      if (!isDev) return [];
       return [
         // Mock Gafaelfawr (this is never triggered by a production ingress)
         {
           source: '/auth/api/v1/user-info',
           destination: '/api/dev/user-info',
+        },
+        // Mock Gafaelfawr login info / CSRF + available scopes
+        {
+          source: '/auth/api/v1/login',
+          destination: '/api/dev/login-info',
         },
         // Mock Repertoire (this is never triggered by a production ingress)
         {

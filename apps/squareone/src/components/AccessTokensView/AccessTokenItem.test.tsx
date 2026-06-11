@@ -17,6 +17,23 @@ vi.mock('@lsst-sqre/gafaelfawr-client', async (importOriginal) => {
 });
 vi.mock('../../hooks/useRepertoireUrl');
 
+// Mock Next.js Link so the rendered token key has a deterministic anchor.
+vi.mock('next/link', () => ({
+  default: ({
+    href,
+    children,
+    className,
+  }: {
+    href: string;
+    children: React.ReactNode;
+    className?: string;
+  }) => (
+    <a href={href} className={className}>
+      {children}
+    </a>
+  ),
+}));
+
 vi.mock('../TokenDate/formatters', () => ({
   formatTokenExpiration: vi.fn((expires) => {
     if (expires === null) {
@@ -410,5 +427,27 @@ describe('AccessTokenItem', () => {
     expect(screen.getByText('read:image')).toBeInTheDocument();
     expect(screen.getByText('write:files')).toBeInTheDocument();
     expect(screen.getByText('user:token')).toBeInTheDocument();
+  });
+
+  it('renders the token key as a details link by default', () => {
+    render(<AccessTokenItem token={baseToken} username="testuser" />);
+
+    const link = screen.getByRole('link', { name: 'gt-abc123def456' });
+    expect(link).toHaveAttribute('href', '/settings/tokens/gt-abc123def456');
+  });
+
+  it('omits the token key line when showDetailsLink is false', () => {
+    render(
+      <AccessTokenItem
+        token={baseToken}
+        username="testuser"
+        showDetailsLink={false}
+      />
+    );
+
+    expect(
+      screen.queryByRole('link', { name: 'gt-abc123def456' })
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText('gt-abc123def456')).not.toBeInTheDocument();
   });
 });

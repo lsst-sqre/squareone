@@ -1,4 +1,5 @@
 import type { ComponentPropsWithoutRef, ReactNode } from 'react';
+import React from 'react';
 
 import styles from './Typography.module.css';
 

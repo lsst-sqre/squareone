@@ -89,7 +89,7 @@ describe('LoginInfoQuery', () => {
 
   it('gets available scopes', () => {
     const available = query.getAvailableScopes();
-    expect(available).toHaveLength(5);
+    expect(available).toHaveLength(6);
     expect(available[0].name).toBe('read:tap');
     expect(available[0].description).toBeTruthy();
   });

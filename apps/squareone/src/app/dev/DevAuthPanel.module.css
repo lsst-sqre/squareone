@@ -1,0 +1,160 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sqo-space-lg-fixed);
+  max-width: 640px;
+  margin: var(--sqo-space-lg-fixed) auto;
+  padding: 0 var(--size-screen-padding-min);
+}
+
+.heading {
+  margin: 0 0 var(--sqo-space-xxs-fixed);
+}
+
+.muted {
+  margin: 0;
+  color: var(--rsd-color-gray-600, #4b5563);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sqo-space-sm-fixed);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* Persona presets */
+.personaRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sqo-space-xs-fixed);
+}
+
+.personaButton {
+  padding: var(--sqo-space-xxs-fixed) var(--sqo-space-sm-fixed);
+  border: 1px solid var(--rsd-color-gray-300, #d1d5db);
+  border-radius: var(--sqo-border-radius-1, 4px);
+  background-color: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: var(--sqo-transition-basic);
+}
+
+.personaButton:hover {
+  border-color: var(--rsd-color-primary-600);
+}
+
+.personaButton[data-active="true"] {
+  background-color: var(--rsd-color-primary-600);
+  border-color: var(--rsd-color-primary-600);
+  color: var(--rsd-component-text-reverse-color, #fff);
+}
+
+.customChip {
+  padding: var(--sqo-space-xxs-fixed) var(--sqo-space-sm-fixed);
+  border-radius: var(--sqo-border-radius-1, 4px);
+  background-color: var(--rsd-color-gray-100, #dce0e3);
+  color: var(--rsd-color-gray-600, #4b5563);
+  font-size: 0.875rem;
+}
+
+/* Logged-in toggle */
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sqo-space-xs-fixed);
+  cursor: pointer;
+}
+
+/* Identity fields */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sqo-space-xxs-fixed);
+}
+
+.fieldLabel {
+  font-weight: 600;
+}
+
+.input {
+  padding: var(--sqo-space-xs-fixed) var(--sqo-space-sm-fixed);
+  border: 1px solid var(--rsd-color-gray-300, #d1d5db);
+  border-radius: var(--sqo-border-radius-1, 4px);
+  background-color: var(--rsd-component-page-background-color, #fff);
+  color: inherit;
+  font: inherit;
+}
+
+.input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Scope checklist */
+.scopeList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sqo-space-xs-fixed);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.scopeItem {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sqo-space-xs-fixed);
+}
+
+.scopeLabel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--sqo-space-xs-fixed);
+  cursor: pointer;
+}
+
+.scopeName {
+  font-weight: 600;
+}
+
+.scopeDescription {
+  color: var(--rsd-color-gray-600, #4b5563);
+}
+
+/* Apply */
+.applyRow {
+  display: flex;
+  align-items: center;
+  gap: var(--sqo-space-sm-fixed);
+}
+
+.applyButton {
+  padding: var(--sqo-space-xs-fixed) var(--sqo-space-md-fixed);
+  border: none;
+  border-radius: var(--sqo-border-radius-1, 4px);
+  background-color: var(--sqo-primary-button-background-color);
+  color: var(--sqo-primary-button-text-color);
+  cursor: pointer;
+  transition: var(--sqo-transition-basic);
+}
+
+.applyButton:hover:not(:disabled) {
+  background-color: var(--sqo-primary-button-background-color-hover);
+}
+
+.applyButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.applied {
+  color: var(--rsd-color-green-600, #237028);
+}

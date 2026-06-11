@@ -8,10 +8,25 @@ export type TokenSuccessModalProps = {
   open: boolean;
   onClose: () => void;
   token: string;
-  tokenName: string;
+  /**
+   * Optional display name for the token. The service-token flow omits it
+   * (Gafaelfawr's service path has no token name); it is currently unused in
+   * the rendered output.
+   */
+  tokenName?: string;
   scopes: string[];
   expiration: ExpirationValue;
-  templateUrl: string;
+  /**
+   * Optional template URL for the "Copy token template" action. When omitted
+   * (e.g. for service tokens, which have no shareable creation template), the
+   * template button is hidden.
+   */
+  templateUrl?: string;
+  /**
+   * Where to navigate when the modal closes. Defaults to the user token list.
+   * Pass `null` to stay on the current page (e.g. the admin service-token page).
+   */
+  redirectUrl?: string | null;
 };
 
 export default function TokenSuccessModal({
@@ -22,6 +37,7 @@ export default function TokenSuccessModal({
   scopes,
   expiration,
   templateUrl,
+  redirectUrl = '/settings/tokens',
 }: TokenSuccessModalProps) {
   const router = useRouter();
   const tokenCopyButtonRef = useRef<HTMLButtonElement>(null);
@@ -44,7 +60,9 @@ export default function TokenSuccessModal({
 
   const handleClose = () => {
     onClose();
-    router.push('/settings/tokens');
+    if (redirectUrl) {
+      router.push(redirectUrl);
+    }
   };
 
   // Focus the token copy button when the modal opens
@@ -94,15 +112,17 @@ export default function TokenSuccessModal({
 
         <div className={styles.actions}>
           <Button onClick={handleClose}>Done</Button>
-          <ClipboardButton
-            text={templateUrl}
-            label="Copy token template"
-            successLabel="Template URL copied!"
-            size="md"
-            ariaLabel="Copy token template to clipboard"
-            className={styles.templateCopyButton}
-            variant="secondary"
-          />
+          {templateUrl && (
+            <ClipboardButton
+              text={templateUrl}
+              label="Copy token template"
+              successLabel="Template URL copied!"
+              size="md"
+              ariaLabel="Copy token template to clipboard"
+              className={styles.templateCopyButton}
+              variant="secondary"
+            />
+          )}
         </div>
       </div>
     </Modal>

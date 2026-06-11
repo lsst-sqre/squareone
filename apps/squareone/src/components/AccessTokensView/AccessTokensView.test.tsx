@@ -21,6 +21,24 @@ vi.mock('@lsst-sqre/gafaelfawr-client', async (importOriginal) => {
 });
 vi.mock('../../hooks/useRepertoireUrl');
 
+// Mock Next.js Link so token keys rendered by AccessTokenItem have a
+// deterministic anchor when the details link is shown.
+vi.mock('next/link', () => ({
+  default: ({
+    href,
+    children,
+    className,
+  }: {
+    href: string;
+    children: React.ReactNode;
+    className?: string;
+  }) => (
+    <a href={href} className={className}>
+      {children}
+    </a>
+  ),
+}));
+
 vi.mock('./tokenDateFormatters', () => ({
   formatTokenExpiration: vi.fn((expires) => {
     if (expires === null) {
@@ -88,6 +106,21 @@ describe('AccessTokensView', () => {
       created: now - 3600,
       expires: now + 86400,
       last_used: now - 60,
+      parent: null,
+    },
+  ];
+
+  const mockServiceTokens: TokenInfo[] = [
+    {
+      username: 'bot-ci',
+      token_type: 'service',
+      service: null,
+      scopes: ['read:tap'],
+      token: 'gt-service-token',
+      token_name: 'service-token',
+      created: now - 7200,
+      expires: null,
+      last_used: null,
       parent: null,
     },
   ];
@@ -228,6 +261,51 @@ describe('AccessTokensView', () => {
     expect(container.firstChild).toBeNull();
   });
 
+  it('lists only service tokens when tokenType is "service"', () => {
+    const mixedTokens = [...mockUserTokens, ...mockServiceTokens];
+    mockUseUserTokens.mockReturnValue({
+      tokens: mixedTokens,
+      error: null,
+      isLoading: false,
+      isPending: false,
+      query: null,
+      refetch: vi.fn(),
+      invalidate: vi.fn(),
+    });
+
+    render(<AccessTokensView username="bot-ci" tokenType="service" />);
+
+    // The service token is listed.
+    expect(screen.getByText('service-token')).toBeInTheDocument();
+    // User tokens are filtered out under the service variant.
+    expect(screen.queryByText('recent-token')).not.toBeInTheDocument();
+    expect(screen.queryByText('old-token')).not.toBeInTheDocument();
+  });
+
+  it('renders the emptyState node when there are no matching tokens', () => {
+    mockUseUserTokens.mockReturnValue({
+      tokens: mockUserTokens, // no service tokens
+      error: null,
+      isLoading: false,
+      isPending: false,
+      query: null,
+      refetch: vi.fn(),
+      invalidate: vi.fn(),
+    });
+
+    render(
+      <AccessTokensView
+        username="bot-ci"
+        tokenType="service"
+        emptyState={<p>No service tokens for this user.</p>}
+      />
+    );
+
+    expect(
+      screen.getByText('No service tokens for this user.')
+    ).toBeInTheDocument();
+  });
+
   it('handles tokens without created date', () => {
     const tokensWithoutCreated: TokenInfo[] = [
       {
@@ -298,6 +376,41 @@ describe('AccessTokensView', () => {
     expect(tokenKeys[0].textContent).toBe('gt-newest');
     expect(tokenKeys[1].textContent).toBe('gt-recent');
     expect(tokenKeys[2].textContent).toBe('gt-very-old');
+  });
+
+  it('renders token keys as details links by default', () => {
+    mockUseUserTokens.mockReturnValue({
+      tokens: mockUserTokens,
+      error: null,
+      isLoading: false,
+      isPending: false,
+      query: null,
+      refetch: vi.fn(),
+      invalidate: vi.fn(),
+    });
+
+    render(<AccessTokensView username="testuser" />);
+
+    expect(
+      screen.getByRole('link', { name: 'gt-recent-token' })
+    ).toHaveAttribute('href', '/settings/tokens/gt-recent-token');
+  });
+
+  it('forwards showDetailsLink={false} so token key lines are omitted', () => {
+    mockUseUserTokens.mockReturnValue({
+      tokens: mockUserTokens,
+      error: null,
+      isLoading: false,
+      isPending: false,
+      query: null,
+      refetch: vi.fn(),
+      invalidate: vi.fn(),
+    });
+
+    render(<AccessTokensView username="testuser" showDetailsLink={false} />);
+
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    expect(screen.queryByText('gt-recent-token')).not.toBeInTheDocument();
   });
 
   it('passes username to AccessTokenItem components', () => {

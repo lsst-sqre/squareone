@@ -5,6 +5,11 @@
  */
 
 export {
+  type CreateServiceTokenParams,
+  type UseCreateServiceTokenReturn,
+  useCreateServiceToken,
+} from './useCreateServiceToken';
+export {
   type CreateTokenParams,
   type UseCreateTokenReturn,
   useCreateToken,

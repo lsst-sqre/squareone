@@ -146,6 +146,30 @@ export const CreateTokenRequestSchema = z.object({
 });
 
 /**
+ * Admin service-token creation request schema
+ * For the admin endpoint POST /auth/api/v1/tokens with token_type "service".
+ *
+ * Unlike the user-token request, the target bot username travels in the body
+ * (the admin endpoint is not scoped to a username path segment), and optional
+ * identity metadata (name/email/uid/gid/groups) may be supplied for the bot
+ * user.
+ *
+ * Note: unlike the user-token request, there is no `token_name` — Gafaelfawr's
+ * service path rejects it (`Tokens of type service cannot have a name`).
+ */
+export const AdminTokenRequestSchema = z.object({
+  username: z.string().min(1).max(64),
+  token_type: z.literal('service'),
+  scopes: z.array(z.string()),
+  expires: z.number().int().nullable().optional(),
+  name: z.string().nullable().optional(),
+  email: z.string().nullable().optional(),
+  uid: z.number().int().min(1).nullable().optional(),
+  gid: z.number().int().min(1).nullable().optional(),
+  groups: z.array(GroupSchema).optional(),
+});
+
+/**
  * Token creation response schema
  * Returns the full token string (only shown once)
  */
@@ -199,6 +223,7 @@ export type TokenChangeHistoryEntry = z.infer<
   typeof TokenChangeHistoryEntrySchema
 >;
 export type CreateTokenRequest = z.infer<typeof CreateTokenRequestSchema>;
+export type AdminTokenRequest = z.infer<typeof AdminTokenRequestSchema>;
 export type CreateTokenResponse = z.infer<typeof CreateTokenResponseSchema>;
 export type ValidationError = z.infer<typeof ValidationErrorSchema>;
 export type ErrorResponse = z.infer<typeof ErrorResponseSchema>;

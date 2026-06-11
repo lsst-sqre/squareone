@@ -4,6 +4,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
+  createServiceToken,
   createToken,
   DEFAULT_GAFAELFAWR_URL,
   deleteToken,
@@ -367,6 +368,106 @@ describe('createToken', () => {
         '/auth/api/v1'
       )
     ).rejects.toThrow('body.token_name: required');
+  });
+});
+
+describe('createServiceToken', () => {
+  beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn());
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('posts to the admin tokens endpoint with token_type service', async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ token: 'gt-new-service-token' }),
+    });
+    vi.stubGlobal('fetch', mockFetch);
+
+    const result = await createServiceToken(
+      {
+        username: 'bot-example',
+        token_type: 'service',
+        scopes: ['read:tap'],
+        expires: 1700000000,
+      },
+      'csrf-token',
+      '/auth/api/v1'
+    );
+
+    expect(mockFetch).toHaveBeenCalledWith('/auth/api/v1/tokens', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-csrf-token': 'csrf-token',
+      },
+      body: JSON.stringify({
+        username: 'bot-example',
+        token_type: 'service',
+        scopes: ['read:tap'],
+        expires: 1700000000,
+      }),
+    });
+    // Gafaelfawr's service path rejects a token_name; it must not be sent.
+    const sentBody = JSON.parse(
+      (mockFetch.mock.calls[0][1] as RequestInit).body as string
+    );
+    expect(sentBody).not.toHaveProperty('token_name');
+    expect(result.token).toBe('gt-new-service-token');
+  });
+
+  it('normalizes a base URL with a trailing slash', async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ token: 'gt-new-service-token' }),
+    });
+    vi.stubGlobal('fetch', mockFetch);
+
+    await createServiceToken(
+      {
+        username: 'bot-example',
+        token_type: 'service',
+        scopes: [],
+      },
+      'csrf-token',
+      '/auth/api/v1/'
+    );
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      '/auth/api/v1/tokens',
+      expect.anything()
+    );
+  });
+
+  it('throws with a formatted error on validation failure', async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 422,
+      statusText: 'Unprocessable Entity',
+      json: () =>
+        Promise.resolve({
+          detail: [
+            { loc: ['body', 'username'], msg: 'required', type: 'missing' },
+          ],
+        }),
+    });
+    vi.stubGlobal('fetch', mockFetch);
+
+    await expect(
+      createServiceToken(
+        {
+          username: '',
+          token_type: 'service',
+          scopes: [],
+        },
+        'csrf',
+        '/auth/api/v1'
+      )
+    ).rejects.toThrow('body.username: required');
   });
 });
 

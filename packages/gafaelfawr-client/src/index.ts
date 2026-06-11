@@ -33,8 +33,10 @@
 
 export {
   // Types
-  type CreateTokenRequest,
+  type AdminTokenRequest,
   // Schemas
+  AdminTokenRequestSchema,
+  type CreateTokenRequest,
   CreateTokenRequestSchema,
   type CreateTokenResponse,
   CreateTokenResponseSchema,
@@ -65,6 +67,7 @@ export {
 } from './schemas';
 
 export type {
+  CreateServiceTokenVariables,
   CreateTokenVariables,
   DeleteTokenVariables,
   TokenHistoryFilters,
@@ -76,6 +79,7 @@ export type {
 // =============================================================================
 
 export {
+  createServiceToken,
   createToken,
   DEFAULT_GAFAELFAWR_URL,
   deleteToken,
@@ -123,6 +127,7 @@ export {
 // =============================================================================
 
 export {
+  createServiceTokenMutationConfig,
   createTokenMutationConfig,
   deleteTokenMutationConfig,
 } from './mutation-options';
@@ -160,8 +165,10 @@ export {
 // =============================================================================
 
 export {
+  type CreateServiceTokenParams,
   type CreateTokenParams,
   extractTokenNames,
+  type UseCreateServiceTokenReturn,
   type UseCreateTokenReturn,
   type UseDeleteTokenReturn,
   type UseLoginInfoReturn,
@@ -169,6 +176,7 @@ export {
   type UseTokenDetailsReturn,
   type UseUserInfoReturn,
   type UseUserTokensReturn,
+  useCreateServiceToken,
   useCreateToken,
   useDeleteToken,
   useGafaelfawrUrl,

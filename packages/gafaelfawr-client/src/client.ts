@@ -8,6 +8,7 @@ import { z } from 'zod';
 
 import { formatValidationError, GafaelfawrError } from './errors';
 import {
+  type AdminTokenRequest,
   type CreateTokenRequest,
   type CreateTokenResponse,
   CreateTokenResponseSchema,
@@ -303,6 +304,59 @@ export async function createToken(
   if (!response.ok) {
     // Try to parse error response for detailed message
     let errorMessage = `Failed to create token: ${response.status} ${response.statusText}`;
+    try {
+      const errorData = await response.json();
+      const parsed = ErrorResponseSchema.safeParse(errorData);
+      if (parsed.success) {
+        errorMessage = formatValidationError(parsed.data.detail);
+      }
+    } catch {
+      // Ignore JSON parse errors, use default message
+    }
+
+    throw new GafaelfawrError(errorMessage, response.status);
+  }
+
+  const data = await response.json();
+  return CreateTokenResponseSchema.parse(data);
+}
+
+/**
+ * Create a new service token via the admin endpoint.
+ *
+ * Unlike {@link createToken}, this targets the admin endpoint
+ * `POST {base}/tokens` (not the per-user
+ * `POST {base}/users/{username}/tokens` route) and carries the target bot
+ * username in the request body. It requires the `admin:token` scope on the
+ * caller's session.
+ *
+ * @param request - Admin service-token creation parameters (includes the
+ *                   target bot username and `token_type: "service"`)
+ * @param csrfToken - CSRF token from login info
+ * @param baseUrl - Gafaelfawr API base URL
+ * @returns Created token response (includes full token string)
+ * @throws GafaelfawrError if request fails
+ */
+export async function createServiceToken(
+  request: AdminTokenRequest,
+  csrfToken: string,
+  baseUrl: string
+): Promise<CreateTokenResponse> {
+  const url = `${normalizeUrl(baseUrl)}/tokens`;
+
+  const response = await fetch(url, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-csrf-token': csrfToken,
+    },
+    body: JSON.stringify(request),
+  });
+
+  if (!response.ok) {
+    // Try to parse error response for detailed message
+    let errorMessage = `Failed to create service token: ${response.status} ${response.statusText}`;
     try {
       const errorData = await response.json();
       const parsed = ErrorResponseSchema.safeParse(errorData);

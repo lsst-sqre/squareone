@@ -3,10 +3,14 @@
  *
  * These are used with useMutation to handle token creation and deletion.
  */
-import { createToken, deleteToken } from './client';
+import { createServiceToken, createToken, deleteToken } from './client';
 import { gafaelfawrKeys } from './query-keys';
-import type { CreateTokenResponse } from './schemas';
-import type { CreateTokenVariables, DeleteTokenVariables } from './types';
+import type { AdminTokenRequest, CreateTokenResponse } from './schemas';
+import type {
+  CreateServiceTokenVariables,
+  CreateTokenVariables,
+  DeleteTokenVariables,
+} from './types';
 
 /**
  * Mutation options for creating a new token.
@@ -46,6 +50,67 @@ export const createTokenMutationConfig = {
   getInvalidateKeys: (username: string) => [
     gafaelfawrKeys.tokensList(username),
     gafaelfawrKeys.tokenHistory(),
+  ],
+};
+
+/**
+ * Mutation options for creating a new service token via the admin endpoint.
+ *
+ * Mirrors {@link createTokenMutationConfig} but targets the admin
+ * `POST {base}/tokens` route (the bot username travels in the body) and forwards
+ * optional identity metadata for the bot user. On success, only the bot user's
+ * token list needs invalidating — the admin's own token history is unaffected.
+ *
+ * Usage with useMutation:
+ * ```ts
+ * const mutation = useMutation({
+ *   mutationFn: createServiceTokenMutationConfig.mutationFn,
+ * });
+ * mutation.mutate({ username, scopes, expires, csrfToken, baseUrl });
+ * ```
+ */
+export const createServiceTokenMutationConfig = {
+  mutationFn: async (
+    variables: CreateServiceTokenVariables
+  ): Promise<CreateTokenResponse> => {
+    const {
+      username,
+      scopes,
+      expires,
+      name,
+      email,
+      uid,
+      gid,
+      groups,
+      csrfToken,
+      baseUrl,
+    } = variables;
+
+    // Convert Date to epoch seconds for API
+    const expiresEpoch = expires ? Math.floor(expires.getTime() / 1000) : null;
+
+    const request: AdminTokenRequest = {
+      username,
+      token_type: 'service',
+      scopes,
+      expires: expiresEpoch,
+      // Only forward optional metadata that was explicitly supplied.
+      ...(name !== undefined ? { name } : {}),
+      ...(email !== undefined ? { email } : {}),
+      ...(uid !== undefined ? { uid } : {}),
+      ...(gid !== undefined ? { gid } : {}),
+      ...(groups !== undefined ? { groups } : {}),
+    };
+
+    return createServiceToken(request, csrfToken, baseUrl);
+  },
+
+  /**
+   * Returns mutation keys to invalidate on success.
+   * The caller should use these to invalidate the query cache.
+   */
+  getInvalidateKeys: (username: string) => [
+    gafaelfawrKeys.tokensList(username),
   ],
 };
 

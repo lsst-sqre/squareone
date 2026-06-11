@@ -38,6 +38,15 @@ export const Default: Story = {
   },
 };
 
+// Service-token listings (e.g. the admin manage section) have no
+// `/settings/tokens/<key>` details route, so the key line is omitted.
+export const WithoutDetailsLink: Story = {
+  args: {
+    token: baseToken,
+    showDetailsLink: false,
+  },
+};
+
 export const NeverExpires: Story = {
   args: {
     token: {

@@ -20,6 +20,14 @@ function getScopeColor(scope: string): BadgeColor {
 type AccessTokenItemProps = {
   token: TokenInfo;
   username: string;
+  /**
+   * Whether the token key links to its `/settings/tokens/<key>` details page.
+   * Defaults to `true` (the user-token settings listing). Pass `false` for
+   * listings where that route does not resolve (e.g. the admin service-token
+   * view), which omits the key line entirely — the key already appears as the
+   * bold heading for keyless service tokens.
+   */
+  showDetailsLink?: boolean;
   onDeleteSuccess?: () => void;
   onDeleteError?: (error: Error) => void;
 };
@@ -27,6 +35,7 @@ type AccessTokenItemProps = {
 export default function AccessTokenItem({
   token,
   username,
+  showDetailsLink = true,
   onDeleteSuccess,
   onDeleteError,
 }: AccessTokenItemProps) {
@@ -64,12 +73,14 @@ export default function AccessTokenItem({
           <div className={styles.tokenName}>
             {token.token_name || token.token}
           </div>
-          <Link
-            href={`/settings/tokens/${token.token}`}
-            className={styles.tokenKey}
-          >
-            {token.token}
-          </Link>
+          {showDetailsLink && (
+            <Link
+              href={`/settings/tokens/${token.token}`}
+              className={styles.tokenKey}
+            >
+              {token.token}
+            </Link>
+          )}
           {sortedScopes.length > 0 ? (
             <div className={styles.scopesBadges}>
               {sortedScopes.map((scope) => (

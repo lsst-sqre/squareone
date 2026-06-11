@@ -84,6 +84,43 @@ describe('TokenSuccessModal', () => {
     expect(mockPush).toHaveBeenCalledWith('/settings/tokens');
   });
 
+  it('stays on the current page when redirectUrl is null', async () => {
+    const user = userEvent.setup();
+    render(<TokenSuccessModal {...defaultProps} redirectUrl={null} />);
+
+    const doneButton = screen.getByRole('button', { name: 'Done' });
+    await user.click(doneButton);
+
+    expect(mockOnClose).toHaveBeenCalledTimes(1);
+    expect(mockPush).not.toHaveBeenCalled();
+  });
+
+  it('navigates to a custom redirectUrl when provided', async () => {
+    const user = userEvent.setup();
+    render(
+      <TokenSuccessModal
+        {...defaultProps}
+        redirectUrl="/admin/service-tokens"
+      />
+    );
+
+    const doneButton = screen.getByRole('button', { name: 'Done' });
+    await user.click(doneButton);
+
+    expect(mockPush).toHaveBeenCalledWith('/admin/service-tokens');
+  });
+
+  it('hides the template button when templateUrl is omitted', () => {
+    const { templateUrl: _templateUrl, ...propsWithoutTemplate } = defaultProps;
+    render(<TokenSuccessModal {...propsWithoutTemplate} />);
+
+    expect(
+      screen.queryByRole('button', {
+        name: 'Copy token template to clipboard',
+      })
+    ).not.toBeInTheDocument();
+  });
+
   it('has copy token button', () => {
     render(<TokenSuccessModal {...defaultProps} />);
 
