@@ -64,7 +64,7 @@ To get a personal access token for the remote cache:
 1. Visit https://roundtable.lsst.cloud
 2. Log in with your credentials
 3. Navigate to the token management page
-4. Create a new token with the ``write:git-lfs`` scope
+4. Create a new token with the ``write:turborepo`` scope
 5. Store it securely in 1Password or your :file:`.env` file (never commit it to Git)
 
 The token is a Gafaelfawr user access token that authorizes access to the Turborepo cache server.

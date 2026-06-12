@@ -58,7 +58,7 @@ You'll still use Turborepo's local caching, provides significant speedups for re
 The remote cache is optional and does not affect your ability to contribute.
 
 **Rubin Observatory staff:** If you want to use the remote cache, you'll need to authenticate.
-The ``TURBO_TOKEN`` is a Gafaelfawr user access token for roundtable.lsst.cloud with the ``write:git-lfs`` scope.
+The ``TURBO_TOKEN`` is a Gafaelfawr user access token for roundtable.lsst.cloud with the ``write:turborepo`` scope.
 
 .. note::
 
