@@ -29,7 +29,27 @@ permissions:
   statuses: read # Required by multiplatform-build-and-push
 
 jobs:
+  resolve-source-commit:
+    name: Resolve source commit
+    runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.resolve.outputs.sha }}
+    steps:
+      - name: Resolve source commit SHA
+        id: resolve
+        # For pull_request events, github.sha is the ephemeral refs/pull/N/merge
+        # commit that never lands in git history; use the PR head SHA so the
+        # stamped release is reproducible. For push and tag (release) events,
+        # github.sha is already the real commit.
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "sha=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+          fi
+
   build:
+    needs: resolve-source-commit
     uses: lsst-sqre/multiplatform-build-and-push/.github/workflows/build.yaml@v4
     with:
       images: ghcr.io/${{ github.repository }}
@@ -37,6 +57,9 @@ jobs:
       tag: ${{ inputs.tag }}
       additional-tags: ${{ inputs.additional-tags }}
       push: ${{ inputs.push }}
+      # SOURCE_COMMIT stamps the image as its Sentry release (forwarded to
+      # docker/build-push-action and consumed by the Dockerfile ARG).
+      build-args: SOURCE_COMMIT=${{ needs.resolve-source-commit.outputs.sha }}
     secrets:
       IMAGE_SECRETS: |
         SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
