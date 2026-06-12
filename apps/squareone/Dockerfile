@@ -60,8 +60,21 @@ WORKDIR /app
 # reads SENTRY_RELEASE at runtime, and the OCI revision label records the
 # build's commit for `docker inspect`.
 ARG SOURCE_COMMIT
+ARG VERSION
 ENV SENTRY_RELEASE=$SOURCE_COMMIT
-LABEL org.opencontainers.image.revision=$SOURCE_COMMIT
+
+# OCI image annotations. Static fields surface on the GHCR package page; `source`
+# links the package to its repository (and inherits repo visibility/access),
+# while `revision`/`version` record the exact build. See GitHub's container
+# registry labelling guidance.
+LABEL org.opencontainers.image.source="https://github.com/lsst-sqre/squareone" \
+      org.opencontainers.image.url="https://github.com/lsst-sqre/squareone" \
+      org.opencontainers.image.title="Squareone" \
+      org.opencontainers.image.description="Squareone: the Rubin Science Platform landing page and front-end portal, built with Next.js." \
+      org.opencontainers.image.vendor="Rubin Observatory / SQuaRE" \
+      org.opencontainers.image.licenses="MIT" \
+      org.opencontainers.image.revision="$SOURCE_COMMIT" \
+      org.opencontainers.image.version="$VERSION"
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
