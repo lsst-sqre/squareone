@@ -7,6 +7,12 @@ import * as Sentry from '@sentry/nextjs';
 export async function register() {
   if (process.env.NEXT_RUNTIME === 'nodejs') {
     await import('./sentry.server.config');
+
+    // Emit a one-time startup line carrying the build's version + revision
+    // (bound as base fields on the logger). Imported dynamically because the
+    // Pino logger is Node-only and register() also runs in the edge runtime.
+    const { default: logger } = await import('./src/lib/logger');
+    logger.info('Squareone starting');
   }
 
   if (process.env.NEXT_RUNTIME === 'edge') {
