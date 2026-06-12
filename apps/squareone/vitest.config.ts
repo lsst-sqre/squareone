@@ -12,6 +12,19 @@ export default defineConfig({
     projects: [
       // Unit testing project with traditional vitest tests
       defineProject({
+        // Mirror the tsconfig "@/*" -> "./src/*" path alias so unit tests can
+        // import (and mock) shell components that reference modules via "@/".
+        resolve: {
+          alias: {
+            '@': path.resolve(__dirname, 'src'),
+          },
+        },
+        // The app's tsconfig uses jsx: "preserve" (Next transforms it with the
+        // automatic runtime). Match that here so components that use JSX without
+        // importing React render under vitest's esbuild transform too.
+        esbuild: {
+          jsx: 'automatic',
+        },
         test: {
           name: 'unit',
           include: ['src/**/*.test.{ts,tsx}'],
