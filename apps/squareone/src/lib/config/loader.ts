@@ -32,6 +32,12 @@ export interface SentryConfig {
   replaysOnErrorSampleRate?: number;
   baseUrl?: string;
   version?: string;
+  /**
+   * The build's git commit SHA (`getAppVersion().revision`), threaded to the
+   * browser so client events carry the same Sentry `release` as server/edge
+   * events read from `SENTRY_RELEASE`. Omitted when no SHA is set (local dev).
+   */
+  release?: string;
 }
 
 export interface AppConfig {
