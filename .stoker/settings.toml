@@ -37,6 +37,12 @@ TURBO_TOKEN = "$secret:turbo_token"
 #   - times-square.lsst.io hosts the times-square-client OpenAPI spec
 #     (`/_static/openapi.json`), which is served there rather than on
 #     data.lsst.cloud.
+#   - gafaelfawr.lsst.io and phalanx.lsst.io host the Gafaelfawr (RSP auth
+#     service) and Phalanx (RSP Argo CD deployment platform) documentation on
+#     the lsst.io docs host (LSST the Docs, behind Fastly), read during
+#     interactive reference work. Like times-square.lsst.io these are exact
+#     hostnames: the firewall has no wildcard support, so each lsst.io doc
+#     site must be listed individually.
 [sandbox.firewall_extra_domains]
 domains = [
   "roundtable.lsst.cloud",
@@ -46,6 +52,8 @@ domains = [
   "data-dev.lsst.cloud",
   "roundtable-dev.lsst.cloud",
   "times-square.lsst.io",
+  "gafaelfawr.lsst.io",
+  "phalanx.lsst.io",
 ]
 
 [secrets_required.turbo_token]
