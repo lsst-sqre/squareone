@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
+import { version } from '../../package.json';
 import { getAppVersion } from './version';
 
 describe('getAppVersion', () => {
@@ -13,7 +14,7 @@ describe('getAppVersion', () => {
   });
 
   it('returns the package.json version', () => {
-    expect(getAppVersion().version).toBe('0.32.0');
+    expect(getAppVersion().version).toBe(version);
   });
 
   it('reads the revision from SENTRY_RELEASE when set', () => {
