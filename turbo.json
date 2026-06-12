@@ -4,6 +4,7 @@
     "build": {
       "dependsOn": ["^build", "type-check"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"],
+      "env": ["SENTRY_RELEASE"],
       "passThroughEnv": ["SENTRY_AUTH_TOKEN"],
       "outputLogs": "errors-only"
     },

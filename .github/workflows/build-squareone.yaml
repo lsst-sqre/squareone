@@ -29,7 +29,46 @@ permissions:
   statuses: read # Required by multiplatform-build-and-push
 
 jobs:
+  resolve-source-commit:
+    name: Resolve build metadata
+    runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.resolve.outputs.sha }}
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Resolve source commit SHA
+        id: resolve
+        # For pull_request events, github.sha is the ephemeral refs/pull/N/merge
+        # commit that never lands in git history; use the PR head SHA so the
+        # stamped release is reproducible. For push and tag (release) events,
+        # github.sha is already the real commit.
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "sha=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Resolve image version
+        id: version
+        # VERSION mirrors the primary image tag chosen by
+        # multiplatform-build-and-push: the explicit `tag` input for releases,
+        # otherwise the branch-derived tag (PR head ref, else the pushed ref
+        # name) with slashes turned to dashes. Keeps
+        # org.opencontainers.image.version equal to the image's tag.
+        env:
+          INPUT_TAG: ${{ inputs.tag }}
+        run: |
+          if [ -n "$INPUT_TAG" ]; then
+            version="$INPUT_TAG"
+          elif [ -n "$GITHUB_HEAD_REF" ]; then
+            version=$(echo "$GITHUB_HEAD_REF" | sed -E 's,/,-,g')
+          else
+            version=$(echo "$GITHUB_REF" | sed -E 's,refs/(heads|tags)/,,' | sed -E 's,/,-,g')
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
   build:
+    needs: resolve-source-commit
     uses: lsst-sqre/multiplatform-build-and-push/.github/workflows/build.yaml@v4
     with:
       images: ghcr.io/${{ github.repository }}
@@ -37,6 +76,12 @@ jobs:
       tag: ${{ inputs.tag }}
       additional-tags: ${{ inputs.additional-tags }}
       push: ${{ inputs.push }}
+      # SOURCE_COMMIT stamps the image as its Sentry release and OCI revision;
+      # VERSION sets the OCI version label. Both are forwarded to
+      # docker/build-push-action and consumed by Dockerfile ARGs.
+      build-args: |
+        SOURCE_COMMIT=${{ needs.resolve-source-commit.outputs.sha }}
+        VERSION=${{ needs.resolve-source-commit.outputs.version }}
     secrets:
       IMAGE_SECRETS: |
         SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}

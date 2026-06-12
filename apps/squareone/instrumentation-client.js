@@ -1,8 +1,9 @@
 // This file configures client-side instrumentation for Next.js.
 // Since Sentry DSN is only available at runtime on the server (from Kubernetes
 // ConfigMaps), we can't use NEXT_PUBLIC_ environment variables which are set
-// at build time. Instead, _document.tsx loads the server configuration and
-// injects it into the browser as window.__SENTRY_CONFIG__ for client-side use.
+// at build time. Instead, SentryConfigScript (src/app/SentryConfigScript.tsx)
+// loads the server configuration and injects it into the browser as
+// window.__SENTRY_CONFIG__ for client-side use.
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from '@sentry/nextjs';
@@ -17,6 +18,13 @@ Sentry.init({
   dsn: config.dsn || undefined,
 
   environment: config.environment || 'development',
+
+  // Attribute client events to the build's git SHA so they match the release
+  // server/edge events read from SENTRY_RELEASE at runtime. Threaded through
+  // window.__SENTRY_CONFIG__ like the DSN. When absent (local dev), the key is
+  // omitted entirely so the SDK's build-time-injected release (if any) still
+  // applies — an explicit `release: undefined` would override that default.
+  ...(config.release ? { release: config.release } : {}),
 
   // Add optional integrations for additional features
   integrations: [Sentry.replayIntegration()],
@@ -41,6 +49,14 @@ Sentry.init({
   // while you're setting up Sentry.
   debug: false,
 });
+
+// Surface the image tag (branch tag for branch builds, release version for
+// releases) on every event, mirroring the server/edge `build` context. Threaded
+// from the server via window.__SENTRY_CONFIG__ (see SentryConfigScript), since
+// the client can't read the server-only SQUAREONE_VERSION env.
+if (config.version) {
+  Sentry.setContext('build', { version: config.version });
+}
 
 // Export router transition hook for navigation instrumentation
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;

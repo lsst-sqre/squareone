@@ -1,4 +1,7 @@
+import React from 'react';
+
 import type { SentryConfig, StaticConfig } from '../lib/config/rsc';
+import { getAppVersion } from '../lib/version';
 
 type SentryConfigScriptProps = {
   config: StaticConfig;
@@ -17,6 +20,7 @@ type SentryConfigScriptProps = {
 export default function SentryConfigScript({
   config,
 }: SentryConfigScriptProps) {
+  const appVersion = getAppVersion();
   const sentryConfig: SentryConfig = {
     dsn: config.sentryDsn,
     environment: config.environmentName,
@@ -24,6 +28,8 @@ export default function SentryConfigScript({
     replaysSessionSampleRate: config.sentryReplaysSessionSampleRate,
     replaysOnErrorSampleRate: config.sentryReplaysOnErrorSampleRate,
     baseUrl: config.baseUrl,
+    version: appVersion.version,
+    release: appVersion.revision ?? undefined,
   };
 
   // Only inject the script if we have Sentry configuration

@@ -95,6 +95,19 @@ const sentryWrappedConfig = withSentryConfig(module.exports, {
   org: 'rubin-observatory',
   project: 'squareone',
 
+  // Stamp client + server bundles and uploaded source maps with the git commit
+  // SHA, threaded in as SENTRY_RELEASE at build time by the Dockerfile. Builds
+  // run through turbo in strict env mode, so SENTRY_RELEASE must be declared in
+  // turbo.json's build `env` for it to reach this process (which also keys the
+  // build cache on the SHA, as the value is baked into the client bundle).
+  // Unset in local dev/builds, where the plugin degrades gracefully to no
+  // release. At runtime the client release is (re-)set from
+  // window.__SENTRY_CONFIG__ (see instrumentation-client.js), which carries the
+  // same SHA.
+  release: {
+    name: process.env.SENTRY_RELEASE,
+  },
+
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,
 

@@ -30,6 +30,7 @@ import { ConfigProvider } from '../contexts/rsc';
 import { getStaticConfig } from '../lib/config/rsc';
 import logger from '../lib/logger';
 import { compileFooterMdxForRsc } from '../lib/mdx/rsc';
+import { getAppVersion } from '../lib/version';
 import FooterRsc from './FooterRsc';
 import PlausibleWrapper from './PlausibleWrapper';
 import Providers from './providers';
@@ -123,9 +124,16 @@ export default async function RootLayout({ children }: RootLayoutProps) {
   // Compile footer MDX once at layout level
   const footerMdxContent = await compileFooterMdxForRsc();
 
+  // Surface the build identity in the served HTML so a running build is
+  // identifiable from the page source. Revision degrades to "unknown" when
+  // no SHA is stamped (e.g. local pnpm dev). See src/lib/version.ts.
+  const { version, revision } = getAppVersion();
+
   return (
     <html lang="en" dir="ltr" suppressHydrationWarning>
       <head>
+        <meta name="squareone:version" content={version} />
+        <meta name="squareone:revision" content={revision ?? 'unknown'} />
         <SentryConfigScript config={config} />
       </head>
       <body>
