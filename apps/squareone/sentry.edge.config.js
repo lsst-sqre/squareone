@@ -7,6 +7,10 @@ import * as Sentry from '@sentry/nextjs';
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
 
+  // Git commit SHA baked into the image at build time (see Dockerfile). Unset
+  // in local dev, where events carry a null release.
+  release: process.env.SENTRY_RELEASE,
+
   environment: process.env.SQUAREONE_ENVIRONMENT_NAME || 'development',
 
   // Define how likely traces are sampled.

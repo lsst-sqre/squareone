@@ -1,3 +1,10 @@
+# Git commit SHA threaded in at build time, e.g.
+# `docker build --build-arg SOURCE_COMMIT=$(git rev-parse HEAD)`. Used as the
+# Sentry release so client/server/edge events and uploaded source maps all
+# associate with this build. Declared globally here and re-declared in the
+# stages that consume it (Docker scopes ARGs per-stage after each FROM).
+ARG SOURCE_COMMIT
+
 FROM node:22.21.1-alpine AS base
 
 RUN npm install -g corepack@latest  # Ensure latest corepack
@@ -32,6 +39,12 @@ RUN pnpm install
 COPY --from=builder /app/out/full/ .
 COPY turbo.json turbo.json
 
+# Stamp the build with the source commit so the Sentry bundler plugin marks
+# client/server bundles and uploads source maps under this release. Unset in
+# local builds, where the plugin falls back to no release.
+ARG SOURCE_COMMIT
+ENV SENTRY_RELEASE=$SOURCE_COMMIT
+
 # Remote caching for Turborepo
 RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN,env=SENTRY_AUTH_TOKEN \
     --mount=type=secret,id=TURBO_TOKEN,env=TURBO_TOKEN \
@@ -42,6 +55,13 @@ RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN,env=SENTRY_AUTH_TOKEN \
 FROM base AS runner
 
 WORKDIR /app
+
+# Carry the source commit into the runtime image: server/edge `Sentry.init`
+# reads SENTRY_RELEASE at runtime, and the OCI revision label records the
+# build's commit for `docker inspect`.
+ARG SOURCE_COMMIT
+ENV SENTRY_RELEASE=$SOURCE_COMMIT
+LABEL org.opencontainers.image.revision=$SOURCE_COMMIT
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1

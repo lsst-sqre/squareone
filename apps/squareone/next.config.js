@@ -95,6 +95,13 @@ const sentryWrappedConfig = withSentryConfig(module.exports, {
   org: 'rubin-observatory',
   project: 'squareone',
 
+  // Stamp client + server bundles and uploaded source maps with the git commit
+  // SHA, threaded in as SENTRY_RELEASE at build time by the Dockerfile. Unset in
+  // local dev/builds, where the plugin degrades gracefully to no release.
+  release: {
+    name: process.env.SENTRY_RELEASE,
+  },
+
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,
 
