@@ -301,8 +301,10 @@ describe('useServiceDiscovery', () => {
       });
 
       const { query } = result.current;
-      expect(query?.hasDataset('dp0.2')).toBe(true);
-      expect(query?.getDataset('dp0.2')?.description).toBe('Data Preview 0.2');
+      expect(query?.hasDataset('dp02')).toBe(true);
+      expect(query?.getDataset('dp02')?.description).toContain(
+        'Data Preview 0.2'
+      );
     });
   });
 

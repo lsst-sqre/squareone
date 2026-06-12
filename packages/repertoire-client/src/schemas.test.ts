@@ -84,6 +84,46 @@ describe('DiscoverySchema', () => {
     expect(result.success).toBe(true);
   });
 
+  it('accepts the 2.0.0 environment_name field', () => {
+    const result = DiscoverySchema.safeParse({
+      environment_name: 'data.lsst.cloud',
+      services: { internal: {}, ui: {} },
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.environment_name).toBe('data.lsst.cloud');
+    }
+  });
+
+  it('accepts the 2.0.0 InfluxDB local flag and defaults it to false', () => {
+    const result = DiscoverySchema.safeParse({
+      services: { internal: {}, ui: {} },
+      influxdb_databases: {
+        local_metrics: {
+          url: 'https://data.lsst.cloud/influxdb/',
+          database: 'lsst.square.metrics',
+          schema_registry: 'http://schema-registry:8081/',
+          credentials_url:
+            'https://data.lsst.cloud/repertoire/discovery/influxdb/local_metrics',
+          local: true,
+        },
+        remote_efd: {
+          url: 'https://data.lsst.cloud/influxdb/',
+          database: 'efd',
+          schema_registry: 'http://schema-registry:8081/',
+          credentials_url:
+            'https://data.lsst.cloud/repertoire/discovery/influxdb/remote_efd',
+        },
+      },
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.influxdb_databases.local_metrics.local).toBe(true);
+      // Omitted (exclude_defaults) -> defaults to false
+      expect(result.data.influxdb_databases.remote_efd.local).toBe(false);
+    }
+  });
+
   it('validates randomly generated discovery data', () => {
     // Test with multiple seeds for broader coverage
     const seeds = [1, 42, 123, 999];

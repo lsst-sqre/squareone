@@ -132,16 +132,17 @@ describe('ServiceDiscoveryQuery', () => {
       const query = createDiscoveryQuery(mockDiscovery);
       const datasets = query.getDatasets();
 
-      expect(Object.keys(datasets)).toContain('dp0.2');
       expect(Object.keys(datasets)).toContain('dp1');
+      expect(Object.keys(datasets)).toContain('dp02');
+      expect(Object.keys(datasets)).toContain('dp03');
     });
 
     it('getDataset returns specific dataset', () => {
       const query = createDiscoveryQuery(mockDiscovery);
-      const dp02 = query.getDataset('dp0.2');
+      const dp02 = query.getDataset('dp02');
 
       expect(dp02).toBeDefined();
-      expect(dp02?.description).toBe('Data Preview 0.2');
+      expect(dp02?.description).toContain('Data Preview 0.2');
       expect(dp02?.docs_url).toBe('https://dp0-2.lsst.io');
     });
 
@@ -154,8 +155,9 @@ describe('ServiceDiscoveryQuery', () => {
     it('hasDataset returns true for existing datasets', () => {
       const query = createDiscoveryQuery(mockDiscovery);
 
-      expect(query.hasDataset('dp0.2')).toBe(true);
       expect(query.hasDataset('dp1')).toBe(true);
+      expect(query.hasDataset('dp02')).toBe(true);
+      expect(query.hasDataset('dp03')).toBe(true);
     });
 
     it('hasDataset returns false for non-existent datasets', () => {
@@ -168,22 +170,28 @@ describe('ServiceDiscoveryQuery', () => {
       const query = createDiscoveryQuery(mockDiscovery);
       const tapDatasets = query.getDatasetsWithService('tap');
 
-      expect(tapDatasets).toHaveLength(2);
-      expect(tapDatasets.map((d) => d.id)).toContain('dp0.2');
+      // Every dataset (dp1, dp02, dp03) serves TAP.
+      expect(tapDatasets).toHaveLength(3);
       expect(tapDatasets.map((d) => d.id)).toContain('dp1');
+      expect(tapDatasets.map((d) => d.id)).toContain('dp02');
+      expect(tapDatasets.map((d) => d.id)).toContain('dp03');
 
-      const dp02 = tapDatasets.find((d) => d.id === 'dp0.2');
-      expect(dp02?.serviceUrl).toBe('https://data.lsst.cloud/api/tap');
+      const dp1 = tapDatasets.find((d) => d.id === 'dp1');
+      expect(dp1?.serviceUrl).toBe('https://data.lsst.cloud/api/tap');
+      // dp03 routes through the SSO TAP endpoint.
+      const dp03 = tapDatasets.find((d) => d.id === 'dp03');
+      expect(dp03?.serviceUrl).toBe('https://data.lsst.cloud/api/ssotap');
     });
 
     it('getDatasetsWithService finds datasets with SIA service', () => {
       const query = createDiscoveryQuery(mockDiscovery);
       const siaDatasets = query.getDatasetsWithService('sia');
 
-      // Only dp0.2 has SIA service in mock data
-      expect(siaDatasets).toHaveLength(1);
-      expect(siaDatasets[0].id).toBe('dp0.2');
-      expect(siaDatasets[0].serviceUrl).toBe('https://data.lsst.cloud/api/sia');
+      // Only the image datasets (dp1, dp02) serve SIA.
+      expect(siaDatasets).toHaveLength(2);
+      expect(siaDatasets.map((d) => d.id).sort()).toEqual(['dp02', 'dp1']);
+      const dp1 = siaDatasets.find((d) => d.id === 'dp1');
+      expect(dp1?.serviceUrl).toBe('https://data.lsst.cloud/api/sia/dp1');
     });
 
     it('getDatasetsWithService returns empty array for non-existent service', () => {
@@ -229,6 +237,7 @@ describe('ServiceDiscoveryQuery', () => {
             database: 'efd',
             schema_registry: 'https://schema.lsst.cloud',
             credentials_url: 'https://creds.lsst.cloud/influx/efd',
+            local: false,
           },
         },
       };

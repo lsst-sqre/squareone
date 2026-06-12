@@ -6,7 +6,6 @@ const uriSchema = z.string().url().min(1).max(2083);
 // API Version (used in service versions)
 export const ApiVersionSchema = z.object({
   url: uriSchema,
-  ivoa_standard_id: z.string().nullable().optional(),
 });
 
 // Data Service (services within datasets)
@@ -50,12 +49,19 @@ export const InfluxDatabaseSchema = z.object({
   database: z.string(),
   schema_registry: uriSchema,
   credentials_url: uriSchema,
+  // Added in Repertoire 2.0.0; whether the database is local to the queried
+  // Phalanx environment. Serialized with exclude_defaults, so it is omitted
+  // when false.
+  local: z.boolean().default(false),
 });
 
 // Root Discovery response
 export const DiscoverySchema = z.object({
   applications: z.array(z.string()).default([]),
   datasets: z.record(DatasetSchema).default({}),
+  // Added in Repertoire 2.0.0; human-readable name of the environment, intended
+  // for status/error reporting only (not a hostname, not used to build URLs).
+  environment_name: z.string().nullable().optional(),
   influxdb_databases: z.record(InfluxDatabaseSchema).default({}),
   services: ServicesSchema,
 });
