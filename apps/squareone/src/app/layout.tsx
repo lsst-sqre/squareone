@@ -128,7 +128,13 @@ export default async function RootLayout({ children }: RootLayoutProps) {
       <head>
         <SentryConfigScript config={config} />
       </head>
-      <body>
+      {/*
+       * suppressHydrationWarning absorbs attributes that browser extensions
+       * (Grammarly, password managers, Dark Reader, etc.) inject onto <body>
+       * before React hydrates. Caveat: this suppresses one level only — the
+       * <body> element's own attributes — not extension-injected child nodes.
+       */}
+      <body suppressHydrationWarning>
         <PlausibleWrapper domain={config.plausibleDomain}>
           <ConfigProvider configPromise={getStaticConfig()}>
             <Providers>
