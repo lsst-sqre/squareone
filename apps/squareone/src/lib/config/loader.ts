@@ -31,6 +31,7 @@ export interface SentryConfig {
   replaysSessionSampleRate?: number;
   replaysOnErrorSampleRate?: number;
   baseUrl?: string;
+  version?: string;
 }
 
 export interface AppConfig {

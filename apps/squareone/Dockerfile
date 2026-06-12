@@ -56,12 +56,16 @@ FROM base AS runner
 
 WORKDIR /app
 
-# Carry the source commit into the runtime image: server/edge `Sentry.init`
-# reads SENTRY_RELEASE at runtime, and the OCI revision label records the
-# build's commit for `docker inspect`.
+# Carry the source commit and image tag into the runtime image: server/edge
+# `Sentry.init` reads SENTRY_RELEASE at runtime, and the OCI revision label
+# records the build's commit for `docker inspect`. VERSION (the image's primary
+# tag) is likewise exposed as SQUAREONE_VERSION so the app self-reports it as the
+# runtime `version` in the `<head>`, server logs, and Sentry, in addition to the
+# OCI `version` label.
 ARG SOURCE_COMMIT
 ARG VERSION
 ENV SENTRY_RELEASE=$SOURCE_COMMIT
+ENV SQUAREONE_VERSION=$VERSION
 
 # OCI image annotations. Static fields surface on the GHCR package page; `source`
 # links the package to its repository (and inherits repo visibility/access),

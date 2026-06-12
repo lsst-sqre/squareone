@@ -1,4 +1,5 @@
 import type { SentryConfig, StaticConfig } from '../lib/config/rsc';
+import { getAppVersion } from '../lib/version';
 
 type SentryConfigScriptProps = {
   config: StaticConfig;
@@ -24,6 +25,7 @@ export default function SentryConfigScript({
     replaysSessionSampleRate: config.sentryReplaysSessionSampleRate,
     replaysOnErrorSampleRate: config.sentryReplaysOnErrorSampleRate,
     baseUrl: config.baseUrl,
+    version: getAppVersion().version,
   };
 
   // Only inject the script if we have Sentry configuration

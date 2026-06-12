@@ -4,6 +4,7 @@ import { getAppVersion } from './version';
 
 describe('getAppVersion', () => {
   const originalRelease = process.env.SENTRY_RELEASE;
+  const originalVersion = process.env.SQUAREONE_VERSION;
 
   afterEach(() => {
     if (originalRelease === undefined) {
@@ -11,9 +12,20 @@ describe('getAppVersion', () => {
     } else {
       process.env.SENTRY_RELEASE = originalRelease;
     }
+    if (originalVersion === undefined) {
+      delete process.env.SQUAREONE_VERSION;
+    } else {
+      process.env.SQUAREONE_VERSION = originalVersion;
+    }
   });
 
-  it('returns the package.json version', () => {
+  it('reads the version from SQUAREONE_VERSION when set', () => {
+    process.env.SQUAREONE_VERSION = 'tickets-DM-55226';
+    expect(getAppVersion().version).toBe('tickets-DM-55226');
+  });
+
+  it('falls back to the package.json version when SQUAREONE_VERSION is unset', () => {
+    delete process.env.SQUAREONE_VERSION;
     expect(getAppVersion().version).toBe(version);
   });
 

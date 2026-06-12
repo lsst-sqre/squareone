@@ -42,5 +42,13 @@ Sentry.init({
   debug: false,
 });
 
+// Surface the image tag (branch tag for branch builds, release version for
+// releases) on every event, mirroring the server/edge `build` context. Threaded
+// from the server via window.__SENTRY_CONFIG__ (see SentryConfigScript), since
+// the client can't read the server-only SQUAREONE_VERSION env.
+if (config.version) {
+  Sentry.setContext('build', { version: config.version });
+}
+
 // Export router transition hook for navigation instrumentation
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
