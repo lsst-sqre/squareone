@@ -24,11 +24,28 @@ TURBO_TOKEN = "$secret:turbo_token"
 #     the Storybook browser tests); without them `pnpm exec playwright install
 #     chromium` is blocked. See scripts/install-playwright.js for the on-demand
 #     install.
+#   - data.lsst.cloud is the production RSP; it hosts the vendored RSP OpenAPI
+#     specs synced by the repertoire (`/repertoire/openapi.json`), gafaelfawr
+#     (`/auth/openapi.json`), and semaphore (`/semaphore/openapi.json`) clients
+#     (see each package's `fetch-openapi` script). Reached during interactive
+#     spec re-syncs, not boot.
+#   - data-dev.lsst.cloud is the dev RSP equivalent of data.lsst.cloud, for
+#     syncing the same specs against the development deployment.
+#   - roundtable-dev.lsst.cloud is the dev roundtable deployment (the prod
+#     roundtable.lsst.cloud above is already allowlisted as the Turborepo cache
+#     host, so it is not duplicated here).
+#   - times-square.lsst.io hosts the times-square-client OpenAPI spec
+#     (`/_static/openapi.json`), which is served there rather than on
+#     data.lsst.cloud.
 [sandbox.firewall_extra_domains]
 domains = [
   "roundtable.lsst.cloud",
   "cdn.playwright.dev",
   "playwright.download.prss.microsoft.com",
+  "data.lsst.cloud",
+  "data-dev.lsst.cloud",
+  "roundtable-dev.lsst.cloud",
+  "times-square.lsst.io",
 ]
 
 [secrets_required.turbo_token]
