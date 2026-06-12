@@ -36,8 +36,6 @@ jobs:
       sha: ${{ steps.resolve.outputs.sha }}
       version: ${{ steps.version.outputs.version }}
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v6
       - name: Resolve source commit SHA
         id: resolve
         # For pull_request events, github.sha is the ephemeral refs/pull/N/merge
@@ -50,10 +48,24 @@ jobs:
           else
             echo "sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"
           fi
-      - name: Resolve squareone version
+      - name: Resolve image version
         id: version
+        # VERSION mirrors the primary image tag chosen by
+        # multiplatform-build-and-push: the explicit `tag` input for releases,
+        # otherwise the branch-derived tag (PR head ref, else the pushed ref
+        # name) with slashes turned to dashes. Keeps
+        # org.opencontainers.image.version equal to the image's tag.
+        env:
+          INPUT_TAG: ${{ inputs.tag }}
         run: |
-          echo "version=$(node -e "console.log(require('./apps/squareone/package.json').version);")" >> "$GITHUB_OUTPUT"
+          if [ -n "$INPUT_TAG" ]; then
+            version="$INPUT_TAG"
+          elif [ -n "$GITHUB_HEAD_REF" ]; then
+            version=$(echo "$GITHUB_HEAD_REF" | sed -E 's,/,-,g')
+          else
+            version=$(echo "$GITHUB_REF" | sed -E 's,refs/(heads|tags)/,,' | sed -E 's,/,-,g')
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
 
   build:
     needs: resolve-source-commit
