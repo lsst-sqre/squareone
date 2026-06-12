@@ -1,5 +1,65 @@
 # squareone
 
+## 0.32.1
+
+### Patch Changes
+
+- [#458](https://github.com/lsst-sqre/squareone/pull/458) [`fee09f9`](https://github.com/lsst-sqre/squareone/commit/fee09f9c6c9c3a66308345e98b833cd817863d60) Thanks [@jonathansick](https://github.com/jonathansick)! - Attribute client-side Sentry events to the build's git commit SHA as the
+  `release`, matching server/edge events.
+
+  Browser events previously reported `release: null` because Turborepo's strict
+  env mode stripped `SENTRY_RELEASE` from the `next build` environment, so the
+  Sentry bundler plugin never injected a release into the client bundle (the
+  server/edge SDKs were unaffected — they read `SENTRY_RELEASE` at runtime). Two
+  complementary fixes:
+
+  - Declare `SENTRY_RELEASE` in the `build` task's `env` in `turbo.json` so it
+    reaches `withSentryConfig` at build time; the plugin now bakes the release
+    into the client bundle and associates uploaded source maps with it. Using
+    `env` (not `passThroughEnv`) also keys the build cache on the SHA, so a
+    cached bundle baked with an older commit's release is never reused.
+  - Thread the SHA (`getAppVersion().revision`) through `window.__SENTRY_CONFIG__`
+    as `release`, alongside the existing runtime DSN/`version` injection, and use
+    it in the client `Sentry.init`. This keeps the client release identical to
+    the server's runtime value by construction.
+
+  In local dev (no `SENTRY_RELEASE`), both paths degrade gracefully to an unset
+  release as before.
+
+- [#458](https://github.com/lsst-sqre/squareone/pull/458) [`c9fcda7`](https://github.com/lsst-sqre/squareone/commit/c9fcda7a3d44346ccd5b550873fbf1901549e58d) Thanks [@jonathansick](https://github.com/jonathansick)! - Add standard OCI image labels to the squareone Docker image.
+
+  The runner stage now sets `org.opencontainers.image.source`, `url`, `title`,
+  `description`, `vendor`, `licenses`, `revision`, and `version`. The `source`
+  label links the GHCR package to its repository (inheriting the repo's
+  visibility/access), and the static fields surface a title, description, and
+  license on the package page. `version` comes from a new `VERSION` build arg and
+  mirrors the image's primary tag: the release version for releases, and the
+  branch-derived tag for PR/branch builds (e.g. `tickets-DM-55226`).
+
+- [#458](https://github.com/lsst-sqre/squareone/pull/458) [`6eba665`](https://github.com/lsst-sqre/squareone/commit/6eba6658ab0cb5a4bdcba668417ab0969bc65fb3) Thanks [@jonathansick](https://github.com/jonathansick)! - Make the app's runtime `version` reflect the container image tag.
+
+  The Dockerfile exposes the `VERSION` build arg as a `SQUAREONE_VERSION` runtime
+  env in the runner stage, and `getAppVersion()` now reports it as `version` —
+  the branch-derived tag for PR/branch builds (e.g. `tickets-DM-55226`), the
+  release version for releases — falling back to the `package.json` version when
+  unset (local `pnpm dev`/`pnpm build`). This flows to the `<head>`
+  `squareone:version` meta tag and the `version` field bound on every server log
+  record, and is reported to Sentry as a `build` context (server, edge, and
+  client). Previously these all showed the stale `package.json` version on branch
+  builds.
+
+- [#458](https://github.com/lsst-sqre/squareone/pull/458) [`67eee1f`](https://github.com/lsst-sqre/squareone/commit/67eee1f0e5678b8559c8f163a30a2b46b58c982d) Thanks [@jonathansick](https://github.com/jonathansick)! - Stamp the git commit SHA into the Docker image as the Sentry `release`.
+
+  The Dockerfile takes a `SOURCE_COMMIT` build arg and exposes it as
+  `SENTRY_RELEASE` in both the installer stage (so the Sentry bundler plugin marks
+  client/server bundles and uploads source maps under the SHA) and the runner
+  stage (so server/edge `Sentry.init` reports it at runtime); it also records the
+  SHA in the `org.opencontainers.image.revision` OCI label. `next.config.js`,
+  `sentry.server.config.js`, and `sentry.edge.config.js` now read
+  `process.env.SENTRY_RELEASE`. Server/edge/client events carry the build's SHA
+  instead of `null`, and the value degrades gracefully to no release when
+  `SENTRY_RELEASE` is unset (e.g. local `pnpm dev`/`pnpm build`).
+
 ## 0.32.0
 
 ### Minor Changes
