@@ -17,6 +17,20 @@
   margin-bottom: var(--sqo-space-xs);
 }
 
+.headingLink {
+  color: inherit;
+  text-decoration: none;
+}
+
+.headingLink:hover {
+  text-decoration: underline;
+}
+
+.description {
+  margin: 0 0 var(--sqo-space-sm);
+  color: var(--rsd-component-text-color);
+}
+
 .list {
   list-style: none;
   margin: 0;

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import ApiEndpoints from '../../components/ApiEndpoints';
+import ApiEndpoints, { type HeadingLevel } from '../../components/ApiEndpoints';
 import MainContent from '../../components/MainContent';
 import { resolveApiEndpoints } from '../../lib/apiEndpoints';
 import { getStaticConfig } from '../../lib/config/rsc';
@@ -33,10 +33,14 @@ export default async function ApiAspectPage() {
   });
 
   // Bind the resolved listing into the <ApiEndpoints/> MDX component so the
-  // per-environment prose can place it wherever it wants.
+  // per-environment prose can place it wherever it wants. MDX-supplied props
+  // (e.g. headingLevel) flow through so editors can nest the listing under
+  // their page's heading hierarchy.
   const mdxComponents = {
     ...commonMdxComponents,
-    ApiEndpoints: () => <ApiEndpoints result={apiEndpointsResult} />,
+    ApiEndpoints: (props: { headingLevel?: HeadingLevel }) => (
+      <ApiEndpoints result={apiEndpointsResult} {...props} />
+    ),
   };
 
   const { content } = await compileMdxForRsc({
