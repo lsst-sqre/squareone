@@ -8,6 +8,8 @@
 
 import * as Sentry from '@sentry/nextjs';
 
+import { beforeSend } from './src/lib/sentry/beforeSend';
+
 // Get configuration injected by SentryConfigScript from server-side AppConfig.
 // Use defensive check: window.__SENTRY_CONFIG__ may be undefined if Sentry
 // is not configured (no SENTRY_DSN environment variable).
@@ -48,6 +50,11 @@ Sentry.init({
   // Setting this option to true will print useful information to the console
   // while you're setting up Sentry.
   debug: false,
+
+  // Classify hydration recoverable-errors before they're sent: regroup
+  // browser-extension DOM noise into one mutable issue while keeping genuine
+  // in-app mismatches loud. Defensive — always returns the event.
+  beforeSend,
 });
 
 // Surface the image tag (branch tag for branch builds, release version for
