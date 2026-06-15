@@ -3,7 +3,7 @@
   "info": {
     "title": "Repertoire",
     "description": "Service discovery for the Rubin Science Platform",
-    "version": "0.6.1"
+    "version": "2.0.0"
   },
   "paths": {
     "/repertoire/": {
@@ -102,6 +102,30 @@
           }
         }
       }
+    },
+    "/api/registry": {
+      "get": {
+        "summary": "IVOA Publishing Registry",
+        "description": "Handle an OAI-PMH request.\n\nAccepts any OAI-PMH verb as a query parameter (GET) or form field\n(POST) and returns the corresponding XML response.  All responses\n(including errors) use HTTP 200 as specified in OAI-PMH.",
+        "operationId": "get_oai_api_registry_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          }
+        }
+      },
+      "post": {
+        "summary": "IVOA Publishing Registry",
+        "description": "Handle an OAI-PMH request.\n\nAccepts any OAI-PMH verb as a query parameter (GET) or form field\n(POST) and returns the corresponding XML response.  All responses\n(including errors) use HTTP 200 as specified in OAI-PMH.",
+        "operationId": "get_oai_api_registry_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -116,12 +140,6 @@
             "title": "Service URL",
             "description": "Access URL for that version of the service",
             "examples": ["https://example.org/api/cutout/sync"]
-          },
-          "ivoa_standard_id": {
-            "anyOf": [{ "type": "string" }, { "type": "null" }],
-            "title": "IVOA standardID",
-            "description": "IVOA standardID used in service registrations",
-            "examples": ["ivo://ivoa.net/std/SODA#async-1.0"]
           }
         },
         "type": "object",
@@ -248,6 +266,11 @@
             "description": "All datasets available in the local environment",
             "default": {}
           },
+          "environment_name": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Name of environment",
+            "description": "Human-readable name of the environment, intended for use in status or error reporting. This may be a hostname if that is the most descriptive name, but should not be assumed to be a hostname or used to construct any URLs."
+          },
           "influxdb_databases": {
             "additionalProperties": {
               "$ref": "#/components/schemas/InfluxDatabaseWithPointer"
@@ -316,6 +339,12 @@
             "description": "URL of corresponding Confluent schema registry",
             "examples": ["https://example.org/schema-registry"]
           },
+          "local": {
+            "type": "boolean",
+            "title": "Is database local",
+            "description": "Whether the database is local to this environment",
+            "default": false
+          },
           "username": {
             "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Client username",
@@ -368,6 +397,12 @@
             "title": "Schema registry URL",
             "description": "URL of corresponding Confluent schema registry",
             "examples": ["https://example.org/schema-registry"]
+          },
+          "local": {
+            "type": "boolean",
+            "title": "Is database local",
+            "description": "Whether the database is local to this environment",
+            "default": false
           },
           "credentials_url": {
             "type": "string",
@@ -525,7 +560,9 @@
             "title": "Location"
           },
           "msg": { "type": "string", "title": "Message" },
-          "type": { "type": "string", "title": "Error Type" }
+          "type": { "type": "string", "title": "Error Type" },
+          "input": { "title": "Input" },
+          "ctx": { "type": "object", "title": "Context" }
         },
         "type": "object",
         "required": ["loc", "msg", "type"],
