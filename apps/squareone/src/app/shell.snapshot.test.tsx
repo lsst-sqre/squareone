@@ -2,15 +2,20 @@
  * Shell render-determinism tests.
  *
  * These guard PRD #455 / DM-55227: the shared App Router shell must render
- * identically given the same props so a future SSR/CSR non-determinism
+ * identically given the same props so a future intra-render non-determinism
  * regression (a stray Date.now(), Math.random(), locale-dependent format, or
- * environment-conditional branch) is caught here rather than surfacing as an
- * app-wide React hydration mismatch in production.
+ * mutable module state) is caught here rather than surfacing as an app-wide
+ * React hydration mismatch in production.
  *
  * Each shell component is rendered to static server markup twice with the same
  * props and the two outputs are asserted byte-identical. React's useId values
  * are tree-position-based under server rendering, so they are stable across the
  * two renders; only genuine non-determinism would make the strings diverge.
+ *
+ * Scope caveat: both renders run in the same (jsdom) environment, so these
+ * tests catch non-determinism that varies between two identical renders — not
+ * genuine SSR-vs-CSR divergence (e.g. a `typeof window` branch), which renders
+ * identically here yet would still mismatch on real hydration.
  */
 
 import React from 'react';
