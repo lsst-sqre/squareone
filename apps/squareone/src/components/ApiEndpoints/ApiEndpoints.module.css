@@ -1,0 +1,12 @@
+/**
+ * ApiEndpoints styles
+ *
+ * The discovery-bound wrapper only owns the "temporarily unavailable" notice;
+ * the successful listing is styled by ApiEndpointsList.
+ */
+
+.notice {
+  margin: var(--sqo-space-md) 0;
+  color: var(--rsd-color-gray-500);
+  font-style: italic;
+}
