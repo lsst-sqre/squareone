@@ -36,6 +36,14 @@ export const FromMockDiscovery: Story = {
       canvas.getByRole('heading', { name: 'Data Preview 0.2' })
     ).toBeInTheDocument();
 
+    // Each dataset surfaces a "Read the documentation" link to its docs site at
+    // the end of the description.
+    await expect(
+      canvas.getByRole('link', {
+        name: 'Read the Data Preview 1 documentation',
+      })
+    ).toHaveAttribute('href', 'https://dp1.lsst.io');
+
     // Curated SIA name renders as plain text and exposes a book-icon "IVOA
     // doc" link to the IVOA SIA standard, and the dp1 SIA endpoint surfaces the
     // sia-query-2.0 /query URL (matching idfprod) as copyable code text.

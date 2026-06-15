@@ -66,6 +66,24 @@ describe('ApiEndpointsList', () => {
     ).toBeInTheDocument();
   });
 
+  test('appends a "Read the documentation" link to the description', () => {
+    render(<ApiEndpointsList groups={groups} />);
+
+    expect(
+      screen.getByRole('link', {
+        name: 'Read the Data Preview 1 documentation',
+      })
+    ).toHaveAttribute('href', 'https://dp1.lsst.io');
+  });
+
+  test('omits the documentation link when the dataset has no docs url', () => {
+    render(<ApiEndpointsList groups={[{ ...groups[0], docsUrl: null }]} />);
+
+    expect(
+      screen.queryByRole('link', { name: /read the .* documentation/i })
+    ).not.toBeInTheDocument();
+  });
+
   test('renders a curated endpoint name as plain text with an IVOA doc link', () => {
     render(<ApiEndpointsList groups={groups} />);
 

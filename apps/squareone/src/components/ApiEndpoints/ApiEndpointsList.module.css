@@ -41,6 +41,28 @@
   color: var(--rsd-component-text-color);
 }
 
+/* "Read the documentation" link appended to the description blurb. Color +
+ * trailing arrow icon mark it as a link without relying on color alone;
+ * white-space keeps the label and icon together so the arrow never orphans. */
+.docsLink {
+  color: var(--rsd-component-text-link-color);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.docsLink:hover {
+  color: var(--rsd-component-text-link-hover-color);
+  text-decoration: underline;
+}
+
+.docsLinkIcon {
+  /* Override the global `svg { display: block }` reset so the arrow stays
+   * inline on the label's baseline instead of dropping onto its own line. */
+  display: inline-block;
+  margin-left: var(--sqo-space-xxxs);
+  vertical-align: -0.125em;
+}
+
 .list {
   display: grid;
   grid-column: 1 / -1;
