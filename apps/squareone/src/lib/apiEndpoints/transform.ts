@@ -15,8 +15,8 @@ import type { ApiEndpointGroup } from './types';
  * order. Each group resolves the dataset display name (falling back to the raw
  * key) and carries the dataset `docs_url` and `description`. Every service
  * under a dataset is rendered: mapped services get the curated label, IVOA
- * standard link, and version-selected URL; services absent from the map fall
- * back to the raw service name, the base URL, and a null IVOA link.
+ * standard link and name, and version-selected URL; services absent from the
+ * map fall back to the raw service name, the base URL, and a null IVOA link.
  *
  * Pure and parameterized by `presentation` (defaulting to the app's curated
  * map) so tests can inject their own mapping. Empty/missing fallbacks: a
@@ -38,12 +38,18 @@ export function serviceDiscoveryToApiEndpointGroups(
       ([serviceName, service]) => {
         const curated = presentation.services[serviceName];
         if (!curated) {
-          return { label: serviceName, url: service.url, ivoaUrl: null };
+          return {
+            label: serviceName,
+            url: service.url,
+            ivoaUrl: null,
+            ivoaName: null,
+          };
         }
         return {
           label: curated.label,
           url: selectServiceUrl(service, curated.url),
           ivoaUrl: curated.ivoaUrl ?? null,
+          ivoaName: curated.ivoaName ?? null,
         };
       }
     ),

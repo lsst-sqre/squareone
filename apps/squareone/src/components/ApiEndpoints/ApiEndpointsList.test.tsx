@@ -15,11 +15,13 @@ const groups: ApiEndpointGroup[] = [
         label: 'Table Access Protocol (TAP)',
         url: 'https://data.lsst.cloud/api/tap',
         ivoaUrl: 'https://www.ivoa.net/documents/TAP/',
+        ivoaName: 'TAP',
       },
       {
         label: 'DataLink',
         url: 'https://data.lsst.cloud/api/datalink',
         ivoaUrl: null,
+        ivoaName: null,
       },
     ],
   },
@@ -84,14 +86,14 @@ describe('ApiEndpointsList', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('renders a curated endpoint name as plain text with an IVOA doc link', () => {
+  test('renders a curated endpoint name as plain text with a spec-named IVOA doc link', () => {
     render(<ApiEndpointsList groups={groups} />);
 
     expect(
       screen.queryByRole('link', { name: 'Table Access Protocol (TAP)' })
     ).not.toBeInTheDocument();
     expect(screen.getByText('Table Access Protocol (TAP)')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'IVOA doc' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'IVOA TAP docs' })).toHaveAttribute(
       'href',
       'https://www.ivoa.net/documents/TAP/'
     );

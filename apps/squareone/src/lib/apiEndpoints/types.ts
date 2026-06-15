@@ -15,6 +15,12 @@ export type ApiEndpoint = {
    * service is unmapped (no curated standard link).
    */
   ivoaUrl?: string | null;
+  /**
+   * Short standard/spec acronym for the IVOA doc link's accessible label —
+   * e.g. `TAP` yields "IVOA TAP docs". `null` when the service is unmapped
+   * (no curated standard link). Pairs with {@link ivoaUrl}.
+   */
+  ivoaName?: string | null;
 };
 
 /**

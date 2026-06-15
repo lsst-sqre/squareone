@@ -27,10 +27,10 @@ type ApiEndpointsListProps = {
  * suffixed with a "Read the documentation" link to the dataset's documentation
  * site when available — and a list of endpoints. Each endpoint name is always
  * plain text; a curated, IVOA-mapped service additionally shows a book-icon
- * "IVOA doc" link to its standard. Each endpoint URL renders as copyable
- * monospace code text (not a
- * link, since these are programmatic API base URLs) with an icon-only
- * copy-to-clipboard button.
+ * link to its standard, labeled with the spec name (e.g. "IVOA TAP docs").
+ * Each endpoint URL renders as copyable monospace code text (not a link, since
+ * these are programmatic API base URLs) with an icon-only copy-to-clipboard
+ * button.
  */
 export default function ApiEndpointsList({
   groups,
@@ -79,39 +79,47 @@ export default function ApiEndpointsList({
               <p className={styles.description}>{docsLink}</p>
             ) : null}
             <ul className={styles.list}>
-              {group.endpoints.map((endpoint) => (
-                <li
-                  key={`${endpoint.label}:${endpoint.url}`}
-                  className={styles.item}
-                >
-                  <div className={styles.labelCell}>
-                    <span className={styles.label}>{endpoint.label}</span>
-                    {endpoint.ivoaUrl ? (
-                      <a
-                        className={styles.ivoaLink}
-                        href={endpoint.ivoaUrl}
-                        title="IVOA doc"
-                        aria-label="IVOA doc"
-                      >
-                        <BookOpen size={16} aria-hidden="true" />
-                      </a>
-                    ) : null}
-                  </div>
-                  <div className={styles.url}>
-                    <code className={styles.urlCode}>{endpoint.url}</code>
-                    <ClipboardButton
-                      text={endpoint.url}
-                      label=""
-                      successLabel=""
-                      ariaLabel={`Copy the ${endpoint.label} endpoint URL to the clipboard`}
-                      size="sm"
-                      appearance="text"
-                      tone="secondary"
-                      className={styles.copyButton}
-                    />
-                  </div>
-                </li>
-              ))}
+              {group.endpoints.map((endpoint) => {
+                // Accessible label/tooltip for the book-icon link, naming the
+                // standard (e.g. "IVOA TAP docs"); falls back to a generic
+                // label if an IVOA-linked service has no curated standard name.
+                const ivoaDocLabel = endpoint.ivoaName
+                  ? `IVOA ${endpoint.ivoaName} docs`
+                  : 'IVOA doc';
+                return (
+                  <li
+                    key={`${endpoint.label}:${endpoint.url}`}
+                    className={styles.item}
+                  >
+                    <div className={styles.labelCell}>
+                      <span className={styles.label}>{endpoint.label}</span>
+                      {endpoint.ivoaUrl ? (
+                        <a
+                          className={styles.ivoaLink}
+                          href={endpoint.ivoaUrl}
+                          title={ivoaDocLabel}
+                          aria-label={ivoaDocLabel}
+                        >
+                          <BookOpen size={16} aria-hidden="true" />
+                        </a>
+                      ) : null}
+                    </div>
+                    <div className={styles.url}>
+                      <code className={styles.urlCode}>{endpoint.url}</code>
+                      <ClipboardButton
+                        text={endpoint.url}
+                        label=""
+                        successLabel=""
+                        ariaLabel={`Copy the ${endpoint.label} endpoint URL to the clipboard`}
+                        size="sm"
+                        appearance="text"
+                        tone="secondary"
+                        className={styles.copyButton}
+                      />
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           </section>
         );

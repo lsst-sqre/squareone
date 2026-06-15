@@ -44,19 +44,16 @@ export const FromMockDiscovery: Story = {
       })
     ).toHaveAttribute('href', 'https://dp1.lsst.io');
 
-    // Curated SIA name renders as plain text and exposes a book-icon "IVOA
-    // doc" link to the IVOA SIA standard, and the dp1 SIA endpoint surfaces the
-    // sia-query-2.0 /query URL (matching idfprod) as copyable code text.
+    // Curated SIA name renders as plain text and exposes a book-icon link
+    // labeled "IVOA SIA docs" to the IVOA SIA standard, and the dp1 SIA
+    // endpoint surfaces the sia-query-2.0 /query URL (matching idfprod) as
+    // copyable code text.
     await expect(
       canvas.getAllByText('Simple Image Access (SIA v2)')[0]
     ).toBeInTheDocument();
-    const ivoaLinks = canvas.getAllByRole('link', { name: 'IVOA doc' });
     await expect(
-      ivoaLinks.some(
-        (el) =>
-          el.getAttribute('href') === 'https://www.ivoa.net/documents/SIA/'
-      )
-    ).toBe(true);
+      canvas.getAllByRole('link', { name: 'IVOA SIA docs' })[0]
+    ).toHaveAttribute('href', 'https://www.ivoa.net/documents/SIA/');
     await expect(
       canvas.getByText('https://data.lsst.cloud/api/sia/dp1/query')
     ).toBeInTheDocument();
@@ -66,31 +63,26 @@ export const FromMockDiscovery: Story = {
       canvas.getByText('https://data.lsst.cloud/api/hips/v2/dp1/list')
     ).toBeInTheDocument();
 
-    // ObsTAP (the generic TAP label) renders as plain text with an IVOA doc
-    // link to the TAP standard.
+    // ObsTAP (the generic TAP label) renders as plain text with a book-icon
+    // link labeled "IVOA TAP docs" to the TAP standard.
     await expect(
       canvas.getAllByText('Table Access Protocol (TAP)')[0]
     ).toBeInTheDocument();
     await expect(
-      ivoaLinks.some(
-        (el) =>
-          el.getAttribute('href') === 'https://www.ivoa.net/documents/TAP/'
-      )
-    ).toBe(true);
+      canvas.getAllByRole('link', { name: 'IVOA TAP docs' })[0]
+    ).toHaveAttribute('href', 'https://www.ivoa.net/documents/TAP/');
 
     // DataLink renders its name as plain text alongside its base URL as code
-    // text, with a book-icon "IVOA doc" link to the DataLink standard.
+    // text, with a book-icon link labeled "IVOA DataLink docs" to the DataLink
+    // standard.
     await expect(canvas.getAllByText('DataLink')[0]).toBeInTheDocument();
     const datalinkUrls = canvas.getAllByText(
       'https://data.lsst.cloud/api/datalink'
     );
     await expect(datalinkUrls.length).toBeGreaterThan(0);
     await expect(
-      ivoaLinks.some(
-        (el) =>
-          el.getAttribute('href') === 'https://www.ivoa.net/documents/DataLink/'
-      )
-    ).toBe(true);
+      canvas.getAllByRole('link', { name: 'IVOA DataLink docs' })[0]
+    ).toHaveAttribute('href', 'https://www.ivoa.net/documents/DataLink/');
 
     // Each endpoint exposes an icon-only copy-to-clipboard button.
     const copyButtons = canvas.getAllByRole('button', {

@@ -18,6 +18,12 @@ export type ServicePresentation = {
   label: string;
   /** IVOA standard documentation link the label points to, if any. */
   ivoaUrl?: string;
+  /**
+   * Short standard/spec acronym used in the doc link's accessible label —
+   * e.g. `TAP` renders the book-icon link as "IVOA TAP docs". Pairs with
+   * {@link ivoaUrl}.
+   */
+  ivoaName?: string;
   /** Which discovery URL to surface (defaults to the base `url`). */
   url?: UrlSelector;
 };
@@ -52,31 +58,37 @@ export const presentationMap: PresentationMap = {
     sia: {
       label: 'Simple Image Access (SIA v2)',
       ivoaUrl: 'https://www.ivoa.net/documents/SIA/',
+      ivoaName: 'SIA',
       url: { versionKey: 'sia-query-2.0' },
     },
     hips: {
       label: 'HiPS (Hierarchical Progressive Survey)',
       ivoaUrl: 'https://www.ivoa.net/documents/HiPS',
+      ivoaName: 'HiPS',
       url: { versionKey: 'hips-list-1.0' },
     },
     tap: {
       label: 'Table Access Protocol (TAP)',
       ivoaUrl: 'https://www.ivoa.net/documents/TAP/',
+      ivoaName: 'TAP',
       url: 'base',
     },
     cutout: {
       label: 'SODA Image Cutouts',
       ivoaUrl: 'https://www.ivoa.net/documents/SODA/20170517/REC-SODA-1.0.html',
+      ivoaName: 'SODA',
       url: 'base',
     },
     datalink: {
       label: 'DataLink',
       ivoaUrl: 'https://www.ivoa.net/documents/DataLink/',
+      ivoaName: 'DataLink',
       url: 'base',
     },
     gms: {
       label: 'Group Membership Service (GMS)',
       ivoaUrl: 'https://www.ivoa.net/documents/GMS/',
+      ivoaName: 'GMS',
       url: 'base',
     },
   },

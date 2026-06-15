@@ -64,6 +64,7 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
       label: 'Simple Image Access (SIA v2)',
       url: 'https://data.lsst.cloud/api/sia/dp1/query',
       ivoaUrl: 'https://www.ivoa.net/documents/SIA/',
+      ivoaName: 'SIA',
     });
     // HiPS surfaces the hips-list-1.0 /list URL.
     expect(byLabel('HiPS (Hierarchical Progressive Survey)')?.url).toBe(
@@ -117,6 +118,7 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
       label: 'mystery',
       url: 'https://data.lsst.cloud/api/mystery',
       ivoaUrl: null,
+      ivoaName: null,
     });
   });
 
@@ -157,6 +159,7 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
       label: 'Custom TAP',
       url: 'https://example.org/tap',
       ivoaUrl: null,
+      ivoaName: null,
     });
   });
 
