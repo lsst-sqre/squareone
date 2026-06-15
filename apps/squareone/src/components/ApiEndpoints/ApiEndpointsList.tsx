@@ -1,4 +1,5 @@
 import { ClipboardButton } from '@lsst-sqre/squared';
+import { BookOpen } from 'lucide-react';
 
 import type { ApiEndpointGroup } from '../../lib/apiEndpoints/types';
 import styles from './ApiEndpointsList.module.css';
@@ -23,10 +24,11 @@ type ApiEndpointsListProps = {
  * Purely props-driven (no data fetching) so it can be exercised from Storybook
  * and unit tests. Each group renders a heading (the dataset display name,
  * linked to its docs when available) followed by the dataset description and a
- * list of endpoints. A curated endpoint label links to its IVOA standard doc;
- * an unmapped one renders as plain text. Each endpoint URL renders as copyable
- * monospace code text (not a link, since these are programmatic API base URLs)
- * with an icon-only copy-to-clipboard button.
+ * list of endpoints. Each endpoint name is always plain text; a curated,
+ * IVOA-mapped service additionally shows a book-icon "IVOA doc" link to its
+ * standard. Each endpoint URL renders as copyable monospace code text (not a
+ * link, since these are programmatic API base URLs) with an icon-only
+ * copy-to-clipboard button.
  */
 export default function ApiEndpointsList({
   groups,
@@ -56,13 +58,19 @@ export default function ApiEndpointsList({
                 key={`${endpoint.label}:${endpoint.url}`}
                 className={styles.item}
               >
-                {endpoint.ivoaUrl ? (
-                  <a className={styles.label} href={endpoint.ivoaUrl}>
-                    {endpoint.label}
-                  </a>
-                ) : (
+                <div className={styles.labelCell}>
                   <span className={styles.label}>{endpoint.label}</span>
-                )}
+                  {endpoint.ivoaUrl ? (
+                    <a
+                      className={styles.ivoaLink}
+                      href={endpoint.ivoaUrl}
+                      title="IVOA doc"
+                      aria-label="IVOA doc"
+                    >
+                      <BookOpen size={16} aria-hidden="true" />
+                    </a>
+                  ) : null}
+                </div>
                 <div className={styles.url}>
                   <code className={styles.urlCode}>{endpoint.url}</code>
                   <ClipboardButton

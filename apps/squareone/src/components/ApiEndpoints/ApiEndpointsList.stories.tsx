@@ -35,16 +35,19 @@ export const FromMockDiscovery: Story = {
       canvas.getByRole('heading', { name: 'Data Preview 0.2' })
     ).toBeInTheDocument();
 
-    // Curated SIA label links to the IVOA SIA standard, and the dp1 SIA
-    // endpoint surfaces the sia-query-2.0 /query URL (matching idfprod) as
-    // copyable code text.
-    const siaLabels = canvas.getAllByRole('link', {
-      name: 'Simple Image Access (SIA v2)',
-    });
-    await expect(siaLabels[0]).toHaveAttribute(
-      'href',
-      'https://www.ivoa.net/documents/SIA/'
-    );
+    // Curated SIA name renders as plain text and exposes a book-icon "IVOA
+    // doc" link to the IVOA SIA standard, and the dp1 SIA endpoint surfaces the
+    // sia-query-2.0 /query URL (matching idfprod) as copyable code text.
+    await expect(
+      canvas.getAllByText('Simple Image Access (SIA v2)')[0]
+    ).toBeInTheDocument();
+    const ivoaLinks = canvas.getAllByRole('link', { name: 'IVOA doc' });
+    await expect(
+      ivoaLinks.some(
+        (el) =>
+          el.getAttribute('href') === 'https://www.ivoa.net/documents/SIA/'
+      )
+    ).toBe(true);
     await expect(
       canvas.getByText('https://data.lsst.cloud/api/sia/dp1/query')
     ).toBeInTheDocument();
@@ -54,12 +57,17 @@ export const FromMockDiscovery: Story = {
       canvas.getByText('https://data.lsst.cloud/api/hips/v2/dp1/list')
     ).toBeInTheDocument();
 
-    // ObsTAP (the generic TAP label) uses the base URL.
+    // ObsTAP (the generic TAP label) renders as plain text with an IVOA doc
+    // link to the TAP standard.
     await expect(
-      canvas.getAllByRole('link', {
-        name: 'Table Access Protocol (TAP)',
-      })[0]
-    ).toHaveAttribute('href', 'https://www.ivoa.net/documents/TAP/');
+      canvas.getAllByText('Table Access Protocol (TAP)')[0]
+    ).toBeInTheDocument();
+    await expect(
+      ivoaLinks.some(
+        (el) =>
+          el.getAttribute('href') === 'https://www.ivoa.net/documents/TAP/'
+      )
+    ).toBe(true);
 
     // A curated service without an IVOA standard (DataLink) renders its label
     // as plain text alongside its base URL as code text.

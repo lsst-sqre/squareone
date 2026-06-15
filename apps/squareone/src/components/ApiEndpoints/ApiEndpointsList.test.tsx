@@ -66,12 +66,17 @@ describe('ApiEndpointsList', () => {
     ).toBeInTheDocument();
   });
 
-  test('links a curated endpoint label to its IVOA standard doc', () => {
+  test('renders a curated endpoint name as plain text with an IVOA doc link', () => {
     render(<ApiEndpointsList groups={groups} />);
 
     expect(
-      screen.getByRole('link', { name: 'Table Access Protocol (TAP)' })
-    ).toHaveAttribute('href', 'https://www.ivoa.net/documents/TAP/');
+      screen.queryByRole('link', { name: 'Table Access Protocol (TAP)' })
+    ).not.toBeInTheDocument();
+    expect(screen.getByText('Table Access Protocol (TAP)')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'IVOA doc' })).toHaveAttribute(
+      'href',
+      'https://www.ivoa.net/documents/TAP/'
+    );
   });
 
   test('renders an endpoint label with no IVOA link as plain text', () => {

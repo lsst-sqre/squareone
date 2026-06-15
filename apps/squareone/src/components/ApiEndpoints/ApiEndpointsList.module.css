@@ -60,9 +60,26 @@
   align-items: center;
 }
 
+.labelCell {
+  display: flex;
+  align-items: center;
+  gap: var(--sqo-space-xs);
+}
+
 .label {
   color: var(--rsd-component-text-color);
   font-weight: 500;
+}
+
+.ivoaLink {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: var(--rsd-component-text-link-color);
+}
+
+.ivoaLink:hover {
+  color: var(--rsd-component-text-link-hover-color);
 }
 
 .url {
