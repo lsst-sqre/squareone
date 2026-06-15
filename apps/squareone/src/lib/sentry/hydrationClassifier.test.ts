@@ -50,6 +50,20 @@ describe('isHydrationError', () => {
     expect(isHydrationError(event)).toBe(false);
   });
 
+  it('does not flag a generic "didn\'t match" error without a hydration stem', () => {
+    const event = hydrationEventFromMessage(
+      "Received value didn't match the expected snapshot"
+    );
+    expect(isHydrationError(event)).toBe(false);
+  });
+
+  it('flags a "didn\'t match" message when a hydration stem co-occurs', () => {
+    const event = hydrationEventFromMessage(
+      "While hydrating, the server rendered HTML didn't match the client."
+    );
+    expect(isHydrationError(event)).toBe(true);
+  });
+
   it('is defensive against an empty event', () => {
     expect(isHydrationError({})).toBe(false);
   });
@@ -97,6 +111,17 @@ describe('classifyHydrationEvent', () => {
   it('classifies a non-hydration error as unknown even with markers present', () => {
     const result = classifyHydrationEvent({
       event: hydrationEventFromMessage('TypeError: boom'),
+      bodyAttrs: [GRAMMARLY_ATTR],
+      htmlAttrs: [],
+    });
+    expect(result.classification).toBe('unknown');
+  });
+
+  it('does not bury a generic "didn\'t match" app error under extension noise', () => {
+    const result = classifyHydrationEvent({
+      event: hydrationEventFromMessage(
+        "Received value didn't match the expected snapshot"
+      ),
       bodyAttrs: [GRAMMARLY_ATTR],
       htmlAttrs: [],
     });

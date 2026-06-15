@@ -82,16 +82,22 @@ export const KNOWN_EXTENSION_MARKERS: ExtensionMarker[] = [
 // hydration failures.
 const HYDRATION_ERROR_CODES = [418, 419, 421, 422, 423, 425];
 
-// Lower-cased substrings that identify a hydration mismatch from the
-// human-readable error text (dev builds and some recoverable-error messages).
+// Unambiguous hydration phrasings from the human-readable error text (dev
+// builds and some recoverable-error messages). These appear only in hydration
+// errors, so they always classify as hydration.
 const HYDRATION_MESSAGE_PATTERNS = [
   'hydration failed',
-  "didn't match",
-  'did not match',
   'error while hydrating',
   'text content does not match',
   'hydrating but react',
 ];
+
+// Generic mismatch phrasings that also appear in unrelated errors (assertions,
+// routing, regex, checksums). Only treat these as hydration when a hydration
+// stem co-occurs in the event text, so a real app error is never buried under
+// extension noise just because its message happens to say "didn't match".
+const GENERIC_MISMATCH_PATTERNS = ["didn't match", 'did not match'];
+const HYDRATION_STEM = 'hydrat';
 
 /**
  * Gather the searchable text from a Sentry event (top-level message plus every
@@ -138,7 +144,15 @@ export const isHydrationError = (event: Event | undefined | null): boolean => {
       return true;
     }
   }
-  return HYDRATION_MESSAGE_PATTERNS.some((pattern) => text.includes(pattern));
+  if (HYDRATION_MESSAGE_PATTERNS.some((pattern) => text.includes(pattern))) {
+    return true;
+  }
+  // Generic mismatch phrasings only count as hydration when a hydration stem
+  // co-occurs, so unrelated "didn't match" errors are not mis-classified.
+  return (
+    text.includes(HYDRATION_STEM) &&
+    GENERIC_MISMATCH_PATTERNS.some((pattern) => text.includes(pattern))
+  );
 };
 
 /**
