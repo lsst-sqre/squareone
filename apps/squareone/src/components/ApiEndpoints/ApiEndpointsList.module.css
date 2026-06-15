@@ -1,0 +1,45 @@
+/**
+ * ApiEndpointsList styles
+ *
+ * A stack of dataset sections, each with a heading and a list of endpoints.
+ * This is the base (skeleton) presentation; curated polish lands in #465.
+ */
+
+.root {
+  margin: var(--sqo-space-md) 0;
+}
+
+.group {
+  margin-bottom: var(--sqo-space-lg);
+}
+
+.heading {
+  margin-bottom: var(--sqo-space-xs);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.item {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sqo-space-xs) var(--sqo-space-md);
+  padding: var(--sqo-space-xxs) 0;
+}
+
+.label {
+  color: var(--rsd-component-text-color);
+  font-weight: 500;
+}
+
+.url {
+  color: var(--rsd-component-text-link-color);
+  word-break: break-all;
+}
+
+.url:hover {
+  text-decoration: underline;
+}
