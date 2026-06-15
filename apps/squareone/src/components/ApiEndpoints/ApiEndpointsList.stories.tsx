@@ -20,8 +20,9 @@ type Story = StoryObj<typeof ApiEndpointsList>;
 
 // Rendered from mock discovery: one section per dataset with curated labels,
 // IVOA standard links, and selected URLs matching the production idfprod page.
-// Curated services without an IVOA standard (DataLink, GMS) render a plain-text
-// label; a service absent from the map would fall back to its raw name.
+// Every curated RSP service maps to an IVOA standard, so each name shows a
+// book-icon "IVOA doc" link; a service absent from the map would fall back to
+// its raw name with no link.
 export const FromMockDiscovery: Story = {
   args: { groups: discoveryGroups },
   play: async ({ canvasElement }) => {
@@ -69,13 +70,19 @@ export const FromMockDiscovery: Story = {
       )
     ).toBe(true);
 
-    // A curated service without an IVOA standard (DataLink) renders its label
-    // as plain text alongside its base URL as code text.
+    // DataLink renders its name as plain text alongside its base URL as code
+    // text, with a book-icon "IVOA doc" link to the DataLink standard.
     await expect(canvas.getAllByText('DataLink')[0]).toBeInTheDocument();
     const datalinkUrls = canvas.getAllByText(
       'https://data.lsst.cloud/api/datalink'
     );
     await expect(datalinkUrls.length).toBeGreaterThan(0);
+    await expect(
+      ivoaLinks.some(
+        (el) =>
+          el.getAttribute('href') === 'https://www.ivoa.net/documents/DataLink/'
+      )
+    ).toBe(true);
 
     // Each endpoint exposes an icon-only copy-to-clipboard button.
     const copyButtons = canvas.getAllByRole('button', {

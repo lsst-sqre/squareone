@@ -77,6 +77,13 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
     expect(byLabel('SODA Image Cutouts')?.url).toBe(
       'https://data.lsst.cloud/api/cutout'
     );
+    // DataLink and GMS link to their IVOA standards too.
+    expect(byLabel('DataLink')?.ivoaUrl).toBe(
+      'https://www.ivoa.net/documents/DataLink/'
+    );
+    expect(byLabel('Group Membership Service (GMS)')?.ivoaUrl).toBe(
+      'https://www.ivoa.net/documents/GMS/'
+    );
   });
 
   test('uses a single generic TAP label across datasets; the dataset gives context', () => {

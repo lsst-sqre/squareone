@@ -71,10 +71,12 @@ export const presentationMap: PresentationMap = {
     },
     datalink: {
       label: 'DataLink',
+      ivoaUrl: 'https://www.ivoa.net/documents/DataLink/',
       url: 'base',
     },
     gms: {
       label: 'Group Membership Service (GMS)',
+      ivoaUrl: 'https://www.ivoa.net/documents/GMS/',
       url: 'base',
     },
   },
