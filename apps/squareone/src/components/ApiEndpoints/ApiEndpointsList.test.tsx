@@ -83,12 +83,23 @@ describe('ApiEndpointsList', () => {
     expect(screen.getByText('DataLink')).toBeInTheDocument();
   });
 
-  test('renders each endpoint as a link to its url', () => {
+  test('renders each endpoint url as code text, not a link', () => {
     render(<ApiEndpointsList groups={groups} />);
 
     expect(
-      screen.getByRole('link', { name: 'https://data.lsst.cloud/api/tap' })
-    ).toHaveAttribute('href', 'https://data.lsst.cloud/api/tap');
+      screen.queryByRole('link', { name: 'https://data.lsst.cloud/api/tap' })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByText('https://data.lsst.cloud/api/tap')
+    ).toBeInTheDocument();
+  });
+
+  test('renders a copy button for each endpoint', () => {
+    render(<ApiEndpointsList groups={groups} />);
+
+    expect(
+      screen.getAllByRole('button', { name: /copy the .* endpoint url/i })
+    ).toHaveLength(2);
   });
 
   test('renders no group headings when given an empty list', () => {

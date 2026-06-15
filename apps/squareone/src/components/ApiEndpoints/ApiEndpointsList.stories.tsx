@@ -36,7 +36,8 @@ export const FromMockDiscovery: Story = {
     ).toBeInTheDocument();
 
     // Curated SIA label links to the IVOA SIA standard, and the dp1 SIA
-    // endpoint surfaces the sia-query-2.0 /query URL (matching idfprod).
+    // endpoint surfaces the sia-query-2.0 /query URL (matching idfprod) as
+    // copyable code text.
     const siaLabels = canvas.getAllByRole('link', {
       name: 'Simple Image Access (SIA v2)',
     });
@@ -45,16 +46,12 @@ export const FromMockDiscovery: Story = {
       'https://www.ivoa.net/documents/SIA/'
     );
     await expect(
-      canvas.getByRole('link', {
-        name: 'https://data.lsst.cloud/api/sia/dp1/query',
-      })
+      canvas.getByText('https://data.lsst.cloud/api/sia/dp1/query')
     ).toBeInTheDocument();
 
-    // HiPS surfaces the /list URL.
+    // HiPS surfaces the /list URL as code text.
     await expect(
-      canvas.getByRole('link', {
-        name: 'https://data.lsst.cloud/api/hips/v2/dp1/list',
-      })
+      canvas.getByText('https://data.lsst.cloud/api/hips/v2/dp1/list')
     ).toBeInTheDocument();
 
     // ObsTAP (the generic TAP label) uses the base URL.
@@ -65,12 +62,18 @@ export const FromMockDiscovery: Story = {
     ).toHaveAttribute('href', 'https://www.ivoa.net/documents/TAP/');
 
     // A curated service without an IVOA standard (DataLink) renders its label
-    // as plain text alongside its base URL link.
+    // as plain text alongside its base URL as code text.
     await expect(canvas.getAllByText('DataLink')[0]).toBeInTheDocument();
-    const datalinkLinks = canvas.getAllByRole('link', {
-      name: 'https://data.lsst.cloud/api/datalink',
+    const datalinkUrls = canvas.getAllByText(
+      'https://data.lsst.cloud/api/datalink'
+    );
+    await expect(datalinkUrls.length).toBeGreaterThan(0);
+
+    // Each endpoint exposes an icon-only copy-to-clipboard button.
+    const copyButtons = canvas.getAllByRole('button', {
+      name: /copy the .* endpoint url/i,
     });
-    await expect(datalinkLinks.length).toBeGreaterThan(0);
+    await expect(copyButtons.length).toBeGreaterThan(0);
   },
 };
 

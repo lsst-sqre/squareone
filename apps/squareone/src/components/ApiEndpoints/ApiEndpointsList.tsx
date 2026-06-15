@@ -1,3 +1,5 @@
+import { ClipboardButton } from '@lsst-sqre/squared';
+
 import type { ApiEndpointGroup } from '../../lib/apiEndpoints/types';
 import styles from './ApiEndpointsList.module.css';
 
@@ -22,7 +24,9 @@ type ApiEndpointsListProps = {
  * and unit tests. Each group renders a heading (the dataset display name,
  * linked to its docs when available) followed by the dataset description and a
  * list of endpoints. A curated endpoint label links to its IVOA standard doc;
- * an unmapped one renders as plain text. Each endpoint also links to its URL.
+ * an unmapped one renders as plain text. Each endpoint URL renders as copyable
+ * monospace code text (not a link, since these are programmatic API base URLs)
+ * with an icon-only copy-to-clipboard button.
  */
 export default function ApiEndpointsList({
   groups,
@@ -59,9 +63,19 @@ export default function ApiEndpointsList({
                 ) : (
                   <span className={styles.label}>{endpoint.label}</span>
                 )}
-                <a className={styles.url} href={endpoint.url}>
-                  {endpoint.url}
-                </a>
+                <div className={styles.url}>
+                  <code className={styles.urlCode}>{endpoint.url}</code>
+                  <ClipboardButton
+                    text={endpoint.url}
+                    label=""
+                    successLabel=""
+                    ariaLabel={`Copy the ${endpoint.label} endpoint URL to the clipboard`}
+                    size="sm"
+                    appearance="text"
+                    tone="secondary"
+                    className={styles.copyButton}
+                  />
+                </div>
               </li>
             ))}
           </ul>

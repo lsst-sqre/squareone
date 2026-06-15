@@ -57,7 +57,7 @@
   grid-template-columns: subgrid;
   column-gap: var(--sqo-space-lg);
   padding: var(--sqo-space-xxs) 0;
-  align-items: baseline;
+  align-items: center;
 }
 
 .label {
@@ -66,12 +66,27 @@
 }
 
 .url {
-  color: var(--rsd-component-text-link-color);
+  display: flex;
+  align-items: center;
+  /* Button sits a short gap to the right of the endpoint text, not page-right. */
+  gap: var(--sqo-space-md);
+  /*
+   * Reserve the copied-state height (ClipboardButton's success state is 2rem
+   * tall, taller than the resting icon button) so swapping to the check mark
+   * doesn't grow the row and shift the rows below.
+   */
+  min-height: 2rem;
+}
+
+.urlCode {
+  min-width: 0; /* allow break-all to wrap a long URL within the flex item */
+  font-family: monospace;
+  color: var(--rsd-component-text-color);
   word-break: break-all;
 }
 
-.url:hover {
-  text-decoration: underline;
+.copyButton {
+  flex-shrink: 0; /* button keeps its size; only the code wraps */
 }
 
 @media (max-width: 768px) {

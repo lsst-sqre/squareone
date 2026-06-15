@@ -44,9 +44,7 @@ describe('ApiEndpoints', () => {
     expect(
       screen.getByRole('heading', { name: 'Data Preview 1' })
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole('link', { name: 'https://example.org/api/tap' })
-    ).toBeInTheDocument();
+    expect(screen.getByText('https://example.org/api/tap')).toBeInTheDocument();
   });
 
   test('forwards headingLevel through to the listing', () => {
