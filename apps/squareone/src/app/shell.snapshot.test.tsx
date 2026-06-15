@@ -58,7 +58,8 @@ vi.mock('@lsst-sqre/semaphore-client', async (importOriginal) => ({
   useBroadcasts: vi.fn(),
 }));
 
-vi.mock('@lsst-sqre/gafaelfawr-client', () => ({
+vi.mock('@lsst-sqre/gafaelfawr-client', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@lsst-sqre/gafaelfawr-client')>()),
   useUserInfo: vi.fn(),
   useLoginInfo: vi.fn(),
 }));
