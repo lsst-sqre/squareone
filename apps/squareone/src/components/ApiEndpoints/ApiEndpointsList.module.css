@@ -1,33 +1,91 @@
 /**
  * ApiEndpointsList styles
  *
- * A stack of dataset sections, each with a heading and a list of endpoints.
- * This is the base (skeleton) presentation; curated polish lands in #465.
+ * Dataset sections share one label column via a root grid + subgrid chain:
+ * .root (grid) -> .group (subgrid) -> .list (subgrid) -> .item (subgrid).
+ * The root `auto` track is sized by the widest label across ALL datasets, so
+ * every dataset's URL column starts at the same x-position. On mobile the root
+ * collapses to one column and each item stacks label above URL.
  */
 
 .root {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
   margin: var(--sqo-space-md) 0;
 }
 
 .group {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
   margin-bottom: var(--sqo-space-lg);
 }
 
 .heading {
+  grid-column: 1 / -1;
   margin-bottom: var(--sqo-space-xs);
 }
 
+.headingLink {
+  color: inherit;
+  text-decoration: none;
+}
+
+.headingLink:hover {
+  text-decoration: underline;
+}
+
+.description {
+  grid-column: 1 / -1;
+  margin: 0 0 var(--sqo-space-sm);
+  color: var(--rsd-component-text-color);
+}
+
+/* "Read the documentation" link appended to the description blurb. Color +
+ * trailing arrow icon mark it as a link without relying on color alone;
+ * white-space keeps the label and icon together so the arrow never orphans. */
+.docsLink {
+  color: var(--rsd-component-text-link-color);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.docsLink:hover {
+  color: var(--rsd-component-text-link-hover-color);
+  text-decoration: underline;
+}
+
+.docsLinkIcon {
+  /* Override the global `svg { display: block }` reset so the arrow stays
+   * inline on the label's baseline instead of dropping onto its own line. */
+  display: inline-block;
+  margin-left: var(--sqo-space-xxxs);
+  vertical-align: -0.125em;
+}
+
 .list {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  row-gap: var(--sqo-space-xs);
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
 .item {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sqo-space-xs) var(--sqo-space-md);
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  column-gap: var(--sqo-space-lg);
   padding: var(--sqo-space-xxs) 0;
+  align-items: center;
+}
+
+.labelCell {
+  display: flex;
+  align-items: center;
+  gap: var(--sqo-space-xs);
 }
 
 .label {
@@ -35,11 +93,48 @@
   font-weight: 500;
 }
 
-.url {
+.ivoaLink {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
   color: var(--rsd-component-text-link-color);
+}
+
+.ivoaLink:hover {
+  color: var(--rsd-component-text-link-hover-color);
+}
+
+.url {
+  display: flex;
+  align-items: center;
+  /* Button sits a short gap to the right of the endpoint text, not page-right. */
+  gap: var(--sqo-space-md);
+  /*
+   * Reserve the copied-state height (ClipboardButton's success state is 2rem
+   * tall, taller than the resting icon button) so swapping to the check mark
+   * doesn't grow the row and shift the rows below.
+   */
+  min-height: 2rem;
+}
+
+.urlCode {
+  min-width: 0; /* allow break-all to wrap a long URL within the flex item */
+  font-family: monospace;
+  color: var(--rsd-component-text-color);
   word-break: break-all;
 }
 
-.url:hover {
-  text-decoration: underline;
+.copyButton {
+  flex-shrink: 0; /* button keeps its size; only the code wraps */
+}
+
+@media (max-width: 768px) {
+  .root {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .item {
+    column-gap: 0;
+    row-gap: var(--sqo-space-xxxs);
+  }
 }

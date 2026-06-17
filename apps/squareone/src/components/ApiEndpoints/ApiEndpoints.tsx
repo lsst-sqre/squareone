@@ -1,10 +1,17 @@
 import type { ApiEndpointsResult } from '../../lib/apiEndpoints/types';
 import styles from './ApiEndpoints.module.css';
-import ApiEndpointsList from './ApiEndpointsList';
+import ApiEndpointsList, { type HeadingLevel } from './ApiEndpointsList';
 
 type ApiEndpointsProps = {
   /** Resolved outcome of fetching/transforming service discovery. */
   result: ApiEndpointsResult;
+  /**
+   * Heading level for the dataset section headings, forwarded to
+   * {@link ApiEndpointsList}. MDX authors set this (e.g.
+   * `<ApiEndpoints headingLevel={3} />`) to nest the listing under their page's
+   * heading hierarchy.
+   */
+  headingLevel?: HeadingLevel;
 };
 
 /**
@@ -16,7 +23,10 @@ type ApiEndpointsProps = {
  * - `unavailable` -> render a brief notice;
  * - `ok` -> render the {@link ApiEndpointsList} for the dataset groups.
  */
-export default function ApiEndpoints({ result }: ApiEndpointsProps) {
+export default function ApiEndpoints({
+  result,
+  headingLevel,
+}: ApiEndpointsProps) {
   if (result.status === 'omitted') {
     return null;
   }
@@ -29,5 +39,7 @@ export default function ApiEndpoints({ result }: ApiEndpointsProps) {
     );
   }
 
-  return <ApiEndpointsList groups={result.groups} />;
+  return (
+    <ApiEndpointsList groups={result.groups} headingLevel={headingLevel} />
+  );
 }
