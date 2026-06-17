@@ -1,0 +1,12 @@
+{
+  "name": "@lsst-sqre/repo-scripts",
+  "description": "Internal repository maintenance scripts (not published)",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.0"
+  }
+}
