@@ -1,5 +1,119 @@
 # squareone
 
+## 0.33.0
+
+### Minor Changes
+
+- [#472](https://github.com/lsst-sqre/squareone/pull/472) [`9a8fa33`](https://github.com/lsst-sqre/squareone/commit/9a8fa33b0a3b8619a3294b3d9ea76c5d1bc7769a) Thanks [@jonathansick](https://github.com/jonathansick)! - Drive the `/api-aspect` endpoint listing from Repertoire service discovery.
+
+  The page resolves discovery server-side and renders one section per dataset
+  (`dp1`/`dp02`/`dp03`), so the endpoints are present in the server-rendered HTML
+  with no client-side discovery fetch. The listing is embedded via an
+  `<ApiEndpoints/>` MDX component (with a `headingLevel` prop, default `3`) so
+  per-environment prose keeps control of the surrounding content. It degrades
+  gracefully, mirroring the App Router layout's server-side discovery pattern: the
+  listing is omitted when `repertoireUrl` is unset, and a brief "temporarily
+  unavailable" notice (plus a server-side log) is shown when the discovery fetch
+  fails.
+
+  A curated presentation map layers human-readable content onto the raw
+  discovery data:
+
+  - Each dataset section header shows the display name (e.g. "Data Preview 1")
+    linked to its documentation site, followed by the dataset description and a
+    visible "Read the documentation" link sourced from the discovery `docs_url`
+    field (with a dataset-named accessible label; omitted when `docs_url` is
+    absent).
+  - Each service name renders as plain, non-clickable text. When a service maps
+    to an IVOA standard, a book-icon link beside the name points to the standard's
+    documentation with a spec-specific accessible label and tooltip (e.g. "IVOA
+    TAP docs", "IVOA SIA docs"). Mapped services use curated labels and the
+    correct per-standard URLs (e.g. SIA v2 → the `sia-query-2.0` `/query` URL,
+    HiPS → the `/list` URL); unmapped services fall back to their raw name and
+    base URL.
+  - Endpoint base URLs render as copyable monospace code text rather than
+    anchors, since they are hit programmatically (TAP clients, notebooks) rather
+    than clicked. An icon-only copy-to-clipboard button sits beside each URL with
+    a per-endpoint accessible name.
+  - Each dataset's endpoints render in an aligned two-column layout (label | URL)
+    via a CSS grid + subgrid chain, so the URL column starts at the same
+    x-position across every dataset, sized by the widest label on the page. On
+    mobile (≤768px) each row collapses to a single column with the label stacked
+    above its URL.
+
+### Patch Changes
+
+- [#458](https://github.com/lsst-sqre/squareone/pull/458) [`fee09f9`](https://github.com/lsst-sqre/squareone/commit/fee09f9c6c9c3a66308345e98b833cd817863d60) Thanks [@jonathansick](https://github.com/jonathansick)! - Attribute client-side Sentry events to the build's git commit SHA as the
+  `release`, matching server/edge events.
+
+  Browser events previously reported `release: null` because Turborepo's strict
+  env mode stripped `SENTRY_RELEASE` from the `next build` environment, so the
+  Sentry bundler plugin never injected a release into the client bundle (the
+  server/edge SDKs were unaffected — they read `SENTRY_RELEASE` at runtime). Two
+  complementary fixes:
+
+  - Declare `SENTRY_RELEASE` in the `build` task's `env` in `turbo.json` so it
+    reaches `withSentryConfig` at build time; the plugin now bakes the release
+    into the client bundle and associates uploaded source maps with it. Using
+    `env` (not `passThroughEnv`) also keys the build cache on the SHA, so a
+    cached bundle baked with an older commit's release is never reused.
+  - Thread the SHA (`getAppVersion().revision`) through `window.__SENTRY_CONFIG__`
+    as `release`, alongside the existing runtime DSN/`version` injection, and use
+    it in the client `Sentry.init`. This keeps the client release identical to
+    the server's runtime value by construction.
+
+  In local dev (no `SENTRY_RELEASE`), both paths degrade gracefully to an unset
+  release as before.
+
+- [#482](https://github.com/lsst-sqre/squareone/pull/482) [`7a2fcb3`](https://github.com/lsst-sqre/squareone/commit/7a2fcb314a2690264f025435880f334ed9af72cf) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump js-yaml from 4.1.1 to 4.2.0 in the security-patch group across 1 directory
+
+- [#458](https://github.com/lsst-sqre/squareone/pull/458) [`c9fcda7`](https://github.com/lsst-sqre/squareone/commit/c9fcda7a3d44346ccd5b550873fbf1901549e58d) Thanks [@jonathansick](https://github.com/jonathansick)! - Add standard OCI image labels to the squareone Docker image.
+
+  The runner stage now sets `org.opencontainers.image.source`, `url`, `title`,
+  `description`, `vendor`, `licenses`, `revision`, and `version`. The `source`
+  label links the GHCR package to its repository (inheriting the repo's
+  visibility/access), and the static fields surface a title, description, and
+  license on the package page. `version` comes from a new `VERSION` build arg and
+  mirrors the image's primary tag: the release version for releases, and the
+  branch-derived tag for PR/branch builds (e.g. `tickets-DM-55226`).
+
+- [#458](https://github.com/lsst-sqre/squareone/pull/458) [`6eba665`](https://github.com/lsst-sqre/squareone/commit/6eba6658ab0cb5a4bdcba668417ab0969bc65fb3) Thanks [@jonathansick](https://github.com/jonathansick)! - Make the app's runtime `version` reflect the container image tag.
+
+  The Dockerfile exposes the `VERSION` build arg as a `SQUAREONE_VERSION` runtime
+  env in the runner stage, and `getAppVersion()` now reports it as `version` —
+  the branch-derived tag for PR/branch builds (e.g. `tickets-DM-55226`), the
+  release version for releases — falling back to the `package.json` version when
+  unset (local `pnpm dev`/`pnpm build`). This flows to the `<head>`
+  `squareone:version` meta tag and the `version` field bound on every server log
+  record, and is reported to Sentry as a `build` context (server, edge, and
+  client). Previously these all showed the stale `package.json` version on branch
+  builds.
+
+- [#460](https://github.com/lsst-sqre/squareone/pull/460) [`043894c`](https://github.com/lsst-sqre/squareone/commit/043894c07ccd08129f97d63ae1b10f7246ac4b2c) Thanks [@jonathansick](https://github.com/jonathansick)! - Classify React hydration errors in the client-side Sentry pipeline so browser-extension DOM noise stops drowning out genuine mismatches.
+
+  A new pure `hydrationClassifier` module recognises React's recoverable hydration errors (codes 418/419/421/422/423/425 and the "Hydration failed" / "didn't match" message patterns) and, given a snapshot of the `<body>`/`<html>` attribute names, conservatively labels each event `extension`, `in-app`, or `unknown` — only calling it `extension` when a known extension marker (Grammarly, Dark Reader, password managers, etc.) is present alongside a hydration error. A `beforeSend` wrapper wired into `instrumentation-client.js` tags every event with `hydration.classification`, attaches the matched markers plus a body-attribute fingerprint as context, and regroups extension noise under a single mutable Sentry issue via a custom fingerprint. The event is always kept (never dropped), and the wrapper is defensive — it returns the event unchanged if `document` is unavailable or any internal error occurs.
+
+- [#458](https://github.com/lsst-sqre/squareone/pull/458) [`67eee1f`](https://github.com/lsst-sqre/squareone/commit/67eee1f0e5678b8559c8f163a30a2b46b58c982d) Thanks [@jonathansick](https://github.com/jonathansick)! - Stamp the git commit SHA into the Docker image as the Sentry `release`.
+
+  The Dockerfile takes a `SOURCE_COMMIT` build arg and exposes it as
+  `SENTRY_RELEASE` in both the installer stage (so the Sentry bundler plugin marks
+  client/server bundles and uploads source maps under the SHA) and the runner
+  stage (so server/edge `Sentry.init` reports it at runtime); it also records the
+  SHA in the `org.opencontainers.image.revision` OCI label. `next.config.js`,
+  `sentry.server.config.js`, and `sentry.edge.config.js` now read
+  `process.env.SENTRY_RELEASE`. Server/edge/client events carry the build's SHA
+  instead of `null`, and the value degrades gracefully to no release when
+  `SENTRY_RELEASE` is unset (e.g. local `pnpm dev`/`pnpm build`).
+
+- [#462](https://github.com/lsst-sqre/squareone/pull/462) [`9d8069f`](https://github.com/lsst-sqre/squareone/commit/9d8069fc1413e17b12dda02dd802389674909376) Thanks [@jonathansick](https://github.com/jonathansick)! - Harden the App Router shell against browser-extension hydration noise and guard it against future SSR/CSR non-determinism.
+
+  `<body>` now carries `suppressHydrationWarning` so attributes injected by browser extensions (Grammarly, password managers, Dark Reader, etc.) onto the `<body>` element no longer trip React's hydration warning — complementing the existing `<html suppressHydrationWarning>`. The suppression covers one level only (the `<body>` element's own attributes), not extension-injected child nodes. A deterministic-render audit of the shared shell chain (`layout` → `Header` / `PreHeader` / `HeaderNav` / `Login` / `UserMenu` → `BroadcastBannerStack` → `FooterRsc` → `PrimaryNavigation`) found it free of genuine SSR/CSR non-determinism — the auth path is guarded by a `hasMounted` two-pass, there is no theme-conditional rendering, and no time/random/locale-dependent output — so no production fixes were required. New shell render-determinism tests render each shell component twice with identical props and assert byte-identical server markup, guarding against future non-deterministic regressions.
+
+- Updated dependencies [[`4a7c56a`](https://github.com/lsst-sqre/squareone/commit/4a7c56a1869677891ec9075314a08eb4d4289a92)]:
+  - @lsst-sqre/repertoire-client@0.3.0
+  - @lsst-sqre/gafaelfawr-client@2.0.0
+  - @lsst-sqre/times-square-client@2.0.0
+
 ## 0.32.0
 
 ### Minor Changes

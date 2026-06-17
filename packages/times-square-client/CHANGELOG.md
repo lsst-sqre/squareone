@@ -1,5 +1,12 @@
 # @lsst-sqre/times-square-client
 
+## 2.0.0
+
+### Patch Changes
+
+- Updated dependencies [[`4a7c56a`](https://github.com/lsst-sqre/squareone/commit/4a7c56a1869677891ec9075314a08eb4d4289a92)]:
+  - @lsst-sqre/repertoire-client@0.3.0
+
 ## 1.0.0
 
 ### Minor Changes
