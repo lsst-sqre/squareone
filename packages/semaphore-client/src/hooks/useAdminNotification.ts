@@ -42,7 +42,11 @@ export function useAdminNotification(
 
   return {
     notification: data,
-    isLoading: isPending,
+    // Guard against the disabled state: when the query is disabled (empty
+    // url or id) it stays `pending` indefinitely, so report `false` rather
+    // than a perpetual loading state. Mirrors `useTokenDetails` in
+    // `@lsst-sqre/gafaelfawr-client`.
+    isLoading: isPending && !!semaphoreUrl && !!id,
     isError,
     error: error ?? null,
     refetch,

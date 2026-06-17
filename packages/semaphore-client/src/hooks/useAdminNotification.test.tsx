@@ -54,6 +54,18 @@ describe('useAdminNotification', () => {
     expect(result.current.isError).toBe(false);
   });
 
+  it('does not report loading when the query is disabled (empty id)', () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+
+    const { result } = renderHook(() => useAdminNotification(url, ''), {
+      wrapper: createWrapper(),
+    });
+
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.notification).toBeUndefined();
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
   it('exposes an error state when the fetch fails', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(
       new Response('Not Found', { status: 404, statusText: 'Not Found' })
