@@ -79,7 +79,7 @@ The container ensures consistent browser testing environments.
 
 Key steps:
 
-1. **Docker Version Validation**: Runs :file:`scripts/validate-docker-versions.js` to ensure Dockerfile version tags match :file:`package.json` versions for Node.js, pnpm, and Turborepo
+1. **Docker Version Validation**: Runs :file:`packages/repo-scripts/src/validate-docker-versions.js` to ensure Dockerfile version tags match :file:`package.json` versions for Node.js, pnpm, and Turborepo
 2. **Biome Format Check**: Verifies code formatting for JavaScript, TypeScript, JSON, and CSS with Biome_
 3. **YAML Format Check**: Verifies YAML file formatting with Prettier_ (Biome doesn't support YAML)
 4. **Biome Lint**: Runs Biome linting for correctness, accessibility, performance, security, and code style
@@ -131,7 +131,7 @@ The CI workflow uses several tools to ensure code quality, consistency, and corr
 Docker version validation
 -------------------------
 
-The :file:`scripts/validate-docker-versions.js` script ensures that all Dockerfile version tags stay synchronized with the versions specified in :file:`package.json`.
+The :file:`packages/repo-scripts/src/validate-docker-versions.js` script ensures that all Dockerfile version tags stay synchronized with the versions specified in :file:`package.json`.
 
 **What it validates:**
 

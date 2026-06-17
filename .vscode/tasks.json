@@ -402,7 +402,7 @@
       "type": "npm",
       "script": "validate-docker",
       "problemMatcher": [],
-      "detail": "Validate Dockerfile versions match package.json (runs: node scripts/validate-docker-versions.js)"
+      "detail": "Validate Dockerfile versions match package.json (runs: node packages/repo-scripts/src/validate-docker-versions.js)"
     }
   ]
 }

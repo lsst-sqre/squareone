@@ -81,7 +81,7 @@ Extras, run only when the change touches the relevant area:
 - Production build: `pnpm build` — CI builds the app; run it when a
   change could affect the Next.js/production build, since it catches
   errors `test`/`type-check` miss.
-- Docker versions: `node scripts/validate-docker-versions.js` — run
+- Docker versions: `node packages/repo-scripts/src/validate-docker-versions.js` — run
   when a `Dockerfile*` changes.
 - Docs: `uv run noxfile.py -s docs` (Sphinx via documenteer) — run
   when `docs/**` changes. For tasks that specifically refine the
