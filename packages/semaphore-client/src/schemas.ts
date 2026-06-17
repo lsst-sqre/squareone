@@ -61,6 +61,19 @@ export const UserNotificationWithUrlSchema = UserNotificationSchema.extend({
   url: z.string(),
 });
 
+/**
+ * Payload for creating a user notification via the admin API.
+ *
+ * Sent to `POST /v1/admin/notifications`. `recipient` and `summary` are
+ * required; `summary` may use inline Markdown only, while the optional `body`
+ * supports full Markdown.
+ */
+export const CreateUserNotificationSchema = z.object({
+  recipient: z.string(),
+  summary: z.string(),
+  body: z.string().optional(),
+});
+
 // Infer types from schemas
 export type FormattedText = z.infer<typeof FormattedTextSchema>;
 export type BroadcastCategory = z.infer<typeof BroadcastCategorySchema>;
@@ -69,4 +82,7 @@ export type BroadcastsResponse = z.infer<typeof BroadcastsResponseSchema>;
 export type UserNotification = z.infer<typeof UserNotificationSchema>;
 export type UserNotificationWithUrl = z.infer<
   typeof UserNotificationWithUrlSchema
+>;
+export type CreateUserNotification = z.infer<
+  typeof CreateUserNotificationSchema
 >;

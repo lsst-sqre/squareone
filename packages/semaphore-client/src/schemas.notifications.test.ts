@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  CreateUserNotificationSchema,
   UserNotificationSchema,
   UserNotificationWithUrlSchema,
 } from './schemas';
@@ -79,5 +80,38 @@ describe('UserNotificationSchema', () => {
     };
 
     expect(() => UserNotificationSchema.parse(payload)).toThrow();
+  });
+});
+
+describe('CreateUserNotificationSchema', () => {
+  it('parses a representative create payload with recipient, summary, and body', () => {
+    const payload = {
+      recipient: 'some-user',
+      summary: 'You are approaching your disk space **quota** limit',
+      body: 'You are using 448GiB of disk out of a quota of 500GiB.',
+    };
+
+    const parsed = CreateUserNotificationSchema.parse(payload);
+    expect(parsed).toEqual(payload);
+  });
+
+  it('parses a payload with only the required recipient and summary fields', () => {
+    const payload = { recipient: 'some-user', summary: 'Heads up' };
+
+    const parsed = CreateUserNotificationSchema.parse(payload);
+    expect(parsed).toEqual(payload);
+    expect(parsed.body).toBeUndefined();
+  });
+
+  it('rejects a payload missing the recipient', () => {
+    expect(() =>
+      CreateUserNotificationSchema.parse({ summary: 'Heads up' })
+    ).toThrow();
+  });
+
+  it('rejects a payload missing the summary', () => {
+    expect(() =>
+      CreateUserNotificationSchema.parse({ recipient: 'some-user' })
+    ).toThrow();
   });
 });

@@ -2,8 +2,10 @@ import { z } from 'zod';
 import {
   type BroadcastsResponse,
   BroadcastsResponseSchema,
+  type CreateUserNotification,
   type UserNotification,
   UserNotificationSchema,
+  type UserNotificationWithUrl,
   UserNotificationWithUrlSchema,
 } from './schemas';
 import type { AdminNotificationFilters, AdminNotificationsPage } from './types';
@@ -247,4 +249,50 @@ export async function fetchAdminNotification(
 
   const data = await response.json();
   return UserNotificationSchema.parse(data);
+}
+
+/**
+ * Create a user notification via the Semaphore admin API.
+ *
+ * POSTs the `{ recipient, summary, body? }` payload with `credentials:
+ * 'include'` and the Gafaelfawr `x-csrf-token` header — the same mutation
+ * pattern used by `@lsst-sqre/gafaelfawr-client`. The CSRF token is sourced by
+ * the caller from Gafaelfawr login info. The endpoint echoes back the created
+ * notification (including its `url`).
+ *
+ * @endpoint POST /v1/admin/notifications
+ *
+ * @param semaphoreUrl - Base URL of the Semaphore service
+ * @param notification - The `{ recipient, summary, body? }` payload to create
+ * @param csrfToken - CSRF token from Gafaelfawr login info
+ * @returns The created notification, including its resource URL
+ * @throws SemaphoreError if the request fails
+ */
+export async function createAdminNotification(
+  semaphoreUrl: string,
+  notification: CreateUserNotification,
+  csrfToken: string
+): Promise<UserNotificationWithUrl> {
+  const baseUrl = normalizeUrl(semaphoreUrl);
+  const url = `${baseUrl}/v1/admin/notifications`;
+
+  const response = await fetch(url, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-csrf-token': csrfToken,
+    },
+    body: JSON.stringify(notification),
+  });
+
+  if (!response.ok) {
+    throw new SemaphoreError(
+      `Semaphore API error: ${response.status} ${response.statusText}`,
+      response.status
+    );
+  }
+
+  const data = await response.json();
+  return UserNotificationWithUrlSchema.parse(data);
 }

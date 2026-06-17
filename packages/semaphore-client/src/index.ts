@@ -3,6 +3,7 @@
 export type { Logger } from './client';
 export {
   clearBroadcastsCache,
+  createAdminNotification,
   fetchAdminNotification,
   fetchAdminNotifications,
   fetchBroadcasts,
@@ -18,6 +19,7 @@ export {
   useAdminNotification,
   useAdminNotifications,
   useBroadcasts,
+  useCreateAdminNotification,
 } from './hooks';
 // Mock data for development
 export {
@@ -32,6 +34,9 @@ export {
   mockAdminNotification,
   mockAdminNotifications,
 } from './mock-notifications';
+// TanStack Query mutations
+export type { CreateAdminNotificationVariables } from './mutation-options';
+export { createAdminNotificationMutationOptions } from './mutation-options';
 export type { BroadcastsQueryConfig } from './query-options';
 // TanStack Query integration
 export {
@@ -44,6 +49,7 @@ export type {
   Broadcast,
   BroadcastCategory,
   BroadcastsResponse,
+  CreateUserNotification,
   FormattedText,
   UserNotification,
   UserNotificationWithUrl,
@@ -52,6 +58,7 @@ export {
   BroadcastCategorySchema,
   BroadcastSchema,
   BroadcastsResponseSchema,
+  CreateUserNotificationSchema,
   FormattedTextSchema,
   UserNotificationSchema,
   UserNotificationWithUrlSchema,
