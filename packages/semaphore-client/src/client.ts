@@ -33,6 +33,17 @@ export class SemaphoreError extends Error {
   }
 }
 
+/**
+ * Normalize a Semaphore base URL by stripping trailing slashes.
+ */
+function normalizeUrl(url: string): string {
+  let normalized = url;
+  while (normalized.endsWith('/')) {
+    normalized = normalized.slice(0, -1);
+  }
+  return normalized;
+}
+
 // Module-level cache for deduplication (applies to both server and client contexts)
 let cachedBroadcasts: BroadcastsResponse | null = null;
 let cacheTimestamp = 0;
@@ -84,11 +95,7 @@ export async function fetchBroadcasts(
   }
 
   // Remove trailing slashes, then append /v1/broadcasts
-  let baseUrl = semaphoreUrl;
-  while (baseUrl.endsWith('/')) {
-    baseUrl = baseUrl.slice(0, -1);
-  }
-  const broadcastsUrl = `${baseUrl}/v1/broadcasts`;
+  const broadcastsUrl = `${normalizeUrl(semaphoreUrl)}/v1/broadcasts`;
 
   const startTime = Date.now();
   log.debug({ requestId, broadcastsUrl }, 'Starting network fetch');
@@ -129,17 +136,6 @@ export function getEmptyBroadcasts(): BroadcastsResponse {
 // =============================================================================
 // Admin notifications
 // =============================================================================
-
-/**
- * Normalize a Semaphore base URL by stripping trailing slashes.
- */
-function normalizeUrl(url: string): string {
-  let normalized = url;
-  while (normalized.endsWith('/')) {
-    normalized = normalized.slice(0, -1);
-  }
-  return normalized;
-}
 
 /**
  * Parse the next-page cursor from an RFC 5988 `Link` header.
