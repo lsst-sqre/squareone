@@ -59,7 +59,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Validate Docker versions
-        run: node scripts/validate-docker-versions.js
+        run: node packages/repo-scripts/src/validate-docker-versions.js
 
       - name: Check formatting with Biome
         run: pnpm run biome:format:check

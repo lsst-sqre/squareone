@@ -8,7 +8,7 @@ description: |
   Dockerfile changes and in CI pipeline. Trigger keywords: Dockerfile, Docker version, Node version,
   pnpm version, turbo version, version mismatch, version sync, Docker update.
 allowed-tools:
-  - Bash(node scripts/validate-docker-versions.js:*)
+  - Bash(node packages/repo-scripts/src/validate-docker-versions.js:*)
   - Bash(pnpm validate-docker:*)
 ---
 
@@ -100,7 +100,9 @@ The validation runs automatically at three integration points:
 ```javascript
 // .lintstagedrc.mjs
 export default {
-  '**/Dockerfile*': ['node scripts/validate-docker-versions.js'],
+  '**/Dockerfile*': [
+    'node packages/repo-scripts/src/validate-docker-versions.js',
+  ],
 };
 ```
 
@@ -112,7 +114,7 @@ export default {
 ```yaml
 # .github/workflows/ci.yaml
 - name: Validate Docker versions
-  run: node scripts/validate-docker-versions.js
+  run: node packages/repo-scripts/src/validate-docker-versions.js
 ```
 
 - **Triggers:** On every push and pull request
@@ -367,7 +369,7 @@ RUN pnpx turbo@2.6.0 prune ...
 
 ### Validation Script
 
-**Location:** `scripts/validate-docker-versions.js`
+**Location:** `packages/repo-scripts/src/validate-docker-versions.js`
 
 **Key functions:**
 - `findDockerfiles(dir)` - Recursively finds all Dockerfiles

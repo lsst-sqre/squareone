@@ -1,0 +1,45 @@
+name: Periodic CI
+
+# Weekly check that no vendored OpenAPI client spec has drifted from its live
+# source. This runs in GitHub Actions (open egress), so it is not subject to the
+# development sandbox's egress firewall. Modeled on lsst-sqre/ook's periodic-ci.
+
+'on':
+  schedule:
+    - cron: '0 12 * * 1' # Mondays at 12:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  openapi-drift:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: pnpm/action-setup@v6
+
+      - name: Set up node
+        uses: actions/setup-node@v6
+        with:
+          cache: 'pnpm'
+          node-version-file: '.nvmrc'
+
+      - name: Install npm packages
+        run: pnpm install --frozen-lockfile
+
+      - name: Check for OpenAPI spec drift
+        run: pnpm run check-openapi-drift
+
+      - name: Report status
+        if: always()
+        uses: ravsamhq/notify-slack-action@v2
+        with:
+          status: ${{ job.status }}
+          notify_when: 'failure'
+          notification_title: 'OpenAPI spec drift check for {repo} failed'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_ALERT_WEBHOOK }}

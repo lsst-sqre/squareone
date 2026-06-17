@@ -345,7 +345,8 @@ function validateDockerfile(dockerfilePath, rootDir) {
  * Main execution
  */
 function main() {
-  const rootDir = path.resolve(__dirname, '..');
+  // Repo root, resolved from this script's home in packages/repo-scripts/src.
+  const rootDir = path.resolve(__dirname, '../../..');
 
   console.log(`${colors.bold}Docker Version Validator${colors.reset}`);
   console.log(`Checking Dockerfiles in: ${rootDir}\n`);

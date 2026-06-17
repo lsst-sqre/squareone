@@ -231,7 +231,7 @@ Skills are modular capabilities that extend Claude's expertise with domain-speci
 
 **Supporting files**:
 
-- None (references validation script at `scripts/validate-docker-versions.js`)
+- None (references validation script at `packages/repo-scripts/src/validate-docker-versions.js`)
 
 #### file-factory
 
