@@ -66,4 +66,18 @@ describe('UserNotificationSchema', () => {
     const parsed = UserNotificationSchema.parse(payload);
     expect(parsed).toEqual(payload);
   });
+
+  it('rejects a non-ISO-8601 created date', () => {
+    const payload = {
+      id: '4561-a7513',
+      created: 'not-a-date',
+      read: null,
+      sender: 'bot-quota-notifier',
+      recipient: 'some-user',
+      summary: 'A summary',
+      body: null,
+    };
+
+    expect(() => UserNotificationSchema.parse(payload)).toThrow();
+  });
 });

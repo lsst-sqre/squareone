@@ -38,13 +38,14 @@ export const BroadcastsResponseSchema = z.array(BroadcastSchema);
  * (`GET /v1/admin/notifications/{id}`). Unlike the user-facing endpoint,
  * the admin endpoints return `summary` and `body` as **raw Markdown**
  * strings (not pre-rendered gfm/html), so admin UIs render Markdown
- * client-side. `created` and `read` are ISO 8601 date-time strings; `read`
- * is null when the recipient has not read the notification.
+ * client-side. `created` and `read` are validated as ISO 8601 date-time
+ * strings (offsets allowed, e.g. `2026-06-12T17:10:32+00:00`); `read` is
+ * null when the recipient has not read the notification.
  */
 export const UserNotificationSchema = z.object({
   id: z.string(),
-  created: z.string(),
-  read: z.string().nullable(),
+  created: z.string().datetime({ offset: true }),
+  read: z.string().datetime({ offset: true }).nullable(),
   sender: z.string(),
   recipient: z.string(),
   summary: z.string(),
