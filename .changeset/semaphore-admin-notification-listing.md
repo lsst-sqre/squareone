@@ -1,0 +1,5 @@
+---
+'squareone': minor
+---
+
+Add the `/admin/notifications` listing page for admin user notifications. Reachable from the new "User notifications" admin sidebar entry (under the inherited `exec:admin` gate), it lists the most recent notifications in a `DataTable` — recipient, sender, created time, and a rendered-Markdown summary — with loading, empty, and error-with-retry states. Recipient, sender, and since/until date-range filters narrow and combine, a "clear all" resets them, and the active filters are captured in the URL query string (via the new `useAdminNotificationFilters` hook) so a filtered view can be bookmarked and reproduced. A caller-owned "Load more" control pages through older notifications with a shown-of-total count, and a "Compose" button links to the compose route. The presentational `NotificationFilters` and `NotificationsTableView` components are driven entirely by props and ship with Storybook stories (loading / loaded / empty / error) that run as interaction tests.

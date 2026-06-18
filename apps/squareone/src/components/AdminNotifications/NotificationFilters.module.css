@@ -1,0 +1,28 @@
+/* NotificationFilters: filter controls for the admin notifications listing */
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sqo-space-md);
+  align-items: end;
+  margin-bottom: var(--sqo-space-md);
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sqo-space-xxs);
+}
+
+.filterLabel {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--rsd-color-gray-500);
+}
+
+/* Responsive layout: full width on mobile */
+@media (max-width: 768px) {
+  .filterGroup {
+    width: 100%;
+  }
+}

@@ -18,6 +18,7 @@ export function getAdminNavigation(
       items: [
         { href: '/admin/sentry', label: 'Sentry' },
         { href: '/admin/service-tokens', label: 'Service tokens' },
+        { href: '/admin/notifications', label: 'User notifications' },
       ],
     },
   ];
