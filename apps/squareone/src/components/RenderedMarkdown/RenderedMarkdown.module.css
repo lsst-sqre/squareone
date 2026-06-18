@@ -1,0 +1,9 @@
+/**
+ * RenderedMarkdown styles
+ */
+
+.root {
+  /* Long URLs in summaries/bodies should wrap rather than overflow their
+   * container (e.g. a table cell). Consumers add their own typographic styles. */
+  overflow-wrap: break-word;
+}

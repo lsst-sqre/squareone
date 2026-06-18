@@ -16,6 +16,7 @@ import type { Scope } from '@lsst-sqre/gafaelfawr-client';
 export const AVAILABLE_SCOPES: Scope[] = [
   { name: 'exec:admin', description: 'Administer the Science Platform' },
   { name: 'admin:token', description: 'Administer user tokens' },
+  { name: 'admin:notifications', description: 'Send user notifications' },
   { name: 'read:tap', description: 'Query TAP services' },
   { name: 'exec:notebook', description: 'Run notebooks in Nublado' },
   { name: 'read:image', description: 'Read images from the archive' },
