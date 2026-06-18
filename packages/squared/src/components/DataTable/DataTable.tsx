@@ -13,9 +13,17 @@ import React from 'react';
 import { Button } from '../Button';
 import styles from './DataTable.module.css';
 
-export type DataTableProps<TData, TValue = unknown> = {
-  /** Column definitions, as TanStack Table `ColumnDef`s. */
-  columns: ColumnDef<TData, TValue>[];
+export type DataTableProps<TData> = {
+  /**
+   * Column definitions, as TanStack Table `ColumnDef`s.
+   *
+   * The value type is `any` per column rather than one shared generic, so a
+   * heterogeneous set of columns — each with its own accessor value type —
+   * can be passed without widening them all to a single type. This is
+   * TanStack's idiomatic signature for table wrapper components.
+   */
+  // biome-ignore lint/suspicious/noExplicitAny: per-column value types; TanStack's idiomatic wrapper signature
+  columns: ColumnDef<TData, any>[];
   /**
    * The currently-loaded rows.
    *
@@ -111,7 +119,7 @@ function SortIndicator({ direction }: { direction: SortDirection }) {
  * />
  * ```
  */
-export function DataTable<TData, TValue = unknown>({
+export function DataTable<TData>({
   columns,
   data,
   initialSorting = [],
@@ -123,7 +131,7 @@ export function DataTable<TData, TValue = unknown>({
   caption,
   'aria-label': ariaLabel,
   className,
-}: DataTableProps<TData, TValue>) {
+}: DataTableProps<TData>) {
   const [sorting, setSorting] = React.useState<SortingState>(initialSorting);
 
   const table = useReactTable({
