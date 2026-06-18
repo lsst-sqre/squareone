@@ -49,6 +49,14 @@ module.exports = (phase) => {
           source: '/semaphore/v1/broadcasts',
           destination: '/api/dev/semaphore/v1/broadcasts',
         },
+        {
+          source: '/semaphore/v1/admin/notifications',
+          destination: '/api/dev/semaphore/v1/admin/notifications',
+        },
+        {
+          source: '/semaphore/v1/admin/notifications/:id',
+          destination: '/api/dev/semaphore/v1/admin/notifications/:id',
+        },
         // Mock Times Square (this is never triggered by a production ingress)
         {
           source: '/times-square/api/v1/pages',

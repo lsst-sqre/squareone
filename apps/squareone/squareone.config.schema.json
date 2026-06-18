@@ -39,7 +39,8 @@
     "semaphoreUrl": {
       "type": "string",
       "title": "Semaphore URL",
-      "description": "URL prefix of the Semaphore API service for obtaining notifications and broadcasts. Does not end in /. Omit or set as null to disable Semaphore features."
+      "description": "Deprecated: use Repertoire service discovery instead. The Semaphore URL is now resolved via repertoireUrl, so this field is no longer read by the app. It is retained only for backwards compatibility so existing Phalanx configurations that still set it continue to validate. Does not end in /.",
+      "deprecated": true
     },
     "repertoireUrl": {
       "type": "string",

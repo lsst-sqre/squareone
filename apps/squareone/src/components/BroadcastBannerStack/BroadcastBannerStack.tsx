@@ -1,14 +1,11 @@
 'use client';
 
-import { useServiceDiscovery } from '@lsst-sqre/repertoire-client';
 import { useBroadcasts } from '@lsst-sqre/semaphore-client';
-import { useRepertoireUrl } from '@/hooks/useRepertoireUrl';
+import { useSemaphoreUrl } from '@/hooks/useSemaphoreUrl';
 import BroadcastBanner from './BroadcastBanner';
 
 export default function BroadcastBannerStack() {
-  const repertoireUrl = useRepertoireUrl();
-  const { query: discoveryQuery } = useServiceDiscovery(repertoireUrl ?? '');
-  const semaphoreUrl = discoveryQuery?.getSemaphoreUrl();
+  const semaphoreUrl = useSemaphoreUrl();
 
   const { broadcasts, isPending, isError } = useBroadcasts(semaphoreUrl ?? '');
 

@@ -18,7 +18,6 @@ const defaultConfig: AppConfigContextValue = {
   timesSquareUrl: null,
   environmentName: 'storybook',
   sentryDsn: null,
-  semaphoreUrl: null,
   plausibleDomain: null,
   mdxDir: '/mock/mdx',
 };

@@ -21,6 +21,7 @@ let DEV_STATE: DevState = {
   scopes: [
     'exec:admin',
     'admin:token',
+    'admin:notifications',
     'read:tap',
     'exec:notebook',
     'read:image',

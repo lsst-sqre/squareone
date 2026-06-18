@@ -9,10 +9,16 @@ import type { DevState } from '../../lib/mocks/devstate';
 
 import styles from './DevAuthPanel.module.css';
 
-// Persona scope presets. Admin = User plus the two admin scopes, matching the
-// boot default in `src/lib/mocks/devstate.ts`.
+// Persona scope presets. Admin = User plus the admin scopes (exec:admin,
+// admin:token, admin:notifications), matching the boot default in
+// `src/lib/mocks/devstate.ts`.
 const USER_SCOPES = ['read:tap', 'exec:notebook', 'read:image'];
-const ADMIN_SCOPES = ['exec:admin', 'admin:token', ...USER_SCOPES];
+const ADMIN_SCOPES = [
+  'exec:admin',
+  'admin:token',
+  'admin:notifications',
+  ...USER_SCOPES,
+];
 
 type Persona = {
   id: string;
