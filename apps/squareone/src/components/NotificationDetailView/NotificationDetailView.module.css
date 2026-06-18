@@ -1,0 +1,135 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.backLink {
+  margin: 0 0 var(--sqo-space-md-fixed);
+}
+
+.backLink a {
+  color: var(--rsd-component-text-link-color);
+  text-decoration: none;
+}
+
+.backLink a:hover {
+  text-decoration: underline;
+}
+
+.metadataCard {
+  background-color: var(--sqo-doc-card-background-color);
+  border: 1px solid var(--rsd-color-primary-600);
+  border-radius: var(--sqo-border-radius-2);
+  padding: var(--sqo-space-md-fixed);
+  margin-bottom: var(--sqo-space-lg-fixed);
+  box-shadow: var(--sqo-elevation-sm);
+}
+
+.metadataHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--sqo-space-md-fixed);
+  margin-bottom: var(--sqo-space-md-fixed);
+}
+
+.summary {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+/* The rendered summary is inline Markdown; collapse the wrapping paragraph
+ * margins so it reads as a heading. */
+.summary :global(p) {
+  margin: 0;
+}
+
+.metadataGrid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sqo-space-sm-fixed);
+  margin: 0;
+}
+
+.metadataRow {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: var(--sqo-space-md-fixed);
+  align-items: start;
+}
+
+.metadataLabel {
+  font-weight: 500;
+  color: var(--rsd-color-gray-500);
+  margin: 0;
+}
+
+.metadataValue {
+  margin: 0;
+  word-break: break-word;
+}
+
+.muted {
+  color: var(--rsd-color-gray-500);
+}
+
+.id {
+  font-family: monospace;
+  font-size: 0.875rem;
+  background-color: var(--rsd-color-gray-100);
+  color: var(--rsd-color-gray-900);
+  padding: 0.125rem 0.25rem;
+  border-radius: var(--sqo-border-radius-1);
+}
+
+.bodySection {
+  margin-top: var(--sqo-space-lg-fixed);
+}
+
+.bodyHeading {
+  margin-bottom: var(--sqo-space-md-fixed);
+  font-size: 1.25rem;
+}
+
+.noBody {
+  color: var(--rsd-color-gray-500);
+  font-style: italic;
+}
+
+.loadingState {
+  color: var(--rsd-color-gray-500);
+}
+
+.errorState {
+  padding: var(--sqo-space-md-fixed);
+  background-color: var(--rsd-color-red-100);
+  border: 1px solid var(--rsd-color-red-500);
+  border-radius: var(--sqo-border-radius-2);
+  color: var(--rsd-color-red-900);
+}
+
+.errorState h2 {
+  margin-top: 0;
+  color: var(--rsd-color-red-900);
+}
+
+.errorState a {
+  color: var(--rsd-color-red-900);
+}
+
+/* Mobile layout */
+@media (max-width: 768px) {
+  .metadataHeader {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .metadataRow {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+
+  .metadataLabel {
+    font-size: 0.875rem;
+  }
+}
