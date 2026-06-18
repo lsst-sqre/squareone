@@ -12,3 +12,35 @@ onlyBuiltDependencies:
   - msw
   - sharp
   - turbo
+
+# Overrides pin vulnerable transitive dependencies up to their patched
+# versions to resolve Dependabot security alerts. Range selectors target
+# only the vulnerable major lines so other resolutions are left untouched.
+overrides:
+  '@babel/core': '^7.29.6'
+  '@opentelemetry/core': '^2.8.0'
+  basic-ftp: '^5.2.2'
+  'esbuild@>=0.27.3 <0.28.1': '0.28.1'
+  fast-uri: '^3.1.2'
+  flatted: '^3.4.2'
+  'glob@>=10.2.0 <10.5.0': '10.5.0'
+  handlebars: '^4.7.9'
+  immutable: '^5.1.5'
+  ip-address: '^10.1.1'
+  'js-yaml@>=4.0.0 <4.2.0': '4.2.0'
+  lodash: '^4.18.1'
+  lodash-es: '^4.18.1'
+  'mdast-util-to-hast@>=13.0.0 <13.2.1': '13.2.1'
+  'minimatch@<3.1.3': '3.1.5'
+  'minimatch@>=5.0.0 <5.1.8': '5.1.8'
+  'minimatch@>=9.0.0 <9.0.7': '9.0.7'
+  'minimatch@>=10.0.0 <10.2.3': '10.2.5'
+  'picomatch@<2.3.2': '2.3.2'
+  'picomatch@>=4.0.0 <4.0.4': '4.0.4'
+  'postcss@<8.5.10': '8.5.15'
+  'rollup@>=4.0.0 <4.59.0': '4.62.0'
+  tmp: '^0.2.6'
+  vite: '^7.3.5'
+  webpack: '^5.104.1'
+  'ws@>=8.0.0 <8.21.0': '8.21.0'
+  'yaml@<1.10.3': '1.10.3'
