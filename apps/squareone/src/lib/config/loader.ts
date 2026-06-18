@@ -43,6 +43,12 @@ export interface SentryConfig {
 export interface AppConfig {
   siteName: string;
   baseUrl: string;
+  /**
+   * @deprecated Use Repertoire service discovery instead (the `useSemaphoreUrl`
+   * hook resolves the Semaphore URL via `repertoireUrl`). Retained only so
+   * Phalanx-delivered configs that still set `semaphoreUrl` validate under the
+   * schema's `additionalProperties: false`; no app code reads it.
+   */
   semaphoreUrl?: string;
   repertoireUrl?: string;
   plausibleDomain?: string;
