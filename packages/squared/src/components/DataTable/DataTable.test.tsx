@@ -26,6 +26,43 @@ describe('DataTable', () => {
     expect(container.querySelector('table')).toBeInTheDocument();
   });
 
+  it('applies aria-label to the table when no caption is provided', () => {
+    const { container } = render(
+      <DataTable
+        columns={columns}
+        data={data}
+        aria-label="Recent notifications"
+      />
+    );
+
+    expect(container.querySelector('table')?.getAttribute('aria-label')).toBe(
+      'Recent notifications'
+    );
+  });
+
+  it('renders a visible caption', () => {
+    render(
+      <DataTable columns={columns} data={data} caption="Recent notifications" />
+    );
+
+    expect(screen.getByText('Recent notifications').tagName).toBe('CAPTION');
+  });
+
+  it('drops aria-label when a caption is present', () => {
+    const { container } = render(
+      <DataTable
+        columns={columns}
+        data={data}
+        caption="Recent notifications"
+        aria-label="Recent notifications"
+      />
+    );
+
+    expect(container.querySelector('table')?.hasAttribute('aria-label')).toBe(
+      false
+    );
+  });
+
   it('renders a column header for each column def', () => {
     render(<DataTable columns={columns} data={data} />);
 

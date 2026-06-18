@@ -49,7 +49,11 @@ export type DataTableProps<TData, TValue = unknown> = {
   emptyContent?: React.ReactNode;
   /** Optional visible caption describing the table. */
   caption?: React.ReactNode;
-  /** Accessible label for the table, used when there is no visible caption. */
+  /**
+   * Accessible label for the table. Used only when there is no visible
+   * `caption`; if a `caption` is provided it takes precedence and this is
+   * ignored.
+   */
   'aria-label'?: string;
   /** Additional class name applied to the wrapper element. */
   className?: string;
@@ -140,7 +144,10 @@ export function DataTable<TData, TValue = unknown>({
 
   return (
     <div className={wrapperClassName}>
-      <table className={styles.table} aria-label={ariaLabel}>
+      <table
+        className={styles.table}
+        aria-label={caption ? undefined : ariaLabel}
+      >
         {caption ? (
           <caption className={styles.caption}>{caption}</caption>
         ) : null}
