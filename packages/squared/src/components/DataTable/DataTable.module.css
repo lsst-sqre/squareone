@@ -1,0 +1,106 @@
+/* DataTable styles */
+
+.wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--rsd-component-text-color);
+}
+
+.caption {
+  caption-side: top;
+  text-align: left;
+  padding: 0 0 var(--sqo-space-xs) 0;
+  color: var(--rsd-color-gray-500);
+  font-size: 0.875rem;
+}
+
+.head {
+  border-bottom: 2px solid var(--rsd-color-gray-200);
+}
+
+.headerCell {
+  /* Reset default centered, bold th rendering */
+  text-align: left;
+  font-weight: 600;
+  color: var(--rsd-color-gray-700);
+  white-space: nowrap;
+  padding: 0;
+  vertical-align: bottom;
+}
+
+/* Non-sortable headers don't get a button, so pad the cell directly. */
+.headerCell:not(:has(.sortButton)) {
+  padding: var(--sqo-space-xs) var(--sqo-space-sm);
+}
+
+.sortButton {
+  /* A full-bleed button so the whole header cell is the click target. */
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sqo-space-xxs);
+  width: 100%;
+  padding: var(--sqo-space-xs) var(--sqo-space-sm);
+  border: none;
+  background: none;
+  font: inherit;
+  font-weight: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  border-radius: var(--sqo-border-radius-1);
+  transition: var(--sqo-transition-basic);
+}
+
+.sortButton:hover {
+  background: var(--rsd-color-gray-50);
+  color: var(--rsd-color-primary-700);
+}
+
+.sortButton:focus-visible {
+  outline: 2px solid var(--rsd-color-primary-600);
+  outline-offset: -2px;
+}
+
+.headerLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sortIcon {
+  flex-shrink: 0;
+  color: var(--rsd-color-primary-600);
+}
+
+/* Inactive (sortable but not currently sorted) indicator is muted. */
+.sortIconInactive {
+  color: var(--rsd-color-gray-300);
+}
+
+.row {
+  border-bottom: 1px solid var(--rsd-color-gray-100);
+}
+
+.cell {
+  padding: var(--sqo-space-xs) var(--sqo-space-sm);
+  text-align: left;
+  vertical-align: top;
+}
+
+.emptyCell {
+  padding: var(--sqo-space-lg) var(--sqo-space-sm);
+  text-align: center;
+  color: var(--rsd-color-gray-500);
+}
+
+.footer {
+  display: flex;
+  justify-content: center;
+  padding: var(--sqo-space-md) 0 0 0;
+}

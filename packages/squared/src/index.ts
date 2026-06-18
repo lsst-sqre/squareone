@@ -23,6 +23,8 @@ export type { CheckboxGroupProps } from './components/CheckboxGroup';
 export { CheckboxGroup } from './components/CheckboxGroup';
 export type { ClipboardButtonProps } from './components/ClipboardButton';
 export { default as ClipboardButton } from './components/ClipboardButton';
+export type { DataTableProps } from './components/DataTable';
+export { DataTable } from './components/DataTable';
 export type {
   DateTimePickerProps,
   TimeInputProps,
