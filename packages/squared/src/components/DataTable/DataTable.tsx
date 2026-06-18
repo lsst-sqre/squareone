@@ -19,10 +19,11 @@ export type DataTableProps<TData, TValue = unknown> = {
   /**
    * The currently-loaded rows.
    *
-   * Rows are expected in the server's order — for the admin notifications
-   * API that is most-recent-first (created-desc). Client-side sorting
-   * (below) reorders only these loaded rows, **not** the full server-side
-   * result set. See the caveat in the component description.
+   * Rows are expected in the server's order — for example an API that
+   * returns most-recent-first (created-desc), as the admin notifications
+   * UI does. Client-side sorting (below) reorders only these loaded rows,
+   * **not** the full server-side result set. See the caveat in the
+   * component description.
    */
   data: TData[];
   /** Sort state applied on first render. Defaults to unsorted (server order). */
@@ -90,14 +91,14 @@ function SortIndicator({ direction }: { direction: SortDirection }) {
  *
  * ## Sorting + cursor pagination caveat
  *
- * Rows arrive in the server's order (created-desc for the admin
- * notifications API). Clicking a sortable column header sorts only the
- * **currently-loaded** rows on the client — it does not re-query the
+ * Rows arrive in the server's order (for example created-desc, as in the
+ * admin notifications UI). Clicking a sortable column header sorts only
+ * the **currently-loaded** rows on the client — it does not re-query the
  * server, so it does not produce a globally-sorted result across pages
  * that have not been loaded. "Load more" appends the next cursor page (in
  * server order) and the active client sort is then re-applied to the
- * larger loaded set. This is acceptable for an admin triage view; it is
- * intentionally not a global sort.
+ * larger loaded set. This is acceptable for use cases like an admin triage
+ * view; it is intentionally not a global sort.
  *
  * @example
  * ```tsx

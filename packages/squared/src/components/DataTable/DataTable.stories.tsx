@@ -51,7 +51,8 @@ const meta: Meta<typeof DataTable> = {
       description: {
         component:
           'A generic, TanStack-Table-backed table. **Sorting caveat:** rows ' +
-          'arrive in the server order (created-desc for admin notifications). ' +
+          'arrive in the server order (for example created-desc, as in the ' +
+          'admin notifications UI). ' +
           'Clicking a sortable header sorts only the currently-loaded rows on ' +
           'the client — it does not re-query the server, so it is not a global ' +
           'sort across unloaded pages. "Load more" is a caller-owned slot: the ' +
