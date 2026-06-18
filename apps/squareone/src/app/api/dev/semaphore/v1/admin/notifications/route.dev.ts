@@ -20,11 +20,11 @@ import {
 } from '@lsst-sqre/semaphore-client';
 import { NextResponse } from 'next/server';
 
-import { getDevState } from '../../../../../../../lib/mocks/devstate';
+import { getDevState } from '@/lib/mocks/devstate';
 import {
   addDevNotification,
   getDevNotifications,
-} from '../../../../../../../lib/mocks/notificationsStore';
+} from '@/lib/mocks/notificationsStore';
 
 // Default page size so "Load more" is demonstrable against the 8 seeded
 // fixtures.

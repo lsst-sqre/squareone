@@ -13,7 +13,7 @@
 
 import { NextResponse } from 'next/server';
 
-import { getDevNotificationById } from '../../../../../../../../lib/mocks/notificationsStore';
+import { getDevNotificationById } from '@/lib/mocks/notificationsStore';
 
 export async function GET(
   _request: Request,

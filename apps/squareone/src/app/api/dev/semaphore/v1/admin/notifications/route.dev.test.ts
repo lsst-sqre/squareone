@@ -4,7 +4,7 @@ import {
 } from '@lsst-sqre/semaphore-client';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { resetDevNotifications } from '../../../../../../../lib/mocks/notificationsStore';
+import { resetDevNotifications } from '@/lib/mocks/notificationsStore';
 
 import { GET, POST } from './route.dev';
 
