@@ -18,7 +18,6 @@ const baseConfig: AppConfigContextValue = {
   coManageRegistryUrl: null,
   timesSquareUrl: null,
   environmentName: 'idfprod',
-  semaphoreUrl: null,
   plausibleDomain: null,
   mdxDir: '/mock/mdx',
 };
