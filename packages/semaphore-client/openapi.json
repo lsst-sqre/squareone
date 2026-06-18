@@ -1,9 +1,9 @@
 {
-  "openapi": "3.0.2",
+  "openapi": "3.1.0",
   "info": {
     "title": "Semaphore",
     "description": "Semaphore is the user message and notification system for the Rubin Science Platform.\n\nYou can find Semaphore's user and developer documentation at [https://semaphore.lsst.io](https://semaphore.lsst.io). Semaphore is developed at [https://github.com/lsst-sqre/semaphore](https://github.com/lsst-sqre/semaphore)",
-    "version": "0.5.0"
+    "version": "0.1.dev1+g482752235"
   },
   "paths": {
     "/": {
@@ -68,12 +68,339 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "title": "Response Get Broadcasts Semaphore V1 Broadcasts Get",
-                  "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/BroadcastMessageModel"
-                  }
+                  },
+                  "type": "array",
+                  "title": "Response Get Broadcasts Semaphore V1 Broadcasts Get"
                 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/semaphore/v1/admin/notifications": {
+      "post": {
+        "tags": ["admin", "notifications"],
+        "summary": "Create admin notification",
+        "description": "Send an admin notification to a user.",
+        "operationId": "admin_create_notification_semaphore_v1_admin_notifications_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserNotification"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserNotificationWithUrl"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["admin", "notifications"],
+        "summary": "List admin notifications",
+        "description": "List all current admin notifications.",
+        "operationId": "admin_list_notifications_semaphore_v1_admin_notifications_get",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^p?[0-9]+_[0-9]+$" },
+                { "type": "null" }
+              ],
+              "title": "Cursor",
+              "description": "Pagination cursor",
+              "examples": ["1614985055_4234"]
+            },
+            "description": "Pagination cursor"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "integer", "minimum": 1 },
+                { "type": "null" }
+              ],
+              "title": "Row limit",
+              "description": "Maximum number of notifications to return.",
+              "examples": [500]
+            },
+            "description": "Maximum number of notifications to return."
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "$ref": "#/components/schemas/UtcDatetime" },
+                { "type": "null" }
+              ],
+              "title": "Not before",
+              "description": "Only show entries at or after this time.",
+              "examples": ["2021-03-05T14:59:52Z"]
+            },
+            "description": "Only show entries at or after this time."
+          },
+          {
+            "name": "until",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "$ref": "#/components/schemas/UtcDatetime" },
+                { "type": "null" }
+              ],
+              "title": "Not after",
+              "description": "Only show entries before or at this time.",
+              "examples": ["2021-03-05T14:59:52Z"]
+            },
+            "description": "Only show entries before or at this time."
+          },
+          {
+            "name": "recipient",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "title": "Recipient",
+              "description": "Limit notifications to this recipient.",
+              "examples": ["username"]
+            },
+            "description": "Limit notifications to this recipient."
+          },
+          {
+            "name": "sender",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "title": "Sender",
+              "description": "Limit notifications to this sender.",
+              "examples": ["bot-quota"]
+            },
+            "description": "Limit notifications to this sender."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserNotificationWithUrl"
+                  },
+                  "title": "Response Admin List Notifications Semaphore V1 Admin Notifications Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/semaphore/v1/admin/notifications/{id}": {
+      "get": {
+        "tags": ["admin", "notifications"],
+        "summary": "Get admin notification",
+        "description": "Retrieve a specific admin notification.",
+        "operationId": "admin_get_notification_semaphore_v1_admin_notifications__id__get",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Id" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserNotification" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/semaphore/v1/notifications": {
+      "get": {
+        "tags": ["notifications"],
+        "summary": "List notifications",
+        "description": "List all current notifications for the authenticated user.",
+        "operationId": "list_notifications_semaphore_v1_notifications_get",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^p?[0-9]+_[0-9]+$" },
+                { "type": "null" }
+              ],
+              "title": "Cursor",
+              "description": "Pagination cursor",
+              "examples": ["1614985055_4234"]
+            },
+            "description": "Pagination cursor"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "integer", "minimum": 1 },
+                { "type": "null" }
+              ],
+              "title": "Row limit",
+              "description": "Maximum number of notifications to return.",
+              "examples": [500]
+            },
+            "description": "Maximum number of notifications to return."
+          },
+          {
+            "name": "unread",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "title": "Only unread",
+              "description": "Only show unread notifications.",
+              "default": false
+            },
+            "description": "Only show unread notifications."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserNotificationSummary"
+                  },
+                  "title": "Response List Notifications Semaphore V1 Notifications Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/semaphore/v1/notifications/{id}": {
+      "get": {
+        "tags": ["notifications"],
+        "summary": "Get admin notification",
+        "description": "Retrieve a specific admin notification.",
+        "operationId": "get_notification_semaphore_v1_notifications__id__get",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Id" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserNotificationFormatted"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/semaphore/v1/notifications/read": {
+      "post": {
+        "tags": ["notifications"],
+        "summary": "Mark notifications read",
+        "description": "Mark a list of notifications read. Notifications that do not exist or that are already marked as read are silently ignored. Returning errors for nonexistent notifications is not useful since there may be race conditions with services revoking notifications.",
+        "operationId": "post_notification_read_semaphore_v1_notifications_read_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UserNotificationRead" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": { "description": "Successful Response" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
               }
             }
           }
@@ -84,116 +411,451 @@
   "components": {
     "schemas": {
       "BroadcastCategory": {
-        "title": "BroadcastCategory",
-        "enum": ["outage", "info", "notice"],
         "type": "string",
+        "enum": ["outage", "info", "notice"],
+        "title": "BroadcastCategory",
         "description": "Broadcast message categories."
       },
       "BroadcastMessageModel": {
-        "title": "BroadcastMessageModel",
-        "required": ["id", "summary", "active", "enabled", "stale", "category"],
-        "type": "object",
         "properties": {
-          "id": { "title": "The message's identifier", "type": "string" },
+          "id": { "type": "string", "title": "The message's identifier" },
           "summary": {
-            "title": "The message summary",
-            "allOf": [{ "$ref": "#/components/schemas/FormattedText" }]
+            "$ref": "#/components/schemas/semaphore__handlers__v1__models__FormattedText",
+            "title": "The message summary"
           },
           "body": {
-            "title": "The body content (optional).",
-            "allOf": [{ "$ref": "#/components/schemas/FormattedText" }]
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/semaphore__handlers__v1__models__FormattedText"
+              },
+              { "type": "null" }
+            ],
+            "title": "The body content (optional)."
           },
           "active": {
-            "title": "Whether the message should be displayed",
             "type": "boolean",
+            "title": "Whether the message should be displayed",
             "description": "True if the message should be broadcast based on its schedule and being enabled."
           },
           "enabled": {
-            "title": "Toggle for whether the message is enabled",
             "type": "boolean",
+            "title": "Toggle for whether the message is enabled",
             "description": "When false, the message isn't shown even if it is scheduled"
           },
           "stale": {
-            "title": "Flag indicated the message is stable",
             "type": "boolean",
+            "title": "Flag indicated the message is stable",
             "description": "True if the message has no future scheduled broadcast events."
           },
           "category": {
-            "title": "Category of the message.",
-            "allOf": [{ "$ref": "#/components/schemas/BroadcastCategory" }]
+            "$ref": "#/components/schemas/BroadcastCategory",
+            "title": "Category of the message."
           }
         },
+        "type": "object",
+        "required": [
+          "id",
+          "summary",
+          "body",
+          "active",
+          "enabled",
+          "stale",
+          "category"
+        ],
+        "title": "BroadcastMessageModel",
         "description": "A broadcast message."
       },
-      "FormattedText": {
-        "title": "FormattedText",
-        "required": ["gfm", "html"],
-        "type": "object",
+      "CreateUserNotification": {
         "properties": {
-          "gfm": {
-            "title": "The GitHub-flavored Markdown-formatted text.",
-            "type": "string"
+          "recipient": {
+            "type": "string",
+            "title": "Recipient",
+            "description": "Username to whom to send the notification.",
+            "examples": ["some-user"]
           },
-          "html": { "title": "The HTML-formatted text.", "type": "string" }
+          "summary": {
+            "type": "string",
+            "title": "Summary",
+            "description": "Short summary in Markdown format. This will be shown in the message list. This may only use inline formatting.",
+            "examples": ["You are approaching your disk space quota limit"]
+          },
+          "body": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Message body",
+            "description": "Optional message body. This can use full Markdown formatting including lists and headings.",
+            "examples": [
+              "You are using 448GiB of disk out of a quota of 500GiB."
+            ]
+          }
         },
-        "description": "Text that is formatted in both markdown and HTML."
+        "type": "object",
+        "required": ["recipient", "summary"],
+        "title": "CreateUserNotification",
+        "description": "Input for creating a new user notification."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": { "$ref": "#/components/schemas/ValidationError" },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
       },
       "Index": {
-        "title": "Index",
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata",
+            "title": "Package metadata"
+          },
+          "github_app_id": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Github App Id"
+          },
+          "github_app_enabled": {
+            "type": "boolean",
+            "title": "Github App Enabled"
+          },
+          "api_docs_path": { "type": "string", "title": "Api Docs Path" },
+          "openapi_path": { "type": "string", "title": "Openapi Path" }
+        },
+        "type": "object",
         "required": [
           "metadata",
+          "github_app_id",
           "github_app_enabled",
           "api_docs_path",
           "openapi_path"
         ],
-        "type": "object",
-        "properties": {
-          "metadata": {
-            "title": "Package metadata",
-            "allOf": [{ "$ref": "#/components/schemas/Metadata" }]
-          },
-          "github_app_id": { "title": "Github App Id", "type": "string" },
-          "github_app_enabled": {
-            "title": "Github App Enabled",
-            "type": "boolean"
-          },
-          "api_docs_path": { "title": "Api Docs Path", "type": "string" },
-          "openapi_path": { "title": "Openapi Path", "type": "string" }
-        },
+        "title": "Index",
         "description": "The application's root response, including metadata and information\nabout the APIs."
       },
       "Metadata": {
-        "title": "Metadata",
-        "required": ["name", "version"],
-        "type": "object",
         "properties": {
           "name": {
-            "title": "Application name",
             "type": "string",
-            "example": "myapp"
+            "title": "Application name",
+            "examples": ["myapp"]
           },
           "version": {
-            "title": "Version",
             "type": "string",
-            "example": "1.0.0"
+            "title": "Version",
+            "examples": ["1.0.0"]
           },
           "description": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Description",
-            "type": "string",
-            "example": "string"
+            "examples": ["Some package description"]
           },
           "repository_url": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Repository URL",
-            "type": "string",
-            "example": "https://example.com/"
+            "examples": ["https://example.com/"]
           },
           "documentation_url": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Documentation URL",
-            "type": "string",
-            "example": "https://example.com/"
+            "examples": ["https://example.com/"]
           }
         },
+        "type": "object",
+        "required": ["name", "version"],
+        "title": "Metadata",
         "description": "Metadata about a package."
+      },
+      "UserNotification": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Message ID",
+            "description": "Unique message ID for this message. Clients should not make any assumptions about the structure of this ID and should treat it as an opaque string.",
+            "examples": ["4561-a7513"]
+          },
+          "created": {
+            "$ref": "#/components/schemas/UtcDatetime",
+            "title": "Created date",
+            "description": "When the message was sent.",
+            "examples": ["2026-06-12T17:10:32-00:00"]
+          },
+          "read": {
+            "anyOf": [
+              { "$ref": "#/components/schemas/UtcDatetime" },
+              { "type": "null" }
+            ],
+            "title": "Read date",
+            "description": "When the notification was read by its recipient, or null if the notification has not been read.",
+            "examples": ["2026-06-13T14:45:12-00:00"]
+          },
+          "sender": {
+            "type": "string",
+            "title": "Sender",
+            "description": "Username of the agent that sent the notification.",
+            "examples": ["bot-quota-notifier"]
+          },
+          "recipient": {
+            "type": "string",
+            "title": "Recipient",
+            "description": "Username to whom the notiication was sent.",
+            "examples": ["some-user"]
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary",
+            "description": "Short summary in Markdown format.",
+            "examples": ["You are approaching your disk space quota limit"]
+          },
+          "body": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Message body",
+            "description": "Optional body, or null if there is no body.",
+            "examples": [
+              "You are using 448GiB of disk out of a quota of 500GiB."
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "created",
+          "read",
+          "sender",
+          "recipient",
+          "summary",
+          "body"
+        ],
+        "title": "UserNotification",
+        "description": "Model for a created but not formatted user notification."
+      },
+      "UserNotificationFormatted": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Message ID",
+            "description": "Unique message ID for this message. Clients should not make any assumptions about the structure of this ID and should treat it as an opaque string.",
+            "examples": ["4561-a7513"]
+          },
+          "created": {
+            "$ref": "#/components/schemas/UtcDatetime",
+            "title": "Created date",
+            "description": "When the message was sent.",
+            "examples": ["2026-06-12T17:10:32-00:00"]
+          },
+          "read": {
+            "anyOf": [
+              { "$ref": "#/components/schemas/UtcDatetime" },
+              { "type": "null" }
+            ],
+            "title": "Read date",
+            "description": "When the notification was read by its recipient, or null if the notification has not been read.",
+            "examples": ["2026-06-13T14:45:12-00:00"]
+          },
+          "summary": {
+            "$ref": "#/components/schemas/semaphore__models__notification__FormattedText",
+            "title": "Summary",
+            "description": "Will be formatted for inline context."
+          },
+          "body": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/semaphore__models__notification__FormattedText"
+              },
+              { "type": "null" }
+            ],
+            "title": "Message body",
+            "description": "Will be formatted for block context."
+          }
+        },
+        "type": "object",
+        "required": ["id", "created", "read", "summary", "body"],
+        "title": "UserNotificationFormatted",
+        "description": "The full formatted user notification for user-facing UIs."
+      },
+      "UserNotificationRead": {
+        "properties": {
+          "ids": {
+            "items": { "type": "string" },
+            "type": "array",
+            "uniqueItems": true,
+            "title": "Notification IDs",
+            "description": "These notifications will be marked as read at the current time if they are not already marked as read."
+          }
+        },
+        "type": "object",
+        "required": ["ids"],
+        "title": "UserNotificationRead",
+        "description": "Notification IDs to mark as read."
+      },
+      "UserNotificationSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Message ID",
+            "description": "Unique message ID for this message. Clients should not make any assumptions about the structure of this ID and should treat it as an opaque string.",
+            "examples": ["4561-a7513"]
+          },
+          "created": {
+            "$ref": "#/components/schemas/UtcDatetime",
+            "title": "Created date",
+            "description": "When the message was sent.",
+            "examples": ["2026-06-12T17:10:32-00:00"]
+          },
+          "read": {
+            "anyOf": [
+              { "$ref": "#/components/schemas/UtcDatetime" },
+              { "type": "null" }
+            ],
+            "title": "Read date",
+            "description": "When the notification was read by its recipient, or null if the notification has not been read.",
+            "examples": ["2026-06-13T14:45:12-00:00"]
+          },
+          "summary": {
+            "$ref": "#/components/schemas/semaphore__models__notification__FormattedText",
+            "title": "Summary",
+            "description": "Will be formatted for inline context."
+          },
+          "url": {
+            "type": "string",
+            "maxLength": 2083,
+            "minLength": 1,
+            "format": "uri",
+            "title": "URL",
+            "description": "URL to the sent notification.",
+            "examples": [
+              "https://data.example.com/semaphore/v1/admin/notifications/4561-a7513"
+            ]
+          }
+        },
+        "type": "object",
+        "required": ["id", "created", "read", "summary", "url"],
+        "title": "UserNotificationSummary",
+        "description": "User notification with a formatted summary but no body.\n\nReturned in lists of notifications to display to a user. Includes a URL\nfrom which the full notification including the formatted body can be\nreturned."
+      },
+      "UserNotificationWithUrl": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Message ID",
+            "description": "Unique message ID for this message. Clients should not make any assumptions about the structure of this ID and should treat it as an opaque string.",
+            "examples": ["4561-a7513"]
+          },
+          "created": {
+            "$ref": "#/components/schemas/UtcDatetime",
+            "title": "Created date",
+            "description": "When the message was sent.",
+            "examples": ["2026-06-12T17:10:32-00:00"]
+          },
+          "read": {
+            "anyOf": [
+              { "$ref": "#/components/schemas/UtcDatetime" },
+              { "type": "null" }
+            ],
+            "title": "Read date",
+            "description": "When the notification was read by its recipient, or null if the notification has not been read.",
+            "examples": ["2026-06-13T14:45:12-00:00"]
+          },
+          "sender": {
+            "type": "string",
+            "title": "Sender",
+            "description": "Username of the agent that sent the notification.",
+            "examples": ["bot-quota-notifier"]
+          },
+          "recipient": {
+            "type": "string",
+            "title": "Recipient",
+            "description": "Username to whom the notiication was sent.",
+            "examples": ["some-user"]
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary",
+            "description": "Short summary in Markdown format.",
+            "examples": ["You are approaching your disk space quota limit"]
+          },
+          "body": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Message body",
+            "description": "Optional body, or null if there is no body.",
+            "examples": [
+              "You are using 448GiB of disk out of a quota of 500GiB."
+            ]
+          },
+          "url": {
+            "type": "string",
+            "maxLength": 2083,
+            "minLength": 1,
+            "format": "uri",
+            "title": "URL",
+            "description": "URL to the sent notification.",
+            "examples": [
+              "https://data.example.com/semaphore/v1/admin/notifications/4561-a7513"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "created",
+          "read",
+          "sender",
+          "recipient",
+          "summary",
+          "body",
+          "url"
+        ],
+        "title": "UserNotificationWithUrl",
+        "description": "User notification with URL.\n\nReturned in lists of user notifications so that each notification in the\nlist has a URL to retrieve or manipulate the notification."
+      },
+      "UtcDatetime": { "type": "string", "format": "date-time" },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": { "anyOf": [{ "type": "string" }, { "type": "integer" }] },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": { "type": "string", "title": "Message" },
+          "type": { "type": "string", "title": "Error Type" },
+          "input": { "title": "Input" },
+          "ctx": { "type": "object", "title": "Context" }
+        },
+        "type": "object",
+        "required": ["loc", "msg", "type"],
+        "title": "ValidationError"
+      },
+      "semaphore__handlers__v1__models__FormattedText": {
+        "properties": {
+          "gfm": {
+            "type": "string",
+            "title": "The GitHub-flavored Markdown-formatted text."
+          },
+          "html": { "type": "string", "title": "The HTML-formatted text." }
+        },
+        "type": "object",
+        "required": ["gfm", "html"],
+        "title": "FormattedText",
+        "description": "Text that is formatted in both markdown and HTML."
+      },
+      "semaphore__models__notification__FormattedText": {
+        "properties": {
+          "gfm": {
+            "type": "string",
+            "title": "Markdown text",
+            "description": "The GitHub Flavored Markdown-formatted text.",
+            "examples": ["Some *Markdown* text."]
+          },
+          "html": {
+            "type": "string",
+            "title": "HTML text",
+            "description": "The HTML-formatted text.",
+            "examples": ["Some <em>HTML</em> text."]
+          }
+        },
+        "type": "object",
+        "required": ["gfm", "html"],
+        "title": "FormattedText",
+        "description": "Text that is formatted in both Markdown and HTML."
       }
     }
   }
