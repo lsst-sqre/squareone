@@ -219,6 +219,32 @@ describe('createAdminNotification', () => {
     expect(body).not.toHaveProperty('body');
   });
 
+  it('strips stray keys from the payload before sending', async () => {
+    const mockFetch = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({ ...detailPayload, url: listPayload[0].url }),
+        {
+          status: 200,
+        }
+      )
+    );
+
+    await createAdminNotification(
+      'https://example.com/semaphore',
+      {
+        recipient: 'some-user',
+        summary: 'Heads up',
+        // @ts-expect-error - exercising runtime stripping of unknown keys
+        extra: 'should not be sent',
+      },
+      'csrf-token-abc'
+    );
+
+    const body = JSON.parse(mockFetch.mock.calls[0][1]?.body as string);
+    expect(body).toEqual({ recipient: 'some-user', summary: 'Heads up' });
+    expect(body).not.toHaveProperty('extra');
+  });
+
   it('returns the created notification parsed from the response', async () => {
     const created = {
       ...detailPayload,

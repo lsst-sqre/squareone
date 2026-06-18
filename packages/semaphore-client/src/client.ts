@@ -3,6 +3,7 @@ import {
   type BroadcastsResponse,
   BroadcastsResponseSchema,
   type CreateUserNotification,
+  CreateUserNotificationSchema,
   type UserNotification,
   UserNotificationSchema,
   type UserNotificationWithUrl,
@@ -276,6 +277,10 @@ export async function createAdminNotification(
   const baseUrl = normalizeUrl(semaphoreUrl);
   const url = `${baseUrl}/v1/admin/notifications`;
 
+  // Validate and normalize the payload at the boundary: this strips any stray
+  // keys and drops an undefined `body` so it is omitted from the request.
+  const payload = CreateUserNotificationSchema.parse(notification);
+
   const response = await fetch(url, {
     method: 'POST',
     credentials: 'include',
@@ -283,7 +288,7 @@ export async function createAdminNotification(
       'Content-Type': 'application/json',
       'x-csrf-token': csrfToken,
     },
-    body: JSON.stringify(notification),
+    body: JSON.stringify(payload),
   });
 
   if (!response.ok) {

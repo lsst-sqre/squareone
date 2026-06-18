@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useAdminNotifications } from './useAdminNotifications';
@@ -72,6 +72,18 @@ describe('useAdminNotifications', () => {
     expect(result.current.hasMore).toBe(true);
   });
 
+  it('does not report loading and does not fetch when disabled (empty url)', () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+
+    const { result } = renderHook(() => useAdminNotifications(''), {
+      wrapper: createWrapper(),
+    });
+
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.entries).toBeUndefined();
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
   it('reports hasMore false when there is no next cursor', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(
       new Response(JSON.stringify([n1]), { status: 200 })
@@ -116,7 +128,9 @@ describe('useAdminNotifications', () => {
       expect(result.current.entries).toEqual([n1]);
     });
 
-    result.current.loadMore();
+    act(() => {
+      result.current.loadMore();
+    });
 
     await waitFor(() => {
       expect(result.current.entries).toEqual([n1, n2]);

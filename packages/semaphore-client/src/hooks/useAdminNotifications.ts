@@ -75,7 +75,11 @@ export function useAdminNotifications(
 
   return {
     entries,
-    isLoading: isLoading && !!semaphoreUrl,
+    // `isLoading` (isPending && isFetching) is already false when the query is
+    // disabled (empty url), since a disabled query never enters the fetching
+    // state — no extra guard needed here. (Contrast `useAdminNotification`,
+    // which derives loading from `isPending` and must guard it explicitly.)
+    isLoading,
     isFetching,
     isLoadingMore: isFetchingNextPage,
     error: error ?? null,
