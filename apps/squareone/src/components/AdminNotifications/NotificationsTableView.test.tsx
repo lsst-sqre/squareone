@@ -46,6 +46,12 @@ describe('NotificationsTableView', () => {
     // The summary Markdown (`**quota**`) is rendered to a <strong> element.
     const emphasized = screen.getByText('quota');
     expect(emphasized.tagName).toBe('STRONG');
+
+    // The summary now lives in a full-width detail row, not a column, so
+    // there is no "Summary" column header.
+    expect(
+      screen.queryByRole('columnheader', { name: /Summary/ })
+    ).not.toBeInTheDocument();
   });
 
   it('renders an empty state when there are no notifications', () => {

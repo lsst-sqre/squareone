@@ -55,27 +55,18 @@ const columns: DataTableProps<UserNotificationWithUrl>['columns'] = [
     header: 'Created',
     cell: (info) => formatCreated(info.getValue<string>()),
   },
-  {
-    accessorKey: 'summary',
-    header: 'Summary',
-    enableSorting: false,
-    cell: (info) => (
-      <RenderedMarkdown
-        className={styles.summary}
-        markdown={info.getValue<string>()}
-      />
-    ),
-  },
 ];
 
 /**
  * Presentational view of the admin notifications listing.
  *
- * Renders a "Compose" button plus the notifications {@link DataTable}
- * (recipient / sender / created / rendered-Markdown summary), a caller-owned
- * "Load more" control, a shown-of-total count, and the loading, empty, and
- * error-with-retry states. It is fully driven by props so it can be exercised
- * from Storybook with fixtures; data fetching lives in the container.
+ * Renders a "Compose" button plus the notifications {@link DataTable}. Each
+ * notification is a two-row unit: a primary row with the sortable recipient,
+ * sender, and created columns, and a full-width secondary row beneath it
+ * holding the rendered-Markdown summary (no column header). The view also
+ * owns a "Load more" control, a shown-of-total count, and the loading, empty,
+ * and error-with-retry states. It is fully driven by props so it can be
+ * exercised from Storybook with fixtures; data fetching lives in the container.
  */
 export default function NotificationsTableView({
   notifications,
@@ -120,6 +111,9 @@ export default function NotificationsTableView({
           onLoadMore={onLoadMore}
           aria-label="User notifications"
           emptyContent="No notifications match your filters."
+          renderDetailRow={(n) => (
+            <RenderedMarkdown className={styles.summary} markdown={n.summary} />
+          )}
         />
         {shownCount > 0 && (
           <div className={styles.count}>

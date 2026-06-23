@@ -40,7 +40,14 @@
   color: var(--rsd-color-gray-500);
 }
 
-/* Collapse the rendered-Markdown summary so it sits inline within the table
+/* The rendered-Markdown summary now sits in a full-width detail row beneath
+ * its primary row; mute it slightly so the primary recipient/sender/created
+ * row stays the visual anchor. */
+.summary {
+  color: var(--rsd-color-gray-600);
+}
+
+/* Collapse the rendered-Markdown summary so it sits inline within the detail
  * cell rather than introducing paragraph block spacing. */
 .summary :global(p) {
   margin: 0;

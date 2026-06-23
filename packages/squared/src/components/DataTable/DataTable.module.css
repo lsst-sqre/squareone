@@ -87,8 +87,32 @@
   border-bottom: 1px solid var(--rsd-color-gray-100);
 }
 
+/* When a detail row is present, the separator lives on the <tbody> group so
+ * the primary row and its detail row read as a single unit. */
+.rowGroup {
+  border-bottom: 1px solid var(--rsd-color-gray-100);
+}
+
+/* The primary row of a detail-row pair carries no separator of its own; the
+ * .rowGroup draws the divider beneath the pair. */
+.primaryRow {
+  border-bottom: none;
+}
+
 .cell {
   padding: var(--sqo-space-xs) var(--sqo-space-sm);
+  text-align: left;
+  vertical-align: top;
+}
+
+/* The full-width secondary row hugs its primary row: reduced top padding and
+ * no separator of its own (the .rowGroup carries the separator). */
+.detailRow {
+  border-bottom: none;
+}
+
+.detailCell {
+  padding: 0 var(--sqo-space-sm) var(--sqo-space-sm) var(--sqo-space-sm);
   text-align: left;
   vertical-align: top;
 }

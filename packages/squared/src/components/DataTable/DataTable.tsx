@@ -56,6 +56,23 @@ export type DataTableProps<TData> = {
   loadMoreLabel?: string;
   /** Content rendered in the table body when there are no rows. */
   emptyContent?: React.ReactNode;
+  /**
+   * Optionally render a full-width secondary row beneath each primary row.
+   *
+   * When provided, every data item renders as a pair of `<tr>`s inside its
+   * own `<tbody>`: the primary row of column cells, followed by a secondary
+   * row whose single cell spans all columns (`colSpan`) and holds whatever
+   * this returns. The notifications listing uses this to place a rendered
+   * Markdown summary full-width beneath its recipient/sender/created row.
+   *
+   * The detail `colSpan` tracks the leaf column count, so this is
+   * forward-compatible with adding a leading expander column for a future
+   * expand-to-detail interaction: the secondary slot can swap its content on
+   * the row's expanded state without changing this signature's shape.
+   *
+   * When omitted, each item renders as a single `<tr>` (backward compatible).
+   */
+  renderDetailRow?: (row: TData) => React.ReactNode;
   /** Optional visible caption describing the table. */
   caption?: React.ReactNode;
   /**
@@ -131,6 +148,7 @@ export function DataTable<TData>({
   caption,
   'aria-label': ariaLabel,
   className,
+  renderDetailRow,
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = React.useState<SortingState>(initialSorting);
 
@@ -208,15 +226,37 @@ export function DataTable<TData>({
             </tr>
           ))}
         </thead>
-        <tbody>
-          {rows.length === 0 ? (
+        {rows.length === 0 ? (
+          <tbody>
             <tr className={styles.row}>
               <td className={styles.emptyCell} colSpan={columnCount}>
                 {emptyContent}
               </td>
             </tr>
-          ) : (
-            rows.map((row) => (
+          </tbody>
+        ) : renderDetailRow ? (
+          // Each item is its own <tbody> (multiple tbodies are valid HTML)
+          // holding a primary row of cells plus a full-width detail row, so
+          // the pair reads as one unit.
+          rows.map((row) => (
+            <tbody key={row.id} className={styles.rowGroup}>
+              <tr className={styles.primaryRow}>
+                {row.getVisibleCells().map((cell) => (
+                  <td key={cell.id} className={styles.cell}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+              <tr className={styles.detailRow}>
+                <td className={styles.detailCell} colSpan={columnCount}>
+                  {renderDetailRow(row.original)}
+                </td>
+              </tr>
+            </tbody>
+          ))
+        ) : (
+          <tbody>
+            {rows.map((row) => (
               <tr key={row.id} className={styles.row}>
                 {row.getVisibleCells().map((cell) => (
                   <td key={cell.id} className={styles.cell}>
@@ -224,9 +264,9 @@ export function DataTable<TData>({
                   </td>
                 ))}
               </tr>
-            ))
-          )}
-        </tbody>
+            ))}
+          </tbody>
+        )}
       </table>
 
       {showLoadMore ? (
