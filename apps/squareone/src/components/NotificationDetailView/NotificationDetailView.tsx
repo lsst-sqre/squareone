@@ -4,6 +4,7 @@ import type { UserNotification } from '@lsst-sqre/semaphore-client';
 import { Badge } from '@lsst-sqre/squared';
 import Link from 'next/link';
 
+import { formatUtcTimestamp } from '../../lib/utils/dateFormatters';
 import RenderedMarkdown from '../RenderedMarkdown';
 import styles from './NotificationDetailView.module.css';
 
@@ -26,23 +27,6 @@ export type NotificationDetailViewProps = {
   /** Where the "Return to notifications" link points. */
   returnHref?: string;
 };
-
-/**
- * Format an ISO 8601 timestamp as a stable, timezone-independent `YYYY-MM-DD
- * HH:MM UTC` string, matching the listing's Created column.
- */
-function formatTimestamp(iso: string): string {
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) {
-    return iso;
-  }
-  const year = date.getUTCFullYear();
-  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-  const day = String(date.getUTCDate()).padStart(2, '0');
-  const hours = String(date.getUTCHours()).padStart(2, '0');
-  const minutes = String(date.getUTCMinutes()).padStart(2, '0');
-  return `${year}-${month}-${day} ${hours}:${minutes} UTC`;
-}
 
 /**
  * True when the error represents an unknown-id (404) response, whether it is a
@@ -148,7 +132,7 @@ export default function NotificationDetailView({
           <div className={styles.metadataRow}>
             <dt className={styles.metadataLabel}>Created</dt>
             <dd className={styles.metadataValue}>
-              <time dateTime={created}>{formatTimestamp(created)}</time>
+              <time dateTime={created}>{formatUtcTimestamp(created)}</time>
             </dd>
           </div>
 
@@ -156,7 +140,7 @@ export default function NotificationDetailView({
             <dt className={styles.metadataLabel}>Read</dt>
             <dd className={styles.metadataValue}>
               {isRead ? (
-                <time dateTime={read}>{formatTimestamp(read)}</time>
+                <time dateTime={read}>{formatUtcTimestamp(read)}</time>
               ) : (
                 <span className={styles.muted}>&mdash;</span>
               )}

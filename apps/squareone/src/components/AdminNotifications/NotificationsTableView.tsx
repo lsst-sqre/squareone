@@ -3,6 +3,7 @@ import { Button, DataTable, type DataTableProps } from '@lsst-sqre/squared';
 import { PlusCircle } from 'lucide-react';
 import Link from 'next/link';
 
+import { formatUtcTimestamp } from '../../lib/utils/dateFormatters';
 import RenderedMarkdown from '../RenderedMarkdown';
 import styles from './NotificationsTableView.module.css';
 
@@ -30,30 +31,13 @@ export type NotificationsTableViewProps = {
   composeHref?: string;
 };
 
-/**
- * Format an ISO 8601 timestamp as a stable, timezone-independent `YYYY-MM-DD
- * HH:MM UTC` string for the Created column.
- */
-function formatCreated(iso: string): string {
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) {
-    return iso;
-  }
-  const year = date.getUTCFullYear();
-  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-  const day = String(date.getUTCDate()).padStart(2, '0');
-  const hours = String(date.getUTCHours()).padStart(2, '0');
-  const minutes = String(date.getUTCMinutes()).padStart(2, '0');
-  return `${year}-${month}-${day} ${hours}:${minutes} UTC`;
-}
-
 const columns: DataTableProps<UserNotificationWithUrl>['columns'] = [
   { accessorKey: 'recipient', header: 'Recipient' },
   { accessorKey: 'sender', header: 'Sender' },
   {
     accessorKey: 'created',
     header: 'Created',
-    cell: (info) => formatCreated(info.getValue<string>()),
+    cell: (info) => formatUtcTimestamp(info.getValue<string>()),
   },
 ];
 
