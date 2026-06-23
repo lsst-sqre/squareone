@@ -9,9 +9,3 @@ declare module '*.yml' {
   const content: Record<string, any>;
   export default content;
 }
-
-// Declaration for js-yaml
-declare module 'js-yaml' {
-  export function load(str: string, options?: any): any;
-  export function dump(obj: any, options?: any): string;
-}

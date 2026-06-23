@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import yaml from 'js-yaml';
+import { load } from 'js-yaml';
 import { describe, expect, it } from 'vitest';
 
 // Resolve the app-root config files relative to this test (src/lib/config/).
@@ -9,7 +9,7 @@ const appRoot = join(__dirname, '../../../');
 const schema = JSON.parse(
   readFileSync(join(appRoot, 'squareone.config.schema.json'), 'utf8')
 );
-const devConfig = yaml.load(
+const devConfig = load(
   readFileSync(join(appRoot, 'squareone.config.yaml'), 'utf8')
 ) as Record<string, unknown>;
 
