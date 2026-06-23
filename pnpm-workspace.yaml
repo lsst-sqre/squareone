@@ -38,6 +38,11 @@ overrides:
   'picomatch@<2.3.2': '2.3.2'
   'picomatch@>=4.0.0 <4.0.4': '4.0.4'
   'postcss@<8.5.10': '8.5.15'
+  # read-yaml-file@1.x (via the Changesets CLI's @manypkg/get-packages) is the
+  # sole remaining consumer of the vulnerable js-yaml@3.x. 2.1.0 keeps the same
+  # CommonJS default/.sync API @manypkg relies on but parses with js-yaml 4.x
+  # (read-yaml-file@3 is ESM-only and would break @manypkg).
+  'read-yaml-file@<2': '2.1.0'
   'rollup@>=4.0.0 <4.59.0': '4.62.0'
   tmp: '^0.2.6'
   vite: '^7.3.5'
