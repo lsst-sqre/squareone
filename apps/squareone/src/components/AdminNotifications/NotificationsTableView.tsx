@@ -7,8 +7,11 @@ import { formatUtcTimestamp } from '../../lib/utils/dateFormatters';
 import RenderedMarkdown from '../RenderedMarkdown';
 import styles from './NotificationsTableView.module.css';
 
+/** Base path for the admin notifications routes. */
+const NOTIFICATIONS_BASE_HREF = '/admin/notifications';
+
 /** Where the "Compose" button links by default. */
-const DEFAULT_COMPOSE_HREF = '/admin/notifications/new';
+const DEFAULT_COMPOSE_HREF = `${NOTIFICATIONS_BASE_HREF}/new`;
 
 export type NotificationsTableViewProps = {
   /** The currently-loaded notifications (server order, most-recent first). */
@@ -96,7 +99,15 @@ export default function NotificationsTableView({
           aria-label="User notifications"
           emptyContent="No notifications match your filters."
           renderDetailRow={(n) => (
-            <RenderedMarkdown className={styles.summary} markdown={n.summary} />
+            <Link
+              href={`${NOTIFICATIONS_BASE_HREF}/${n.id}`}
+              className={styles.summaryLink}
+            >
+              <RenderedMarkdown
+                className={styles.summary}
+                markdown={n.summary}
+              />
+            </Link>
           )}
         />
         {shownCount > 0 && (

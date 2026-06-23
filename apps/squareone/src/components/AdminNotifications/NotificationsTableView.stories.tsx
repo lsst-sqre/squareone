@@ -45,6 +45,11 @@ export const Loaded: Story = {
     await expect(
       canvas.getByRole('link', { name: /compose/i })
     ).toHaveAttribute('href', '/admin/notifications/new');
+
+    // Each summary links to its per-notification detail page.
+    await expect(
+      canvas.getByRole('link', { name: /disk space quota limit/i })
+    ).toHaveAttribute('href', '/admin/notifications/ntf-001');
   },
 };
 

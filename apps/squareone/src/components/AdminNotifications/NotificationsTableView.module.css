@@ -40,6 +40,19 @@
   color: var(--rsd-color-gray-500);
 }
 
+/* The summary links to the notification's detail page; keep it reading as a
+ * title (inherit color, no underline) with a hover affordance that surfaces
+ * the standard link color. */
+.summaryLink {
+  color: inherit;
+  text-decoration: none;
+}
+
+.summaryLink:hover {
+  color: var(--rsd-component-text-link-color);
+  text-decoration: underline;
+}
+
 /* The rendered-Markdown summary now sits in a full-width detail row beneath
  * its primary row; mute it slightly so the primary recipient/sender/created
  * row stays the visual anchor. */
