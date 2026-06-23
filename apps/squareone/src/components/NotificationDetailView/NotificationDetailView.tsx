@@ -100,7 +100,14 @@ export default function NotificationDetailView({
 
       <div className={styles.metadataCard}>
         <div className={styles.metadataHeader}>
-          <RenderedMarkdown className={styles.summary} markdown={summary} />
+          {/* The summary is the page's primary title, so it carries h1
+           * semantics. RenderedMarkdown emits a block <div>/<p>, which a
+           * literal <h1> may not legally contain, so an ARIA heading is the
+           * only valid way to expose it as the h1. */}
+          {/* biome-ignore lint/a11y/useSemanticElements: an <h1> may not contain the block <div>/<p> RenderedMarkdown emits */}
+          <div className={styles.summary} role="heading" aria-level={1}>
+            <RenderedMarkdown markdown={summary} />
+          </div>
           <Badge
             variant="soft"
             color={isRead ? 'gray' : 'blue'}

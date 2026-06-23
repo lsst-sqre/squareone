@@ -37,6 +37,10 @@ export const Loaded: Story = {
     await expect(canvas.getByText('Unread')).toBeInTheDocument();
     // The summary renders Markdown (the emphasised word is its own element).
     await expect(canvas.getByText('quota')).toBeInTheDocument();
+    // The summary is the page-level (h1) heading.
+    await expect(canvas.getByRole('heading', { level: 1 })).toHaveTextContent(
+      mockAdminNotification.summary.replace(/\*\*/g, '')
+    );
   },
 };
 

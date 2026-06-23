@@ -33,6 +33,15 @@ describe('NotificationDetailView', () => {
     expect(screen.getByText('quota')).toBeInTheDocument();
   });
 
+  it('exposes the summary as the page-level (h1) heading', () => {
+    render(<NotificationDetailView notification={baseNotification} />);
+
+    const heading = screen.getByRole('heading', { level: 1 });
+    expect(heading).toHaveTextContent(
+      'You are approaching your disk space quota limit'
+    );
+  });
+
   it('shows "Unread" when the notification has not been read', () => {
     render(<NotificationDetailView notification={baseNotification} />);
 
