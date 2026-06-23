@@ -88,6 +88,40 @@ export const WithRenderedCells: Story = {
   },
 };
 
+// `renderDetailRow` renders a full-width secondary row beneath each primary
+// row. The sortable columns get the full table width while the wide content
+// (here a summary) spans every column below — a two-row layout per item.
+export const WithDetailRow: Story = {
+  name: 'With detail row',
+  render: () => {
+    const primaryColumns: ColumnDef<NotificationRow>[] = [
+      { accessorKey: 'recipient', header: 'Recipient' },
+      { accessorKey: 'sender', header: 'Sender' },
+      { accessorKey: 'created', header: 'Created' },
+    ];
+    return (
+      <DataTable
+        columns={primaryColumns}
+        data={rows}
+        renderDetailRow={(row) => row.summary}
+      />
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // The summary content appears full-width beneath its primary row.
+    await expect(
+      canvas.getByText('Your notebook finished executing.')
+    ).toBeInTheDocument();
+
+    // There is no "Summary" column header; the detail row carries it instead.
+    await expect(
+      canvas.queryByRole('columnheader', { name: /Summary/ })
+    ).not.toBeInTheDocument();
+  },
+};
+
 export const Empty: Story = {
   render: () => (
     <DataTable

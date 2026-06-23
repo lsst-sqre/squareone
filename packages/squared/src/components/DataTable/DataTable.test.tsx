@@ -163,6 +163,40 @@ describe('DataTable', () => {
     expect(sortedCells[0]).toHaveTextContent('Alpha');
   });
 
+  it('renders a detail row per data item with a full-width cell when renderDetailRow is provided', () => {
+    const { container } = render(
+      <DataTable
+        columns={columns}
+        data={data}
+        renderDetailRow={(row) => <span>detail: {row.name}</span>}
+      />
+    );
+
+    // One detail row per data item, each holding a single cell that spans
+    // every column.
+    const detailCells = Array.from(
+      container.querySelectorAll('td[colspan]')
+    ).filter((cell) => cell.getAttribute('colspan') === String(columns.length));
+    expect(detailCells).toHaveLength(data.length);
+
+    // The detail content is rendered for each item.
+    expect(screen.getByText('detail: Alpha')).toBeInTheDocument();
+    expect(screen.getByText('detail: Bravo')).toBeInTheDocument();
+  });
+
+  it('still renders the primary cell values alongside detail rows', () => {
+    render(
+      <DataTable
+        columns={columns}
+        data={data}
+        renderDetailRow={(row) => <span>detail: {row.name}</span>}
+      />
+    );
+
+    expect(screen.getByText('Alpha')).toBeInTheDocument();
+    expect(screen.getByText('Bravo')).toBeInTheDocument();
+  });
+
   it('applies a custom className to the table wrapper', () => {
     const { container } = render(
       <DataTable columns={columns} data={data} className="custom-class" />
