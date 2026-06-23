@@ -168,7 +168,7 @@ export default function NotificationDetailView({
       <section className={styles.bodySection}>
         <h2 className={styles.bodyHeading}>Message body</h2>
         {hasBody ? (
-          <RenderedMarkdown className={styles.body} markdown={body} />
+          <RenderedMarkdown markdown={body} />
         ) : (
           <p className={styles.noBody}>This notification has no body.</p>
         )}
