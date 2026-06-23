@@ -123,6 +123,14 @@ export default function NewNotificationPageClient() {
       NOTIFICATIONS_ADMIN_SCOPE
     );
 
+    // Semaphore's base URL is resolved asynchronously via Repertoire service
+    // discovery, so it is `undefined` while discovery is pending or when
+    // Semaphore is undiscovered. Submitting in that window would POST to a
+    // relative URL on squareone's own origin and fail, so the form stays
+    // disabled until the URL is known. This covers both the transient
+    // (discovery pending) and permanent (Semaphore undiscovered) cases.
+    const isNotificationServiceReady = Boolean(semaphoreUrl);
+
     content = (
       <>
         {!hasAdminNotifications && (
@@ -135,12 +143,21 @@ export default function NewNotificationPageClient() {
             </p>
           </Note>
         )}
+        {hasAdminNotifications && !isNotificationServiceReady && (
+          <Note type="warning">
+            <p>
+              The notification service is currently unavailable. It may still be
+              starting up or being discovered. The form below is disabled until
+              the service is ready; please try again in a moment.
+            </p>
+          </Note>
+        )}
         <NotificationForm
           initialValues={formInitialValues}
           onSubmit={handleSubmit}
           onCancel={handleCancel}
           isSubmitting={createNotification.isPending}
-          disabled={!hasAdminNotifications}
+          disabled={!hasAdminNotifications || !isNotificationServiceReady}
         />
       </>
     );

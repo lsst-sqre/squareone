@@ -4,6 +4,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
+import { useSemaphoreUrl } from '../../../../hooks/useSemaphoreUrl';
 import NewNotificationPageClient from './NewNotificationPageClient';
 
 vi.mock('@lsst-sqre/gafaelfawr-client', () => ({
@@ -19,7 +20,7 @@ vi.mock('../../../../hooks/useRepertoireUrl', () => ({
 }));
 
 vi.mock('../../../../hooks/useSemaphoreUrl', () => ({
-  useSemaphoreUrl: (): string | undefined => 'https://example.com/semaphore',
+  useSemaphoreUrl: vi.fn(),
 }));
 
 const mockPush = vi.fn();
@@ -69,6 +70,7 @@ describe('NewNotificationPageClient', () => {
     mockSearchParams = new URLSearchParams();
     mockLogin();
     mockCreate();
+    vi.mocked(useSemaphoreUrl).mockReturnValue('https://example.com/semaphore');
   });
 
   test('renders the compose heading and form', () => {
@@ -105,6 +107,22 @@ describe('NewNotificationPageClient', () => {
 
     expect(
       screen.getByText(/required to send notifications/i)
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText(/recipient/i)).toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: /send notification/i })
+    ).toBeDisabled();
+  });
+
+  test('shows a service-unavailable note and disables the form while Semaphore is undiscovered', () => {
+    // Login has resolved with the admin:notifications scope, but Semaphore
+    // discovery is still pending (or Semaphore is undiscovered), so the base
+    // URL is undefined. The form must not be submittable into a relative URL.
+    vi.mocked(useSemaphoreUrl).mockReturnValue(undefined);
+    render(<NewNotificationPageClient />);
+
+    expect(
+      screen.getByText(/notification service is currently unavailable/i)
     ).toBeInTheDocument();
     expect(screen.getByLabelText(/recipient/i)).toBeDisabled();
     expect(
