@@ -39,6 +39,17 @@ export default function NotificationsPageClient() {
     refetch,
   } = useAdminNotifications(semaphoreUrl ?? '', filters);
 
+  // While service discovery is pending the Semaphore URL is `undefined`, which
+  // keeps the underlying query disabled, so `isLoading` is `false` even though
+  // no data has arrived yet. Treat that pending window as loading so the table
+  // shows its loading state rather than the misleading "no matches" empty state.
+  const isDiscovering = semaphoreUrl === undefined;
+
+  // Each handler emitted by `NotificationFilters` carries exactly one key, so
+  // applying them one at a time is safe. If a future caller batches multiple
+  // keys into a single `partial`, route them through one URLSearchParams update
+  // instead: `setFilter` snapshots `searchParams`, so per-key calls here would
+  // clobber each other and only the last key would survive.
   const handleFilterChange = (partial: Partial<AdminNotificationFilters>) => {
     for (const [key, value] of Object.entries(partial)) {
       setFilter(
@@ -65,7 +76,7 @@ export default function NotificationsPageClient() {
 
       <NotificationsTableView
         notifications={entries}
-        isLoading={isLoading}
+        isLoading={isLoading || isDiscovering}
         error={error}
         hasMore={hasMore}
         isLoadingMore={isLoadingMore}

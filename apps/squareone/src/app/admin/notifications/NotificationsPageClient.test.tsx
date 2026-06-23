@@ -79,6 +79,27 @@ describe('NotificationsPageClient', () => {
     expect(mockUseAdminNotifications).toHaveBeenCalledWith('', {});
   });
 
+  it('shows the loading state, not the empty state, while discovery is pending', () => {
+    // Discovery pending: the URL is undefined and the disabled query reports
+    // isLoading=false with no entries. The container should still surface a
+    // loading state rather than the misleading "no matches" empty state.
+    mockUseSemaphoreUrl.mockReturnValue(undefined);
+    mockUseAdminNotifications.mockReturnValue(
+      makeNotificationsReturn({
+        entries: undefined,
+        isLoading: false,
+        totalCount: null,
+      })
+    );
+
+    render(<NotificationsPageClient />);
+
+    expect(screen.getByText(/loading notifications/i)).toBeInTheDocument();
+    expect(
+      screen.queryByText(/no notifications match/i)
+    ).not.toBeInTheDocument();
+  });
+
   it('renders the notifications table', () => {
     render(<NotificationsPageClient />);
 
