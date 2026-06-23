@@ -119,8 +119,8 @@ export function NotificationForm({
     try {
       await onSubmit({
         recipient: data.recipient.trim(),
-        summary: data.summary,
-        body: trimmedBody === '' ? undefined : data.body,
+        summary: data.summary.trim(),
+        body: trimmedBody === '' ? undefined : trimmedBody,
         draftAnother: data.draftAnother,
       });
 

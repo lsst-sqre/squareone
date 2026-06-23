@@ -129,6 +129,48 @@ describe('NotificationForm', () => {
     });
   });
 
+  test('trims surrounding whitespace from the submitted summary and body', async () => {
+    const user = userEvent.setup();
+    const { onSubmit } = renderForm();
+
+    await user.type(screen.getByLabelText(/recipient/i), '  rachel  ');
+    await user.type(screen.getByLabelText(/summary/i), '  Heads up  ');
+    await user.type(screen.getByLabelText(/^body/i), '  Full **details**.  ');
+    await user.click(
+      screen.getByRole('button', { name: /send notification/i })
+    );
+
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith({
+        recipient: 'rachel',
+        summary: 'Heads up',
+        body: 'Full **details**.',
+        draftAnother: false,
+      });
+    });
+  });
+
+  test('omits the body when it contains only whitespace', async () => {
+    const user = userEvent.setup();
+    const { onSubmit } = renderForm();
+
+    await user.type(screen.getByLabelText(/recipient/i), 'rachel');
+    await user.type(screen.getByLabelText(/summary/i), 'Heads up');
+    await user.type(screen.getByLabelText(/^body/i), '   ');
+    await user.click(
+      screen.getByRole('button', { name: /send notification/i })
+    );
+
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith({
+        recipient: 'rachel',
+        summary: 'Heads up',
+        body: undefined,
+        draftAnother: false,
+      });
+    });
+  });
+
   test('clears the form and confirms success when "draft another" is checked', async () => {
     const user = userEvent.setup();
     const { onSubmit } = renderForm();
