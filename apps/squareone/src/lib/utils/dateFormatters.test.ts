@@ -1,5 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { formatExpiration, formatLastUsed } from './dateFormatters';
+import {
+  formatExpiration,
+  formatLastUsed,
+  formatUtcTimestamp,
+} from './dateFormatters';
 
 describe('dateFormatters', () => {
   const SECONDS_PER_HOUR = 3600;
@@ -129,6 +133,18 @@ describe('dateFormatters', () => {
     it('handles edge case at exactly 7 days', () => {
       const exactlySevenDays = MOCK_NOW - 7 * SECONDS_PER_DAY;
       expect(formatLastUsed(exactlySevenDays)).toBe('Last used 2023-12-25');
+    });
+  });
+
+  describe('formatUtcTimestamp', () => {
+    it('formats an ISO 8601 timestamp as YYYY-MM-DD HH:MM UTC', () => {
+      expect(formatUtcTimestamp('2026-06-12T17:10:32+00:00')).toBe(
+        '2026-06-12 17:10 UTC'
+      );
+    });
+
+    it('returns the original string unchanged for an invalid date', () => {
+      expect(formatUtcTimestamp('not-a-date')).toBe('not-a-date');
     });
   });
 

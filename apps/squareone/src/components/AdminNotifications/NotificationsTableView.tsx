@@ -3,11 +3,15 @@ import { Button, DataTable, type DataTableProps } from '@lsst-sqre/squared';
 import { PlusCircle } from 'lucide-react';
 import Link from 'next/link';
 
+import { formatUtcTimestamp } from '../../lib/utils/dateFormatters';
 import RenderedMarkdown from '../RenderedMarkdown';
 import styles from './NotificationsTableView.module.css';
 
+/** Base path for the admin notifications routes. */
+const NOTIFICATIONS_BASE_HREF = '/admin/notifications';
+
 /** Where the "Compose" button links by default. */
-const DEFAULT_COMPOSE_HREF = '/admin/notifications/new';
+const DEFAULT_COMPOSE_HREF = `${NOTIFICATIONS_BASE_HREF}/new`;
 
 export type NotificationsTableViewProps = {
   /** The currently-loaded notifications (server order, most-recent first). */
@@ -30,30 +34,13 @@ export type NotificationsTableViewProps = {
   composeHref?: string;
 };
 
-/**
- * Format an ISO 8601 timestamp as a stable, timezone-independent `YYYY-MM-DD
- * HH:MM UTC` string for the Created column.
- */
-function formatCreated(iso: string): string {
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) {
-    return iso;
-  }
-  const year = date.getUTCFullYear();
-  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-  const day = String(date.getUTCDate()).padStart(2, '0');
-  const hours = String(date.getUTCHours()).padStart(2, '0');
-  const minutes = String(date.getUTCMinutes()).padStart(2, '0');
-  return `${year}-${month}-${day} ${hours}:${minutes} UTC`;
-}
-
 const columns: DataTableProps<UserNotificationWithUrl>['columns'] = [
   { accessorKey: 'recipient', header: 'Recipient' },
   { accessorKey: 'sender', header: 'Sender' },
   {
     accessorKey: 'created',
     header: 'Created',
-    cell: (info) => formatCreated(info.getValue<string>()),
+    cell: (info) => formatUtcTimestamp(info.getValue<string>()),
   },
 ];
 
@@ -112,7 +99,15 @@ export default function NotificationsTableView({
           aria-label="User notifications"
           emptyContent="No notifications match your filters."
           renderDetailRow={(n) => (
-            <RenderedMarkdown className={styles.summary} markdown={n.summary} />
+            <Link
+              href={`${NOTIFICATIONS_BASE_HREF}/${n.id}`}
+              className={styles.summaryLink}
+            >
+              <RenderedMarkdown
+                className={styles.summary}
+                markdown={n.summary}
+              />
+            </Link>
           )}
         />
         {shownCount > 0 && (

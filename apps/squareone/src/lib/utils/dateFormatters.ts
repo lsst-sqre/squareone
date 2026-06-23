@@ -43,6 +43,28 @@ export function formatAsISODate(date: Date): string {
 }
 
 /**
+ * Format an ISO 8601 timestamp as a stable, timezone-independent
+ * `YYYY-MM-DD HH:MM UTC` string.
+ *
+ * Returns the original string unchanged when it does not parse to a valid date,
+ * so a malformed value is surfaced verbatim rather than as `Invalid Date`.
+ * @param iso - ISO 8601 timestamp string
+ * @returns Formatted `YYYY-MM-DD HH:MM UTC` string, or `iso` if it is invalid
+ */
+export function formatUtcTimestamp(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) {
+    return iso;
+  }
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(date.getUTCDate()).padStart(2, '0');
+  const hours = String(date.getUTCHours()).padStart(2, '0');
+  const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+  return `${year}-${month}-${day} ${hours}:${minutes} UTC`;
+}
+
+/**
  * Get a relative time description.
  * @param seconds - Number of seconds for the time period
  * @param direction - 'past' for "ago" or 'future' for "in"

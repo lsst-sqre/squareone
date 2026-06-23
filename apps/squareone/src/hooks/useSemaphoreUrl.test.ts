@@ -13,7 +13,7 @@ vi.mock('@lsst-sqre/repertoire-client', async (importOriginal) => ({
 // Import after mocking.
 import { useServiceDiscovery } from '@lsst-sqre/repertoire-client';
 import { useRepertoireUrl } from './useRepertoireUrl';
-import { useSemaphoreUrl } from './useSemaphoreUrl';
+import { useSemaphoreUrl, useSemaphoreUrlState } from './useSemaphoreUrl';
 
 // Build a fake useServiceDiscovery return that exposes only the query method the
 // hook calls, cast to the full hook return shape.
@@ -41,6 +41,20 @@ function makePendingDiscoveryReturn(): ReturnType<typeof useServiceDiscovery> {
     isPending: true,
     isError: false,
     error: null,
+  } as unknown as ReturnType<typeof useServiceDiscovery>;
+}
+
+// A settled-but-errored discovery query: no data, but the request finished with
+// an error, so discovery is no longer resolving.
+function makeErroredDiscoveryReturn(): ReturnType<typeof useServiceDiscovery> {
+  return {
+    discovery: undefined,
+    query: null,
+    refetch: vi.fn(),
+    isStale: false,
+    isPending: false,
+    isError: true,
+    error: new Error('discovery failed'),
   } as unknown as ReturnType<typeof useServiceDiscovery>;
 }
 
@@ -106,5 +120,73 @@ describe('useSemaphoreUrl', () => {
     const { result } = renderHook(() => useSemaphoreUrl());
 
     expect(result.current).toBeUndefined();
+  });
+});
+
+describe('useSemaphoreUrlState', () => {
+  it('reports resolving while discovery is still pending', () => {
+    vi.mocked(useRepertoireUrl).mockReturnValue(undefined);
+    vi.mocked(useServiceDiscovery).mockReturnValue(
+      makePendingDiscoveryReturn()
+    );
+
+    const { result } = renderHook(() => useSemaphoreUrlState());
+
+    expect(result.current).toEqual({
+      url: undefined,
+      isResolving: true,
+      isUnavailable: false,
+    });
+  });
+
+  it('reports unavailable once discovery settles without a Semaphore URL', () => {
+    vi.mocked(useRepertoireUrl).mockReturnValue(
+      'https://data.example.org/repertoire'
+    );
+    vi.mocked(useServiceDiscovery).mockReturnValue(
+      makeDiscoveryReturn(() => undefined)
+    );
+
+    const { result } = renderHook(() => useSemaphoreUrlState());
+
+    expect(result.current).toEqual({
+      url: undefined,
+      isResolving: false,
+      isUnavailable: true,
+    });
+  });
+
+  it('reports unavailable when discovery settles with an error', () => {
+    vi.mocked(useRepertoireUrl).mockReturnValue(
+      'https://data.example.org/repertoire'
+    );
+    vi.mocked(useServiceDiscovery).mockReturnValue(
+      makeErroredDiscoveryReturn()
+    );
+
+    const { result } = renderHook(() => useSemaphoreUrlState());
+
+    expect(result.current).toEqual({
+      url: undefined,
+      isResolving: false,
+      isUnavailable: true,
+    });
+  });
+
+  it('reports the resolved URL once Semaphore is discovered', () => {
+    vi.mocked(useRepertoireUrl).mockReturnValue(
+      'https://data.example.org/repertoire'
+    );
+    vi.mocked(useServiceDiscovery).mockReturnValue(
+      makeDiscoveryReturn(() => 'https://data.example.org/semaphore')
+    );
+
+    const { result } = renderHook(() => useSemaphoreUrlState());
+
+    expect(result.current).toEqual({
+      url: 'https://data.example.org/semaphore',
+      isResolving: false,
+      isUnavailable: false,
+    });
   });
 });

@@ -95,4 +95,15 @@ describe('NotificationsTableView', () => {
       '/admin/notifications/new'
     );
   });
+
+  it('links each summary to its detail page', () => {
+    const notification = mockAdminNotifications[0];
+    render(
+      <NotificationsTableView notifications={[notification]} totalCount={1} />
+    );
+
+    expect(
+      screen.getByRole('link', { name: /disk space quota limit/i })
+    ).toHaveAttribute('href', `/admin/notifications/${notification.id}`);
+  });
 });
