@@ -1,5 +1,13 @@
 # @lsst-sqre/semaphore-client
 
+## 0.3.0
+
+### Minor Changes
+
+- [#484](https://github.com/lsst-sqre/squareone/pull/484) [`8e195f6`](https://github.com/lsst-sqre/squareone/commit/8e195f67230bb1c056f52cb738685e8c3c9881a5) Thanks [@jonathansick](https://github.com/jonathansick)! - Add the Semaphore admin notifications **create** layer. A new Zod schema (`CreateUserNotificationSchema`) and inferred `CreateUserNotification` type model the `{ recipient, summary, body? }` create payload. The client function `createAdminNotification(semaphoreUrl, notification, csrfToken)` POSTs to `/v1/admin/notifications` with `credentials: 'include'` and the Gafaelfawr `x-csrf-token` header, returning the created `UserNotificationWithUrl`. A new `mutation-options` module ships `createAdminNotificationMutationOptions` (and the `CreateAdminNotificationVariables` type), whose `onSuccess` invalidates the admin-notifications list query, and the `useCreateAdminNotification(semaphoreUrl)` hook exposes the create mutation.
+
+- [#484](https://github.com/lsst-sqre/squareone/pull/484) [`2933281`](https://github.com/lsst-sqre/squareone/commit/29332819e44dcea79e67dd99f98b247c5885f278) Thanks [@jonathansick](https://github.com/jonathansick)! - Add the Semaphore admin notifications **read** layer. New Zod schemas (`UserNotificationSchema`, `UserNotificationWithUrlSchema`) and inferred types model the admin list/detail payloads, where `summary` and `body` are raw Markdown. New client functions `fetchAdminNotifications` (parses the RFC 5988 `Link` header for the next cursor and `X-Total-Count` for the total, and applies the `recipient`/`sender`/`since`/`until` filters) and `fetchAdminNotification` back two new TanStack Query option factories (`adminNotificationsInfiniteQueryOptions`, `adminNotificationQueryOptions`) and hooks (`useAdminNotifications` exposing `{ entries, hasMore, loadMore, isLoadingMore, totalCount }`, `useAdminNotification`). A new `mock-notifications` module ships a fixture dataset plus a pure filter+paginate helper for dev API routes and Storybook stories.
+
 ## 0.2.0
 
 ### Minor Changes
