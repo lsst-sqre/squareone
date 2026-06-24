@@ -1,5 +1,15 @@
 # @lsst-sqre/squared
 
+## 0.14.0
+
+### Minor Changes
+
+- [#489](https://github.com/lsst-sqre/squareone/pull/489) [`8747f33`](https://github.com/lsst-sqre/squareone/commit/8747f33cb0608257d48608c18d779d914e47f6f1) Thanks [@jonathansick](https://github.com/jonathansick)! - Add an optional `renderDetailRow` prop to `DataTable`. When provided, each data item renders as a two-row unit: the primary row of column cells, plus a full-width secondary row beneath it whose single cell spans every column. The detail `colSpan` tracks the leaf column count, leaving a clean path to a future expand-to-detail interaction with a dedicated expander column.
+
+  The squareone admin notifications listing (`/admin/notifications`) uses this for a two-row layout: the sortable recipient, sender, and created columns now get the full table width (no more truncated headers), and the rendered-Markdown summary spans full-width beneath each row instead of competing for a column.
+
+- [#483](https://github.com/lsst-sqre/squareone/pull/483) [`9caa7b3`](https://github.com/lsst-sqre/squareone/commit/9caa7b37dfc6e4268c39a327c636af506ba2887d) Thanks [@jonathansick](https://github.com/jonathansick)! - Add a generic `DataTable` component backed by `@tanstack/react-table`. It renders rows from a `data` array using `columns` (`ColumnDef[]`), supports client-side sorting of the currently-loaded rows via sortable column headers, and exposes a caller-owned "Load more" footer for cursor pagination. Because rows arrive in the server's order (created-desc), client-side sorting reorders only the loaded rows rather than performing a global sort across unloaded pages.
+
 ## 0.13.1
 
 ### Patch Changes
