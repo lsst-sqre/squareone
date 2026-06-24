@@ -5,12 +5,15 @@ import {
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
+  type OnChangeFn,
+  type RowSelectionState,
   type SortingState,
   useReactTable,
 } from '@tanstack/react-table';
 import { ChevronDown, ChevronsUpDown, ChevronUp } from 'lucide-react';
 import React from 'react';
 import { Button } from '../Button';
+import { Checkbox } from '../Checkbox';
 import styles from './DataTable.module.css';
 
 export type DataTableProps<TData> = {
@@ -73,6 +76,20 @@ export type DataTableProps<TData> = {
    * When omitted, each item renders as a single `<tr>` (backward compatible).
    */
   renderDetailRow?: (row: TData) => React.ReactNode;
+  /**
+   * Controlled row-selection state, keyed by TanStack row id. Providing this
+   * together with `onRowSelectionChange` opts the table into row selection: a
+   * leading checkbox column and a select-all header checkbox render and drive
+   * `@tanstack/react-table`'s row-selection model. When either prop is omitted
+   * the table renders exactly as before, with no checkbox column.
+   */
+  rowSelection?: RowSelectionState;
+  /**
+   * Invoked when the selection changes (per-row toggle or select-all). Receives
+   * TanStack's updater; the caller owns the `rowSelection` state. Required,
+   * alongside `rowSelection`, to enable selection.
+   */
+  onRowSelectionChange?: OnChangeFn<RowSelectionState>;
   /** Optional visible caption describing the table. */
   caption?: React.ReactNode;
   /**
@@ -86,6 +103,40 @@ export type DataTableProps<TData> = {
 };
 
 type SortDirection = false | 'asc' | 'desc';
+
+/**
+ * The leading checkbox column prepended when row selection is enabled. Its
+ * header drives select-all (with an indeterminate state when only some rows
+ * are selected) and each cell toggles its own row through TanStack's
+ * row-selection model.
+ */
+function createSelectionColumn<TData>(): ColumnDef<TData, unknown> {
+  return {
+    id: 'select',
+    enableSorting: false,
+    header: ({ table }) => (
+      <Checkbox
+        aria-label="Select all rows"
+        checked={
+          table.getIsAllRowsSelected()
+            ? true
+            : table.getIsSomeRowsSelected()
+              ? 'indeterminate'
+              : false
+        }
+        onCheckedChange={(value) => table.toggleAllRowsSelected(value === true)}
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        aria-label="Select row"
+        checked={row.getIsSelected()}
+        disabled={!row.getCanSelect()}
+        onCheckedChange={(value) => row.toggleSelected(value === true)}
+      />
+    ),
+  };
+}
 
 function SortIndicator({ direction }: { direction: SortDirection }) {
   if (direction === 'asc') {
@@ -149,14 +200,33 @@ export function DataTable<TData>({
   'aria-label': ariaLabel,
   className,
   renderDetailRow,
+  rowSelection,
+  onRowSelectionChange,
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = React.useState<SortingState>(initialSorting);
 
+  // Selection is opt-in: both the controlled state and its change handler must
+  // be supplied. When enabled, prepend the leading checkbox column.
+  const selectionEnabled =
+    rowSelection !== undefined && onRowSelectionChange !== undefined;
+
+  const tableColumns = React.useMemo(
+    () =>
+      selectionEnabled ? [createSelectionColumn<TData>(), ...columns] : columns,
+    [selectionEnabled, columns]
+  );
+
   const table = useReactTable({
     data,
-    columns,
-    state: { sorting },
+    columns: tableColumns,
+    state: {
+      sorting,
+      ...(selectionEnabled ? { rowSelection } : {}),
+    },
     onSortingChange: setSorting,
+    ...(selectionEnabled
+      ? { enableRowSelection: true, onRowSelectionChange }
+      : {}),
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
   });
