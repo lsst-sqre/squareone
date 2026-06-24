@@ -5,11 +5,19 @@ import {
   type CreateUserNotification,
   CreateUserNotificationSchema,
   type UserNotification,
+  type UserNotificationFormatted,
+  UserNotificationFormattedSchema,
   UserNotificationSchema,
+  UserNotificationSummarySchema,
   type UserNotificationWithUrl,
   UserNotificationWithUrlSchema,
 } from './schemas';
-import type { AdminNotificationFilters, AdminNotificationsPage } from './types';
+import type {
+  AdminNotificationFilters,
+  AdminNotificationsPage,
+  UserNotificationListParams,
+  UserNotificationsPage,
+} from './types';
 
 /**
  * Minimal logger interface compatible with pino's calling convention.
@@ -300,4 +308,143 @@ export async function createAdminNotification(
 
   const data = await response.json();
   return UserNotificationWithUrlSchema.parse(data);
+}
+
+// =============================================================================
+// User-facing notifications
+// =============================================================================
+
+/**
+ * Fetch a page of the authenticated user's notifications.
+ *
+ * Targets the user-facing list endpoint, which returns
+ * {@link UserNotificationSummarySchema} entries (with `summary` as
+ * `FormattedText`, not raw Markdown). Applies the `unread` / `limit` filters
+ * plus an opaque pagination `cursor`, parses the next-page cursor from the RFC
+ * 5988 `Link` header, and reads the total from `X-Total-Count` (the latter two
+ * are only present when `limit` is set). The request is authenticated via the
+ * browser's session cookie (`credentials: 'include'`).
+ *
+ * @endpoint GET /v1/notifications
+ *
+ * @param semaphoreUrl - Base URL of the Semaphore service
+ * @param params - `unread` / `limit` filters and the pagination `cursor`
+ * @returns A page of notification summaries with `nextCursor` and `totalCount`
+ * @throws SemaphoreError if the request fails
+ */
+export async function fetchUserNotifications(
+  semaphoreUrl: string,
+  params: UserNotificationListParams = {}
+): Promise<UserNotificationsPage> {
+  const baseUrl = normalizeUrl(semaphoreUrl);
+
+  const search = new URLSearchParams();
+  if (params.unread) search.set('unread', 'true');
+  if (params.limit) search.set('limit', String(params.limit));
+  if (params.cursor) search.set('cursor', params.cursor);
+
+  const queryString = search.toString();
+  const url = `${baseUrl}/v1/notifications${queryString ? `?${queryString}` : ''}`;
+
+  const response = await fetch(url, {
+    credentials: 'include',
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    throw new SemaphoreError(
+      `Semaphore API error: ${response.status} ${response.statusText}`,
+      response.status
+    );
+  }
+
+  const data = await response.json();
+  const entries = z.array(UserNotificationSummarySchema).parse(data);
+
+  const nextCursor = parseCursorFromLink(response.headers.get('Link'));
+  const totalCountHeader = response.headers.get('X-Total-Count');
+  const totalCount = totalCountHeader
+    ? Number.parseInt(totalCountHeader, 10)
+    : null;
+
+  return { entries, nextCursor, totalCount };
+}
+
+/**
+ * Fetch a single user-facing notification by id.
+ *
+ * Returns a {@link UserNotificationFormattedSchema} with both `summary` and
+ * `body` as `FormattedText`. Fetching the detail does **not** auto-mark the
+ * notification read — that is an explicit action via {@link markNotificationsRead}.
+ *
+ * @endpoint GET /v1/notifications/{id}
+ *
+ * @param semaphoreUrl - Base URL of the Semaphore service
+ * @param id - Opaque notification id
+ * @returns The full formatted notification
+ * @throws SemaphoreError if the request fails or the id is not found
+ */
+export async function fetchUserNotification(
+  semaphoreUrl: string,
+  id: string
+): Promise<UserNotificationFormatted> {
+  const baseUrl = normalizeUrl(semaphoreUrl);
+  const url = `${baseUrl}/v1/notifications/${encodeURIComponent(id)}`;
+
+  const response = await fetch(url, {
+    credentials: 'include',
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    throw new SemaphoreError(
+      `Semaphore API error: ${response.status} ${response.statusText}`,
+      response.status
+    );
+  }
+
+  const data = await response.json();
+  return UserNotificationFormattedSchema.parse(data);
+}
+
+/**
+ * Mark a set of the authenticated user's notifications read.
+ *
+ * POSTs `{ ids }` with `credentials: 'include'` and the Gafaelfawr
+ * `x-csrf-token` header — the same mutation pattern used by
+ * {@link createAdminNotification}. The endpoint is idempotent: already-read or
+ * nonexistent ids are silently ignored and it responds with `204 No Content`,
+ * so this function resolves to `void` on success.
+ *
+ * @endpoint POST /v1/notifications/read
+ *
+ * @param semaphoreUrl - Base URL of the Semaphore service
+ * @param ids - The notification ids to mark read
+ * @param csrfToken - CSRF token from Gafaelfawr login info
+ * @throws SemaphoreError if the request fails
+ */
+export async function markNotificationsRead(
+  semaphoreUrl: string,
+  ids: string[],
+  csrfToken: string
+): Promise<void> {
+  const baseUrl = normalizeUrl(semaphoreUrl);
+  const url = `${baseUrl}/v1/notifications/read`;
+
+  const response = await fetch(url, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-csrf-token': csrfToken,
+    },
+    body: JSON.stringify({ ids }),
+  });
+
+  if (!response.ok) {
+    throw new SemaphoreError(
+      `Semaphore API error: ${response.status} ${response.statusText}`,
+      response.status
+    );
+  }
 }

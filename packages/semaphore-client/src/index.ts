@@ -7,19 +7,30 @@ export {
   fetchAdminNotification,
   fetchAdminNotifications,
   fetchBroadcasts,
+  fetchUserNotification,
+  fetchUserNotifications,
   getEmptyBroadcasts,
+  markNotificationsRead,
   SemaphoreError,
 } from './client';
 // React hooks
 export type {
   UseAdminNotificationReturn,
   UseAdminNotificationsReturn,
+  UseUnreadNotificationCountOptions,
+  UseUnreadNotificationCountReturn,
+  UseUserNotificationReturn,
+  UseUserNotificationsReturn,
 } from './hooks';
 export {
   useAdminNotification,
   useAdminNotifications,
   useBroadcasts,
   useCreateAdminNotification,
+  useMarkNotificationsRead,
+  useUnreadNotificationCount,
+  useUserNotification,
+  useUserNotifications,
 } from './hooks';
 // Mock data for development
 export {
@@ -28,21 +39,40 @@ export {
   mockBroadcasts,
   mockOutageBroadcast,
 } from './mock-broadcasts';
-export type { FilterPaginateParams } from './mock-notifications';
+export type {
+  FilterPaginateParams,
+  UserFilterPaginateParams,
+} from './mock-notifications';
 export {
   filterAndPaginateNotifications,
+  filterAndPaginateUserNotifications,
+  markUserNotificationsRead,
   mockAdminNotification,
   mockAdminNotifications,
+  mockUserNotification,
+  mockUserNotifications,
 } from './mock-notifications';
 // TanStack Query mutations
-export type { CreateAdminNotificationVariables } from './mutation-options';
-export { createAdminNotificationMutationOptions } from './mutation-options';
-export type { BroadcastsQueryConfig } from './query-options';
+export type {
+  CreateAdminNotificationVariables,
+  MarkNotificationsReadVariables,
+} from './mutation-options';
+export {
+  createAdminNotificationMutationOptions,
+  markNotificationsReadMutationOptions,
+} from './mutation-options';
+export type {
+  BroadcastsQueryConfig,
+  UnreadNotificationCountQueryConfig,
+} from './query-options';
 // TanStack Query integration
 export {
   adminNotificationQueryOptions,
   adminNotificationsInfiniteQueryOptions,
   broadcastsQueryOptions,
+  unreadNotificationCountQueryOptions,
+  userNotificationQueryOptions,
+  userNotificationsInfiniteQueryOptions,
 } from './query-options';
 // Schemas and types
 export type {
@@ -52,6 +82,8 @@ export type {
   CreateUserNotification,
   FormattedText,
   UserNotification,
+  UserNotificationFormatted,
+  UserNotificationSummary,
   UserNotificationWithUrl,
 } from './schemas';
 export {
@@ -60,10 +92,15 @@ export {
   BroadcastsResponseSchema,
   CreateUserNotificationSchema,
   FormattedTextSchema,
+  UserNotificationFormattedSchema,
   UserNotificationSchema,
+  UserNotificationSummarySchema,
   UserNotificationWithUrlSchema,
 } from './schemas';
 export type {
   AdminNotificationFilters,
   AdminNotificationsPage,
+  UserNotificationFilters,
+  UserNotificationListParams,
+  UserNotificationsPage,
 } from './types';
