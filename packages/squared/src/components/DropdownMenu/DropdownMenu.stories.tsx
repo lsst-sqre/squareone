@@ -7,14 +7,49 @@ import { DropdownMenu } from './DropdownMenu';
 const meta: Meta<typeof DropdownMenu> = {
   title: 'Components/DropdownMenu',
   component: DropdownMenu,
-  parameters: { layout: 'centered' },
+  parameters: {
+    layout: 'centered',
+    docs: {
+      description: {
+        component:
+          '`DropdownMenu` presents a list of actions in a popover anchored to ' +
+          'a trigger button. Reach for it for action menus — bulk actions on ' +
+          'a selection, per-row "…" overflow menus, or any compact set of ' +
+          'commands that would otherwise crowd a toolbar. It is built on ' +
+          'Radix UI primitives, so keyboard navigation, focus management, ' +
+          'typeahead, and ARIA menu roles work out of the box.\n\n' +
+          'It is **not** a form control: items fire actions via `onSelect` ' +
+          'rather than binding a value. When the user needs to pick a value ' +
+          'from a list, use `Select` instead.\n\n' +
+          '**Anatomy** — compose these subcomponents:\n\n' +
+          '- `DropdownMenu` (root) — owns the open state. Uncontrolled by ' +
+          'default; pass `open` + `onOpenChange` to control it, or ' +
+          '`defaultOpen` to set the initial state. `modal` (default `true`) ' +
+          'traps focus and blocks outside interaction while the menu is ' +
+          'open.\n' +
+          '- `DropdownMenu.Trigger` — the button that opens the menu. ' +
+          'Renders a styled button with a chevron affordance by default; set ' +
+          '`showChevron={false}` to hide it, or `asChild` to use your own ' +
+          'element (for example a squared `Button`) as the trigger.\n' +
+          '- `DropdownMenu.Content` — the popover, rendered in a portal so it ' +
+          'escapes overflow clipping. Tune placement with `align` (`start` ' +
+          'by default) and `sideOffset` (`6` by default).\n' +
+          '- `DropdownMenu.Item` — a selectable action. Use `onSelect` for ' +
+          'its handler and `disabled` to make it inert.\n' +
+          '- `DropdownMenu.Label` and `DropdownMenu.Separator` — ' +
+          'non-interactive helpers for titling and visually grouping items.' +
+          '\n\nThe stories below demonstrate the common variants.',
+      },
+    },
+  },
   tags: ['autodocs'],
 };
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// Basic bulk-actions menu
+// The default trigger renders a styled button with a chevron affordance and
+// opens a simple list of actions.
 export const Default: Story = {
   render: () => (
     <DropdownMenu>
@@ -47,7 +82,8 @@ export const Default: Story = {
   },
 };
 
-// Bulk-actions menu with a label and separator, like a selection toolbar
+// `DropdownMenu.Label` and `DropdownMenu.Separator` add a non-interactive
+// heading and a divider — useful for captioning a selection toolbar.
 export const WithLabelAndSeparator: Story = {
   render: () => (
     <DropdownMenu>
@@ -70,7 +106,8 @@ export const WithLabelAndSeparator: Story = {
   },
 };
 
-// Selecting an item fires its handler
+// Each `DropdownMenu.Item` fires its `onSelect` handler when chosen, and the
+// menu closes automatically afterward.
 export const ItemSelection: Story = {
   render: () => {
     const [lastAction, setLastAction] = useState<string>('none');
@@ -150,7 +187,8 @@ export const KeyboardInteraction: Story = {
   },
 };
 
-// Disabled item is not selectable
+// A `disabled` item is skipped by pointer and keyboard navigation and cannot
+// be selected.
 export const DisabledItem: Story = {
   render: () => (
     <DropdownMenu>
@@ -174,7 +212,9 @@ export const DisabledItem: Story = {
   },
 };
 
-// Custom trigger via asChild, composing the squared Button
+// `asChild` lets you supply your own trigger element — here a squared
+// `Button` — instead of the default styled button. The chevron is omitted so
+// the trigger's own styling is preserved.
 export const CustomTrigger: Story = {
   render: () => (
     <DropdownMenu>
