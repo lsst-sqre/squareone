@@ -35,6 +35,15 @@ export {
   TimeInput,
   TimezoneSelector,
 } from './components/DateTimePicker';
+export type {
+  DropdownMenuContentProps,
+  DropdownMenuItemProps,
+  DropdownMenuLabelProps,
+  DropdownMenuProps,
+  DropdownMenuSeparatorProps,
+  DropdownMenuTriggerProps,
+} from './components/DropdownMenu';
+export { DropdownMenu } from './components/DropdownMenu';
 export type { ErrorMessageProps } from './components/ErrorMessage';
 export { default as ErrorMessage } from './components/ErrorMessage';
 export type { FormFieldProps } from './components/FormField';
