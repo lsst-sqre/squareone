@@ -2,6 +2,7 @@
 
 import MainContent from '../../components/MainContent';
 import DevAuthPanel from './DevAuthPanel';
+import DevNotificationsPanel from './DevNotificationsPanel';
 
 /**
  * Dev-only auth control panel route (`/dev`).
@@ -13,12 +14,15 @@ import DevAuthPanel from './DevAuthPanel';
  *
  * This is the first piece of a future dev-tools hub. For now it renders the
  * {@link DevAuthPanel}, which lets a developer flip login state, pick a persona,
- * and edit the active Gafaelfawr scopes and identity at runtime.
+ * and edit the active Gafaelfawr scopes and identity at runtime, and the
+ * {@link DevNotificationsPanel}, which sets the mocked unread-notification count
+ * that drives the header badge.
  */
 export default function DevPage() {
   return (
     <MainContent>
       <DevAuthPanel />
+      <DevNotificationsPanel />
     </MainContent>
   );
 }

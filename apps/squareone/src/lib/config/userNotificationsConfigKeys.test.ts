@@ -45,7 +45,10 @@ describe('user notifications feature-flag config keys', () => {
   });
 
   it('sets the development defaults in squareone.config.yaml', () => {
-    expect(devConfig.enableUserNotifications).toBe(false);
+    // Enabled in the dev config so the header badge / notifications UI are
+    // exercisable against the local dev mocks; the schema default (and thus the
+    // production default when the key is omitted) stays false.
+    expect(devConfig.enableUserNotifications).toBe(true);
     expect(devConfig.userNotificationsPollIntervalSeconds).toBe(300);
   });
 
