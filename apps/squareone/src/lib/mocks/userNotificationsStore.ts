@@ -16,7 +16,9 @@
 // reaches the production build.
 
 import {
+  type FormattedText,
   mockUserNotifications,
+  type UserNotificationFormatted,
   type UserNotificationSummary,
 } from '@lsst-sqre/semaphore-client';
 
@@ -29,6 +31,45 @@ let notifications: UserNotificationSummary[] = structuredClone(
 /** Return the current user's notifications, most-recent first. */
 export function getDevUserNotifications(): UserNotificationSummary[] {
   return notifications;
+}
+
+/**
+ * Synthesize a detail body for a summary. The shared user fixtures are
+ * summary-only, but the user detail endpoint returns a formatted `body`, so the
+ * dev mock derives one from the summary text plus a clearly-marked development
+ * note. The real service stores a distinct, richer body.
+ */
+function synthesizeBody(summary: FormattedText, id: string): FormattedText {
+  return {
+    gfm: `${summary.gfm}\n\n_(Development mock body for notification ${id}.)_`,
+    html: `${summary.html}\n<p><em>(Development mock body for notification ${id}.)</em></p>`,
+  };
+}
+
+/**
+ * Return a single notification by id in the user-facing detail shape
+ * ({@link UserNotificationFormatted}: `summary` + synthesized `body` as
+ * `FormattedText`, no sender/recipient), or `undefined` when the id is unknown
+ * (which the route turns into a 404). Fetching does **not** mark the
+ * notification read; the read state reflects the persistent store.
+ *
+ * @param id - The notification id to look up
+ * @returns The formatted notification, or undefined if not found
+ */
+export function getDevUserNotificationById(
+  id: string
+): UserNotificationFormatted | undefined {
+  const notification = notifications.find((n) => n.id === id);
+  if (!notification) {
+    return undefined;
+  }
+  return {
+    id: notification.id,
+    created: notification.created,
+    read: notification.read,
+    summary: notification.summary,
+    body: synthesizeBody(notification.summary, notification.id),
+  };
 }
 
 /** Reset the store to its seeded state. Primarily for tests. */
