@@ -1,6 +1,7 @@
-import type { ColumnDef } from '@tanstack/react-table';
+import type { ColumnDef, RowSelectionState } from '@tanstack/react-table';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { DataTable } from './DataTable';
 
@@ -203,5 +204,119 @@ describe('DataTable', () => {
     );
 
     expect(container.querySelector('.custom-class')).toBeInTheDocument();
+  });
+});
+
+// A controlled host owning row-selection state, mirroring how a consumer
+// (the notifications inbox) wires the selection props.
+function SelectableTable({
+  onChange,
+  getRowLabel,
+}: {
+  onChange?: (selection: RowSelectionState) => void;
+  getRowLabel?: (row: Row) => string;
+}) {
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+
+  return (
+    <DataTable
+      columns={columns}
+      data={data}
+      rowSelection={rowSelection}
+      getRowLabel={getRowLabel}
+      onRowSelectionChange={(updater) => {
+        setRowSelection((prev) => {
+          const next = typeof updater === 'function' ? updater(prev) : updater;
+          onChange?.(next);
+          return next;
+        });
+      }}
+    />
+  );
+}
+
+describe('DataTable row selection', () => {
+  it('renders no checkbox column when the selection props are omitted', () => {
+    render(<DataTable columns={columns} data={data} />);
+
+    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+  });
+
+  it('renders a leading checkbox column with a select-all header checkbox when selection is enabled', () => {
+    render(<SelectableTable />);
+
+    // One select-all header checkbox plus one checkbox per loaded row.
+    expect(screen.getAllByRole('checkbox')).toHaveLength(data.length + 1);
+    expect(
+      screen.getByRole('checkbox', { name: /select all/i })
+    ).toBeInTheDocument();
+  });
+
+  it('select-all toggles every loaded row', async () => {
+    render(<SelectableTable />);
+
+    await userEvent.click(
+      screen.getByRole('checkbox', { name: /select all/i })
+    );
+
+    const rowCheckboxes = screen.getAllByRole('checkbox', {
+      name: /select row/i,
+    });
+    expect(rowCheckboxes).toHaveLength(data.length);
+    for (const checkbox of rowCheckboxes) {
+      expect(checkbox).toBeChecked();
+    }
+    expect(screen.getByRole('checkbox', { name: /select all/i })).toBeChecked();
+  });
+
+  it('toggling an individual row updates the controlled selection via the callback', async () => {
+    const onChange = vi.fn();
+    render(<SelectableTable onChange={onChange} />);
+
+    const rowCheckboxes = screen.getAllByRole('checkbox', {
+      name: /select row/i,
+    });
+    await userEvent.click(rowCheckboxes[0]);
+
+    expect(rowCheckboxes[0]).toBeChecked();
+    expect(rowCheckboxes[1]).not.toBeChecked();
+    expect(onChange).toHaveBeenCalled();
+
+    // The latest controlled selection has exactly one row selected.
+    const latest = onChange.mock.calls.at(-1)?.[0] as RowSelectionState;
+    expect(Object.values(latest).filter(Boolean)).toHaveLength(1);
+  });
+
+  it('clears the selection when select-all is toggled off', async () => {
+    render(<SelectableTable />);
+
+    const selectAll = screen.getByRole('checkbox', { name: /select all/i });
+    await userEvent.click(selectAll);
+    await userEvent.click(selectAll);
+
+    for (const checkbox of screen.getAllByRole('checkbox', {
+      name: /select row/i,
+    })) {
+      expect(checkbox).not.toBeChecked();
+    }
+  });
+
+  it('gives each row checkbox a distinct accessible name when getRowLabel is provided', () => {
+    render(<SelectableTable getRowLabel={(row) => row.name} />);
+
+    // Each per-row checkbox gets a unique "Select row: <name>" label so a
+    // screen-reader user can tell the rows apart.
+    expect(
+      screen.getByRole('checkbox', { name: /select row: bravo/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('checkbox', { name: /select row: alpha/i })
+    ).toBeInTheDocument();
+
+    // The labelled checkboxes still match the generic /select row/i query, so
+    // backward compatibility with the default label holds.
+    expect(
+      screen.getAllByRole('checkbox', { name: /select row/i })
+    ).toHaveLength(data.length);
   });
 });

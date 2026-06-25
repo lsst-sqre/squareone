@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import type { ColumnDef } from '@tanstack/react-table';
+import type { ColumnDef, RowSelectionState } from '@tanstack/react-table';
 import { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Badge } from '../Badge';
@@ -211,6 +211,72 @@ function LoadMoreDemo() {
     />
   );
 }
+
+// A stateful host owning controlled row-selection state, mirroring how the
+// notifications inbox wires selection for its bulk "Mark read" action.
+function SelectableDemo() {
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const selectedCount = Object.values(rowSelection).filter(Boolean).length;
+
+  return (
+    <div>
+      <p style={{ marginBottom: 'var(--sqo-space-sm)' }}>
+        {selectedCount} selected
+      </p>
+      <DataTable
+        columns={columns}
+        data={rows}
+        rowSelection={rowSelection}
+        onRowSelectionChange={setRowSelection}
+      />
+    </div>
+  );
+}
+
+// Interaction test: the leading checkbox column selects individual rows and
+// the header checkbox selects/clears all loaded rows.
+export const Selectable: Story = {
+  render: () => <SelectableDemo />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // No rows selected to start.
+    await expect(canvas.getByText('0 selected')).toBeInTheDocument();
+
+    // Toggling a single row updates the controlled selection.
+    const rowCheckboxes = canvas.getAllByRole('checkbox', {
+      name: /select row/i,
+    });
+    await userEvent.click(rowCheckboxes[0]);
+    await waitFor(async () => {
+      await expect(canvas.getByText('1 selected')).toBeInTheDocument();
+    });
+    await expect(rowCheckboxes[0]).toBeChecked();
+
+    // Select-all toggles every loaded row.
+    await userEvent.click(
+      canvas.getByRole('checkbox', { name: /select all/i })
+    );
+    await waitFor(async () => {
+      await expect(
+        canvas.getByText(`${rows.length} selected`)
+      ).toBeInTheDocument();
+    });
+    for (const checkbox of canvas.getAllByRole('checkbox', {
+      name: /select row/i,
+    })) {
+      await expect(checkbox).toBeChecked();
+    }
+
+    // Toggling select-all again clears the selection.
+    await userEvent.click(
+      canvas.getByRole('checkbox', { name: /select all/i })
+    );
+    await waitFor(async () => {
+      await expect(canvas.getByText('0 selected')).toBeInTheDocument();
+    });
+  },
+};
 
 // Interaction test: the "Load more" slot invokes the caller's handler,
 // which appends the next page of rows.
