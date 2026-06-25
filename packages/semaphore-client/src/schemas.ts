@@ -62,6 +62,43 @@ export const UserNotificationWithUrlSchema = UserNotificationSchema.extend({
 });
 
 /**
+ * A user-facing notification summary from the Semaphore user API.
+ *
+ * Returned by the user list endpoint (`GET /v1/notifications`). Unlike the
+ * admin shape (raw Markdown strings), the user endpoints return
+ * {@link FormattedTextSchema} (`{ gfm, html }`) for `summary` so the client can
+ * render the `gfm` field for visual consistency with the admin UI. `created`
+ * and `read` are ISO 8601 date-time strings (offsets allowed); `read` is null
+ * until the recipient reads the notification. `url` points at the full
+ * notification resource. Sender/recipient are intentionally absent: the user
+ * API omits the sender and the recipient is always the current user.
+ */
+export const UserNotificationSummarySchema = z.object({
+  id: z.string(),
+  created: z.string().datetime({ offset: true }),
+  read: z.string().datetime({ offset: true }).nullable(),
+  summary: FormattedTextSchema,
+  url: z.string(),
+});
+
+/**
+ * A full user-facing notification from the Semaphore user API.
+ *
+ * Returned by the user detail endpoint (`GET /v1/notifications/{id}`). Carries
+ * the same fields as {@link UserNotificationSummarySchema} except it replaces
+ * `url` with the formatted `body` ({@link FormattedTextSchema} or null when the
+ * notification has no body). Fetching the detail does **not** auto-mark the
+ * notification read.
+ */
+export const UserNotificationFormattedSchema = z.object({
+  id: z.string(),
+  created: z.string().datetime({ offset: true }),
+  read: z.string().datetime({ offset: true }).nullable(),
+  summary: FormattedTextSchema,
+  body: FormattedTextSchema.nullable(),
+});
+
+/**
  * Payload for creating a user notification via the admin API.
  *
  * Sent to `POST /v1/admin/notifications`. `recipient` and `summary` are
@@ -82,6 +119,12 @@ export type BroadcastsResponse = z.infer<typeof BroadcastsResponseSchema>;
 export type UserNotification = z.infer<typeof UserNotificationSchema>;
 export type UserNotificationWithUrl = z.infer<
   typeof UserNotificationWithUrlSchema
+>;
+export type UserNotificationSummary = z.infer<
+  typeof UserNotificationSummarySchema
+>;
+export type UserNotificationFormatted = z.infer<
+  typeof UserNotificationFormattedSchema
 >;
 export type CreateUserNotification = z.infer<
   typeof CreateUserNotificationSchema

@@ -1,5 +1,5 @@
 import { mutationOptions, type QueryClient } from '@tanstack/react-query';
-import { createAdminNotification } from './client';
+import { createAdminNotification, markNotificationsRead } from './client';
 import type {
   CreateUserNotification,
   UserNotificationWithUrl,
@@ -41,5 +41,51 @@ export const createAdminNotificationMutationOptions = (
       queryClient.invalidateQueries({
         queryKey: ['admin-notifications', semaphoreUrl],
       });
+    },
+  });
+
+/**
+ * Variables for the mark-notifications-read mutation.
+ */
+export type MarkNotificationsReadVariables = {
+  /** The notification ids to mark read. */
+  ids: string[];
+  /** CSRF token sourced by the caller from Gafaelfawr login info. */
+  csrfToken: string;
+};
+
+/**
+ * TanStack Query mutation options for marking user notifications read.
+ *
+ * On success, invalidates every query the read affects: the user-notifications
+ * list (the `['user-notifications', semaphoreUrl]` prefix, covering all filter
+ * variants), the unread count, and the detail query for each marked id — so the
+ * inbox, header badge, and any open detail view all reflect the new read state.
+ *
+ * @param semaphoreUrl - Base URL of the Semaphore service
+ * @param queryClient - Query client used to invalidate affected queries on success
+ */
+export const markNotificationsReadMutationOptions = (
+  semaphoreUrl: string,
+  queryClient: QueryClient
+) =>
+  mutationOptions({
+    mutationFn: ({
+      ids,
+      csrfToken,
+    }: MarkNotificationsReadVariables): Promise<void> =>
+      markNotificationsRead(semaphoreUrl, ids, csrfToken),
+    onSuccess: (_data, { ids }: MarkNotificationsReadVariables) => {
+      queryClient.invalidateQueries({
+        queryKey: ['user-notifications', semaphoreUrl],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['unread-notification-count', semaphoreUrl],
+      });
+      for (const id of ids) {
+        queryClient.invalidateQueries({
+          queryKey: ['user-notification', semaphoreUrl, id],
+        });
+      }
     },
   });
