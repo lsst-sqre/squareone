@@ -1,0 +1,108 @@
+/* UserNotificationsTableView: user notifications listing table + states */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sqo-space-md);
+  width: 100%;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--sqo-space-md);
+}
+
+/* Bulk-actions group (dropdown + "Mark all as read") sits at the start of the
+ * toolbar. */
+.bulkActions {
+  display: flex;
+  align-items: center;
+  gap: var(--sqo-space-sm);
+}
+
+/* Keep the "Show unread only" filter pushed to the trailing edge whether or not
+ * the bulk-actions group is present. */
+.filter {
+  margin-left: auto;
+}
+
+.loadingState,
+.errorState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sqo-space-xs);
+  padding: var(--sqo-space-xl);
+  text-align: center;
+  color: var(--rsd-color-gray-500);
+}
+
+.errorState {
+  color: var(--rsd-color-red-500);
+}
+
+.errorMessage {
+  font-size: 0.875rem;
+  color: var(--rsd-color-gray-600);
+}
+
+.count {
+  padding-top: var(--sqo-space-sm);
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--rsd-color-gray-500);
+}
+
+/* The detail cell stacks the summary row and, when expanded, the body. */
+.detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sqo-space-sm);
+}
+
+/* The expander control sits to the left of the rendered-Markdown summary. */
+.summaryRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sqo-space-xs);
+}
+
+/* Bare icon button toggling the in-place body; inherits the row's box so the
+ * chevron aligns with the first line of the summary. */
+.expandButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--rsd-color-gray-500);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.expandButton:hover {
+  color: var(--rsd-color-gray-700);
+}
+
+/* The rendered-Markdown summary sits in a full-width detail row beneath its
+ * primary date/status row; mute it slightly so the primary row stays the
+ * visual anchor. */
+.summary {
+  color: var(--rsd-color-gray-600);
+}
+
+/* Collapse the rendered-Markdown summary so it sits inline within the detail
+ * cell rather than introducing paragraph block spacing. */
+.summary :global(p) {
+  margin: 0;
+}
+
+/* The expanded body is indented to align under the summary (past the expander
+ * affordance) and reads as the primary text once revealed. */
+.body {
+  margin-left: calc(16px + var(--sqo-space-xs));
+  color: var(--rsd-color-gray-800);
+}

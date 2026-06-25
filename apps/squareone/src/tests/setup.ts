@@ -55,3 +55,21 @@ Object.defineProperty(window, 'matchMedia', {
 
 // Mock scrollTo
 global.scrollTo = vi.fn();
+
+// Polyfills for the JSDOM environment needed by Radix UI popover-style
+// components (e.g. DropdownMenu): pointer capture and scrollIntoView are used
+// by Radix's focus management and are absent in JSDOM. Mirrors the squared
+// package's test setup.
+Object.defineProperty(Element.prototype, 'hasPointerCapture', {
+  value: () => false,
+  writable: true,
+});
+Object.defineProperty(Element.prototype, 'setPointerCapture', {
+  value: () => {},
+  writable: true,
+});
+Object.defineProperty(Element.prototype, 'releasePointerCapture', {
+  value: () => {},
+  writable: true,
+});
+Element.prototype.scrollIntoView = () => {};
