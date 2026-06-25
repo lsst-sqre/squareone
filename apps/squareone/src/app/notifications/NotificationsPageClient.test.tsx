@@ -1,7 +1,7 @@
 import { useLoginInfo } from '@lsst-sqre/gafaelfawr-client';
 import * as semaphoreClient from '@lsst-sqre/semaphore-client';
 import { mockUserNotifications } from '@lsst-sqre/semaphore-client';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -16,6 +16,7 @@ vi.mock('@lsst-sqre/semaphore-client', async (importOriginal) => {
     useUserNotifications: vi.fn(),
     useUserNotification: vi.fn(),
     useMarkNotificationsRead: vi.fn(),
+    fetchUserNotifications: vi.fn(),
   };
 });
 vi.mock('@lsst-sqre/gafaelfawr-client', () => ({
@@ -41,6 +42,9 @@ const mockUseUserNotifications = vi.mocked(
 const mockUseUserNotification = vi.mocked(semaphoreClient.useUserNotification);
 const mockUseMarkNotificationsRead = vi.mocked(
   semaphoreClient.useMarkNotificationsRead
+);
+const mockFetchUserNotifications = vi.mocked(
+  semaphoreClient.fetchUserNotifications
 );
 const mockUseLoginInfo = vi.mocked(useLoginInfo);
 const mockUseSemaphoreUrl = vi.mocked(useSemaphoreUrlModule.useSemaphoreUrl);
@@ -243,6 +247,56 @@ describe('NotificationsPageClient', () => {
     expect(markReadMutate).toHaveBeenCalledWith({
       ids: ['ntf-001'],
       csrfToken: 'csrf-token-xyz',
+    });
+  });
+
+  it('marks the selected rows read through the mutation', async () => {
+    const user = userEvent.setup();
+
+    render(<NotificationsPageClient />);
+
+    // Select the first row (ntf-001), open the bulk-actions dropdown, mark read.
+    await user.click(
+      screen.getAllByRole('checkbox', { name: /select row/i })[0]
+    );
+    await user.click(screen.getByRole('button', { name: /bulk actions/i }));
+    await user.click(screen.getByRole('menuitem', { name: /mark read/i }));
+
+    expect(markReadMutate).toHaveBeenCalledWith({
+      ids: ['ntf-001'],
+      csrfToken: 'csrf-token-xyz',
+    });
+  });
+
+  it('marks all unread read by enumerating the unread ids', async () => {
+    const user = userEvent.setup();
+    // The unread enumeration query (?unread=true) returns the unread summaries.
+    mockFetchUserNotifications.mockResolvedValue({
+      entries: [
+        mockUserNotifications[0], // ntf-001 (unread)
+        mockUserNotifications[2], // ntf-003 (unread)
+      ],
+      nextCursor: null,
+      totalCount: 2,
+    });
+
+    render(<NotificationsPageClient />);
+
+    await user.click(screen.getByRole('button', { name: /mark all as read/i }));
+
+    // It enumerates the unread notifications…
+    expect(mockFetchUserNotifications).toHaveBeenCalledWith(
+      'https://semaphore.example.com',
+      { unread: true }
+    );
+
+    // …then marks that enumerated set read through the same mutation that
+    // invalidates the list, the unread count, and each affected detail.
+    await waitFor(() => {
+      expect(markReadMutate).toHaveBeenCalledWith({
+        ids: ['ntf-001', 'ntf-003'],
+        csrfToken: 'csrf-token-xyz',
+      });
     });
   });
 

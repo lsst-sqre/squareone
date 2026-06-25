@@ -2,7 +2,9 @@
 
 import { useLoginInfo } from '@lsst-sqre/gafaelfawr-client';
 import {
+  fetchUserNotifications,
   type UserNotificationSummary,
+  useMarkNotificationsRead,
   useUserNotification,
   useUserNotifications,
 } from '@lsst-sqre/semaphore-client';
@@ -61,6 +63,38 @@ function NotificationsContent() {
     limit: PAGE_SIZE,
   });
 
+  // The explicit mark-read actions (bulk "Mark read" on a selection and "Mark
+  // all as read") route through this one mutation, whose shared `onSuccess`
+  // invalidates the list, the unread count, and each affected detail — so the
+  // inbox and the header badge update without a manual refresh.
+  const { mutate: markRead } = useMarkNotificationsRead(semaphoreUrl ?? '');
+
+  const handleMarkRead = useCallback(
+    (ids: string[]) => {
+      if (!csrfToken || ids.length === 0) {
+        return;
+      }
+      markRead({ ids, csrfToken });
+    },
+    [csrfToken, markRead]
+  );
+
+  // "Mark all as read" has no standing query for the full unread set, so it
+  // enumerates the unread ids on demand (the `?unread=true` list, unpaged) and
+  // marks exactly that set read.
+  const handleMarkAllRead = useCallback(async () => {
+    if (!semaphoreUrl || !csrfToken) {
+      return;
+    }
+    const { entries: unread } = await fetchUserNotifications(semaphoreUrl, {
+      unread: true,
+    });
+    const ids = unread.map((n) => n.id);
+    if (ids.length > 0) {
+      markRead({ ids, csrfToken });
+    }
+  }, [semaphoreUrl, csrfToken, markRead]);
+
   // While service discovery is pending the Semaphore URL is `undefined`, which
   // keeps the underlying query disabled, so `isLoading` is `false` even though
   // no data has arrived yet. Treat that pending window as loading so the table
@@ -102,6 +136,8 @@ function NotificationsContent() {
         showUnreadOnly={showUnreadOnly}
         onShowUnreadOnlyChange={setShowUnreadOnly}
         renderExpandedBody={renderExpandedBody}
+        onMarkRead={handleMarkRead}
+        onMarkAllRead={handleMarkAllRead}
       />
     </div>
   );

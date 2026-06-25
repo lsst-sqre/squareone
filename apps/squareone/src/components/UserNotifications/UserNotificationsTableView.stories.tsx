@@ -1,6 +1,6 @@
 import { mockUserNotifications } from '@lsst-sqre/semaphore-client';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { expect, fn, userEvent, within } from 'storybook/test';
+import { expect, fn, screen, userEvent, within } from 'storybook/test';
 
 import RenderedMarkdown from '../RenderedMarkdown';
 import UserNotificationsTableView from './UserNotificationsTableView';
@@ -80,6 +80,54 @@ export const Expandable: Story = {
     await expect(
       canvas.getByRole('button', { name: /hide message body/i })
     ).toBeInTheDocument();
+  },
+};
+
+/**
+ * Supplying `onMarkRead` / `onMarkAllRead` opts the table into row selection
+ * (a leading checkbox column with select-all) plus a bulk-actions dropdown and
+ * a "Mark all as read" button. The "Mark read" action is disabled until at
+ * least one row is selected; selecting a row enables it, and choosing it marks
+ * the selection read and clears it. The container owns the mutation (and the
+ * shared cache invalidation that updates the list and header count).
+ */
+export const WithBulkActions: Story = {
+  name: 'With bulk actions',
+  args: {
+    notifications: mockUserNotifications,
+    totalCount: mockUserNotifications.length,
+    onShowUnreadOnlyChange: fn(),
+    onMarkRead: fn(),
+    onMarkAllRead: fn(),
+  },
+  play: async ({ args, canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // The bulk-actions dropdown is disabled until a row is selected.
+    const bulkActions = canvas.getByRole('button', { name: /bulk actions/i });
+    await expect(bulkActions).toBeDisabled();
+
+    // "Mark all as read" calls back (the container enumerates + marks). Done
+    // before opening the dropdown, since the modal menu makes the rest of the
+    // page inert (aria-hidden) while open.
+    await userEvent.click(
+      canvas.getByRole('button', { name: /mark all as read/i })
+    );
+    await expect(args.onMarkAllRead).toHaveBeenCalled();
+
+    // Selecting a row enables the dropdown; "Mark read" marks the selection.
+    await userEvent.click(
+      canvas.getAllByRole('checkbox', { name: /select row/i })[0]
+    );
+    await expect(bulkActions).toBeEnabled();
+    await userEvent.click(bulkActions);
+
+    // The dropdown content is portaled to the document body, so query the
+    // screen rather than the canvas.
+    await userEvent.click(
+      await screen.findByRole('menuitem', { name: /mark read/i })
+    );
+    await expect(args.onMarkRead).toHaveBeenCalledWith(['ntf-001']);
   },
 };
 
