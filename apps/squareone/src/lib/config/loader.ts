@@ -65,6 +65,18 @@ export interface AppConfig {
   }>;
   showPreview: boolean;
   previewLink?: string;
+  /**
+   * Feature flag for the user-facing notifications UI (header badge,
+   * /notifications inbox and detail pages). Defaults to false so the feature
+   * stays hidden until release. Resolved from the schema default when absent.
+   */
+  enableUserNotifications: boolean;
+  /**
+   * Background polling cadence, in seconds, for the header unread-notification
+   * count (consumed by useUnreadNotificationCount). Resolved from the schema
+   * default (300) when absent.
+   */
+  userNotificationsPollIntervalSeconds: number;
   mdxDir: string; // New: configurable MDX directory
   sentryDsn?: string; // Injected from environment
   sentryTracesSampleRate?: number;

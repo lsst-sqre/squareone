@@ -10,6 +10,8 @@ const defaultConfig: AppConfigContextValue = {
     'The Rubin Science Platform (RSP) provides web-based data access and analysis tools.',
   showPreview: true,
   previewLink: 'https://rsp.lsst.io/roadmap.html',
+  enableUserNotifications: false,
+  userNotificationsPollIntervalSeconds: 300,
   docsBaseUrl: 'https://rsp.lsst.io',
   enableAppsMenu: false,
   appLinks: [],

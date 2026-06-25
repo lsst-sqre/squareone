@@ -17,6 +17,8 @@ appLinks:
     internal: false
 showPreview: true
 previewLink: 'https://rsp.lsst.io/roadmap.html'
+enableUserNotifications: false
+userNotificationsPollIntervalSeconds: 300
 # New configuration for filesystem-based MDX content
 mdxDir: 'src/content/pages'
 sentryTracesSampleRate: 0

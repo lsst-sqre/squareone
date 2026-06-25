@@ -14,6 +14,8 @@ const baseConfig: AppConfigContextValue = {
   enableAppsMenu: false,
   appLinks: [],
   showPreview: false,
+  enableUserNotifications: false,
+  userNotificationsPollIntervalSeconds: 300,
   mdxDir: 'src/content/pages',
 };
 

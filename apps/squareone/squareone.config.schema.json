@@ -150,6 +150,19 @@
       "description": "URL for the preview badge link",
       "default": "https://rsp.lsst.io/roadmap.html"
     },
+    "enableUserNotifications": {
+      "type": "boolean",
+      "title": "Enable user notifications",
+      "description": "Setting this option to true enables the user-facing notifications UI: the unread badge in the header user menu and the /notifications inbox and detail pages. Defaults to false so the feature stays hidden until it is released.",
+      "default": false
+    },
+    "userNotificationsPollIntervalSeconds": {
+      "type": "integer",
+      "title": "User notifications poll interval (seconds)",
+      "description": "Background polling cadence, in seconds, for the unread notification count shown in the header user menu. Consumed by the useUnreadNotificationCount hook (converted to milliseconds for TanStack Query's refetchInterval). Only relevant when enableUserNotifications is true.",
+      "minimum": 30,
+      "default": 300
+    },
     "headerLogoUrl": {
       "type": "string",
       "title": "Header logo URL",

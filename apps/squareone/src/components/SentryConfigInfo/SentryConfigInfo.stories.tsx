@@ -11,6 +11,8 @@ const baseConfig: AppConfigContextValue = {
   siteDescription: 'The Rubin Science Platform.',
   showPreview: false,
   previewLink: 'https://rsp.lsst.io/roadmap.html',
+  enableUserNotifications: false,
+  userNotificationsPollIntervalSeconds: 300,
   docsBaseUrl: 'https://rsp.lsst.io',
   enableAppsMenu: false,
   appLinks: [],
