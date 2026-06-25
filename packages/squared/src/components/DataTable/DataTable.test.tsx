@@ -212,9 +212,11 @@ describe('DataTable', () => {
 function SelectableTable({
   onChange,
   getRowLabel,
+  getRowId,
 }: {
   onChange?: (selection: RowSelectionState) => void;
   getRowLabel?: (row: Row) => string;
+  getRowId?: (row: Row) => string;
 }) {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
@@ -224,6 +226,7 @@ function SelectableTable({
       data={data}
       rowSelection={rowSelection}
       getRowLabel={getRowLabel}
+      getRowId={getRowId}
       onRowSelectionChange={(updater) => {
         setRowSelection((prev) => {
           const next = typeof updater === 'function' ? updater(prev) : updater;
@@ -299,6 +302,24 @@ describe('DataTable row selection', () => {
     })) {
       expect(checkbox).not.toBeChecked();
     }
+  });
+
+  it('keys the controlled selection by getRowId when provided', async () => {
+    const onChange = vi.fn();
+    render(
+      <SelectableTable onChange={onChange} getRowId={(row) => row.name} />
+    );
+
+    // data[0] is Bravo. With getRowId the selection is keyed by that derived id
+    // ("Bravo"), not by the row index ("0"), so a consumer can map selection
+    // straight back to its domain ids without an index round-trip.
+    const rowCheckboxes = screen.getAllByRole('checkbox', {
+      name: /select row/i,
+    });
+    await userEvent.click(rowCheckboxes[0]);
+
+    const latest = onChange.mock.calls.at(-1)?.[0] as RowSelectionState;
+    expect(latest).toEqual({ Bravo: true });
   });
 
   it('gives each row checkbox a distinct accessible name when getRowLabel is provided', () => {

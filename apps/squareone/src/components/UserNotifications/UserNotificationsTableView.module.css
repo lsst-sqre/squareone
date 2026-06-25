@@ -9,7 +9,22 @@
 
 .toolbar {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  gap: var(--sqo-space-md);
+}
+
+/* Bulk-actions group (dropdown + "Mark all as read") sits at the start of the
+ * toolbar. */
+.bulkActions {
+  display: flex;
+  align-items: center;
+  gap: var(--sqo-space-sm);
+}
+
+/* Keep the "Show unread only" filter pushed to the trailing edge whether or not
+ * the bulk-actions group is present. */
+.filter {
+  margin-left: auto;
 }
 
 .loadingState,

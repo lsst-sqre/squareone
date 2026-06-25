@@ -7,6 +7,7 @@ import {
   Checkbox,
   DataTable,
   type DataTableProps,
+  DropdownMenu,
 } from '@lsst-sqre/squared';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
@@ -47,7 +48,33 @@ export type UserNotificationsTableViewProps = {
   renderExpandedBody?: (
     notification: UserNotificationSummary
   ) => React.ReactNode;
+  /**
+   * Mark a set of notifications read.
+   *
+   * Supplying this opts the table into row selection — a leading checkbox column
+   * with a select-all header — plus a bulk-actions {@link DropdownMenu} whose
+   * "Mark read" action marks the current selection read. The dropdown is disabled
+   * until at least one row is selected, and the selection clears after the action
+   * fires. The container owns the mutation and the shared cache invalidation that
+   * updates the list and the header unread count. When omitted, no checkbox
+   * column or bulk-actions dropdown is shown.
+   */
+  onMarkRead?: (ids: string[]) => void;
+  /**
+   * Mark every unread notification read.
+   *
+   * Supplying this shows a "Mark all as read" button; the container enumerates
+   * the unread ids (via `?unread=true`) and marks them read. When omitted, the
+   * button is not shown.
+   */
+  onMarkAllRead?: () => void;
 };
+
+// Stable identities so the DataTable's memoized selection column (and its
+// checkbox cells) don't rebuild on every render — an inline function here would
+// remount the row checkboxes on each selection change.
+const getNotificationRowId = (n: UserNotificationSummary) => n.id;
+const getNotificationRowLabel = (n: UserNotificationSummary) => n.summary.gfm;
 
 const columns: DataTableProps<UserNotificationSummary>['columns'] = [
   {
@@ -81,10 +108,16 @@ const columns: DataTableProps<UserNotificationSummary>['columns'] = [
  * `renderExpandedBody` renderer is supplied, the secondary row also carries an
  * expander control that reveals the message body in place beneath the summary;
  * the view owns the expanded/collapsed state, while fetching the body and
- * auto-marking it read live in that container-supplied renderer. The view also
- * owns a "Load more" control, a shown-of-total count, and the loading, empty,
- * and error-with-retry states. It is fully driven by props so it can be
- * exercised from Storybook with fixtures; data fetching lives in the container.
+ * auto-marking it read live in that container-supplied renderer. When an
+ * `onMarkRead` handler is supplied, the table also gains row selection (a
+ * leading checkbox column with select-all) and a bulk-actions dropdown whose
+ * "Mark read" action — enabled once at least one row is selected — marks the
+ * selection read; an `onMarkAllRead` handler adds a "Mark all as read" button.
+ * The view owns the selection state but routes the actual marking back to the
+ * container. The view also owns a "Load more" control, a shown-of-total count,
+ * and the loading, empty, and error-with-retry states. It is fully driven by
+ * props so it can be exercised from Storybook with fixtures; data fetching lives
+ * in the container.
  */
 export default function UserNotificationsTableView({
   notifications,
@@ -98,9 +131,36 @@ export default function UserNotificationsTableView({
   showUnreadOnly = false,
   onShowUnreadOnlyChange,
   renderExpandedBody,
+  onMarkRead,
+  onMarkAllRead,
 }: UserNotificationsTableViewProps) {
   const entries = notifications ?? [];
   const shownCount = entries.length;
+
+  // Row selection drives the bulk-actions dropdown; it's enabled only when the
+  // container supplies a mark-read handler. The selection map is keyed by
+  // notification id (via the table's `getRowId`), so it maps straight back to
+  // ids and a stale id from a row that left the list is harmless.
+  const selectionEnabled = onMarkRead !== undefined;
+  const [rowSelection, setRowSelection] = useState<Record<string, boolean>>(
+    () => ({})
+  );
+  const selectedIds = entries
+    .filter((n) => rowSelection[n.id])
+    .map((n) => n.id);
+
+  const markReadSelected = () => {
+    if (selectedIds.length === 0) {
+      return;
+    }
+    onMarkRead?.(selectedIds);
+    // Clear the selection: the marked rows are done, and (under "Show unread
+    // only") they leave the list on the next refetch, so a lingering selection
+    // would be meaningless.
+    setRowSelection({});
+  };
+
+  const hasBulkControls = selectionEnabled || onMarkAllRead !== undefined;
 
   // Which rows are currently expanded to show their body. Purely presentational
   // interaction state; the body content itself comes from `renderExpandedBody`.
@@ -143,6 +203,10 @@ export default function UserNotificationsTableView({
           hasMore={hasMore}
           isLoadingMore={isLoadingMore}
           onLoadMore={onLoadMore}
+          getRowId={getNotificationRowId}
+          getRowLabel={getNotificationRowLabel}
+          rowSelection={selectionEnabled ? rowSelection : undefined}
+          onRowSelectionChange={selectionEnabled ? setRowSelection : undefined}
           aria-label="Notifications"
           emptyContent={
             showUnreadOnly
@@ -199,13 +263,41 @@ export default function UserNotificationsTableView({
   return (
     <div className={styles.container}>
       <div className={styles.toolbar}>
-        <Checkbox
-          label="Show unread only"
-          checked={showUnreadOnly}
-          onCheckedChange={(checked) =>
-            onShowUnreadOnlyChange?.(checked === true)
-          }
-        />
+        {hasBulkControls && (
+          <div className={styles.bulkActions}>
+            {selectionEnabled && (
+              <DropdownMenu>
+                <DropdownMenu.Trigger disabled={selectedIds.length === 0}>
+                  Bulk actions
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Content>
+                  <DropdownMenu.Item onSelect={markReadSelected}>
+                    Mark read
+                  </DropdownMenu.Item>
+                </DropdownMenu.Content>
+              </DropdownMenu>
+            )}
+            {onMarkAllRead && (
+              <Button
+                appearance="outline"
+                tone="secondary"
+                size="sm"
+                onClick={onMarkAllRead}
+              >
+                Mark all as read
+              </Button>
+            )}
+          </div>
+        )}
+        <div className={styles.filter}>
+          <Checkbox
+            label="Show unread only"
+            checked={showUnreadOnly}
+            onCheckedChange={(checked) =>
+              onShowUnreadOnlyChange?.(checked === true)
+            }
+          />
+        </div>
       </div>
       {body}
     </div>

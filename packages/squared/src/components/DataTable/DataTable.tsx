@@ -99,6 +99,14 @@ export type DataTableProps<TData> = {
    * enabled.
    */
   getRowLabel?: (row: TData) => string;
+  /**
+   * Optionally derive a stable row id from each row. When provided, the
+   * row-selection state is keyed by this id instead of the row's index, so a
+   * consumer can map the selection straight back to its domain ids (and the
+   * selection survives reordering or paging of `data`). Mirrors TanStack
+   * Table's own `getRowId`; only the row is exposed.
+   */
+  getRowId?: (row: TData) => string;
   /** Optional visible caption describing the table. */
   caption?: React.ReactNode;
   /**
@@ -218,6 +226,7 @@ export function DataTable<TData>({
   rowSelection,
   onRowSelectionChange,
   getRowLabel,
+  getRowId,
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = React.useState<SortingState>(initialSorting);
 
@@ -242,6 +251,7 @@ export function DataTable<TData>({
       ...(selectionEnabled ? { rowSelection } : {}),
     },
     onSortingChange: setSorting,
+    ...(getRowId ? { getRowId: (row: TData) => getRowId(row) } : {}),
     ...(selectionEnabled
       ? { enableRowSelection: true, onRowSelectionChange }
       : {}),

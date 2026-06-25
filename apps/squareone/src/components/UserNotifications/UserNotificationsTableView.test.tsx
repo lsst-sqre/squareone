@@ -141,6 +141,118 @@ describe('UserNotificationsTableView', () => {
     ).not.toBeInTheDocument();
   });
 
+  it('shows no row-selection checkboxes or bulk-actions dropdown without an onMarkRead handler', () => {
+    render(
+      <UserNotificationsTableView
+        notifications={mockUserNotifications.slice(0, 2)}
+        totalCount={2}
+      />
+    );
+
+    // No leading select column and no bulk-actions trigger.
+    expect(
+      screen.queryByRole('checkbox', { name: /select all rows/i })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /bulk actions/i })
+    ).not.toBeInTheDocument();
+  });
+
+  it('disables the bulk-actions dropdown until a row is selected, then marks the selection read', async () => {
+    const user = userEvent.setup();
+    const onMarkRead = vi.fn();
+    render(
+      <UserNotificationsTableView
+        notifications={mockUserNotifications.slice(0, 2)}
+        totalCount={2}
+        onMarkRead={onMarkRead}
+      />
+    );
+
+    // With nothing selected the bulk-actions trigger is disabled.
+    const bulkActions = screen.getByRole('button', { name: /bulk actions/i });
+    expect(bulkActions).toBeDisabled();
+
+    // Select the first row (ntf-001).
+    const rowCheckboxes = screen.getAllByRole('checkbox', {
+      name: /select row/i,
+    });
+    await user.click(rowCheckboxes[0]);
+
+    // The trigger is now enabled; open it and mark the selection read.
+    expect(bulkActions).toBeEnabled();
+    await user.click(bulkActions);
+    await user.click(screen.getByRole('menuitem', { name: /mark read/i }));
+
+    expect(onMarkRead).toHaveBeenCalledWith(['ntf-001']);
+  });
+
+  it('clears the selection after marking the selection read', async () => {
+    const user = userEvent.setup();
+    const onMarkRead = vi.fn();
+    render(
+      <UserNotificationsTableView
+        notifications={mockUserNotifications.slice(0, 2)}
+        totalCount={2}
+        onMarkRead={onMarkRead}
+      />
+    );
+
+    await user.click(
+      screen.getAllByRole('checkbox', { name: /select row/i })[0]
+    );
+    expect(
+      screen.getAllByRole('checkbox', { name: /select row/i })[0]
+    ).toBeChecked();
+
+    await user.click(screen.getByRole('button', { name: /bulk actions/i }));
+    await user.click(screen.getByRole('menuitem', { name: /mark read/i }));
+
+    // The selection is cleared, so the row checkbox is unchecked and the
+    // bulk-actions trigger is disabled again.
+    expect(
+      screen.getAllByRole('checkbox', { name: /select row/i })[0]
+    ).not.toBeChecked();
+    expect(
+      screen.getByRole('button', { name: /bulk actions/i })
+    ).toBeDisabled();
+  });
+
+  it('marks the whole selection read when several rows are selected via select-all', async () => {
+    const user = userEvent.setup();
+    const onMarkRead = vi.fn();
+    render(
+      <UserNotificationsTableView
+        notifications={mockUserNotifications.slice(0, 3)}
+        totalCount={3}
+        onMarkRead={onMarkRead}
+      />
+    );
+
+    await user.click(
+      screen.getByRole('checkbox', { name: /select all rows/i })
+    );
+    await user.click(screen.getByRole('button', { name: /bulk actions/i }));
+    await user.click(screen.getByRole('menuitem', { name: /mark read/i }));
+
+    expect(onMarkRead).toHaveBeenCalledWith(['ntf-001', 'ntf-002', 'ntf-003']);
+  });
+
+  it('exposes a "Mark all as read" control that invokes the handler', async () => {
+    const user = userEvent.setup();
+    const onMarkAllRead = vi.fn();
+    render(
+      <UserNotificationsTableView
+        notifications={mockUserNotifications.slice(0, 2)}
+        totalCount={2}
+        onMarkAllRead={onMarkAllRead}
+      />
+    );
+
+    await user.click(screen.getByRole('button', { name: /mark all as read/i }));
+    expect(onMarkAllRead).toHaveBeenCalled();
+  });
+
   it('reflects and toggles the "Show unread only" control', async () => {
     const user = userEvent.setup();
     const onShowUnreadOnlyChange = vi.fn();
