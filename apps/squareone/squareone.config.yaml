@@ -17,7 +17,10 @@ appLinks:
     internal: false
 showPreview: true
 previewLink: 'https://rsp.lsst.io/roadmap.html'
-enableUserNotifications: false
+# Enabled in the dev config so the header unread badge and notifications UI are
+# exercisable against the local dev mocks (see src/app/api/dev/semaphore). The
+# production default remains false (schema default; Phalanx configs opt in).
+enableUserNotifications: true
 userNotificationsPollIntervalSeconds: 300
 # New configuration for filesystem-based MDX content
 mdxDir: 'src/content/pages'

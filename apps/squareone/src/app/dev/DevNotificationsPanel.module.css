@@ -1,0 +1,72 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sqo-space-lg-fixed);
+  max-width: 640px;
+  margin: var(--sqo-space-lg-fixed) auto;
+  padding: 0 var(--size-screen-padding-min);
+}
+
+.heading {
+  margin: 0 0 var(--sqo-space-xxs-fixed);
+}
+
+.muted {
+  margin: 0;
+  color: var(--rsd-color-gray-600, #4b5563);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sqo-space-sm-fixed);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sqo-space-xxs-fixed);
+}
+
+.fieldLabel {
+  font-weight: 600;
+}
+
+.input {
+  width: 8rem;
+  padding: var(--sqo-space-xs-fixed) var(--sqo-space-sm-fixed);
+  border: 1px solid var(--rsd-color-gray-300, #d1d5db);
+  border-radius: var(--sqo-border-radius-1, 4px);
+  background-color: var(--rsd-component-page-background-color, #fff);
+  color: inherit;
+  font: inherit;
+}
+
+.applyRow {
+  display: flex;
+  align-items: center;
+  gap: var(--sqo-space-sm-fixed);
+}
+
+.applyButton {
+  padding: var(--sqo-space-xs-fixed) var(--sqo-space-md-fixed);
+  border: none;
+  border-radius: var(--sqo-border-radius-1, 4px);
+  background-color: var(--sqo-primary-button-background-color);
+  color: var(--sqo-primary-button-text-color);
+  cursor: pointer;
+  transition: var(--sqo-transition-basic);
+}
+
+.applyButton:hover:not(:disabled) {
+  background-color: var(--sqo-primary-button-background-color-hover);
+}
+
+.applyButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.applied {
+  color: var(--rsd-color-green-600, #237028);
+}

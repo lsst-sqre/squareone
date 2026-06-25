@@ -61,6 +61,7 @@ vi.mock('@lsst-sqre/repertoire-client', async (importOriginal) => ({
 vi.mock('@lsst-sqre/semaphore-client', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@lsst-sqre/semaphore-client')>()),
   useBroadcasts: vi.fn(),
+  useUnreadNotificationCount: vi.fn(),
 }));
 
 vi.mock('@lsst-sqre/gafaelfawr-client', async (importOriginal) => ({
@@ -82,7 +83,10 @@ import type {
 import { useLoginInfo, useUserInfo } from '@lsst-sqre/gafaelfawr-client';
 import { useServiceDiscovery } from '@lsst-sqre/repertoire-client';
 import type { Broadcast } from '@lsst-sqre/semaphore-client';
-import { useBroadcasts } from '@lsst-sqre/semaphore-client';
+import {
+  useBroadcasts,
+  useUnreadNotificationCount,
+} from '@lsst-sqre/semaphore-client';
 import { PrimaryNavigation, useGafaelfawrUser } from '@lsst-sqre/squared';
 
 import BroadcastBannerStack from '../components/BroadcastBannerStack';
@@ -153,6 +157,16 @@ function emptyBroadcasts(): ReturnType<typeof useBroadcasts> {
   } as unknown as ReturnType<typeof useBroadcasts>;
 }
 
+function noUnreadCount(): ReturnType<typeof useUnreadNotificationCount> {
+  return {
+    count: undefined,
+    isLoading: false,
+    isError: false,
+    error: null,
+    refetch: vi.fn(),
+  };
+}
+
 describe('shell render determinism', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -160,6 +174,7 @@ describe('shell render determinism', () => {
     vi.mocked(useServiceDiscovery).mockReturnValue(makeDiscoveryReturn());
     vi.mocked(useUserInfo).mockReturnValue(loggedOutUserInfo());
     vi.mocked(useBroadcasts).mockReturnValue(emptyBroadcasts());
+    vi.mocked(useUnreadNotificationCount).mockReturnValue(noUnreadCount());
   });
 
   test('Header renders identical markup across renders', () => {
