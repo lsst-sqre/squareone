@@ -61,7 +61,9 @@ export default function UserMenu({ pageUrl }: UserMenuProps) {
             color="blue"
             radius="full"
             size="sm"
-            aria-label={`${unreadCount} unread notifications`}
+            aria-label={`${unreadCount} unread notification${
+              unreadCount === 1 ? '' : 's'
+            }`}
           >
             {unreadCount}
           </Badge>
@@ -80,7 +82,9 @@ export default function UserMenu({ pageUrl }: UserMenuProps) {
             <PrimaryNavigation.Link asChild>
               <NextLink href="/notifications">
                 {unreadCount > 0
-                  ? `${unreadCount} unread messages`
+                  ? `${unreadCount} unread message${
+                      unreadCount === 1 ? '' : 's'
+                    }`
                   : 'Notifications'}
               </NextLink>
             </PrimaryNavigation.Link>

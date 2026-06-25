@@ -170,6 +170,25 @@ describe('UserMenu', () => {
       expect(item).toHaveAttribute('href', '/notifications');
     });
 
+    test('uses singular wording when there is exactly one unread message', async () => {
+      const user = userEvent.setup();
+      mockUser();
+      mockConfig({ enableUserNotifications: true });
+      mockUnreadCount(1);
+
+      renderMenu();
+
+      // The badge aria-label is singular for a single notification.
+      expect(
+        screen.getByLabelText('1 unread notification')
+      ).toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: /testuser/i }));
+
+      const item = screen.getByRole('link', { name: '1 unread message' });
+      expect(item).toHaveAttribute('href', '/notifications');
+    });
+
     test('shows a "Notifications" item and no badge when the flag is on and unread is 0', async () => {
       const user = userEvent.setup();
       mockUser();
