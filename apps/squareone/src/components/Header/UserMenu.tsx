@@ -56,7 +56,6 @@ export default function UserMenu({ pageUrl }: UserMenuProps) {
   return (
     <>
       <PrimaryNavigation.Trigger>
-        {user.username}{' '}
         {showUnreadBadge && (
           <Badge
             color="blue"
@@ -66,7 +65,8 @@ export default function UserMenu({ pageUrl }: UserMenuProps) {
           >
             {unreadCount}
           </Badge>
-        )}
+        )}{' '}
+        {user.username}
         <ChevronDown />
       </PrimaryNavigation.Trigger>
       <PrimaryNavigation.Content>
