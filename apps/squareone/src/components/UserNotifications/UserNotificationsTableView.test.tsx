@@ -99,6 +99,48 @@ describe('UserNotificationsTableView', () => {
     expect(onLoadMore).toHaveBeenCalled();
   });
 
+  it('expands a row in place to reveal the body and collapses it again', async () => {
+    const user = userEvent.setup();
+    render(
+      <UserNotificationsTableView
+        notifications={mockUserNotifications.slice(0, 2)}
+        totalCount={2}
+        renderExpandedBody={(n) => <div>Body for {n.id}</div>}
+      />
+    );
+
+    // Bodies stay hidden until a row is expanded.
+    expect(screen.queryByText('Body for ntf-001')).not.toBeInTheDocument();
+
+    const expanders = screen.getAllByRole('button', {
+      name: /show message body/i,
+    });
+    await user.click(expanders[0]);
+
+    // The expanded row reveals its body; the other row stays collapsed.
+    expect(screen.getByText('Body for ntf-001')).toBeInTheDocument();
+    expect(screen.queryByText('Body for ntf-002')).not.toBeInTheDocument();
+
+    // The control reflects the expanded state and collapses on a second click.
+    const collapse = screen.getByRole('button', { name: /hide message body/i });
+    expect(collapse).toHaveAttribute('aria-expanded', 'true');
+    await user.click(collapse);
+    expect(screen.queryByText('Body for ntf-001')).not.toBeInTheDocument();
+  });
+
+  it('shows no expander when no expanded-body renderer is supplied', () => {
+    render(
+      <UserNotificationsTableView
+        notifications={mockUserNotifications.slice(0, 2)}
+        totalCount={2}
+      />
+    );
+
+    expect(
+      screen.queryByRole('button', { name: /show message body/i })
+    ).not.toBeInTheDocument();
+  });
+
   it('reflects and toggles the "Show unread only" control', async () => {
     const user = userEvent.setup();
     const onShowUnreadOnlyChange = vi.fn();

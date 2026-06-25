@@ -72,6 +72,32 @@ export function getDevUserNotificationById(
   };
 }
 
+/**
+ * Mark the given notifications read, in place.
+ *
+ * Mirrors the idempotent semantics of `POST /v1/notifications/read`: matching
+ * notifications that are currently unread get a fresh read timestamp;
+ * already-read notifications keep their original one, and unknown ids are
+ * silently ignored. Because the store is persistent, this lowers the unread
+ * total the header badge reads from the list endpoint.
+ *
+ * Implemented inline rather than via the shared `markUserNotificationsRead`
+ * helper because that helper's `{ id: string }` generic constraint is
+ * unsatisfiable against this package's cross-package `z.infer` types (their keys
+ * resolve as optional from squareone's side).
+ *
+ * @param ids - The notification ids to mark read
+ */
+export function markDevUserNotificationsRead(ids: string[]): void {
+  const idSet = new Set(ids);
+  const readDate = new Date().toISOString();
+  notifications = notifications.map((notification) =>
+    idSet.has(notification.id) && notification.read === null
+      ? { ...notification, read: readDate }
+      : notification
+  );
+}
+
 /** Reset the store to its seeded state. Primarily for tests. */
 export function resetDevUserNotifications(): void {
   notifications = structuredClone(mockUserNotifications);

@@ -1,3 +1,5 @@
+'use client';
+
 import type { UserNotificationSummary } from '@lsst-sqre/semaphore-client';
 import {
   Badge,
@@ -6,6 +8,8 @@ import {
   DataTable,
   type DataTableProps,
 } from '@lsst-sqre/squared';
+import { ChevronDown, ChevronRight } from 'lucide-react';
+import { useState } from 'react';
 
 import { formatUtcTimestamp } from '../../lib/utils/dateFormatters';
 import RenderedMarkdown from '../RenderedMarkdown';
@@ -32,6 +36,17 @@ export type UserNotificationsTableViewProps = {
   showUnreadOnly?: boolean;
   /** Toggle the "Show unread only" filter. */
   onShowUnreadOnlyChange?: (showUnreadOnly: boolean) => void;
+  /**
+   * Render the expand-in-place body for a notification.
+   *
+   * A `UserNotificationSummary` carries no body, so the container supplies this
+   * to fetch and render the full message's body (and to auto-mark it read) only
+   * once a row is expanded. When omitted, no expander affordance is shown and
+   * each row stays summary-only.
+   */
+  renderExpandedBody?: (
+    notification: UserNotificationSummary
+  ) => React.ReactNode;
 };
 
 const columns: DataTableProps<UserNotificationSummary>['columns'] = [
@@ -62,13 +77,14 @@ const columns: DataTableProps<UserNotificationSummary>['columns'] = [
  * Renders a "Show unread only" toggle plus the notifications {@link DataTable}.
  * Each notification is a two-row unit: a primary row with its date and read
  * status, and a full-width secondary row beneath it holding the rendered-
- * Markdown summary (the user API's `gfm` field, no column header). The view also
+ * Markdown summary (the user API's `gfm` field, no column header). When a
+ * `renderExpandedBody` renderer is supplied, the secondary row also carries an
+ * expander control that reveals the message body in place beneath the summary;
+ * the view owns the expanded/collapsed state, while fetching the body and
+ * auto-marking it read live in that container-supplied renderer. The view also
  * owns a "Load more" control, a shown-of-total count, and the loading, empty,
  * and error-with-retry states. It is fully driven by props so it can be
  * exercised from Storybook with fixtures; data fetching lives in the container.
- *
- * Read-only in this slice: there is no row selection, mark-read, or per-message
- * detail navigation yet.
  */
 export default function UserNotificationsTableView({
   notifications,
@@ -81,9 +97,24 @@ export default function UserNotificationsTableView({
   onRetry,
   showUnreadOnly = false,
   onShowUnreadOnlyChange,
+  renderExpandedBody,
 }: UserNotificationsTableViewProps) {
   const entries = notifications ?? [];
   const shownCount = entries.length;
+
+  // Which rows are currently expanded to show their body. Purely presentational
+  // interaction state; the body content itself comes from `renderExpandedBody`.
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(() => new Set());
+  const toggleExpanded = (id: string) =>
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
 
   let body: React.ReactNode;
   if (isLoading) {
@@ -118,12 +149,39 @@ export default function UserNotificationsTableView({
               ? 'You have no unread notifications.'
               : 'You have no notifications.'
           }
-          renderDetailRow={(n) => (
-            <RenderedMarkdown
-              className={styles.summary}
-              markdown={n.summary.gfm}
-            />
-          )}
+          renderDetailRow={(n) => {
+            const expanded = expandedIds.has(n.id);
+            return (
+              <div className={styles.detail}>
+                <div className={styles.summaryRow}>
+                  {renderExpandedBody && (
+                    <button
+                      type="button"
+                      className={styles.expandButton}
+                      aria-expanded={expanded}
+                      aria-label={
+                        expanded ? 'Hide message body' : 'Show message body'
+                      }
+                      onClick={() => toggleExpanded(n.id)}
+                    >
+                      {expanded ? (
+                        <ChevronDown size={16} aria-hidden="true" />
+                      ) : (
+                        <ChevronRight size={16} aria-hidden="true" />
+                      )}
+                    </button>
+                  )}
+                  <RenderedMarkdown
+                    className={styles.summary}
+                    markdown={n.summary.gfm}
+                  />
+                </div>
+                {renderExpandedBody && expanded && (
+                  <div className={styles.body}>{renderExpandedBody(n)}</div>
+                )}
+              </div>
+            );
+          }}
         />
         {shownCount > 0 && (
           <div className={styles.count}>

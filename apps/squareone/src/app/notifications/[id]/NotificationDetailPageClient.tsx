@@ -1,9 +1,12 @@
 'use client';
 
+import { useLoginInfo } from '@lsst-sqre/gafaelfawr-client';
 import { useUserNotification } from '@lsst-sqre/semaphore-client';
 
 import AuthRequired from '../../../components/AuthRequired';
 import { UserNotificationDetailView } from '../../../components/UserNotifications';
+import { useAutoMarkNotificationRead } from '../../../hooks/useAutoMarkNotificationRead';
+import { useRepertoireUrl } from '../../../hooks/useRepertoireUrl';
 import { useSemaphoreUrlState } from '../../../hooks/useSemaphoreUrl';
 
 export type NotificationDetailPageClientProps = {
@@ -30,6 +33,10 @@ const UNAVAILABLE_ERROR = new Error(
  * the query is disabled and we show a loading state. Once it has settled without
  * a Semaphore URL (Semaphore undiscoverable / unavailable) we render a terminal
  * unavailable state — not an endless spinner, and not a misleading not-found.
+ *
+ * Viewing the detail page auto-marks the notification read (via
+ * {@link useAutoMarkNotificationRead}) once it loads unread, so the inbox row
+ * status and the header unread badge update without a manual refresh.
  */
 export default function NotificationDetailPageClient({
   id,
@@ -43,10 +50,21 @@ export default function NotificationDetailPageClient({
 
 function NotificationDetailContent({ id }: { id: string }) {
   const { url, isResolving, isUnavailable } = useSemaphoreUrlState();
+  const repertoireUrl = useRepertoireUrl();
+  const { csrfToken } = useLoginInfo(repertoireUrl);
   const { notification, isLoading, isError, error } = useUserNotification(
     url ?? '',
     id
   );
+
+  useAutoMarkNotificationRead({
+    semaphoreUrl: url,
+    csrfToken,
+    id,
+    // Gate on the fetched record so a mark only fires once the body is shown,
+    // and never for an already-read notification.
+    isUnread: notification?.read === null,
+  });
 
   const resolvedError = isUnavailable
     ? UNAVAILABLE_ERROR

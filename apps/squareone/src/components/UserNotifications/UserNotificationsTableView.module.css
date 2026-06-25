@@ -40,6 +40,38 @@
   color: var(--rsd-color-gray-500);
 }
 
+/* The detail cell stacks the summary row and, when expanded, the body. */
+.detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sqo-space-sm);
+}
+
+/* The expander control sits to the left of the rendered-Markdown summary. */
+.summaryRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sqo-space-xs);
+}
+
+/* Bare icon button toggling the in-place body; inherits the row's box so the
+ * chevron aligns with the first line of the summary. */
+.expandButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--rsd-color-gray-500);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.expandButton:hover {
+  color: var(--rsd-color-gray-700);
+}
+
 /* The rendered-Markdown summary sits in a full-width detail row beneath its
  * primary date/status row; mute it slightly so the primary row stays the
  * visual anchor. */
@@ -51,4 +83,11 @@
  * cell rather than introducing paragraph block spacing. */
 .summary :global(p) {
   margin: 0;
+}
+
+/* The expanded body is indented to align under the summary (past the expander
+ * affordance) and reads as the primary text once revealed. */
+.body {
+  margin-left: calc(16px + var(--sqo-space-xs));
+  color: var(--rsd-color-gray-800);
 }
