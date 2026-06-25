@@ -211,8 +211,10 @@ describe('DataTable', () => {
 // (the notifications inbox) wires the selection props.
 function SelectableTable({
   onChange,
+  getRowLabel,
 }: {
   onChange?: (selection: RowSelectionState) => void;
+  getRowLabel?: (row: Row) => string;
 }) {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
@@ -221,6 +223,7 @@ function SelectableTable({
       columns={columns}
       data={data}
       rowSelection={rowSelection}
+      getRowLabel={getRowLabel}
       onRowSelectionChange={(updater) => {
         setRowSelection((prev) => {
           const next = typeof updater === 'function' ? updater(prev) : updater;
@@ -296,5 +299,24 @@ describe('DataTable row selection', () => {
     })) {
       expect(checkbox).not.toBeChecked();
     }
+  });
+
+  it('gives each row checkbox a distinct accessible name when getRowLabel is provided', () => {
+    render(<SelectableTable getRowLabel={(row) => row.name} />);
+
+    // Each per-row checkbox gets a unique "Select row: <name>" label so a
+    // screen-reader user can tell the rows apart.
+    expect(
+      screen.getByRole('checkbox', { name: /select row: bravo/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('checkbox', { name: /select row: alpha/i })
+    ).toBeInTheDocument();
+
+    // The labelled checkboxes still match the generic /select row/i query, so
+    // backward compatibility with the default label holds.
+    expect(
+      screen.getAllByRole('checkbox', { name: /select row/i })
+    ).toHaveLength(data.length);
   });
 });

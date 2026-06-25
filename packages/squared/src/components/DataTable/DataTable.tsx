@@ -90,6 +90,15 @@ export type DataTableProps<TData> = {
    * alongside `rowSelection`, to enable selection.
    */
   onRowSelectionChange?: OnChangeFn<RowSelectionState>;
+  /**
+   * Optionally derive a per-row accessible label for that row's selection
+   * checkbox. Without it, every checkbox shares the generic `"Select row"`
+   * label, which screen-reader users cannot tell apart. Return a stable,
+   * human-readable identifier for the row (e.g. a name or title); it is
+   * rendered as `Select row: <identifier>`. Only used when row selection is
+   * enabled.
+   */
+  getRowLabel?: (row: TData) => string;
   /** Optional visible caption describing the table. */
   caption?: React.ReactNode;
   /**
@@ -110,7 +119,9 @@ type SortDirection = false | 'asc' | 'desc';
  * are selected) and each cell toggles its own row through TanStack's
  * row-selection model.
  */
-function createSelectionColumn<TData>(): ColumnDef<TData, unknown> {
+function createSelectionColumn<TData>(
+  getRowLabel?: (row: TData) => string
+): ColumnDef<TData, unknown> {
   return {
     id: 'select',
     enableSorting: false,
@@ -129,7 +140,11 @@ function createSelectionColumn<TData>(): ColumnDef<TData, unknown> {
     ),
     cell: ({ row }) => (
       <Checkbox
-        aria-label="Select row"
+        aria-label={
+          getRowLabel
+            ? `Select row: ${getRowLabel(row.original)}`
+            : 'Select row'
+        }
         checked={row.getIsSelected()}
         disabled={!row.getCanSelect()}
         onCheckedChange={(value) => row.toggleSelected(value === true)}
@@ -202,6 +217,7 @@ export function DataTable<TData>({
   renderDetailRow,
   rowSelection,
   onRowSelectionChange,
+  getRowLabel,
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = React.useState<SortingState>(initialSorting);
 
@@ -212,8 +228,10 @@ export function DataTable<TData>({
 
   const tableColumns = React.useMemo(
     () =>
-      selectionEnabled ? [createSelectionColumn<TData>(), ...columns] : columns,
-    [selectionEnabled, columns]
+      selectionEnabled
+        ? [createSelectionColumn<TData>(getRowLabel), ...columns]
+        : columns,
+    [selectionEnabled, columns, getRowLabel]
   );
 
   const table = useReactTable({
