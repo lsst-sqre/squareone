@@ -2,6 +2,7 @@ import { mockUserNotifications } from '@lsst-sqre/semaphore-client';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
+import RenderedMarkdown from '../RenderedMarkdown';
 import UserNotificationsTableView from './UserNotificationsTableView';
 
 const meta: Meta<typeof UserNotificationsTableView> = {
@@ -43,6 +44,41 @@ export const Loaded: Story = {
     ).toBeInTheDocument();
     await expect(
       canvas.getByRole('checkbox', { name: /show unread only/i })
+    ).toBeInTheDocument();
+  },
+};
+
+/**
+ * When a `renderExpandedBody` renderer is supplied, each row gains an expander
+ * control that reveals the message body in place. The view owns the
+ * expanded/collapsed state; the container supplies the body (fetched on demand)
+ * and auto-marks it read.
+ */
+export const Expandable: Story = {
+  args: {
+    notifications: mockUserNotifications,
+    totalCount: mockUserNotifications.length,
+    onShowUnreadOnlyChange: fn(),
+    renderExpandedBody: (n) => (
+      <RenderedMarkdown markdown={`Full message body for **${n.id}**.`} />
+    ),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // Bodies are hidden until a row is expanded.
+    await expect(canvas.queryByText('ntf-001')).not.toBeInTheDocument();
+
+    const expanders = canvas.getAllByRole('button', {
+      name: /show message body/i,
+    });
+    await userEvent.click(expanders[0]);
+
+    // The expanded row reveals its body (rendered Markdown), and the control
+    // flips to a collapse affordance.
+    await expect(canvas.getByText('ntf-001').tagName).toBe('STRONG');
+    await expect(
+      canvas.getByRole('button', { name: /hide message body/i })
     ).toBeInTheDocument();
   },
 };

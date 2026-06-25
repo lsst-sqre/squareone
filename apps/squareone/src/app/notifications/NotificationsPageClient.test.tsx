@@ -1,3 +1,4 @@
+import { useLoginInfo } from '@lsst-sqre/gafaelfawr-client';
 import * as semaphoreClient from '@lsst-sqre/semaphore-client';
 import { mockUserNotifications } from '@lsst-sqre/semaphore-client';
 import { render, screen } from '@testing-library/react';
@@ -13,9 +14,17 @@ vi.mock('@lsst-sqre/semaphore-client', async (importOriginal) => {
   return {
     ...actual,
     useUserNotifications: vi.fn(),
+    useUserNotification: vi.fn(),
+    useMarkNotificationsRead: vi.fn(),
   };
 });
+vi.mock('@lsst-sqre/gafaelfawr-client', () => ({
+  useLoginInfo: vi.fn(),
+}));
 vi.mock('../../hooks/useSemaphoreUrl');
+vi.mock('../../hooks/useRepertoireUrl', () => ({
+  useRepertoireUrl: (): string | undefined => 'https://repertoire.example.com',
+}));
 
 // Render AuthRequired as a transparent wrapper so the container's wiring can be
 // exercised without a mocked auth backend; AuthRequired's own redirect/loading
@@ -29,10 +38,17 @@ vi.mock('../../components/AuthRequired', () => ({
 const mockUseUserNotifications = vi.mocked(
   semaphoreClient.useUserNotifications
 );
+const mockUseUserNotification = vi.mocked(semaphoreClient.useUserNotification);
+const mockUseMarkNotificationsRead = vi.mocked(
+  semaphoreClient.useMarkNotificationsRead
+);
+const mockUseLoginInfo = vi.mocked(useLoginInfo);
 const mockUseSemaphoreUrl = vi.mocked(useSemaphoreUrlModule.useSemaphoreUrl);
 
 // The container owns the page size and passes it to the list query.
 const PAGE_SIZE = 20;
+
+const markReadMutate = vi.fn();
 
 function makeNotificationsReturn(
   overrides: Partial<semaphoreClient.UseUserNotificationsReturn> = {}
@@ -51,11 +67,47 @@ function makeNotificationsReturn(
   };
 }
 
+function makeNotificationReturn(
+  overrides: Partial<semaphoreClient.UseUserNotificationReturn> = {}
+): semaphoreClient.UseUserNotificationReturn {
+  return {
+    notification: undefined,
+    isLoading: false,
+    isError: false,
+    error: null,
+    refetch: vi.fn(),
+    ...overrides,
+  };
+}
+
+const unreadDetail: semaphoreClient.UserNotificationFormatted = {
+  id: 'ntf-001',
+  created: '2026-06-12T17:10:32+00:00',
+  read: null,
+  summary: {
+    gfm: 'You are approaching your disk space **quota** limit',
+    html: '<p>You are approaching your disk space <strong>quota</strong> limit</p>',
+  },
+  body: {
+    gfm: 'You are using **448GiB** of your 500GiB quota.',
+    html: '<p>You are using <strong>448GiB</strong> of your 500GiB quota.</p>',
+  },
+};
+
 describe('NotificationsPageClient', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockUseSemaphoreUrl.mockReturnValue('https://semaphore.example.com');
     mockUseUserNotifications.mockReturnValue(makeNotificationsReturn());
+    mockUseUserNotification.mockReturnValue(makeNotificationReturn());
+    mockUseMarkNotificationsRead.mockReturnValue({
+      mutate: markReadMutate,
+    } as unknown as ReturnType<
+      typeof semaphoreClient.useMarkNotificationsRead
+    >);
+    mockUseLoginInfo.mockReturnValue({
+      csrfToken: 'csrf-token-xyz',
+    } as unknown as ReturnType<typeof useLoginInfo>);
   });
 
   it('wraps its content in AuthRequired', () => {
@@ -165,5 +217,54 @@ describe('NotificationsPageClient', () => {
       'https://semaphore.example.com',
       { unread: true, limit: PAGE_SIZE }
     );
+  });
+
+  it('expands a row to fetch its body and auto-marks an unread message read', async () => {
+    const user = userEvent.setup();
+    mockUseUserNotification.mockReturnValue(
+      makeNotificationReturn({ notification: unreadDetail })
+    );
+
+    render(<NotificationsPageClient />);
+
+    const expanders = screen.getAllByRole('button', {
+      name: /show message body/i,
+    });
+    await user.click(expanders[0]);
+
+    // The body is fetched for the expanded row and rendered in place…
+    expect(mockUseUserNotification).toHaveBeenCalledWith(
+      'https://semaphore.example.com',
+      'ntf-001'
+    );
+    expect(screen.getByText('448GiB')).toBeInTheDocument();
+
+    // …and the unread message is auto-marked read through the mutation.
+    expect(markReadMutate).toHaveBeenCalledWith({
+      ids: ['ntf-001'],
+      csrfToken: 'csrf-token-xyz',
+    });
+  });
+
+  it('does not re-mark an already-read message when its body is shown', async () => {
+    const user = userEvent.setup();
+    mockUseUserNotification.mockReturnValue(
+      makeNotificationReturn({
+        notification: {
+          ...unreadDetail,
+          read: '2026-06-12T18:00:00+00:00',
+        },
+      })
+    );
+
+    render(<NotificationsPageClient />);
+
+    const expanders = screen.getAllByRole('button', {
+      name: /show message body/i,
+    });
+    await user.click(expanders[0]);
+
+    expect(screen.getByText('448GiB')).toBeInTheDocument();
+    expect(markReadMutate).not.toHaveBeenCalled();
   });
 });

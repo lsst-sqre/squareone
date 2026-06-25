@@ -1,3 +1,4 @@
+import { useLoginInfo } from '@lsst-sqre/gafaelfawr-client';
 import * as semaphoreClient from '@lsst-sqre/semaphore-client';
 import { render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
@@ -11,9 +12,16 @@ vi.mock('@lsst-sqre/semaphore-client', async (importOriginal) => {
   return {
     ...actual,
     useUserNotification: vi.fn(),
+    useMarkNotificationsRead: vi.fn(),
   };
 });
+vi.mock('@lsst-sqre/gafaelfawr-client', () => ({
+  useLoginInfo: vi.fn(),
+}));
 vi.mock('../../../hooks/useSemaphoreUrl');
+vi.mock('../../../hooks/useRepertoireUrl', () => ({
+  useRepertoireUrl: (): string | undefined => 'https://repertoire.example.com',
+}));
 
 // Render AuthRequired as a transparent wrapper so the container's wiring can be
 // exercised without a mocked auth backend; AuthRequired's own redirect/loading
@@ -25,9 +33,15 @@ vi.mock('../../../components/AuthRequired', () => ({
 }));
 
 const mockUseUserNotification = vi.mocked(semaphoreClient.useUserNotification);
+const mockUseMarkNotificationsRead = vi.mocked(
+  semaphoreClient.useMarkNotificationsRead
+);
+const mockUseLoginInfo = vi.mocked(useLoginInfo);
 const mockUseSemaphoreUrlState = vi.mocked(
   useSemaphoreUrlModule.useSemaphoreUrlState
 );
+
+const markReadMutate = vi.fn();
 
 const notification: semaphoreClient.UserNotificationFormatted = {
   id: 'ntf-001',
@@ -62,6 +76,14 @@ describe('NotificationDetailPageClient', () => {
       isUnavailable: false,
     });
     mockNotificationReturn();
+    mockUseMarkNotificationsRead.mockReturnValue({
+      mutate: markReadMutate,
+    } as unknown as ReturnType<
+      typeof semaphoreClient.useMarkNotificationsRead
+    >);
+    mockUseLoginInfo.mockReturnValue({
+      csrfToken: 'csrf-token-xyz',
+    } as unknown as ReturnType<typeof useLoginInfo>);
   });
 
   it('wraps its content in AuthRequired', () => {
@@ -124,5 +146,34 @@ describe('NotificationDetailPageClient', () => {
     render(<NotificationDetailPageClient id="missing" />);
 
     expect(screen.getByText('Notification not found')).toBeInTheDocument();
+  });
+
+  it('auto-marks an unread notification read once it loads', () => {
+    // The fixture is unread (`read: null`).
+    mockNotificationReturn({ notification });
+
+    render(<NotificationDetailPageClient id="ntf-001" />);
+
+    expect(markReadMutate).toHaveBeenCalledWith({
+      ids: ['ntf-001'],
+      csrfToken: 'csrf-token-xyz',
+    });
+  });
+
+  it('does not mark an already-read notification', () => {
+    mockNotificationReturn({
+      notification: { ...notification, read: '2026-06-12T18:00:00+00:00' },
+    });
+
+    render(<NotificationDetailPageClient id="ntf-001" />);
+
+    expect(markReadMutate).not.toHaveBeenCalled();
+  });
+
+  it('does not mark before the notification has loaded', () => {
+    // Default mock: notification is still undefined.
+    render(<NotificationDetailPageClient id="ntf-001" />);
+
+    expect(markReadMutate).not.toHaveBeenCalled();
   });
 });
