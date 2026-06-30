@@ -16,6 +16,7 @@ import { UserNotificationsTableView } from '../../components/UserNotifications';
 import { useAutoMarkNotificationRead } from '../../hooks/useAutoMarkNotificationRead';
 import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
 import { useSemaphoreUrl } from '../../hooks/useSemaphoreUrl';
+import { useStaticConfig } from '../../hooks/useStaticConfig';
 
 /** Page size owned by the listing container, requested from the list query. */
 const PAGE_SIZE = 20;
@@ -47,6 +48,7 @@ function NotificationsContent() {
   const semaphoreUrl = useSemaphoreUrl();
   const repertoireUrl = useRepertoireUrl();
   const { csrfToken } = useLoginInfo(repertoireUrl);
+  const { baseUrl } = useStaticConfig();
   const [showUnreadOnly, setShowUnreadOnly] = useState(false);
 
   const {
@@ -79,10 +81,10 @@ function NotificationsContent() {
     [csrfToken, markRead]
   );
 
-  // "Mark all as read" has no standing query for the full unread set, so it
-  // enumerates the unread ids on demand (the `?unread=true` list, unpaged) and
-  // marks exactly that set read.
-  const handleMarkAllRead = useCallback(async () => {
+  // The two-tier "Select all M notifications" path has no standing query for the
+  // full unread set, so it enumerates the unread ids on demand (the
+  // `?unread=true` list, unpaged) and marks exactly that set read.
+  const handleMarkAllMatchingRead = useCallback(async () => {
     if (!semaphoreUrl || !csrfToken) {
       return;
     }
@@ -136,8 +138,9 @@ function NotificationsContent() {
         showUnreadOnly={showUnreadOnly}
         onShowUnreadOnlyChange={setShowUnreadOnly}
         renderExpandedBody={renderExpandedBody}
+        permalinkBase={baseUrl}
         onMarkRead={handleMarkRead}
-        onMarkAllRead={handleMarkAllRead}
+        onMarkAllMatchingRead={handleMarkAllMatchingRead}
       />
     </div>
   );

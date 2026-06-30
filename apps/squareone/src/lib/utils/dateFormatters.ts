@@ -65,6 +65,25 @@ export function formatUtcTimestamp(iso: string): string {
 }
 
 /**
+ * Format an ISO 8601 timestamp as a past-tense relative description of how long
+ * ago it was, e.g. `"18 days ago"` or `"less than 1 hour ago"`.
+ *
+ * Reads the current time via `Date.now()` at call time, so callers that need
+ * deterministic output (tests) should stub the clock. Returns the original
+ * string unchanged when it does not parse to a valid date.
+ * @param iso - ISO 8601 timestamp string
+ * @returns Relative description with a trailing " ago", or `iso` if invalid
+ */
+export function formatRelativeToNow(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) {
+    return iso;
+  }
+  const secondsAgo = Math.max(0, (Date.now() - date.getTime()) / 1000);
+  return `${getRelativeTimeDescription(secondsAgo, 'past')} ago`;
+}
+
+/**
  * Get a relative time description.
  * @param seconds - Number of seconds for the time period
  * @param direction - 'past' for "ago" or 'future' for "in"

@@ -7,6 +7,8 @@ import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import * as useSemaphoreUrlModule from '../../hooks/useSemaphoreUrl';
+import { useStaticConfig } from '../../hooks/useStaticConfig';
+import type { AppConfig } from '../../lib/config/loader';
 import NotificationsPageClient from './NotificationsPageClient';
 
 vi.mock('@lsst-sqre/semaphore-client', async (importOriginal) => {
@@ -25,6 +27,11 @@ vi.mock('@lsst-sqre/gafaelfawr-client', () => ({
 vi.mock('../../hooks/useSemaphoreUrl');
 vi.mock('../../hooks/useRepertoireUrl', () => ({
   useRepertoireUrl: (): string | undefined => 'https://repertoire.example.com',
+}));
+// The container reads `baseUrl` from static config to build copy-link
+// permalinks; mock it so the component renders without a ConfigProvider.
+vi.mock('../../hooks/useStaticConfig', () => ({
+  useStaticConfig: vi.fn(),
 }));
 
 // Render AuthRequired as a transparent wrapper so the container's wiring can be
@@ -101,6 +108,9 @@ const unreadDetail: semaphoreClient.UserNotificationFormatted = {
 describe('NotificationsPageClient', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(useStaticConfig).mockReturnValue({
+      baseUrl: 'https://example.test',
+    } as AppConfig);
     mockUseSemaphoreUrl.mockReturnValue('https://semaphore.example.com');
     mockUseUserNotifications.mockReturnValue(makeNotificationsReturn());
     mockUseUserNotification.mockReturnValue(makeNotificationReturn());
@@ -232,7 +242,7 @@ describe('NotificationsPageClient', () => {
     render(<NotificationsPageClient />);
 
     const expanders = screen.getAllByRole('button', {
-      name: /show message body/i,
+      name: /show message/i,
     });
     await user.click(expanders[0]);
 
@@ -255,12 +265,12 @@ describe('NotificationsPageClient', () => {
 
     render(<NotificationsPageClient />);
 
-    // Select the first row (ntf-001), open the bulk-actions dropdown, mark read.
+    // Select the first row (ntf-001), open the Actions dropdown, mark it read.
     await user.click(
-      screen.getAllByRole('checkbox', { name: /select row/i })[0]
+      screen.getAllByRole('checkbox', { name: /select notification/i })[0]
     );
-    await user.click(screen.getByRole('button', { name: /bulk actions/i }));
-    await user.click(screen.getByRole('menuitem', { name: /mark read/i }));
+    await user.click(screen.getByRole('button', { name: 'Actions' }));
+    await user.click(screen.getByRole('menuitem', { name: /mark as read/i }));
 
     expect(markReadMutate).toHaveBeenCalledWith({
       ids: ['ntf-001'],
@@ -268,8 +278,13 @@ describe('NotificationsPageClient', () => {
     });
   });
 
-  it('marks all unread read by enumerating the unread ids', async () => {
+  it('marks all matching read by enumerating the unread ids when selection is extended across pages', async () => {
     const user = userEvent.setup();
+    // More pages exist than are loaded, so selecting all enables the across-
+    // pages extension banner.
+    mockUseUserNotifications.mockReturnValue(
+      makeNotificationsReturn({ hasMore: true, totalCount: 12 })
+    );
     // The unread enumeration query (?unread=true) returns the unread summaries.
     mockFetchUserNotifications.mockResolvedValue({
       entries: [
@@ -282,7 +297,13 @@ describe('NotificationsPageClient', () => {
 
     render(<NotificationsPageClient />);
 
-    await user.click(screen.getByRole('button', { name: /mark all as read/i }));
+    // Select the loaded rows, extend the selection across pages, then mark read.
+    await user.click(screen.getByRole('checkbox', { name: /select all/i }));
+    await user.click(
+      screen.getByRole('button', { name: /select all 12 notifications/i })
+    );
+    await user.click(screen.getByRole('button', { name: 'Actions' }));
+    await user.click(screen.getByRole('menuitem', { name: /mark as read/i }));
 
     // It enumerates the unread notifications…
     expect(mockFetchUserNotifications).toHaveBeenCalledWith(
@@ -314,7 +335,7 @@ describe('NotificationsPageClient', () => {
     render(<NotificationsPageClient />);
 
     const expanders = screen.getAllByRole('button', {
-      name: /show message body/i,
+      name: /show message/i,
     });
     await user.click(expanders[0]);
 
