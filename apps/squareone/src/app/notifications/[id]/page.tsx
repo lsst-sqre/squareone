@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
+import MainContent from '../../../components/MainContent';
 import { getStaticConfig } from '../../../lib/config/rsc';
 import NotificationDetailPageClient from './NotificationDetailPageClient';
 
@@ -45,5 +46,9 @@ export default async function NotificationDetailPage({
     notFound();
   }
 
-  return <NotificationDetailPageClient id={id} />;
+  return (
+    <MainContent>
+      <NotificationDetailPageClient id={id} />
+    </MainContent>
+  );
 }

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
+import MainContent from '../../components/MainContent';
 import { getStaticConfig } from '../../lib/config/rsc';
 import NotificationsPageClient from './NotificationsPageClient';
 
@@ -37,8 +38,10 @@ export default async function NotificationsPage() {
   }
 
   return (
-    <Suspense>
-      <NotificationsPageClient />
-    </Suspense>
+    <MainContent>
+      <Suspense>
+        <NotificationsPageClient />
+      </Suspense>
+    </MainContent>
   );
 }
