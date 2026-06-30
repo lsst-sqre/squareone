@@ -8,12 +8,13 @@ import {
   DropdownMenu,
 } from '@lsst-sqre/squared';
 import { ChevronDown, ChevronRight, MoreHorizontal } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import {
   formatRelativeToNow,
   formatUtcTimestamp,
 } from '../../lib/utils/dateFormatters';
+import { markdownToPlainText, renderInlineMarkdown } from '../RenderedMarkdown';
 import styles from './UserNotificationsTableView.module.css';
 
 export type UserNotificationsTableViewProps = {
@@ -82,32 +83,6 @@ export type UserNotificationsTableViewProps = {
   onMarkAllMatchingRead?: () => void;
 };
 
-/**
- * Reduce a notification's pre-rendered summary HTML to inline phrasing content.
- *
- * The summary toggle is a real `<button>`, so it must not contain block or
- * interactive descendants. This strips the paragraph wrapper and unwraps any
- * anchors to their text (live links live in the expanded body and the detail
- * page) while keeping emphasis like `<strong>`/`<em>`. The input is already the
- * sanitized output of the server's (or the mock's) remark pipeline, so no new
- * markup is introduced here.
- */
-function summaryToInlineHtml(html: string): string {
-  return html
-    .replace(/<a\b[^>]*>/gi, '')
-    .replace(/<\/a>/gi, '')
-    .replace(/<\/?p[^>]*>/gi, '')
-    .trim();
-}
-
-/** Strip all tags from summary HTML for use in an accessible label. */
-function summaryToPlainText(html: string): string {
-  return html
-    .replace(/<[^>]+>/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
 type NotificationRowProps = {
   notification: UserNotificationSummary;
   /** Whether this row's selection checkbox is checked. */
@@ -150,8 +125,18 @@ function NotificationRow({
   selectionEnabled,
 }: NotificationRowProps) {
   const isUnread = notification.read === null;
-  const inlineSummaryHtml = summaryToInlineHtml(notification.summary.html);
-  const plainSummary = summaryToPlainText(notification.summary.html);
+  // Render the summary from its Markdown (`gfm`) through the shared sanitizing
+  // pipeline rather than injecting the API's pre-rendered `summary.html`:
+  // `renderInlineMarkdown` strips dangerous HTML, flattens links, and drops the
+  // block wrapper so the result is valid phrasing content for the toggle button.
+  const inlineSummaryHtml = useMemo(
+    () => renderInlineMarkdown(notification.summary.gfm),
+    [notification.summary.gfm]
+  );
+  const plainSummary = useMemo(
+    () => markdownToPlainText(notification.summary.gfm),
+    [notification.summary.gfm]
+  );
 
   const relativeDate = formatRelativeToNow(notification.created);
   const absoluteDate = formatUtcTimestamp(notification.created);
@@ -202,8 +187,7 @@ function NotificationRow({
           ) : (
             <ChevronRight size={16} aria-hidden="true" />
           )}
-          {/* The summary HTML is the sanitized remark output, flattened to inline
-              phrasing content (see summaryToInlineHtml). */}
+          {/* Sanitized, link-flattened inline HTML (see renderInlineMarkdown). */}
           <span
             className={styles.summaryText}
             dangerouslySetInnerHTML={{ __html: inlineSummaryHtml }}
