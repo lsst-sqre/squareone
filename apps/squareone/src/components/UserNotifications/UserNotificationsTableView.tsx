@@ -2,18 +2,18 @@
 
 import type { UserNotificationSummary } from '@lsst-sqre/semaphore-client';
 import {
-  Badge,
   Button,
   Checkbox,
-  DataTable,
-  type DataTableProps,
+  copyToClipboard,
   DropdownMenu,
 } from '@lsst-sqre/squared';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronRight, MoreHorizontal } from 'lucide-react';
 import { useState } from 'react';
 
-import { formatUtcTimestamp } from '../../lib/utils/dateFormatters';
-import RenderedMarkdown from '../RenderedMarkdown';
+import {
+  formatRelativeToNow,
+  formatUtcTimestamp,
+} from '../../lib/utils/dateFormatters';
 import styles from './UserNotificationsTableView.module.css';
 
 export type UserNotificationsTableViewProps = {
@@ -42,82 +42,234 @@ export type UserNotificationsTableViewProps = {
    *
    * A `UserNotificationSummary` carries no body, so the container supplies this
    * to fetch and render the full message's body (and to auto-mark it read) only
-   * once a row is expanded. When omitted, no expander affordance is shown and
-   * each row stays summary-only.
+   * once a row is expanded. When omitted, the chevron+summary toggle is not
+   * shown and each row's summary stays a plain, non-interactive line.
    */
   renderExpandedBody?: (
     notification: UserNotificationSummary
   ) => React.ReactNode;
   /**
+   * Absolute origin used to build each row's "Copy link" permalink.
+   *
+   * The per-row "…" menu copies `${permalinkBase}/notifications/{id}` so the
+   * link resolves to the standalone detail page from anywhere. Defaults to `''`,
+   * in which case a relative `/notifications/{id}` path is copied instead (still
+   * navigable in-app, and convenient for Storybook where no config is present).
+   */
+  permalinkBase?: string;
+  /**
    * Mark a set of notifications read.
    *
-   * Supplying this opts the table into row selection — a leading checkbox column
-   * with a select-all header — plus a bulk-actions {@link DropdownMenu} whose
-   * "Mark read" action marks the current selection read. The dropdown is disabled
-   * until at least one row is selected, and the selection clears after the action
-   * fires. The container owns the mutation and the shared cache invalidation that
-   * updates the list and the header unread count. When omitted, no checkbox
-   * column or bulk-actions dropdown is shown.
+   * Supplying this opts the inbox into row selection — a leading checkbox per
+   * row plus a "Select all" toolbar checkbox — and an "Actions" dropdown (shown
+   * once at least one row is selected) whose "Mark as read" action marks the
+   * unread members of the selection read. The same handler also backs each row's
+   * per-row "Mark as read" menu item. The container owns the mutation and the
+   * shared cache invalidation that updates the list and the header unread count.
+   * When omitted, no selection chrome or per-row mark-read action is shown.
    */
   onMarkRead?: (ids: string[]) => void;
   /**
-   * Mark every unread notification read.
+   * Mark the entire filtered result set read, including pages not yet loaded.
    *
-   * Supplying this shows a "Mark all as read" button; the container enumerates
-   * the unread ids (via `?unread=true`) and marks them read. When omitted, the
-   * button is not shown.
+   * Backs the two-tier "Select all M notifications" extension: once every loaded
+   * row is selected and more pages exist, the user can extend the selection to
+   * the full filtered set, which the view cannot enumerate. Choosing "Mark as
+   * read" in that state calls this so the container can enumerate the unread ids
+   * (via `?unread=true`) and mark them read. When omitted, the extension banner
+   * still appears but its bulk mark-read is a no-op for the unloaded remainder.
    */
-  onMarkAllRead?: () => void;
+  onMarkAllMatchingRead?: () => void;
 };
 
-// Stable identities so the DataTable's memoized selection column (and its
-// checkbox cells) don't rebuild on every render — an inline function here would
-// remount the row checkboxes on each selection change.
-const getNotificationRowId = (n: UserNotificationSummary) => n.id;
-const getNotificationRowLabel = (n: UserNotificationSummary) => n.summary.gfm;
+/**
+ * Reduce a notification's pre-rendered summary HTML to inline phrasing content.
+ *
+ * The summary toggle is a real `<button>`, so it must not contain block or
+ * interactive descendants. This strips the paragraph wrapper and unwraps any
+ * anchors to their text (live links live in the expanded body and the detail
+ * page) while keeping emphasis like `<strong>`/`<em>`. The input is already the
+ * sanitized output of the server's (or the mock's) remark pipeline, so no new
+ * markup is introduced here.
+ */
+function summaryToInlineHtml(html: string): string {
+  return html
+    .replace(/<a\b[^>]*>/gi, '')
+    .replace(/<\/a>/gi, '')
+    .replace(/<\/?p[^>]*>/gi, '')
+    .trim();
+}
 
-const columns: DataTableProps<UserNotificationSummary>['columns'] = [
-  {
-    accessorKey: 'created',
-    header: 'Date',
-    cell: (info) => formatUtcTimestamp(info.getValue<string>()),
-  },
-  {
-    accessorKey: 'read',
-    header: 'Status',
-    cell: (info) =>
-      info.getValue<string | null>() ? (
-        <Badge color="gray" variant="soft">
-          Read
-        </Badge>
-      ) : (
-        <Badge color="blue" variant="solid">
-          Unread
-        </Badge>
-      ),
-  },
-];
+/** Strip all tags from summary HTML for use in an accessible label. */
+function summaryToPlainText(html: string): string {
+  return html
+    .replace(/<[^>]+>/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+type NotificationRowProps = {
+  notification: UserNotificationSummary;
+  /** Whether this row's selection checkbox is checked. */
+  selected: boolean;
+  /** Toggle this row's selection. */
+  onSelectedChange: (selected: boolean) => void;
+  /** Whether this row is expanded to show its body. */
+  expanded: boolean;
+  /** Toggle this row's expanded state. */
+  onToggleExpanded: () => void;
+  /** Render the expand-in-place body; when omitted the summary is plain text. */
+  renderExpandedBody?: (
+    notification: UserNotificationSummary
+  ) => React.ReactNode;
+  /** Absolute origin for the copy-link permalink (or `''` for a relative path). */
+  permalinkBase: string;
+  /** Mark this single notification read; enables the per-row "Mark as read". */
+  onMarkRead?: (ids: string[]) => void;
+  /** Whether the leading selection checkbox is shown. */
+  selectionEnabled: boolean;
+};
 
 /**
- * Presentational view of the user's notifications listing.
+ * One inbox row: unread dot · selection checkbox · summary (a toggle that
+ * expands the body in place) · relative date · always-visible "…" menu.
  *
- * Renders a "Show unread only" toggle plus the notifications {@link DataTable}.
- * Each notification is a two-row unit: a primary row with its date and read
- * status, and a full-width secondary row beneath it holding the rendered-
- * Markdown summary (the user API's `gfm` field, no column header). When a
- * `renderExpandedBody` renderer is supplied, the secondary row also carries an
- * expander control that reveals the message body in place beneath the summary;
- * the view owns the expanded/collapsed state, while fetching the body and
- * auto-marking it read live in that container-supplied renderer. When an
- * `onMarkRead` handler is supplied, the table also gains row selection (a
- * leading checkbox column with select-all) and a bulk-actions dropdown whose
- * "Mark read" action — enabled once at least one row is selected — marks the
- * selection read; an `onMarkAllRead` handler adds a "Mark all as read" button.
- * The view owns the selection state but routes the actual marking back to the
- * container. The view also owns a "Load more" control, a shown-of-total count,
- * and the loading, empty, and error-with-retry states. It is fully driven by
- * props so it can be exercised from Storybook with fixtures; data fetching lives
- * in the container.
+ * The interactive controls are sibling grid cells, never nested, so the row
+ * stays valid, keyboard-accessible HTML. Unread state is conveyed visually by
+ * the dot (decorative) and to assistive tech by the toggle's accessible label.
+ */
+function NotificationRow({
+  notification,
+  selected,
+  onSelectedChange,
+  expanded,
+  onToggleExpanded,
+  renderExpandedBody,
+  permalinkBase,
+  onMarkRead,
+  selectionEnabled,
+}: NotificationRowProps) {
+  const isUnread = notification.read === null;
+  const inlineSummaryHtml = summaryToInlineHtml(notification.summary.html);
+  const plainSummary = summaryToPlainText(notification.summary.html);
+
+  const relativeDate = formatRelativeToNow(notification.created);
+  const absoluteDate = formatUtcTimestamp(notification.created);
+
+  let permalinkUrl = `/notifications/${notification.id}`;
+  if (permalinkBase) {
+    try {
+      permalinkUrl = new URL(permalinkUrl, permalinkBase).toString();
+    } catch {
+      // Keep the relative fallback when permalinkBase is not a valid origin.
+    }
+  }
+
+  const handleCopyLink = () => {
+    copyToClipboard(permalinkUrl);
+  };
+
+  return (
+    <li className={`${styles.row} ${isUnread ? styles.unread : ''}`}>
+      {isUnread ? (
+        <span className={styles.unreadDot} aria-hidden="true" />
+      ) : (
+        <span className={styles.readDot} aria-hidden="true" />
+      )}
+
+      <span className={styles.checkboxCell}>
+        {selectionEnabled && (
+          <Checkbox
+            aria-label={`Select notification: ${plainSummary}`}
+            checked={selected}
+            onCheckedChange={(checked) => onSelectedChange(checked === true)}
+          />
+        )}
+      </span>
+
+      {renderExpandedBody ? (
+        <button
+          type="button"
+          className={styles.summaryToggle}
+          aria-expanded={expanded}
+          aria-label={`${isUnread ? 'Unread. ' : ''}${
+            expanded ? 'Hide' : 'Show'
+          } message: ${plainSummary}`}
+          onClick={onToggleExpanded}
+        >
+          {expanded ? (
+            <ChevronDown size={16} aria-hidden="true" />
+          ) : (
+            <ChevronRight size={16} aria-hidden="true" />
+          )}
+          {/* The summary HTML is the sanitized remark output, flattened to inline
+              phrasing content (see summaryToInlineHtml). */}
+          <span
+            className={styles.summaryText}
+            dangerouslySetInnerHTML={{ __html: inlineSummaryHtml }}
+          />
+        </button>
+      ) : (
+        <span
+          className={styles.summaryText}
+          dangerouslySetInnerHTML={{ __html: inlineSummaryHtml }}
+        />
+      )}
+
+      <time
+        className={styles.date}
+        dateTime={notification.created}
+        title={absoluteDate}
+      >
+        {relativeDate}
+      </time>
+
+      <DropdownMenu>
+        <DropdownMenu.Trigger asChild showChevron={false}>
+          <button
+            type="button"
+            className={styles.menuButton}
+            aria-label="Notification actions"
+          >
+            <MoreHorizontal size={16} aria-hidden="true" />
+          </button>
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content align="end">
+          {isUnread && onMarkRead && (
+            <DropdownMenu.Item onSelect={() => onMarkRead([notification.id])}>
+              Mark as read
+            </DropdownMenu.Item>
+          )}
+          <DropdownMenu.Item onSelect={handleCopyLink}>
+            Copy link
+          </DropdownMenu.Item>
+        </DropdownMenu.Content>
+      </DropdownMenu>
+
+      {renderExpandedBody && expanded && (
+        <div className={styles.expandedBody}>
+          {renderExpandedBody(notification)}
+        </div>
+      )}
+    </li>
+  );
+}
+
+/**
+ * Presentational view of the user's notifications inbox.
+ *
+ * Renders a GitHub-style flat list of full-width rows — unread dot, selection
+ * checkbox, a summary that expands its body inline, a relative date, and a
+ * per-row "…" menu (Mark as read / Copy link) — beneath a toolbar carrying a
+ * "Select all" checkbox, a selection-driven "Actions" dropdown, and the "Show
+ * unread only" filter. Selection is two-tier: "Select all" selects the loaded
+ * rows, and when more pages exist a banner offers to extend the selection to the
+ * whole filtered set. The view owns the expanded/collapsed and selection state
+ * but routes the actual marking back to the container (which owns the mutation
+ * and cache invalidation). It also owns the "Load more" control, a shown-of-total
+ * count, and the loading, empty, and error-with-retry states. It is fully driven
+ * by props so it can be exercised from Storybook with fixtures; data fetching
+ * lives in the container.
  */
 export default function UserNotificationsTableView({
   notifications,
@@ -131,39 +283,26 @@ export default function UserNotificationsTableView({
   showUnreadOnly = false,
   onShowUnreadOnlyChange,
   renderExpandedBody,
+  permalinkBase = '',
   onMarkRead,
-  onMarkAllRead,
+  onMarkAllMatchingRead,
 }: UserNotificationsTableViewProps) {
   const entries = notifications ?? [];
   const shownCount = entries.length;
 
-  // Row selection drives the bulk-actions dropdown; it's enabled only when the
-  // container supplies a mark-read handler. The selection map is keyed by
-  // notification id (via the table's `getRowId`), so it maps straight back to
-  // ids and a stale id from a row that left the list is harmless.
+  // Selection chrome is enabled only when the container supplies a mark-read
+  // handler. The selection map is keyed by notification id, so it maps straight
+  // back to ids and a stale id from a row that left the list is harmless.
   const selectionEnabled = onMarkRead !== undefined;
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>(
     () => ({})
   );
-  const selectedIds = entries
-    .filter((n) => rowSelection[n.id])
-    .map((n) => n.id);
+  // Two-tier extension flag: the user selected every loaded row and then opted
+  // to extend the selection to the full filtered set (pages not yet loaded).
+  const [allMatchingSelected, setAllMatchingSelected] = useState(false);
 
-  const markReadSelected = () => {
-    if (selectedIds.length === 0) {
-      return;
-    }
-    onMarkRead?.(selectedIds);
-    // Clear the selection: the marked rows are done, and (under "Show unread
-    // only") they leave the list on the next refetch, so a lingering selection
-    // would be meaningless.
-    setRowSelection({});
-  };
-
-  const hasBulkControls = selectionEnabled || onMarkAllRead !== undefined;
-
-  // Which rows are currently expanded to show their body. Purely presentational
-  // interaction state; the body content itself comes from `renderExpandedBody`.
+  // Which rows are expanded to show their body. Purely presentational; the body
+  // content itself comes from `renderExpandedBody`.
   const [expandedIds, setExpandedIds] = useState<Set<string>>(() => new Set());
   const toggleExpanded = (id: string) =>
     setExpandedIds((prev) => {
@@ -175,6 +314,60 @@ export default function UserNotificationsTableView({
       }
       return next;
     });
+
+  // A stale "all M" selection would target the wrong set after the filter flips.
+  // The filter only changes via the toggle below, which clears the selection as
+  // it fires, so there is no separate effect to keep them in sync.
+  const clearSelection = () => {
+    setRowSelection({});
+    setAllMatchingSelected(false);
+  };
+
+  const loadedSelectedIds = entries
+    .filter((n) => rowSelection[n.id])
+    .map((n) => n.id);
+  const allLoadedSelected =
+    entries.length > 0 && loadedSelectedIds.length === entries.length;
+  const headerChecked: boolean | 'indeterminate' = allLoadedSelected
+    ? true
+    : loadedSelectedIds.length > 0
+      ? 'indeterminate'
+      : false;
+  const hasSelection = loadedSelectedIds.length > 0 || allMatchingSelected;
+  const selectedCount =
+    allMatchingSelected && totalCount != null
+      ? totalCount
+      : loadedSelectedIds.length;
+  const showSelectAllBanner =
+    selectionEnabled && allLoadedSelected && hasMore && !allMatchingSelected;
+
+  const handleHeaderToggle = (checked: boolean | 'indeterminate') => {
+    if (checked === true) {
+      const next: Record<string, boolean> = {};
+      for (const n of entries) {
+        next[n.id] = true;
+      }
+      setRowSelection(next);
+    } else {
+      clearSelection();
+    }
+  };
+
+  const handleBulkMarkRead = () => {
+    if (allMatchingSelected) {
+      // The view cannot enumerate the unloaded ids; the container marks the
+      // whole filtered set read via its `?unread=true` enumeration.
+      onMarkAllMatchingRead?.();
+    } else {
+      const ids = entries
+        .filter((n) => rowSelection[n.id] && n.read === null)
+        .map((n) => n.id);
+      if (ids.length > 0) {
+        onMarkRead?.(ids);
+      }
+    }
+    clearSelection();
+  };
 
   let body: React.ReactNode;
   if (isLoading) {
@@ -194,59 +387,48 @@ export default function UserNotificationsTableView({
         </Button>
       </div>
     );
+  } else if (entries.length === 0) {
+    body = (
+      <div className={styles.emptyState}>
+        {showUnreadOnly
+          ? 'You have no unread notifications.'
+          : 'You have no notifications.'}
+      </div>
+    );
   } else {
     body = (
       <>
-        <DataTable
-          columns={columns}
-          data={entries}
-          hasMore={hasMore}
-          isLoadingMore={isLoadingMore}
-          onLoadMore={onLoadMore}
-          getRowId={getNotificationRowId}
-          getRowLabel={getNotificationRowLabel}
-          rowSelection={selectionEnabled ? rowSelection : undefined}
-          onRowSelectionChange={selectionEnabled ? setRowSelection : undefined}
-          aria-label="Notifications"
-          emptyContent={
-            showUnreadOnly
-              ? 'You have no unread notifications.'
-              : 'You have no notifications.'
-          }
-          renderDetailRow={(n) => {
-            const expanded = expandedIds.has(n.id);
-            return (
-              <div className={styles.detail}>
-                <div className={styles.summaryRow}>
-                  {renderExpandedBody && (
-                    <button
-                      type="button"
-                      className={styles.expandButton}
-                      aria-expanded={expanded}
-                      aria-label={
-                        expanded ? 'Hide message body' : 'Show message body'
-                      }
-                      onClick={() => toggleExpanded(n.id)}
-                    >
-                      {expanded ? (
-                        <ChevronDown size={16} aria-hidden="true" />
-                      ) : (
-                        <ChevronRight size={16} aria-hidden="true" />
-                      )}
-                    </button>
-                  )}
-                  <RenderedMarkdown
-                    className={styles.summary}
-                    markdown={n.summary.gfm}
-                  />
-                </div>
-                {renderExpandedBody && expanded && (
-                  <div className={styles.body}>{renderExpandedBody(n)}</div>
-                )}
-              </div>
-            );
-          }}
-        />
+        <ul className={styles.list} aria-label="Notifications">
+          {entries.map((n) => (
+            <NotificationRow
+              key={n.id}
+              notification={n}
+              selected={rowSelection[n.id] === true}
+              onSelectedChange={(checked) =>
+                setRowSelection((prev) => ({ ...prev, [n.id]: checked }))
+              }
+              expanded={expandedIds.has(n.id)}
+              onToggleExpanded={() => toggleExpanded(n.id)}
+              renderExpandedBody={renderExpandedBody}
+              permalinkBase={permalinkBase}
+              onMarkRead={onMarkRead}
+              selectionEnabled={selectionEnabled}
+            />
+          ))}
+        </ul>
+        {hasMore && onLoadMore && (
+          <div className={styles.loadMore}>
+            <Button
+              appearance="outline"
+              tone="secondary"
+              size="sm"
+              onClick={onLoadMore}
+              loading={isLoadingMore}
+            >
+              Load more
+            </Button>
+          </div>
+        )}
         {shownCount > 0 && (
           <div className={styles.count}>
             Showing {shownCount}
@@ -263,29 +445,29 @@ export default function UserNotificationsTableView({
   return (
     <div className={styles.container}>
       <div className={styles.toolbar}>
-        {hasBulkControls && (
-          <div className={styles.bulkActions}>
-            {selectionEnabled && (
-              <DropdownMenu>
-                <DropdownMenu.Trigger disabled={selectedIds.length === 0}>
-                  Bulk actions
-                </DropdownMenu.Trigger>
-                <DropdownMenu.Content>
-                  <DropdownMenu.Item onSelect={markReadSelected}>
-                    Mark read
-                  </DropdownMenu.Item>
-                </DropdownMenu.Content>
-              </DropdownMenu>
-            )}
-            {onMarkAllRead && (
-              <Button
-                appearance="outline"
-                tone="secondary"
-                size="sm"
-                onClick={onMarkAllRead}
-              >
-                Mark all as read
-              </Button>
+        {selectionEnabled && (
+          <div className={styles.selectionControls}>
+            <Checkbox
+              aria-label="Select all"
+              checked={headerChecked}
+              onCheckedChange={handleHeaderToggle}
+            />
+            {hasSelection && (
+              <>
+                <span className={styles.selectedCount} aria-live="polite">
+                  {selectedCount} selected
+                </span>
+                <DropdownMenu>
+                  <DropdownMenu.Trigger className={styles.actionsTrigger}>
+                    Actions
+                  </DropdownMenu.Trigger>
+                  <DropdownMenu.Content>
+                    <DropdownMenu.Item onSelect={handleBulkMarkRead}>
+                      Mark as read
+                    </DropdownMenu.Item>
+                  </DropdownMenu.Content>
+                </DropdownMenu>
+              </>
             )}
           </div>
         )}
@@ -293,12 +475,45 @@ export default function UserNotificationsTableView({
           <Checkbox
             label="Show unread only"
             checked={showUnreadOnly}
-            onCheckedChange={(checked) =>
-              onShowUnreadOnlyChange?.(checked === true)
-            }
+            onCheckedChange={(checked) => {
+              // A stale "all M" selection would target the pre-filter set.
+              clearSelection();
+              onShowUnreadOnlyChange?.(checked === true);
+            }}
           />
         </div>
       </div>
+
+      {selectionEnabled && (showSelectAllBanner || allMatchingSelected) && (
+        <div className={styles.selectAllBanner}>
+          {allMatchingSelected ? (
+            <>
+              <span>
+                All {totalCount ?? loadedSelectedIds.length} selected.
+              </span>
+              <button
+                type="button"
+                className={styles.bannerButton}
+                onClick={clearSelection}
+              >
+                Clear selection
+              </button>
+            </>
+          ) : (
+            <>
+              <span>All {shownCount} on this page selected.</span>
+              <button
+                type="button"
+                className={styles.bannerButton}
+                onClick={() => setAllMatchingSelected(true)}
+              >
+                Select all {totalCount ?? shownCount} notifications
+              </button>
+            </>
+          )}
+        </div>
+      )}
+
       {body}
     </div>
   );

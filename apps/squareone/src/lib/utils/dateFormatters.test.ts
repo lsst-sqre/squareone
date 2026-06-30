@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   formatExpiration,
   formatLastUsed,
+  formatRelativeToNow,
   formatUtcTimestamp,
 } from './dateFormatters';
 
@@ -145,6 +146,32 @@ describe('dateFormatters', () => {
 
     it('returns the original string unchanged for an invalid date', () => {
       expect(formatUtcTimestamp('not-a-date')).toBe('not-a-date');
+    });
+  });
+
+  describe('formatRelativeToNow', () => {
+    it('describes a multi-day-old timestamp in days with a trailing "ago"', () => {
+      // 18 days before MOCK_NOW (2024-01-01 00:00:00 UTC).
+      const created = new Date(
+        (MOCK_NOW - 18 * SECONDS_PER_DAY) * 1000
+      ).toISOString();
+      expect(formatRelativeToNow(created)).toBe('18 days ago');
+    });
+
+    it('describes an hours-old timestamp in hours', () => {
+      const created = new Date(
+        (MOCK_NOW - 2 * SECONDS_PER_HOUR) * 1000
+      ).toISOString();
+      expect(formatRelativeToNow(created)).toBe('2 hours ago');
+    });
+
+    it('describes a sub-hour-old timestamp as less than 1 hour', () => {
+      const created = new Date((MOCK_NOW - 60) * 1000).toISOString();
+      expect(formatRelativeToNow(created)).toBe('less than 1 hour ago');
+    });
+
+    it('returns the original string unchanged for an invalid date', () => {
+      expect(formatRelativeToNow('not-a-date')).toBe('not-a-date');
     });
   });
 

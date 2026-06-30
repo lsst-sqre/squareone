@@ -1,6 +1,6 @@
 import { mockUserNotifications } from '@lsst-sqre/semaphore-client';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { expect, fn, screen, userEvent, within } from 'storybook/test';
+import { expect, fn, screen, userEvent, waitFor, within } from 'storybook/test';
 
 import RenderedMarkdown from '../RenderedMarkdown';
 import UserNotificationsTableView from './UserNotificationsTableView';
@@ -17,9 +17,10 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * The default loaded view: the user's notifications with date, read status, a
- * rendered-Markdown summary per row, a shown-of-total count, and the "Show
- * unread only" toggle.
+ * The default loaded view: a flat list of rows with an unread dot, a rendered-
+ * Markdown summary, a relative date (with the absolute UTC timestamp as its
+ * tooltip), a per-row "…" menu, a shown-of-total count, and the "Show unread
+ * only" toggle.
  */
 export const Loaded: Story = {
   args: {
@@ -30,9 +31,9 @@ export const Loaded: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    // The fixtures cover both read and unread statuses.
-    await expect(canvas.getAllByText('Unread').length).toBeGreaterThan(0);
-    await expect(canvas.getAllByText('Read').length).toBeGreaterThan(0);
+    // The date renders relative, with the absolute UTC timestamp as its tooltip.
+    const date = canvas.getByTitle('2026-06-12 17:10 UTC');
+    await expect(date).toHaveTextContent(/ago/);
 
     // The summary Markdown renders to HTML (the `**quota**` emphasis).
     const emphasized = canvas.getByText('quota');
@@ -49,10 +50,10 @@ export const Loaded: Story = {
 };
 
 /**
- * When a `renderExpandedBody` renderer is supplied, each row gains an expander
- * control that reveals the message body in place. The view owns the
- * expanded/collapsed state; the container supplies the body (fetched on demand)
- * and auto-marks it read.
+ * When a `renderExpandedBody` renderer is supplied, the chevron+summary becomes
+ * a toggle that reveals the message body in place. Clicking the chevron or the
+ * summary text expands the row; the view owns the expanded/collapsed state while
+ * the container supplies the body (fetched on demand) and auto-marks it read.
  */
 export const Expandable: Story = {
   args: {
@@ -69,65 +70,145 @@ export const Expandable: Story = {
     // Bodies are hidden until a row is expanded.
     await expect(canvas.queryByText('ntf-001')).not.toBeInTheDocument();
 
-    const expanders = canvas.getAllByRole('button', {
-      name: /show message body/i,
-    });
-    await userEvent.click(expanders[0]);
+    // Clicking the summary text itself toggles the body open.
+    await userEvent.click(canvas.getByText('quota'));
 
-    // The expanded row reveals its body (rendered Markdown), and the control
+    // The expanded row reveals its body (rendered Markdown), and the toggle
     // flips to a collapse affordance.
     await expect(canvas.getByText('ntf-001').tagName).toBe('STRONG');
     await expect(
-      canvas.getByRole('button', { name: /hide message body/i })
+      canvas.getByRole('button', { name: /hide message/i })
     ).toBeInTheDocument();
   },
 };
 
 /**
- * Supplying `onMarkRead` / `onMarkAllRead` opts the table into row selection
- * (a leading checkbox column with select-all) plus a bulk-actions dropdown and
- * a "Mark all as read" button. The "Mark read" action is disabled until at
- * least one row is selected; selecting a row enables it, and choosing it marks
- * the selection read and clears it. The container owns the mutation (and the
- * shared cache invalidation that updates the list and header count).
+ * Supplying `onMarkRead` opts the inbox into row selection: a per-row checkbox
+ * and a toolbar "Select all" checkbox, plus an "Actions" dropdown that appears
+ * once at least one row is selected. Choosing "Mark as read" marks the unread
+ * members of the selection read and clears it. The container owns the mutation
+ * (and the shared cache invalidation that updates the list and header count).
  */
-export const WithBulkActions: Story = {
-  name: 'With bulk actions',
+export const WithSelection: Story = {
+  name: 'With selection',
   args: {
     notifications: mockUserNotifications,
     totalCount: mockUserNotifications.length,
     onShowUnreadOnlyChange: fn(),
     onMarkRead: fn(),
-    onMarkAllRead: fn(),
+    permalinkBase: 'https://example.test',
   },
   play: async ({ args, canvasElement }) => {
     const canvas = within(canvasElement);
 
-    // The bulk-actions dropdown is disabled until a row is selected.
-    const bulkActions = canvas.getByRole('button', { name: /bulk actions/i });
-    await expect(bulkActions).toBeDisabled();
+    // No Actions dropdown until a row is selected.
+    await expect(
+      canvas.queryByRole('button', { name: 'Actions' })
+    ).not.toBeInTheDocument();
 
-    // "Mark all as read" calls back (the container enumerates + marks). Done
-    // before opening the dropdown, since the modal menu makes the rest of the
-    // page inert (aria-hidden) while open.
+    // Selecting a row reveals the Actions dropdown; "Mark as read" marks it.
     await userEvent.click(
-      canvas.getByRole('button', { name: /mark all as read/i })
+      canvas.getAllByRole('checkbox', { name: /select notification/i })[0]
     );
-    await expect(args.onMarkAllRead).toHaveBeenCalled();
-
-    // Selecting a row enables the dropdown; "Mark read" marks the selection.
-    await userEvent.click(
-      canvas.getAllByRole('checkbox', { name: /select row/i })[0]
-    );
-    await expect(bulkActions).toBeEnabled();
-    await userEvent.click(bulkActions);
+    await userEvent.click(canvas.getByRole('button', { name: 'Actions' }));
 
     // The dropdown content is portaled to the document body, so query the
     // screen rather than the canvas.
     await userEvent.click(
-      await screen.findByRole('menuitem', { name: /mark read/i })
+      await screen.findByRole('menuitem', { name: /mark as read/i })
     );
     await expect(args.onMarkRead).toHaveBeenCalledWith(['ntf-001']);
+  },
+};
+
+/**
+ * Two-tier select-all (GitHub style): "Select all" selects the loaded rows, and
+ * when more pages exist a banner offers to extend the selection to the whole
+ * filtered set. "Mark as read" then routes to `onMarkAllMatchingRead`, which the
+ * container backs by enumerating the unread ids across all pages.
+ */
+export const SelectAllAcrossPages: Story = {
+  name: 'Select all across pages',
+  args: {
+    notifications: mockUserNotifications.slice(0, 3),
+    totalCount: 9,
+    hasMore: true,
+    onLoadMore: fn(),
+    onShowUnreadOnlyChange: fn(),
+    onMarkRead: fn(),
+    onMarkAllMatchingRead: fn(),
+    permalinkBase: 'https://example.test',
+  },
+  play: async ({ args, canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // Select the loaded rows, then extend the selection across pages.
+    await userEvent.click(
+      canvas.getByRole('checkbox', { name: /select all/i })
+    );
+    await userEvent.click(
+      canvas.getByRole('button', { name: /select all 9 notifications/i })
+    );
+
+    // "Mark as read" now targets the whole filtered set.
+    await userEvent.click(canvas.getByRole('button', { name: 'Actions' }));
+    await userEvent.click(
+      await screen.findByRole('menuitem', { name: /mark as read/i })
+    );
+    await expect(args.onMarkAllMatchingRead).toHaveBeenCalled();
+  },
+};
+
+/**
+ * Each row carries an always-visible "…" menu. Unread rows offer "Mark as read"
+ * and "Copy link"; read rows offer "Copy link" only. "Copy link" copies the
+ * absolute `${permalinkBase}/notifications/{id}` permalink.
+ */
+export const PerRowMenu: Story = {
+  name: 'Per-row menu',
+  args: {
+    notifications: mockUserNotifications.slice(0, 2),
+    totalCount: 2,
+    onShowUnreadOnlyChange: fn(),
+    onMarkRead: fn(),
+    permalinkBase: 'https://example.test',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    const menus = canvas.getAllByRole('button', {
+      name: /notification actions/i,
+    });
+
+    // ntf-001 is unread → Mark as read + Copy link.
+    await userEvent.click(menus[0]);
+    await expect(
+      await screen.findByRole('menuitem', { name: /mark as read/i })
+    ).toBeInTheDocument();
+    await expect(
+      screen.getByRole('menuitem', { name: /copy link/i })
+    ).toBeInTheDocument();
+
+    await userEvent.keyboard('{Escape}');
+
+    // Wait for the first menu to fully close: while it is open Radix marks the
+    // other triggers aria-hidden, so they are unreachable by role until then.
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('menuitem', { name: /copy link/i })
+      ).not.toBeInTheDocument()
+    );
+
+    // ntf-002 is read → Copy link only.
+    await userEvent.click(
+      canvas.getAllByRole('button', { name: /notification actions/i })[1]
+    );
+    await expect(
+      await screen.findByRole('menuitem', { name: /copy link/i })
+    ).toBeInTheDocument();
+    await expect(
+      screen.queryByRole('menuitem', { name: /mark as read/i })
+    ).not.toBeInTheDocument();
   },
 };
 
