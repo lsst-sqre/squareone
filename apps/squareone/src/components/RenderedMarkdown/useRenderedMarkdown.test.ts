@@ -2,6 +2,8 @@ import { renderHook } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import {
+  markdownToPlainText,
+  renderInlineMarkdown,
   renderMarkdownToHtml,
   useRenderedMarkdown,
 } from './useRenderedMarkdown';
@@ -25,6 +27,55 @@ describe('renderMarkdownToHtml', () => {
   it('returns an empty string for empty input', () => {
     expect(renderMarkdownToHtml('')).toBe('');
     expect(renderMarkdownToHtml('   ')).toBe('');
+  });
+});
+
+describe('renderInlineMarkdown', () => {
+  it('keeps inline emphasis', () => {
+    expect(renderInlineMarkdown('A **bold** word')).toContain(
+      '<strong>bold</strong>'
+    );
+  });
+
+  it('drops the block paragraph wrapper so the result is phrasing content', () => {
+    const out = renderInlineMarkdown('A **bold** word');
+    expect(out).not.toContain('<p>');
+    expect(out).not.toContain('</p>');
+  });
+
+  it('flattens links to their text (no anchor element)', () => {
+    const out = renderInlineMarkdown('See [the policy](https://example.com)');
+    expect(out).not.toContain('<a');
+    expect(out).not.toContain('example.com');
+    expect(out).toContain('the policy');
+  });
+
+  it('strips dangerous raw HTML rather than reintroducing it', () => {
+    // The sanitizing pipeline removes scripts; a naive tag-stripping regex could
+    // splice `<scr<script>ipt>` back into `<script>`.
+    const out = renderInlineMarkdown('hi <scr<script>ipt>alert(1)</script>');
+    expect(out).not.toContain('<script');
+  });
+
+  it('returns an empty string for empty input', () => {
+    expect(renderInlineMarkdown('')).toBe('');
+    expect(renderInlineMarkdown('   ')).toBe('');
+  });
+});
+
+describe('markdownToPlainText', () => {
+  it('drops emphasis markers but keeps the text', () => {
+    expect(markdownToPlainText('A **bold** word')).toBe('A bold word');
+  });
+
+  it('keeps link text and discards the URL', () => {
+    expect(markdownToPlainText('See [the policy](https://example.com)')).toBe(
+      'See the policy'
+    );
+  });
+
+  it('collapses runs of whitespace and trims', () => {
+    expect(markdownToPlainText('  spaced   out  ')).toBe('spaced out');
   });
 });
 
