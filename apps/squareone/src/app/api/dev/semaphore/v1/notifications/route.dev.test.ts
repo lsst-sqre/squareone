@@ -4,10 +4,7 @@ import {
 } from '@lsst-sqre/semaphore-client';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import {
-  resetDevUserNotifications,
-  setDevUnreadCount,
-} from '@/lib/mocks/userNotificationsStore';
+import { resetDevUserNotifications } from '@/lib/mocks/userNotificationsStore';
 
 import { GET } from './route.dev';
 
@@ -29,27 +26,35 @@ async function readEntries(
 }
 
 describe('GET /api/dev/semaphore/v1/notifications', () => {
-  it('reports the dev-selected unread total via X-Total-Count (badge query)', async () => {
-    setDevUnreadCount(3);
+  it("returns the user's notifications as FormattedText summaries", async () => {
+    const response = await GET(new Request(BASE));
 
+    expect(response.status).toBe(200);
+
+    const entries = await readEntries(response);
+    // The seeded user fixtures: six summaries, four unread and two read.
+    expect(entries).toHaveLength(6);
+    expect(entries.filter((n) => n.read === null)).toHaveLength(4);
+    expect(entries.filter((n) => n.read !== null)).toHaveLength(2);
+
+    // Summaries are user-shaped FormattedText ({ gfm, html }); sender/recipient
+    // are intentionally absent from the user surface.
+    expect(entries[0].summary.gfm).toContain('**quota**');
+    expect(entries[0]).not.toHaveProperty('recipient');
+    expect(entries[0]).not.toHaveProperty('sender');
+  });
+
+  it('reports the unread total via X-Total-Count (the badge query)', async () => {
     const response = await GET(new Request(`${BASE}?unread=true&limit=1`));
 
     expect(response.status).toBe(200);
-    expect(response.headers.get('X-Total-Count')).toBe('3');
+    // The header badge reads the unread total from this count, which is derived
+    // from the persistent store rather than a dev-set number.
+    expect(response.headers.get('X-Total-Count')).toBe('4');
 
     const entries = await readEntries(response);
     expect(entries).toHaveLength(1);
     expect(entries[0].read).toBeNull();
-  });
-
-  it('reports zero unread when the count is set to 0', async () => {
-    setDevUnreadCount(0);
-
-    const response = await GET(new Request(`${BASE}?unread=true&limit=1`));
-
-    expect(response.headers.get('X-Total-Count')).toBe('0');
-    const entries = await readEntries(response);
-    expect(entries).toHaveLength(0);
   });
 
   it('omits X-Total-Count when no limit is provided (matching the real contract)', async () => {
@@ -59,29 +64,32 @@ describe('GET /api/dev/semaphore/v1/notifications', () => {
     expect(response.headers.get('Link')).toBeNull();
   });
 
-  it('returns the selected unread entries plus the static read fixtures unfiltered', async () => {
-    setDevUnreadCount(2);
-
-    const response = await GET(new Request(BASE));
+  it('filters to unread notifications when unread=true', async () => {
+    const response = await GET(new Request(`${BASE}?unread=true`));
 
     const entries = await readEntries(response);
-    const unread = entries.filter((n) => n.read === null);
-    const read = entries.filter((n) => n.read !== null);
-    expect(unread).toHaveLength(2);
-    expect(read.length).toBeGreaterThan(0);
+    expect(entries).toHaveLength(4);
+    expect(entries.every((entry) => entry.read === null)).toBe(true);
   });
 
-  it('paginates unread results with a Link cursor when a limit is set', async () => {
-    setDevUnreadCount(5);
-
-    const response = await GET(new Request(`${BASE}?unread=true&limit=2`));
+  it('honors limit, conveying the next cursor through a Link header', async () => {
+    const response = await GET(new Request(`${BASE}?limit=2`));
 
     const entries = await readEntries(response);
     expect(entries).toHaveLength(2);
-    expect(response.headers.get('X-Total-Count')).toBe('5');
+    expect(response.headers.get('X-Total-Count')).toBe('6');
 
     const link = response.headers.get('Link');
     expect(link).toContain('rel="next"');
     expect(link).toContain('cursor=2');
+  });
+
+  it('honors the cursor and omits the Link header once exhausted', async () => {
+    const response = await GET(new Request(`${BASE}?cursor=4&limit=2`));
+
+    const entries = await readEntries(response);
+    expect(entries).toHaveLength(2);
+    expect(response.headers.get('Link')).toBeNull();
+    expect(response.headers.get('X-Total-Count')).toBe('6');
   });
 });
