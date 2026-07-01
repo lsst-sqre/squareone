@@ -1,5 +1,11 @@
 # @lsst-sqre/semaphore-client
 
+## 0.4.0
+
+### Minor Changes
+
+- [#507](https://github.com/lsst-sqre/squareone/pull/507) [`79cea8a`](https://github.com/lsst-sqre/squareone/commit/79cea8a96fa82e3155679c73ec7b5d3c0acdad82) Thanks [@jonathansick](https://github.com/jonathansick)! - Add the Semaphore user-facing notifications surface, parallel to the admin one. New Zod schemas `UserNotificationSummarySchema` and `UserNotificationFormattedSchema` (reusing `FormattedTextSchema`) model the user list/detail payloads, where `summary`/`body` are pre-rendered `{ gfm, html }` rather than raw Markdown. New client functions `fetchUserNotifications` (applies `unread`/`limit`/`cursor`, parses the RFC 5988 `Link` cursor and `X-Total-Count`), `fetchUserNotification`, and `markNotificationsRead` (`POST /v1/notifications/read` with the CSRF header; 204 is success) back new TanStack Query option factories (`userNotificationsInfiniteQueryOptions`, `userNotificationQueryOptions`, `unreadNotificationCountQueryOptions`) and a `markNotificationsReadMutationOptions` whose `onSuccess` invalidates the user lists, the unread count, and each affected detail. New hooks `useUserNotifications`, `useUserNotification`, `useUnreadNotificationCount` (with a configurable background poll), and `useMarkNotificationsRead` wrap them. The `mock-notifications` module gains user-facing fixtures in the `FormattedText` shape plus `filterAndPaginateUserNotifications` and a generic `markUserNotificationsRead` helper for dev routes and Storybook.
+
 ## 0.3.0
 
 ### Minor Changes

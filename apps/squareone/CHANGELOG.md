@@ -1,5 +1,23 @@
 # squareone
 
+## 0.35.0
+
+### Minor Changes
+
+- [#510](https://github.com/lsst-sqre/squareone/pull/510) [`66a4ab2`](https://github.com/lsst-sqre/squareone/commit/66a4ab2146c218bb8f7b7207c00b6bcf29378479) Thanks [@jonathansick](https://github.com/jonathansick)! - Add two feature-flag config keys for the upcoming user notifications UI: `enableUserNotifications` (boolean, default `false`) and `userNotificationsPollIntervalSeconds` (number, default `300`). Both flow through the existing config pipeline — declared in `squareone.config.schema.json` with titles/descriptions/defaults, added to the `AppConfig` type, and defaulted in `squareone.config.yaml` — so they resolve via `getStaticConfig()` / `useStaticConfig()`. They ship `false`/`300` everywhere and no UI consumes them yet; the flag keeps the in-progress notifications feature hidden until it is released.
+
+### Patch Changes
+
+- [#516](https://github.com/lsst-sqre/squareone/pull/516) [`f917b03`](https://github.com/lsst-sqre/squareone/commit/f917b034354e148db8f75ba47ff525f38fa13329) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @types/react from 19.2.14 to 19.2.17
+
+- [#516](https://github.com/lsst-sqre/squareone/pull/516) [`f917b03`](https://github.com/lsst-sqre/squareone/commit/f917b034354e148db8f75ba47ff525f38fa13329) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump react-dom from 19.2.4 to 19.2.7
+
+- [#516](https://github.com/lsst-sqre/squareone/pull/516) [`f917b03`](https://github.com/lsst-sqre/squareone/commit/f917b034354e148db8f75ba47ff525f38fa13329) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump react from 19.2.4 to 19.2.7
+
+- Updated dependencies [[`79cea8a`](https://github.com/lsst-sqre/squareone/commit/79cea8a96fa82e3155679c73ec7b5d3c0acdad82), [`7cf81df`](https://github.com/lsst-sqre/squareone/commit/7cf81dfd4e13dc825d23fba81edc066a08b4f299), [`c923dd7`](https://github.com/lsst-sqre/squareone/commit/c923dd754343ba36ad49577f95e1676ea7814dcd)]:
+  - @lsst-sqre/semaphore-client@0.4.0
+  - @lsst-sqre/squared@0.15.0
+
 ## 0.34.0
 
 ### Minor Changes
