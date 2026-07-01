@@ -96,7 +96,7 @@ jobs:
     if: inputs.push == true
     steps:
       - name: Install crane
-        uses: imjasonh/setup-crane@v0.6
+        uses: imjasonh/setup-crane@v0.7
 
       - name: Login to GHCR
         run: |
