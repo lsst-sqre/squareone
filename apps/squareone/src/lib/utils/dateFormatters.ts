@@ -65,6 +65,35 @@ export function formatUtcTimestamp(iso: string): string {
 }
 
 /**
+ * Format an ISO 8601 timestamp in the reader's local timezone, e.g.
+ * `Jun 12, 2026, 10:10 AM PDT`, using the reader's locale.
+ *
+ * Explicit component options are used (rather than `dateStyle`/`timeStyle`)
+ * because `Intl.DateTimeFormat` throws when those presets are combined with
+ * `timeZoneName`, which we need for the trailing zone abbreviation.
+ *
+ * Returns the original string unchanged when it does not parse to a valid date,
+ * so a malformed value is surfaced verbatim rather than as `Invalid Date`.
+ * @param iso - ISO 8601 timestamp string
+ * @returns Localized date-time string with a zone abbreviation, or `iso` if
+ *   it is invalid
+ */
+export function formatLocalTimestamp(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) {
+    return iso;
+  }
+  return new Intl.DateTimeFormat(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZoneName: 'short',
+  }).format(date);
+}
+
+/**
  * Format an ISO 8601 timestamp as a past-tense relative description of how long
  * ago it was, e.g. `"18 days ago"` or `"less than 1 hour ago"`.
  *

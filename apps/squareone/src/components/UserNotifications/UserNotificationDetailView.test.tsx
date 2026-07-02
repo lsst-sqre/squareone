@@ -2,6 +2,7 @@ import type { UserNotificationFormatted } from '@lsst-sqre/semaphore-client';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
+import { formatLocalTimestamp } from '../../lib/utils/dateFormatters';
 import UserNotificationDetailView from './UserNotificationDetailView';
 
 const baseNotification: UserNotificationFormatted = {
@@ -19,12 +20,14 @@ const baseNotification: UserNotificationFormatted = {
 };
 
 describe('UserNotificationDetailView', () => {
-  it('renders the metadata and the rendered-Markdown summary and body', () => {
+  it('renders the created timestamp and the rendered-Markdown summary and body', () => {
     render(<UserNotificationDetailView notification={baseNotification} />);
 
-    // Metadata: id and created timestamp.
-    expect(screen.getByText('ntf-001')).toBeInTheDocument();
-    expect(screen.getByText('2026-06-12 17:10 UTC')).toBeInTheDocument();
+    // The created timestamp is shown in the reader's local time (matching the
+    // component's own formatter so this is timezone-independent).
+    expect(
+      screen.getByText(formatLocalTimestamp(baseNotification.created))
+    ).toBeInTheDocument();
 
     // The body's `gfm` is rendered as Markdown (the bold word becomes its own
     // element), not shown as raw `**448GiB**` text.
@@ -33,6 +36,24 @@ describe('UserNotificationDetailView', () => {
 
     // The summary's `gfm` is rendered too (bold word is emphasised, not literal).
     expect(screen.getByText('quota')).toBeInTheDocument();
+  });
+
+  it('does not render the message id or a "Read" date', () => {
+    render(
+      <UserNotificationDetailView
+        notification={{
+          ...baseNotification,
+          read: '2026-06-12T18:00:00+00:00',
+        }}
+      />
+    );
+
+    // The redesign drops the metadata card entirely: no id, no "Created"/"Read"
+    // labels, and no separate read timestamp.
+    expect(screen.queryByText('ntf-001')).not.toBeInTheDocument();
+    expect(screen.queryByText('Created')).not.toBeInTheDocument();
+    // "Read" survives only as the badge, so there is exactly one occurrence.
+    expect(screen.getAllByText('Read')).toHaveLength(1);
   });
 
   it('exposes the summary as the page-level (h1) heading', () => {
@@ -50,7 +71,7 @@ describe('UserNotificationDetailView', () => {
     expect(screen.getByText('Unread')).toBeInTheDocument();
   });
 
-  it('shows the read timestamp and flips the badge off "Unread" when read', () => {
+  it('flips the badge to "Read" when the notification has been read', () => {
     render(
       <UserNotificationDetailView
         notification={{
@@ -60,10 +81,52 @@ describe('UserNotificationDetailView', () => {
       />
     );
 
-    // The read timestamp renders and the badge is no longer "Unread". ("Read"
-    // is not asserted directly because it also appears as the metadata label.)
-    expect(screen.getByText('2026-06-12 18:00 UTC')).toBeInTheDocument();
+    expect(screen.getByText('Read')).toBeInTheDocument();
     expect(screen.queryByText('Unread')).not.toBeInTheDocument();
+  });
+
+  it('renders prev/next links with the neighbor summaries and hrefs', () => {
+    render(
+      <UserNotificationDetailView
+        notification={baseNotification}
+        prevNotification={{ id: 'ntf-000', summary: 'A newer message' }}
+        nextNotification={{ id: 'ntf-002', summary: 'An older message' }}
+      />
+    );
+
+    const prev = screen.getByRole('link', { name: /Previous/ });
+    expect(prev).toHaveAttribute('href', '/notifications/ntf-000');
+    expect(prev).toHaveTextContent('A newer message');
+
+    const next = screen.getByRole('link', { name: /Next/ });
+    expect(next).toHaveAttribute('href', '/notifications/ntf-002');
+    expect(next).toHaveTextContent('An older message');
+  });
+
+  it('derives neighbor hrefs from a custom returnHref', () => {
+    render(
+      <UserNotificationDetailView
+        notification={baseNotification}
+        returnHref="/inbox"
+        nextNotification={{ id: 'ntf-002', summary: 'An older message' }}
+      />
+    );
+
+    expect(screen.getByRole('link', { name: /Next/ })).toHaveAttribute(
+      'href',
+      '/inbox/ntf-002'
+    );
+  });
+
+  it('omits prev/next links when there are no neighbors', () => {
+    render(<UserNotificationDetailView notification={baseNotification} />);
+
+    expect(
+      screen.queryByRole('link', { name: /Previous/ })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: /Next/ })
+    ).not.toBeInTheDocument();
   });
 
   it('shows a no-body placeholder when the body is null', () => {

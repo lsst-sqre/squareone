@@ -1,7 +1,10 @@
 'use client';
 
 import { useLoginInfo } from '@lsst-sqre/gafaelfawr-client';
-import { useUserNotification } from '@lsst-sqre/semaphore-client';
+import {
+  useUserNotification,
+  useUserNotifications,
+} from '@lsst-sqre/semaphore-client';
 
 import AuthRequired from '../../../components/AuthRequired';
 import { UserNotificationDetailView } from '../../../components/UserNotifications';
@@ -37,6 +40,11 @@ const UNAVAILABLE_ERROR = new Error(
  * Viewing the detail page auto-marks the notification read (via
  * {@link useAutoMarkNotificationRead}) once it loads unread, so the inbox row
  * status and the header unread badge update without a manual refresh.
+ *
+ * It also fetches the inbox list to derive prev/next neighbors for the view's
+ * footer navigation (the Semaphore API exposes no neighbor endpoint), degrading
+ * gracefully when the list is still loading or the id falls outside the loaded
+ * page.
  */
 export default function NotificationDetailPageClient({
   id,
@@ -56,6 +64,28 @@ function NotificationDetailContent({ id }: { id: string }) {
     url ?? '',
     id
   );
+
+  // Derive prev/next neighbors from the inbox list so the detail page can offer
+  // navigation the Semaphore API has no endpoint for. The list is unfiltered
+  // (no `unread`) so neighbors stay stable regardless of the inbox's filter
+  // state, and `entries` is already newest-first server order (no client sort).
+  // Convention: Previous = newer (up the list), Next = older (down the list).
+  // Neighbors are absent while the list loads, when the id isn't in this page,
+  // or at the list's ends — the view simply omits the missing link. Known
+  // limitation: only the first `limit` page is searched, so an id beyond that
+  // window shows no neighbors (fine for typical inboxes; a follow-up could
+  // auto-`loadMore` until the id is found).
+  const { entries } = useUserNotifications(url ?? '', { limit: 100 });
+  const i = entries?.findIndex((n) => n.id === id) ?? -1;
+  const prev = entries && i > 0 ? entries[i - 1] : undefined;
+  const next =
+    entries && i >= 0 && i < entries.length - 1 ? entries[i + 1] : undefined;
+  const prevNotification = prev
+    ? { id: prev.id, summary: prev.summary.gfm }
+    : undefined;
+  const nextNotification = next
+    ? { id: next.id, summary: next.summary.gfm }
+    : undefined;
 
   useAutoMarkNotificationRead({
     semaphoreUrl: url,
@@ -77,6 +107,8 @@ function NotificationDetailContent({ id }: { id: string }) {
       notification={notification}
       isLoading={isLoading || isResolving}
       error={resolvedError}
+      prevNotification={prevNotification}
+      nextNotification={nextNotification}
     />
   );
 }

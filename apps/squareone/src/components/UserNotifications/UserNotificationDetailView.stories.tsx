@@ -15,16 +15,23 @@ const meta: Meta<typeof UserNotificationDetailView> = {
 export default meta;
 type Story = StoryObj<typeof UserNotificationDetailView>;
 
-// An unread notification with a Markdown body — the common case.
+// An unread notification with a Markdown body and neighbors on both sides — the
+// common case in the middle of the inbox.
 export const Loaded: Story = {
   args: {
     notification: mockUserNotification,
+    prevNotification: {
+      id: 'ntf-000',
+      summary: 'Your notebook server was culled after 24h idle',
+    },
+    nextNotification: {
+      id: 'ntf-002',
+      summary: 'Scheduled maintenance window this weekend',
+    },
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    // Metadata: the id is shown.
-    await expect(canvas.getByText(mockUserNotification.id)).toBeInTheDocument();
     // Unread items show the "Unread" badge.
     await expect(canvas.getByText('Unread')).toBeInTheDocument();
     // The summary's `gfm` renders Markdown (the emphasised word is its own
@@ -34,10 +41,18 @@ export const Loaded: Story = {
     await expect(canvas.getByRole('heading', { level: 1 })).toHaveTextContent(
       mockUserNotification.summary.gfm.replace(/\*\*/g, '')
     );
+    // Prev/next links point at the neighbor detail pages.
+    await expect(
+      canvas.getByRole('link', { name: /Previous/ })
+    ).toHaveAttribute('href', '/notifications/ntf-000');
+    await expect(canvas.getByRole('link', { name: /Next/ })).toHaveAttribute(
+      'href',
+      '/notifications/ntf-002'
+    );
   },
 };
 
-// A read notification shows the read timestamp instead of the unread marker.
+// A read notification shows the "Read" badge instead of the unread marker.
 export const Read: Story = {
   args: {
     notification: {
@@ -48,10 +63,29 @@ export const Read: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    // The read timestamp is shown and the "Unread" badge is gone. ("Read" alone
-    // is ambiguous — it is also the metadata label — so assert the timestamp.)
-    await expect(canvas.getByText('2026-06-12 18:30 UTC')).toBeInTheDocument();
+    await expect(canvas.getByText('Read')).toBeInTheDocument();
     await expect(canvas.queryByText('Unread')).not.toBeInTheDocument();
+  },
+};
+
+// At the ends of the list a neighbor is missing, so only one nav link appears.
+export const ListEnd: Story = {
+  args: {
+    notification: mockUserNotification,
+    prevNotification: {
+      id: 'ntf-000',
+      summary: 'Your notebook server was culled after 24h idle',
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await expect(
+      canvas.getByRole('link', { name: /Previous/ })
+    ).toBeInTheDocument();
+    await expect(
+      canvas.queryByRole('link', { name: /Next/ })
+    ).not.toBeInTheDocument();
   },
 };
 

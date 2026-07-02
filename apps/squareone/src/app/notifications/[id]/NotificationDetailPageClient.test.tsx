@@ -12,6 +12,7 @@ vi.mock('@lsst-sqre/semaphore-client', async (importOriginal) => {
   return {
     ...actual,
     useUserNotification: vi.fn(),
+    useUserNotifications: vi.fn(),
     useMarkNotificationsRead: vi.fn(),
   };
 });
@@ -33,6 +34,9 @@ vi.mock('../../../components/AuthRequired', () => ({
 }));
 
 const mockUseUserNotification = vi.mocked(semaphoreClient.useUserNotification);
+const mockUseUserNotifications = vi.mocked(
+  semaphoreClient.useUserNotifications
+);
 const mockUseMarkNotificationsRead = vi.mocked(
   semaphoreClient.useMarkNotificationsRead
 );
@@ -67,6 +71,49 @@ function mockNotificationReturn(
   });
 }
 
+function mockNotificationsListReturn(
+  entries: semaphoreClient.UserNotificationSummary[] | undefined
+) {
+  mockUseUserNotifications.mockReturnValue({
+    entries,
+    isLoading: false,
+    isFetching: false,
+    isLoadingMore: false,
+    error: null,
+    hasMore: false,
+    totalCount: entries?.length ?? null,
+    loadMore: vi.fn(),
+    refetch: vi.fn(),
+  });
+}
+
+const listEntries: semaphoreClient.UserNotificationSummary[] = [
+  {
+    id: 'ntf-000',
+    created: '2026-06-13T09:00:00+00:00',
+    read: null,
+    summary: { gfm: 'A newer message', html: '<p>A newer message</p>' },
+    url: 'https://semaphore.example.com/v1/notifications/ntf-000',
+  },
+  {
+    id: 'ntf-001',
+    created: '2026-06-12T17:10:32+00:00',
+    read: null,
+    summary: {
+      gfm: 'Approaching your quota',
+      html: '<p>Approaching your quota</p>',
+    },
+    url: 'https://semaphore.example.com/v1/notifications/ntf-001',
+  },
+  {
+    id: 'ntf-002',
+    created: '2026-06-11T09:00:00+00:00',
+    read: null,
+    summary: { gfm: 'An older message', html: '<p>An older message</p>' },
+    url: 'https://semaphore.example.com/v1/notifications/ntf-002',
+  },
+];
+
 describe('NotificationDetailPageClient', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -76,6 +123,7 @@ describe('NotificationDetailPageClient', () => {
       isUnavailable: false,
     });
     mockNotificationReturn();
+    mockNotificationsListReturn(undefined);
     mockUseMarkNotificationsRead.mockReturnValue({
       mutate: markReadMutate,
     } as unknown as ReturnType<
@@ -101,7 +149,29 @@ describe('NotificationDetailPageClient', () => {
       'https://semaphore.example.com',
       'ntf-001'
     );
-    expect(screen.getByText('ntf-001')).toBeInTheDocument();
+    expect(screen.getByText('Approaching your quota')).toBeInTheDocument();
+  });
+
+  it('derives prev/next neighbors from the unfiltered inbox list', () => {
+    mockNotificationReturn({ notification });
+    mockNotificationsListReturn(listEntries);
+
+    render(<NotificationDetailPageClient id="ntf-001" />);
+
+    // The list is fetched unfiltered so neighbors are stable across filter state.
+    expect(mockUseUserNotifications).toHaveBeenCalledWith(
+      'https://semaphore.example.com',
+      { limit: 100 }
+    );
+
+    // Previous = newer (ntf-000), Next = older (ntf-002).
+    const prev = screen.getByRole('link', { name: /Previous/ });
+    expect(prev).toHaveAttribute('href', '/notifications/ntf-000');
+    expect(prev).toHaveTextContent('A newer message');
+
+    const next = screen.getByRole('link', { name: /Next/ });
+    expect(next).toHaveAttribute('href', '/notifications/ntf-002');
+    expect(next).toHaveTextContent('An older message');
   });
 
   it('shows a loading state while Semaphore discovery is still pending', () => {
