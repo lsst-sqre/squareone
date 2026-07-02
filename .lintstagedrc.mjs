@@ -4,4 +4,7 @@ export default {
   '**/Dockerfile*': [
     'node packages/repo-scripts/src/validate-docker-versions.js',
   ],
+  'biome.{json,jsonc}': [
+    'node packages/repo-scripts/src/validate-biome-schema.js',
+  ],
 };

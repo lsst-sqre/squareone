@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "localci": "node packages/repo-scripts/src/validate-docker-versions.js && node scripts/turbo-wrapper.js run biome:format:check prettier:yaml lint type-check test build && pnpm run biome:lint",
+    "localci": "node packages/repo-scripts/src/validate-docker-versions.js && node packages/repo-scripts/src/validate-biome-schema.js && node scripts/turbo-wrapper.js run biome:format:check prettier:yaml lint type-check test build && pnpm run biome:lint",
     "build": "node scripts/turbo-wrapper.js run build",
     "file-factory": "node packages/file-factory/dist/cli.js",
     "dev": "node scripts/turbo-wrapper.js run dev",
@@ -22,6 +22,7 @@
     "build:local": "turbo run build",
     "docs": "uv run noxfile.py -s docs",
     "validate-docker": "node packages/repo-scripts/src/validate-docker-versions.js",
+    "validate-biome": "node packages/repo-scripts/src/validate-biome-schema.js",
     "check-openapi-drift": "node packages/repo-scripts/src/check-openapi-drift.js",
     "prepare": "node -e \"try { require('husky').install() } catch (e) {if (e.code !== 'MODULE_NOT_FOUND') throw e}\" && node scripts/install-playwright.js"
   },
