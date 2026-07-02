@@ -21,6 +21,7 @@ This directory contains configuration for Claude Code, including specialized ski
 │   ├── data-fetching-patterns/ # SWR data fetching patterns
 │   ├── platform-api-integration/ # RSP API discovery & integration
 │   ├── docker-version-validation/ # Dockerfile version synchronization
+│   ├── biome-migrate/          # Run biome migrate on Biome version bumps
 │   └── file-factory/          # CLI scaffolding for components, hooks, contexts, pages
 ├── tasks/                      # Gitignored task-specific docs
 ├── projects/                   # Project-specific configurations
@@ -232,6 +233,21 @@ Skills are modular capabilities that extend Claude's expertise with domain-speci
 **Supporting files**:
 
 - None (references validation script at `packages/repo-scripts/src/validate-docker-versions.js`)
+
+#### biome-migrate
+
+**When to use**: Processing a dependabot PR that bumps `@biomejs/biome` (arrives via the npm `monorepo-infra` group), seeing a `biome:lint`/`biome:format` schema info ("Expected … Found … Run the command biome migrate"), or noticing `biome.json`'s `$schema` version lagging the installed Biome
+
+**Covers**:
+
+- Running `pnpm exec biome migrate --write` to sync `biome.json`'s `$schema` (and any deprecated config) with the installed Biome
+- Recognizing the non-blocking info-level signal that a migrate is overdue
+- Folding the migrate into a dependabot PR branch vs. a follow-up branch when the bump already merged
+- Why the change needs no Changeset (repo-root tooling config)
+
+**Supporting files**:
+
+- None (references `biome.json` and the root `biome:*` scripts)
 
 #### file-factory
 
