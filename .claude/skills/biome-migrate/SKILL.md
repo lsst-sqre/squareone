@@ -6,9 +6,10 @@ description: |
   Use when processing a dependabot PR that bumps @biomejs/biome (it arrives via the
   npm monorepo-infra group), when biome:lint/biome:format reports an info like
   "Expected: <new> Found: <old> — Run the command biome migrate", or any time you
-  notice biome.json's $schema version lagging the installed Biome. Trigger keywords:
-  biome, @biomejs/biome, biome migrate, biome.json, $schema mismatch, schema version,
-  dependabot biome bump, Biome upgrade.
+  notice biome.json's $schema version lagging the installed Biome, or when the
+  "Validate Biome schema version" CI step (validate-biome-schema.js) fails.
+  Trigger keywords: biome, @biomejs/biome, biome migrate, biome.json, $schema
+  mismatch, schema version, dependabot biome bump, Biome upgrade.
 allowed-tools:
   - Bash(pnpm exec biome migrate:*)
   - Bash(pnpm exec biome --version:*)
@@ -43,6 +44,11 @@ follow-up** to any Biome version bump — most often a dependabot PR.
 
   This is *info*-level and does **not** fail lint, so it is easy to miss — but
   it is the signal that a migrate is overdue.
+- **The `validate-biome-schema` check fails.** `biome:lint`'s info is only
+  advisory, so `validate-biome-schema.js` turns the drift into a hard failure —
+  it runs as the "Validate Biome schema version" CI step, on pre-commit when
+  `biome.json` is staged, and in `pnpm localci`. When it fails it prints the same
+  two-step hint (run the command, or use this skill).
 - **You notice `biome.json`'s `$schema` lagging** the installed Biome during any
   other workflow (a rebase, a manual dependency change, etc.).
 
@@ -68,6 +74,9 @@ review the full diff and keep the migrated result.
 ## Verify
 
 ```bash
+# the enforcement check should pass (exit 0, "Biome schema is in sync")
+pnpm run validate-biome
+
 # $schema version should now match the installed Biome
 grep '"\$schema"' biome.json
 pnpm exec biome --version
