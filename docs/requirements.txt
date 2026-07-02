@@ -1,2 +1,2 @@
-documenteer[guide]>=2.3.0
+documenteer[guide]>=2.4.0
 sphinx-jsonschema
