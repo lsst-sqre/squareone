@@ -5,7 +5,7 @@ import { Badge } from '@lsst-sqre/squared';
 import Link from 'next/link';
 
 import { formatLocalTimestamp } from '../../lib/utils/dateFormatters';
-import RenderedMarkdown from '../RenderedMarkdown';
+import RenderedMarkdown, { markdownToPlainText } from '../RenderedMarkdown';
 import styles from './UserNotificationDetailView.module.css';
 
 /** Where the "back to notifications" link points by default. */
@@ -15,7 +15,10 @@ const DEFAULT_RETURN_HREF = '/notifications';
 export type NeighborNotification = {
   /** The neighbor's opaque id, appended to `returnHref` for its detail link. */
   id: string;
-  /** The neighbor's plain `gfm` summary, rendered as truncated nav text. */
+  /**
+   * The neighbor's raw `gfm` summary. Markdown syntax is stripped to plain
+   * text before it is rendered as the truncated nav label.
+   */
   summary: string;
 };
 
@@ -162,8 +165,10 @@ export default function UserNotificationDetailView({
                 href={`${returnHref}/${prevNotification.id}`}
               >
                 <span className={styles.navDirection}>&larr; Previous</span>
+                {/* Nav labels stay plain text, so Markdown syntax is stripped
+                 * rather than rendered (the heading above renders it richly). */}
                 <span className={styles.navSummary}>
-                  {prevNotification.summary}
+                  {markdownToPlainText(prevNotification.summary)}
                 </span>
               </Link>
             )}
@@ -176,7 +181,7 @@ export default function UserNotificationDetailView({
               >
                 <span className={styles.navDirection}>Next &rarr;</span>
                 <span className={styles.navSummary}>
-                  {nextNotification.summary}
+                  {markdownToPlainText(nextNotification.summary)}
                 </span>
               </Link>
             )}

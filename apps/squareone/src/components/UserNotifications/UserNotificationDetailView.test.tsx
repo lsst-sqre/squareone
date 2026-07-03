@@ -103,6 +103,33 @@ describe('UserNotificationDetailView', () => {
     expect(next).toHaveTextContent('An older message');
   });
 
+  it('strips Markdown syntax from the prev/next nav labels', () => {
+    render(
+      <UserNotificationDetailView
+        notification={baseNotification}
+        prevNotification={{
+          id: 'ntf-000',
+          summary: '**Maintenance** tonight',
+        }}
+        nextNotification={{
+          id: 'ntf-002',
+          summary: 'See [details](https://example.com) here',
+        }}
+      />
+    );
+
+    // Bold markers are dropped, not shown literally and not rendered as HTML.
+    const prev = screen.getByRole('link', { name: /Previous/ });
+    expect(prev).toHaveTextContent('Maintenance tonight');
+    expect(prev.textContent).not.toContain('**');
+
+    // Link syntax collapses to its text; the URL is discarded.
+    const next = screen.getByRole('link', { name: /Next/ });
+    expect(next).toHaveTextContent('See details here');
+    expect(next.textContent).not.toContain('[');
+    expect(next.textContent).not.toContain('https://example.com');
+  });
+
   it('derives neighbor hrefs from a custom returnHref', () => {
     render(
       <UserNotificationDetailView
