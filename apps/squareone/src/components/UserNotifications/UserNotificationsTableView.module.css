@@ -11,6 +11,10 @@
    * this height keeps it from growing and shoving the list down when it does. */
   --notification-toolbar-height: 1.75rem;
 
+  /* Size of the expand/collapse chevron in the summary toggle. Applied to the
+   * icon via `.summaryToggle > svg` so the TSX never hardcodes the size. */
+  --sqo-notification-expander-size: 16px;
+
   display: flex;
   flex-direction: column;
   gap: var(--sqo-space-md);
@@ -156,6 +160,8 @@
 .summaryToggle > svg {
   flex-shrink: 0;
   align-self: center;
+  width: var(--sqo-notification-expander-size);
+  height: var(--sqo-notification-expander-size);
   color: var(--rsd-color-gray-500);
 }
 

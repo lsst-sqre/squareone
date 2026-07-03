@@ -93,12 +93,12 @@ function NotificationsContent() {
 
   const handleMarkRead = useCallback(
     (ids: string[]) => {
-      if (!csrfToken || ids.length === 0) {
+      if (!semaphoreUrl || !csrfToken || ids.length === 0) {
         return;
       }
       markRead({ ids, csrfToken });
     },
-    [csrfToken, markRead]
+    [semaphoreUrl, csrfToken, markRead]
   );
 
   // The two-tier "Select all M notifications" path has no standing query for the

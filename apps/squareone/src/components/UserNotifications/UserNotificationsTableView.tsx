@@ -185,10 +185,12 @@ function NotificationRow({
           } message: ${plainSummary}`}
           onClick={onToggleExpanded}
         >
+          {/* Chevron size comes from --sqo-notification-expander-size in the
+           * module CSS, so no size prop here. */}
           {expanded ? (
-            <ChevronDown size={16} aria-hidden="true" />
+            <ChevronDown aria-hidden="true" />
           ) : (
-            <ChevronRight size={16} aria-hidden="true" />
+            <ChevronRight aria-hidden="true" />
           )}
           {/* Sanitized, link-flattened inline HTML (see renderInlineMarkdown). */}
           <span
