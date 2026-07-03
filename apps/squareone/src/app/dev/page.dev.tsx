@@ -2,7 +2,6 @@
 
 import MainContent from '../../components/MainContent';
 import DevAuthPanel from './DevAuthPanel';
-import DevNotificationsPanel from './DevNotificationsPanel';
 
 /**
  * Dev-only auth control panel route (`/dev`).
@@ -14,15 +13,16 @@ import DevNotificationsPanel from './DevNotificationsPanel';
  *
  * This is the first piece of a future dev-tools hub. For now it renders the
  * {@link DevAuthPanel}, which lets a developer flip login state, pick a persona,
- * and edit the active Gafaelfawr scopes and identity at runtime, and the
- * {@link DevNotificationsPanel}, which sets the mocked unread-notification count
- * that drives the header badge.
+ * and edit the active Gafaelfawr scopes and identity at runtime. The mocked
+ * unread-notification count is no longer set here: the user-notifications dev
+ * mock now serves a persistent notification list (see `userNotificationsStore`),
+ * so the header badge reflects the seeded notifications and any that are marked
+ * read from the inbox.
  */
 export default function DevPage() {
   return (
     <MainContent>
       <DevAuthPanel />
-      <DevNotificationsPanel />
     </MainContent>
   );
 }

@@ -45,3 +45,94 @@ export function renderMarkdownToHtml(markdown: string): string {
 export function useRenderedMarkdown(markdown: string): string {
   return useMemo(() => renderMarkdownToHtml(markdown), [markdown]);
 }
+
+// Minimal structural view of the mdast nodes the helpers below traverse. The
+// full mdast types are not imported to keep this dependency-light; only `type`,
+// `value`, and `children` are needed.
+type SummaryNode = {
+  type: string;
+  value?: string;
+  children?: SummaryNode[];
+};
+
+/** Replace every link node with its inline children, in place and recursively. */
+function unwrapLinks(node: SummaryNode): void {
+  if (!node.children) {
+    return;
+  }
+  const next: SummaryNode[] = [];
+  for (const child of node.children) {
+    unwrapLinks(child);
+    if (child.type === 'link' && child.children) {
+      next.push(...child.children);
+    } else {
+      next.push(child);
+    }
+  }
+  node.children = next;
+}
+
+// remark transformer that rewrites a parsed summary into inline phrasing
+// content: it unwraps links to their text/emphasis (live links belong in the
+// expanded body and the detail page, not the inline summary) and unwraps a lone
+// top-level paragraph so the rendered HTML carries no block `<p>` wrapper —
+// keeping it valid phrasing content inside the summary toggle `<button>`.
+function remarkInlineSummary() {
+  return (tree: unknown) => {
+    const root = tree as SummaryNode;
+    unwrapLinks(root);
+    if (root.children?.length === 1 && root.children[0].type === 'paragraph') {
+      root.children = root.children[0].children ?? [];
+    }
+  };
+}
+
+const inlineSummaryProcessor = remark()
+  .use(gfm)
+  .use(remarkInlineSummary)
+  .use(html);
+
+/**
+ * Render a notification summary's GitHub-flavored Markdown to **inline** HTML.
+ *
+ * Goes through the same sanitizing remark/remark-html pipeline as
+ * {@link renderMarkdownToHtml} (so dangerous raw HTML is stripped — never trust
+ * the API's pre-rendered `summary.html`), but additionally flattens links to
+ * plain text and drops the block paragraph wrapper. The result is valid
+ * phrasing content, safe to place inside a `<button>` and to inject via
+ * `dangerouslySetInnerHTML`.
+ *
+ * @param markdown - Raw Markdown source (the summary's `gfm` field)
+ * @returns The rendered inline HTML
+ */
+export function renderInlineMarkdown(markdown: string): string {
+  if (markdown.trim() === '') {
+    return '';
+  }
+  return inlineSummaryProcessor.processSync(markdown).toString().trim();
+}
+
+/** Concatenate the text of an mdast subtree (drops markup, keeps link text). */
+function collectText(node: SummaryNode): string {
+  if (typeof node.value === 'string') {
+    return node.value;
+  }
+  if (node.children) {
+    return node.children.map(collectText).join('');
+  }
+  return '';
+}
+
+/**
+ * Extract the plain-text content of a GitHub-flavored Markdown string for use in
+ * an accessible label: emphasis markers are dropped, link text is kept, and URLs
+ * are discarded. Parses with the same remark/gfm toolchain and walks the syntax
+ * tree, so there is no HTML to sanitize.
+ *
+ * @param markdown - Raw Markdown source (the summary's `gfm` field)
+ * @returns The plain-text content, with runs of whitespace collapsed
+ */
+export function markdownToPlainText(markdown: string): string {
+  const tree = processor.parse(markdown) as unknown as SummaryNode;
+  return collectText(tree).replace(/\s+/g, ' ').trim();
+}

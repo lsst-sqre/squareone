@@ -2,6 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   formatExpiration,
   formatLastUsed,
+  formatLocalTimestamp,
+  formatRelativeToNow,
   formatUtcTimestamp,
 } from './dateFormatters';
 
@@ -145,6 +147,56 @@ describe('dateFormatters', () => {
 
     it('returns the original string unchanged for an invalid date', () => {
       expect(formatUtcTimestamp('not-a-date')).toBe('not-a-date');
+    });
+  });
+
+  describe('formatLocalTimestamp', () => {
+    it('formats an ISO 8601 timestamp in the reader local time with a zone', () => {
+      // The exact output depends on the reader's locale/timezone, so assert it
+      // matches the same Intl options the formatter uses — verifying the guard
+      // passes and the options (including the trailing zone abbreviation) are
+      // applied — rather than a hard-coded, machine-dependent string.
+      const iso = '2026-06-12T17:10:32+00:00';
+      const expected = new Intl.DateTimeFormat(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        timeZoneName: 'short',
+      }).format(new Date(iso));
+
+      expect(formatLocalTimestamp(iso)).toBe(expected);
+    });
+
+    it('returns the original string unchanged for an invalid date', () => {
+      expect(formatLocalTimestamp('not-a-date')).toBe('not-a-date');
+    });
+  });
+
+  describe('formatRelativeToNow', () => {
+    it('describes a multi-day-old timestamp in days with a trailing "ago"', () => {
+      // 18 days before MOCK_NOW (2024-01-01 00:00:00 UTC).
+      const created = new Date(
+        (MOCK_NOW - 18 * SECONDS_PER_DAY) * 1000
+      ).toISOString();
+      expect(formatRelativeToNow(created)).toBe('18 days ago');
+    });
+
+    it('describes an hours-old timestamp in hours', () => {
+      const created = new Date(
+        (MOCK_NOW - 2 * SECONDS_PER_HOUR) * 1000
+      ).toISOString();
+      expect(formatRelativeToNow(created)).toBe('2 hours ago');
+    });
+
+    it('describes a sub-hour-old timestamp as less than 1 hour', () => {
+      const created = new Date((MOCK_NOW - 60) * 1000).toISOString();
+      expect(formatRelativeToNow(created)).toBe('less than 1 hour ago');
+    });
+
+    it('returns the original string unchanged for an invalid date', () => {
+      expect(formatRelativeToNow('not-a-date')).toBe('not-a-date');
     });
   });
 

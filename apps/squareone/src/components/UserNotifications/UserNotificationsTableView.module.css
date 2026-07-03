@@ -1,0 +1,253 @@
+/* UserNotificationsTableView: GitHub-style flat notifications inbox + states */
+
+.container {
+  /* Diameter of the unread dot (and the read-row spacer that replaces it);
+   * also used to align the toolbar "Select all" checkbox with the per-row
+   * checkboxes. */
+  --notification-dot-size: 8px;
+
+  /* Reserved toolbar row height. The selection-driven "Actions" trigger only
+   * appears once rows are selected; pinning the toolbar (and the trigger) to
+   * this height keeps it from growing and shoving the list down when it does. */
+  --notification-toolbar-height: 1.75rem;
+
+  /* Size of the expand/collapse chevron in the summary toggle. Applied to the
+   * icon via `.summaryToggle > svg` so the TSX never hardcodes the size. */
+  --sqo-notification-expander-size: 16px;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--sqo-space-md);
+  width: 100%;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--sqo-space-md);
+  min-height: var(--notification-toolbar-height);
+}
+
+/* Selection controls (select-all checkbox + "N selected" + Actions) sit at the
+ * start of the toolbar. The leading checkbox is indented by the row's left
+ * padding plus the unread-dot column and its gap so it lines up vertically with
+ * the per-row selection checkboxes (the second column of `.row`). */
+.selectionControls {
+  display: flex;
+  align-items: center;
+  gap: var(--sqo-space-sm);
+  padding-left: calc(
+    var(--sqo-space-xs) +
+    var(--notification-dot-size) +
+    var(--sqo-space-sm)
+  );
+}
+
+/* Compact override of the squared DropdownMenu trigger (whose default
+ * min-height is a 44px touch target). Scoped to win over the library class and
+ * pinned to the reserved toolbar height so showing it never resizes the row. */
+.selectionControls .actionsTrigger {
+  min-height: var(--notification-toolbar-height);
+  height: var(--notification-toolbar-height);
+  padding-block: 0;
+  font-size: 0.875rem;
+}
+
+.selectedCount {
+  font-size: 0.875rem;
+  color: var(--rsd-color-gray-600);
+}
+
+/* Keep the "Show unread only" filter pushed to the trailing edge whether or not
+ * the selection controls are present. */
+.filter {
+  margin-left: auto;
+}
+
+.loadingState,
+.errorState,
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sqo-space-xs);
+  padding: var(--sqo-space-xl);
+  text-align: center;
+  color: var(--rsd-color-gray-500);
+}
+
+.errorState {
+  color: var(--rsd-color-red-500);
+}
+
+.errorMessage {
+  font-size: 0.875rem;
+  color: var(--rsd-color-gray-600);
+}
+
+.count {
+  padding-top: var(--sqo-space-sm);
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--rsd-color-gray-500);
+}
+
+/* The notifications list is a borderless stack of full-width rows. */
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--rsd-color-gray-200);
+}
+
+/* dot · checkbox · summary · date · menu, with the expanded body flowing into a
+ * second grid row spanning the summary through the menu. */
+.row {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto auto;
+  align-items: center;
+  column-gap: var(--sqo-space-sm);
+  row-gap: var(--sqo-space-sm);
+  padding: var(--sqo-space-sm) var(--sqo-space-xs);
+  border-bottom: 1px solid var(--rsd-color-gray-200);
+}
+
+.row:hover {
+  background-color: var(--rsd-color-gray-100);
+}
+
+/* Filled blue dot marking an unread row; purely decorative (aria-hidden). */
+.unreadDot {
+  width: var(--notification-dot-size);
+  height: var(--notification-dot-size);
+  border-radius: 50%;
+  background-color: var(--rsd-color-blue-600);
+}
+
+/* Same-size empty spacer so read rows stay aligned with unread rows. */
+.readDot {
+  width: var(--notification-dot-size);
+  height: var(--notification-dot-size);
+}
+
+/* Reserve the checkbox column even when selection is disabled so rows stay
+ * aligned; the cell is empty in that case. */
+.checkboxCell {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* The chevron + summary act as a single full-width toggle. */
+.summaryToggle {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--sqo-space-xs);
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  text-align: left;
+  color: var(--rsd-color-gray-800);
+  cursor: pointer;
+}
+
+.summaryToggle:hover .summaryText {
+  color: var(--rsd-color-primary-600);
+}
+
+/* The chevron sits at the top of the (potentially wrapping) summary. */
+.summaryToggle > svg {
+  flex-shrink: 0;
+  align-self: center;
+  width: var(--sqo-notification-expander-size);
+  height: var(--sqo-notification-expander-size);
+  color: var(--rsd-color-gray-500);
+}
+
+/* Collapse paragraph spacing from any leftover block markup in the summary. */
+.summaryText :global(p) {
+  margin: 0;
+}
+
+/* Unread rows lead with a heavier summary, matching GitHub's unread emphasis. */
+.unread .summaryText {
+  font-weight: 600;
+}
+
+.date {
+  white-space: nowrap;
+  font-size: 0.875rem;
+  color: var(--rsd-color-gray-500);
+}
+
+/* Bare icon button opening the per-row "…" menu. */
+.menuButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sqo-space-xxs);
+  border: none;
+  border-radius: var(--sqo-border-radius-1);
+  background: none;
+  color: var(--rsd-color-gray-500);
+  cursor: pointer;
+}
+
+.menuButton:hover {
+  background-color: var(--rsd-color-gray-200);
+  color: var(--rsd-color-gray-700);
+}
+
+/* The expanded body indents under the summary column and reads as the primary
+ * text once revealed. */
+.expandedBody {
+  grid-column: 3 / -1;
+  color: var(--rsd-color-gray-800);
+}
+
+/* Tinted banner offering to extend selection across pages (or clear it). */
+.selectAllBanner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sqo-space-xs);
+  padding: var(--sqo-space-sm);
+  border-radius: var(--sqo-border-radius-1);
+  background-color: var(--rsd-color-blue-100);
+  font-size: 0.875rem;
+  color: var(--rsd-color-gray-700);
+}
+
+/* Underlined, link-style button inside the select-all banner. */
+.bannerButton {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--rsd-color-primary-600);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Tinted banner shown when the across-pages bulk mark-read fails. Styled like
+ * the select-all banner but in error colors; the selection is kept alongside it
+ * so the user can retry the action. */
+.bulkMarkReadError {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sqo-space-xs);
+  padding: var(--sqo-space-sm);
+  border-radius: var(--sqo-border-radius-1);
+  background-color: var(--rsd-color-red-100);
+  font-size: 0.875rem;
+  color: var(--rsd-color-red-500);
+}
+
+/* Centered wrapper for the "Load more" button. */
+.loadMore {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--sqo-space-sm);
+}

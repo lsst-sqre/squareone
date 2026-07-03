@@ -1,0 +1,139 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  /* Vertical breathing room so the content doesn't abut the header/footer.
+   * Padding (not margin) so it never collapses through the MainContent wrapper. */
+  padding: var(--sqo-space-xl-fixed) 0;
+}
+
+.backLink {
+  margin: 0 0 var(--sqo-space-md-fixed);
+}
+
+.backLink a {
+  color: var(--rsd-component-text-link-color);
+  text-decoration: none;
+}
+
+.backLink a:hover {
+  text-decoration: underline;
+}
+
+.summary {
+  font-size: 1.5rem;
+  font-weight: 600;
+  /* Separate the title from the body below it. */
+  margin-bottom: var(--sqo-space-lg-fixed);
+}
+
+/* The rendered summary is inline Markdown; collapse the wrapping paragraph
+ * margins so it reads as a heading. */
+.summary :global(p) {
+  margin: 0;
+}
+
+/* The date + read badge form an eyebrow directly above the title. */
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: var(--sqo-space-md-fixed);
+  margin: 0 0 var(--sqo-space-xs-fixed);
+}
+
+.createdDate {
+  color: var(--rsd-color-gray-500);
+}
+
+.muted {
+  color: var(--rsd-color-gray-500);
+}
+
+.noBody {
+  color: var(--rsd-color-gray-500);
+  font-style: italic;
+}
+
+.nav {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sqo-space-lg-fixed);
+  margin-top: var(--sqo-space-xl-fixed);
+  padding-top: var(--sqo-space-md-fixed);
+  border-top: 1px solid var(--rsd-color-gray-200);
+}
+
+/* Two equal slots so Previous stays left and Next stays right even when only
+ * one neighbor is present. */
+.navSlot {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.navLink {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sqo-space-xxs-fixed);
+  color: var(--rsd-component-text-link-color);
+  text-decoration: none;
+}
+
+.navLink:hover .navSummary {
+  text-decoration: underline;
+}
+
+.navPrev {
+  text-align: left;
+  align-items: flex-start;
+}
+
+.navNext {
+  text-align: right;
+  align-items: flex-end;
+}
+
+.navDirection {
+  font-weight: 500;
+}
+
+/* Clamp long neighbor summaries to two lines so nav labels stay compact. */
+.navSummary {
+  color: var(--rsd-color-gray-500);
+  font-size: 0.875rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.loadingState {
+  color: var(--rsd-color-gray-500);
+}
+
+.errorState {
+  padding: var(--sqo-space-md-fixed);
+  background-color: var(--rsd-color-red-100);
+  border: 1px solid var(--rsd-color-red-500);
+  border-radius: var(--sqo-border-radius-2);
+  color: var(--rsd-color-red-900);
+}
+
+.errorState h2 {
+  margin-top: 0;
+  color: var(--rsd-color-red-900);
+}
+
+.errorState a {
+  color: var(--rsd-color-red-900);
+}
+
+/* Mobile layout */
+@media (max-width: 768px) {
+  .nav {
+    flex-direction: column;
+  }
+
+  .navNext {
+    text-align: left;
+    align-items: flex-start;
+  }
+}

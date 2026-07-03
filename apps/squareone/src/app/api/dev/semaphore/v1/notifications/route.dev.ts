@@ -8,8 +8,9 @@
  * an RFC 5988 `Link` header and the unread/total through `X-Total-Count` — the
  * same contract the real Semaphore user API uses (and that the semaphore-client
  * `fetchUserNotifications` parses). The header `useUnreadNotificationCount` hook
- * reads the total from a `?unread=true&limit=1` request, so the dev-selected
- * unread count (set from the `/dev` panel) drives the header badge.
+ * reads the total from a `?unread=true&limit=1` request, so the persistent dev
+ * store's unread notifications drive the header badge — marking one read (from
+ * the inbox or by viewing its body) lowers the count.
  *
  * This file is only built into the development server (see `next.config.js`
  * `pageExtensions`), so it never reaches the production bundle.
