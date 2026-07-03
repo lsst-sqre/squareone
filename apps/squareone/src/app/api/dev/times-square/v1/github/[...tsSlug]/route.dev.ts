@@ -4,6 +4,7 @@
  * Fixed URLs to use mock API endpoints
  */
 
+import type { Page } from '@lsst-sqre/times-square-client';
 import { NextResponse } from 'next/server';
 
 import { loadAppConfig } from '@/lib/config/loader';
@@ -33,7 +34,7 @@ export async function GET(
 
     // Shape must conform to the PageSchema Zod schema in
     // @lsst-sqre/times-square-client (packages/times-square-client/src/schemas.ts).
-    const content = {
+    const content: Page = {
       name: page,
       title: `Title for ${page}`,
       description: {
@@ -41,7 +42,9 @@ export async function GET(
         html: '<p>This is the description.</p>',
       },
       date_added: '2024-01-15T10:00:00Z',
-      uploader_username: null as string | null,
+      authors: [],
+      tags: [],
+      uploader_username: null,
       self_url: pageBaseUrl,
       source_url: `${pageBaseUrl}/source`,
       rendered_url: `${pageBaseUrl}/rendered`,
