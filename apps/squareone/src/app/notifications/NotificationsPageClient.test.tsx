@@ -61,6 +61,10 @@ const mockUseSemaphoreUrlState = vi.mocked(
 // The container owns the page size and passes it to the list query.
 const PAGE_SIZE = 20;
 
+// Page size the container uses when enumerating the full unread set for
+// "Mark all as read".
+const MARK_ALL_PAGE_SIZE = 100;
+
 const markReadMutate = vi.fn();
 const markReadMutateAsync = vi.fn();
 
@@ -350,11 +354,13 @@ describe('NotificationsPageClient', () => {
     await user.click(screen.getByRole('button', { name: 'Actions' }));
     await user.click(screen.getByRole('menuitem', { name: /mark as read/i }));
 
-    // It enumerates the unread notifications…
+    // It enumerates the unread notifications with an explicit page size…
     expect(mockFetchUserNotifications).toHaveBeenCalledWith(
       'https://semaphore.example.com',
-      { unread: true }
+      { unread: true, limit: MARK_ALL_PAGE_SIZE, cursor: null }
     );
+    // …and stops after one request when there is no next cursor…
+    expect(mockFetchUserNotifications).toHaveBeenCalledTimes(1);
 
     // …then marks that enumerated set read through the same mutation that
     // invalidates the list, the unread count, and each affected detail. The
@@ -365,6 +371,127 @@ describe('NotificationsPageClient', () => {
         csrfToken: 'csrf-token-xyz',
       });
     });
+  });
+
+  it('follows the cursor across pages so every unread id is marked read', async () => {
+    const user = userEvent.setup();
+    mockUseUserNotifications.mockReturnValue(
+      makeNotificationsReturn({ hasMore: true, totalCount: 12 })
+    );
+    // The unread set spans two pages of the enumeration; the second page is
+    // requested with the first page's cursor.
+    mockFetchUserNotifications
+      .mockResolvedValueOnce({
+        entries: [mockUserNotifications[0]], // ntf-001 (unread)
+        nextCursor: 'cursor-page-2',
+        totalCount: 2,
+      })
+      .mockResolvedValueOnce({
+        entries: [mockUserNotifications[2]], // ntf-003 (unread)
+        nextCursor: null,
+        totalCount: 2,
+      });
+
+    render(<NotificationsPageClient />);
+
+    await user.click(screen.getByRole('checkbox', { name: /select all/i }));
+    await user.click(
+      screen.getByRole('button', { name: /select all 12 notifications/i })
+    );
+    await user.click(screen.getByRole('button', { name: 'Actions' }));
+    await user.click(screen.getByRole('menuitem', { name: /mark as read/i }));
+
+    // The ids from every page — not just the first — are marked read.
+    await waitFor(() => {
+      expect(markReadMutateAsync).toHaveBeenCalledWith({
+        ids: ['ntf-001', 'ntf-003'],
+        csrfToken: 'csrf-token-xyz',
+      });
+    });
+
+    // The enumeration walked the cursor to exhaustion.
+    expect(mockFetchUserNotifications).toHaveBeenCalledTimes(2);
+    expect(mockFetchUserNotifications).toHaveBeenNthCalledWith(
+      1,
+      'https://semaphore.example.com',
+      { unread: true, limit: MARK_ALL_PAGE_SIZE, cursor: null }
+    );
+    expect(mockFetchUserNotifications).toHaveBeenNthCalledWith(
+      2,
+      'https://semaphore.example.com',
+      { unread: true, limit: MARK_ALL_PAGE_SIZE, cursor: 'cursor-page-2' }
+    );
+  });
+
+  it('stops enumerating when the server repeats a cursor instead of looping forever', async () => {
+    const user = userEvent.setup();
+    mockUseUserNotifications.mockReturnValue(
+      makeNotificationsReturn({ hasMore: true, totalCount: 12 })
+    );
+    // A misbehaving server returns the same next cursor on every page.
+    mockFetchUserNotifications
+      .mockResolvedValueOnce({
+        entries: [mockUserNotifications[0]], // ntf-001 (unread)
+        nextCursor: 'stuck-cursor',
+        totalCount: 2,
+      })
+      .mockResolvedValue({
+        entries: [mockUserNotifications[2]], // ntf-003 (unread)
+        nextCursor: 'stuck-cursor',
+        totalCount: 2,
+      });
+
+    render(<NotificationsPageClient />);
+
+    await user.click(screen.getByRole('checkbox', { name: /select all/i }));
+    await user.click(
+      screen.getByRole('button', { name: /select all 12 notifications/i })
+    );
+    await user.click(screen.getByRole('button', { name: 'Actions' }));
+    await user.click(screen.getByRole('menuitem', { name: /mark as read/i }));
+
+    // The walk terminates after the repeated cursor and still marks what it
+    // enumerated.
+    await waitFor(() => {
+      expect(markReadMutateAsync).toHaveBeenCalledWith({
+        ids: ['ntf-001', 'ntf-003'],
+        csrfToken: 'csrf-token-xyz',
+      });
+    });
+    expect(mockFetchUserNotifications).toHaveBeenCalledTimes(2);
+  });
+
+  it('rejects and keeps the selection when a later enumeration page fails', async () => {
+    const user = userEvent.setup();
+    mockUseUserNotifications.mockReturnValue(
+      makeNotificationsReturn({ hasMore: true, totalCount: 12 })
+    );
+    // The first page succeeds but the cursor-follow request fails mid-walk.
+    mockFetchUserNotifications
+      .mockResolvedValueOnce({
+        entries: [mockUserNotifications[0]], // ntf-001 (unread)
+        nextCursor: 'cursor-page-2',
+        totalCount: 2,
+      })
+      .mockRejectedValueOnce(
+        new semaphoreClient.SemaphoreError('Semaphore API error: 500', 500)
+      );
+
+    render(<NotificationsPageClient />);
+
+    await user.click(screen.getByRole('checkbox', { name: /select all/i }));
+    await user.click(
+      screen.getByRole('button', { name: /select all 12 notifications/i })
+    );
+    await user.click(screen.getByRole('button', { name: 'Actions' }));
+    await user.click(screen.getByRole('menuitem', { name: /mark as read/i }));
+
+    // The mid-walk failure is surfaced inline, the selection is kept, and no
+    // partial set was marked read.
+    const alert = await screen.findByRole('alert');
+    expect(alert).toHaveTextContent(/failed to mark notifications as read/i);
+    expect(screen.getByText(/all 12 selected/i)).toBeInTheDocument();
+    expect(markReadMutateAsync).not.toHaveBeenCalled();
   });
 
   it('surfaces an enumeration failure and keeps the selection when marking all matching read', async () => {

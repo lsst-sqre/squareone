@@ -21,6 +21,14 @@ import { useStaticConfig } from '../../hooks/useStaticConfig';
 /** Page size owned by the listing container, requested from the list query. */
 const PAGE_SIZE = 20;
 
+/**
+ * Page size for enumerating the full unread set in "Mark all as read".
+ *
+ * Larger than the display page size to keep the number of round trips low when
+ * walking the cursor-paginated `?unread=true` list to exhaustion.
+ */
+const MARK_ALL_PAGE_SIZE = 100;
+
 /** Surfaced when service discovery settles but Semaphore is undiscoverable. */
 const UNAVAILABLE_ERROR = new Error(
   'The notification service is currently unavailable. Please try again later.'
@@ -94,19 +102,40 @@ function NotificationsContent() {
   );
 
   // The two-tier "Select all M notifications" path has no standing query for the
-  // full unread set, so it enumerates the unread ids on demand (the
-  // `?unread=true` list, unpaged) and marks exactly that set read. Failures from
-  // the enumeration or the mark-read call reject the returned promise, which the
-  // table view awaits so it can keep the selection and surface the error inline
-  // (letting the user retry) instead of silently pretending the action worked.
+  // full unread set, so it enumerates the unread ids on demand by walking the
+  // cursor-paginated `?unread=true` list to exhaustion — Semaphore caps a single
+  // response at its default page size, so one unpaged request would only cover
+  // the first page — and marks exactly that set read. Failures from any page of
+  // the enumeration or from the mark-read call reject the returned promise,
+  // which the table view awaits so it can keep the selection and surface the
+  // error inline (letting the user retry) instead of silently pretending the
+  // action worked.
   const handleMarkAllMatchingRead = useCallback(async () => {
     if (!semaphoreUrl || !csrfToken) {
       return;
     }
-    const { entries: unread } = await fetchUserNotifications(semaphoreUrl, {
-      unread: true,
-    });
-    const ids = unread.map((n) => n.id);
+    const ids: string[] = [];
+    const seenCursors = new Set<string>();
+    let cursor: string | null = null;
+    do {
+      const page = await fetchUserNotifications(semaphoreUrl, {
+        unread: true,
+        limit: MARK_ALL_PAGE_SIZE,
+        cursor,
+      });
+      for (const notification of page.entries) {
+        ids.push(notification.id);
+      }
+      cursor = page.nextCursor;
+      // Guard against a server that repeats a cursor: stop rather than loop
+      // forever, marking read whatever was enumerated so far.
+      if (cursor !== null) {
+        if (seenCursors.has(cursor)) {
+          break;
+        }
+        seenCursors.add(cursor);
+      }
+    } while (cursor !== null);
     if (ids.length > 0) {
       await markReadAsync({ ids, csrfToken });
     }
