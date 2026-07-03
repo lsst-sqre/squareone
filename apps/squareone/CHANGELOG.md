@@ -1,5 +1,65 @@
 # squareone
 
+## 0.35.0
+
+### Minor Changes
+
+- [#510](https://github.com/lsst-sqre/squareone/pull/510) [`66a4ab2`](https://github.com/lsst-sqre/squareone/commit/66a4ab2146c218bb8f7b7207c00b6bcf29378479) Thanks [@jonathansick](https://github.com/jonathansick)! - Add two feature-flag config keys for the upcoming user notifications UI: `enableUserNotifications` (boolean, default `false`) and `userNotificationsPollIntervalSeconds` (number, default `300`). Both flow through the existing config pipeline — declared in `squareone.config.schema.json` with titles/descriptions/defaults, added to the `AppConfig` type, and defaulted in `squareone.config.yaml` — so they resolve via `getStaticConfig()` / `useStaticConfig()`. They ship `false`/`300` everywhere and no UI consumes them yet; the flag keeps the in-progress notifications feature hidden until it is released.
+
+- [#514](https://github.com/lsst-sqre/squareone/pull/514) [`3d03f5c`](https://github.com/lsst-sqre/squareone/commit/3d03f5ce085980a7bf249e2dd528f428efc47f66) Thanks [@jonathansick](https://github.com/jonathansick)! - Add the deep-linkable user notification detail page at `/notifications/[id]` behind the `enableUserNotifications` flag. When the flag is off the route returns 404; when on, logged-in users (gated by `AuthRequired`) see the full message — the rendered-Markdown (`gfm`) summary as the page heading, the created date rendered in the reader's **local time with a timezone abbreviation** (e.g. `Jun 12, 2026, 10:10 AM PDT`, via a new `formatLocalTimestamp` helper), and a read-status badge, followed by the rendered-Markdown body — with a "Back to notifications" link, plus loading, terminal-unavailable, error, and 404/not-found states. **Previous/Next** links navigate to the adjacent inbox notifications (Previous = newer, Next = older), each showing the neighbor's summary snippet; neighbors are derived client-side from the (unfiltered) inbox list via `useUserNotifications`, since the Semaphore API exposes no neighbor endpoint (known limitation: neighbors come only from the first loaded page, `limit: 100`, so a notification beyond that window shows no prev/next). The new props-driven `UserNotificationDetailView` presentational component carries those states (with a Storybook story per state). Adds the dev mock `GET /api/dev/semaphore/v1/notifications/[id]` returning a single `UserNotificationFormatted` from the persistent user-notifications store (404 for an unknown id); it does not auto-mark the notification read. Display only — auto-mark-read on view is a later slice.
+
+- [#514](https://github.com/lsst-sqre/squareone/pull/514) [`c094d12`](https://github.com/lsst-sqre/squareone/commit/c094d12b3e5b06e3f7d1e21dcfb089f35840c37b) Thanks [@jonathansick](https://github.com/jonathansick)! - Add the `/notifications` inbox page behind the `enableUserNotifications` flag. When the flag is off the route returns 404; when on, logged-in users (gated by `AuthRequired`) see their notifications listed newest-first with date, read status, and a rendered-Markdown (`gfm`) summary, plus a "Show unread only" toggle, "Load more" cursor paging with a total count, and loading/error/empty states. Adds the dev mock `GET /api/dev/semaphore/v1/notifications` honoring `unread`/`cursor`/`limit` with RFC 5988 `Link` + `X-Total-Count`, served from a persistent in-memory user-notifications store. That store replaces the temporary unread-count shim that previously drove the header badge: the badge now reflects the seeded notifications and any later marked read. Read-only in this slice — row selection, mark-read, and the per-message detail view land in later tasks.
+
+- [#514](https://github.com/lsst-sqre/squareone/pull/514) [`8b5ed79`](https://github.com/lsst-sqre/squareone/commit/8b5ed79450913784b4c1b2b474dcb088fbe1fc15) Thanks [@jonathansick](https://github.com/jonathansick)! - Add explicit mark-read actions to the `/notifications` inbox (behind the `enableUserNotifications` flag). `UserNotificationsTableView` gains controlled row selection (a leading checkbox column with select-all, keyed by notification id), a bulk-actions `DropdownMenu` whose "Mark read" action is enabled only when at least one row is selected and marks the selection read (clearing it afterwards), and a "Mark all as read" button. The inbox container enumerates the unread ids on demand (the `?unread=true` list) for "Mark all as read" and routes both actions through `useMarkNotificationsRead`, whose shared cache invalidation updates the list, the unread count, and each affected detail without a manual refresh. The bulk dropdown is built to be extensible for future bulk actions.
+
+### Patch Changes
+
+- [#520](https://github.com/lsst-sqre/squareone/pull/520) [`a914e96`](https://github.com/lsst-sqre/squareone/commit/a914e96e3578ce4656dc202006355fcc7b912a7c) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @changesets/changelog-github from 0.5.2 to 0.7.0
+
+- [#520](https://github.com/lsst-sqre/squareone/pull/520) [`a914e96`](https://github.com/lsst-sqre/squareone/commit/a914e96e3578ce4656dc202006355fcc7b912a7c) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @changesets/cli from 2.29.8 to 2.31.0
+
+- [#518](https://github.com/lsst-sqre/squareone/pull/518) [`d4df26e`](https://github.com/lsst-sqre/squareone/commit/d4df26e66889b910641ef588afafa0919cef7fdc) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-a11y from 10.4.1 to 10.4.6
+
+- [#518](https://github.com/lsst-sqre/squareone/pull/518) [`d4df26e`](https://github.com/lsst-sqre/squareone/commit/d4df26e66889b910641ef588afafa0919cef7fdc) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-docs from 10.4.1 to 10.4.6
+
+- [#518](https://github.com/lsst-sqre/squareone/pull/518) [`d4df26e`](https://github.com/lsst-sqre/squareone/commit/d4df26e66889b910641ef588afafa0919cef7fdc) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-links from 10.4.1 to 10.4.6
+
+- [#518](https://github.com/lsst-sqre/squareone/pull/518) [`d4df26e`](https://github.com/lsst-sqre/squareone/commit/d4df26e66889b910641ef588afafa0919cef7fdc) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-onboarding from 10.4.1 to 10.4.6
+
+- [#518](https://github.com/lsst-sqre/squareone/pull/518) [`d4df26e`](https://github.com/lsst-sqre/squareone/commit/d4df26e66889b910641ef588afafa0919cef7fdc) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-themes from 10.4.1 to 10.4.6
+
+- [#518](https://github.com/lsst-sqre/squareone/pull/518) [`d4df26e`](https://github.com/lsst-sqre/squareone/commit/d4df26e66889b910641ef588afafa0919cef7fdc) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-vitest from 10.4.1 to 10.4.6
+
+- [#518](https://github.com/lsst-sqre/squareone/pull/518) [`d4df26e`](https://github.com/lsst-sqre/squareone/commit/d4df26e66889b910641ef588afafa0919cef7fdc) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/react-vite from 10.4.1 to 10.4.6
+
+- [#520](https://github.com/lsst-sqre/squareone/pull/520) [`a914e96`](https://github.com/lsst-sqre/squareone/commit/a914e96e3578ce4656dc202006355fcc7b912a7c) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @turbo/gen from 2.9.18 to 2.10.0
+
+- [#516](https://github.com/lsst-sqre/squareone/pull/516) [`f917b03`](https://github.com/lsst-sqre/squareone/commit/f917b034354e148db8f75ba47ff525f38fa13329) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @types/react from 19.2.14 to 19.2.17
+
+- [#522](https://github.com/lsst-sqre/squareone/pull/522) [`14418c4`](https://github.com/lsst-sqre/squareone/commit/14418c41074e4e6159948a958ffc8f0c8e3adcb5) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump actions/checkout from 6 to 7
+
+- [#517](https://github.com/lsst-sqre/squareone/pull/517) [`13e314a`](https://github.com/lsst-sqre/squareone/commit/13e314a0538587e2f8cb2af2190b4543e9ca464d) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump eslint-config-next from 16.2.7 to 16.2.9
+
+- [#520](https://github.com/lsst-sqre/squareone/pull/520) [`a914e96`](https://github.com/lsst-sqre/squareone/commit/a914e96e3578ce4656dc202006355fcc7b912a7c) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump eslint-config-turbo from 2.8.3 to 2.10.0
+
+- [#518](https://github.com/lsst-sqre/squareone/pull/518) [`d4df26e`](https://github.com/lsst-sqre/squareone/commit/d4df26e66889b910641ef588afafa0919cef7fdc) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump eslint-plugin-storybook from 10.4.1 to 10.4.6
+
+- [#522](https://github.com/lsst-sqre/squareone/pull/522) [`14418c4`](https://github.com/lsst-sqre/squareone/commit/14418c41074e4e6159948a958ffc8f0c8e3adcb5) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump imjasonh/setup-crane from 0.6 to 0.7
+
+- [#517](https://github.com/lsst-sqre/squareone/pull/517) [`13e314a`](https://github.com/lsst-sqre/squareone/commit/13e314a0538587e2f8cb2af2190b4543e9ca464d) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump next from 16.2.7 to 16.2.10
+
+- [#519](https://github.com/lsst-sqre/squareone/pull/519) [`c116c4b`](https://github.com/lsst-sqre/squareone/commit/c116c4b8bb4c40a94cf0783308cc6c43ddc4ec8a) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump playwright from 1.60.0 to 1.61.1 in the playwright group across 1 directory
+
+- [#516](https://github.com/lsst-sqre/squareone/pull/516) [`f917b03`](https://github.com/lsst-sqre/squareone/commit/f917b034354e148db8f75ba47ff525f38fa13329) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump react-dom from 19.2.4 to 19.2.7
+
+- [#516](https://github.com/lsst-sqre/squareone/pull/516) [`f917b03`](https://github.com/lsst-sqre/squareone/commit/f917b034354e148db8f75ba47ff525f38fa13329) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump react from 19.2.4 to 19.2.7
+
+- [#520](https://github.com/lsst-sqre/squareone/pull/520) [`a914e96`](https://github.com/lsst-sqre/squareone/commit/a914e96e3578ce4656dc202006355fcc7b912a7c) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump turbo from 2.9.14 to 2.10.0
+
+- Updated dependencies [[`79cea8a`](https://github.com/lsst-sqre/squareone/commit/79cea8a96fa82e3155679c73ec7b5d3c0acdad82), [`7cf81df`](https://github.com/lsst-sqre/squareone/commit/7cf81dfd4e13dc825d23fba81edc066a08b4f299), [`c923dd7`](https://github.com/lsst-sqre/squareone/commit/c923dd754343ba36ad49577f95e1676ea7814dcd)]:
+  - @lsst-sqre/semaphore-client@0.4.0
+  - @lsst-sqre/squared@0.15.0
+
 ## 0.34.0
 
 ### Minor Changes
