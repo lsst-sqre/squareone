@@ -1,9 +1,0 @@
----
-'@lsst-sqre/squared': minor
----
-
-Add optional controlled row selection to `DataTable`. Providing the new `rowSelection` and `onRowSelectionChange` props opts the table into `@tanstack/react-table`'s row-selection model: a leading checkbox column renders with a select-all header checkbox (indeterminate when only some rows are selected), each row gets its own toggle, and the controlled state stays owned by the caller. Select-all toggles every loaded row. When either prop is omitted the table renders exactly as before, with no checkbox column and no behavior change.
-
-An optional `getRowLabel` prop derives a per-row accessible label (`Select row: <identifier>`) so screen-reader users can tell the row checkboxes apart; without it the checkboxes keep the generic `Select row` label.
-
-An optional `getRowId` prop keys the selection state by a stable, caller-derived id (mirroring TanStack Table's own `getRowId`) instead of the row index, so a consumer can map the selection straight back to its domain ids and the selection survives reordering or paging of `data`.
