@@ -1,5 +1,5 @@
 import { mockUserNotifications } from '@lsst-sqre/semaphore-client';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -303,6 +303,71 @@ describe('UserNotificationsTableView', () => {
 
     expect(onMarkAllMatchingRead).toHaveBeenCalled();
     expect(onMarkRead).not.toHaveBeenCalled();
+  });
+
+  it('clears the selection once marking all matching read succeeds', async () => {
+    const user = userEvent.setup();
+    render(
+      <UserNotificationsTableView
+        notifications={mockUserNotifications}
+        totalCount={12}
+        hasMore
+        onMarkRead={vi.fn()}
+        onMarkAllMatchingRead={vi.fn().mockResolvedValue(undefined)}
+      />
+    );
+
+    await user.click(screen.getByRole('checkbox', { name: /select all/i }));
+    await user.click(
+      screen.getByRole('button', { name: /select all 12 notifications/i })
+    );
+    await user.click(screen.getByRole('button', { name: 'Actions' }));
+    await user.click(screen.getByRole('menuitem', { name: /mark as read/i }));
+
+    // The selection clears only after the handler's promise resolves.
+    await waitFor(() => {
+      expect(screen.queryByText(/all 12 selected/i)).not.toBeInTheDocument();
+    });
+    expect(
+      screen.queryByRole('button', { name: 'Actions' })
+    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('keeps the selection and shows an error when marking all matching read fails', async () => {
+    const user = userEvent.setup();
+    const onMarkAllMatchingRead = vi
+      .fn()
+      .mockRejectedValue(new Error('Semaphore API error: 500'));
+    render(
+      <UserNotificationsTableView
+        notifications={mockUserNotifications}
+        totalCount={12}
+        hasMore
+        onMarkRead={vi.fn()}
+        onMarkAllMatchingRead={onMarkAllMatchingRead}
+      />
+    );
+
+    await user.click(screen.getByRole('checkbox', { name: /select all/i }));
+    await user.click(
+      screen.getByRole('button', { name: /select all 12 notifications/i })
+    );
+    await user.click(screen.getByRole('button', { name: 'Actions' }));
+    await user.click(screen.getByRole('menuitem', { name: /mark as read/i }));
+
+    // The rejection is surfaced inline (not an unhandled rejection)…
+    const alert = await screen.findByRole('alert');
+    expect(alert).toHaveTextContent(/failed to mark notifications as read/i);
+    expect(alert).toHaveTextContent(/semaphore api error: 500/i);
+
+    // …and the selection is kept so the user can retry the action.
+    expect(screen.getByText(/all 12 selected/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Actions' })).toBeInTheDocument();
+
+    // Clearing the selection dismisses the error along with it.
+    await user.click(screen.getByRole('button', { name: /clear selection/i }));
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
   it('cancels select-all-across-pages when a row is deselected, excluding it from Mark as read', async () => {

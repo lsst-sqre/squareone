@@ -224,6 +224,21 @@
   cursor: pointer;
 }
 
+/* Tinted banner shown when the across-pages bulk mark-read fails. Styled like
+ * the select-all banner but in error colors; the selection is kept alongside it
+ * so the user can retry the action. */
+.bulkMarkReadError {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sqo-space-xs);
+  padding: var(--sqo-space-sm);
+  border-radius: var(--sqo-border-radius-1);
+  background-color: var(--rsd-color-red-100);
+  font-size: 0.875rem;
+  color: var(--rsd-color-red-500);
+}
+
 /* Centered wrapper for the "Load more" button. */
 .loadMore {
   display: flex;

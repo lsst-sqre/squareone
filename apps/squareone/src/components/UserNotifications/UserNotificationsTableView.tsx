@@ -77,10 +77,13 @@ export type UserNotificationsTableViewProps = {
    * row is selected and more pages exist, the user can extend the selection to
    * the full filtered set, which the view cannot enumerate. Choosing "Mark as
    * read" in that state calls this so the container can enumerate the unread ids
-   * (via `?unread=true`) and mark them read. When omitted, the extension banner
-   * still appears but its bulk mark-read is a no-op for the unloaded remainder.
+   * (via `?unread=true`) and mark them read. The view awaits the returned
+   * promise: on success it clears the selection, and on rejection it keeps the
+   * selection and shows an inline error so the user can retry. When omitted, the
+   * extension banner still appears but its bulk mark-read is a no-op for the
+   * unloaded remainder.
    */
-  onMarkAllMatchingRead?: () => void;
+  onMarkAllMatchingRead?: () => void | Promise<void>;
 };
 
 type NotificationRowProps = {
@@ -284,6 +287,11 @@ export default function UserNotificationsTableView({
   // Two-tier extension flag: the user selected every loaded row and then opted
   // to extend the selection to the full filtered set (pages not yet loaded).
   const [allMatchingSelected, setAllMatchingSelected] = useState(false);
+  // Set when the across-pages bulk mark-read fails. The selection is kept in
+  // that case so the user can retry; the error is shown inline above the list.
+  const [bulkMarkReadError, setBulkMarkReadError] = useState<Error | null>(
+    null
+  );
 
   // Which rows are expanded to show their body. Purely presentational; the body
   // content itself comes from `renderExpandedBody`.
@@ -305,6 +313,9 @@ export default function UserNotificationsTableView({
   const clearSelection = () => {
     setRowSelection({});
     setAllMatchingSelected(false);
+    // A bulk mark-read error describes the selection it failed for, so it is
+    // dismissed along with that selection.
+    setBulkMarkReadError(null);
   };
 
   // While the "all matching" extension is active every loaded row is selected
@@ -362,11 +373,21 @@ export default function UserNotificationsTableView({
     }
   };
 
-  const handleBulkMarkRead = () => {
+  const handleBulkMarkRead = async () => {
     if (allMatchingSelected) {
       // The view cannot enumerate the unloaded ids; the container marks the
-      // whole filtered set read via its `?unread=true` enumeration.
-      onMarkAllMatchingRead?.();
+      // whole filtered set read via its `?unread=true` enumeration. Await it so
+      // a failure keeps the selection (letting the user retry) and surfaces an
+      // inline error instead of clearing the selection as if the action worked.
+      setBulkMarkReadError(null);
+      try {
+        await onMarkAllMatchingRead?.();
+      } catch (error) {
+        setBulkMarkReadError(
+          error instanceof Error ? error : new Error(String(error))
+        );
+        return;
+      }
     } else {
       const ids = entries
         .filter((n) => rowSelection[n.id] && n.read === null)
@@ -520,6 +541,12 @@ export default function UserNotificationsTableView({
               </button>
             </>
           )}
+        </div>
+      )}
+
+      {bulkMarkReadError && (
+        <div className={styles.bulkMarkReadError} role="alert">
+          Failed to mark notifications as read: {bulkMarkReadError.message}
         </div>
       )}
 

@@ -69,7 +69,8 @@ function NotificationsContent() {
   // all as read") route through this one mutation, whose shared `onSuccess`
   // invalidates the list, the unread count, and each affected detail — so the
   // inbox and the header badge update without a manual refresh.
-  const { mutate: markRead } = useMarkNotificationsRead(semaphoreUrl ?? '');
+  const { mutate: markRead, mutateAsync: markReadAsync } =
+    useMarkNotificationsRead(semaphoreUrl ?? '');
 
   const handleMarkRead = useCallback(
     (ids: string[]) => {
@@ -83,7 +84,10 @@ function NotificationsContent() {
 
   // The two-tier "Select all M notifications" path has no standing query for the
   // full unread set, so it enumerates the unread ids on demand (the
-  // `?unread=true` list, unpaged) and marks exactly that set read.
+  // `?unread=true` list, unpaged) and marks exactly that set read. Failures from
+  // the enumeration or the mark-read call reject the returned promise, which the
+  // table view awaits so it can keep the selection and surface the error inline
+  // (letting the user retry) instead of silently pretending the action worked.
   const handleMarkAllMatchingRead = useCallback(async () => {
     if (!semaphoreUrl || !csrfToken) {
       return;
@@ -93,9 +97,9 @@ function NotificationsContent() {
     });
     const ids = unread.map((n) => n.id);
     if (ids.length > 0) {
-      markRead({ ids, csrfToken });
+      await markReadAsync({ ids, csrfToken });
     }
-  }, [semaphoreUrl, csrfToken, markRead]);
+  }, [semaphoreUrl, csrfToken, markReadAsync]);
 
   // While service discovery is pending the Semaphore URL is `undefined`, which
   // keeps the underlying query disabled, so `isLoading` is `false` even though

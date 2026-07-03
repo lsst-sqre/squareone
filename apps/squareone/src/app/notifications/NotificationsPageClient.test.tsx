@@ -60,6 +60,7 @@ const mockUseSemaphoreUrl = vi.mocked(useSemaphoreUrlModule.useSemaphoreUrl);
 const PAGE_SIZE = 20;
 
 const markReadMutate = vi.fn();
+const markReadMutateAsync = vi.fn();
 
 function makeNotificationsReturn(
   overrides: Partial<semaphoreClient.UseUserNotificationsReturn> = {}
@@ -114,8 +115,10 @@ describe('NotificationsPageClient', () => {
     mockUseSemaphoreUrl.mockReturnValue('https://semaphore.example.com');
     mockUseUserNotifications.mockReturnValue(makeNotificationsReturn());
     mockUseUserNotification.mockReturnValue(makeNotificationReturn());
+    markReadMutateAsync.mockResolvedValue(undefined);
     mockUseMarkNotificationsRead.mockReturnValue({
       mutate: markReadMutate,
+      mutateAsync: markReadMutateAsync,
     } as unknown as ReturnType<
       typeof semaphoreClient.useMarkNotificationsRead
     >);
@@ -312,13 +315,48 @@ describe('NotificationsPageClient', () => {
     );
 
     // …then marks that enumerated set read through the same mutation that
-    // invalidates the list, the unread count, and each affected detail.
+    // invalidates the list, the unread count, and each affected detail. The
+    // async form is used so a mark-read failure rejects back to the view.
     await waitFor(() => {
-      expect(markReadMutate).toHaveBeenCalledWith({
+      expect(markReadMutateAsync).toHaveBeenCalledWith({
         ids: ['ntf-001', 'ntf-003'],
         csrfToken: 'csrf-token-xyz',
       });
     });
+  });
+
+  it('surfaces an enumeration failure and keeps the selection when marking all matching read', async () => {
+    const user = userEvent.setup();
+    mockUseUserNotifications.mockReturnValue(
+      makeNotificationsReturn({ hasMore: true, totalCount: 12 })
+    );
+    // The unread enumeration query (?unread=true) fails, e.g. a Semaphore 500.
+    mockFetchUserNotifications.mockRejectedValue(
+      new semaphoreClient.SemaphoreError('Semaphore API error: 500', 500)
+    );
+
+    render(<NotificationsPageClient />);
+
+    // Select the loaded rows, extend the selection across pages, then mark read.
+    await user.click(screen.getByRole('checkbox', { name: /select all/i }));
+    await user.click(
+      screen.getByRole('button', { name: /select all 12 notifications/i })
+    );
+    await user.click(screen.getByRole('button', { name: 'Actions' }));
+    await user.click(screen.getByRole('menuitem', { name: /mark as read/i }));
+
+    // The failure is surfaced inline rather than swallowed…
+    const alert = await screen.findByRole('alert');
+    expect(alert).toHaveTextContent(/failed to mark notifications as read/i);
+    expect(alert).toHaveTextContent(/semaphore api error: 500/i);
+
+    // …the selection is kept so the user can retry…
+    expect(screen.getByText(/all 12 selected/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Actions' })).toBeInTheDocument();
+
+    // …and nothing was marked read.
+    expect(markReadMutateAsync).not.toHaveBeenCalled();
+    expect(markReadMutate).not.toHaveBeenCalled();
   });
 
   it('does not re-mark an already-read message when its body is shown', async () => {
