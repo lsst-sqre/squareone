@@ -54,7 +54,9 @@ const mockFetchUserNotifications = vi.mocked(
   semaphoreClient.fetchUserNotifications
 );
 const mockUseLoginInfo = vi.mocked(useLoginInfo);
-const mockUseSemaphoreUrl = vi.mocked(useSemaphoreUrlModule.useSemaphoreUrl);
+const mockUseSemaphoreUrlState = vi.mocked(
+  useSemaphoreUrlModule.useSemaphoreUrlState
+);
 
 // The container owns the page size and passes it to the list query.
 const PAGE_SIZE = 20;
@@ -112,7 +114,11 @@ describe('NotificationsPageClient', () => {
     vi.mocked(useStaticConfig).mockReturnValue({
       baseUrl: 'https://example.test',
     } as AppConfig);
-    mockUseSemaphoreUrl.mockReturnValue('https://semaphore.example.com');
+    mockUseSemaphoreUrlState.mockReturnValue({
+      url: 'https://semaphore.example.com',
+      isResolving: false,
+      isUnavailable: false,
+    });
     mockUseUserNotifications.mockReturnValue(makeNotificationsReturn());
     mockUseUserNotification.mockReturnValue(makeNotificationReturn());
     markReadMutateAsync.mockResolvedValue(undefined);
@@ -143,7 +149,11 @@ describe('NotificationsPageClient', () => {
   });
 
   it('passes an empty URL through so the query stays disabled before discovery', () => {
-    mockUseSemaphoreUrl.mockReturnValue(undefined);
+    mockUseSemaphoreUrlState.mockReturnValue({
+      url: undefined,
+      isResolving: true,
+      isUnavailable: false,
+    });
 
     render(<NotificationsPageClient />);
 
@@ -154,7 +164,11 @@ describe('NotificationsPageClient', () => {
   });
 
   it('shows the loading state, not the empty state, while discovery is pending', () => {
-    mockUseSemaphoreUrl.mockReturnValue(undefined);
+    mockUseSemaphoreUrlState.mockReturnValue({
+      url: undefined,
+      isResolving: true,
+      isUnavailable: false,
+    });
     mockUseUserNotifications.mockReturnValue(
       makeNotificationsReturn({
         entries: undefined,
@@ -169,6 +183,34 @@ describe('NotificationsPageClient', () => {
     expect(
       screen.queryByText(/you have no notifications/i)
     ).not.toBeInTheDocument();
+  });
+
+  it('shows a terminal unavailable state when Semaphore is undiscoverable', () => {
+    mockUseSemaphoreUrlState.mockReturnValue({
+      url: undefined,
+      isResolving: false,
+      isUnavailable: true,
+    });
+    mockUseUserNotifications.mockReturnValue(
+      makeNotificationsReturn({
+        entries: undefined,
+        isLoading: false,
+        totalCount: null,
+      })
+    );
+
+    render(<NotificationsPageClient />);
+
+    // Not an eternal spinner and not a misleading empty state.
+    expect(
+      screen.queryByText(/loading notifications/i)
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/you have no notifications/i)
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByText(/notification service is currently unavailable/i)
+    ).toBeInTheDocument();
   });
 
   it('renders the notifications table', () => {

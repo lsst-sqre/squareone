@@ -15,11 +15,16 @@ import RenderedMarkdown from '../../components/RenderedMarkdown';
 import { UserNotificationsTableView } from '../../components/UserNotifications';
 import { useAutoMarkNotificationRead } from '../../hooks/useAutoMarkNotificationRead';
 import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
-import { useSemaphoreUrl } from '../../hooks/useSemaphoreUrl';
+import { useSemaphoreUrlState } from '../../hooks/useSemaphoreUrl';
 import { useStaticConfig } from '../../hooks/useStaticConfig';
 
 /** Page size owned by the listing container, requested from the list query. */
 const PAGE_SIZE = 20;
+
+/** Surfaced when service discovery settles but Semaphore is undiscoverable. */
+const UNAVAILABLE_ERROR = new Error(
+  'The notification service is currently unavailable. Please try again later.'
+);
 
 /**
  * Client container for the `/notifications` inbox page.
@@ -33,8 +38,10 @@ const PAGE_SIZE = 20;
  *
  * Wrapped in {@link AuthRequired} (login only, no admin scope) so logged-out
  * users are redirected to log in. While discovery is pending the Semaphore URL
- * is `undefined`, which keeps the underlying query disabled (graceful
- * degradation, as the admin listing already does).
+ * is `undefined`, which keeps the underlying query disabled and shows the
+ * loading state; once discovery settles without a Semaphore URL the table shows
+ * a terminal unavailable state instead of an endless spinner (matching the
+ * detail page).
  */
 export default function NotificationsPageClient() {
   return (
@@ -45,7 +52,11 @@ export default function NotificationsPageClient() {
 }
 
 function NotificationsContent() {
-  const semaphoreUrl = useSemaphoreUrl();
+  const {
+    url: semaphoreUrl,
+    isResolving,
+    isUnavailable,
+  } = useSemaphoreUrlState();
   const repertoireUrl = useRepertoireUrl();
   const { csrfToken } = useLoginInfo(repertoireUrl);
   const { baseUrl } = useStaticConfig();
@@ -101,11 +112,14 @@ function NotificationsContent() {
     }
   }, [semaphoreUrl, csrfToken, markReadAsync]);
 
-  // While service discovery is pending the Semaphore URL is `undefined`, which
-  // keeps the underlying query disabled, so `isLoading` is `false` even though
-  // no data has arrived yet. Treat that pending window as loading so the table
-  // shows its loading state rather than the misleading empty state.
-  const isDiscovering = semaphoreUrl === undefined;
+  // Discovery has two distinct "no URL yet" outcomes. While it is still
+  // resolving the query is disabled, so `isLoading` is `false` even though no
+  // data has arrived yet — treat that pending window as loading so the table
+  // shows its loading state rather than the misleading empty state. Once
+  // discovery settles without a Semaphore URL (Semaphore undiscoverable /
+  // unavailable) surface a terminal unavailable error — not an endless spinner —
+  // matching the detail page.
+  const resolvedError = isUnavailable ? UNAVAILABLE_ERROR : error;
 
   // A `UserNotificationSummary` has no body, so expand-in-place renders a small
   // child that fetches the full notification (for its body) and auto-marks it
@@ -132,8 +146,8 @@ function NotificationsContent() {
 
       <UserNotificationsTableView
         notifications={entries}
-        isLoading={isLoading || isDiscovering}
-        error={error}
+        isLoading={isLoading || isResolving}
+        error={resolvedError}
         hasMore={hasMore}
         isLoadingMore={isLoadingMore}
         totalCount={totalCount}
