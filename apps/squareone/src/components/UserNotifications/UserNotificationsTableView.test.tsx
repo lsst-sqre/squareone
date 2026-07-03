@@ -305,6 +305,83 @@ describe('UserNotificationsTableView', () => {
     expect(onMarkRead).not.toHaveBeenCalled();
   });
 
+  it('cancels select-all-across-pages when a row is deselected, excluding it from Mark as read', async () => {
+    const user = userEvent.setup();
+    const onMarkRead = vi.fn();
+    const onMarkAllMatchingRead = vi.fn();
+    render(
+      <UserNotificationsTableView
+        notifications={mockUserNotifications}
+        totalCount={12}
+        hasMore
+        onMarkRead={onMarkRead}
+        onMarkAllMatchingRead={onMarkAllMatchingRead}
+      />
+    );
+
+    // Select every loaded row, then extend the selection across pages.
+    await user.click(screen.getByRole('checkbox', { name: /select all/i }));
+    await user.click(
+      screen.getByRole('button', { name: /select all 12 notifications/i })
+    );
+    expect(screen.getByText(/all 12 selected/i)).toBeInTheDocument();
+
+    // Deselecting one row cancels the across-pages extension: the banner
+    // drops back and the selection becomes the loaded rows minus this one.
+    await user.click(
+      screen.getAllByRole('checkbox', { name: /select notification/i })[0]
+    );
+    expect(screen.queryByText(/all 12 selected/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/5 selected/i)).toBeInTheDocument();
+
+    // "Mark as read" now targets only the still-selected unread rows — never
+    // the whole filtered set, which would re-include the deselected row.
+    await user.click(screen.getByRole('button', { name: 'Actions' }));
+    await user.click(screen.getByRole('menuitem', { name: /mark as read/i }));
+
+    expect(onMarkAllMatchingRead).not.toHaveBeenCalled();
+    expect(onMarkRead).toHaveBeenCalledWith(['ntf-003', 'ntf-004', 'ntf-006']);
+  });
+
+  it('renders newly loaded rows as selected while select-all-across-pages is active', async () => {
+    const user = userEvent.setup();
+    const { rerender } = render(
+      <UserNotificationsTableView
+        notifications={mockUserNotifications.slice(0, 3)}
+        totalCount={12}
+        hasMore
+        onMarkRead={vi.fn()}
+        onMarkAllMatchingRead={vi.fn()}
+      />
+    );
+
+    await user.click(screen.getByRole('checkbox', { name: /select all/i }));
+    await user.click(
+      screen.getByRole('button', { name: /select all 12 notifications/i })
+    );
+
+    // Simulate "Load more" appending another page while "All 12 selected".
+    rerender(
+      <UserNotificationsTableView
+        notifications={mockUserNotifications.slice(0, 6)}
+        totalCount={12}
+        hasMore
+        onMarkRead={vi.fn()}
+        onMarkAllMatchingRead={vi.fn()}
+      />
+    );
+
+    // The fresh rows render checked, consistent with the banner state.
+    expect(screen.getByText(/all 12 selected/i)).toBeInTheDocument();
+    const rowCheckboxes = screen.getAllByRole('checkbox', {
+      name: /select notification/i,
+    });
+    expect(rowCheckboxes).toHaveLength(6);
+    for (const checkbox of rowCheckboxes) {
+      expect(checkbox).toBeChecked();
+    }
+  });
+
   it('does not offer select-all-across-pages when there are no more pages', async () => {
     const user = userEvent.setup();
     render(

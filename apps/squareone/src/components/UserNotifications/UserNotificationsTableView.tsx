@@ -307,8 +307,14 @@ export default function UserNotificationsTableView({
     setAllMatchingSelected(false);
   };
 
+  // While the "all matching" extension is active every loaded row is selected
+  // by definition — including rows appended by "Load more" after the extension
+  // was chosen — so derive per-row checked state from the flag, not just the
+  // concrete selection map.
+  const isRowSelected = (id: string) =>
+    allMatchingSelected || rowSelection[id] === true;
   const loadedSelectedIds = entries
-    .filter((n) => rowSelection[n.id])
+    .filter((n) => isRowSelected(n.id))
     .map((n) => n.id);
   const allLoadedSelected =
     entries.length > 0 && loadedSelectedIds.length === entries.length;
@@ -334,6 +340,25 @@ export default function UserNotificationsTableView({
       setRowSelection(next);
     } else {
       clearSelection();
+    }
+  };
+
+  const handleRowSelectedChange = (id: string, checked: boolean) => {
+    if (allMatchingSelected) {
+      // Any manual change to row selection cancels the "all matching"
+      // extension: the user is now curating a concrete selection, so fall back
+      // to the loaded rows (all selected under the extension) with this row's
+      // new state applied. Otherwise "Mark as read" would still act on the
+      // whole filtered set — including the row just visibly deselected.
+      const next: Record<string, boolean> = {};
+      for (const n of entries) {
+        next[n.id] = true;
+      }
+      next[id] = checked;
+      setAllMatchingSelected(false);
+      setRowSelection(next);
+    } else {
+      setRowSelection((prev) => ({ ...prev, [id]: checked }));
     }
   };
 
@@ -387,9 +412,9 @@ export default function UserNotificationsTableView({
             <NotificationRow
               key={n.id}
               notification={n}
-              selected={rowSelection[n.id] === true}
+              selected={isRowSelected(n.id)}
               onSelectedChange={(checked) =>
-                setRowSelection((prev) => ({ ...prev, [n.id]: checked }))
+                handleRowSelectedChange(n.id, checked)
               }
               expanded={expandedIds.has(n.id)}
               onToggleExpanded={() => toggleExpanded(n.id)}
