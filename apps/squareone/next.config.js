@@ -22,6 +22,7 @@ module.exports = (phase) => {
       '@lsst-sqre/repertoire-client',
       '@lsst-sqre/gafaelfawr-client',
       '@lsst-sqre/semaphore-client',
+      '@lsst-sqre/sse-client',
       '@lsst-sqre/times-square-client',
     ],
     async rewrites() {
