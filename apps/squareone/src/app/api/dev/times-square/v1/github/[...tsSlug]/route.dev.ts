@@ -31,10 +31,17 @@ export async function GET(
       return new Response(null, { status: 404 });
     }
 
+    // Shape must conform to the PageSchema Zod schema in
+    // @lsst-sqre/times-square-client (packages/times-square-client/src/schemas.ts).
     const content = {
       name: page,
       title: `Title for ${page}`,
-      description: '<p>This is the description.</p>',
+      description: {
+        gfm: 'This is the description.',
+        html: '<p>This is the description.</p>',
+      },
+      date_added: '2024-01-15T10:00:00Z',
+      uploader_username: null as string | null,
       self_url: pageBaseUrl,
       source_url: `${pageBaseUrl}/source`,
       rendered_url: `${pageBaseUrl}/rendered`,

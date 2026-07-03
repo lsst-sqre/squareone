@@ -1,9 +1,18 @@
 /*
  * Client-only TimesSquareHtmlEventsProvider component - handles SSE events on client side only.
+ *
+ * The SSE transport lives in @lsst-sqre/times-square-client's
+ * subscribeToHtmlEvents (built on @lsst-sqre/sse-client), which owns Zod
+ * validation of events, credentials, reconnection, and auto-abort on
+ * execution completion. This component only wires the subscription to the
+ * React lifecycle and exposes event fields through context.
  */
 
-import { useTimesSquarePage } from '@lsst-sqre/times-square-client';
-import { fetchEventSource } from '@microsoft/fetch-event-source';
+import {
+  type HtmlEvent,
+  subscribeToHtmlEvents,
+  useTimesSquarePage,
+} from '@lsst-sqre/times-square-client';
 import {
   type ReactNode,
   useContext,
@@ -19,16 +28,6 @@ import {
   type TimesSquareHtmlEventsContextValue,
 } from './TimesSquareHtmlEventsProvider';
 
-type HtmlEvent = {
-  date_submitted: string;
-  date_started: string;
-  date_finished: string;
-  execution_status: string;
-  execution_duration: number;
-  html_hash: string;
-  html_url: string;
-};
-
 type TimesSquareHtmlEventsProviderClientProps = {
   children: ReactNode;
 };
@@ -36,72 +35,31 @@ type TimesSquareHtmlEventsProviderClientProps = {
 export default function TimesSquareHtmlEventsProviderClient({
   children,
 }: TimesSquareHtmlEventsProviderClientProps) {
-  const [isClient, setIsClient] = useState(false);
   const [htmlEvent, setHtmlEvent] = useState<HtmlEvent | null>(null);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   const repertoireUrl = useRepertoireUrl();
   const urlParameters = useContext(TimesSquareUrlParametersContext);
   const githubSlug = urlParameters?.githubSlug ?? '';
   const { htmlEventsUrl } = useTimesSquarePage(githubSlug, { repertoireUrl });
 
-  const urlQueryString = urlParameters?.urlQueryString;
-  const fullHtmlEventsUrl = htmlEventsUrl
-    ? `${htmlEventsUrl}?${urlQueryString}`
-    : null;
+  const urlQueryString = urlParameters?.urlQueryString ?? '';
 
   useEffect(() => {
-    // Don't run SSE on server side
-    if (!isClient) return () => {};
-
-    const abortController = new AbortController();
-
-    async function runEffect(): Promise<void> {
-      if (htmlEventsUrl && fullHtmlEventsUrl) {
-        await fetchEventSource(fullHtmlEventsUrl, {
-          method: 'GET',
-          signal: abortController.signal,
-          async onopen(res) {
-            if (res.status >= 400 && res.status < 500 && res.status !== 429) {
-              console.error(`Client side error ${fullHtmlEventsUrl}`, res);
-            }
-          },
-          onmessage(event) {
-            let parsedData: HtmlEvent;
-            try {
-              parsedData = JSON.parse(event.data);
-            } catch (_error) {
-              return;
-            }
-            setHtmlEvent(parsedData);
-
-            if (
-              parsedData.execution_status === 'complete' &&
-              parsedData.html_hash
-            ) {
-              abortController.abort();
-            }
-          },
-          onclose() {},
-          onerror(err) {
-            console.error(
-              `Error fetching Times Square events SSE ${fullHtmlEventsUrl}`,
-              err
-            );
-          },
-        });
-      }
+    if (!htmlEventsUrl) {
+      return undefined;
     }
-    runEffect();
 
-    return () => {
-      // Clean up: close the event source connection
-      abortController.abort();
-    };
-  }, [fullHtmlEventsUrl, htmlEventsUrl, isClient]);
+    const params = Object.fromEntries(new URLSearchParams(urlQueryString));
+    return subscribeToHtmlEvents(htmlEventsUrl, params, {
+      onEvent: setHtmlEvent,
+      onError: (error) => {
+        console.error(
+          `Error fetching Times Square events SSE ${htmlEventsUrl}`,
+          error
+        );
+      },
+    });
+  }, [htmlEventsUrl, urlQueryString]);
 
   const contextValue = useMemo(
     (): TimesSquareHtmlEventsContextValue => ({
