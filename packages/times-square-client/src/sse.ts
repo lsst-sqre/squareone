@@ -1,10 +1,12 @@
 /**
  * Server-Sent Events (SSE) handler for Times Square HTML events.
  *
- * Uses @microsoft/fetch-event-source for SSE support with features like
- * automatic reconnection and proper abort handling.
+ * Built on the shared @lsst-sqre/sse-client transport, which provides
+ * automatic reconnection with backoff (honoring server `retry:` fields)
+ * and proper abort handling. This layer owns Times Square semantics:
+ * Zod validation of HTML events and auto-abort on execution completion.
  */
-import { fetchEventSource } from '@microsoft/fetch-event-source';
+import { subscribeToEventSource } from '@lsst-sqre/sse-client';
 
 import { buildUrlWithParams } from './client';
 import type { Logger } from './query-options';
@@ -44,6 +46,8 @@ export type SubscribeOptions = {
  * Opens an SSE connection to the Times Square API and invokes callbacks
  * as events are received. The connection is automatically closed when
  * the execution completes (status === 'complete' and html_hash is present).
+ * If the connection drops before completion, the transport reconnects
+ * automatically with backoff.
  *
  * @param eventsUrl - The full URL to the html/events endpoint
  * @param params - Optional parameters to append to the URL
@@ -86,33 +90,22 @@ export function subscribeToHtmlEvents(
 
   // Link external signal to internal abort controller
   if (signal) {
-    signal.addEventListener('abort', () => abortController.abort());
+    if (signal.aborted) {
+      abortController.abort();
+    } else {
+      signal.addEventListener('abort', () => abortController.abort(), {
+        once: true,
+      });
+    }
   }
 
-  // Start the SSE connection
-  fetchEventSource(fullUrl, {
-    method: 'GET',
+  subscribeToEventSource(fullUrl, {
     signal: abortController.signal,
-    credentials: 'include',
-
-    async onopen(response) {
-      if (
-        response.status >= 400 &&
-        response.status < 500 &&
-        response.status !== 429
-      ) {
-        const error = new Error(
-          `SSE connection failed: ${response.status} ${response.statusText}`
-        );
-        onError?.(error);
-      }
-    },
-
-    onmessage(event) {
+    onMessage(message) {
       // Parse and validate the event data
       let parsedData: unknown;
       try {
-        parsedData = JSON.parse(event.data);
+        parsedData = JSON.parse(message.data);
       } catch {
         // Ignore non-JSON events (e.g., heartbeats)
         return;
@@ -143,30 +136,19 @@ export function subscribeToHtmlEvents(
       }
     },
 
-    onclose() {
-      // Connection closed normally
-    },
-
-    onerror(error) {
-      // Only report errors if we haven't aborted
+    onDisconnect() {
+      // The transport reconnects automatically; report the interruption
+      // unless the subscription was deliberately aborted.
       if (!abortController.signal.aborted) {
-        const sseError =
-          error instanceof Error
-            ? error
-            : new Error(`SSE error: ${String(error)}`);
-        onError?.(sseError);
+        onError?.(new Error('SSE connection lost'));
       }
     },
-  }).catch((error) => {
-    // Catch any unhandled errors from fetchEventSource
-    // AbortError is expected when we clean up
-    if (error instanceof Error && error.name === 'AbortError') {
-      return;
-    }
-    onError?.(error instanceof Error ? error : new Error(String(error)));
+
+    onScheduleReconnect({ delay }) {
+      log?.debug({ delay }, 'SSE reconnect scheduled');
+    },
   });
 
-  // Return cleanup function
   return () => {
     abortController.abort();
   };

@@ -658,9 +658,9 @@ importers:
 
   packages/times-square-client:
     dependencies:
-      '@microsoft/fetch-event-source':
-        specifier: ^2.0.1
-        version: 2.0.1
+      '@lsst-sqre/sse-client':
+        specifier: workspace:*
+        version: link:../sse-client
       zod:
         specifier: ^3.24.0
         version: 3.25.76
