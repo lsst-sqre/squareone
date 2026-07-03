@@ -3,7 +3,7 @@
   "info": {
     "title": "Times Square",
     "description": "**Times Square is a Rubin Science Platform (RSP) service for displaying parameterized Jupyter Notebooks as websites.**\n\nExcellent applications for Times Square include:\n\n- Engineering dashboards\n- Quick-look data previewing\n- Reports that incorporate live data sources\n\nThe design and architecture of Times Square is described in [The Times Square service for publishing parameterized Jupyter Notebooks in the Rubin Science platform](https://sqr-062.lsst.io).\nTimes Square uses Noteburst ([GitHub](https://github.com/lsst-sqre/noteburst), [SQR-065](https://sqr-065.lsst.io)) to execute Jupyter Notebooks in Nublado (JupyterLab) instances, thereby mechanizing the RSP's notebook aspect.\n\nThis Times Square API service is developed at [https://github.com/lsst-sqre/times-square](https://github.com/lsst-sqre/times-square).\nThe user interface is developed separately at [https://github.com/lsst-sqre/times-square-ui](https://github.com/lsst-sqre/times-square-ui).\n",
-    "version": "0.23.1.dev24+g576ef1393"
+    "version": "0.24.0"
   },
   "paths": {
     "/healthcheck": {
@@ -23,11 +23,11 @@
         }
       }
     },
-    "/times-square/": {
+    "/times-square/api/": {
       "get": {
         "summary": "Application metadata",
         "description": "GET metadata about the application.",
-        "operationId": "get_index_times_square__get",
+        "operationId": "get_index_times_square_api__get",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -42,11 +42,11 @@
         }
       }
     },
-    "/times-square/github/webhook": {
+    "/times-square/api/github/webhook": {
       "post": {
         "summary": "GitHub App webhook",
         "description": "This endpoint receives webhook events from GitHub",
-        "operationId": "post_github_webhook_times_square_github_webhook_post",
+        "operationId": "post_github_webhook_times_square_api_github_webhook_post",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -55,11 +55,11 @@
         }
       }
     },
-    "/times-square/v1/": {
+    "/times-square/api/v1/": {
       "get": {
         "summary": "v1 API metadata",
         "description": "Get metadata about the v1 REST API, including links to documentation and\nendpoints.",
-        "operationId": "get_index_times_square_v1__get",
+        "operationId": "get_index_times_square_api_v1__get",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -74,12 +74,12 @@
         }
       }
     },
-    "/times-square/v1/pages/{page}": {
+    "/times-square/api/v1/pages/{page}": {
       "get": {
         "tags": ["Pages"],
         "summary": "Page metadata",
         "description": "Get metadata about a page resource, which models a webpage that is\nrendered from a parameterized Jupyter Notebook.",
-        "operationId": "get_page_times_square_v1_pages__page__get",
+        "operationId": "get_page_times_square_api_v1_pages__page__get",
         "parameters": [
           {
             "name": "page",
@@ -122,12 +122,12 @@
         }
       }
     },
-    "/times-square/v1/pages": {
+    "/times-square/api/v1/pages": {
       "get": {
         "tags": ["Pages"],
         "summary": "List pages",
         "description": "List available pages.",
-        "operationId": "get_pages_times_square_v1_pages_get",
+        "operationId": "get_pages_times_square_api_v1_pages_get",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -136,7 +136,7 @@
                 "schema": {
                   "type": "array",
                   "items": { "$ref": "#/components/schemas/PageSummary" },
-                  "title": "Response Get Pages Times Square V1 Pages Get"
+                  "title": "Response Get Pages Times Square Api V1 Pages Get"
                 }
               }
             }
@@ -147,7 +147,7 @@
         "tags": ["Pages"],
         "summary": "Create a new page",
         "description": "Register a new page with a Jinja-templated Jupyter Notebook.\n\n## Preparing the ipynb file\n\nThe `ipynb` property is a Jupyter Notebook file, either as a JSON-encoded\nstring or a parsed object. You can *parameterize* the notebook by\nadding Jinja template syntax. You can create Jinja variables that get\ntheir values from the URL query string of users viewing the notebook.\n\nFor example, a code cell:\n\n```\na = {{params.a}}\nb = {{params.b}}\na + b\n```\n\nA viewer can set these parameters by modifying URLs query string:\n\n```\n?a=4&b=2\n```\n\nTo declare these parameters, add a `times-square` field to the notebook's\nmetadata (top-level metadata, not per-cell metadata). This field should\ncontain a ``parameters`` field that contains an object keyed by parameter\nname and the value is a\n[JSON Schema](https://json-schema.org/understanding-json-schema/) object\ndescribing that parameter. For example, to declare that parameters\nmust be integers:\n\n```json\n{\n  \"times-square\": {\n    \"parameters\": {\n      \"a\": {\n        \"type\": \"integer\",\n        \"default\": 0,\n        \"description\": \"A demo value\"\n      },\n      \"b\": {\n        \"type\": \"integer\",\n        \"default\": 0,\n        \"description\": \"Another demo value\"\n      }\n    }\n  }\n}\n```\n\nThese JSON Schema parameters have special use by Times Square beyond\ndata validation:\n\n- ``default`` is used when the URL does not override a parameter value.\n- ``description`` is used for documentation.",
-        "operationId": "post_page_times_square_v1_pages_post",
+        "operationId": "post_page_times_square_api_v1_pages_post",
         "requestBody": {
           "required": true,
           "content": {
@@ -176,12 +176,12 @@
         }
       }
     },
-    "/times-square/v1/pages/{page}/source": {
+    "/times-square/api/v1/pages/{page}/source": {
       "get": {
         "tags": ["Pages"],
         "summary": "Get the source parameterized notebook (ipynb)",
         "description": "Get the content of the source ipynb file, which is unexecuted and has\nJinja templating of parameterizations.",
-        "operationId": "get_page_source_times_square_v1_pages__page__source_get",
+        "operationId": "get_page_source_times_square_api_v1_pages__page__source_get",
         "parameters": [
           {
             "name": "page",
@@ -220,12 +220,12 @@
         }
       }
     },
-    "/times-square/v1/pages/{page}/rendered": {
+    "/times-square/api/v1/pages/{page}/rendered": {
       "get": {
         "tags": ["Pages"],
         "summary": "Get the unexecuted notebook source with rendered parameters",
         "description": "Get a Jupyter Notebook by page slug, with the parameter values filled\nin. The notebook is still unexecuted.",
-        "operationId": "get_rendered_notebook_times_square_v1_pages__page__rendered_get",
+        "operationId": "get_rendered_notebook_times_square_api_v1_pages__page__rendered_get",
         "parameters": [
           {
             "name": "page",
@@ -264,12 +264,12 @@
         }
       }
     },
-    "/times-square/v1/pages/{page}/html": {
+    "/times-square/api/v1/pages/{page}/html": {
       "get": {
         "tags": ["Pages"],
         "summary": "Get the HTML page of an computed notebook",
         "description": "Get the rendered HTML of a notebook.",
-        "operationId": "get_page_html_times_square_v1_pages__page__html_get",
+        "operationId": "get_page_html_times_square_api_v1_pages__page__html_get",
         "parameters": [
           {
             "name": "page",
@@ -311,7 +311,7 @@
         "tags": ["Pages"],
         "summary": "Delete the cached HTML of a notebook.",
         "description": "Delete the cached HTML of a notebook execution, causing it to be\nrecomputed in the background.\n\nBy default, the HTML is soft-deleted so that it remains available to\nexisting clients until the new HTML replaces it in the cache. This endpoint\ntriggers a background task that recomputes the notebook and replaces the\ncached HTML.",
-        "operationId": "delete_page_html_times_square_v1_pages__page__html_delete",
+        "operationId": "delete_page_html_times_square_api_v1_pages__page__html_delete",
         "parameters": [
           {
             "name": "page",
@@ -354,11 +354,11 @@
         }
       }
     },
-    "/times-square/v1/pages/{page}/htmlstatus": {
+    "/times-square/api/v1/pages/{page}/htmlstatus": {
       "get": {
         "tags": ["Pages"],
         "summary": "Get the status of a page's HTML rendering",
-        "operationId": "get_page_html_status_times_square_v1_pages__page__htmlstatus_get",
+        "operationId": "get_page_html_status_times_square_api_v1_pages__page__htmlstatus_get",
         "parameters": [
           {
             "name": "page",
@@ -401,12 +401,12 @@
         }
       }
     },
-    "/times-square/v1/pages/{page}/html/events": {
+    "/times-square/api/v1/pages/{page}/html/events": {
       "get": {
         "tags": ["Pages"],
         "summary": "Subscribe to an event stream for a page's execution and rendering.",
         "description": "Subscribe to an event stream for a page's execution and rendering.",
-        "operationId": "get_page_html_events_times_square_v1_pages__page__html_events_get",
+        "operationId": "get_page_html_events_times_square_api_v1_pages__page__html_events_get",
         "parameters": [
           {
             "name": "page",
@@ -448,12 +448,12 @@
         }
       }
     },
-    "/times-square/v1/github": {
+    "/times-square/api/v1/github": {
       "get": {
         "tags": ["GitHub Notebooks"],
         "summary": "Get a tree of GitHub-backed pages",
         "description": "Get the tree of GitHub-backed pages.\n\nThis endpoint is primarily intended to be used by Squareone to power\nits navigational view of GitHub pages. Pages are included in the\nhierarchical structure of GitHub organization, repository, directories\n(as necessary) and finally the page itself.",
-        "operationId": "get_github_tree_times_square_v1_github_get",
+        "operationId": "get_github_tree_times_square_api_v1_github_get",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -466,12 +466,12 @@
         }
       }
     },
-    "/times-square/v1/github/rendered/{display_path}": {
+    "/times-square/api/v1/github/rendered/{display_path}": {
       "get": {
         "tags": ["GitHub Notebooks"],
         "summary": "Get the unexecuted notebook source with rendered parameters for a GitHub-based notebook.",
         "description": "Get a Jupyter Notebook by GitHub path, with the parameter values filled\nin. The notebook is still unexecuted.\n\nThis route provides the same functionality as ``get_rendered_notebook``,\nbut exposed at a different path so that different access controls can be\napplied upstream.",
-        "operationId": "get_github_rendered_notebook_times_square_v1_github_rendered__display_path__get",
+        "operationId": "get_github_rendered_notebook_times_square_api_v1_github_rendered__display_path__get",
         "parameters": [
           {
             "name": "display_path",
@@ -510,12 +510,12 @@
         }
       }
     },
-    "/times-square/v1/github/{display_path}": {
+    "/times-square/api/v1/github/{display_path}": {
       "get": {
         "tags": ["GitHub Notebooks"],
         "summary": "Metadata for GitHub-backed page",
         "description": "Get the metadata for a GitHub-backed page.\n\nThis endpoint provides the same data as ``GET /v1/pages/:page``, but\nis queried via the page's GitHub \"display path\" rather than the opaque\npage name.",
-        "operationId": "get_github_page_times_square_v1_github__display_path__get",
+        "operationId": "get_github_page_times_square_api_v1_github__display_path__get",
         "parameters": [
           {
             "name": "display_path",
@@ -558,12 +558,12 @@
         }
       }
     },
-    "/times-square/v1/github-pr/{owner}/{repo}/{commit}": {
+    "/times-square/api/v1/github-pr/{owner}/{repo}/{commit}": {
       "get": {
         "tags": ["Pull Requests"],
         "summary": "Get a tree of GitHub PR preview pages",
         "description": "Get the tree of GitHub-backed pages for a pull request.\n\nThis endpoint is primarily intended to be used by Squareone to power\nits navigational view of GitHub pages for a specific pull request\n(actually a commit SHA) of a repository.",
-        "operationId": "get_github_pr_tree_times_square_v1_github_pr__owner___repo___commit__get",
+        "operationId": "get_github_pr_tree_times_square_api_v1_github_pr__owner___repo___commit__get",
         "parameters": [
           {
             "name": "owner",
@@ -616,12 +616,12 @@
         }
       }
     },
-    "/times-square/v1/github-pr/{owner}/{repo}/{commit}/{path}": {
+    "/times-square/api/v1/github-pr/{owner}/{repo}/{commit}/{path}": {
       "get": {
         "tags": ["Pull Requests"],
         "summary": "Metadata for page in a pull request",
         "description": "Get the metadata for a pull request preview of a GitHub-backed page.",
-        "operationId": "get_github_pr_page_times_square_v1_github_pr__owner___repo___commit___path__get",
+        "operationId": "get_github_pr_page_times_square_api_v1_github_pr__owner___repo___commit___path__get",
         "parameters": [
           {
             "name": "owner",
@@ -1372,7 +1372,9 @@
             "title": "Location"
           },
           "msg": { "type": "string", "title": "Message" },
-          "type": { "type": "string", "title": "Error Type" }
+          "type": { "type": "string", "title": "Error Type" },
+          "input": { "title": "Input" },
+          "ctx": { "type": "object", "title": "Context" }
         },
         "type": "object",
         "required": ["loc", "msg", "type"],
@@ -1421,5 +1423,6 @@
         "description": "Metadata returned by the external root URL of the application."
       }
     }
-  }
+  },
+  "tags": [{ "name": "v1", "description": "Times Square v1 REST API" }]
 }

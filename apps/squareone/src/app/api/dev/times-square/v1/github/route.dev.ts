@@ -2,10 +2,11 @@
  * Mock Times Square API endpoint: /times-square/v1/github (App Router version)
  */
 
+import type { GitHubContentsRoot } from '@lsst-sqre/times-square-client';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
-  const content = {
+  const content: GitHubContentsRoot = {
     contents: [
       {
         node_type: 'owner',
@@ -21,6 +22,7 @@ export async function GET() {
                 node_type: 'page',
                 title: 'Demo',
                 path: 'lsst-sqre/times-square-demo/demo',
+                contents: [],
               },
               {
                 node_type: 'directory',
@@ -31,6 +33,7 @@ export async function GET() {
                     node_type: 'page',
                     title: 'Gaussian 2D',
                     path: 'lsst-sqre/times-square-demo/matplotlib/gaussian2d',
+                    contents: [],
                   },
                 ],
               },

@@ -3,10 +3,11 @@
  * /times-square/v1/github-pr/:owner/:repo/:commit (App Router version)
  */
 
+import type { GitHubPrContents } from '@lsst-sqre/times-square-client';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
-  const data = {
+  const data: GitHubPrContents = {
     contents: [
       {
         node_type: 'owner',
@@ -17,6 +18,7 @@ export async function GET() {
             node_type: 'page',
             title: 'Demo',
             path: 'demo',
+            contents: [],
           },
           {
             node_type: 'directory',
@@ -27,6 +29,7 @@ export async function GET() {
                 node_type: 'page',
                 title: 'Gaussian 2D',
                 path: 'matplotlib/gaussian2d',
+                contents: [],
               },
             ],
           },
