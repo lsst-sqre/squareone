@@ -8,6 +8,7 @@
 import { z } from 'zod';
 
 import { TimesSquareError } from './errors';
+import { normalizeGitHubContents } from './normalize';
 import {
   type GitHubContentsRoot,
   GitHubContentsRootSchema,
@@ -136,7 +137,8 @@ export async function fetchGitHubContents(
   }
 
   const data = await response.json();
-  return GitHubContentsRootSchema.parse(data);
+  const parsed = GitHubContentsRootSchema.parse(data);
+  return { ...parsed, contents: normalizeGitHubContents(parsed.contents) };
 }
 
 // =============================================================================
@@ -208,7 +210,8 @@ export async function fetchGitHubPrContents(
   }
 
   const data = await response.json();
-  return GitHubPrContentsSchema.parse(data);
+  const parsed = GitHubPrContentsSchema.parse(data);
+  return { ...parsed, contents: normalizeGitHubContents(parsed.contents) };
 }
 
 // =============================================================================
