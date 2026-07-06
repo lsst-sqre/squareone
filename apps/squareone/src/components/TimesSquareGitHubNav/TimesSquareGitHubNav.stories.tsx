@@ -1,6 +1,6 @@
 import { mockGitHubContents } from '@lsst-sqre/times-square-client';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import TimesSquareGitHubNav from './TimesSquareGitHubNav';
 
@@ -168,6 +168,65 @@ export const Focused: Story = {
     await expect(pageLink.getAttribute('href')).toContain('ts_nav_focus=');
     await expect(
       canvas.queryByRole('link', { name: 'Image Quality Analysis' })
+    ).not.toBeInTheDocument();
+  },
+};
+
+export const KebabFocusMenu: Story = {
+  args: {
+    contentNodes: mockGitHubContents.contents,
+    pagePath: '',
+    pagePathRoot: '/times-square/github',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // The kebab is invisible until the row is hovered or focused, but stays
+    // in the tab order so keyboard users can reach it.
+    const kebab = canvas.getByRole('button', { name: 'Actions for weather' });
+    await expect(window.getComputedStyle(kebab).opacity).toBe('0');
+    kebab.focus();
+    await expect(window.getComputedStyle(kebab).opacity).toBe('1');
+
+    // Activating the kebab opens a menu whose action focuses the node by
+    // linking to the current page with ts_nav_focus set.
+    await userEvent.click(kebab);
+    const body = within(canvasElement.ownerDocument.body);
+    const menuItem = await body.findByRole('menuitem', {
+      name: 'Focus on this directory',
+    });
+    const href = menuItem.getAttribute('href') ?? '';
+    const query = new URLSearchParams(href.split('?')[1] ?? '');
+    await expect(query.get('ts_nav_focus')).toBe(
+      'lsst-sqre/times-square-demo/weather'
+    );
+
+    // Escape closes the menu (Radix removes it asynchronously) and returns
+    // focus to the kebab.
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() =>
+      expect(
+        body.queryByRole('menuitem', { name: 'Focus on this directory' })
+      ).not.toBeInTheDocument()
+    );
+    await expect(kebab).toHaveFocus();
+  },
+};
+
+export const PrPreviewTree: Story = {
+  args: {
+    contentNodes: mockGitHubContents.contents,
+    pagePath: null,
+    pagePathRoot: '/times-square/github-pr',
+  },
+  play: async ({ canvasElement }) => {
+    // The PR-preview tree gets icons and collapsing, but no kebab/focus UI.
+    const canvas = within(canvasElement);
+    await expect(
+      canvas.getByRole('button', { name: 'Toggle weather' })
+    ).toBeVisible();
+    await expect(
+      canvas.queryByRole('button', { name: /^Actions for / })
     ).not.toBeInTheDocument();
   },
 };

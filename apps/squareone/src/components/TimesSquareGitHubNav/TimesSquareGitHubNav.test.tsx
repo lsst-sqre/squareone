@@ -442,6 +442,113 @@ describe('TimesSquareGitHubNav focus mode', () => {
     ).toBe('lsst-sqre/times-square-demo/weather');
   });
 
+  it('shows a kebab menu button on every container row in the main tree', () => {
+    renderNav();
+    for (const name of [
+      'Actions for lsst-sqre',
+      'Actions for times-square-demo',
+      'Actions for weather',
+    ]) {
+      expect(screen.getByRole('button', { name })).toBeInTheDocument();
+    }
+  });
+
+  it('opens a kebab menu whose action focuses that node via ts_nav_focus', async () => {
+    const user = userEvent.setup();
+    mockPathname =
+      '/times-square/github/lsst-sqre/times-square-demo/weather/summit-weather';
+    mockSearchParams = new URLSearchParams({ myparam: '42' });
+    renderNav('lsst-sqre/times-square-demo/weather/summit-weather');
+
+    await user.click(
+      screen.getByRole('button', { name: 'Actions for weather' })
+    );
+    const menuItem = within(document.body).getByRole('menuitem', {
+      name: 'Focus on this directory',
+    });
+    const [path, query] = (menuItem.getAttribute('href') ?? '').split('?');
+    expect(path).toBe(mockPathname);
+    const params = new URLSearchParams(query);
+    expect(params.get('ts_nav_focus')).toBe(
+      'lsst-sqre/times-square-demo/weather'
+    );
+    expect(params.get('myparam')).toBe('42');
+  });
+
+  it('labels the focus action with the row node type', async () => {
+    const user = userEvent.setup();
+    renderNav();
+
+    await user.click(
+      screen.getByRole('button', { name: 'Actions for lsst-sqre' })
+    );
+    const menuItem = within(document.body).getByRole('menuitem', {
+      name: 'Focus on this organization',
+    });
+    expect(focusParamOf(menuItem)).toBe('lsst-sqre');
+    await user.keyboard('{Escape}');
+
+    await user.click(
+      screen.getByRole('button', { name: 'Actions for times-square-demo' })
+    );
+    expect(
+      within(document.body).getByRole('menuitem', {
+        name: 'Focus on this repository',
+      })
+    ).toBeInTheDocument();
+  });
+
+  it('shows the kebab on container rows inside a focused view to focus deeper', async () => {
+    const user = userEvent.setup();
+    render(
+      <TimesSquareGitHubNav
+        contentNodes={contentNodes}
+        pagePathRoot="/times-square/github"
+        pagePath={null}
+        focusPath="lsst-sqre/times-square-demo"
+      />
+    );
+
+    await user.click(
+      screen.getByRole('button', { name: 'Actions for weather' })
+    );
+    const menuItem = within(document.body).getByRole('menuitem', {
+      name: 'Focus on this directory',
+    });
+    expect(focusParamOf(menuItem)).toBe('lsst-sqre/times-square-demo/weather');
+  });
+
+  it('is keyboard operable: the kebab opens a menu and Escape returns focus', async () => {
+    const user = userEvent.setup();
+    renderNav();
+
+    const kebab = screen.getByRole('button', { name: 'Actions for weather' });
+    kebab.focus();
+    await user.keyboard('{Enter}');
+    const menu = within(document.body).getByRole('menu');
+    expect(menu).toBeInTheDocument();
+    expect(
+      within(menu).getByRole('menuitem', { name: 'Focus on this directory' })
+    ).toBeInTheDocument();
+
+    await user.keyboard('{Escape}');
+    expect(within(document.body).queryByRole('menu')).not.toBeInTheDocument();
+    expect(kebab).toHaveFocus();
+  });
+
+  it('shows no kebab or focus UI in the PR-preview tree', () => {
+    render(
+      <TimesSquareGitHubNav
+        contentNodes={contentNodes}
+        pagePathRoot="/times-square/github-pr"
+        pagePath={null}
+      />
+    );
+    expect(
+      screen.queryByRole('button', { name: /^Actions for / })
+    ).not.toBeInTheDocument();
+  });
+
   it('renders the full tree when no focus path segment matches', () => {
     render(
       <TimesSquareGitHubNav

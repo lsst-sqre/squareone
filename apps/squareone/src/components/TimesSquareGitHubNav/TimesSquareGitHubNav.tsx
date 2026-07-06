@@ -79,7 +79,8 @@ function generateChildren(
   currentPath: string | null,
   pathRoot: string,
   expansion: TreeExpansion,
-  focusPath: string | null
+  focusPath: string | null,
+  getFocusHref: ((nodePath: string) => string) | null
 ): React.ReactNode[] {
   return contents.map((item) => {
     if (item.node_type !== 'page') {
@@ -91,13 +92,15 @@ function generateChildren(
           current={isCurrentPath(currentPath, item.path)}
           expanded={expansion.isExpanded(item.path)}
           onToggle={() => expansion.toggle(item.path)}
+          focusHref={getFocusHref ? getFocusHref(item.path) : null}
         >
           {generateChildren(
             item.contents,
             currentPath,
             pathRoot,
             expansion,
-            focusPath
+            focusPath,
+            getFocusHref
           )}
         </Directory>
       );
@@ -146,12 +149,22 @@ export default function TimesSquareGitHubNav({
     currentPath: pagePath,
     storageKey: `times-square-github-nav:${pagePathRoot}`,
   });
+
+  // Focus mode is a main-tree feature: the PR-preview tree gets no kebab or
+  // focus UI. When enabled, each container row's kebab menu links to the
+  // current page with `ts_nav_focus` set to that node's path.
+  const focusUiEnabled = pagePathRoot === '/times-square/github';
+  const getFocusHref = focusUiEnabled
+    ? (nodePath: string) => buildFocusHref(pathname, search, nodePath)
+    : null;
+
   const children = generateChildren(
     visibleNodes,
     pagePath,
     pagePathRoot,
     expansion,
-    focusedNode ? focusedNode.path : null
+    focusedNode ? focusedNode.path : null,
+    getFocusHref
   );
 
   return (
