@@ -80,10 +80,14 @@ export default function TimesSquareUrlParametersProvider({
 
     const queryString = searchParams?.toString() ?? '';
 
-    // Separate display settings from notebook parameters
-    const { ts_hide_code = '1', ...notebookParameters } = userParameters;
+    // Separate reserved `ts_`-prefixed parameters (display settings like
+    // ts_hide_code, navigation state like ts_nav_focus) from notebook
+    // parameters.
+    const notebookParameters = Object.fromEntries(
+      Object.entries(userParameters).filter(([key]) => !key.startsWith('ts_'))
+    );
     const displaySettings = {
-      ts_hide_code,
+      ts_hide_code: userParameters.ts_hide_code ?? '1',
     };
 
     return {

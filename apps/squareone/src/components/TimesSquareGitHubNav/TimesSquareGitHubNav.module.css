@@ -1,3 +1,54 @@
+.breadcrumb {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.breadcrumbList {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 0.3rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.9rem;
+  line-height: 1.3;
+}
+
+.breadcrumbItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.breadcrumbItem + .breadcrumbItem::before {
+  content: "/";
+  opacity: 0.6;
+}
+
+.breadcrumbItem[aria-current="location"] {
+  font-weight: bold;
+}
+
+.breadcrumbClear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0.15rem;
+  border-radius: 0.25rem;
+  color: inherit;
+  line-height: 0;
+}
+
+.breadcrumbClear:hover,
+.breadcrumbClear:focus-visible {
+  background-color: var(--rsd-color-primary-100, #e6f3ff);
+}
+
 .toolbar {
   display: flex;
   justify-content: flex-end;

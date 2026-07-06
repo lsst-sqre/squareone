@@ -7,21 +7,22 @@
 
 'use client';
 
-import { ChevronsDownUp, ChevronsUpDown } from 'lucide-react';
+import { ChevronsDownUp, ChevronsUpDown, X } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname, useSearchParams } from 'next/navigation';
 import React, { useMemo } from 'react';
 
 import type { TreeExpansion } from '../../hooks/useTreeExpansion';
 import { useTreeExpansion } from '../../hooks/useTreeExpansion';
 import Directory from './Directory';
+import type { ContentNode } from './navFocus';
+import {
+  buildFocusHref,
+  getFocusBreadcrumb,
+  resolveFocusNode,
+} from './navFocus';
 import Page from './Page';
 import styles from './TimesSquareGitHubNav.module.css';
-
-type ContentNode = {
-  node_type: 'owner' | 'repo' | 'directory' | 'page';
-  title: string;
-  path: string;
-  contents: ContentNode[];
-};
 
 type TimesSquareGitHubNavProps = {
   /**
@@ -36,6 +37,13 @@ type TimesSquareGitHubNavProps = {
    * Path of the current page (or null if not on a page)
    */
   pagePath: string | null;
+  /**
+   * Requested focus path from the `ts_nav_focus` URL parameter (main tree
+   * only). When it resolves to a node in the tree, that node renders as the
+   * tree root beneath a breadcrumb; a stale path resolves to its nearest
+   * existing ancestor. Null or unresolvable renders the full tree.
+   */
+  focusPath?: string | null;
 };
 
 /**
@@ -70,7 +78,8 @@ function generateChildren(
   contents: ContentNode[],
   currentPath: string | null,
   pathRoot: string,
-  expansion: TreeExpansion
+  expansion: TreeExpansion,
+  focusPath: string | null
 ): React.ReactNode[] {
   return contents.map((item) => {
     if (item.node_type !== 'page') {
@@ -83,14 +92,20 @@ function generateChildren(
           expanded={expansion.isExpanded(item.path)}
           onToggle={() => expansion.toggle(item.path)}
         >
-          {generateChildren(item.contents, currentPath, pathRoot, expansion)}
+          {generateChildren(
+            item.contents,
+            currentPath,
+            pathRoot,
+            expansion,
+            focusPath
+          )}
         </Directory>
       );
     } else {
       return (
         <Page
           title={item.title}
-          path={`${pathRoot}/${item.path}`}
+          path={buildFocusHref(`${pathRoot}/${item.path}`, '', focusPath)}
           key={item.path}
           current={isCurrentPath(currentPath, item.path)}
         />
@@ -103,7 +118,25 @@ export default function TimesSquareGitHubNav({
   pagePath,
   contentNodes,
   pagePathRoot,
+  focusPath = null,
 }: TimesSquareGitHubNavProps) {
+  const pathname = usePathname() ?? '';
+  const searchParams = useSearchParams();
+  const search = searchParams?.toString() ?? '';
+
+  // Resolve the requested focus path against the tree: an exact container
+  // match, else the nearest existing ancestor, else null (full tree).
+  const focusedNode = useMemo(
+    () => (focusPath ? resolveFocusNode(contentNodes, focusPath) : null),
+    [contentNodes, focusPath]
+  );
+  const breadcrumb = useMemo(
+    () =>
+      focusedNode ? getFocusBreadcrumb(contentNodes, focusedNode.path) : [],
+    [contentNodes, focusedNode]
+  );
+  const visibleNodes = focusedNode ? [focusedNode] : contentNodes;
+
   const allPaths = useMemo(
     () => collectContainerPaths(contentNodes),
     [contentNodes]
@@ -114,14 +147,46 @@ export default function TimesSquareGitHubNav({
     storageKey: `times-square-github-nav:${pagePathRoot}`,
   });
   const children = generateChildren(
-    contentNodes,
+    visibleNodes,
     pagePath,
     pagePathRoot,
-    expansion
+    expansion,
+    focusedNode ? focusedNode.path : null
   );
 
   return (
     <nav>
+      {focusedNode && (
+        <div className={styles.breadcrumb}>
+          <ol className={styles.breadcrumbList} aria-label="Focus breadcrumb">
+            {breadcrumb.map((crumb, index) => (
+              <li
+                key={crumb.path}
+                className={styles.breadcrumbItem}
+                aria-current={
+                  index === breadcrumb.length - 1 ? 'location' : undefined
+                }
+              >
+                {index === breadcrumb.length - 1 ? (
+                  crumb.title
+                ) : (
+                  <Link href={buildFocusHref(pathname, search, crumb.path)}>
+                    {crumb.title}
+                  </Link>
+                )}
+              </li>
+            ))}
+          </ol>
+          <Link
+            href={buildFocusHref(pathname, search, null)}
+            className={styles.breadcrumbClear}
+            aria-label="Clear focus"
+            title="Clear focus"
+          >
+            <X className={styles.toolbarIcon} aria-hidden />
+          </Link>
+        </div>
+      )}
       <div className={styles.toolbar}>
         <button
           type="button"

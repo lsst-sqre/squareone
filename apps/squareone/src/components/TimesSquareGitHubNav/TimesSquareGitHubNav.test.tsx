@@ -1,9 +1,17 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ComponentProps } from 'react';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import TimesSquareGitHubNav from './TimesSquareGitHubNav';
+
+let mockPathname = '/times-square/github';
+let mockSearchParams = new URLSearchParams();
+
+vi.mock('next/navigation', () => ({
+  usePathname: () => mockPathname,
+  useSearchParams: () => mockSearchParams,
+}));
 
 type ContentNodes = ComponentProps<typeof TimesSquareGitHubNav>['contentNodes'];
 
@@ -49,6 +57,8 @@ function renderNav(pagePath: string | null = null) {
 
 beforeEach(() => {
   window.sessionStorage.clear();
+  mockPathname = '/times-square/github';
+  mockSearchParams = new URLSearchParams();
 });
 
 /**
@@ -265,6 +275,20 @@ describe('TimesSquareGitHubNav current page highlighting', () => {
     );
   });
 
+  it('marks the focused ancestor of the current page as current in focus mode', () => {
+    render(
+      <TimesSquareGitHubNav
+        contentNodes={contentNodes}
+        pagePathRoot="/times-square/github"
+        pagePath="lsst-sqre/times-square-demo/weather/summit-weather"
+        focusPath="lsst-sqre/times-square-demo/weather"
+      />
+    );
+    expect(
+      screen.getByRole('button', { name: 'Toggle weather' }).closest('div')
+    ).toHaveAttribute('aria-current', 'true');
+  });
+
   it('does not mark a sibling page sharing a string prefix as current', () => {
     render(
       <TimesSquareGitHubNav
@@ -278,6 +302,168 @@ describe('TimesSquareGitHubNav current page highlighting', () => {
     ).toHaveAttribute('aria-current', 'page');
     expect(screen.getByRole('link', { name: 'Summit' })).not.toHaveAttribute(
       'aria-current'
+    );
+  });
+});
+
+/** Extract the `ts_nav_focus` value from an element's href, if any. */
+function focusParamOf(element: HTMLElement): string | null {
+  const query = element.getAttribute('href')?.split('?')[1] ?? '';
+  return new URLSearchParams(query).get('ts_nav_focus');
+}
+
+describe('TimesSquareGitHubNav focus mode', () => {
+  it('renders the focused node as the tree root under a breadcrumb', () => {
+    render(
+      <TimesSquareGitHubNav
+        contentNodes={contentNodes}
+        pagePathRoot="/times-square/github"
+        pagePath={null}
+        focusPath="lsst-sqre/times-square-demo/weather"
+      />
+    );
+
+    // The breadcrumb lists the ancestors as refocus links and the focused
+    // node as the current location.
+    const breadcrumb = screen.getByRole('list', { name: 'Focus breadcrumb' });
+    expect(
+      within(breadcrumb).getByRole('link', { name: 'lsst-sqre' })
+    ).toBeVisible();
+    expect(
+      within(breadcrumb).getByRole('link', { name: 'times-square-demo' })
+    ).toBeVisible();
+    expect(
+      within(breadcrumb).getByText('weather').closest('li')
+    ).toHaveAttribute('aria-current', 'location');
+
+    // The focused node is the tree root: its ancestors are not tree rows.
+    expect(
+      screen.getByRole('button', { name: 'Toggle weather' })
+    ).toBeVisible();
+    expect(
+      screen.queryByRole('button', { name: 'Toggle lsst-sqre' })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Toggle times-square-demo' })
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Summit Weather' })).toBeVisible();
+  });
+
+  it('links breadcrumb segments to refocus on that ancestor', () => {
+    mockPathname =
+      '/times-square/github/lsst-sqre/times-square-demo/weather/summit-weather';
+    render(
+      <TimesSquareGitHubNav
+        contentNodes={contentNodes}
+        pagePathRoot="/times-square/github"
+        pagePath="lsst-sqre/times-square-demo/weather/summit-weather"
+        focusPath="lsst-sqre/times-square-demo/weather"
+      />
+    );
+    const breadcrumb = screen.getByRole('list', { name: 'Focus breadcrumb' });
+    const repoLink = within(breadcrumb).getByRole('link', {
+      name: 'times-square-demo',
+    });
+    expect(repoLink.getAttribute('href')).toMatch(
+      new RegExp(`^${mockPathname}\\?`)
+    );
+    expect(focusParamOf(repoLink)).toBe('lsst-sqre/times-square-demo');
+  });
+
+  it('clears focus while preserving other query parameters', () => {
+    mockPathname =
+      '/times-square/github/lsst-sqre/times-square-demo/weather/summit-weather';
+    mockSearchParams = new URLSearchParams({
+      ts_nav_focus: 'lsst-sqre/times-square-demo/weather',
+      myparam: '42',
+    });
+    render(
+      <TimesSquareGitHubNav
+        contentNodes={contentNodes}
+        pagePathRoot="/times-square/github"
+        pagePath="lsst-sqre/times-square-demo/weather/summit-weather"
+        focusPath="lsst-sqre/times-square-demo/weather"
+      />
+    );
+    const clearLink = screen.getByRole('link', { name: 'Clear focus' });
+    const [path, query] = (clearLink.getAttribute('href') ?? '').split('?');
+    expect(path).toBe(mockPathname);
+    const params = new URLSearchParams(query);
+    expect(params.get('ts_nav_focus')).toBeNull();
+    expect(params.get('myparam')).toBe('42');
+  });
+
+  it('propagates ts_nav_focus onto sidebar page links', () => {
+    render(
+      <TimesSquareGitHubNav
+        contentNodes={contentNodes}
+        pagePathRoot="/times-square/github"
+        pagePath={null}
+        focusPath="lsst-sqre/times-square-demo/weather"
+      />
+    );
+    const pageLink = screen.getByRole('link', { name: 'Summit Weather' });
+    expect(pageLink.getAttribute('href')).toMatch(
+      /^\/times-square\/github\/lsst-sqre\/times-square-demo\/weather\/summit-weather\?/
+    );
+    expect(focusParamOf(pageLink)).toBe('lsst-sqre/times-square-demo/weather');
+  });
+
+  it('does not add ts_nav_focus to page links without focus', () => {
+    renderNav();
+    const pageLink = screen.getByRole('link', { name: 'Summit Weather' });
+    expect(pageLink.getAttribute('href')).toBe(
+      '/times-square/github/lsst-sqre/times-square-demo/weather/summit-weather'
+    );
+  });
+
+  it('focuses the nearest existing ancestor for a stale focus path', () => {
+    render(
+      <TimesSquareGitHubNav
+        contentNodes={contentNodes}
+        pagePathRoot="/times-square/github"
+        pagePath={null}
+        focusPath="lsst-sqre/times-square-demo/weather/deleted-directory"
+      />
+    );
+    const breadcrumb = screen.getByRole('list', { name: 'Focus breadcrumb' });
+    expect(
+      within(breadcrumb).getByText('weather').closest('li')
+    ).toHaveAttribute('aria-current', 'location');
+    expect(
+      screen.getByRole('button', { name: 'Toggle weather' })
+    ).toBeVisible();
+    expect(
+      screen.queryByRole('button', { name: 'Toggle lsst-sqre' })
+    ).not.toBeInTheDocument();
+    // Breadcrumb refocus links carry the resolved (existing) path.
+    expect(
+      focusParamOf(screen.getByRole('link', { name: 'Summit Weather' }))
+    ).toBe('lsst-sqre/times-square-demo/weather');
+  });
+
+  it('renders the full tree when no focus path segment matches', () => {
+    render(
+      <TimesSquareGitHubNav
+        contentNodes={contentNodes}
+        pagePathRoot="/times-square/github"
+        pagePath={null}
+        focusPath="other-org/other-repo"
+      />
+    );
+    expect(
+      screen.queryByRole('list', { name: 'Focus breadcrumb' })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: 'Clear focus' })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Toggle lsst-sqre' })
+    ).toBeVisible();
+    expect(
+      screen.getByRole('link', { name: 'Summit Weather' }).getAttribute('href')
+    ).toBe(
+      '/times-square/github/lsst-sqre/times-square-demo/weather/summit-weather'
     );
   });
 });

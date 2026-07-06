@@ -16,6 +16,12 @@ const meta: Meta<typeof TimesSquareGitHubNav> = {
     },
   ],
   parameters: {
+    nextjs: {
+      appDirectory: true,
+      navigation: {
+        pathname: '/times-square/github',
+      },
+    },
     viewport: {
       viewports: {
         sidebar: {
@@ -118,5 +124,90 @@ export const AutoReveal: Story = {
     await expect(
       canvas.queryByRole('link', { name: 'Image Quality Analysis' })
     ).not.toBeInTheDocument();
+  },
+};
+
+export const Focused: Story = {
+  args: {
+    contentNodes: mockGitHubContents.contents,
+    pagePath: 'lsst-sqre/times-square-demo/weather/summit-weather',
+    pagePathRoot: '/times-square/github',
+    focusPath: 'lsst-sqre/times-square-demo/weather',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // The breadcrumb shows the ancestors as refocus links and the focused
+    // node as the current location, plus a clear control.
+    const breadcrumb = canvas.getByRole('list', { name: 'Focus breadcrumb' });
+    const crumbs = within(breadcrumb);
+    await expect(
+      canvas.getByRole('link', { name: 'Clear focus' })
+    ).toBeVisible();
+    const ownerCrumb = crumbs.getByRole('link', { name: 'lsst-sqre' });
+    await expect(ownerCrumb).toBeVisible();
+    await expect(ownerCrumb.getAttribute('href')).toContain('ts_nav_focus=');
+    await expect(
+      crumbs.getByRole('link', { name: 'times-square-demo' })
+    ).toBeVisible();
+    await expect(crumbs.getByText('weather')).toBeVisible();
+
+    // The focused directory is the tree root: its ancestors are not rows.
+    await expect(
+      canvas.getByRole('button', { name: 'Toggle weather' })
+    ).toBeVisible();
+    await expect(
+      canvas.queryByRole('button', { name: 'Toggle lsst-sqre' })
+    ).not.toBeInTheDocument();
+
+    // Page links inside the focused subtree carry the focus parameter, and
+    // pages outside the subtree are not rendered.
+    const pageLink = canvas.getByRole('link', {
+      name: 'Summit Weather Dashboard',
+    });
+    await expect(pageLink.getAttribute('href')).toContain('ts_nav_focus=');
+    await expect(
+      canvas.queryByRole('link', { name: 'Image Quality Analysis' })
+    ).not.toBeInTheDocument();
+  },
+};
+
+export const FocusedStalePath: Story = {
+  args: {
+    contentNodes: mockGitHubContents.contents,
+    pagePath: '',
+    pagePathRoot: '/times-square/github',
+    focusPath: 'lsst-sqre/times-square-demo/weather/deleted-directory',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    // The stale path resolves to its nearest existing ancestor (weather).
+    const breadcrumb = canvas.getByRole('list', { name: 'Focus breadcrumb' });
+    await expect(within(breadcrumb).getByText('weather')).toBeVisible();
+    await expect(
+      canvas.getByRole('button', { name: 'Toggle weather' })
+    ).toBeVisible();
+    await expect(
+      canvas.queryByRole('button', { name: 'Toggle lsst-sqre' })
+    ).not.toBeInTheDocument();
+  },
+};
+
+export const FocusedUnmatchedPath: Story = {
+  args: {
+    contentNodes: mockGitHubContents.contents,
+    pagePath: '',
+    pagePathRoot: '/times-square/github',
+    focusPath: 'other-org/other-repo',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    // An entirely unmatched focus path falls back to the full tree.
+    await expect(
+      canvas.queryByRole('list', { name: 'Focus breadcrumb' })
+    ).not.toBeInTheDocument();
+    await expect(
+      canvas.getByRole('button', { name: 'Toggle lsst-sqre' })
+    ).toBeVisible();
   },
 };
