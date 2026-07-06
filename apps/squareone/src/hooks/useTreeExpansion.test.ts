@@ -1,0 +1,136 @@
+import { act, renderHook } from '@testing-library/react';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { useTreeExpansion } from './useTreeExpansion';
+
+const allPaths = [
+  'lsst-sqre',
+  'lsst-sqre/times-square-demo',
+  'lsst-sqre/times-square-demo/weather',
+  'lsst-sqre/times-square-demo/analysis',
+];
+
+const storageKey = 'test:tree-expansion';
+
+function renderTreeExpansion({
+  currentPath = null,
+}: {
+  currentPath?: string | null;
+} = {}) {
+  return renderHook(() =>
+    useTreeExpansion({ allPaths, currentPath, storageKey })
+  );
+}
+
+beforeEach(() => {
+  window.sessionStorage.clear();
+});
+
+describe('useTreeExpansion', () => {
+  it('expands every path by default', () => {
+    const { result } = renderTreeExpansion();
+    for (const path of allPaths) {
+      expect(result.current.isExpanded(path)).toBe(true);
+    }
+  });
+
+  it('collapses a path when toggled', () => {
+    const { result } = renderTreeExpansion();
+    act(() => {
+      result.current.toggle('lsst-sqre/times-square-demo/weather');
+    });
+    expect(
+      result.current.isExpanded('lsst-sqre/times-square-demo/weather')
+    ).toBe(false);
+    expect(result.current.isExpanded('lsst-sqre')).toBe(true);
+  });
+
+  it('re-expands a collapsed path when toggled again', () => {
+    const { result } = renderTreeExpansion();
+    act(() => {
+      result.current.toggle('lsst-sqre');
+    });
+    act(() => {
+      result.current.toggle('lsst-sqre');
+    });
+    expect(result.current.isExpanded('lsst-sqre')).toBe(true);
+  });
+
+  it('collapses every path with collapseAll', () => {
+    const { result } = renderTreeExpansion();
+    act(() => {
+      result.current.collapseAll();
+    });
+    for (const path of allPaths) {
+      expect(result.current.isExpanded(path)).toBe(false);
+    }
+  });
+
+  it('expands every path with expandAll', () => {
+    const { result } = renderTreeExpansion();
+    act(() => {
+      result.current.collapseAll();
+    });
+    act(() => {
+      result.current.expandAll();
+    });
+    for (const path of allPaths) {
+      expect(result.current.isExpanded(path)).toBe(true);
+    }
+  });
+
+  it('restores collapsed state from sessionStorage in a new hook instance', () => {
+    const first = renderTreeExpansion();
+    act(() => {
+      first.result.current.toggle('lsst-sqre/times-square-demo');
+    });
+    first.unmount();
+
+    const second = renderTreeExpansion();
+    expect(
+      second.result.current.isExpanded('lsst-sqre/times-square-demo')
+    ).toBe(false);
+    expect(second.result.current.isExpanded('lsst-sqre')).toBe(true);
+  });
+
+  it('falls back to all-expanded when the stored value is malformed', () => {
+    window.sessionStorage.setItem(storageKey, 'not json {');
+    const { result } = renderTreeExpansion();
+    for (const path of allPaths) {
+      expect(result.current.isExpanded(path)).toBe(true);
+    }
+  });
+
+  it('keeps the current page ancestor chain expanded after collapseAll', () => {
+    const { result } = renderTreeExpansion({
+      currentPath: 'lsst-sqre/times-square-demo/weather/summit-weather',
+    });
+    act(() => {
+      result.current.collapseAll();
+    });
+    expect(result.current.isExpanded('lsst-sqre')).toBe(true);
+    expect(result.current.isExpanded('lsst-sqre/times-square-demo')).toBe(true);
+    expect(
+      result.current.isExpanded('lsst-sqre/times-square-demo/weather')
+    ).toBe(true);
+    expect(
+      result.current.isExpanded('lsst-sqre/times-square-demo/analysis')
+    ).toBe(false);
+  });
+
+  it('does not reveal a sibling path sharing a string prefix with an ancestor', () => {
+    const { result } = renderTreeExpansion({
+      currentPath: 'lsst-sqre/times-square-demo/weather-archive/history',
+    });
+    act(() => {
+      result.current.collapseAll();
+    });
+    // 'weather' is a string prefix of 'weather-archive' but not a path
+    // segment ancestor, so it must stay collapsed.
+    expect(
+      result.current.isExpanded('lsst-sqre/times-square-demo/weather')
+    ).toBe(false);
+    expect(
+      result.current.isExpanded('lsst-sqre/times-square-demo/weather-archive')
+    ).toBe(true);
+  });
+});

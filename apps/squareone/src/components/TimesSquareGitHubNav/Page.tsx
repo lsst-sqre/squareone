@@ -19,7 +19,9 @@ function Page({ title, path, current }: PageProps) {
   return (
     <div className={clsx(styles.wrapper, current && styles.wrapperCurrent)}>
       <FileText className={styles.icon} aria-hidden />
-      <Link href={path}>{title}</Link>
+      <Link href={path} aria-current={current ? 'page' : undefined}>
+        {title}
+      </Link>
     </div>
   );
 }

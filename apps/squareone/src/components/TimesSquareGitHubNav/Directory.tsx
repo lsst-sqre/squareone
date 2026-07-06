@@ -7,7 +7,7 @@
 
 import clsx from 'clsx';
 import { Book, Building2, ChevronDown, Folder } from 'lucide-react';
-import React from 'react';
+import React, { useId } from 'react';
 import styles from './Directory.module.css';
 
 type DirectoryNodeType = 'owner' | 'repo' | 'directory';
@@ -16,6 +16,10 @@ type DirectoryProps = {
   title: string;
   nodeType: DirectoryNodeType;
   current: boolean;
+  /** Whether the contained subtree is visible. */
+  expanded: boolean;
+  /** Called when the disclosure button is activated. */
+  onToggle: () => void;
   children: React.ReactNode;
 };
 
@@ -29,16 +33,45 @@ const nodeTypeIcons: Record<
   directory: Folder,
 };
 
-function Directory({ title, nodeType, current, children }: DirectoryProps) {
+function Directory({
+  title,
+  nodeType,
+  current,
+  expanded,
+  onToggle,
+  children,
+}: DirectoryProps) {
   const NodeIcon = nodeTypeIcons[nodeType];
+  const contentsId = useId();
   return (
     <div>
-      <div className={clsx(styles.header, current && styles.headerCurrent)}>
-        <ChevronDown className={styles.icon} aria-hidden />
+      <div
+        className={clsx(styles.header, current && styles.headerCurrent)}
+        aria-current={current ? 'true' : undefined}
+      >
+        <button
+          type="button"
+          className={styles.disclosureButton}
+          aria-expanded={expanded}
+          aria-controls={contentsId}
+          aria-label={`Toggle ${title}`}
+          onClick={onToggle}
+        >
+          <ChevronDown
+            className={clsx(
+              styles.icon,
+              styles.disclosureIcon,
+              !expanded && styles.disclosureIconCollapsed
+            )}
+            aria-hidden
+          />
+        </button>
         <NodeIcon className={styles.icon} aria-hidden />
         {title}
       </div>
-      <div className={styles.contents}>{children}</div>
+      <div className={styles.contents} id={contentsId} hidden={!expanded}>
+        {children}
+      </div>
     </div>
   );
 }
