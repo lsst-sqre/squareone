@@ -5,7 +5,7 @@
  */
 
 import clsx from 'clsx';
-import { File } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import Link from 'next/link';
 import styles from './Page.module.css';
 
@@ -18,7 +18,7 @@ type PageProps = {
 function Page({ title, path, current }: PageProps) {
   return (
     <div className={clsx(styles.wrapper, current && styles.wrapperCurrent)}>
-      <File className={styles.icon} />
+      <FileText className={styles.icon} aria-hidden />
       <Link href={path}>{title}</Link>
     </div>
   );

@@ -44,6 +44,7 @@ function generateChildren(
       return (
         <Directory
           title={item.title}
+          nodeType={item.node_type}
           key={item.path}
           current={currentPath ? currentPath.startsWith(item.path) : false}
         >
