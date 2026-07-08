@@ -71,7 +71,7 @@ export default function NotificationDetailView({
     const notFound = !error || isNotFoundError(error);
     return (
       <div className={styles.container}>
-        <Note type="note">
+        <Note type="warning">
           <h2 className={styles.errorHeading}>
             {notFound ? 'Notification not found' : 'Error loading notification'}
           </h2>
