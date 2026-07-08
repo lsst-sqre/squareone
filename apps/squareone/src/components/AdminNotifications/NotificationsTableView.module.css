@@ -21,7 +21,7 @@
   gap: var(--sqo-space-xs);
   padding: var(--sqo-space-xl);
   text-align: center;
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
 }
 
 .errorState {
@@ -30,14 +30,14 @@
 
 .errorMessage {
   font-size: 0.875rem;
-  color: var(--rsd-color-gray-600);
+  color: var(--rsd-component-text-secondary-color);
 }
 
 .count {
   padding-top: var(--sqo-space-sm);
   text-align: center;
   font-size: 0.875rem;
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
 }
 
 /* The summary links to the notification's detail page; keep it reading as a
@@ -57,7 +57,7 @@
  * its primary row; mute it slightly so the primary recipient/sender/created
  * row stays the visual anchor. */
 .summary {
-  color: var(--rsd-color-gray-600);
+  color: var(--rsd-component-text-secondary-color);
 }
 
 /* Collapse the rendered-Markdown summary so it sits inline within the detail

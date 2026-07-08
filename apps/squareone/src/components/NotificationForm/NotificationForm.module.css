@@ -17,15 +17,15 @@
   flex-direction: column;
   gap: var(--rsd-space-1x, 0.5rem);
   padding: var(--rsd-space-2x, 0.75rem);
-  border: 1px solid var(--rsd-color-gray-300, #d1d5db);
+  border: 1px solid var(--rsd-component-divider-color);
   border-radius: var(--rsd-radius-1, 0.25rem);
-  background-color: var(--rsd-color-gray-100, #f3f4f6);
+  background-color: var(--rsd-component-surface-secondary-background-color);
 }
 
 .previewLabel {
   font-size: var(--rsd-font-size-1, 0.875rem);
   font-weight: 600;
-  color: var(--rsd-color-gray-600, #4b5563);
+  color: var(--rsd-component-text-secondary-color);
 }
 
 .actions {
