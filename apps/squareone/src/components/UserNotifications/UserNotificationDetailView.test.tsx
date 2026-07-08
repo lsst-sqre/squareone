@@ -204,6 +204,15 @@ describe('UserNotificationDetailView', () => {
     ).toBeInTheDocument();
   });
 
+  it('renders the error state inside a squared Note callout', () => {
+    render(<UserNotificationDetailView error={new Error('Network down')} />);
+
+    // The shared squared Note renders a "Note" type badge in its corner bubble;
+    // asserting it confirms the bespoke error banner was swapped for the shared
+    // callout rather than a hand-rolled box.
+    expect(screen.getByText('Note')).toBeInTheDocument();
+  });
+
   it('links the back affordance to the notifications inbox by default', () => {
     render(<UserNotificationDetailView notification={baseNotification} />);
 

@@ -6,6 +6,8 @@ import {
   Checkbox,
   copyToClipboard,
   DropdownMenu,
+  ErrorMessage,
+  Note,
 } from '@lsst-sqre/squared';
 import { ChevronDown, ChevronRight, MoreHorizontal } from 'lucide-react';
 import { useMemo, useState } from 'react';
@@ -407,7 +409,10 @@ export default function UserNotificationsTableView({
   } else if (error) {
     body = (
       <div className={styles.errorState}>
-        <p>Failed to load notifications</p>
+        <ErrorMessage
+          strategy="dynamic"
+          message="Failed to load notifications"
+        />
         <p className={styles.errorMessage}>{error.message}</p>
         <Button
           appearance="outline"
@@ -517,39 +522,44 @@ export default function UserNotificationsTableView({
       </div>
 
       {selectionEnabled && (showSelectAllBanner || allMatchingSelected) && (
-        <div className={styles.selectAllBanner}>
-          {allMatchingSelected ? (
-            <>
-              <span>
-                All {totalCount ?? loadedSelectedIds.length} selected.
-              </span>
-              <button
-                type="button"
-                className={styles.bannerButton}
-                onClick={clearSelection}
-              >
-                Clear selection
-              </button>
-            </>
-          ) : (
-            <>
-              <span>All {shownCount} on this page selected.</span>
-              <button
-                type="button"
-                className={styles.bannerButton}
-                onClick={() => setAllMatchingSelected(true)}
-              >
-                Select all {totalCount ?? shownCount} notifications
-              </button>
-            </>
-          )}
-        </div>
+        <Note type="info">
+          <div className={styles.selectAllBanner}>
+            {allMatchingSelected ? (
+              <>
+                <span>
+                  All {totalCount ?? loadedSelectedIds.length} selected.
+                </span>
+                <button
+                  type="button"
+                  className={styles.bannerButton}
+                  onClick={clearSelection}
+                >
+                  Clear selection
+                </button>
+              </>
+            ) : (
+              <>
+                <span>All {shownCount} on this page selected.</span>
+                <button
+                  type="button"
+                  className={styles.bannerButton}
+                  onClick={() => setAllMatchingSelected(true)}
+                >
+                  Select all {totalCount ?? shownCount} notifications
+                </button>
+              </>
+            )}
+          </div>
+        </Note>
       )}
 
       {bulkMarkReadError && (
-        <div className={styles.bulkMarkReadError} role="alert">
-          Failed to mark notifications as read: {bulkMarkReadError.message}
-        </div>
+        <ErrorMessage
+          className={styles.bulkMarkReadError}
+          strategy="dynamic"
+          role="alert"
+          message={`Failed to mark notifications as read: ${bulkMarkReadError.message}`}
+        />
       )}
 
       {body}

@@ -24,10 +24,6 @@
   color: var(--rsd-component-text-secondary-color);
 }
 
-.errorState {
-  color: var(--rsd-color-red-500);
-}
-
 .errorMessage {
   font-size: 0.875rem;
   color: var(--rsd-component-text-secondary-color);

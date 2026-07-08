@@ -146,6 +146,10 @@ export const SelectAllAcrossPages: Story = {
     await userEvent.click(
       canvas.getByRole('checkbox', { name: /select all/i })
     );
+
+    // The extension prompt renders via the shared squared Note (type="info").
+    await expect(canvas.getByText('Info')).toBeInTheDocument();
+
     await userEvent.click(
       canvas.getByRole('button', { name: /select all 9 notifications/i })
     );
@@ -311,9 +315,11 @@ export const ErrorState: Story = {
   play: async ({ args, canvasElement }) => {
     const canvas = within(canvasElement);
 
-    await expect(
-      canvas.getByText(/failed to load notifications/i)
-    ).toBeInTheDocument();
+    // The load failure surfaces through the shared squared ErrorMessage
+    // (role="status") rather than a bespoke red banner.
+    await expect(canvas.getByRole('status')).toHaveTextContent(
+      /failed to load notifications/i
+    );
     await expect(
       canvas.getByText('Semaphore is unavailable')
     ).toBeInTheDocument();

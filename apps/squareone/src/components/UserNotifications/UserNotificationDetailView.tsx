@@ -1,7 +1,7 @@
 'use client';
 
 import type { UserNotificationFormatted } from '@lsst-sqre/semaphore-client';
-import { Badge } from '@lsst-sqre/squared';
+import { Badge, Note } from '@lsst-sqre/squared';
 import Link from 'next/link';
 
 import { formatLocalTimestamp } from '../../lib/utils/dateFormatters';
@@ -99,8 +99,8 @@ export default function UserNotificationDetailView({
     const notFound = !error || isNotFoundError(error);
     return (
       <div className={styles.container}>
-        <div className={styles.errorState}>
-          <h2>
+        <Note type="note">
+          <h2 className={styles.errorHeading}>
             {notFound ? 'Notification not found' : 'Error loading notification'}
           </h2>
           <p>
@@ -111,7 +111,7 @@ export default function UserNotificationDetailView({
           <p>
             <Link href={returnHref}>&larr; Back to notifications</Link>
           </p>
-        </div>
+        </Note>
       </div>
     );
   }

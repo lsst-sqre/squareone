@@ -151,5 +151,7 @@ export const ErrorState: Story = {
     await expect(
       canvas.getByText('Network request failed')
     ).toBeInTheDocument();
+    // The error/not-found state renders via the shared squared Note callout.
+    await expect(canvas.getByText('Note')).toBeInTheDocument();
   },
 };

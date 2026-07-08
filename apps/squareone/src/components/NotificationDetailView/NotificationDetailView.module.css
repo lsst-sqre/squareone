@@ -100,21 +100,10 @@
   color: var(--rsd-component-text-secondary-color);
 }
 
-.errorState {
-  padding: var(--sqo-space-md-fixed);
-  background-color: var(--rsd-color-red-100);
-  border: 1px solid var(--rsd-color-red-500);
-  border-radius: var(--sqo-border-radius-2);
-  color: var(--rsd-color-red-900);
-}
-
-.errorState h2 {
+/* The error/not-found state is a shared squared Note callout; only the
+ * heading needs its default top margin collapsed inside the callout. */
+.errorHeading {
   margin-top: 0;
-  color: var(--rsd-color-red-900);
-}
-
-.errorState a {
-  color: var(--rsd-color-red-900);
 }
 
 /* Mobile layout */

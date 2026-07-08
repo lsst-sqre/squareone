@@ -77,10 +77,6 @@
   color: var(--rsd-component-text-secondary-color);
 }
 
-.errorState {
-  color: var(--rsd-color-red-500);
-}
-
 .errorMessage {
   font-size: 0.875rem;
   color: var(--rsd-component-text-secondary-color);
@@ -206,15 +202,12 @@
   color: var(--rsd-component-text-color);
 }
 
-/* Tinted banner offering to extend selection across pages (or clear it). */
+/* Row layout for the select-all extension controls; the callout box (border,
+ * corner bubble) is provided by the shared squared Note (type="info"). */
 .selectAllBanner {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: var(--sqo-space-xs);
-  padding: var(--sqo-space-sm);
-  border-radius: var(--sqo-border-radius-1);
-  background-color: var(--rsd-color-blue-100);
   font-size: 0.875rem;
   color: var(--rsd-component-text-color);
 }
@@ -230,19 +223,11 @@
   cursor: pointer;
 }
 
-/* Tinted banner shown when the across-pages bulk mark-read fails. Styled like
- * the select-all banner but in error colors; the selection is kept alongside it
- * so the user can retry the action. */
+/* Inline error shown when the across-pages bulk mark-read fails. The red color
+ * and inline-error semantics come from the shared squared ErrorMessage; the
+ * selection is kept alongside it so the user can retry the action. */
 .bulkMarkReadError {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--sqo-space-xs);
-  padding: var(--sqo-space-sm);
-  border-radius: var(--sqo-border-radius-1);
-  background-color: var(--rsd-color-red-100);
-  font-size: 0.875rem;
-  color: var(--rsd-color-red-500);
+  text-align: center;
 }
 
 /* Centered wrapper for the "Load more" button. */
