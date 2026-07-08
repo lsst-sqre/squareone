@@ -8,6 +8,7 @@ import {
   isDarkHex,
   loadBaseline,
   partitionByBaseline,
+  SCAN_ROOTS,
   scannedModules,
   validateModuleFile,
 } from './validate-theme-tokens.js';
@@ -313,5 +314,46 @@ describe('empty baseline — the fully-migrated end state', () => {
       return !result.ok;
     });
     expect(offenders).toEqual([]);
+  });
+});
+
+describe('scan roots — squareone App Router pages (src/app)', () => {
+  const rootDir = path.resolve(__dirname, '../../..');
+
+  it('includes the squareone app root alongside the two component roots', () => {
+    expect(SCAN_ROOTS).toContain('apps/squareone/src/app');
+    expect(SCAN_ROOTS).toContain('apps/squareone/src/components');
+    expect(SCAN_ROOTS).toContain('packages/squared/src/components');
+  });
+
+  it('discovers page-local *.module.css files under src/app', () => {
+    // The App Router root is glob-walked, so page-local modules (which live
+    // outside the two **/components/** roots) are now in scope.
+    const modules = scannedModules();
+    expect(modules.some((p) => p.startsWith('apps/squareone/src/app/'))).toBe(
+      true
+    );
+  });
+
+  it('detects a fixed dark-gray text violation in an app-page module', () => {
+    // Prove the new scan root actually surfaces a violation: write an
+    // unmigrated app-page module under src/app and validate it against the
+    // empty baseline the way the scanner does.
+    const tmpDir = fs.mkdtempSync(
+      path.join(rootDir, 'apps/squareone/src/app/__theme_token_test_')
+    );
+    const tmpFile = path.join(tmpDir, 'Offending.module.css');
+    try {
+      fs.writeFileSync(
+        tmpFile,
+        '.muted {\n  color: var(--rsd-color-gray-600, #4b5563);\n}\n'
+      );
+      const result = validateModuleFile(tmpFile, []);
+      expect(result.ok).toBe(false);
+      expect(result.newViolations).toHaveLength(1);
+      expect(result.newViolations[0].value).toBe('#4b5563');
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
   });
 });

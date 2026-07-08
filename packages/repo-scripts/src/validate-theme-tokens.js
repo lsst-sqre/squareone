@@ -12,7 +12,8 @@
  * mode. DM-55433 migrated the notification modules onto adaptive tokens and then
  * the shared `DataTable`/`KeyValueList` and app-local `SentryConfigInfo`; this
  * guardrail keeps them there and extends the scan to the whole squared component
- * library and the squareone app component modules so new regressions are caught.
+ * library, the squareone app component modules, and the squareone App Router
+ * pages (`src/app`) so new regressions are caught.
  *
  * ---------------------------------------------------------------------------
  * PRINCIPLED DETECTION RULE (deliberately narrow, to stay low-noise)
@@ -105,9 +106,12 @@ const NOTIFICATION_CSS_MODULES = [
 
 // Directories whose *.module.css files are recursively scanned (relative to repo
 // root). The notification modules live under the first; broadening to the whole
-// tree here also covers the squared component library.
+// tree here also covers the squared component library and the squareone app's
+// App Router pages (`src/app`), whose page-local modules can also carry
+// dark-mode text bugs.
 const SCAN_ROOTS = [
   'apps/squareone/src/components',
+  'apps/squareone/src/app',
   'packages/squared/src/components',
 ];
 
