@@ -17,19 +17,19 @@
   caption-side: top;
   text-align: left;
   padding: 0 0 var(--sqo-space-xs) 0;
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
   font-size: 0.875rem;
 }
 
 .head {
-  border-bottom: 2px solid var(--rsd-color-gray-200);
+  border-bottom: 2px solid var(--rsd-component-divider-color);
 }
 
 .headerCell {
   /* Reset default centered, bold th rendering */
   text-align: left;
   font-weight: 600;
-  color: var(--rsd-color-gray-700);
+  color: var(--rsd-component-text-secondary-color);
   white-space: nowrap;
   padding: 0;
   vertical-align: bottom;
@@ -59,7 +59,7 @@
 }
 
 .sortButton:hover {
-  background: var(--rsd-color-gray-50);
+  background: var(--rsd-component-surface-secondary-background-color);
   color: var(--rsd-color-primary-700);
 }
 
@@ -80,17 +80,17 @@
 
 /* Inactive (sortable but not currently sorted) indicator is muted. */
 .sortIconInactive {
-  color: var(--rsd-color-gray-300);
+  color: var(--rsd-component-text-secondary-color);
 }
 
 .row {
-  border-bottom: 1px solid var(--rsd-color-gray-100);
+  border-bottom: 1px solid var(--rsd-component-divider-color);
 }
 
 /* When a detail row is present, the separator lives on the <tbody> group so
  * the primary row and its detail row read as a single unit. */
 .rowGroup {
-  border-bottom: 1px solid var(--rsd-color-gray-100);
+  border-bottom: 1px solid var(--rsd-component-divider-color);
 }
 
 /* The primary row of a detail-row pair carries no separator of its own; the
@@ -120,7 +120,7 @@
 .emptyCell {
   padding: var(--sqo-space-lg) var(--sqo-space-sm);
   text-align: center;
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
 }
 
 .footer {
