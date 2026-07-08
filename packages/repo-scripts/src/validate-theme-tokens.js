@@ -93,17 +93,6 @@ const colors = {
 // Repo root, resolved from this script's home in packages/repo-scripts/src.
 const rootDir = path.resolve(__dirname, '../../..');
 
-// Notification CSS modules originally guarded (relative to repo root). These stay
-// explicit; the rest of the scope is discovered by glob (see collectCssModules).
-const NOTIFICATION_CSS_MODULES = [
-  'apps/squareone/src/components/AdminNotifications/NotificationFilters.module.css',
-  'apps/squareone/src/components/AdminNotifications/NotificationsTableView.module.css',
-  'apps/squareone/src/components/NotificationDetailView/NotificationDetailView.module.css',
-  'apps/squareone/src/components/NotificationForm/NotificationForm.module.css',
-  'apps/squareone/src/components/UserNotifications/UserNotificationDetailView.module.css',
-  'apps/squareone/src/components/UserNotifications/UserNotificationsTableView.module.css',
-];
-
 // Directories whose *.module.css files are recursively scanned (relative to repo
 // root). The notification modules live under the first; broadening to the whole
 // tree here also covers the squared component library and the squareone app's
@@ -605,7 +594,6 @@ module.exports = {
   collectCssModules,
   scannedModules,
   loadBaseline,
-  NOTIFICATION_CSS_MODULES,
   SCAN_ROOTS,
   DARK_GRAY_MIN_WEIGHT,
 };
