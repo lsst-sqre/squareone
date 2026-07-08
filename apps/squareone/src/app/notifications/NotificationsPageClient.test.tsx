@@ -34,6 +34,20 @@ vi.mock('../../hooks/useStaticConfig', () => ({
   useStaticConfig: vi.fn(),
 }));
 
+// The "Show unread only" filter is URL-driven (via useUnreadOnlyFilter), so the
+// App Router navigation hooks must be mocked: the URL is the source of truth for
+// the filter, and toggling it pushes a new URL. `mockSearchParams` stands in for
+// the current query string; `mockPush` captures navigations.
+const mockPush = vi.fn();
+const mockPathname = '/notifications';
+let mockSearchParams = new URLSearchParams();
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: mockPush }),
+  usePathname: () => mockPathname,
+  useSearchParams: () => mockSearchParams,
+}));
+
 // Render AuthRequired as a transparent wrapper so the container's wiring can be
 // exercised without a mocked auth backend; AuthRequired's own redirect/loading
 // behavior is covered by its dedicated test.
@@ -115,6 +129,7 @@ const unreadDetail: semaphoreClient.UserNotificationFormatted = {
 describe('NotificationsPageClient', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockSearchParams = new URLSearchParams();
     vi.mocked(useStaticConfig).mockReturnValue({
       baseUrl: 'https://example.test',
     } as AppConfig);
@@ -267,7 +282,20 @@ describe('NotificationsPageClient', () => {
     expect(refetch).toHaveBeenCalled();
   });
 
-  it('refetches unread-only when the toggle is switched on', async () => {
+  it('fetches unread-only when the URL carries unread=true', () => {
+    // The URL is the source of truth for the filter, so a bookmarked
+    // `/notifications?unread=true` fetches the unread-only list.
+    mockSearchParams = new URLSearchParams({ unread: 'true' });
+
+    render(<NotificationsPageClient />);
+
+    expect(mockUseUserNotifications).toHaveBeenCalledWith(
+      'https://semaphore.example.com',
+      { unread: true, limit: PAGE_SIZE }
+    );
+  });
+
+  it('reflects the "Show unread only" toggle into the URL', async () => {
     const user = userEvent.setup();
 
     render(<NotificationsPageClient />);
@@ -276,10 +304,11 @@ describe('NotificationsPageClient', () => {
       screen.getByRole('checkbox', { name: /show unread only/i })
     );
 
-    expect(mockUseUserNotifications).toHaveBeenCalledWith(
-      'https://semaphore.example.com',
-      { unread: true, limit: PAGE_SIZE }
-    );
+    // Toggling pushes the filtered URL (without scrolling to the top); the
+    // resulting navigation is what re-drives the query in production.
+    expect(mockPush).toHaveBeenCalledWith('/notifications?unread=true', {
+      scroll: false,
+    });
   });
 
   it('expands a row to fetch its body and auto-marks an unread message read', async () => {

@@ -8,7 +8,7 @@ import {
   useUserNotification,
   useUserNotifications,
 } from '@lsst-sqre/semaphore-client';
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 
 import AuthRequired from '../../components/AuthRequired';
 import RenderedMarkdown from '../../components/RenderedMarkdown';
@@ -17,6 +17,7 @@ import { useAutoMarkNotificationRead } from '../../hooks/useAutoMarkNotification
 import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
 import { useSemaphoreUrlState } from '../../hooks/useSemaphoreUrl';
 import { useStaticConfig } from '../../hooks/useStaticConfig';
+import useUnreadOnlyFilter from '../../hooks/useUnreadOnlyFilter';
 
 /** Page size owned by the listing container, requested from the list query. */
 const PAGE_SIZE = 20;
@@ -68,7 +69,9 @@ function NotificationsContent() {
   const repertoireUrl = useRepertoireUrl();
   const { csrfToken } = useLoginInfo(repertoireUrl);
   const { baseUrl } = useStaticConfig();
-  const [showUnreadOnly, setShowUnreadOnly] = useState(false);
+  // The "Show unread only" filter is URL-driven so a filtered inbox is
+  // bookmarkable (`/notifications?unread=true`); see useUnreadOnlyFilter.
+  const { showUnreadOnly, setShowUnreadOnly } = useUnreadOnlyFilter();
 
   const {
     entries,
