@@ -485,7 +485,7 @@ export default function UserNotificationsTableView({
         {selectionEnabled && (
           <div className={styles.selectionControls}>
             <Checkbox
-              aria-label="Select all"
+              label="Select all"
               checked={headerChecked}
               onCheckedChange={handleHeaderToggle}
             />
