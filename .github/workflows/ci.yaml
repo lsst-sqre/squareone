@@ -64,6 +64,9 @@ jobs:
       - name: Validate Biome schema version
         run: node packages/repo-scripts/src/validate-biome-schema.js
 
+      - name: Validate theme tokens
+        run: node packages/repo-scripts/src/validate-theme-tokens.js
+
       - name: Check formatting with Biome
         run: pnpm run biome:format:check
 
