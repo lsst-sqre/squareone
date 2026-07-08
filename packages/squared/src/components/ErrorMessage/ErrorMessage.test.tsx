@@ -13,6 +13,25 @@ describe('ErrorMessage', () => {
     expect(errorElement).toHaveAttribute('aria-atomic', 'true');
   });
 
+  it('announces assertively when role="alert" is passed', () => {
+    render(<ErrorMessage message="This is an error" role="alert" />);
+
+    const errorElement = screen.getByText('This is an error');
+    expect(errorElement).toHaveAttribute('role', 'alert');
+    expect(errorElement).toHaveAttribute('aria-live', 'assertive');
+    expect(errorElement).toHaveAttribute('aria-atomic', 'true');
+  });
+
+  it('honors an explicitly passed aria-live over the role default', () => {
+    render(
+      <ErrorMessage message="This is an error" role="alert" aria-live="off" />
+    );
+
+    const errorElement = screen.getByText('This is an error');
+    expect(errorElement).toHaveAttribute('role', 'alert');
+    expect(errorElement).toHaveAttribute('aria-live', 'off');
+  });
+
   it('reserves space when no message is provided with reserve-space strategy', () => {
     render(<ErrorMessage id="test-error" strategy="reserve-space" />);
 
