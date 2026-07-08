@@ -17,7 +17,10 @@
 }
 
 .label {
-  color: var(--rsd-color-gray-500);
+  /* Adaptive muted-text token (re-maps under data-theme="dark"); a fixed
+     --rsd-color-gray-* scale token would be identical in both themes and
+     render near-invisible on the dark background. */
+  color: var(--rsd-component-text-secondary-color);
   font-weight: 500;
   margin: 0;
 }
