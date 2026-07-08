@@ -38,7 +38,12 @@ export default function ErrorPage({ error, reset }: ErrorProps) {
         }}
       >
         <h1>Something went wrong</h1>
-        <p style={{ color: 'var(--sqo-text-muted)', marginBottom: '1.5rem' }}>
+        <p
+          style={{
+            color: 'var(--rsd-component-text-secondary-color)',
+            marginBottom: '1.5rem',
+          }}
+        >
           An error occurred while loading this page. Our team has been notified.
         </p>
         <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
