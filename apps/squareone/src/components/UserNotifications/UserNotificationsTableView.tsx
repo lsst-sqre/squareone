@@ -482,7 +482,10 @@ export default function UserNotificationsTableView({
   return (
     <div className={styles.container}>
       <div className={styles.toolbar}>
-        {selectionEnabled && (
+        {/* Hide the selection controls when there is nothing to select — an
+         * empty inbox, or the unread-only view with no unread messages — so the
+         * toolbar never offers a "Select all" over an empty list. */}
+        {selectionEnabled && shownCount > 0 && (
           <div className={styles.selectionControls}>
             <Checkbox
               label="Select all"

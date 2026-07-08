@@ -109,6 +109,35 @@ describe('UserNotificationsTableView', () => {
     ).toBeInTheDocument();
   });
 
+  it('hides the "Select all" checkbox when the list is empty', () => {
+    render(
+      <UserNotificationsTableView
+        notifications={[]}
+        totalCount={0}
+        onMarkRead={vi.fn()}
+      />
+    );
+
+    expect(
+      screen.queryByRole('checkbox', { name: /select all/i })
+    ).not.toBeInTheDocument();
+  });
+
+  it('hides the "Select all" checkbox when unread-only has no unread messages', () => {
+    render(
+      <UserNotificationsTableView
+        notifications={[]}
+        totalCount={0}
+        showUnreadOnly
+        onMarkRead={vi.fn()}
+      />
+    );
+
+    expect(
+      screen.queryByRole('checkbox', { name: /select all/i })
+    ).not.toBeInTheDocument();
+  });
+
   it('shows a shown-of-total count', () => {
     render(
       <UserNotificationsTableView
