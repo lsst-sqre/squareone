@@ -41,15 +41,15 @@
 }
 
 .createdDate {
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
 }
 
 .muted {
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
 }
 
 .noBody {
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
   font-style: italic;
 }
 
@@ -59,7 +59,7 @@
   gap: var(--sqo-space-lg-fixed);
   margin-top: var(--sqo-space-xl-fixed);
   padding-top: var(--sqo-space-md-fixed);
-  border-top: 1px solid var(--rsd-color-gray-200);
+  border-top: 1px solid var(--rsd-component-divider-color);
 }
 
 /* Two equal slots so Previous stays left and Next stays right even when only
@@ -97,7 +97,7 @@
 
 /* Clamp long neighbor summaries to two lines so nav labels stay compact. */
 .navSummary {
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
   font-size: 0.875rem;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -106,7 +106,7 @@
 }
 
 .loadingState {
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
 }
 
 .errorState {

@@ -12,3 +12,5 @@ New tokens (authored as `themed: {light, dark}` YAML in `rubin-style-dictionary`
 - `--rsd-component-surface-secondary-background-color` — subtle surfaces such as hover/selected rows and the inline code chip (light `gray-100`, dark `gray-700`).
 
 Repoint the three dangling refs at the new secondary-text token so muted text renders adaptively in both themes instead of silently falling back to inherited body color: `--sqo-color-text-secondary` in `AdminRequired.module.css` and `AuthRequired.module.css`, and `--sqo-text-muted` in `app/error.tsx`. Dark-gray weights are the starting values; exact tuning is deferred to the dark-mode visual-QA step.
+
+Migrate the user-facing notification CSS modules (`UserNotifications/UserNotificationsTableView.module.css` and `UserNotifications/UserNotificationDetailView.module.css`) off fixed `--rsd-color-gray-*` scale tokens onto these adaptive tokens, so the `/notifications` list, expanded body, detail page, and empty/loading states are legible in dark mode.

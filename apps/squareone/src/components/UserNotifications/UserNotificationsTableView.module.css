@@ -55,7 +55,7 @@
 
 .selectedCount {
   font-size: 0.875rem;
-  color: var(--rsd-color-gray-600);
+  color: var(--rsd-component-text-secondary-color);
 }
 
 /* Keep the "Show unread only" filter pushed to the trailing edge whether or not
@@ -74,7 +74,7 @@
   gap: var(--sqo-space-xs);
   padding: var(--sqo-space-xl);
   text-align: center;
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
 }
 
 .errorState {
@@ -83,14 +83,14 @@
 
 .errorMessage {
   font-size: 0.875rem;
-  color: var(--rsd-color-gray-600);
+  color: var(--rsd-component-text-secondary-color);
 }
 
 .count {
   padding-top: var(--sqo-space-sm);
   text-align: center;
   font-size: 0.875rem;
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
 }
 
 /* The notifications list is a borderless stack of full-width rows. */
@@ -98,7 +98,7 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  border-top: 1px solid var(--rsd-color-gray-200);
+  border-top: 1px solid var(--rsd-component-divider-color);
 }
 
 /* dot · checkbox · summary · date · menu, with the expanded body flowing into a
@@ -110,11 +110,11 @@
   column-gap: var(--sqo-space-sm);
   row-gap: var(--sqo-space-sm);
   padding: var(--sqo-space-sm) var(--sqo-space-xs);
-  border-bottom: 1px solid var(--rsd-color-gray-200);
+  border-bottom: 1px solid var(--rsd-component-divider-color);
 }
 
 .row:hover {
-  background-color: var(--rsd-color-gray-100);
+  background-color: var(--rsd-component-surface-secondary-background-color);
 }
 
 /* Filled blue dot marking an unread row; purely decorative (aria-hidden). */
@@ -148,7 +148,7 @@
   border: none;
   background: none;
   text-align: left;
-  color: var(--rsd-color-gray-800);
+  color: var(--rsd-component-text-color);
   cursor: pointer;
 }
 
@@ -162,7 +162,7 @@
   align-self: center;
   width: var(--sqo-notification-expander-size);
   height: var(--sqo-notification-expander-size);
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
 }
 
 /* Collapse paragraph spacing from any leftover block markup in the summary. */
@@ -178,7 +178,7 @@
 .date {
   white-space: nowrap;
   font-size: 0.875rem;
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
 }
 
 /* Bare icon button opening the per-row "…" menu. */
@@ -190,20 +190,20 @@
   border: none;
   border-radius: var(--sqo-border-radius-1);
   background: none;
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
   cursor: pointer;
 }
 
 .menuButton:hover {
-  background-color: var(--rsd-color-gray-200);
-  color: var(--rsd-color-gray-700);
+  background-color: var(--rsd-component-surface-secondary-background-color);
+  color: var(--rsd-component-text-color);
 }
 
 /* The expanded body indents under the summary column and reads as the primary
  * text once revealed. */
 .expandedBody {
   grid-column: 3 / -1;
-  color: var(--rsd-color-gray-800);
+  color: var(--rsd-component-text-color);
 }
 
 /* Tinted banner offering to extend selection across pages (or clear it). */
@@ -216,7 +216,7 @@
   border-radius: var(--sqo-border-radius-1);
   background-color: var(--rsd-color-blue-100);
   font-size: 0.875rem;
-  color: var(--rsd-color-gray-700);
+  color: var(--rsd-component-text-color);
 }
 
 /* Underlined, link-style button inside the select-all banner. */
