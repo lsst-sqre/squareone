@@ -1,0 +1,182 @@
+{
+  "apps/squareone/src/components/AccessTokensView/AccessTokensView.module.css": [
+    {
+      "line": 10,
+      "value": "var(--rsd-color-gray-600)"
+    }
+  ],
+  "apps/squareone/src/components/ApiEndpoints/ApiEndpoints.module.css": [
+    {
+      "line": 10,
+      "value": "var(--rsd-color-gray-500)"
+    }
+  ],
+  "apps/squareone/src/components/ServiceTokenForm/ServiceTokenForm.module.css": [
+    {
+      "line": 34,
+      "value": "#4b5563"
+    }
+  ],
+  "apps/squareone/src/components/SessionTokensView/SessionTokensView.module.css": [
+    {
+      "line": 10,
+      "value": "var(--rsd-color-gray-600)"
+    }
+  ],
+  "apps/squareone/src/components/SidebarLayout/SidebarNavSection.module.css": [
+    {
+      "line": 13,
+      "value": "#6b7280"
+    }
+  ],
+  "apps/squareone/src/components/TokenDetails/TokenDetailsView.module.css": [
+    {
+      "line": 45,
+      "value": "var(--rsd-color-gray-500)"
+    }
+  ],
+  "apps/squareone/src/components/TokenHistory/TokenHistoryDetails.module.css": [
+    {
+      "line": 32,
+      "value": "var(--rsd-color-gray-500)"
+    },
+    {
+      "line": 86,
+      "value": "var(--rsd-color-gray-400)"
+    },
+    {
+      "line": 97,
+      "value": "var(--rsd-color-gray-500)"
+    }
+  ],
+  "apps/squareone/src/components/TokenHistory/TokenHistoryFilters.module.css": [
+    {
+      "line": 29,
+      "value": "var(--rsd-color-gray-500)"
+    }
+  ],
+  "apps/squareone/src/components/TokenHistory/TokenHistorySummary.module.css": [
+    {
+      "line": 35,
+      "value": "var(--rsd-color-gray-500)"
+    },
+    {
+      "line": 44,
+      "value": "var(--rsd-color-gray-500)"
+    },
+    {
+      "line": 61,
+      "value": "var(--rsd-color-gray-500)"
+    }
+  ],
+  "apps/squareone/src/components/TokenHistory/TokenHistoryView.module.css": [
+    {
+      "line": 17,
+      "value": "var(--rsd-color-gray-500)"
+    },
+    {
+      "line": 27,
+      "value": "var(--rsd-color-gray-600)"
+    },
+    {
+      "line": 54,
+      "value": "var(--rsd-color-gray-500)"
+    }
+  ],
+  "packages/squared/src/components/Button/Button.module.css": [
+    {
+      "line": 206,
+      "value": "var(--rsd-color-gray-800)"
+    }
+  ],
+  "packages/squared/src/components/Checkbox/Checkbox.module.css": [
+    {
+      "line": 187,
+      "value": "var(--rsd-color-gray-500)"
+    }
+  ],
+  "packages/squared/src/components/CheckboxGroup/CheckboxGroup.module.css": [
+    {
+      "line": 26,
+      "value": "var(--rsd-color-gray-500)"
+    }
+  ],
+  "packages/squared/src/components/DateTimePicker/DateTimePicker.module.css": [
+    {
+      "line": 35,
+      "value": "var(--rsd-color-gray-500)"
+    },
+    {
+      "line": 242,
+      "value": "var(--rsd-color-gray-600)"
+    },
+    {
+      "line": 279,
+      "value": "var(--rsd-color-gray-500)"
+    },
+    {
+      "line": 354,
+      "value": "var(--rsd-color-gray-400)"
+    }
+  ],
+  "packages/squared/src/components/DateTimePicker/TimeInput.module.css": [
+    {
+      "line": 124,
+      "value": "var(--rsd-color-gray-500)"
+    }
+  ],
+  "packages/squared/src/components/DropdownMenu/DropdownMenu.module.css": [
+    {
+      "line": 51,
+      "value": "var(--rsd-color-gray-500)"
+    },
+    {
+      "line": 154,
+      "value": "var(--rsd-color-gray-500)"
+    }
+  ],
+  "packages/squared/src/components/FormField/FormField.module.css": [
+    {
+      "line": 9,
+      "value": "var(--rsd-color-gray-500)"
+    }
+  ],
+  "packages/squared/src/components/Label/Label.module.css": [
+    {
+      "line": 44,
+      "value": "var(--rsd-color-gray-500)"
+    }
+  ],
+  "packages/squared/src/components/RadioGroup/RadioGroup.module.css": [
+    {
+      "line": 181,
+      "value": "var(--rsd-color-gray-500)"
+    }
+  ],
+  "packages/squared/src/components/Select/Select.module.css": [
+    {
+      "line": 86,
+      "value": "var(--rsd-color-gray-500)"
+    },
+    {
+      "line": 112,
+      "value": "var(--rsd-color-gray-500)"
+    }
+  ],
+  "packages/squared/src/components/TextArea/TextArea.module.css": [
+    {
+      "line": 62,
+      "value": "var(--rsd-color-gray-500)"
+    }
+  ],
+  "packages/squared/src/components/TextInput/TextInput.module.css": [
+    {
+      "line": 46,
+      "value": "var(--rsd-color-gray-500)"
+    },
+    {
+      "line": 104,
+      "value": "var(--rsd-color-gray-500)"
+    }
+  ]
+}
