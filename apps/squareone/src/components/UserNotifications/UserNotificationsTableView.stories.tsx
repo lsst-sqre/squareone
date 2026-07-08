@@ -328,3 +328,28 @@ export const ErrorState: Story = {
     await expect(args.onRetry).toHaveBeenCalled();
   },
 };
+
+/**
+ * The loaded list under the dark toolbar theme, so the migration to adaptive
+ * `--rsd-component-*` tokens is visually verifiable in dark mode and can't
+ * silently rot. Pins the `withThemeByDataAttribute` global to `dark` so the
+ * toolbar renders the story with `data-theme="dark"` (toggle the toolbar theme
+ * to compare against the light stories above).
+ */
+export const Dark: Story = {
+  args: {
+    notifications: mockUserNotifications,
+    totalCount: mockUserNotifications.length,
+    onShowUnreadOnlyChange: fn(),
+  },
+  globals: {
+    theme: 'dark',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await expect(
+      canvas.getByText(/showing 6 of 6 notifications/i)
+    ).toBeInTheDocument();
+  },
+};

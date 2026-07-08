@@ -106,3 +106,22 @@ export const SubmitError: Story = {
     await expect(canvas.getByLabelText(/recipient/i)).toHaveValue('rachel');
   },
 };
+
+/**
+ * The compose form under the dark toolbar theme, so the migration to adaptive
+ * `--rsd-component-*` tokens (labels, help text, dividers) is visually
+ * verifiable in dark mode and can't silently rot. Pins the
+ * `withThemeByDataAttribute` global to `dark` so the toolbar renders the story
+ * with `data-theme="dark"` (toggle the toolbar theme to compare against the
+ * light stories above).
+ */
+export const Dark: Story = {
+  globals: {
+    theme: 'dark',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await expect(canvas.getByLabelText(/recipient/i)).toBeEnabled();
+  },
+};
