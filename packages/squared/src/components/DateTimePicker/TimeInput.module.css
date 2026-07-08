@@ -24,7 +24,7 @@
 .spinboxContainer {
   display: flex;
   align-items: stretch;
-  border: 1px solid var(--rsd-color-gray-100);
+  border: 1px solid var(--rsd-component-divider-color);
   border-radius: var(--sqo-border-radius-1);
   overflow: hidden;
   transition: var(--sqo-transition-basic);
@@ -63,7 +63,7 @@
 }
 
 .spinboxInput:disabled {
-  background-color: var(--rsd-color-gray-50);
+  background-color: var(--rsd-component-surface-secondary-background-color);
   cursor: not-allowed;
 }
 
@@ -82,8 +82,8 @@
   justify-content: center;
   background: var(--rsd-component-page-background-color);
   border: none;
-  border-left: 1px solid var(--rsd-color-gray-100);
-  color: var(--rsd-color-gray-500);
+  border-left: 1px solid var(--rsd-component-divider-color);
+  color: var(--rsd-component-text-secondary-color);
   cursor: pointer;
   transition: var(--sqo-transition-basic);
   padding: 0;
@@ -96,16 +96,16 @@
 
 .spinboxButton:last-child {
   border-bottom-right-radius: var(--sqo-border-radius-1);
-  border-top: 1px solid var(--rsd-color-gray-100);
+  border-top: 1px solid var(--rsd-component-divider-color);
 }
 
 .spinboxButton:hover:not(:disabled) {
-  background: var(--rsd-color-gray-50);
-  color: var(--rsd-color-gray-700);
+  background: var(--rsd-component-surface-secondary-background-color);
+  color: var(--rsd-component-text-color);
 }
 
 .spinboxButton:active:not(:disabled) {
-  background: var(--rsd-color-gray-100);
+  background: var(--rsd-component-surface-secondary-background-color);
 }
 
 .spinboxButton:focus-visible {
@@ -121,7 +121,7 @@
 
 /* Time separator */
 .timeSeparator {
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
   font-weight: 500;
   user-select: none;
   font-variant-numeric: tabular-nums;

@@ -82,29 +82,5 @@
       "line": 54,
       "value": "var(--rsd-color-gray-500)"
     }
-  ],
-  "packages/squared/src/components/DateTimePicker/DateTimePicker.module.css": [
-    {
-      "line": 35,
-      "value": "var(--rsd-color-gray-500)"
-    },
-    {
-      "line": 242,
-      "value": "var(--rsd-color-gray-600)"
-    },
-    {
-      "line": 279,
-      "value": "var(--rsd-color-gray-500)"
-    },
-    {
-      "line": 354,
-      "value": "var(--rsd-color-gray-400)"
-    }
-  ],
-  "packages/squared/src/components/DateTimePicker/TimeInput.module.css": [
-    {
-      "line": 124,
-      "value": "var(--rsd-color-gray-500)"
-    }
   ]
 }

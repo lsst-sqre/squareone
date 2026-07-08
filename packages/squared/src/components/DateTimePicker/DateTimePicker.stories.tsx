@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import DateTimePicker from './DateTimePicker';
 
 const meta: Meta<typeof DateTimePicker> = {
@@ -434,5 +435,52 @@ export const InteractiveDemo: Story = {
         </div>
       </div>
     );
+  },
+};
+
+// The DateTimePicker under the dark toolbar theme, with the calendar popover
+// opened so the DM-55433 migration of the calendar chrome onto adaptive
+// `--rsd-component-*` tokens is visually verifiable in dark mode and can't
+// silently rot. Before the migration the muted text (`.calendarButton`,
+// `.calendarNavButton`, `.calendarHeadCell`, outside days, and the time
+// `.timeSeparator`) was pinned to fixed `--rsd-color-gray-4xx/5xx/6xx` scale
+// tokens that stayed dark on the dark surface, and the hover/selected surfaces
+// and calendar/popover borders were pinned to fixed light grays — all now ride
+// `--rsd-component-text(-secondary)-color`,
+// `--rsd-component-surface-secondary-background-color`, and
+// `--rsd-component-divider-color`, which re-map under `data-theme="dark"`. Pins
+// the `withThemeByDataAttribute` global to `dark` (toggle the toolbar theme to
+// compare against the light stories above). The `play` opens the popover so the
+// head cells, day cells (including the selected day and adjacent outside days),
+// hover states, and the time inputs render in dark mode.
+export const Dark: Story = {
+  globals: {
+    theme: 'dark',
+  },
+  render: (args: React.ComponentProps<typeof DateTimePicker>) => (
+    <ControlledDateTimePicker {...args} />
+  ),
+  args: {
+    defaultValue: '2024-03-15T14:30:00Z',
+    defaultTimezone: 'UTC',
+    placeholder: 'Select date and time',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // Open the calendar popover so the calendar chrome renders in dark mode.
+    const calendarButton = canvas.getByLabelText('Open calendar');
+    await userEvent.click(calendarButton);
+
+    // The calendar grid (head cells, day cells, selected/outside days) is
+    // visible under the dark theme.
+    await waitFor(() => {
+      expect(within(document.body).getByRole('grid')).toBeInTheDocument();
+    });
+
+    // The time inputs render alongside the calendar in dark mode.
+    expect(
+      within(document.body).getByLabelText('Select time')
+    ).toBeInTheDocument();
   },
 };
