@@ -6,7 +6,7 @@
 }
 
 .description {
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
   font-size: 0.875rem;
   line-height: 1.4;
   margin-top: var(--sqo-space-xxxs);

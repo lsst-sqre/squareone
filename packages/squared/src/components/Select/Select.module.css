@@ -83,7 +83,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
   transition: var(--sqo-transition-basic);
   flex-shrink: 0;
 }
@@ -109,7 +109,7 @@
 
 /* Placeholder styling */
 .trigger[data-placeholder] {
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
 }
 
 /* Content (dropdown) styles */
@@ -173,13 +173,13 @@
   background: var(--rsd-component-page-background-color);
   border: none;
   cursor: pointer;
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
   transition: var(--sqo-transition-basic);
 }
 
 .scrollButton:hover {
-  background: var(--rsd-color-gray-50);
-  color: var(--rsd-color-gray-700);
+  background: var(--rsd-component-surface-secondary-background-color);
+  color: var(--rsd-component-text-color);
 }
 
 .scrollButton svg {
@@ -206,7 +206,7 @@
 }
 
 .item:hover {
-  background: var(--rsd-color-gray-50);
+  background: var(--rsd-component-surface-secondary-background-color);
 }
 
 .item:focus-visible {
@@ -258,8 +258,8 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--rsd-color-gray-500);
-  background: var(--rsd-color-gray-50);
+  color: var(--rsd-component-text-secondary-color);
+  background: var(--rsd-component-surface-secondary-background-color);
   margin: var(--sqo-space-xxxs) 0 var(--sqo-space-xxxs) 0;
   border-radius: var(--sqo-border-radius-1);
 }

@@ -543,3 +543,49 @@ export const ReactHookFormIntegration: Story = {
     // Form should submit successfully (alert will be shown in browser)
   },
 };
+
+// The select under the dark toolbar theme, so the migration of the chevron
+// `.icon` and the `[data-placeholder]` trigger text off the fixed
+// `--rsd-color-gray-500` scale token onto the adaptive
+// `--rsd-component-text-secondary-color` token (plus the group label and hover
+// surfaces) is visually verifiable in dark mode and can't silently rot — the
+// placeholder and chevron previously rendered near-invisible gray-500 on the
+// dark background. Pins the `withThemeByDataAttribute` global to `dark` so the
+// toolbar renders the story with `data-theme="dark"` (toggle the toolbar theme
+// to compare against the light stories above). Opens the menu so the muted
+// group label is also visible in dark mode.
+export const Dark: Story = {
+  globals: {
+    theme: 'dark',
+  },
+  render: () => (
+    <Select placeholder="Choose a country">
+      <Select.Group label="North America">
+        <Select.Item value="us">United States</Select.Item>
+        <Select.Item value="ca">Canada</Select.Item>
+      </Select.Group>
+      <Select.Separator />
+      <Select.Group label="Europe">
+        <Select.Item value="uk">United Kingdom</Select.Item>
+        <Select.Item value="fr">France</Select.Item>
+      </Select.Group>
+    </Select>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('combobox');
+
+    // The placeholder text renders (it maps to an adaptive, legible token in
+    // both themes rather than the old near-invisible fixed gray-500).
+    expect(trigger).toHaveTextContent('Choose a country');
+
+    // Open the menu so the muted group labels are visible in dark mode.
+    await userEvent.click(trigger);
+    await waitFor(() => {
+      expect(
+        within(document.body).getByText('North America')
+      ).toBeInTheDocument();
+    });
+    expect(within(document.body).getByText('Europe')).toBeInTheDocument();
+  },
+};

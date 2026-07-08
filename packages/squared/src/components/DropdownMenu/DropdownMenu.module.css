@@ -48,7 +48,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
   transition: var(--sqo-transition-basic);
   flex-shrink: 0;
 }
@@ -151,7 +151,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
 }
 
 /* Separator styles */

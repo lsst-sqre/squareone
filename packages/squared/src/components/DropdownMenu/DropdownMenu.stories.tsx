@@ -241,3 +241,39 @@ export const CustomTrigger: Story = {
     });
   },
 };
+
+// The menu under the dark toolbar theme, so the migration of the trigger
+// chevron `.triggerIcon` and the group `.label` off the fixed
+// `--rsd-color-gray-500` scale token onto the adaptive
+// `--rsd-component-text-secondary-color` token is visually verifiable in dark
+// mode and can't silently rot — the chevron and label previously rendered
+// near-invisible gray-500 on the dark background. Pins the
+// `withThemeByDataAttribute` global to `dark` so the toolbar renders the story
+// with `data-theme="dark"` (toggle the toolbar theme to compare against the
+// light stories above). Opens the menu so the muted group label is visible.
+export const Dark: Story = {
+  globals: {
+    theme: 'dark',
+  },
+  render: () => (
+    <DropdownMenu>
+      <DropdownMenu.Trigger>Bulk actions</DropdownMenu.Trigger>
+      <DropdownMenu.Content>
+        <DropdownMenu.Label>2 selected</DropdownMenu.Label>
+        <DropdownMenu.Separator />
+        <DropdownMenu.Item>Mark read</DropdownMenu.Item>
+        <DropdownMenu.Item>Mark all read</DropdownMenu.Item>
+      </DropdownMenu.Content>
+    </DropdownMenu>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('button', { name: 'Bulk actions' }));
+
+    // The muted group label renders (it maps to an adaptive, legible token in
+    // both themes rather than the old near-invisible fixed gray-500).
+    await waitFor(() => {
+      expect(within(document.body).getByText('2 selected')).toBeInTheDocument();
+    });
+  },
+};

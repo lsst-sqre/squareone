@@ -669,3 +669,31 @@ export const ReactHookFormIntegration: Story = {
     );
   },
 };
+
+// The textarea under the dark toolbar theme, so the migration of the
+// `::placeholder` text off the fixed `--rsd-color-gray-500` scale token onto
+// the adaptive `--rsd-component-text-secondary-color` token is visually
+// verifiable in dark mode and can't silently rot — the placeholder previously
+// rendered near-invisible gray-500 on the dark background. Pins the
+// `withThemeByDataAttribute` global to `dark` so the toolbar renders the story
+// with `data-theme="dark"` (toggle the toolbar theme to compare against the
+// light stories above).
+export const Dark: Story = {
+  globals: {
+    theme: 'dark',
+  },
+  args: {
+    placeholder: 'Enter your message...',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const textarea = canvas.getByRole('textbox');
+
+    // The placeholder renders (it maps to an adaptive, legible token in both
+    // themes rather than the old near-invisible fixed gray-500).
+    await expect(textarea).toHaveAttribute(
+      'placeholder',
+      'Enter your message...'
+    );
+  },
+};

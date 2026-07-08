@@ -59,7 +59,7 @@
 }
 
 .textarea::placeholder {
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
   opacity: 1;
 }
 
