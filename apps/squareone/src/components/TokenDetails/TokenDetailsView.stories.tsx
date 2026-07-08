@@ -240,7 +240,7 @@ function TokenDetailsViewWrapper({
       {/* Change History Section */}
       <div className={styles.historySection}>
         <h2>Change History</h2>
-        <p style={{ color: 'var(--rsd-color-gray-500)' }}>
+        <p style={{ color: 'var(--rsd-component-text-secondary-color)' }}>
           Token history view would appear here (mocked for Storybook)
         </p>
       </div>
@@ -314,5 +314,23 @@ export const NetworkError = {
       error={new Error('Network error')}
       tokenKey="error123456789012345"
     />
+  ),
+};
+
+/**
+ * The details view under the dark toolbar theme, so the migration of the muted
+ * `.metadataLabel` text and the `.tokenKey` chip (foreground and background
+ * migrated together onto adaptive `--rsd-component-*` tokens) is visually
+ * verifiable in dark mode and can't silently rot. Pins the
+ * `withThemeByDataAttribute` global to `dark` so the story renders with
+ * `data-theme="dark"` (toggle the toolbar theme to compare against the light
+ * stories above).
+ */
+export const Dark = {
+  globals: {
+    theme: 'dark',
+  },
+  render: () => (
+    <TokenDetailsViewWrapper token={mockToken} tokenKey={mockToken.token} />
   ),
 };

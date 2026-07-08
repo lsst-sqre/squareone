@@ -7,6 +7,6 @@
 
 .notice {
   margin: var(--sqo-space-md) 0;
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
   font-style: italic;
 }

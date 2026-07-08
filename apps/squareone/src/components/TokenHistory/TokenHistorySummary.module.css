@@ -32,7 +32,7 @@
 
 .time {
   flex-shrink: 0;
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
 }
 
 .action {
@@ -41,7 +41,7 @@
 
 .actor {
   flex-shrink: 0;
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
 }
 
 /* Color-coded by action type */
@@ -58,7 +58,7 @@
 }
 
 .summary.expire .icon {
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
 }
 
 /* Dark theme overrides */

@@ -31,7 +31,7 @@
 
 .advancedHint {
   margin: 0;
-  color: var(--rsd-color-gray-600, #4b5563);
+  color: var(--rsd-component-text-secondary-color);
 }
 
 .actions {

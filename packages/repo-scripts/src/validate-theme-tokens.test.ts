@@ -1,10 +1,15 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import {
   darkThemeColorSelectors,
   findThemeTokenViolations,
   isDarkHex,
+  loadBaseline,
   partitionByBaseline,
+  scannedModules,
+  validateModuleFile,
 } from './validate-theme-tokens.js';
 
 describe('findThemeTokenViolations — principled dark-text rule', () => {
@@ -276,5 +281,37 @@ describe('partitionByBaseline — baseline behavior', () => {
     const { newViolations } = partitionByBaseline(violations, baseline);
     expect(newViolations).toHaveLength(1);
     expect(newViolations[0].line).toBe(30);
+  });
+
+  it('reports every violation as new when the baseline entries are empty', () => {
+    // With the migration complete the baseline is `{}`, so each module is
+    // validated against an empty entry list. Any residual dark text must surface
+    // as a new violation rather than being silently tolerated.
+    const violations = [{ line: 10, value: 'var(--rsd-color-gray-500)' }];
+    const { newViolations, matchedBaseline } = partitionByBaseline(
+      violations,
+      []
+    );
+    expect(newViolations).toEqual(violations);
+    expect(matchedBaseline).toEqual([]);
+  });
+});
+
+describe('empty baseline — the fully-migrated end state', () => {
+  it('ships an empty baseline (all batches migrated)', () => {
+    // Once every scanned module is on adaptive tokens the baseline is `{}`; a
+    // non-empty baseline here means an un-migrated module slipped back in.
+    expect(loadBaseline()).toEqual({});
+  });
+
+  it('every scanned module passes against the empty baseline', () => {
+    // The guardrail is now fully enforcing: with no tolerated entries, no
+    // in-scope CSS module may carry a fixed dark-color text declaration.
+    const rootDir = path.resolve(__dirname, '../../..');
+    const offenders = scannedModules().filter((relPath) => {
+      const result = validateModuleFile(path.join(rootDir, relPath), []);
+      return !result.ok;
+    });
+    expect(offenders).toEqual([]);
   });
 });

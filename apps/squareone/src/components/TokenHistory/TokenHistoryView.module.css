@@ -14,7 +14,7 @@
   justify-content: center;
   padding: var(--sqo-space-xl);
   text-align: center;
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
 }
 
 .errorState {
@@ -24,7 +24,7 @@
 .errorMessage {
   margin-top: var(--sqo-space-xs);
   font-size: 0.875rem;
-  color: var(--rsd-color-gray-600);
+  color: var(--rsd-component-text-secondary-color);
 }
 
 .retryButton {
@@ -51,5 +51,5 @@
   padding: var(--sqo-space-sm);
   text-align: center;
   font-size: 0.875rem;
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
 }
