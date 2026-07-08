@@ -1,5 +1,6 @@
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useCallback } from 'react';
+import usePushQueryParams from './usePushQueryParams';
 
 /** Query-string key mirroring the "Show unread only" filter. */
 const UNREAD_PARAM = 'unread';
@@ -31,26 +32,25 @@ type UseUnreadOnlyFilterReturn = {
  * @returns The current `showUnreadOnly` flag and a `setShowUnreadOnly` updater.
  */
 export default function useUnreadOnlyFilter(): UseUnreadOnlyFilterReturn {
-  const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
+  const pushQueryParams = usePushQueryParams();
 
   const showUnreadOnly = searchParams.get(UNREAD_PARAM) === 'true';
 
   const setShowUnreadOnly = useCallback(
     (value: boolean) => {
-      const params = new URLSearchParams(searchParams.toString());
-      if (value) {
-        params.set(UNREAD_PARAM, 'true');
-      } else {
-        params.delete(UNREAD_PARAM);
-      }
-      const queryString = params.toString();
-      router.push(queryString ? `${pathname}?${queryString}` : pathname, {
-        scroll: false,
-      });
+      pushQueryParams(
+        (params) => {
+          if (value) {
+            params.set(UNREAD_PARAM, 'true');
+          } else {
+            params.delete(UNREAD_PARAM);
+          }
+        },
+        { scroll: false }
+      );
     },
-    [router, pathname, searchParams]
+    [pushQueryParams]
   );
 
   return { showUnreadOnly, setShowUnreadOnly };
