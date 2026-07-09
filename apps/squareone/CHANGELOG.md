@@ -1,5 +1,24 @@
 # squareone
 
+## 0.36.0
+
+### Minor Changes
+
+- [#535](https://github.com/lsst-sqre/squareone/pull/535) [`3619e18`](https://github.com/lsst-sqre/squareone/commit/3619e18704ca8acb929b096738b40bc866caeb5f) Thanks [@jonathansick](https://github.com/jonathansick)! - Org, repo, and directory rows in the Times Square sidebar now show a kebab (⋯) button on hover and keyboard focus that opens a menu with a "Focus on this organization/repository/directory" action. The action links to the current page with `ts_nav_focus` set to that node's path, switching the sidebar to the rooted-subtree focus view; container rows inside a focused view offer the same menu to focus deeper. The menu is fully keyboard operable (the kebab stays in the tab order while visually hidden, and Escape closes the menu and restores focus). The PR-preview tree shows no kebab or focus UI.
+
+- [#535](https://github.com/lsst-sqre/squareone/pull/535) [`aecae20`](https://github.com/lsst-sqre/squareone/commit/aecae204809dcce149a351f501681eabc21db5b5) Thanks [@jonathansick](https://github.com/jonathansick)! - The Times Square sidebar navigation tree is now collapsible: every org, repo, and directory row's chevron is a rotating disclosure button (WAI-ARIA disclosure pattern with `aria-expanded`/`aria-controls`), and a "Tree actions" kebab (⋯) menu in the tree header offers "Expand all" and "Collapse all" actions, each disabled when it would have no effect on the visible tree. Expansion state is owned by a new `useTreeExpansion` hook, keyed by node path and persisted in `sessionStorage` for the browser session, defaulting to all-expanded; the ancestor chain of the currently viewed notebook is always forced open (auto-reveal), even after collapse-all. Also fixes the current-page highlighting to use path-segment-aware matching so sibling paths sharing a string prefix (e.g. `weather` and `weather-archive`) are no longer both highlighted, and current page links now carry `aria-current="page"`.
+
+- [#535](https://github.com/lsst-sqre/squareone/pull/535) [`9bfcffb`](https://github.com/lsst-sqre/squareone/commit/9bfcffb98bf59ec01f48f24e0d61a93773652a38) Thanks [@jonathansick](https://github.com/jonathansick)! - The Times Square sidebar now supports a linkable focus mode driven by a `ts_nav_focus=<node path>` query parameter. When set, the focused org, repo, or directory renders as the root of the tree beneath a breadcrumb of its ancestors: each ancestor crumb refocuses up to that node (the focused node's own tree row serves as the final crumb) and a clear (✕) control removes focus and restores the full tree. Sidebar page links propagate the parameter so focus survives navigating between notebooks, making focused URLs shareable and reproducible. A stale or invalid focus path resolves to the nearest existing ancestor in the tree (full tree if nothing matches). `ts_nav_focus` joins the reserved `ts_` namespace — it (and any other `ts_`-prefixed parameter) is excluded from notebook parameters. Focus mode applies to the main tree only; the PR-preview tree ignores the parameter.
+
+### Patch Changes
+
+- [#535](https://github.com/lsst-sqre/squareone/pull/535) [`1ae3d25`](https://github.com/lsst-sqre/squareone/commit/1ae3d25b10b242940e90b2db0ac81aabc0b22478) Thanks [@jonathansick](https://github.com/jonathansick)! - The Times Square sidebar navigation tree now shows a distinct Lucide icon for each node type: GitHub organizations (Building2), repositories (Book), directories (Folder), and notebook pages (FileText). Previously owner, repo, and directory rows rendered identically with only a chevron, and pages used a generic file icon.
+
+- [#535](https://github.com/lsst-sqre/squareone/pull/535) [`0ebcf3b`](https://github.com/lsst-sqre/squareone/commit/0ebcf3b6925c5e1863be8f8b0c7d7f8406a84f16) Thanks [@jonathansick](https://github.com/jonathansick)! - Add `normalizeGitHubContents()`, a client-side normalization pass that recursively merges duplicate sibling `directory` nodes (concatenating their contents in order) in the GitHub contents tree. The pass is applied when parsing both the `/github` and `/github-pr/...` responses, keeping the sidebar correct against Times Square deployments that predate the server-side fix (lsst-sqre/times-square#140); it is idempotent against fixed servers. New mock fixtures (`mockGitHubContentsNested`, `mockGitHubContentsDuplicateDirectories`) cover multi-segment nested directories and the duplicate-directory bug shape, and the squareone dev API route for `/times-square/api/v1/github` now serves the buggy shape so the normalizer is exercised in development.
+
+- Updated dependencies [[`0ebcf3b`](https://github.com/lsst-sqre/squareone/commit/0ebcf3b6925c5e1863be8f8b0c7d7f8406a84f16)]:
+  - @lsst-sqre/times-square-client@2.1.0
+
 ## 0.35.1
 
 ### Patch Changes
