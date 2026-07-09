@@ -16,8 +16,10 @@ function renderTreeExpansion({
 }: {
   currentPath?: string | null;
 } = {}) {
-  return renderHook(() =>
-    useTreeExpansion({ allPaths, currentPath, storageKey })
+  return renderHook(
+    ({ currentPath: path }) =>
+      useTreeExpansion({ allPaths, currentPath: path, storageKey }),
+    { initialProps: { currentPath } }
   );
 }
 
@@ -115,6 +117,53 @@ describe('useTreeExpansion', () => {
     expect(
       result.current.isExpanded('lsst-sqre/times-square-demo/analysis')
     ).toBe(false);
+  });
+
+  it('collapses an ancestor of the current page immediately when toggled', () => {
+    const { result } = renderTreeExpansion({
+      currentPath: 'lsst-sqre/times-square-demo/weather/summit-weather',
+    });
+    // The ancestor is auto-revealed on mount.
+    expect(result.current.isExpanded('lsst-sqre/times-square-demo')).toBe(true);
+
+    act(() => {
+      result.current.toggle('lsst-sqre/times-square-demo');
+    });
+
+    // Toggling an auto-revealed ancestor has an immediately visible effect,
+    // rather than being masked at read time.
+    expect(result.current.isExpanded('lsst-sqre/times-square-demo')).toBe(
+      false
+    );
+    expect(
+      JSON.parse(window.sessionStorage.getItem(storageKey) ?? '[]')
+    ).toContain('lsst-sqre/times-square-demo');
+  });
+
+  it('reveals previously collapsed ancestors when navigating into them', () => {
+    // A prior visit collapsed a container and persisted it.
+    window.sessionStorage.setItem(
+      storageKey,
+      JSON.stringify(['lsst-sqre/times-square-demo'])
+    );
+
+    const { result, rerender } = renderTreeExpansion({ currentPath: null });
+    expect(result.current.isExpanded('lsst-sqre/times-square-demo')).toBe(
+      false
+    );
+
+    // Navigate to a page whose ancestor chain includes the collapsed node.
+    act(() => {
+      rerender({
+        currentPath: 'lsst-sqre/times-square-demo/weather/summit-weather',
+      });
+    });
+
+    // The ancestor is revealed and pruned from the persisted collapsed set.
+    expect(result.current.isExpanded('lsst-sqre/times-square-demo')).toBe(true);
+    expect(
+      JSON.parse(window.sessionStorage.getItem(storageKey) ?? '[]')
+    ).not.toContain('lsst-sqre/times-square-demo');
   });
 
   it('does not reveal a sibling path sharing a string prefix with an ancestor', () => {

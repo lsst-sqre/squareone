@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 /**
  * Parameters for {@link useTreeExpansion}.
@@ -77,11 +77,42 @@ export function getAncestorPaths(path: string): Set<string> {
 }
 
 /**
+ * Remove every element of `remove` from `source`, returning `source`
+ * unchanged (same reference) when nothing would change.
+ *
+ * Preserving the reference lets callers of `setState` bail out of a re-render
+ * when the pruning is a no-op.
+ */
+function pruneSet(
+  source: ReadonlySet<string>,
+  remove: ReadonlySet<string>
+): ReadonlySet<string> {
+  let next: Set<string> | null = null;
+  for (const path of remove) {
+    if (source.has(path)) {
+      if (next === null) {
+        next = new Set(source);
+      }
+      next.delete(path);
+    }
+  }
+  return next ?? source;
+}
+
+/**
  * Own the expansion state of a path-keyed navigation tree.
  *
  * State is stored as the set of *collapsed* paths so the default (empty set)
  * is all-expanded — matching the sidebar's historical behavior and keeping
- * newly appearing nodes expanded.
+ * newly appearing nodes expanded. `isExpanded` reads directly from this set
+ * (its single source of truth), so `toggle` always has an immediately
+ * visible effect.
+ *
+ * Auto-reveal is modeled as a state transition rather than a read-time mask:
+ * whenever `currentPath` changes (including on mount/hydration) its ancestor
+ * chain is pruned from the collapsed set — and thus from `sessionStorage` —
+ * forcing the current page's containers open. `collapseAll` likewise leaves
+ * that chain expanded.
  */
 export function useTreeExpansion({
   allPaths,
@@ -111,9 +142,18 @@ export function useTreeExpansion({
     [currentPath]
   );
 
+  // Reconcile auto-reveal into the collapsed set: when the current page (and
+  // therefore its ancestor chain) changes, prune those ancestors so they are
+  // expanded — and persisted as such — rather than masked at read time.
+  const revealedPathsRef = useRef(revealedPaths);
+  revealedPathsRef.current = revealedPaths;
+  useEffect(() => {
+    setCollapsedPaths((previous) => pruneSet(previous, revealedPaths));
+  }, [revealedPaths]);
+
   const isExpanded = useCallback(
-    (path: string) => revealedPaths.has(path) || !collapsedPaths.has(path),
-    [collapsedPaths, revealedPaths]
+    (path: string) => !collapsedPaths.has(path),
+    [collapsedPaths]
   );
 
   const toggle = useCallback((path: string) => {
@@ -129,7 +169,9 @@ export function useTreeExpansion({
   }, []);
 
   const collapseAll = useCallback(() => {
-    setCollapsedPaths(new Set(allPaths));
+    // Collapse everything except the current page's ancestor chain, which
+    // stays expanded so the current page is never hidden.
+    setCollapsedPaths(pruneSet(new Set(allPaths), revealedPathsRef.current));
   }, [allPaths]);
 
   const expandAll = useCallback(() => {
