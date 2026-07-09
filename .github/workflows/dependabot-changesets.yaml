@@ -11,10 +11,13 @@ name: Add Changesets to Dependabot PRs
 # - This pattern is recommended by GitHub's official Dependabot documentation
 #
 # IMPORTANT: Dependabot Secrets Requirement
-# - GitHub App credentials (SQUAREONE_CI_GH_APP_ID, SQUAREONE_CI_GH_APP_PRIVATE_KEY)
-#   must be configured as DEPENDABOT SECRETS, not just GitHub Actions secrets
+# - The GitHub App private key (SQUAREONE_CI_GH_APP_PRIVATE_KEY) must be
+#   configured as a DEPENDABOT SECRET, not just a GitHub Actions secret
 # - GitHub isolates Dependabot workflows for security - only Dependabot secrets
 #   are accessible when Dependabot triggers pull_request events
+# - The app's client ID (SQUAREONE_CI_GH_APP_CLIENT_ID) is a non-secret
+#   repository variable; Dependabot's secret isolation does not apply to
+#   variables, so it resolves normally in this context
 # - See docs/dev/github-actions-architecture.rst for configuration instructions
 
 permissions:
@@ -35,7 +38,7 @@ jobs:
         id: generate_token
         uses: actions/create-github-app-token@v3
         with:
-          app-id: ${{ secrets.SQUAREONE_CI_GH_APP_ID }}
+          client-id: ${{ vars.SQUAREONE_CI_GH_APP_CLIENT_ID }}
           private-key: ${{ secrets.SQUAREONE_CI_GH_APP_PRIVATE_KEY }}
 
       - name: Get GitHub App User ID
