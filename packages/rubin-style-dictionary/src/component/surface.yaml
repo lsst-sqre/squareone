@@ -1,0 +1,12 @@
+component:
+  # Subtle surfaces: hover/selected rows, inline code chips
+  surface:
+    secondary:
+      background-color:
+        themed:
+          light:
+            value: '{color.gray.100.value}'
+            comment: 'Subtle surface background color'
+          dark:
+            value: '{color.gray.700.value}'
+            comment: 'Subtle surface background color in dark theme'

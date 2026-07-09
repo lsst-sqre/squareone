@@ -146,6 +146,10 @@ export const SelectAllAcrossPages: Story = {
     await userEvent.click(
       canvas.getByRole('checkbox', { name: /select all/i })
     );
+
+    // The extension prompt renders via the shared squared Note (type="info").
+    await expect(canvas.getByText('Info')).toBeInTheDocument();
+
     await userEvent.click(
       canvas.getByRole('button', { name: /select all 9 notifications/i })
     );
@@ -311,14 +315,41 @@ export const ErrorState: Story = {
   play: async ({ args, canvasElement }) => {
     const canvas = within(canvasElement);
 
-    await expect(
-      canvas.getByText(/failed to load notifications/i)
-    ).toBeInTheDocument();
+    // The load failure surfaces through the shared squared ErrorMessage
+    // (role="status") rather than a bespoke red banner.
+    await expect(canvas.getByRole('status')).toHaveTextContent(
+      /failed to load notifications/i
+    );
     await expect(
       canvas.getByText('Semaphore is unavailable')
     ).toBeInTheDocument();
 
     await userEvent.click(canvas.getByRole('button', { name: /retry/i }));
     await expect(args.onRetry).toHaveBeenCalled();
+  },
+};
+
+/**
+ * The loaded list under the dark toolbar theme, so the migration to adaptive
+ * `--rsd-component-*` tokens is visually verifiable in dark mode and can't
+ * silently rot. Pins the `withThemeByDataAttribute` global to `dark` so the
+ * toolbar renders the story with `data-theme="dark"` (toggle the toolbar theme
+ * to compare against the light stories above).
+ */
+export const Dark: Story = {
+  args: {
+    notifications: mockUserNotifications,
+    totalCount: mockUserNotifications.length,
+    onShowUnreadOnlyChange: fn(),
+  },
+  globals: {
+    theme: 'dark',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await expect(
+      canvas.getByText(/showing 6 of 6 notifications/i)
+    ).toBeInTheDocument();
   },
 };

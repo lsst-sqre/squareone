@@ -55,6 +55,22 @@ describe('UserNotificationsTableView', () => {
     expect(onRetry).toHaveBeenCalled();
   });
 
+  it('surfaces the load failure via a squared ErrorMessage', () => {
+    render(
+      <UserNotificationsTableView
+        notifications={undefined}
+        error={new Error('Boom')}
+      />
+    );
+
+    // The squared ErrorMessage renders with role="status"; asserting the
+    // failure headline lives on it confirms the bespoke red banner was swapped
+    // for the shared inline error component.
+    expect(screen.getByRole('status')).toHaveTextContent(
+      /failed to load notifications/i
+    );
+  });
+
   it('renders a relative date with an absolute UTC title and a rendered-Markdown summary', () => {
     render(
       <UserNotificationsTableView
@@ -91,6 +107,35 @@ describe('UserNotificationsTableView', () => {
     expect(
       screen.getByText(/you have no unread notifications/i)
     ).toBeInTheDocument();
+  });
+
+  it('hides the "Select all" checkbox when the list is empty', () => {
+    render(
+      <UserNotificationsTableView
+        notifications={[]}
+        totalCount={0}
+        onMarkRead={vi.fn()}
+      />
+    );
+
+    expect(
+      screen.queryByRole('checkbox', { name: /select all/i })
+    ).not.toBeInTheDocument();
+  });
+
+  it('hides the "Select all" checkbox when unread-only has no unread messages', () => {
+    render(
+      <UserNotificationsTableView
+        notifications={[]}
+        totalCount={0}
+        showUnreadOnly
+        onMarkRead={vi.fn()}
+      />
+    );
+
+    expect(
+      screen.queryByRole('checkbox', { name: /select all/i })
+    ).not.toBeInTheDocument();
   });
 
   it('shows a shown-of-total count', () => {
@@ -305,6 +350,29 @@ describe('UserNotificationsTableView', () => {
     expect(onMarkRead).not.toHaveBeenCalled();
   });
 
+  it('renders the select-all-across-pages banner as a squared info Note', async () => {
+    const user = userEvent.setup();
+    render(
+      <UserNotificationsTableView
+        notifications={mockUserNotifications}
+        totalCount={12}
+        hasMore
+        onMarkRead={vi.fn()}
+        onMarkAllMatchingRead={vi.fn()}
+      />
+    );
+
+    await user.click(screen.getByRole('checkbox', { name: /select all/i }));
+
+    // The squared Note (type="info") renders an "Info" type badge in its corner
+    // bubble; asserting it confirms the bespoke blue banner was swapped for the
+    // shared callout.
+    expect(screen.getByText('Info')).toBeInTheDocument();
+    expect(
+      screen.getByText(/all 6 on this page selected/i)
+    ).toBeInTheDocument();
+  });
+
   it('clears the selection once marking all matching read succeeds', async () => {
     const user = userEvent.setup();
     render(
@@ -364,6 +432,11 @@ describe('UserNotificationsTableView', () => {
     // …and the selection is kept so the user can retry the action.
     expect(screen.getByText(/all 12 selected/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Actions' })).toBeInTheDocument();
+
+    // The failure is surfaced through the shared squared ErrorMessage, which
+    // carries the "Failed to mark…" headline; keeping role="alert" preserves the
+    // assertive announcement the bespoke banner had.
+    expect(alert).toHaveTextContent(/failed to mark notifications as read/i);
 
     // Clearing the selection dismisses the error along with it.
     await user.click(screen.getByRole('button', { name: /clear selection/i }));

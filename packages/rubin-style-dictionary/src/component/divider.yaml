@@ -1,0 +1,11 @@
+component:
+  # Borders and dividers between content
+  divider:
+    color:
+      themed:
+        light:
+          value: '{color.gray.200.value}'
+          comment: 'Border/divider color'
+        dark:
+          value: '{color.gray.700.value}'
+          comment: 'Border/divider color in dark theme'

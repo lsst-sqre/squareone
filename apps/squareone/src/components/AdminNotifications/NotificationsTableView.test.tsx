@@ -32,6 +32,22 @@ describe('NotificationsTableView', () => {
     expect(onRetry).toHaveBeenCalled();
   });
 
+  it('surfaces the load failure via a squared ErrorMessage', () => {
+    render(
+      <NotificationsTableView
+        notifications={undefined}
+        error={new Error('Boom')}
+      />
+    );
+
+    // The squared ErrorMessage renders with role="status"; asserting the
+    // failure headline lives on it confirms the bespoke red banner was swapped
+    // for the shared inline error component.
+    expect(screen.getByRole('status')).toHaveTextContent(
+      /failed to load notifications/i
+    );
+  });
+
   it('renders recipient, sender, and a rendered Markdown summary', () => {
     render(
       <NotificationsTableView

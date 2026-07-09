@@ -42,7 +42,7 @@
 
 .metadataLabel {
   font-weight: 500;
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
   margin: 0;
 }
 
@@ -54,8 +54,8 @@
 .tokenKey {
   font-family: monospace;
   font-size: 0.875rem;
-  background-color: var(--rsd-color-gray-100);
-  color: var(--rsd-color-gray-900);
+  background-color: var(--rsd-component-surface-secondary-background-color);
+  color: var(--rsd-component-text-color);
   padding: 0.125rem 0.25rem;
   border-radius: var(--sqo-border-radius-1);
 }

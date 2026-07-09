@@ -280,3 +280,41 @@ export const MixedTokenTypes = {
     return <TokenHistoryViewWrapper entries={mixedEntries} />;
   },
 };
+
+/**
+ * The list view under the dark toolbar theme, so the migration of the muted
+ * `.time`/`.actor` summary text and the `.totalCount` footer onto adaptive
+ * `--rsd-component-*` tokens is visually verifiable in dark mode and can't
+ * silently rot. Pins the `withThemeByDataAttribute` global to `dark` so the
+ * story renders with `data-theme="dark"` (toggle the toolbar theme to compare
+ * against the light stories above). Includes the total-count footer.
+ */
+export const Dark = {
+  globals: {
+    theme: 'dark',
+  },
+  render: () => (
+    <TokenHistoryViewWrapper
+      entries={mockEntries}
+      hasMore={true}
+      totalCount={100}
+    />
+  ),
+};
+
+/**
+ * The error state under the dark toolbar theme, so the muted `.errorMessage`
+ * text (migrated to `--rsd-component-text-secondary-color`) is verifiable in
+ * dark mode alongside the semantic `.errorState` red heading.
+ */
+export const DarkError = {
+  globals: {
+    theme: 'dark',
+  },
+  render: () => (
+    <TokenHistoryViewWrapper
+      entries={[]}
+      error={{ message: 'Failed to fetch token history' } as Error}
+    />
+  ),
+};

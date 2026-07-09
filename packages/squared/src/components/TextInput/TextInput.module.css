@@ -43,7 +43,7 @@
 }
 
 .input::placeholder {
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
   opacity: 1;
 }
 
@@ -101,7 +101,7 @@
   align-items: center;
   justify-content: center;
   pointer-events: none;
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
   z-index: 1;
 }
 

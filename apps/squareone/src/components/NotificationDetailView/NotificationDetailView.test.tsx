@@ -112,6 +112,16 @@ describe('NotificationDetailView', () => {
     ).toBeInTheDocument();
   });
 
+  it('renders the error state inside a squared Note callout', () => {
+    render(<NotificationDetailView error={new Error('Network down')} />);
+
+    // The shared squared Note renders its type badge in the corner bubble; the
+    // error/not-found state uses the warning variant, so the badge reads
+    // "Warning". Asserting it confirms the bespoke error banner was swapped for
+    // the shared callout rather than a hand-rolled box.
+    expect(screen.getByText('Warning')).toBeInTheDocument();
+  });
+
   it('points the back link at a custom returnHref', () => {
     render(
       <NotificationDetailView

@@ -124,5 +124,27 @@ export const ErrorState: Story = {
     await expect(
       canvas.getByText('Network request failed')
     ).toBeInTheDocument();
+    // The error/not-found state renders via the shared squared Note callout's
+    // warning variant, so the badge reads "Warning".
+    await expect(canvas.getByText('Warning')).toBeInTheDocument();
+  },
+};
+
+// The admin detail view under the dark toolbar theme, so the migration to
+// adaptive `--rsd-component-*` tokens is visually verifiable in dark mode and
+// can't silently rot. Pins the `withThemeByDataAttribute` global to `dark` so
+// the toolbar renders the story with `data-theme="dark"` (toggle the toolbar
+// theme to compare against the light stories above).
+export const Dark: Story = {
+  args: {
+    notification: mockAdminNotification,
+  },
+  globals: {
+    theme: 'dark',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await expect(canvas.getByText('Unread')).toBeInTheDocument();
   },
 };

@@ -1,6 +1,7 @@
 import type { TokenType } from '@lsst-sqre/gafaelfawr-client';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useMemo } from 'react';
+import usePushQueryParams from './usePushQueryParams';
 
 export type TokenHistoryFilters = {
   tokenType?: TokenType;
@@ -72,6 +73,7 @@ export default function useTokenHistoryFilters(): UseTokenHistoryFiltersReturn {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const pushQueryParams = usePushQueryParams();
 
   // Parse current filters from URL search params
   const filters = useMemo<TokenHistoryFilters>(() => {
@@ -92,8 +94,6 @@ export default function useTokenHistoryFilters(): UseTokenHistoryFiltersReturn {
       key: K,
       value: TokenHistoryFilters[K]
     ) => {
-      const params = new URLSearchParams(searchParams.toString());
-
       // Map filter key to URL parameter name
       const paramName =
         key === 'tokenType'
@@ -102,21 +102,20 @@ export default function useTokenHistoryFilters(): UseTokenHistoryFiltersReturn {
             ? 'ip_address'
             : key;
 
-      if (value === undefined || value === null) {
-        // Remove parameter if value is undefined or null
-        params.delete(paramName);
-      } else if (value instanceof Date) {
-        // Serialize Date as ISO string
-        params.set(paramName, value.toISOString());
-      } else {
-        // Set as string
-        params.set(paramName, String(value));
-      }
-
-      const queryString = params.toString();
-      router.push(queryString ? `${pathname}?${queryString}` : pathname);
+      pushQueryParams((params) => {
+        if (value === undefined || value === null) {
+          // Remove parameter if value is undefined or null
+          params.delete(paramName);
+        } else if (value instanceof Date) {
+          // Serialize Date as ISO string
+          params.set(paramName, value.toISOString());
+        } else {
+          // Set as string
+          params.set(paramName, String(value));
+        }
+      });
     },
-    [router, pathname, searchParams]
+    [pushQueryParams]
   );
 
   /**
@@ -133,8 +132,12 @@ export default function useTokenHistoryFilters(): UseTokenHistoryFiltersReturn {
    * Clear all filters from the URL
    */
   const clearAllFilters = useCallback(() => {
-    router.push(pathname);
-  }, [router, pathname]);
+    pushQueryParams((params) => {
+      for (const key of Array.from(params.keys())) {
+        params.delete(key);
+      }
+    });
+  }, [pushQueryParams]);
 
   /**
    * Set IP address filter and reset all other filters

@@ -68,6 +68,34 @@ export const Enabled: Story = {
   },
 };
 
+// The config list under the dark toolbar theme, so the migration of the
+// `.label` (<dt>) color from the fixed `--rsd-color-gray-500` scale token onto
+// the adaptive `--rsd-component-text-secondary-color` token is visually
+// verifiable in dark mode and can't silently rot — the "Status",
+// "Environment", sample-rate, and "Base URL" labels previously rendered
+// near-invisible gray-500 on the dark background. Pins the
+// `withThemeByDataAttribute` global to `dark` so the toolbar renders the story
+// with `data-theme="dark"` (toggle the toolbar theme to compare against the
+// light stories above).
+export const Dark: Story = {
+  globals: {
+    theme: 'dark',
+  },
+  render: () => (
+    <ConfigProvider configPromise={Promise.resolve(enabledConfig)}>
+      <SentryConfigInfo />
+    </ConfigProvider>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // The value renders alongside its adaptive, legible <dt> label (which maps
+    // to a token that re-maps in both themes rather than the old near-invisible
+    // fixed gray-500).
+    await expect(await canvas.findByText('Enabled')).toBeInTheDocument();
+  },
+};
+
 // No DSN and no org/project: status reads "Disabled", unset sample rates show
 // "Not set", and the dashboard link is hidden.
 export const Disabled: Story = {

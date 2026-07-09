@@ -17,7 +17,7 @@
 .filterLabel {
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
 }
 
 /* Responsive layout: full width on mobile */

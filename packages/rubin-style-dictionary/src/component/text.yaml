@@ -9,6 +9,15 @@ component:
         dark:
           value: '{color.gray.100.value}'
           comment: 'Body text color in dark theme'
+    secondary:
+      color:
+        themed:
+          light:
+            value: '{color.gray.600.value}'
+            comment: 'Muted/secondary text color'
+          dark:
+            value: '{color.gray.300.value}'
+            comment: 'Muted/secondary text color in dark theme'
     reverse:
       color:
         value: '{color.gray.100.value}'

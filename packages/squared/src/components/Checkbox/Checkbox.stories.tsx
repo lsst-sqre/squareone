@@ -616,3 +616,30 @@ export const AccessibilityTest: Story = {
     expect(errorMessage).toHaveAttribute('role', 'status');
   },
 };
+
+// The checkbox under the dark toolbar theme, so the migration of the
+// `.description` text off the fixed `--rsd-color-gray-500` scale token onto the
+// adaptive `--rsd-component-text-secondary-color` token is visually verifiable
+// in dark mode and can't silently rot — the description previously rendered
+// near-invisible gray-500 on the dark background. Pins the
+// `withThemeByDataAttribute` global to `dark` so the toolbar renders the story
+// with `data-theme="dark"` (toggle the toolbar theme to compare against the
+// light stories above).
+export const Dark: Story = {
+  globals: {
+    theme: 'dark',
+  },
+  args: {
+    label: 'Marketing communications',
+    description: 'Receive updates about new features and promotions',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // The muted description renders (it maps to an adaptive, legible token in
+    // both themes rather than the old near-invisible fixed gray-500).
+    await expect(
+      canvas.getByText('Receive updates about new features and promotions')
+    ).toBeInTheDocument();
+  },
+};

@@ -313,3 +313,28 @@ export const AllActionTypes = {
     </div>
   ),
 };
+
+// The details view under the dark toolbar theme, so the migration of the muted
+// `.label`, `.oldValue`, and `.changesHeading` text onto adaptive
+// `--rsd-component-*` tokens is visually verifiable in dark mode and can't
+// silently rot. Pins the `withThemeByDataAttribute` global to `dark` so the
+// story renders with `data-theme="dark"` (toggle the toolbar theme to compare
+// against the light stories above). Uses an edit entry so both the labels and
+// the old→new change rows (which exercise `.oldValue`/`.changesHeading`) show.
+export const Dark = {
+  globals: {
+    theme: 'dark',
+  },
+  args: {
+    entry: {
+      ...baseEntry,
+      action: 'edit' as const,
+      token_name: 'Updated Token Name',
+      old_token_name: 'Original Token Name',
+      expires: 1711504645,
+      old_expires: 1710504645,
+      scopes: ['read:tap', 'write:tap', 'admin:users'],
+      old_scopes: ['read:tap', 'exec:notebook'],
+    },
+  },
+};

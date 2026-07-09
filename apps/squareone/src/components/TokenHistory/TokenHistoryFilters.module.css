@@ -26,7 +26,7 @@
 .filterLabel {
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
 }
 
 /* Constrain token input to 22 characters + padding */

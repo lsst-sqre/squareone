@@ -13,7 +13,7 @@
 
 .muted {
   margin: 0;
-  color: var(--rsd-color-gray-600, #4b5563);
+  color: var(--rsd-component-text-secondary-color);
 }
 
 .section {
@@ -38,7 +38,7 @@
 
 .personaButton {
   padding: var(--sqo-space-xxs-fixed) var(--sqo-space-sm-fixed);
-  border: 1px solid var(--rsd-color-gray-300, #d1d5db);
+  border: 1px solid var(--rsd-component-divider-color);
   border-radius: var(--sqo-border-radius-1, 4px);
   background-color: transparent;
   color: inherit;
@@ -59,8 +59,8 @@
 .customChip {
   padding: var(--sqo-space-xxs-fixed) var(--sqo-space-sm-fixed);
   border-radius: var(--sqo-border-radius-1, 4px);
-  background-color: var(--rsd-color-gray-100, #dce0e3);
-  color: var(--rsd-color-gray-600, #4b5563);
+  background-color: var(--rsd-component-surface-secondary-background-color);
+  color: var(--rsd-component-text-secondary-color);
   font-size: 0.875rem;
 }
 
@@ -85,7 +85,7 @@
 
 .input {
   padding: var(--sqo-space-xs-fixed) var(--sqo-space-sm-fixed);
-  border: 1px solid var(--rsd-color-gray-300, #d1d5db);
+  border: 1px solid var(--rsd-component-divider-color);
   border-radius: var(--sqo-border-radius-1, 4px);
   background-color: var(--rsd-component-page-background-color, #fff);
   color: inherit;
@@ -126,7 +126,7 @@
 }
 
 .scopeDescription {
-  color: var(--rsd-color-gray-600, #4b5563);
+  color: var(--rsd-component-text-secondary-color);
 }
 
 /* Apply */
@@ -156,5 +156,5 @@
 }
 
 .applied {
-  color: var(--rsd-color-green-600, #237028);
+  color: var(--rsd-color-green-600);
 }

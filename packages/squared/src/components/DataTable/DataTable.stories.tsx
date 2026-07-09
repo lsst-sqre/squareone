@@ -70,6 +70,35 @@ export const Default: Story = {
   render: () => <DataTable columns={columns} data={rows} />,
 };
 
+// The table under the dark toolbar theme, so the migration of the DataTable
+// stylesheet from fixed `--rsd-color-gray-*` scale tokens onto adaptive
+// `--rsd-component-*` tokens is visually verifiable in dark mode and can't
+// silently rot — notably the column headers, which previously rendered
+// near-black gray-700 on the dark background. Pins the `withThemeByDataAttribute`
+// global to `dark` so the toolbar renders the story with `data-theme="dark"`
+// (toggle the toolbar theme to compare against the light stories above).
+export const Dark: Story = {
+  globals: {
+    theme: 'dark',
+  },
+  render: () => <DataTable columns={columns} data={rows} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // The column headers render (they map to an adaptive, legible token in
+    // both themes rather than the old near-black fixed gray-700).
+    await expect(
+      canvas.getByRole('columnheader', { name: /Recipient/ })
+    ).toBeInTheDocument();
+    await expect(
+      canvas.getByRole('columnheader', { name: /Sender/ })
+    ).toBeInTheDocument();
+    await expect(
+      canvas.getByRole('columnheader', { name: /Created/ })
+    ).toBeInTheDocument();
+  },
+};
+
 // Cells can render arbitrary React via a column `cell` renderer.
 export const WithRenderedCells: Story = {
   name: 'With rendered cells',

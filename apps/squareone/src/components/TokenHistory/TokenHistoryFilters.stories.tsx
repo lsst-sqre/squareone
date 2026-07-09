@@ -244,3 +244,28 @@ export const WithMultipleFilters = {
     onToggleExpandAll: () => console.log('Toggle expand all clicked'),
   },
 };
+
+// The filter bar under the dark toolbar theme, so the migration of the muted
+// `.filterLabel` text onto the adaptive `--rsd-component-text-secondary-color`
+// token is visually verifiable in dark mode and can't silently rot. Pins the
+// `withThemeByDataAttribute` global to `dark` so the story renders with
+// `data-theme="dark"` (toggle the toolbar theme to compare against the light
+// stories above).
+export const Dark = {
+  globals: {
+    theme: 'dark',
+  },
+  args: {
+    filters: {
+      token: 'abc123xyz987def456ghi',
+      ipAddress: '192.168.1.1',
+      since: new Date('2025-03-01T00:00Z'),
+      until: new Date('2025-03-15T23:59Z'),
+    },
+    onFilterChange: (filters: Partial<FilterType>) =>
+      console.log('Filter changed:', filters),
+    onClearFilters: () => console.log('Clear filters clicked'),
+    expandAll: false,
+    onToggleExpandAll: () => console.log('Toggle expand all clicked'),
+  },
+};

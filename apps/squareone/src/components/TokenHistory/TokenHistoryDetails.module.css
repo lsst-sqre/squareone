@@ -29,7 +29,7 @@
  * Subtle gray color for labels
  */
 .label {
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
   font-weight: 500;
   margin: 0;
 }
@@ -83,7 +83,7 @@
  * Light gray to indicate it's the previous value
  */
 .oldValue {
-  color: var(--rsd-color-gray-400);
+  color: var(--rsd-component-text-secondary-color);
 }
 
 /**
@@ -94,7 +94,7 @@
 .changesHeading {
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
   margin: var(--sqo-space-md) 0 var(--sqo-space-xs) 0;
   text-transform: uppercase;
   letter-spacing: 0.05em;

@@ -1,5 +1,10 @@
 import type { UserNotificationWithUrl } from '@lsst-sqre/semaphore-client';
-import { Button, DataTable, type DataTableProps } from '@lsst-sqre/squared';
+import {
+  Button,
+  DataTable,
+  type DataTableProps,
+  ErrorMessage,
+} from '@lsst-sqre/squared';
 import { PlusCircle } from 'lucide-react';
 import Link from 'next/link';
 
@@ -75,7 +80,10 @@ export default function NotificationsTableView({
   } else if (error) {
     body = (
       <div className={styles.errorState}>
-        <p>Failed to load notifications</p>
+        <ErrorMessage
+          strategy="dynamic"
+          message="Failed to load notifications"
+        />
         <p className={styles.errorMessage}>{error.message}</p>
         <Button
           appearance="outline"

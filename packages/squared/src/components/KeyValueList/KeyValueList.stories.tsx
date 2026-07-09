@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, within } from 'storybook/test';
 import { Badge } from '../Badge';
 import { KeyValueList } from './KeyValueList';
 
@@ -22,6 +23,36 @@ export const Default: Story = {
       { key: 'Memory', value: '16 GB' },
       { key: 'Storage', value: '100 GB' },
     ],
+  },
+};
+
+// The list under the dark toolbar theme, so the migration of the `.term`
+// (key/label) color from the fixed `--rsd-color-gray-500` scale token onto the
+// adaptive `--rsd-component-text-secondary-color` token is visually verifiable
+// in dark mode and can't silently rot — the term labels previously rendered
+// near-invisible gray-500 on the dark background. Pins the
+// `withThemeByDataAttribute` global to `dark` so the toolbar renders the story
+// with `data-theme="dark"` (toggle the toolbar theme to compare against the
+// light stories above).
+export const Dark: Story = {
+  globals: {
+    theme: 'dark',
+  },
+  args: {
+    items: [
+      { key: 'CPU', value: '4 cores' },
+      { key: 'Memory', value: '16 GB' },
+      { key: 'Storage', value: '100 GB' },
+    ],
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // The term labels render (they map to an adaptive, legible token in both
+    // themes rather than the old near-invisible fixed gray-500).
+    await expect(canvas.getByText('CPU')).toBeInTheDocument();
+    await expect(canvas.getByText('Memory')).toBeInTheDocument();
+    await expect(canvas.getByText('Storage')).toBeInTheDocument();
   },
 };
 

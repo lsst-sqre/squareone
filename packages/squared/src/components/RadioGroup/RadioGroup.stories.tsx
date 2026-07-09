@@ -677,3 +677,45 @@ export const AccessibilityTest: Story = {
     expect(requiredIndicator).toHaveAttribute('aria-hidden', 'true');
   },
 };
+
+// The radio group under the dark toolbar theme, so the migration of the
+// `.itemDescription` text off the fixed `--rsd-color-gray-500` scale token onto
+// the adaptive `--rsd-component-text-secondary-color` token is visually
+// verifiable in dark mode and can't silently rot — the per-item descriptions
+// previously rendered near-invisible gray-500 on the dark background. Pins the
+// `withThemeByDataAttribute` global to `dark` so the toolbar renders the story
+// with `data-theme="dark"` (toggle the toolbar theme to compare against the
+// light stories above).
+export const Dark: Story = {
+  globals: {
+    theme: 'dark',
+  },
+  args: {
+    legend: 'Subscription Plan',
+    description: 'Choose the plan that best fits your needs',
+    name: 'dark-plan',
+  },
+  render: (args) => (
+    <RadioGroup {...args}>
+      <RadioGroup.Item
+        value="basic"
+        label="Basic Plan"
+        description="Perfect for individuals getting started"
+      />
+      <RadioGroup.Item
+        value="pro"
+        label="Pro Plan"
+        description="Great for small teams and growing businesses"
+      />
+    </RadioGroup>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // The muted item descriptions render (they map to an adaptive, legible
+    // token in both themes rather than the old near-invisible fixed gray-500).
+    await expect(
+      canvas.getByText('Perfect for individuals getting started')
+    ).toBeInTheDocument();
+  },
+};

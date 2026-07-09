@@ -23,7 +23,7 @@
 .description {
   display: block;
   font-weight: 400;
-  color: var(--rsd-color-gray-500);
+  color: var(--rsd-component-text-secondary-color);
   margin-top: 0.25rem;
   font-size: 0.8125rem;
   line-height: 1.3;

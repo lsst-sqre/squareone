@@ -7,7 +7,7 @@
 .loading {
   padding: var(--sqo-space-md-fixed);
   text-align: center;
-  color: var(--rsd-color-gray-600);
+  color: var(--rsd-component-text-secondary-color);
 }
 
 .error {

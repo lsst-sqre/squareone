@@ -1,6 +1,7 @@
 import type { AdminNotificationFilters } from '@lsst-sqre/semaphore-client';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useCallback, useMemo } from 'react';
+import usePushQueryParams from './usePushQueryParams';
 
 /**
  * Filter keys this hook serializes to and from the URL query string.
@@ -50,9 +51,8 @@ function parseString(value: string | null): string | undefined {
  * @returns The current `filters`, a `setFilter` updater, and `clearAllFilters`.
  */
 export default function useAdminNotificationFilters(): UseAdminNotificationFiltersReturn {
-  const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
+  const pushQueryParams = usePushQueryParams();
 
   // Parse the current filters from the URL search params. Each filter key maps
   // directly to a query parameter of the same name (matching the Semaphore
@@ -69,25 +69,26 @@ export default function useAdminNotificationFilters(): UseAdminNotificationFilte
 
   const setFilter = useCallback(
     <K extends UrlFilterKey>(key: K, value: AdminNotificationFilters[K]) => {
-      const params = new URLSearchParams(searchParams.toString());
-
-      if (value === undefined || value === null) {
-        params.delete(key);
-      } else if (value instanceof Date) {
-        params.set(key, value.toISOString());
-      } else {
-        params.set(key, String(value));
-      }
-
-      const queryString = params.toString();
-      router.push(queryString ? `${pathname}?${queryString}` : pathname);
+      pushQueryParams((params) => {
+        if (value === undefined || value === null) {
+          params.delete(key);
+        } else if (value instanceof Date) {
+          params.set(key, value.toISOString());
+        } else {
+          params.set(key, String(value));
+        }
+      });
     },
-    [router, pathname, searchParams]
+    [pushQueryParams]
   );
 
   const clearAllFilters = useCallback(() => {
-    router.push(pathname);
-  }, [router, pathname]);
+    pushQueryParams((params) => {
+      for (const key of Array.from(params.keys())) {
+        params.delete(key);
+      }
+    });
+  }, [pushQueryParams]);
 
   return { filters, setFilter, clearAllFilters };
 }

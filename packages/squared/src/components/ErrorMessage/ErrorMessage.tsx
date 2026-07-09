@@ -12,6 +12,8 @@ const ErrorMessage = ({
   message,
   strategy = 'reserve-space',
   className,
+  role,
+  'aria-live': ariaLive,
   ...props
 }: ErrorMessageProps) => {
   if (!message && strategy === 'dynamic') {
@@ -30,12 +32,20 @@ const ErrorMessage = ({
     );
   }
 
+  // Derive the live-region politeness from the role so that a caller passing
+  // role="alert" gets assertive (interrupting) announcements, while the default
+  // role="status" stays polite (queued). An explicitly passed aria-live always
+  // wins, honoring the caller's override.
+  const effectiveRole = role ?? 'status';
+  const effectiveAriaLive =
+    ariaLive ?? (effectiveRole === 'alert' ? 'assertive' : 'polite');
+
   return (
     <span
       id={id}
       className={[styles.errorMessage, className].filter(Boolean).join(' ')}
-      role="status"
-      aria-live="polite"
+      role={effectiveRole}
+      aria-live={effectiveAriaLive}
       aria-atomic="true"
       {...props}
     >
