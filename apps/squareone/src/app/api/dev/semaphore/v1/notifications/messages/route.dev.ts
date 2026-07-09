@@ -1,7 +1,7 @@
 /**
  * Mock of the Semaphore user-facing notifications list endpoint.
- * GET /semaphore/v1/notifications
- * (rewritten to /api/dev/semaphore/v1/notifications)
+ * GET /semaphore/v1/notifications/messages
+ * (rewritten to /api/dev/semaphore/v1/notifications/messages)
  *
  * Filters and cursor-paginates the in-memory dev store via the shared
  * `filterAndPaginateUserNotifications` helper, conveying the next cursor through

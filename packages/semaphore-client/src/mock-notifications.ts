@@ -185,7 +185,7 @@ export function filterAndPaginateNotifications(
 // =============================================================================
 
 const MOCK_USER_URL_BASE =
-  'https://data.example.com/semaphore/v1/notifications';
+  'https://data.example.com/semaphore/v1/notifications/messages';
 
 /**
  * A realistic set of user-facing notification summaries, ordered most-recent

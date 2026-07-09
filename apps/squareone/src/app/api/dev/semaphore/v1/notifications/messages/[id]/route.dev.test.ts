@@ -11,7 +11,7 @@ import {
 
 import { GET } from './route.dev';
 
-const BASE = 'http://localhost:3000/semaphore/v1/notifications';
+const BASE = 'http://localhost:3000/semaphore/v1/notifications/messages';
 
 beforeEach(() => {
   resetDevUserNotifications();
@@ -34,7 +34,7 @@ async function readDetail(
   return UserNotificationFormattedSchema.parse(data);
 }
 
-describe('GET /api/dev/semaphore/v1/notifications/[id]', () => {
+describe('GET /api/dev/semaphore/v1/notifications/messages/[id]', () => {
   it('returns the formatted notification with summary and body as FormattedText', async () => {
     const response = await getDetail('ntf-001');
 

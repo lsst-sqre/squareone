@@ -5,6 +5,7 @@ import {
   fetchUserNotifications,
   type UserNotificationSummary,
   useMarkNotificationsRead,
+  useMarkNotificationsUnread,
   useUserNotification,
   useUserNotifications,
 } from '@lsst-sqre/semaphore-client';
@@ -104,6 +105,23 @@ function NotificationsContent() {
     [semaphoreUrl, csrfToken, markRead]
   );
 
+  // The mirror of the mark-read mutation: the per-row "Mark as unread" on read
+  // rows and the bulk "Mark as unread" on the read members of a selection route
+  // through this one mutation, whose shared `onSuccess` invalidates the list,
+  // the unread count, and each affected detail — so the inbox and the header
+  // badge update without a manual refresh.
+  const { mutate: markUnread } = useMarkNotificationsUnread(semaphoreUrl ?? '');
+
+  const handleMarkUnread = useCallback(
+    (ids: string[]) => {
+      if (!semaphoreUrl || !csrfToken || ids.length === 0) {
+        return;
+      }
+      markUnread({ ids, csrfToken });
+    },
+    [semaphoreUrl, csrfToken, markUnread]
+  );
+
   // The two-tier "Select all M notifications" path has no standing query for the
   // full unread set, so it enumerates the unread ids on demand by walking the
   // cursor-paginated `?unread=true` list to exhaustion — Semaphore caps a single
@@ -190,6 +208,7 @@ function NotificationsContent() {
         renderExpandedBody={renderExpandedBody}
         permalinkBase={baseUrl}
         onMarkRead={handleMarkRead}
+        onMarkUnread={handleMarkUnread}
         onMarkAllMatchingRead={handleMarkAllMatchingRead}
       />
     </div>

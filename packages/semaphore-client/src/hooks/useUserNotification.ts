@@ -27,7 +27,7 @@ export type UseUserNotificationReturn = {
  * detail page can render a graceful not-found state. Fetching does not
  * auto-mark the notification read.
  *
- * @endpoint GET /v1/notifications/{id}
+ * @endpoint GET /v1/notifications/messages/{id}
  *
  * @param semaphoreUrl - Base URL of the Semaphore service. The query is
  *   disabled when empty.

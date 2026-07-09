@@ -153,7 +153,7 @@ describe('unreadNotificationCountQueryOptions', () => {
 
     expect(count).toBe(3);
     const calledUrl = new URL(mockFetch.mock.calls[0][0] as string);
-    expect(calledUrl.pathname).toBe('/semaphore/v1/notifications');
+    expect(calledUrl.pathname).toBe('/semaphore/v1/notifications/messages');
     expect(calledUrl.searchParams.get('unread')).toBe('true');
     expect(calledUrl.searchParams.get('limit')).toBe('1');
   });

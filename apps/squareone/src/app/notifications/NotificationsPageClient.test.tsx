@@ -18,6 +18,7 @@ vi.mock('@lsst-sqre/semaphore-client', async (importOriginal) => {
     useUserNotifications: vi.fn(),
     useUserNotification: vi.fn(),
     useMarkNotificationsRead: vi.fn(),
+    useMarkNotificationsUnread: vi.fn(),
     fetchUserNotifications: vi.fn(),
   };
 });
@@ -64,6 +65,9 @@ const mockUseUserNotification = vi.mocked(semaphoreClient.useUserNotification);
 const mockUseMarkNotificationsRead = vi.mocked(
   semaphoreClient.useMarkNotificationsRead
 );
+const mockUseMarkNotificationsUnread = vi.mocked(
+  semaphoreClient.useMarkNotificationsUnread
+);
 const mockFetchUserNotifications = vi.mocked(
   semaphoreClient.fetchUserNotifications
 );
@@ -81,6 +85,8 @@ const MARK_ALL_PAGE_SIZE = 100;
 
 const markReadMutate = vi.fn();
 const markReadMutateAsync = vi.fn();
+const markUnreadMutate = vi.fn();
+const markUnreadMutateAsync = vi.fn();
 
 function makeNotificationsReturn(
   overrides: Partial<semaphoreClient.UseUserNotificationsReturn> = {}
@@ -146,6 +152,13 @@ describe('NotificationsPageClient', () => {
       mutateAsync: markReadMutateAsync,
     } as unknown as ReturnType<
       typeof semaphoreClient.useMarkNotificationsRead
+    >);
+    markUnreadMutateAsync.mockResolvedValue(undefined);
+    mockUseMarkNotificationsUnread.mockReturnValue({
+      mutate: markUnreadMutate,
+      mutateAsync: markUnreadMutateAsync,
+    } as unknown as ReturnType<
+      typeof semaphoreClient.useMarkNotificationsUnread
     >);
     mockUseLoginInfo.mockReturnValue({
       csrfToken: 'csrf-token-xyz',
@@ -354,6 +367,42 @@ describe('NotificationsPageClient', () => {
       ids: ['ntf-001'],
       csrfToken: 'csrf-token-xyz',
     });
+  });
+
+  it('marks a read row unread through the mark-unread mutation', async () => {
+    const user = userEvent.setup();
+
+    render(<NotificationsPageClient />);
+
+    // ntf-002 is the first read row; its per-row menu offers "Mark as unread".
+    const menus = screen.getAllByRole('button', {
+      name: /notification actions/i,
+    });
+    await user.click(menus[1]);
+    await user.click(screen.getByRole('menuitem', { name: /mark as unread/i }));
+
+    expect(markUnreadMutate).toHaveBeenCalledWith({
+      ids: ['ntf-002'],
+      csrfToken: 'csrf-token-xyz',
+    });
+    expect(markReadMutate).not.toHaveBeenCalled();
+  });
+
+  it('does not call the mark-unread mutation without a CSRF token', async () => {
+    const user = userEvent.setup();
+    mockUseLoginInfo.mockReturnValue({
+      csrfToken: null,
+    } as unknown as ReturnType<typeof useLoginInfo>);
+
+    render(<NotificationsPageClient />);
+
+    const menus = screen.getAllByRole('button', {
+      name: /notification actions/i,
+    });
+    await user.click(menus[1]);
+    await user.click(screen.getByRole('menuitem', { name: /mark as unread/i }));
+
+    expect(markUnreadMutate).not.toHaveBeenCalled();
   });
 
   it('marks all matching read by enumerating the unread ids when selection is extended across pages', async () => {

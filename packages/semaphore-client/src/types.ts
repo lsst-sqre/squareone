@@ -42,7 +42,7 @@ export type AdminNotificationsPage = {
 /**
  * Filter options for the user-facing notifications list query.
  *
- * Mirrors the query parameters accepted by `GET /v1/notifications`, minus the
+ * Mirrors the query parameters accepted by `GET /v1/notifications/messages`, minus the
  * cursor, which is handled separately by the pagination layer.
  */
 export type UserNotificationFilters = {
@@ -53,7 +53,7 @@ export type UserNotificationFilters = {
 };
 
 /**
- * Parameters for a single page request against `GET /v1/notifications`.
+ * Parameters for a single page request against `GET /v1/notifications/messages`.
  *
  * Extends {@link UserNotificationFilters} with the opaque pagination cursor
  * returned as a previous page's `nextCursor`.

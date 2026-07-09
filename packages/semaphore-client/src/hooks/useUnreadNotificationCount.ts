@@ -39,7 +39,7 @@ export type UseUnreadNotificationCountReturn = {
  * {@link unreadNotificationCountQueryOptions}) and, when `pollIntervalSeconds`
  * is provided, polls in the background on that cadence.
  *
- * @endpoint GET /v1/notifications?unread=true&limit=1
+ * @endpoint GET /v1/notifications/messages?unread=true&limit=1
  *
  * @param semaphoreUrl - Base URL of the Semaphore service. The query is
  *   disabled when empty.

@@ -217,6 +217,67 @@ export const PerRowMenu: Story = {
 };
 
 /**
+ * Supplying `onMarkUnread` mirrors the mark-read affordances for read rows.
+ * Per-row, a read row's "…" menu offers "Mark as unread" (unread rows offer
+ * "Mark as read" instead). In the selection "Actions" dropdown, a "Mark as
+ * unread" item marks the read members of the selection unread — the mirror of
+ * "Mark as read" acting on the unread members. The container owns the mutation
+ * and the shared cache invalidation that updates the list and the header count.
+ */
+export const WithMarkUnread: Story = {
+  name: 'With mark unread',
+  args: {
+    notifications: mockUserNotifications,
+    totalCount: mockUserNotifications.length,
+    onShowUnreadOnlyChange: fn(),
+    onMarkRead: fn(),
+    onMarkUnread: fn(),
+    permalinkBase: 'https://example.test',
+  },
+  play: async ({ args, canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    const menus = canvas.getAllByRole('button', {
+      name: /notification actions/i,
+    });
+
+    // ntf-002 is read → its per-row menu offers "Mark as unread" (not read).
+    await userEvent.click(menus[1]);
+    await expect(
+      await screen.findByRole('menuitem', { name: /mark as unread/i })
+    ).toBeInTheDocument();
+    await expect(
+      screen.queryByRole('menuitem', { name: /mark as read/i })
+    ).not.toBeInTheDocument();
+    await userEvent.click(
+      screen.getByRole('menuitem', { name: /mark as unread/i })
+    );
+    await expect(args.onMarkUnread).toHaveBeenCalledWith(['ntf-002']);
+
+    // Wait for the per-row menu to fully close before opening the toolbar menu.
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('menuitem', { name: /mark as unread/i })
+      ).not.toBeInTheDocument()
+    );
+
+    // Bulk: selecting all rows and choosing "Mark as unread" from Actions marks
+    // the read members (ntf-002, ntf-005) unread.
+    await userEvent.click(
+      canvas.getByRole('checkbox', { name: /select all/i })
+    );
+    await userEvent.click(canvas.getByRole('button', { name: 'Actions' }));
+    await userEvent.click(
+      await screen.findByRole('menuitem', { name: /mark as unread/i })
+    );
+    await expect(args.onMarkUnread).toHaveBeenCalledWith([
+      'ntf-002',
+      'ntf-005',
+    ]);
+  },
+};
+
+/**
  * Toggling "Show unread only" calls back to the caller, which owns the filter
  * state and re-queries.
  */

@@ -325,7 +325,7 @@ export async function createAdminNotification(
  * are only present when `limit` is set). The request is authenticated via the
  * browser's session cookie (`credentials: 'include'`).
  *
- * @endpoint GET /v1/notifications
+ * @endpoint GET /v1/notifications/messages
  *
  * @param semaphoreUrl - Base URL of the Semaphore service
  * @param params - `unread` / `limit` filters and the pagination `cursor`
@@ -344,7 +344,7 @@ export async function fetchUserNotifications(
   if (params.cursor) search.set('cursor', params.cursor);
 
   const queryString = search.toString();
-  const url = `${baseUrl}/v1/notifications${queryString ? `?${queryString}` : ''}`;
+  const url = `${baseUrl}/v1/notifications/messages${queryString ? `?${queryString}` : ''}`;
 
   const response = await fetch(url, {
     credentials: 'include',
@@ -377,7 +377,7 @@ export async function fetchUserNotifications(
  * `body` as `FormattedText`. Fetching the detail does **not** auto-mark the
  * notification read — that is an explicit action via {@link markNotificationsRead}.
  *
- * @endpoint GET /v1/notifications/{id}
+ * @endpoint GET /v1/notifications/messages/{id}
  *
  * @param semaphoreUrl - Base URL of the Semaphore service
  * @param id - Opaque notification id
@@ -389,7 +389,7 @@ export async function fetchUserNotification(
   id: string
 ): Promise<UserNotificationFormatted> {
   const baseUrl = normalizeUrl(semaphoreUrl);
-  const url = `${baseUrl}/v1/notifications/${encodeURIComponent(id)}`;
+  const url = `${baseUrl}/v1/notifications/messages/${encodeURIComponent(id)}`;
 
   const response = await fetch(url, {
     credentials: 'include',
@@ -408,28 +408,30 @@ export async function fetchUserNotification(
 }
 
 /**
- * Mark a set of the authenticated user's notifications read.
+ * POST a set of notification ids to a user-facing read-state endpoint.
  *
- * POSTs `{ ids }` with `credentials: 'include'` and the Gafaelfawr
- * `x-csrf-token` header — the same mutation pattern used by
- * {@link createAdminNotification}. The endpoint is idempotent: already-read or
- * nonexistent ids are silently ignored and it responds with `204 No Content`,
- * so this function resolves to `void` on success.
- *
- * @endpoint POST /v1/notifications/read
+ * Shared implementation behind {@link markNotificationsRead} and
+ * {@link markNotificationsUnread}, which differ only by the `state` path
+ * segment (`read` vs `unread`). POSTs `{ ids }` with `credentials: 'include'`
+ * and the Gafaelfawr `x-csrf-token` header — the same mutation pattern used by
+ * {@link createAdminNotification}. Both endpoints are idempotent: already-in-
+ * state or nonexistent ids are silently ignored and the service responds with
+ * `204 No Content`, so this resolves to `void` on success.
  *
  * @param semaphoreUrl - Base URL of the Semaphore service
- * @param ids - The notification ids to mark read
+ * @param ids - The notification ids to update
  * @param csrfToken - CSRF token from Gafaelfawr login info
+ * @param state - The target read state (`read` or `unread`), used as the path segment
  * @throws SemaphoreError if the request fails
  */
-export async function markNotificationsRead(
+async function markNotifications(
   semaphoreUrl: string,
   ids: string[],
-  csrfToken: string
+  csrfToken: string,
+  state: 'read' | 'unread'
 ): Promise<void> {
   const baseUrl = normalizeUrl(semaphoreUrl);
-  const url = `${baseUrl}/v1/notifications/read`;
+  const url = `${baseUrl}/v1/notifications/${state}`;
 
   const response = await fetch(url, {
     method: 'POST',
@@ -447,4 +449,52 @@ export async function markNotificationsRead(
       response.status
     );
   }
+}
+
+/**
+ * Mark a set of the authenticated user's notifications read.
+ *
+ * POSTs `{ ids }` with `credentials: 'include'` and the Gafaelfawr
+ * `x-csrf-token` header — the same mutation pattern used by
+ * {@link createAdminNotification}. The endpoint is idempotent: already-read or
+ * nonexistent ids are silently ignored and it responds with `204 No Content`,
+ * so this function resolves to `void` on success.
+ *
+ * @endpoint POST /v1/notifications/read
+ *
+ * @param semaphoreUrl - Base URL of the Semaphore service
+ * @param ids - The notification ids to mark read
+ * @param csrfToken - CSRF token from Gafaelfawr login info
+ * @throws SemaphoreError if the request fails
+ */
+export function markNotificationsRead(
+  semaphoreUrl: string,
+  ids: string[],
+  csrfToken: string
+): Promise<void> {
+  return markNotifications(semaphoreUrl, ids, csrfToken, 'read');
+}
+
+/**
+ * Mark a set of the authenticated user's notifications unread.
+ *
+ * The mirror of {@link markNotificationsRead}: POSTs `{ ids }` with
+ * `credentials: 'include'` and the Gafaelfawr `x-csrf-token` header. The
+ * endpoint is idempotent — already-unread or nonexistent ids are silently
+ * ignored and it responds with `204 No Content`, so this function resolves to
+ * `void` on success.
+ *
+ * @endpoint POST /v1/notifications/unread
+ *
+ * @param semaphoreUrl - Base URL of the Semaphore service
+ * @param ids - The notification ids to mark unread
+ * @param csrfToken - CSRF token from Gafaelfawr login info
+ * @throws SemaphoreError if the request fails
+ */
+export function markNotificationsUnread(
+  semaphoreUrl: string,
+  ids: string[],
+  csrfToken: string
+): Promise<void> {
+  return markNotifications(semaphoreUrl, ids, csrfToken, 'unread');
 }

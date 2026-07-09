@@ -11,7 +11,7 @@ const n1 = {
   created: '2026-06-12T17:10:32+00:00',
   read: null,
   summary: { gfm: 'First', html: '<p>First</p>' },
-  url: 'https://example.com/semaphore/v1/notifications/n1',
+  url: 'https://example.com/semaphore/v1/notifications/messages/n1',
 };
 
 const n2 = {
@@ -19,7 +19,7 @@ const n2 = {
   created: '2026-06-11T17:10:32+00:00',
   read: null,
   summary: { gfm: 'Second', html: '<p>Second</p>' },
-  url: 'https://example.com/semaphore/v1/notifications/n2',
+  url: 'https://example.com/semaphore/v1/notifications/messages/n2',
 };
 
 function createWrapper() {
@@ -47,7 +47,7 @@ describe('useUserNotifications', () => {
       new Response(JSON.stringify([n1]), {
         status: 200,
         headers: {
-          Link: '<https://example.com/semaphore/v1/notifications?cursor=c2>; rel="next"',
+          Link: '<https://example.com/semaphore/v1/notifications/messages?cursor=c2>; rel="next"',
           'X-Total-Count': '2',
         },
       })
@@ -90,7 +90,7 @@ describe('useUserNotifications', () => {
         new Response(JSON.stringify([n1]), {
           status: 200,
           headers: {
-            Link: '<https://example.com/semaphore/v1/notifications?cursor=c2>; rel="next"',
+            Link: '<https://example.com/semaphore/v1/notifications/messages?cursor=c2>; rel="next"',
             'X-Total-Count': '2',
           },
         })

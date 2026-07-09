@@ -1,7 +1,9 @@
 // In-memory dev store for the authenticated user's own notifications.
 //
 // Backs the user-facing notification dev mocks:
-//   - GET /api/dev/semaphore/v1/notifications        (the inbox list)
+//   - GET  /api/dev/semaphore/v1/notifications/messages  (the inbox list)
+//   - POST /api/dev/semaphore/v1/notifications/read      (mark read)
+//   - POST /api/dev/semaphore/v1/notifications/unread    (mark unread)
 // and therefore the header unread badge, which the semaphore-client
 // `useUnreadNotificationCount` hook derives from that list endpoint's
 // `X-Total-Count` for an `?unread=true` query.
@@ -94,6 +96,27 @@ export function markDevUserNotificationsRead(ids: string[]): void {
   notifications = notifications.map((notification) =>
     idSet.has(notification.id) && notification.read === null
       ? { ...notification, read: readDate }
+      : notification
+  );
+}
+
+/**
+ * Mark the given notifications unread, in place.
+ *
+ * The mirror of {@link markDevUserNotificationsRead} for `POST
+ * /v1/notifications/unread`: matching notifications that are currently read get
+ * their `read` timestamp cleared to `null`; already-unread notifications stay
+ * `null`, and unknown ids are silently ignored. Because the store is
+ * persistent, this raises the unread total the header badge reads from the list
+ * endpoint.
+ *
+ * @param ids - The notification ids to mark unread
+ */
+export function markDevUserNotificationsUnread(ids: string[]): void {
+  const idSet = new Set(ids);
+  notifications = notifications.map((notification) =>
+    idSet.has(notification.id) && notification.read !== null
+      ? { ...notification, read: null }
       : notification
   );
 }

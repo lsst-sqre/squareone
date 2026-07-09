@@ -8,7 +8,7 @@ import { resetDevUserNotifications } from '@/lib/mocks/userNotificationsStore';
 
 import { GET } from './route.dev';
 
-const BASE = 'http://localhost:3000/semaphore/v1/notifications';
+const BASE = 'http://localhost:3000/semaphore/v1/notifications/messages';
 
 beforeEach(() => {
   resetDevUserNotifications();
@@ -25,7 +25,7 @@ async function readEntries(
   return data.map((entry) => UserNotificationSummarySchema.parse(entry));
 }
 
-describe('GET /api/dev/semaphore/v1/notifications', () => {
+describe('GET /api/dev/semaphore/v1/notifications/messages', () => {
   it("returns the user's notifications as FormattedText summaries", async () => {
     const response = await GET(new Request(BASE));
 
