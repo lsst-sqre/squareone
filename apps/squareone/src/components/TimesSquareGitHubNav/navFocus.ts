@@ -7,15 +7,9 @@
  * set, change, and clear focus.
  */
 
-import { getAncestorPaths } from '../../hooks/useTreeExpansion';
+import type { ContentNode } from '@lsst-sqre/times-square-client';
 
-/** A node in the Times Square GitHub contents tree. */
-export type ContentNode = {
-  node_type: 'owner' | 'repo' | 'directory' | 'page';
-  title: string;
-  path: string;
-  contents: ContentNode[];
-};
+import { getAncestorPaths } from '../../hooks/useTreeExpansion';
 
 /** One segment of the focus breadcrumb. */
 export type FocusBreadcrumbItem = {

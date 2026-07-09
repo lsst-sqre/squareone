@@ -1,6 +1,6 @@
+import type { ContentNode } from '@lsst-sqre/times-square-client';
 import { describe, expect, it } from 'vitest';
 
-import type { ContentNode } from './navFocus';
 import {
   buildFocusHref,
   findNodeByPath,

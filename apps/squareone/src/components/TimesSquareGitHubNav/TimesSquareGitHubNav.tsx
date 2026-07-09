@@ -7,6 +7,7 @@
 
 'use client';
 
+import type { ContentNode } from '@lsst-sqre/times-square-client';
 import { ChevronsDownUp, ChevronsUpDown, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
@@ -15,7 +16,6 @@ import React, { useMemo } from 'react';
 import type { TreeExpansion } from '../../hooks/useTreeExpansion';
 import { useTreeExpansion } from '../../hooks/useTreeExpansion';
 import Directory from './Directory';
-import type { ContentNode } from './navFocus';
 import {
   buildFocusHref,
   getFocusBreadcrumb,
