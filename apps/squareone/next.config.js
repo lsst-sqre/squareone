@@ -50,16 +50,16 @@ module.exports = (phase) => {
           destination: '/api/dev/semaphore/v1/broadcasts',
         },
         {
-          source: '/semaphore/v1/notifications',
-          destination: '/api/dev/semaphore/v1/notifications',
+          source: '/semaphore/v1/notifications/messages',
+          destination: '/api/dev/semaphore/v1/notifications/messages',
         },
         {
           source: '/semaphore/v1/notifications/read',
           destination: '/api/dev/semaphore/v1/notifications/read',
         },
         {
-          source: '/semaphore/v1/notifications/:id',
-          destination: '/api/dev/semaphore/v1/notifications/:id',
+          source: '/semaphore/v1/notifications/messages/:id',
+          destination: '/api/dev/semaphore/v1/notifications/messages/:id',
         },
         {
           source: '/semaphore/v1/admin/notifications',

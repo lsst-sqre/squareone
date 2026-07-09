@@ -325,7 +325,7 @@ export async function createAdminNotification(
  * are only present when `limit` is set). The request is authenticated via the
  * browser's session cookie (`credentials: 'include'`).
  *
- * @endpoint GET /v1/notifications
+ * @endpoint GET /v1/notifications/messages
  *
  * @param semaphoreUrl - Base URL of the Semaphore service
  * @param params - `unread` / `limit` filters and the pagination `cursor`
@@ -344,7 +344,7 @@ export async function fetchUserNotifications(
   if (params.cursor) search.set('cursor', params.cursor);
 
   const queryString = search.toString();
-  const url = `${baseUrl}/v1/notifications${queryString ? `?${queryString}` : ''}`;
+  const url = `${baseUrl}/v1/notifications/messages${queryString ? `?${queryString}` : ''}`;
 
   const response = await fetch(url, {
     credentials: 'include',
@@ -377,7 +377,7 @@ export async function fetchUserNotifications(
  * `body` as `FormattedText`. Fetching the detail does **not** auto-mark the
  * notification read — that is an explicit action via {@link markNotificationsRead}.
  *
- * @endpoint GET /v1/notifications/{id}
+ * @endpoint GET /v1/notifications/messages/{id}
  *
  * @param semaphoreUrl - Base URL of the Semaphore service
  * @param id - Opaque notification id
@@ -389,7 +389,7 @@ export async function fetchUserNotification(
   id: string
 ): Promise<UserNotificationFormatted> {
   const baseUrl = normalizeUrl(semaphoreUrl);
-  const url = `${baseUrl}/v1/notifications/${encodeURIComponent(id)}`;
+  const url = `${baseUrl}/v1/notifications/messages/${encodeURIComponent(id)}`;
 
   const response = await fetch(url, {
     credentials: 'include',

@@ -95,7 +95,7 @@ describe('UserNotificationSummarySchema', () => {
         gfm: 'You are approaching your disk space **quota** limit',
         html: '<p>You are approaching your disk space <strong>quota</strong> limit</p>',
       },
-      url: 'https://data.example.com/semaphore/v1/notifications/4561-a7513',
+      url: 'https://data.example.com/semaphore/v1/notifications/messages/4561-a7513',
     };
 
     const parsed = UserNotificationSummarySchema.parse(payload);
@@ -108,7 +108,7 @@ describe('UserNotificationSummarySchema', () => {
       created: '2026-06-12T17:10:32+00:00',
       read: null,
       summary: { gfm: 'Heads up', html: '<p>Heads up</p>' },
-      url: 'https://data.example.com/semaphore/v1/notifications/abc',
+      url: 'https://data.example.com/semaphore/v1/notifications/messages/abc',
     };
 
     expect(() => UserNotificationSummarySchema.parse(payload)).not.toThrow();
@@ -120,7 +120,7 @@ describe('UserNotificationSummarySchema', () => {
       created: '2026-06-12T17:10:32+00:00',
       read: null,
       summary: 'Heads up',
-      url: 'https://data.example.com/semaphore/v1/notifications/abc',
+      url: 'https://data.example.com/semaphore/v1/notifications/messages/abc',
     };
 
     expect(() => UserNotificationSummarySchema.parse(payload)).toThrow();

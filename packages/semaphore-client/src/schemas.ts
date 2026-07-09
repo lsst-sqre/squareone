@@ -64,7 +64,7 @@ export const UserNotificationWithUrlSchema = UserNotificationSchema.extend({
 /**
  * A user-facing notification summary from the Semaphore user API.
  *
- * Returned by the user list endpoint (`GET /v1/notifications`). Unlike the
+ * Returned by the user list endpoint (`GET /v1/notifications/messages`). Unlike the
  * admin shape (raw Markdown strings), the user endpoints return
  * {@link FormattedTextSchema} (`{ gfm, html }`) for `summary` so the client can
  * render the `gfm` field for visual consistency with the admin UI. `created`
@@ -84,7 +84,7 @@ export const UserNotificationSummarySchema = z.object({
 /**
  * A full user-facing notification from the Semaphore user API.
  *
- * Returned by the user detail endpoint (`GET /v1/notifications/{id}`). Carries
+ * Returned by the user detail endpoint (`GET /v1/notifications/messages/{id}`). Carries
  * the same fields as {@link UserNotificationSummarySchema} except it replaces
  * `url` with the formatted `body` ({@link FormattedTextSchema} or null when the
  * notification has no body). Fetching the detail does **not** auto-mark the

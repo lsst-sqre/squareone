@@ -1,7 +1,7 @@
 /**
  * Mock of the Semaphore user-facing notification detail endpoint.
- * GET /semaphore/v1/notifications/:id
- * (rewritten to /api/dev/semaphore/v1/notifications/:id)
+ * GET /semaphore/v1/notifications/messages/:id
+ * (rewritten to /api/dev/semaphore/v1/notifications/messages/:id)
  *
  * Returns a single notification from the persistent user-notifications dev
  * store, in the user-facing detail shape (`UserNotificationFormatted`: `summary`

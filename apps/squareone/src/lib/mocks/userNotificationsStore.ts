@@ -1,7 +1,7 @@
 // In-memory dev store for the authenticated user's own notifications.
 //
 // Backs the user-facing notification dev mocks:
-//   - GET /api/dev/semaphore/v1/notifications        (the inbox list)
+//   - GET /api/dev/semaphore/v1/notifications/messages   (the inbox list)
 // and therefore the header unread badge, which the semaphore-client
 // `useUnreadNotificationCount` hook derives from that list endpoint's
 // `X-Total-Count` for an `?unread=true` query.

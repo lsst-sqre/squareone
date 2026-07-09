@@ -39,7 +39,7 @@ export type UseUserNotificationsReturn = {
  * Pages are flattened into a single `entries` array, most-recent first (server
  * order); see {@link userNotificationsInfiniteQueryOptions}.
  *
- * @endpoint GET /v1/notifications
+ * @endpoint GET /v1/notifications/messages
  *
  * @param semaphoreUrl - Base URL of the Semaphore service. The query is
  *   disabled when empty.

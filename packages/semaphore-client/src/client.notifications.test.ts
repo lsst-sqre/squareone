@@ -41,7 +41,7 @@ const userListPayload = [
       gfm: 'You are approaching your disk space **quota** limit',
       html: '<p>You are approaching your disk space <strong>quota</strong> limit</p>',
     },
-    url: 'https://example.com/semaphore/v1/notifications/4561-a7513',
+    url: 'https://example.com/semaphore/v1/notifications/messages/4561-a7513',
   },
 ];
 
@@ -316,7 +316,7 @@ describe('fetchUserNotifications', () => {
         status: 200,
         headers: {
           'Content-Type': 'application/json',
-          Link: '<https://example.com/semaphore/v1/notifications?cursor=1614985055_4234>; rel="next"',
+          Link: '<https://example.com/semaphore/v1/notifications/messages?cursor=1614985055_4234>; rel="next"',
           'X-Total-Count': '7',
         },
       })
@@ -352,7 +352,7 @@ describe('fetchUserNotifications', () => {
     });
 
     const calledUrl = new URL(mockFetch.mock.calls[0][0] as string);
-    expect(calledUrl.pathname).toBe('/semaphore/v1/notifications');
+    expect(calledUrl.pathname).toBe('/semaphore/v1/notifications/messages');
     expect(calledUrl.searchParams.get('unread')).toBe('true');
     expect(calledUrl.searchParams.get('limit')).toBe('25');
     expect(calledUrl.searchParams.get('cursor')).toBe('p123_4');
@@ -368,7 +368,9 @@ describe('fetchUserNotifications', () => {
     });
 
     const calledUrl = mockFetch.mock.calls[0][0] as string;
-    expect(calledUrl).toBe('https://example.com/semaphore/v1/notifications');
+    expect(calledUrl).toBe(
+      'https://example.com/semaphore/v1/notifications/messages'
+    );
   });
 
   it('sends credentials with the request', async () => {
@@ -411,7 +413,7 @@ describe('fetchUserNotification', () => {
 
     expect(result).toEqual(userDetailPayload);
     expect(mockFetch.mock.calls[0][0]).toBe(
-      'https://example.com/semaphore/v1/notifications/4561-a7513'
+      'https://example.com/semaphore/v1/notifications/messages/4561-a7513'
     );
     expect(mockFetch.mock.calls[0][1]?.credentials).toBe('include');
   });
