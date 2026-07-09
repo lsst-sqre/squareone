@@ -6,6 +6,7 @@ import {
   fetchUserNotification,
   fetchUserNotifications,
   markNotificationsRead,
+  markNotificationsUnread,
   SemaphoreError,
 } from './client';
 
@@ -468,6 +469,53 @@ describe('markNotificationsRead', () => {
 
     await expect(
       markNotificationsRead(
+        'https://example.com/semaphore',
+        ['n1'],
+        'csrf-token-abc'
+      )
+    ).rejects.toThrow(SemaphoreError);
+  });
+});
+
+describe('markNotificationsUnread', () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('POSTs { ids } to the unread path with credentials and the CSRF header, treating 204 as success', async () => {
+    const mockFetch = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce(new Response(null, { status: 204 }));
+
+    await expect(
+      markNotificationsUnread(
+        'https://example.com/semaphore',
+        ['n1', 'n2'],
+        'csrf-token-abc'
+      )
+    ).resolves.toBeUndefined();
+
+    const [calledUrl, init] = mockFetch.mock.calls[0];
+    expect(calledUrl).toBe(
+      'https://example.com/semaphore/v1/notifications/unread'
+    );
+    expect(init?.method).toBe('POST');
+    expect(init?.credentials).toBe('include');
+
+    const headers = init?.headers as Record<string, string>;
+    expect(headers['x-csrf-token']).toBe('csrf-token-abc');
+    expect(headers['Content-Type']).toBe('application/json');
+
+    expect(JSON.parse(init?.body as string)).toEqual({ ids: ['n1', 'n2'] });
+  });
+
+  it('throws SemaphoreError on HTTP error', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
+      new Response('Forbidden', { status: 403, statusText: 'Forbidden' })
+    );
+
+    await expect(
+      markNotificationsUnread(
         'https://example.com/semaphore',
         ['n1'],
         'csrf-token-abc'

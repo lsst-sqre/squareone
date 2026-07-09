@@ -11,6 +11,7 @@ export {
   fetchUserNotifications,
   getEmptyBroadcasts,
   markNotificationsRead,
+  markNotificationsUnread,
   SemaphoreError,
 } from './client';
 // React hooks
@@ -28,6 +29,7 @@ export {
   useBroadcasts,
   useCreateAdminNotification,
   useMarkNotificationsRead,
+  useMarkNotificationsUnread,
   useUnreadNotificationCount,
   useUserNotification,
   useUserNotifications,
@@ -56,10 +58,12 @@ export {
 export type {
   CreateAdminNotificationVariables,
   MarkNotificationsReadVariables,
+  MarkNotificationsUnreadVariables,
 } from './mutation-options';
 export {
   createAdminNotificationMutationOptions,
   markNotificationsReadMutationOptions,
+  markNotificationsUnreadMutationOptions,
 } from './mutation-options';
 export type {
   BroadcastsQueryConfig,

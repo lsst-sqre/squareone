@@ -9,6 +9,7 @@ export {
 export { useBroadcasts } from './useBroadcasts';
 export { useCreateAdminNotification } from './useCreateAdminNotification';
 export { useMarkNotificationsRead } from './useMarkNotificationsRead';
+export { useMarkNotificationsUnread } from './useMarkNotificationsUnread';
 export {
   type UseUnreadNotificationCountOptions,
   type UseUnreadNotificationCountReturn,

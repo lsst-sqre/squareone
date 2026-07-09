@@ -1,5 +1,9 @@
 import { mutationOptions, type QueryClient } from '@tanstack/react-query';
-import { createAdminNotification, markNotificationsRead } from './client';
+import {
+  createAdminNotification,
+  markNotificationsRead,
+  markNotificationsUnread,
+} from './client';
 import type {
   CreateUserNotification,
   UserNotificationWithUrl,
@@ -76,6 +80,54 @@ export const markNotificationsReadMutationOptions = (
     }: MarkNotificationsReadVariables): Promise<void> =>
       markNotificationsRead(semaphoreUrl, ids, csrfToken),
     onSuccess: (_data, { ids }: MarkNotificationsReadVariables) => {
+      queryClient.invalidateQueries({
+        queryKey: ['user-notifications', semaphoreUrl],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['unread-notification-count', semaphoreUrl],
+      });
+      for (const id of ids) {
+        queryClient.invalidateQueries({
+          queryKey: ['user-notification', semaphoreUrl, id],
+        });
+      }
+    },
+  });
+
+/**
+ * Variables for the mark-notifications-unread mutation.
+ */
+export type MarkNotificationsUnreadVariables = {
+  /** The notification ids to mark unread. */
+  ids: string[];
+  /** CSRF token sourced by the caller from Gafaelfawr login info. */
+  csrfToken: string;
+};
+
+/**
+ * TanStack Query mutation options for marking user notifications unread.
+ *
+ * The mirror of {@link markNotificationsReadMutationOptions}: on success it
+ * invalidates the same set of queries the change affects — the user-
+ * notifications list (the `['user-notifications', semaphoreUrl]` prefix,
+ * covering all filter variants), the unread count, and the detail query for
+ * each affected id — so the inbox, header badge, and any open detail view all
+ * reflect the new unread state.
+ *
+ * @param semaphoreUrl - Base URL of the Semaphore service
+ * @param queryClient - Query client used to invalidate affected queries on success
+ */
+export const markNotificationsUnreadMutationOptions = (
+  semaphoreUrl: string,
+  queryClient: QueryClient
+) =>
+  mutationOptions({
+    mutationFn: ({
+      ids,
+      csrfToken,
+    }: MarkNotificationsUnreadVariables): Promise<void> =>
+      markNotificationsUnread(semaphoreUrl, ids, csrfToken),
+    onSuccess: (_data, { ids }: MarkNotificationsUnreadVariables) => {
       queryClient.invalidateQueries({
         queryKey: ['user-notifications', semaphoreUrl],
       });

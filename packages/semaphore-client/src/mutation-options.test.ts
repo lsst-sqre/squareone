@@ -4,7 +4,9 @@ import {
   type CreateAdminNotificationVariables,
   createAdminNotificationMutationOptions,
   type MarkNotificationsReadVariables,
+  type MarkNotificationsUnreadVariables,
   markNotificationsReadMutationOptions,
+  markNotificationsUnreadMutationOptions,
 } from './mutation-options';
 import type { UserNotificationWithUrl } from './schemas';
 
@@ -122,6 +124,67 @@ describe('markNotificationsReadMutationOptions', () => {
     const onSuccess = opts.onSuccess as (
       data: undefined,
       variables: MarkNotificationsReadVariables
+    ) => void;
+    onSuccess(undefined, variables);
+
+    expect(invalidateQueries).toHaveBeenCalledWith({
+      queryKey: ['user-notifications', url],
+    });
+    expect(invalidateQueries).toHaveBeenCalledWith({
+      queryKey: ['unread-notification-count', url],
+    });
+    expect(invalidateQueries).toHaveBeenCalledWith({
+      queryKey: ['user-notification', url, 'n1'],
+    });
+    expect(invalidateQueries).toHaveBeenCalledWith({
+      queryKey: ['user-notification', url, 'n2'],
+    });
+  });
+});
+
+describe('markNotificationsUnreadMutationOptions', () => {
+  const variables: MarkNotificationsUnreadVariables = {
+    ids: ['n1', 'n2'],
+    csrfToken: 'csrf-token-abc',
+  };
+
+  beforeEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('marks the notifications unread via markNotificationsUnread', async () => {
+    const mockFetch = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce(new Response(null, { status: 204 }));
+    const queryClient = {
+      invalidateQueries: vi.fn(),
+    } as unknown as QueryClient;
+
+    const opts = markNotificationsUnreadMutationOptions(url, queryClient);
+    const mutationFn = opts.mutationFn as (
+      v: MarkNotificationsUnreadVariables
+    ) => Promise<void>;
+    await mutationFn(variables);
+
+    const [calledUrl, init] = mockFetch.mock.calls[0];
+    expect(calledUrl).toBe(
+      'https://example.com/semaphore/v1/notifications/unread'
+    );
+    expect(init?.method).toBe('POST');
+    expect((init?.headers as Record<string, string>)['x-csrf-token']).toBe(
+      'csrf-token-abc'
+    );
+    expect(JSON.parse(init?.body as string)).toEqual({ ids: ['n1', 'n2'] });
+  });
+
+  it('invalidates the user list, the unread count, and each affected detail on success', () => {
+    const invalidateQueries = vi.fn();
+    const queryClient = { invalidateQueries } as unknown as QueryClient;
+
+    const opts = markNotificationsUnreadMutationOptions(url, queryClient);
+    const onSuccess = opts.onSuccess as (
+      data: undefined,
+      variables: MarkNotificationsUnreadVariables
     ) => void;
     onSuccess(undefined, variables);
 

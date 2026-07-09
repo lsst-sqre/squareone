@@ -58,6 +58,10 @@ module.exports = (phase) => {
           destination: '/api/dev/semaphore/v1/notifications/read',
         },
         {
+          source: '/semaphore/v1/notifications/unread',
+          destination: '/api/dev/semaphore/v1/notifications/unread',
+        },
+        {
           source: '/semaphore/v1/notifications/messages/:id',
           destination: '/api/dev/semaphore/v1/notifications/messages/:id',
         },

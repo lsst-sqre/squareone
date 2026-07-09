@@ -5,6 +5,7 @@ import {
   getDevUserNotificationById,
   getDevUserNotifications,
   markDevUserNotificationsRead,
+  markDevUserNotificationsUnread,
   resetDevUserNotifications,
 } from './userNotificationsStore';
 
@@ -77,6 +78,41 @@ describe('userNotificationsStore', () => {
       resetDevUserNotifications();
 
       expect(getDevUserNotificationById('ntf-001')?.read).toBeNull();
+    });
+  });
+
+  describe('markDevUserNotificationsUnread', () => {
+    it('marks a seeded read notification unread', () => {
+      // ntf-005 is a seeded read fixture.
+      expect(getDevUserNotificationById('ntf-005')?.read).not.toBeNull();
+
+      markDevUserNotificationsUnread(['ntf-005']);
+
+      expect(getDevUserNotificationById('ntf-005')?.read).toBeNull();
+    });
+
+    it('leaves an already-unread notification untouched (idempotent)', () => {
+      // ntf-001 is a seeded unread fixture.
+      expect(getDevUserNotificationById('ntf-001')?.read).toBeNull();
+
+      markDevUserNotificationsUnread(['ntf-001']);
+
+      expect(getDevUserNotificationById('ntf-001')?.read).toBeNull();
+    });
+
+    it('ignores unknown ids without throwing', () => {
+      expect(() =>
+        markDevUserNotificationsUnread(['does-not-exist'])
+      ).not.toThrow();
+    });
+
+    it('is undone by resetDevUserNotifications', () => {
+      markDevUserNotificationsUnread(['ntf-005']);
+      expect(getDevUserNotificationById('ntf-005')?.read).toBeNull();
+
+      resetDevUserNotifications();
+
+      expect(getDevUserNotificationById('ntf-005')?.read).not.toBeNull();
     });
   });
 });
