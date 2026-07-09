@@ -231,7 +231,7 @@ The ``release.yaml`` workflow includes several important configuration steps:
 GitHub App authentication
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Uses the ``tibdex/github-app-token`` action to generate a GitHub token from the Squareone CI GitHub App credentials (``SQUAREONE_CI_GH_APP_ID`` and ``SQUAREONE_CI_GH_APP_PRIVATE_KEY`` secrets).
+Uses the ``actions/create-github-app-token@v3`` action to generate a GitHub token from the Squareone CI GitHub App credentials (the ``SQUAREONE_CI_GH_APP_CLIENT_ID`` variable and the ``SQUAREONE_CI_GH_APP_PRIVATE_KEY`` secret).
 This token is used instead of the default ``GITHUB_TOKEN`` because commits made with the default token don't trigger subsequent GitHub Actions workflows.
 
 GitHub Packages authentication
@@ -246,7 +246,10 @@ Git identity configuration
 Manually configures Git identity for the GitHub App bot user:
 
 - User name: ``squareone-ci[bot]``
-- Email: ``<app-id>+squareone-ci[bot]@users.noreply.github.com``
+- Email: ``<user-id>+squareone-ci[bot]@users.noreply.github.com``
+
+The ``<user-id>`` is the bot account's user ID, fetched at runtime with ``gh api "/users/squareone-ci[bot]" --jq .id``.
+This is a distinct value from the GitHub App's numeric App ID (and from its Client ID).
 
 The changesets action is configured with ``setupGitUser: false`` to use this manually configured identity instead of the action's default.
 This configuration ensures that commits made by the changesets action are properly attributed to the GitHub App bot user so that they can trigger GitHub Actions workflows.
@@ -328,7 +331,7 @@ Dependabot secrets requirement
 
 .. important::
 
-   This workflow requires GitHub App credentials to be configured as **Dependabot secrets**, not just GitHub Actions secrets.
+   This workflow requires the GitHub App private key to be configured as a **Dependabot secret**, not just a GitHub Actions secret.
 
 When Dependabot triggers a workflow via ``pull_request`` events, GitHub treats it as if it came from a repository fork for security reasons.
 This means:
@@ -338,7 +341,8 @@ This means:
 - This is by design to prevent secret leakage through malicious dependency updates
 
 The workflow uses a GitHub App (Squareone CI) to generate a token that can trigger other workflows (commits made with the default ``GITHUB_TOKEN`` don't trigger workflows).
-The app credentials must be available as Dependabot secrets.
+The app's private key must be available as a Dependabot secret.
+The app's client ID (``SQUAREONE_CI_GH_APP_CLIENT_ID``) is a non-secret repository **variable**; Dependabot's secret isolation applies only to secrets, so the variable resolves normally in the Dependabot context.
 
 Configuring Dependabot secrets
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -346,19 +350,22 @@ Configuring Dependabot secrets
 Organization administrators must configure these secrets at the organization or repository level:
 
 1. Navigate to Settings → Security → Secrets and variables → Dependabot
-2. Create two Dependabot secrets with the same values as the corresponding GitHub Actions secrets:
+2. Create a Dependabot secret with the same value as the corresponding GitHub Actions secret:
 
-   - ``SQUAREONE_CI_GH_APP_ID`` (numeric app ID)
    - ``SQUAREONE_CI_GH_APP_PRIVATE_KEY`` (PEM-formatted private key)
 
 3. Set repository access to include ``squareone``
 
 .. note::
 
-   These secrets must be duplicated (exist as both Actions secrets and Dependabot secrets) because GitHub isolates Dependabot workflows for security.
-   If the credentials are rotated, both sets of secrets must be updated.
+   The private key must be duplicated (exist as both an Actions secret and a Dependabot secret) because GitHub isolates Dependabot workflows for security.
+   If the credentials are rotated, both copies must be updated.
 
-Without these Dependabot secrets configured, the workflow will fail with an error like "app_id is not set" even though the GitHub Actions secrets are properly configured.
+Without the Dependabot secret configured, the workflow will fail to generate a token even though the GitHub Actions secret is properly configured.
+
+.. note::
+
+   If the ``SQUAREONE_CI_GH_APP_CLIENT_ID`` variable ever fails to resolve in a Dependabot-triggered run, the fallback is to additionally store the client ID as a Dependabot secret with the same name and reference it via ``secrets.`` in this workflow only.
 
 For more information, see GitHub's documentation on `Automating Dependabot with GitHub Actions <https://docs.github.com/en/code-security/dependabot/working-with-dependabot/automating-dependabot-with-github-actions>`__ and `Managing encrypted secrets for Dependabot <https://docs.github.com/en/code-security/dependabot/working-with-dependabot/managing-encrypted-secrets-for-dependabot>`__.
 
@@ -482,8 +489,9 @@ This workflow implements several security best practices aligned with the ``depe
 
 **Authentication:**
 
-- Uses default ``GITHUB_TOKEN`` which is automatically scoped to the repository
-- No additional secrets required (unlike workflows that need to trigger other workflows)
+- Generates a Squareone CI GitHub App token with ``actions/create-github-app-token@v3`` (the ``SQUAREONE_CI_GH_APP_CLIENT_ID`` variable and the ``SQUAREONE_CI_GH_APP_PRIVATE_KEY`` secret)
+- The App token is used for the ``gh`` CLI operations (changeset check, enabling auto-merge, commenting)
+- Because this workflow runs on the ``workflow_run`` trigger (default-branch context), regular GitHub Actions secrets and variables are available — no Dependabot secrets are involved
 
 Timing and workflow coordination
 ---------------------------------
@@ -755,11 +763,11 @@ GitHub Actions secrets
      - Purpose
      - Used By
    * - ``SQUAREONE_CI_GH_APP_ID``
-     - GitHub App ID for Squareone CI app (used to generate tokens that trigger workflows)
-     - release.yaml, dependabot-changesets.yaml
+     - **Deprecated.** Numeric GitHub App ID for the Squareone CI app. No longer referenced by any workflow (superseded by the ``SQUAREONE_CI_GH_APP_CLIENT_ID`` variable); kept in place as a rollback path.
+     - None (deprecated)
    * - ``SQUAREONE_CI_GH_APP_PRIVATE_KEY``
      - Private key for Squareone CI GitHub App (PEM format)
-     - release.yaml, dependabot-changesets.yaml
+     - release.yaml, dependabot-changesets.yaml, dependabot-auto-merge.yaml
    * - ``SENTRY_AUTH_TOKEN``
      - Sentry authentication token for uploading source maps
      - ci.yaml (via build-squareone.yaml), docker-release.yaml (via build-squareone.yaml)
@@ -789,6 +797,9 @@ GitHub Actions variables
    * - Variable Name
      - Purpose
      - Used By
+   * - ``SQUAREONE_CI_GH_APP_CLIENT_ID``
+     - Client ID of the Squareone CI GitHub App (non-sensitive; distinct from the numeric App ID). Used by ``actions/create-github-app-token@v3`` to generate tokens that trigger workflows.
+     - release.yaml, dependabot-changesets.yaml, dependabot-auto-merge.yaml
    * - ``TURBO_API``
      - Turborepo remote cache API endpoint URL
      - ci.yaml, build-squareone.yaml, run-chromatic.yaml
@@ -811,11 +822,14 @@ Dependabot secrets
      - Purpose
      - Used By
    * - ``SQUAREONE_CI_GH_APP_ID``
-     - GitHub App ID (same value as Actions secret)
-     - dependabot-changesets.yaml
+     - **Deprecated.** Numeric GitHub App ID (same value as the deprecated Actions secret). No longer referenced by any workflow; kept in place as a rollback path.
+     - None (deprecated)
    * - ``SQUAREONE_CI_GH_APP_PRIVATE_KEY``
      - GitHub App private key (same value as Actions secret)
      - dependabot-changesets.yaml
+
+The app's client ID is **not** duplicated as a Dependabot secret: it is read from the ``SQUAREONE_CI_GH_APP_CLIENT_ID`` repository variable, and Dependabot's secret isolation does not apply to non-secret variables.
+(If the variable ever fails to resolve in a Dependabot-triggered run, add it as a Dependabot secret and reference it via ``secrets.`` in ``dependabot-changesets.yaml`` only.)
 
 Configuration notes
 -------------------
@@ -837,9 +851,10 @@ Configuration notes
 
 1. Navigate to repository Settings → Security → Secrets and variables → Dependabot
 2. Click "New repository secret" or use organization-level secrets
-3. Add the required secrets (``SQUAREONE_CI_GH_APP_ID`` and ``SQUAREONE_CI_GH_APP_PRIVATE_KEY``)
+3. Add the required secret (``SQUAREONE_CI_GH_APP_PRIVATE_KEY``)
 4. Set repository access to include the squareone repository
 
 .. note::
 
-   When rotating the Squareone CI GitHub App credentials, both the GitHub Actions secrets AND the Dependabot secrets must be updated.
+   When rotating the Squareone CI GitHub App private key, both the GitHub Actions secret AND the Dependabot secret must be updated.
+   The client ID (``SQUAREONE_CI_GH_APP_CLIENT_ID`` variable) is stable for the lifetime of the app and does not rotate with the key.
