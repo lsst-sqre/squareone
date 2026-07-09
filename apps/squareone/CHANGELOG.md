@@ -1,5 +1,68 @@
 # squareone
 
+## 0.35.1
+
+### Patch Changes
+
+- [#543](https://github.com/lsst-sqre/squareone/pull/543) [`0fdb6db`](https://github.com/lsst-sqre/squareone/commit/0fdb6db7db652fe4578026f6c1ce8cb44c29f819) Thanks [@jonathansick](https://github.com/jonathansick)! - Add three adaptive `--rsd-component-*` semantic theme tokens that re-map under dark mode (via `tokens.dark.css`), and repair three pre-existing dangling `--sqo-*` references.
+
+  New tokens (authored as `themed: {light, dark}` YAML in `rubin-style-dictionary`, so they regenerate into both `tokens.css` and `tokens.dark.css`):
+
+  - `--rsd-component-text-secondary-color` — muted/secondary text (light `gray-600`, dark `gray-300`).
+  - `--rsd-component-divider-color` — borders and dividers (light `gray-200`, dark `gray-700`).
+  - `--rsd-component-surface-secondary-background-color` — subtle surfaces such as hover/selected rows and the inline code chip (light `gray-100`, dark `gray-700`).
+
+  Repoint the three dangling refs at the new secondary-text token so muted text renders adaptively in both themes instead of silently falling back to inherited body color: `--sqo-color-text-secondary` in `AdminRequired.module.css` and `AuthRequired.module.css`, and `--sqo-text-muted` in `app/error.tsx`. Dark-gray weights are the starting values; exact tuning is deferred to the dark-mode visual-QA step.
+
+  Migrate the user-facing notification CSS modules (`UserNotifications/UserNotificationsTableView.module.css` and `UserNotifications/UserNotificationDetailView.module.css`) off fixed `--rsd-color-gray-*` scale tokens onto these adaptive tokens, so the `/notifications` list, expanded body, detail page, and empty/loading states are legible in dark mode.
+
+  Migrate the admin notification CSS modules (`AdminNotifications/NotificationFilters.module.css`, `AdminNotifications/NotificationsTableView.module.css`, `NotificationDetailView/NotificationDetailView.module.css`, and `NotificationForm/NotificationForm.module.css`) off fixed `--rsd-color-gray-*` scale tokens (and remove the hardcoded hex fallbacks in `NotificationForm.module.css`) onto these adaptive tokens, so the `/admin/notifications` list, filter bar, detail page, and `/admin/notifications/new` compose form are legible in dark mode.
+
+  Move the bespoke notification callouts onto the shared squared components so they self-theme in dark mode: the boxed error/not-found states in `NotificationDetailView` and `UserNotificationDetailView` now render via squared `Note` (`type="note"`); the inline load-failure states in both table views and the across-pages bulk-mark-read failure render via squared `ErrorMessage`; and the select-all-across-pages info banner renders via squared `Note` (`type="info"`). This removes the last fixed `--rsd-color-red-*`/`--rsd-color-blue-*` callout tokens (and their now-dead CSS) from the notification modules.
+
+  Add a `validate-theme-tokens` guardrail (`packages/repo-scripts/src/validate-theme-tokens.js`, wired into the root `localci` script and CI) that fails when a fixed color-scale token (`color: var(--rsd-color-gray-*|red-*|…)`) or a hardcoded hex is used for text in the notification CSS modules, so the dark-mode migration can't silently rot. The Rubin brand-accent alias `--rsd-color-primary-*` and non-text `background-color` uses are intentionally not flagged; scope is limited to the notification modules.
+
+  Add dark-mode Storybook story variants (a `Dark` story pinning `globals: { theme: 'dark' }` via the existing `withThemeByDataAttribute` toolbar) for the key notification components — the user and admin table views, both detail views, the compose form, and a new `NotificationFilters` story for the filter bar — so the migration is visually verifiable in both themes and can't silently rot.
+
+- [#543](https://github.com/lsst-sqre/squareone/pull/543) [`e4806d0`](https://github.com/lsst-sqre/squareone/commit/e4806d043b98e9447c836bf5b3400c0246de78df) Thanks [@jonathansick](https://github.com/jonathansick)! - Extend the `validate-theme-tokens` dark-mode guardrail to also scan the squareone App Router pages, and fix the one component it surfaces.
+
+  The scanner now recursively scans `apps/squareone/src/app/**/*.module.css` in addition to the two existing `**/components/**` roots (`apps/squareone/src/components` and `packages/squared/src/components`), applying the exact same principled detection rule and exemptions: a text `color:` set to a fixed dark neutral gray-scale token (`--rsd-color-gray-400` … `gray-900`) or a dark hardcoded hex is a violation, while inverted text on a colored/dark background, text a `[data-theme="dark"]` override re-declares, semantic status hues, light gray weights, and the Rubin brand-accent `--rsd-color-primary-*` alias are exempt (DM-55433).
+
+  Broadening the scan surfaces exactly one un-migrated module, `apps/squareone/src/app/dev/DevAuthPanel.module.css` (the dev-only auth panel), which is migrated off the fixed `--rsd-color-gray-*` scale onto the adaptive `--rsd-component-*` semantic tokens that re-map under `data-theme="dark"`, matching the mapping convention this branch established across the notification modules and the shared `DataTable`/`KeyValueList`:
+
+  - muted/secondary text (`.muted`, `.scopeDescription`, from `gray-600`) → `--rsd-component-text-secondary-color`
+  - the "Custom" chip (`.customChip`): its dark-on-light-gray foreground AND fixed light background are migrated together (`gray-600` → `--rsd-component-text-secondary-color`, `gray-100` → `--rsd-component-surface-secondary-background-color`) so the chip surface also adapts
+  - borders (`.personaButton`, `.input`, from `gray-300`) → `--rsd-component-divider-color`
+  - the semantic "Applied ✓" green (`.applied`) keeps its `--rsd-color-green-600` hue but drops its fixed dark-hex fallback so it no longer trips the hardcoded-hex check
+
+  The guardrail baseline remains empty (`{}`) — DevAuthPanel is fixed so it is genuinely clean, not baselined — so the broadened scan passes with 0 known / 0 new violations. Remains wired into the root `localci` script and the CI workflow.
+
+- [#543](https://github.com/lsst-sqre/squareone/pull/543) [`099b388`](https://github.com/lsst-sqre/squareone/commit/099b3886087efe69efac5630ba360b982f27576c) Thanks [@jonathansick](https://github.com/jonathansick)! - Use the `warning` variant of the shared squared `Note` for the notification error/not-found callouts. The admin `NotificationDetailView` and user `UserNotificationDetailView` error/not-found states previously rendered with `type="note"`, which printed the literal badge "Note" above genuine error messages like "Notification not found" / "Error loading notification". They now use `type="warning"`, so the badge reads "Warning" (orange) — an appropriate label and color for a recoverable error/not-found state.
+
+- [#549](https://github.com/lsst-sqre/squareone/pull/549) [`ac50113`](https://github.com/lsst-sqre/squareone/commit/ac50113ab660d71a6c9184b374c056ee3e573de4) Thanks [@jonathansick](https://github.com/jonathansick)! - Surface "Mark as unread" in the `/notifications` inbox, mirroring the existing mark-read affordances (DM-55450). Read rows now offer a per-row "Mark as unread" menu item (the mirror of "Mark as read" on unread rows), and the selection "Actions" dropdown gains a "Mark as unread" item that marks the read members of the loaded selection unread. Both route through the new `useMarkNotificationsUnread` mutation so the list and the header unread badge update without a manual refresh.
+
+- [#543](https://github.com/lsst-sqre/squareone/pull/543) [`1fadc3d`](https://github.com/lsst-sqre/squareone/commit/1fadc3daa55c1cffdff964a2179a711688ee411b) Thanks [@jonathansick](https://github.com/jonathansick)! - Fix the dark-mode appearance of the app-local `SentryConfigInfo` component (the `/admin/sentry` config list) by migrating the `.label` (`<dt>`) text color in `SentryConfigInfo.module.css` off the fixed `--rsd-color-gray-500` scale token (identical in both themes) onto the adaptive `--rsd-component-text-secondary-color` semantic token that re-maps under `data-theme="dark"`.
+
+  The "Status", "Environment", sample-rate, and "Base URL" labels previously rendered near-invisible `--rsd-color-gray-500` on the dark background. They now use `--rsd-component-text-secondary-color` (muted but legible in both themes), matching the mapping convention this branch established across the notification modules and the shared `DataTable`/`KeyValueList`. Adds a `Dark` Storybook story variant so the fix is visually verifiable in both themes and can't silently rot.
+
+- [#543](https://github.com/lsst-sqre/squareone/pull/543) [`c0050fc`](https://github.com/lsst-sqre/squareone/commit/c0050fcb5bd0fb6dcfce5975f7e95fbadfd802aa) Thanks [@jonathansick](https://github.com/jonathansick)! - Fix the dark-mode appearance of the squareone token-management and sidebar views by migrating their fixed `--rsd-color-gray-*` scale colors (and two hardcoded hex grays), which are identical in both themes, onto the adaptive `--rsd-component-*` semantic tokens that re-map under `data-theme="dark"` (DM-55433).
+
+  The muted/label/secondary text in these ten CSS modules previously rendered near-invisible fixed dark grays on the (adaptive) dark background. Each flagged text `color:` now uses `--rsd-component-text-secondary-color` — muted but legible in both themes — matching the mapping convention this branch established across the notification modules, the shared `DataTable`/`KeyValueList`, and the squared form primitives and `DateTimePicker`:
+
+  - `AccessTokensView` `.loading`, `SessionTokensView` `.loading`, `ApiEndpoints` `.notice`, `ServiceTokenForm` `.advancedHint` (a hardcoded `#4b5563`), and `SidebarNavSection` `.label` (a hardcoded `#6b7280`).
+  - `TokenDetailsView` `.metadataLabel`; and the dark-text-on-fixed-light `.tokenKey` chip is migrated foreground **and** background together (`--rsd-component-text-color` on `--rsd-component-surface-secondary-background-color`) so the code chip adapts instead of staying a fixed light pill.
+  - `TokenHistoryDetails` `.label`, `.oldValue`, and `.changesHeading`; `TokenHistoryFilters` `.filterLabel`; `TokenHistorySummary` `.time`, `.actor`, and the neutral `.summary.expire .icon` (the create/edit/revoke status hues stay semantic); and `TokenHistoryView` `.loadingState`/`.errorState`/`.emptyState`, `.errorMessage`, and `.totalCount`.
+
+  The semantic status hues (`--rsd-color-red-*` errors, the create/edit/revoke action-icon colors) and the Rubin brand-accent `--rsd-color-primary-*` borders are left untouched.
+
+  This is the final batch of the migration: it empties the `validate-theme-tokens` baseline (`packages/repo-scripts/src/validate-theme-tokens.baseline.json` is now `{}`), so the guardrail is fully enforcing — every scanned squared + squareone CSS module is on adaptive tokens, and any new fixed dark-color text declaration fails CI. Adds `Dark` Storybook story variants (pinning `globals: { theme: 'dark' }` via the existing `withThemeByDataAttribute` toolbar) to `TokenHistoryDetails`, `TokenHistoryView` (list and error states), `TokenHistoryFilters`, and `TokenDetailsView` so the migrated muted label/timestamp text is visually verifiable in dark mode and can't silently rot.
+
+- Updated dependencies [[`0fdb6db`](https://github.com/lsst-sqre/squareone/commit/0fdb6db7db652fe4578026f6c1ce8cb44c29f819), [`8d095b5`](https://github.com/lsst-sqre/squareone/commit/8d095b58aea053bd9ecfb5948d5c6b6b93e9a7e6), [`b90d533`](https://github.com/lsst-sqre/squareone/commit/b90d5334e74bbcb04d448a8f1d3db0ae2e150af2), [`d7054ab`](https://github.com/lsst-sqre/squareone/commit/d7054ab8cc9de2056565ef29a7abcaa7510d6dfa), [`c3d2bbe`](https://github.com/lsst-sqre/squareone/commit/c3d2bbed184b2ba0d998137281a31fae2a42f3ff), [`1fadc3d`](https://github.com/lsst-sqre/squareone/commit/1fadc3daa55c1cffdff964a2179a711688ee411b), [`13ffc56`](https://github.com/lsst-sqre/squareone/commit/13ffc56a5ff7ddd5c26205dde0ff92410bd71776)]:
+  - @lsst-sqre/rubin-style-dictionary@0.8.0
+  - @lsst-sqre/squared@0.15.1
+  - @lsst-sqre/semaphore-client@0.5.0
+  - @lsst-sqre/global-css@0.2.6
+
 ## 0.35.0
 
 ### Minor Changes

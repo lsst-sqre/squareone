@@ -1,0 +1,26 @@
+# @lsst-sqre/repo-scripts
+
+## 0.0.1
+
+### Patch Changes
+
+- [#543](https://github.com/lsst-sqre/squareone/pull/543) [`162d69a`](https://github.com/lsst-sqre/squareone/commit/162d69a527ac66c8e368c86db9a7c86b33475198) Thanks [@jonathansick](https://github.com/jonathansick)! - Broaden the `validate-theme-tokens` dark-mode guardrail to scan the whole squared component library and the squareone app component CSS modules, not just the six notification modules.
+
+  The check now recursively scans `packages/squared/src/components/**/*.module.css` and `apps/squareone/src/components/**/*.module.css` (DM-55433). The detection rule is deliberately narrow so the guardrail is useful (flags genuine dark-mode text bugs) and low-noise (does not cry wolf on intentional color). A violation is a text `color:` set to a fixed **dark** neutral gray-scale token (`--rsd-color-gray-400` … `gray-900`) or a **dark** hardcoded hex (WCAG relative luminance below a mid-gray threshold) — the body/label/heading/placeholder text that stays dark on the adaptive dark surface. Three classes are intentionally exempt because they read acceptably in both themes: (1) inverted text on a colored/dark background (the same rule sets a non-transparent `background-color`), which auto-exempts `Badge` chips and primary `Button` labels; (2) text a `[data-theme="dark"]` override already re-declares for the same selector, which exempts components like `Tabs`/`Modal`/`ClipboardButton` that hand-tune their dark mode; and (3) semantic status hues (red/green/orange/blue/yellow/purple), which are never flagged at all. Light gray weights (`gray-000`/`50`/`100`/`200`/`300`) and the Rubin brand-accent `--rsd-color-primary-*` alias are also not flagged.
+
+  Because many pre-existing fixed dark-gray text colors remain unmigrated across squared and the app (their migration is future work, not part of this guardrail change), a documented baseline (`validate-theme-tokens.baseline.json`) enumerates the currently-known real violations so CI stays green on the current tree while any NEW (non-baselined) violation or regression fails. Matching is on the offending `{file, value}` so a baselined entry that merely shifts lines still passes, and duplicate occurrences each need their own baseline entry so a new copy can't hide behind an existing one. The baseline is the actionable "needs adjustment" list — shrink it as components migrate onto adaptive `--rsd-component-text-*` tokens and the guardrail locks the win in. Remains wired into the root `localci` script and the CI workflow.
+
+- [#543](https://github.com/lsst-sqre/squareone/pull/543) [`e4806d0`](https://github.com/lsst-sqre/squareone/commit/e4806d043b98e9447c836bf5b3400c0246de78df) Thanks [@jonathansick](https://github.com/jonathansick)! - Extend the `validate-theme-tokens` dark-mode guardrail to also scan the squareone App Router pages, and fix the one component it surfaces.
+
+  The scanner now recursively scans `apps/squareone/src/app/**/*.module.css` in addition to the two existing `**/components/**` roots (`apps/squareone/src/components` and `packages/squared/src/components`), applying the exact same principled detection rule and exemptions: a text `color:` set to a fixed dark neutral gray-scale token (`--rsd-color-gray-400` … `gray-900`) or a dark hardcoded hex is a violation, while inverted text on a colored/dark background, text a `[data-theme="dark"]` override re-declares, semantic status hues, light gray weights, and the Rubin brand-accent `--rsd-color-primary-*` alias are exempt (DM-55433).
+
+  Broadening the scan surfaces exactly one un-migrated module, `apps/squareone/src/app/dev/DevAuthPanel.module.css` (the dev-only auth panel), which is migrated off the fixed `--rsd-color-gray-*` scale onto the adaptive `--rsd-component-*` semantic tokens that re-map under `data-theme="dark"`, matching the mapping convention this branch established across the notification modules and the shared `DataTable`/`KeyValueList`:
+
+  - muted/secondary text (`.muted`, `.scopeDescription`, from `gray-600`) → `--rsd-component-text-secondary-color`
+  - the "Custom" chip (`.customChip`): its dark-on-light-gray foreground AND fixed light background are migrated together (`gray-600` → `--rsd-component-text-secondary-color`, `gray-100` → `--rsd-component-surface-secondary-background-color`) so the chip surface also adapts
+  - borders (`.personaButton`, `.input`, from `gray-300`) → `--rsd-component-divider-color`
+  - the semantic "Applied ✓" green (`.applied`) keeps its `--rsd-color-green-600` hue but drops its fixed dark-hex fallback so it no longer trips the hardcoded-hex check
+
+  The guardrail baseline remains empty (`{}`) — DevAuthPanel is fixed so it is genuinely clean, not baselined — so the broadened scan passes with 0 known / 0 new violations. Remains wired into the root `localci` script and the CI workflow.
+
+- [#543](https://github.com/lsst-sqre/squareone/pull/543) [`2d6b0e6`](https://github.com/lsst-sqre/squareone/commit/2d6b0e6662685aff0814aa9ced6291f1044a0847) Thanks [@jonathansick](https://github.com/jonathansick)! - Remove the unused `NOTIFICATION_CSS_MODULES` constant from `validate-theme-tokens`. The scan is entirely glob-driven via `SCAN_ROOTS`/`scannedModules()`, so this list scoped nothing and was misleading dead code. No behavioral change.
