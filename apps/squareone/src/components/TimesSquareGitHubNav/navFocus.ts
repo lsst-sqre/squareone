@@ -9,74 +9,94 @@
 
 import type { ContentNode } from '@lsst-sqre/times-square-client';
 
-import { getAncestorPaths } from '../../hooks/useTreeExpansion';
-
 /** One segment of the focus breadcrumb. */
 export type FocusBreadcrumbItem = {
   title: string;
   path: string;
 };
 
-/** Find the node with exactly `path`, or null if the tree has none. */
-export function findNodeByPath(
-  nodes: ContentNode[],
-  path: string
-): ContentNode | null {
-  for (const node of nodes) {
-    if (node.path === path) {
-      return node;
-    }
-    const match = findNodeByPath(node.contents, path);
-    if (match) {
-      return match;
-    }
-  }
-  return null;
-}
+/**
+ * A resolved focus: the container node to focus plus its ancestor node chain
+ * (root-first, excluding the focused node itself). The ancestor chain IS the
+ * breadcrumb prefix — append the focused node to render the full breadcrumb.
+ */
+export type ResolvedFocus = {
+  node: ContentNode;
+  ancestors: ContentNode[];
+};
 
 /**
- * Resolve a requested `ts_nav_focus` path to the container node to focus.
+ * Resolve a requested `ts_nav_focus` path to the container node to focus and
+ * its ancestor chain, walking the tree once.
  *
- * Tries the requested path itself, then each path-segment ancestor from
- * deepest to shallowest, returning the first that names a container (owner,
- * repo, or directory) node in the tree. A stale or invalid path therefore
- * focuses the nearest existing ancestor; returns null (full tree) when no
- * segment matches.
+ * Times Square node paths nest by slash segments mirroring the tree, so a
+ * single top-down walk consumes the focus path segment by segment: at each
+ * level it descends into the child whose path matches the next prefix,
+ * recording each container (owner, repo, or directory) node it passes through.
+ * The deepest existing container along that path becomes the focused node and
+ * the containers above it become its ancestors.
+ *
+ * Behavior:
+ * - An exact container path resolves to that node (with its ancestors).
+ * - A page path resolves to its containing directory (pages are not
+ *   focusable), i.e. the deepest container above the page.
+ * - A stale or invalid path resolves to the nearest existing container
+ *   ancestor.
+ * - Returns null (full tree, no breadcrumb) when no path segment matches, or
+ *   for an empty focus path.
+ *
+ * Matching is segment-aware, so a sibling sharing only a string prefix (e.g.
+ * `weather` vs `weather-archive`) is never mistaken for an ancestor.
  */
-export function resolveFocusNode(
+export function resolveFocus(
   nodes: ContentNode[],
   focusPath: string
-): ContentNode | null {
+): ResolvedFocus | null {
   if (!focusPath) {
     return null;
   }
-  const candidates = [focusPath, ...[...getAncestorPaths(focusPath)].reverse()];
-  for (const candidate of candidates) {
-    const node = findNodeByPath(nodes, candidate);
-    if (node && node.node_type !== 'page') {
-      return node;
+
+  const chain: ContentNode[] = [];
+  let level: ContentNode[] = nodes;
+
+  // Descend one path segment (one tree level) at a time. `prefix` is the full
+  // slash path of the node we expect at the current level.
+  const segments = focusPath.split('/');
+  for (let i = 0; i < segments.length; i += 1) {
+    const prefix = segments.slice(0, i + 1).join('/');
+    const match = level.find((node) => node.path === prefix);
+    if (!match) {
+      break;
     }
+    // Pages are not focusable, so stop descending at a page: the deepest
+    // container recorded so far is the focused node.
+    if (match.node_type === 'page') {
+      break;
+    }
+    chain.push(match);
+    level = match.contents;
   }
-  return null;
+
+  if (chain.length === 0) {
+    return null;
+  }
+
+  const node = chain[chain.length - 1];
+  const ancestors = chain.slice(0, -1);
+  return { node, ancestors };
 }
 
 /**
- * Build the breadcrumb for a resolved focus path: the focused node's
- * ancestor chain (shallowest first) ending with the focused node itself.
+ * Build the breadcrumb for a resolved focus: the focused node's ancestor chain
+ * (root-first) ending with the focused node itself.
  */
 export function getFocusBreadcrumb(
-  nodes: ContentNode[],
-  focusPath: string
+  resolved: ResolvedFocus
 ): FocusBreadcrumbItem[] {
-  const paths = [...getAncestorPaths(focusPath), focusPath];
-  const crumbs: FocusBreadcrumbItem[] = [];
-  for (const path of paths) {
-    const node = findNodeByPath(nodes, path);
-    if (node) {
-      crumbs.push({ title: node.title, path: node.path });
-    }
-  }
-  return crumbs;
+  return [...resolved.ancestors, resolved.node].map((node) => ({
+    title: node.title,
+    path: node.path,
+  }));
 }
 
 /**

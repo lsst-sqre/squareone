@@ -16,11 +16,7 @@ import React, { useMemo } from 'react';
 import type { TreeExpansion } from '../../hooks/useTreeExpansion';
 import { useTreeExpansion } from '../../hooks/useTreeExpansion';
 import Directory from './Directory';
-import {
-  buildFocusHref,
-  getFocusBreadcrumb,
-  resolveFocusNode,
-} from './navFocus';
+import { buildFocusHref, getFocusBreadcrumb, resolveFocus } from './navFocus';
 import Page from './Page';
 import styles from './TimesSquareGitHubNav.module.css';
 
@@ -127,17 +123,15 @@ export default function TimesSquareGitHubNav({
   const searchParams = useSearchParams();
   const search = searchParams?.toString() ?? '';
 
-  // Resolve the requested focus path against the tree: an exact container
-  // match, else the nearest existing ancestor, else null (full tree).
-  const focusedNode = useMemo(
-    () => (focusPath ? resolveFocusNode(contentNodes, focusPath) : null),
+  // Resolve the requested focus path against the tree in a single walk: an
+  // exact container match, else the nearest existing ancestor, else null (full
+  // tree). The resolved node's ancestor chain doubles as the breadcrumb.
+  const resolvedFocus = useMemo(
+    () => (focusPath ? resolveFocus(contentNodes, focusPath) : null),
     [contentNodes, focusPath]
   );
-  const breadcrumb = useMemo(
-    () =>
-      focusedNode ? getFocusBreadcrumb(contentNodes, focusedNode.path) : [],
-    [contentNodes, focusedNode]
-  );
+  const focusedNode = resolvedFocus?.node ?? null;
+  const breadcrumb = resolvedFocus ? getFocusBreadcrumb(resolvedFocus) : [];
   const visibleNodes = focusedNode ? [focusedNode] : contentNodes;
 
   const allPaths = useMemo(

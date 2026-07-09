@@ -1,12 +1,7 @@
 import type { ContentNode } from '@lsst-sqre/times-square-client';
 import { describe, expect, it } from 'vitest';
 
-import {
-  buildFocusHref,
-  findNodeByPath,
-  getFocusBreadcrumb,
-  resolveFocusNode,
-} from './navFocus';
+import { buildFocusHref, getFocusBreadcrumb, resolveFocus } from './navFocus';
 
 const contentNodes: ContentNode[] = [
   {
@@ -44,73 +39,67 @@ const contentNodes: ContentNode[] = [
   },
 ];
 
-describe('findNodeByPath', () => {
-  it('finds a nested node by its full path', () => {
-    const node = findNodeByPath(
+describe('resolveFocus', () => {
+  it('resolves an exact container path to its node and ancestor chain', () => {
+    const resolved = resolveFocus(
       contentNodes,
       'lsst-sqre/times-square-demo/weather'
     );
-    expect(node?.title).toBe('weather');
+    expect(resolved?.node.path).toBe('lsst-sqre/times-square-demo/weather');
+    expect(resolved?.ancestors.map((node) => node.path)).toEqual([
+      'lsst-sqre',
+      'lsst-sqre/times-square-demo',
+    ]);
   });
 
-  it('finds a top-level node', () => {
-    expect(findNodeByPath(contentNodes, 'lsst-sqre')?.node_type).toBe('owner');
-  });
-
-  it('returns null for a path not in the tree', () => {
-    expect(findNodeByPath(contentNodes, 'lsst-sqre/nope')).toBeNull();
-  });
-});
-
-describe('resolveFocusNode', () => {
-  it('resolves an exact container path to its node', () => {
-    const node = resolveFocusNode(
-      contentNodes,
-      'lsst-sqre/times-square-demo/weather'
-    );
-    expect(node?.path).toBe('lsst-sqre/times-square-demo/weather');
+  it('resolves a top-level container with an empty ancestor chain', () => {
+    const resolved = resolveFocus(contentNodes, 'lsst-sqre');
+    expect(resolved?.node.node_type).toBe('owner');
+    expect(resolved?.ancestors).toEqual([]);
   });
 
   it('resolves a page path to its containing directory', () => {
-    const node = resolveFocusNode(
+    const resolved = resolveFocus(
       contentNodes,
       'lsst-sqre/times-square-demo/weather/summit-weather'
     );
-    expect(node?.path).toBe('lsst-sqre/times-square-demo/weather');
+    expect(resolved?.node.path).toBe('lsst-sqre/times-square-demo/weather');
   });
 
   it('resolves a stale path to the nearest existing ancestor', () => {
-    const node = resolveFocusNode(
+    const resolved = resolveFocus(
       contentNodes,
       'lsst-sqre/times-square-demo/weather/deleted/deep'
     );
-    expect(node?.path).toBe('lsst-sqre/times-square-demo/weather');
+    expect(resolved?.node.path).toBe('lsst-sqre/times-square-demo/weather');
   });
 
   it('does not treat a sibling sharing a string prefix as an ancestor', () => {
-    const node = resolveFocusNode(
+    const resolved = resolveFocus(
       contentNodes,
       'lsst-sqre/times-square-demo/weather-archive/deleted'
     );
-    expect(node?.path).toBe('lsst-sqre/times-square-demo/weather-archive');
+    expect(resolved?.node.path).toBe(
+      'lsst-sqre/times-square-demo/weather-archive'
+    );
   });
 
   it('returns null when no path segment matches the tree', () => {
-    expect(resolveFocusNode(contentNodes, 'other-org/other-repo')).toBeNull();
+    expect(resolveFocus(contentNodes, 'other-org/other-repo')).toBeNull();
   });
 
   it('returns null for an empty focus path', () => {
-    expect(resolveFocusNode(contentNodes, '')).toBeNull();
+    expect(resolveFocus(contentNodes, '')).toBeNull();
   });
 });
 
 describe('getFocusBreadcrumb', () => {
   it('returns the ancestor chain ending with the focused node', () => {
-    const crumbs = getFocusBreadcrumb(
+    const resolved = resolveFocus(
       contentNodes,
       'lsst-sqre/times-square-demo/weather'
     );
-    expect(crumbs).toEqual([
+    expect(resolved && getFocusBreadcrumb(resolved)).toEqual([
       { title: 'lsst-sqre', path: 'lsst-sqre' },
       { title: 'times-square-demo', path: 'lsst-sqre/times-square-demo' },
       { title: 'weather', path: 'lsst-sqre/times-square-demo/weather' },
@@ -118,7 +107,8 @@ describe('getFocusBreadcrumb', () => {
   });
 
   it('returns a single crumb for a top-level focus', () => {
-    expect(getFocusBreadcrumb(contentNodes, 'lsst-sqre')).toEqual([
+    const resolved = resolveFocus(contentNodes, 'lsst-sqre');
+    expect(resolved && getFocusBreadcrumb(resolved)).toEqual([
       { title: 'lsst-sqre', path: 'lsst-sqre' },
     ]);
   });
