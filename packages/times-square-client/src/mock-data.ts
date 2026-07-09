@@ -225,6 +225,186 @@ export const mockGitHubContents: GitHubContentsRoot = {
 };
 
 /**
+ * Mock GitHub contents tree with multi-segment nested directories.
+ *
+ * A clean (already deduplicated) tree whose directories nest two levels
+ * deep below the repository, mirroring the `sst/mtm1m3` layout on live
+ * deployments.
+ */
+export const mockGitHubContentsNested: GitHubContentsRoot = {
+  contents: [
+    {
+      node_type: 'owner',
+      path: 'lsst-so',
+      title: 'lsst-so',
+      contents: [
+        {
+          node_type: 'repo',
+          path: 'lsst-so/reports-performance-summary',
+          title: 'reports-performance-summary',
+          contents: [
+            {
+              node_type: 'directory',
+              path: 'lsst-so/reports-performance-summary/sst',
+              title: 'sst',
+              contents: [
+                {
+                  node_type: 'directory',
+                  path: 'lsst-so/reports-performance-summary/sst/mtm1m3',
+                  title: 'mtm1m3',
+                  contents: [
+                    {
+                      node_type: 'page',
+                      path: 'lsst-so/reports-performance-summary/sst/mtm1m3/nb1',
+                      title: 'M1M3 Notebook 1',
+                      contents: [],
+                    },
+                    {
+                      node_type: 'page',
+                      path: 'lsst-so/reports-performance-summary/sst/mtm1m3/nb2',
+                      title: 'M1M3 Notebook 2',
+                      contents: [],
+                    },
+                  ],
+                },
+                {
+                  node_type: 'directory',
+                  path: 'lsst-so/reports-performance-summary/sst/nights',
+                  title: 'nights',
+                  contents: [
+                    {
+                      node_type: 'page',
+                      path: 'lsst-so/reports-performance-summary/sst/nights/nb1',
+                      title: 'Nights Notebook 1',
+                      contents: [],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};
+
+/**
+ * Mock GitHub contents tree reproducing the duplicate-directory API bug.
+ *
+ * Times Square servers predating lsst-sqre/times-square#140 emit one
+ * directory node per page for directories at depth >= 2 below a repo:
+ * here `sst` contains `mtm1m3` x3, `nights` x2, and `calsys` x1, each
+ * duplicate holding exactly one notebook (the `sst/mtm1m3` shape confirmed
+ * live on usdfprod). Normalizing this tree must yield one `mtm1m3` node
+ * with three pages, one `nights` node with two pages, and `calsys`
+ * unchanged.
+ */
+export const mockGitHubContentsDuplicateDirectories: GitHubContentsRoot = {
+  contents: [
+    {
+      node_type: 'owner',
+      path: 'lsst-so',
+      title: 'lsst-so',
+      contents: [
+        {
+          node_type: 'repo',
+          path: 'lsst-so/reports-performance-summary',
+          title: 'reports-performance-summary',
+          contents: [
+            {
+              node_type: 'directory',
+              path: 'lsst-so/reports-performance-summary/sst',
+              title: 'sst',
+              contents: [
+                {
+                  node_type: 'directory',
+                  path: 'lsst-so/reports-performance-summary/sst/mtm1m3',
+                  title: 'mtm1m3',
+                  contents: [
+                    {
+                      node_type: 'page',
+                      path: 'lsst-so/reports-performance-summary/sst/mtm1m3/nb1',
+                      title: 'M1M3 Notebook 1',
+                      contents: [],
+                    },
+                  ],
+                },
+                {
+                  node_type: 'directory',
+                  path: 'lsst-so/reports-performance-summary/sst/mtm1m3',
+                  title: 'mtm1m3',
+                  contents: [
+                    {
+                      node_type: 'page',
+                      path: 'lsst-so/reports-performance-summary/sst/mtm1m3/nb2',
+                      title: 'M1M3 Notebook 2',
+                      contents: [],
+                    },
+                  ],
+                },
+                {
+                  node_type: 'directory',
+                  path: 'lsst-so/reports-performance-summary/sst/mtm1m3',
+                  title: 'mtm1m3',
+                  contents: [
+                    {
+                      node_type: 'page',
+                      path: 'lsst-so/reports-performance-summary/sst/mtm1m3/nb3',
+                      title: 'M1M3 Notebook 3',
+                      contents: [],
+                    },
+                  ],
+                },
+                {
+                  node_type: 'directory',
+                  path: 'lsst-so/reports-performance-summary/sst/nights',
+                  title: 'nights',
+                  contents: [
+                    {
+                      node_type: 'page',
+                      path: 'lsst-so/reports-performance-summary/sst/nights/nb1',
+                      title: 'Nights Notebook 1',
+                      contents: [],
+                    },
+                  ],
+                },
+                {
+                  node_type: 'directory',
+                  path: 'lsst-so/reports-performance-summary/sst/nights',
+                  title: 'nights',
+                  contents: [
+                    {
+                      node_type: 'page',
+                      path: 'lsst-so/reports-performance-summary/sst/nights/nb2',
+                      title: 'Nights Notebook 2',
+                      contents: [],
+                    },
+                  ],
+                },
+                {
+                  node_type: 'directory',
+                  path: 'lsst-so/reports-performance-summary/sst/calsys',
+                  title: 'calsys',
+                  contents: [
+                    {
+                      node_type: 'page',
+                      path: 'lsst-so/reports-performance-summary/sst/calsys/nb1',
+                      title: 'Calsys Notebook 1',
+                      contents: [],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};
+
+/**
  * Helper to create a mock content node.
  */
 export function createMockContentNode(

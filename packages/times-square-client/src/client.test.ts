@@ -1,9 +1,13 @@
 /**
  * Tests for Times Square API client functions.
  */
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { sanitizeDisplayPath } from './client';
+import {
+  fetchGitHubContents,
+  fetchGitHubPrContents,
+  sanitizeDisplayPath,
+} from './client';
 import { TimesSquareError } from './errors';
 
 describe('sanitizeDisplayPath', () => {
@@ -169,5 +173,80 @@ describe('sanitizeDisplayPath', () => {
         sanitizeDisplayPath('a/../b/../c/../../../etc/shadow')
       ).toThrow(TimesSquareError);
     });
+  });
+});
+
+describe('GitHub contents normalization on parse', () => {
+  const duplicateDirectoryContents = [
+    {
+      node_type: 'directory',
+      path: 'o/r/dir',
+      title: 'dir',
+      contents: [
+        { node_type: 'page', path: 'o/r/dir/nb1', title: 'nb1', contents: [] },
+      ],
+    },
+    {
+      node_type: 'directory',
+      path: 'o/r/dir',
+      title: 'dir',
+      contents: [
+        { node_type: 'page', path: 'o/r/dir/nb2', title: 'nb2', contents: [] },
+      ],
+    },
+  ];
+
+  function stubFetchJson(body: unknown): void {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        new Response(JSON.stringify(body), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        })
+      )
+    );
+  }
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('fetchGitHubContents merges duplicate directory nodes', async () => {
+    stubFetchJson({ contents: duplicateDirectoryContents });
+
+    const result = await fetchGitHubContents('/times-square/api/v1');
+
+    expect(result.contents).toHaveLength(1);
+    expect(result.contents[0].contents.map((child) => child.path)).toEqual([
+      'o/r/dir/nb1',
+      'o/r/dir/nb2',
+    ]);
+  });
+
+  it('fetchGitHubPrContents merges duplicate directory nodes', async () => {
+    stubFetchJson({
+      contents: duplicateDirectoryContents,
+      owner: 'o',
+      repo: 'r',
+      commit: 'abc123',
+      yaml_check: null,
+      nbexec_check: null,
+      pull_requests: [],
+    });
+
+    const result = await fetchGitHubPrContents(
+      '/times-square/api/v1',
+      'o',
+      'r',
+      'abc123'
+    );
+
+    expect(result.contents).toHaveLength(1);
+    expect(result.contents[0].contents.map((child) => child.path)).toEqual([
+      'o/r/dir/nb1',
+      'o/r/dir/nb2',
+    ]);
+    expect(result.owner).toBe('o');
   });
 });

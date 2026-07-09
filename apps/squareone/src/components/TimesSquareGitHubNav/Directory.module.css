@@ -21,3 +21,55 @@
   flex-shrink: 0;
   opacity: 0.9;
 }
+
+.disclosureButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  line-height: 0;
+}
+
+/*
+ * The kebab (focus menu) button is invisible until the row is hovered or
+ * holds keyboard focus, or while its menu is open. It stays in the tab order
+ * (opacity, not display/visibility) so keyboard users can reach it.
+ */
+.kebabButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  line-height: 0;
+  opacity: 0;
+}
+
+.header:hover .kebabButton,
+.header:focus-within .kebabButton,
+.kebabButton[data-state="open"] {
+  opacity: 1;
+}
+
+.disclosureIcon {
+  transition: transform 0.15s ease;
+}
+
+/* Point the chevron at the row (rightwards) when collapsed. */
+.disclosureIconCollapsed {
+  transform: rotate(-90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .disclosureIcon {
+    transition: none;
+  }
+}

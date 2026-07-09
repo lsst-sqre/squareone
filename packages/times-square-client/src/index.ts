@@ -88,6 +88,12 @@ export {
 } from './client';
 
 // =============================================================================
+// Normalization
+// =============================================================================
+
+export { normalizeGitHubContents } from './normalize';
+
+// =============================================================================
 // Errors
 // =============================================================================
 
@@ -142,6 +148,8 @@ export {
   mockGitHubCheckInProgress,
   mockGitHubCheckSuccess,
   mockGitHubContents,
+  mockGitHubContentsDuplicateDirectories,
+  mockGitHubContentsNested,
   mockGitHubPr,
   mockGitHubPrContents,
   mockHtmlEventComplete,

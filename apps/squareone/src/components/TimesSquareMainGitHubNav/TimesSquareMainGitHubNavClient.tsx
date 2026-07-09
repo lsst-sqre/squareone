@@ -3,6 +3,7 @@
  */
 
 import { useGitHubContents } from '@lsst-sqre/times-square-client';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
 import TimesSquareGitHubNav from '../TimesSquareGitHubNav';
@@ -24,6 +25,11 @@ function TimesSquareMainGitHubNavClient({
   const repertoireUrl = useRepertoireUrl();
   const { contents, isLoading } = useGitHubContents({ repertoireUrl });
 
+  // Focus mode for the main tree: the reserved ts_nav_focus query parameter
+  // scopes the sidebar to a single org, repo, or directory.
+  const searchParams = useSearchParams();
+  const focusPath = searchParams?.get('ts_nav_focus') ?? null;
+
   // Don't render anything until client-side hydration
   if (!isClient) {
     return null;
@@ -39,6 +45,7 @@ function TimesSquareMainGitHubNavClient({
         contentNodes={contents}
         pagePath={pagePath}
         pagePathRoot="/times-square/github"
+        focusPath={focusPath}
       />
     </div>
   );
