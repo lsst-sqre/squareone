@@ -147,6 +147,7 @@ export default function TimesSquareGitHubNav({
   const expansion = useTreeExpansion({
     allPaths,
     currentPath: pagePath,
+    focusPath: focusedNode ? focusedNode.path : null,
     storageKey: `times-square-github-nav:${pagePathRoot}`,
   });
 

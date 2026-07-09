@@ -13,13 +13,20 @@ const storageKey = 'test:tree-expansion';
 
 function renderTreeExpansion({
   currentPath = null,
+  focusPath = null,
 }: {
   currentPath?: string | null;
+  focusPath?: string | null;
 } = {}) {
   return renderHook(
-    ({ currentPath: path }) =>
-      useTreeExpansion({ allPaths, currentPath: path, storageKey }),
-    { initialProps: { currentPath } }
+    ({ currentPath: path, focusPath: focus }) =>
+      useTreeExpansion({
+        allPaths,
+        currentPath: path,
+        focusPath: focus,
+        storageKey,
+      }),
+    { initialProps: { currentPath, focusPath } }
   );
 }
 
@@ -156,6 +163,7 @@ describe('useTreeExpansion', () => {
     act(() => {
       rerender({
         currentPath: 'lsst-sqre/times-square-demo/weather/summit-weather',
+        focusPath: null,
       });
     });
 
@@ -164,6 +172,50 @@ describe('useTreeExpansion', () => {
     expect(
       JSON.parse(window.sessionStorage.getItem(storageKey) ?? '[]')
     ).not.toContain('lsst-sqre/times-square-demo');
+  });
+
+  it('reveals a previously collapsed focused node and prunes it from storage', () => {
+    // A prior visit collapsed the container that is now being focused.
+    window.sessionStorage.setItem(
+      storageKey,
+      JSON.stringify(['lsst-sqre/times-square-demo'])
+    );
+
+    const { result, rerender } = renderTreeExpansion({ focusPath: null });
+    expect(result.current.isExpanded('lsst-sqre/times-square-demo')).toBe(
+      false
+    );
+
+    // Focus that collapsed container: it becomes the tree root and must open.
+    act(() => {
+      rerender({
+        currentPath: null,
+        focusPath: 'lsst-sqre/times-square-demo',
+      });
+    });
+
+    expect(result.current.isExpanded('lsst-sqre/times-square-demo')).toBe(true);
+    expect(
+      JSON.parse(window.sessionStorage.getItem(storageKey) ?? '[]')
+    ).not.toContain('lsst-sqre/times-square-demo');
+  });
+
+  it('keeps the focused root expanded after collapseAll', () => {
+    const { result } = renderTreeExpansion({
+      focusPath: 'lsst-sqre/times-square-demo',
+    });
+    act(() => {
+      result.current.collapseAll();
+    });
+    // The focused root stays expanded so the tree is never blanked.
+    expect(result.current.isExpanded('lsst-sqre/times-square-demo')).toBe(true);
+    // Its descendants still collapse.
+    expect(
+      result.current.isExpanded('lsst-sqre/times-square-demo/weather')
+    ).toBe(false);
+    expect(
+      result.current.isExpanded('lsst-sqre/times-square-demo/analysis')
+    ).toBe(false);
   });
 
   it('does not reveal a sibling path sharing a string prefix with an ancestor', () => {

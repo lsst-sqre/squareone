@@ -549,6 +549,46 @@ describe('TimesSquareGitHubNav focus mode', () => {
     ).not.toBeInTheDocument();
   });
 
+  it('opens a previously collapsed directory when it becomes the focus root', () => {
+    // A prior visit collapsed the directory that is now being focused.
+    window.sessionStorage.setItem(
+      'times-square-github-nav:/times-square/github',
+      JSON.stringify(['lsst-sqre/times-square-demo/weather'])
+    );
+    render(
+      <TimesSquareGitHubNav
+        contentNodes={contentNodes}
+        pagePathRoot="/times-square/github"
+        pagePath={null}
+        focusPath="lsst-sqre/times-square-demo/weather"
+      />
+    );
+    // The focused root is forced open, so its children are visible rather than
+    // hidden under a collapsed row.
+    expect(
+      screen.getByRole('button', { name: 'Toggle weather' })
+    ).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByRole('link', { name: 'Summit Weather' })).toBeVisible();
+  });
+
+  it('keeps the focused root open after collapse-all', async () => {
+    const user = userEvent.setup();
+    render(
+      <TimesSquareGitHubNav
+        contentNodes={contentNodes}
+        pagePathRoot="/times-square/github"
+        pagePath={null}
+        focusPath="lsst-sqre/times-square-demo/weather"
+      />
+    );
+    await user.click(screen.getByRole('button', { name: 'Collapse all' }));
+    // The focused root stays expanded so the tree is never blanked.
+    expect(
+      screen.getByRole('button', { name: 'Toggle weather' })
+    ).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByRole('link', { name: 'Summit Weather' })).toBeVisible();
+  });
+
   it('renders the full tree when no focus path segment matches', () => {
     render(
       <TimesSquareGitHubNav

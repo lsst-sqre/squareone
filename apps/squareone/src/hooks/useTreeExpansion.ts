@@ -13,6 +13,12 @@ export type UseTreeExpansionOptions = {
    * ancestor chain of this path is always forced open (auto-reveal).
    */
   currentPath: string | null;
+  /**
+   * Path of the focused tree root (or `null`/absent when not in focus mode).
+   * In focus mode this node renders as the tree root, so the node itself is
+   * forced open (its ancestors are not rendered and so are not revealed).
+   */
+  focusPath?: string | null;
   /** `sessionStorage` key under which collapsed paths are persisted. */
   storageKey: string;
 };
@@ -109,14 +115,16 @@ function pruneSet(
  * visible effect.
  *
  * Auto-reveal is modeled as a state transition rather than a read-time mask:
- * whenever `currentPath` changes (including on mount/hydration) its ancestor
- * chain is pruned from the collapsed set — and thus from `sessionStorage` —
- * forcing the current page's containers open. `collapseAll` likewise leaves
- * that chain expanded.
+ * whenever `currentPath` (or `focusPath`) changes (including on
+ * mount/hydration) the revealed set — the current page's ancestor chain plus
+ * the focused root itself — is pruned from the collapsed set, and thus from
+ * `sessionStorage`, forcing those containers open. `collapseAll` likewise
+ * leaves the revealed set expanded.
  */
 export function useTreeExpansion({
   allPaths,
   currentPath,
+  focusPath = null,
   storageKey,
 }: UseTreeExpansionOptions): TreeExpansion {
   const [collapsedPaths, setCollapsedPaths] = useState<ReadonlySet<string>>(
@@ -135,12 +143,20 @@ export function useTreeExpansion({
     }
   }, [collapsedPaths, storageKey]);
 
-  // The ancestor chain of the current page is always forced open
-  // (auto-reveal) so the current page can never be hidden.
-  const revealedPaths = useMemo(
-    () => (currentPath ? getAncestorPaths(currentPath) : new Set<string>()),
-    [currentPath]
-  );
+  // The revealed set is always forced open (auto-reveal): the current page's
+  // ancestor chain (so the current page can never be hidden) plus the focused
+  // root itself (so focus mode never renders an empty, collapsed tree). The
+  // focused node's ancestors are not rendered in focus mode, so only the
+  // focused path itself is revealed.
+  const revealedPaths = useMemo(() => {
+    const paths = currentPath
+      ? getAncestorPaths(currentPath)
+      : new Set<string>();
+    if (focusPath) {
+      paths.add(focusPath);
+    }
+    return paths;
+  }, [currentPath, focusPath]);
 
   // Reconcile auto-reveal into the collapsed set: when the current page (and
   // therefore its ancestor chain) changes, prune those ancestors so they are
@@ -169,8 +185,9 @@ export function useTreeExpansion({
   }, []);
 
   const collapseAll = useCallback(() => {
-    // Collapse everything except the current page's ancestor chain, which
-    // stays expanded so the current page is never hidden.
+    // Collapse everything except the revealed set (the current page's ancestor
+    // chain plus any focused root), which stays expanded so the current page
+    // is never hidden and focus mode never blanks the tree.
     setCollapsedPaths(pruneSet(new Set(allPaths), revealedPathsRef.current));
   }, [allPaths]);
 
