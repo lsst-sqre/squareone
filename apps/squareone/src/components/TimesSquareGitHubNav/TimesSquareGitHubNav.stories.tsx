@@ -109,7 +109,18 @@ export const AutoReveal: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByRole('button', { name: 'Collapse all' }));
+    // Collapse-all lives in the nav-level tree-actions kebab menu, which is
+    // portaled to the document body.
+    await userEvent.click(canvas.getByRole('button', { name: 'Tree actions' }));
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      await body.findByRole('menuitem', { name: 'Collapse all' })
+    );
+    // Radix removes the menu asynchronously; the page content is hidden from
+    // the accessibility tree until it is gone.
+    await waitFor(() =>
+      expect(body.queryByRole('menu')).not.toBeInTheDocument()
+    );
     // The current page's ancestor chain stays open after collapse-all...
     await expect(
       canvas.getByRole('link', { name: 'Summit Weather Dashboard' })
@@ -127,6 +138,26 @@ export const AutoReveal: Story = {
   },
 };
 
+export const TreeActionsMenu: Story = {
+  args: {
+    contentNodes: mockGitHubContents.contents,
+    pagePath: '',
+    pagePathRoot: '/times-square/github',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('button', { name: 'Tree actions' }));
+    const body = within(canvasElement.ownerDocument.body);
+    // The tree is fully expanded by default, so expand-all is a no-op and
+    // disabled while collapse-all is available.
+    const expandAll = await body.findByRole('menuitem', { name: 'Expand all' });
+    await expect(expandAll).toHaveAttribute('aria-disabled', 'true');
+    await expect(
+      body.getByRole('menuitem', { name: 'Collapse all' })
+    ).not.toHaveAttribute('aria-disabled');
+  },
+};
+
 export const Focused: Story = {
   args: {
     contentNodes: mockGitHubContents.contents,
@@ -137,8 +168,8 @@ export const Focused: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    // The breadcrumb shows the ancestors as refocus links and the focused
-    // node as the current location, plus a clear control.
+    // The breadcrumb shows only the ancestors as refocus links, plus a clear
+    // control; the focused node itself is the tree root row beneath.
     const breadcrumb = canvas.getByRole('list', { name: 'Focus breadcrumb' });
     const crumbs = within(breadcrumb);
     await expect(
@@ -150,7 +181,7 @@ export const Focused: Story = {
     await expect(
       crumbs.getByRole('link', { name: 'times-square-demo' })
     ).toBeVisible();
-    await expect(crumbs.getByText('weather')).toBeVisible();
+    await expect(crumbs.queryByText('weather')).not.toBeInTheDocument();
 
     // The focused directory is the tree root: its ancestors are not rows.
     await expect(
@@ -240,9 +271,15 @@ export const FocusedStalePath: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    // The stale path resolves to its nearest existing ancestor (weather).
+    // The stale path resolves to its nearest existing ancestor (weather),
+    // which renders as the tree root beneath its ancestor crumbs.
     const breadcrumb = canvas.getByRole('list', { name: 'Focus breadcrumb' });
-    await expect(within(breadcrumb).getByText('weather')).toBeVisible();
+    await expect(
+      within(breadcrumb).getByRole('link', { name: 'times-square-demo' })
+    ).toBeVisible();
+    await expect(
+      within(breadcrumb).queryByText('weather')
+    ).not.toBeInTheDocument();
     await expect(
       canvas.getByRole('button', { name: 'Toggle weather' })
     ).toBeVisible();

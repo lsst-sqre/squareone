@@ -62,6 +62,26 @@ beforeEach(() => {
 });
 
 /**
+ * Open the nav-level tree-actions kebab menu and return the named item.
+ * The menu is portaled, so items are queried from the document body.
+ */
+async function openTreeAction(
+  user: ReturnType<typeof userEvent.setup>,
+  name: 'Expand all' | 'Collapse all'
+) {
+  await user.click(screen.getByRole('button', { name: 'Tree actions' }));
+  return within(document.body).getByRole('menuitem', { name });
+}
+
+/** Activate an action in the nav-level tree-actions kebab menu. */
+async function clickTreeAction(
+  user: ReturnType<typeof userEvent.setup>,
+  name: 'Expand all' | 'Collapse all'
+) {
+  await user.click(await openTreeAction(user, name));
+}
+
+/**
  * Each tree row renders a Lucide icon distinct to its node_type. Lucide
  * stamps each svg with a `lucide-<icon-name>` class, which these tests use
  * to identify the glyph within the row that owns it.
@@ -143,10 +163,10 @@ describe('TimesSquareGitHubNav collapsible tree', () => {
     expect(screen.getByRole('link', { name: 'Summit Weather' })).toBeVisible();
   });
 
-  it('collapses every container with the collapse-all toolbar button', async () => {
+  it('collapses every container with the collapse-all menu action', async () => {
     const user = userEvent.setup();
     renderNav();
-    await user.click(screen.getByRole('button', { name: 'Collapse all' }));
+    await clickTreeAction(user, 'Collapse all');
     expect(
       screen.getByRole('button', { name: 'Toggle lsst-sqre' })
     ).toHaveAttribute('aria-expanded', 'false');
@@ -155,11 +175,11 @@ describe('TimesSquareGitHubNav collapsible tree', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('expands every container with the expand-all toolbar button', async () => {
+  it('expands every container with the expand-all menu action', async () => {
     const user = userEvent.setup();
     renderNav();
-    await user.click(screen.getByRole('button', { name: 'Collapse all' }));
-    await user.click(screen.getByRole('button', { name: 'Expand all' }));
+    await clickTreeAction(user, 'Collapse all');
+    await clickTreeAction(user, 'Expand all');
     for (const name of [
       'Toggle lsst-sqre',
       'Toggle times-square-demo',
@@ -175,19 +195,62 @@ describe('TimesSquareGitHubNav collapsible tree', () => {
 
   it('keeps the current page ancestor chain expanded after collapse-all', async () => {
     const user = userEvent.setup();
-    renderNav('lsst-sqre/times-square-demo/weather/summit-weather');
-    await user.click(screen.getByRole('button', { name: 'Collapse all' }));
-    for (const name of [
-      'Toggle lsst-sqre',
-      'Toggle times-square-demo',
-      'Toggle weather',
-    ]) {
+    // prefixSiblingNodes has a directory off the current page's path
+    // (weather-archive), so collapse-all has something to collapse.
+    render(
+      <TimesSquareGitHubNav
+        contentNodes={prefixSiblingNodes}
+        pagePathRoot="/times-square/github"
+        pagePath="lsst-sqre/demo/weather/summit"
+      />
+    );
+    await clickTreeAction(user, 'Collapse all');
+    for (const name of ['Toggle lsst-sqre', 'Toggle demo', 'Toggle weather']) {
       expect(screen.getByRole('button', { name })).toHaveAttribute(
         'aria-expanded',
         'true'
       );
     }
-    expect(screen.getByRole('link', { name: 'Summit Weather' })).toBeVisible();
+    expect(
+      screen.getByRole('button', { name: 'Toggle weather-archive' })
+    ).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getByRole('link', { name: 'Summit' })).toBeVisible();
+  });
+
+  it('disables collapse-all when every container is force-revealed', async () => {
+    const user = userEvent.setup();
+    // In this fixture every container is an ancestor of the current page, so
+    // collapse-all could not change anything.
+    renderNav('lsst-sqre/times-square-demo/weather/summit-weather');
+    expect(await openTreeAction(user, 'Collapse all')).toHaveAttribute(
+      'aria-disabled',
+      'true'
+    );
+  });
+
+  it('disables expand-all while the tree is fully expanded', async () => {
+    const user = userEvent.setup();
+    renderNav();
+    expect(await openTreeAction(user, 'Expand all')).toHaveAttribute(
+      'aria-disabled',
+      'true'
+    );
+    expect(
+      within(document.body).getByRole('menuitem', { name: 'Collapse all' })
+    ).not.toHaveAttribute('aria-disabled');
+  });
+
+  it('disables collapse-all once every collapsible container is collapsed', async () => {
+    const user = userEvent.setup();
+    renderNav();
+    await clickTreeAction(user, 'Collapse all');
+    expect(await openTreeAction(user, 'Collapse all')).toHaveAttribute(
+      'aria-disabled',
+      'true'
+    );
+    expect(
+      within(document.body).getByRole('menuitem', { name: 'Expand all' })
+    ).not.toHaveAttribute('aria-disabled');
   });
 
   it('restores the collapsed state from sessionStorage on remount', async () => {
@@ -323,8 +386,8 @@ describe('TimesSquareGitHubNav focus mode', () => {
       />
     );
 
-    // The breadcrumb lists the ancestors as refocus links and the focused
-    // node as the current location.
+    // The breadcrumb lists only the ancestors as refocus links; the focused
+    // node itself is the tree root row directly beneath, not a crumb.
     const breadcrumb = screen.getByRole('list', { name: 'Focus breadcrumb' });
     expect(
       within(breadcrumb).getByRole('link', { name: 'lsst-sqre' })
@@ -332,9 +395,7 @@ describe('TimesSquareGitHubNav focus mode', () => {
     expect(
       within(breadcrumb).getByRole('link', { name: 'times-square-demo' })
     ).toBeVisible();
-    expect(
-      within(breadcrumb).getByText('weather').closest('li')
-    ).toHaveAttribute('aria-current', 'location');
+    expect(within(breadcrumb).queryByText('weather')).not.toBeInTheDocument();
 
     // The focused node is the tree root: its ancestors are not tree rows.
     expect(
@@ -426,10 +487,13 @@ describe('TimesSquareGitHubNav focus mode', () => {
         focusPath="lsst-sqre/times-square-demo/weather/deleted-directory"
       />
     );
+    // The resolved node (weather) is the tree root; its ancestors are the
+    // crumbs.
     const breadcrumb = screen.getByRole('list', { name: 'Focus breadcrumb' });
     expect(
-      within(breadcrumb).getByText('weather').closest('li')
-    ).toHaveAttribute('aria-current', 'location');
+      within(breadcrumb).getByRole('link', { name: 'times-square-demo' })
+    ).toBeVisible();
+    expect(within(breadcrumb).queryByText('weather')).not.toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: 'Toggle weather' })
     ).toBeVisible();
@@ -578,15 +642,59 @@ describe('TimesSquareGitHubNav focus mode', () => {
         contentNodes={contentNodes}
         pagePathRoot="/times-square/github"
         pagePath={null}
+        focusPath="lsst-sqre/times-square-demo"
+      />
+    );
+    await clickTreeAction(user, 'Collapse all');
+    // The focused root stays expanded so the tree is never blanked, while
+    // containers within the subtree collapse.
+    expect(
+      screen.getByRole('button', { name: 'Toggle times-square-demo' })
+    ).toHaveAttribute('aria-expanded', 'true');
+    expect(
+      screen.getByRole('button', { name: 'Toggle weather' })
+    ).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('disables both bulk actions when the focused subtree has nothing to toggle', async () => {
+    const user = userEvent.setup();
+    render(
+      <TimesSquareGitHubNav
+        contentNodes={contentNodes}
+        pagePathRoot="/times-square/github"
+        pagePath={null}
         focusPath="lsst-sqre/times-square-demo/weather"
       />
     );
-    await user.click(screen.getByRole('button', { name: 'Collapse all' }));
-    // The focused root stays expanded so the tree is never blanked.
+    // The focused root is forced open and holds only pages, so neither
+    // expand-all nor collapse-all can change anything.
+    expect(await openTreeAction(user, 'Expand all')).toHaveAttribute(
+      'aria-disabled',
+      'true'
+    );
     expect(
-      screen.getByRole('button', { name: 'Toggle weather' })
-    ).toHaveAttribute('aria-expanded', 'true');
-    expect(screen.getByRole('link', { name: 'Summit Weather' })).toBeVisible();
+      within(document.body).getByRole('menuitem', { name: 'Collapse all' })
+    ).toHaveAttribute('aria-disabled', 'true');
+  });
+
+  it('renders no breadcrumb when focusing a top-level node', () => {
+    render(
+      <TimesSquareGitHubNav
+        contentNodes={contentNodes}
+        pagePathRoot="/times-square/github"
+        pagePath={null}
+        focusPath="lsst-sqre"
+      />
+    );
+    // A top-level focus has no ancestors, so there are no crumbs — the
+    // focused root row and the clear-focus control carry the focus UI.
+    expect(
+      screen.queryByRole('list', { name: 'Focus breadcrumb' })
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Clear focus' })).toBeVisible();
+    expect(
+      screen.getByRole('button', { name: 'Toggle lsst-sqre' })
+    ).toBeVisible();
   });
 
   it('renders the full tree when no focus path segment matches', () => {

@@ -94,7 +94,7 @@ describe('resolveFocus', () => {
 });
 
 describe('getFocusBreadcrumb', () => {
-  it('returns the ancestor chain ending with the focused node', () => {
+  it('returns the ancestor chain, excluding the focused node itself', () => {
     const resolved = resolveFocus(
       contentNodes,
       'lsst-sqre/times-square-demo/weather'
@@ -102,15 +102,12 @@ describe('getFocusBreadcrumb', () => {
     expect(resolved && getFocusBreadcrumb(resolved)).toEqual([
       { title: 'lsst-sqre', path: 'lsst-sqre' },
       { title: 'times-square-demo', path: 'lsst-sqre/times-square-demo' },
-      { title: 'weather', path: 'lsst-sqre/times-square-demo/weather' },
     ]);
   });
 
-  it('returns a single crumb for a top-level focus', () => {
+  it('returns no crumbs for a top-level focus', () => {
     const resolved = resolveFocus(contentNodes, 'lsst-sqre');
-    expect(resolved && getFocusBreadcrumb(resolved)).toEqual([
-      { title: 'lsst-sqre', path: 'lsst-sqre' },
-    ]);
+    expect(resolved && getFocusBreadcrumb(resolved)).toEqual([]);
   });
 });
 

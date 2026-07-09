@@ -87,13 +87,14 @@ export function resolveFocus(
 }
 
 /**
- * Build the breadcrumb for a resolved focus: the focused node's ancestor chain
- * (root-first) ending with the focused node itself.
+ * Build the breadcrumb for a resolved focus: the focused node's ancestor
+ * chain, root-first. The focused node itself is excluded — it renders as the
+ * tree root row directly beneath the breadcrumb, serving as the final crumb.
  */
 export function getFocusBreadcrumb(
   resolved: ResolvedFocus
 ): FocusBreadcrumbItem[] {
-  return [...resolved.ancestors, resolved.node].map((node) => ({
+  return resolved.ancestors.map((node) => ({
     title: node.title,
     path: node.path,
   }));

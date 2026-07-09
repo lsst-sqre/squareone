@@ -35,6 +35,13 @@ export type TreeExpansion = {
   collapseAll: () => void;
   /** Expand every container node in the tree. */
   expandAll: () => void;
+  /** Whether `expandAll` would change anything (some node is collapsed). */
+  canExpandAll: boolean;
+  /**
+   * Whether `collapseAll` would change anything (some collapsible node —
+   * i.e. not force-revealed — is expanded).
+   */
+  canCollapseAll: boolean;
 };
 
 /**
@@ -195,9 +202,30 @@ export function useTreeExpansion({
     setCollapsedPaths(new Set());
   }, []);
 
+  // `collapsedPaths` may hold stale entries (e.g. paths outside the currently
+  // rendered subtree in focus mode), so both flags consider only `allPaths`.
+  const canExpandAll = useMemo(
+    () => allPaths.some((path) => collapsedPaths.has(path)),
+    [allPaths, collapsedPaths]
+  );
+  const canCollapseAll = useMemo(
+    () =>
+      allPaths.some(
+        (path) => !collapsedPaths.has(path) && !revealedPaths.has(path)
+      ),
+    [allPaths, collapsedPaths, revealedPaths]
+  );
+
   return useMemo(
-    () => ({ isExpanded, toggle, collapseAll, expandAll }),
-    [isExpanded, toggle, collapseAll, expandAll]
+    () => ({
+      isExpanded,
+      toggle,
+      collapseAll,
+      expandAll,
+      canExpandAll,
+      canCollapseAll,
+    }),
+    [isExpanded, toggle, collapseAll, expandAll, canExpandAll, canCollapseAll]
   );
 }
 

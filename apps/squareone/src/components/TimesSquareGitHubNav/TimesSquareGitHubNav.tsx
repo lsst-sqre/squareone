@@ -7,8 +7,9 @@
 
 'use client';
 
+import { DropdownMenu } from '@lsst-sqre/squared';
 import type { ContentNode } from '@lsst-sqre/times-square-client';
-import { ChevronsDownUp, ChevronsUpDown, X } from 'lucide-react';
+import { MoreHorizontal, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import React, { useMemo } from 'react';
@@ -131,12 +132,15 @@ export default function TimesSquareGitHubNav({
     [contentNodes, focusPath]
   );
   const focusedNode = resolvedFocus?.node ?? null;
-  const breadcrumb = resolvedFocus ? getFocusBreadcrumb(resolvedFocus) : [];
+  const ancestorCrumbs = resolvedFocus ? getFocusBreadcrumb(resolvedFocus) : [];
   const visibleNodes = focusedNode ? [focusedNode] : contentNodes;
 
+  // Expansion state (and the expand/collapse-all actions built on it) is
+  // scoped to the visible subtree, so in focus mode the bulk actions and
+  // their enabled/disabled states reflect what is on screen.
   const allPaths = useMemo(
-    () => collectContainerPaths(contentNodes),
-    [contentNodes]
+    () => collectContainerPaths(visibleNodes),
+    [visibleNodes]
   );
   const expansion = useTreeExpansion({
     allPaths,
@@ -164,56 +168,56 @@ export default function TimesSquareGitHubNav({
 
   return (
     <nav>
-      {focusedNode && (
-        <div className={styles.breadcrumb}>
+      <div className={styles.header}>
+        {focusedNode && ancestorCrumbs.length > 0 && (
           <ol className={styles.breadcrumbList} aria-label="Focus breadcrumb">
-            {breadcrumb.map((crumb, index) => (
-              <li
-                key={crumb.path}
-                className={styles.breadcrumbItem}
-                aria-current={
-                  index === breadcrumb.length - 1 ? 'location' : undefined
-                }
-              >
-                {index === breadcrumb.length - 1 ? (
-                  crumb.title
-                ) : (
-                  <Link href={buildFocusHref(pathname, search, crumb.path)}>
-                    {crumb.title}
-                  </Link>
-                )}
+            {ancestorCrumbs.map((crumb) => (
+              <li key={crumb.path} className={styles.breadcrumbItem}>
+                <Link href={buildFocusHref(pathname, search, crumb.path)}>
+                  {crumb.title}
+                </Link>
               </li>
             ))}
           </ol>
-          <Link
-            href={buildFocusHref(pathname, search, null)}
-            className={styles.breadcrumbClear}
-            aria-label="Clear focus"
-            title="Clear focus"
-          >
-            <X className={styles.toolbarIcon} aria-hidden />
-          </Link>
+        )}
+        <div className={styles.headerActions}>
+          {focusedNode && (
+            <Link
+              href={buildFocusHref(pathname, search, null)}
+              className={styles.headerButton}
+              aria-label="Clear focus"
+              title="Clear focus"
+            >
+              <X className={styles.headerIcon} aria-hidden />
+            </Link>
+          )}
+          <DropdownMenu>
+            <DropdownMenu.Trigger asChild showChevron={false}>
+              <button
+                type="button"
+                className={styles.headerButton}
+                aria-label="Tree actions"
+                title="Tree actions"
+              >
+                <MoreHorizontal className={styles.headerIcon} aria-hidden />
+              </button>
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content align="end">
+              <DropdownMenu.Item
+                disabled={!expansion.canExpandAll}
+                onSelect={expansion.expandAll}
+              >
+                Expand all
+              </DropdownMenu.Item>
+              <DropdownMenu.Item
+                disabled={!expansion.canCollapseAll}
+                onSelect={expansion.collapseAll}
+              >
+                Collapse all
+              </DropdownMenu.Item>
+            </DropdownMenu.Content>
+          </DropdownMenu>
         </div>
-      )}
-      <div className={styles.toolbar}>
-        <button
-          type="button"
-          className={styles.toolbarButton}
-          onClick={expansion.expandAll}
-          aria-label="Expand all"
-          title="Expand all"
-        >
-          <ChevronsUpDown className={styles.toolbarIcon} aria-hidden />
-        </button>
-        <button
-          type="button"
-          className={styles.toolbarButton}
-          onClick={expansion.collapseAll}
-          aria-label="Collapse all"
-          title="Collapse all"
-        >
-          <ChevronsDownUp className={styles.toolbarIcon} aria-hidden />
-        </button>
       </div>
       <div className={styles.contentsWrapper}>{children}</div>
     </nav>

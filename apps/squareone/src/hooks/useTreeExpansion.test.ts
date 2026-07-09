@@ -218,6 +218,51 @@ describe('useTreeExpansion', () => {
     ).toBe(false);
   });
 
+  it('reports expandAll as a no-op while everything is expanded', () => {
+    const { result } = renderTreeExpansion();
+    expect(result.current.canExpandAll).toBe(false);
+    expect(result.current.canCollapseAll).toBe(true);
+
+    act(() => {
+      result.current.toggle('lsst-sqre/times-square-demo/weather');
+    });
+    expect(result.current.canExpandAll).toBe(true);
+  });
+
+  it('reports collapseAll as a no-op once every path is collapsed', () => {
+    const { result } = renderTreeExpansion();
+    act(() => {
+      result.current.collapseAll();
+    });
+    expect(result.current.canCollapseAll).toBe(false);
+    expect(result.current.canExpandAll).toBe(true);
+  });
+
+  it('excludes revealed paths from canCollapseAll', () => {
+    // Every path is either collapsed or force-revealed by the current page's
+    // ancestor chain, so collapseAll can change nothing.
+    const { result } = renderTreeExpansion({
+      currentPath: 'lsst-sqre/times-square-demo/weather/summit-weather',
+    });
+    act(() => {
+      result.current.collapseAll();
+    });
+    expect(result.current.canCollapseAll).toBe(false);
+    // Only the non-revealed path ('analysis') actually collapsed.
+    expect(result.current.canExpandAll).toBe(true);
+  });
+
+  it('ignores collapsed paths outside allPaths for canExpandAll', () => {
+    // A path collapsed on a prior visit that is no longer rendered (e.g. it
+    // is outside the focused subtree) must not enable expand-all.
+    window.sessionStorage.setItem(
+      storageKey,
+      JSON.stringify(['other-org/other-repo'])
+    );
+    const { result } = renderTreeExpansion();
+    expect(result.current.canExpandAll).toBe(false);
+  });
+
   it('does not reveal a sibling path sharing a string prefix with an ancestor', () => {
     const { result } = renderTreeExpansion({
       currentPath: 'lsst-sqre/times-square-demo/weather-archive/history',
