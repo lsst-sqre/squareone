@@ -1,5 +1,17 @@
 # @lsst-sqre/semaphore-client
 
+## 0.5.0
+
+### Minor Changes
+
+- [#549](https://github.com/lsst-sqre/squareone/pull/549) [`13ffc56`](https://github.com/lsst-sqre/squareone/commit/13ffc56a5ff7ddd5c26205dde0ff92410bd71776) Thanks [@jonathansick](https://github.com/jonathansick)! - Add a mark-unread capability mirroring the existing mark-read trio for the Semaphore 2.0 API (DM-55450).
+
+  - `markNotificationsUnread(semaphoreUrl, ids, csrfToken)` POSTs `{ ids }` to `POST /v1/notifications/unread` and, like `markNotificationsRead`, is idempotent (already-unread or unknown ids are silently ignored, `204 No Content`) and resolves to `void`. Both named exports now wrap a shared private helper that differs only by the `read`/`unread` path segment; the public API remains two named exports.
+  - `markNotificationsUnreadMutationOptions` and its `MarkNotificationsUnreadVariables` type perform the same `onSuccess` invalidations as mark-read (the `['user-notifications', url]` list prefix, `['unread-notification-count', url]`, and per-id `['user-notification', url, id]`).
+  - `useMarkNotificationsUnread` is a thin `useMutation` wrapper, exported alongside `useMarkNotificationsRead`.
+
+  Existing function signatures are unchanged.
+
 ## 0.4.0
 
 ### Minor Changes

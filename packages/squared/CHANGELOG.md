@@ -1,5 +1,58 @@
 # @lsst-sqre/squared
 
+## 0.15.1
+
+### Patch Changes
+
+- [#543](https://github.com/lsst-sqre/squareone/pull/543) [`8d095b5`](https://github.com/lsst-sqre/squareone/commit/8d095b58aea053bd9ecfb5948d5c6b6b93e9a7e6) Thanks [@jonathansick](https://github.com/jonathansick)! - Fix the dark-mode appearance of the shared `DataTable` component by migrating `DataTable.module.css` off the fixed `--rsd-color-gray-*` scale tokens (identical in both themes) onto the adaptive `--rsd-component-*` semantic tokens that re-map under `data-theme="dark"`.
+
+  Most visibly, the column headers previously rendered near-black (`--rsd-color-gray-700`) on the dark background — very low contrast on the `/admin/notifications` and `/notifications` pages. They now use `--rsd-component-text-secondary-color` (muted but legible in both themes). The full migration, matching the mapping convention this branch already established across the notification modules:
+
+  - muted/secondary text (`.caption`, `.headerCell`, `.sortIconInactive`, `.emptyCell`, from `gray-500`/`gray-700`/`gray-300`) → `--rsd-component-text-secondary-color`
+  - borders/dividers (`.head`, `.row`, `.rowGroup`, from `gray-100`/`gray-200`) → `--rsd-component-divider-color`
+  - subtle hover surface (`.sortButton:hover` background, from `gray-50`) → `--rsd-component-surface-secondary-background-color`
+
+  The Rubin brand-accent `--rsd-color-primary-*` tokens (sort-button hover/focus text, focus outline, active sort indicator) are intentionally left on their fixed scale, matching the prior notification-module slices. `DataTable` is a shared component, so this corrects dark mode for every consumer. Adds a `Dark` Storybook story variant so the fix is visually verifiable in both themes and can't silently rot.
+
+- [#543](https://github.com/lsst-sqre/squareone/pull/543) [`b90d533`](https://github.com/lsst-sqre/squareone/commit/b90d5334e74bbcb04d448a8f1d3db0ae2e150af2) Thanks [@jonathansick](https://github.com/jonathansick)! - Fix the dark-mode appearance of the squared `DateTimePicker` (and its `TimeInput`) by migrating their fixed `--rsd-color-gray-*` scale colors (identical in both themes) onto the adaptive `--rsd-component-*` semantic tokens that re-map under `data-theme="dark"` (DM-55433).
+
+  Most visibly, the calendar trigger, month-navigation buttons, weekday head cells, outside/adjacent days, and the time `:` separator previously rendered near-invisible fixed `--rsd-color-gray-400/500/600` on the dark background. They now use `--rsd-component-text-secondary-color` (muted but legible in both themes), matching the mapping convention this branch established across the notification modules, the shared `DataTable`/`KeyValueList`, and the form primitives.
+
+  The pass covers the whole calendar/time UI, migrating foreground and surface together so the popover reads correctly in dark:
+
+  - `DateTimePicker` — `.calendarButton`, `.calendarNavButton`, and `.calendarHeadCell` muted text plus `.calendarDayOutside` → `--rsd-component-text-secondary-color`; the `.calendarButton`/`.calendarNavButton` hover text → `--rsd-component-text-color`; the `.calendarButton`/`.calendarNavButton`/`.calendarDay`/`.monthSelect`/`.yearInput` hover and focus surfaces → `--rsd-component-surface-secondary-background-color`; and the `.calendarPopover`, `.monthSelect`, `.yearInput`, `.calendarNavButton`, and `.timeSection`/`.timezoneSection` borders/dividers → `--rsd-component-divider-color`. The now-redundant per-element `[data-theme="dark"]` border/surface overrides are dropped in favor of the adaptive tokens; the popover's deeper drop shadow and the month `<select>`'s lighter chevron glyph (an inline-SVG fill that can't reference a CSS variable) remain as genuine dark-only affordances.
+  - `TimeInput` — the spinbox `.timeSeparator` and button text → `--rsd-component-text-secondary-color`, its hover text → `--rsd-component-text-color`, the disabled/hover/active surfaces → `--rsd-component-surface-secondary-background-color`, and the spinbox container/button borders → `--rsd-component-divider-color`.
+
+  The Rubin brand-accent `--rsd-color-primary-*` selection/focus colors and the semantic `--rsd-color-red-600` error text are left as-is.
+
+  Removes `DateTimePicker.module.css` and `TimeInput.module.css` from the `validate-theme-tokens` baseline (`packages/repo-scripts/src/validate-theme-tokens.baseline.json`), since their flagged text colors are now genuinely adaptive; the guardrail stays green with the reduced baseline (16 known, all in the squareone app, remaining for a later batch). Adds a `Dark` Storybook story variant (pinning `globals: { theme: 'dark' }` via the existing `withThemeByDataAttribute` toolbar) that opens the calendar popover, so the head cells, day cells (selected and outside), hover states, and time inputs are visually verifiable in dark mode and can't silently rot.
+
+- [#543](https://github.com/lsst-sqre/squareone/pull/543) [`d7054ab`](https://github.com/lsst-sqre/squareone/commit/d7054ab8cc9de2056565ef29a7abcaa7510d6dfa) Thanks [@jonathansick](https://github.com/jonathansick)! - Fix the shared `ErrorMessage` component so that a caller passing `role="alert"` is announced assertively (interrupting) by assistive technology instead of politely (queued). Previously the component hardcoded `aria-live="polite"` and spread `{...props}` after it, so even when a caller such as the bulk-mark-read failure in `UserNotificationsTableView` supplied `role="alert"`, the explicit `aria-live="polite"` overrode the assertive live-region behavior that `role="alert"` implies. The component now derives `aria-live` from the effective role — `role="alert"` yields `assertive`, the default `role="status"` stays `polite` — while still honoring an explicitly passed `aria-live` prop as the ultimate override. Default behavior is unchanged.
+
+- [#543](https://github.com/lsst-sqre/squareone/pull/543) [`c3d2bbe`](https://github.com/lsst-sqre/squareone/commit/c3d2bbed184b2ba0d998137281a31fae2a42f3ff) Thanks [@jonathansick](https://github.com/jonathansick)! - Fix the dark-mode appearance of the squared form and menu primitives by migrating their fixed `--rsd-color-gray-*` scale text colors (identical in both themes) onto the adaptive `--rsd-component-*` semantic tokens that re-map under `data-theme="dark"` (DM-55433).
+
+  Most visibly, placeholder text, muted field/item descriptions, and trigger chevrons previously rendered near-invisible `--rsd-color-gray-500` on the dark background. They now use `--rsd-component-text-secondary-color` (muted but legible in both themes), matching the mapping convention this branch established across the notification modules and the shared `DataTable`/`KeyValueList`. The migration, by component:
+
+  - `Select` — chevron `.icon` and `.trigger[data-placeholder]` placeholder → `--rsd-component-text-secondary-color`
+  - `TextInput` — `.input::placeholder` and the leading/trailing icons → `--rsd-component-text-secondary-color`
+  - `TextArea` — `.textarea::placeholder` → `--rsd-component-text-secondary-color`
+  - `FormField` / `Label` / `Checkbox` / `CheckboxGroup` — the `.description` helper text → `--rsd-component-text-secondary-color`
+  - `RadioGroup` — the `.itemDescription` per-item helper text → `--rsd-component-text-secondary-color`
+  - `DropdownMenu` — the trigger chevron `.triggerIcon` and the group `.label` → `--rsd-component-text-secondary-color`
+  - `Button` — the `.text.secondary` label (a primary text weight, previously `--rsd-color-gray-800`) → `--rsd-component-text-color`
+
+  Also migrates `Select`'s hover/chip surfaces together with their foreground so they adapt too: the `.groupLabel` chip (text and its `gray-50` background), the `.scrollButton` muted text plus its hover text and hover background, and the `.item:hover` background → `--rsd-component-text-secondary-color` / `--rsd-component-text-color` / `--rsd-component-surface-secondary-background-color`.
+
+  Removes these ten components from the `validate-theme-tokens` baseline (`packages/repo-scripts/src/validate-theme-tokens.baseline.json`), since their flagged text colors are now genuinely adaptive; the guardrail stays green with the reduced baseline. Adds a `Dark` Storybook story variant (pinning `globals: { theme: 'dark' }` via the existing `withThemeByDataAttribute` toolbar) to `Select`, `TextInput`, `TextArea`, `Checkbox`, `RadioGroup`, and `DropdownMenu` so the muted text is visually verifiable in dark mode and can't silently rot. `DateTimePicker` and `TimeInput` remain baselined for a later batch.
+
+- [#543](https://github.com/lsst-sqre/squareone/pull/543) [`1fadc3d`](https://github.com/lsst-sqre/squareone/commit/1fadc3daa55c1cffdff964a2179a711688ee411b) Thanks [@jonathansick](https://github.com/jonathansick)! - Fix the dark-mode appearance of the shared `KeyValueList` component by migrating the `.term` (key/label) text color in `KeyValueList.module.css` off the fixed `--rsd-color-gray-500` scale token (identical in both themes) onto the adaptive `--rsd-component-text-secondary-color` semantic token that re-maps under `data-theme="dark"`.
+
+  The term labels previously rendered near-invisible `--rsd-color-gray-500` on the dark background — most visibly the "CPU", "Memory", etc. labels on `/settings/quotas`, which renders via the app's `QuotasView`. They now use `--rsd-component-text-secondary-color` (muted but legible in both themes), matching the mapping convention this branch established across the notification modules and the shared `DataTable`. `KeyValueList` is a shared component, so this corrects dark mode for every consumer. Adds a `Dark` Storybook story variant so the fix is visually verifiable in both themes and can't silently rot.
+
+- Updated dependencies [[`0fdb6db`](https://github.com/lsst-sqre/squareone/commit/0fdb6db7db652fe4578026f6c1ce8cb44c29f819)]:
+  - @lsst-sqre/rubin-style-dictionary@0.8.0
+  - @lsst-sqre/global-css@0.2.6
+
 ## 0.15.0
 
 ### Minor Changes
