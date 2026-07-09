@@ -73,6 +73,19 @@ export type UserNotificationsTableViewProps = {
    */
   onMarkRead?: (ids: string[]) => void;
   /**
+   * Mark a set of notifications unread.
+   *
+   * The mirror of {@link onMarkRead}. Supplying this backs each read row's
+   * per-row "Mark as unread" menu item and adds a "Mark as unread" item to the
+   * selection "Actions" dropdown that marks the read members of the selection
+   * unread. Like mark-read, the container owns the mutation and the shared cache
+   * invalidation that updates the list and the header unread count. It does not,
+   * on its own, enable the selection chrome — that is still gated on
+   * {@link onMarkRead}. When omitted, no per-row or bulk mark-unread action is
+   * shown.
+   */
+  onMarkUnread?: (ids: string[]) => void;
+  /**
    * Mark the entire filtered result set read, including pages not yet loaded.
    *
    * Backs the two-tier "Select all M notifications" extension: once every loaded
@@ -106,6 +119,8 @@ type NotificationRowProps = {
   permalinkBase: string;
   /** Mark this single notification read; enables the per-row "Mark as read". */
   onMarkRead?: (ids: string[]) => void;
+  /** Mark this single notification unread; enables the per-row "Mark as unread". */
+  onMarkUnread?: (ids: string[]) => void;
   /** Whether the leading selection checkbox is shown. */
   selectionEnabled: boolean;
 };
@@ -127,6 +142,7 @@ function NotificationRow({
   renderExpandedBody,
   permalinkBase,
   onMarkRead,
+  onMarkUnread,
   selectionEnabled,
 }: NotificationRowProps) {
   const isUnread = notification.read === null;
@@ -231,6 +247,11 @@ function NotificationRow({
               Mark as read
             </DropdownMenu.Item>
           )}
+          {!isUnread && onMarkUnread && (
+            <DropdownMenu.Item onSelect={() => onMarkUnread([notification.id])}>
+              Mark as unread
+            </DropdownMenu.Item>
+          )}
           <DropdownMenu.Item onSelect={handleCopyLink}>
             Copy link
           </DropdownMenu.Item>
@@ -276,6 +297,7 @@ export default function UserNotificationsTableView({
   renderExpandedBody,
   permalinkBase = '',
   onMarkRead,
+  onMarkUnread,
   onMarkAllMatchingRead,
 }: UserNotificationsTableViewProps) {
   const entries = notifications ?? [];
@@ -403,6 +425,22 @@ export default function UserNotificationsTableView({
     clearSelection();
   };
 
+  // Bulk mark-unread is loaded-selection-only: there is no "mark everything
+  // unread" across pages (the list API has no `read=true` filter, and it is not
+  // a real inbox action). Acting on the read members of whatever is selected
+  // among the loaded rows — via `isRowSelected` so an active "all matching"
+  // extension still covers the loaded read rows — mirrors mark-read's unread
+  // members.
+  const handleBulkMarkUnread = () => {
+    const ids = entries
+      .filter((n) => isRowSelected(n.id) && n.read !== null)
+      .map((n) => n.id);
+    if (ids.length > 0) {
+      onMarkUnread?.(ids);
+    }
+    clearSelection();
+  };
+
   let body: React.ReactNode;
   if (isLoading) {
     body = <div className={styles.loadingState}>Loading notifications…</div>;
@@ -449,6 +487,7 @@ export default function UserNotificationsTableView({
               renderExpandedBody={renderExpandedBody}
               permalinkBase={permalinkBase}
               onMarkRead={onMarkRead}
+              onMarkUnread={onMarkUnread}
               selectionEnabled={selectionEnabled}
             />
           ))}
@@ -505,6 +544,11 @@ export default function UserNotificationsTableView({
                     <DropdownMenu.Item onSelect={handleBulkMarkRead}>
                       Mark as read
                     </DropdownMenu.Item>
+                    {onMarkUnread && (
+                      <DropdownMenu.Item onSelect={handleBulkMarkUnread}>
+                        Mark as unread
+                      </DropdownMenu.Item>
+                    )}
                   </DropdownMenu.Content>
                 </DropdownMenu>
               </>

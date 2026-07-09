@@ -315,6 +315,75 @@ describe('UserNotificationsTableView', () => {
     expect(onMarkRead).toHaveBeenCalledWith(['ntf-001', 'ntf-003']);
   });
 
+  it('offers a bulk Mark as unread that marks the read members of the selection', async () => {
+    const user = userEvent.setup();
+    const onMarkRead = vi.fn();
+    const onMarkUnread = vi.fn();
+    render(
+      <UserNotificationsTableView
+        notifications={mockUserNotifications}
+        totalCount={mockUserNotifications.length}
+        onMarkRead={onMarkRead}
+        onMarkUnread={onMarkUnread}
+      />
+    );
+
+    await user.click(screen.getByRole('checkbox', { name: /select all/i }));
+    await user.click(screen.getByRole('button', { name: 'Actions' }));
+    await user.click(screen.getByRole('menuitem', { name: /mark as unread/i }));
+
+    // ntf-002 and ntf-005 are the only read rows, so only those are marked
+    // unread; the unread rows are left untouched.
+    expect(onMarkUnread).toHaveBeenCalledWith(['ntf-002', 'ntf-005']);
+    expect(onMarkRead).not.toHaveBeenCalled();
+  });
+
+  it('clears the selection after the bulk Mark as unread', async () => {
+    const user = userEvent.setup();
+    render(
+      <UserNotificationsTableView
+        notifications={mockUserNotifications}
+        totalCount={mockUserNotifications.length}
+        onMarkRead={vi.fn()}
+        onMarkUnread={vi.fn()}
+      />
+    );
+
+    await user.click(screen.getByRole('checkbox', { name: /select all/i }));
+    await user.click(screen.getByRole('button', { name: 'Actions' }));
+    await user.click(screen.getByRole('menuitem', { name: /mark as unread/i }));
+
+    expect(
+      screen.queryByRole('button', { name: 'Actions' })
+    ).not.toBeInTheDocument();
+    for (const checkbox of screen.getAllByRole('checkbox', {
+      name: /select notification/i,
+    })) {
+      expect(checkbox).not.toBeChecked();
+    }
+  });
+
+  it('omits the bulk Mark as unread item without an onMarkUnread handler', async () => {
+    const user = userEvent.setup();
+    render(
+      <UserNotificationsTableView
+        notifications={mockUserNotifications}
+        totalCount={mockUserNotifications.length}
+        onMarkRead={vi.fn()}
+      />
+    );
+
+    await user.click(screen.getByRole('checkbox', { name: /select all/i }));
+    await user.click(screen.getByRole('button', { name: 'Actions' }));
+
+    expect(
+      screen.getByRole('menuitem', { name: /mark as read/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('menuitem', { name: /mark as unread/i })
+    ).not.toBeInTheDocument();
+  });
+
   it('offers select-all-across-pages when every loaded row is selected and more pages exist', async () => {
     const user = userEvent.setup();
     const onMarkRead = vi.fn();
@@ -574,6 +643,71 @@ describe('UserNotificationsTableView', () => {
     expect(
       screen.getByRole('menuitem', { name: /copy link/i })
     ).toBeInTheDocument();
+  });
+
+  it('shows Mark as unread for a read row and marks it unread', async () => {
+    const user = userEvent.setup();
+    const onMarkUnread = vi.fn();
+    render(
+      <UserNotificationsTableView
+        notifications={mockUserNotifications.slice(0, 2)}
+        totalCount={2}
+        permalinkBase="https://example.test"
+        onMarkRead={vi.fn()}
+        onMarkUnread={onMarkUnread}
+      />
+    );
+
+    const menus = screen.getAllByRole('button', {
+      name: /notification actions/i,
+    });
+
+    // ntf-001 is unread → Mark as read, no Mark as unread.
+    await user.click(menus[0]);
+    expect(
+      screen.getByRole('menuitem', { name: /mark as read/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('menuitem', { name: /mark as unread/i })
+    ).not.toBeInTheDocument();
+
+    await user.keyboard('{Escape}');
+
+    // ntf-002 is read → Mark as unread, no Mark as read.
+    const menusAgain = screen.getAllByRole('button', {
+      name: /notification actions/i,
+    });
+    await user.click(menusAgain[1]);
+    expect(
+      screen.queryByRole('menuitem', { name: /mark as read/i })
+    ).not.toBeInTheDocument();
+    const markUnread = screen.getByRole('menuitem', {
+      name: /mark as unread/i,
+    });
+    expect(markUnread).toBeInTheDocument();
+
+    await user.click(markUnread);
+    expect(onMarkUnread).toHaveBeenCalledWith(['ntf-002']);
+  });
+
+  it('hides the per-row Mark as unread item without an onMarkUnread handler', async () => {
+    const user = userEvent.setup();
+    render(
+      <UserNotificationsTableView
+        notifications={mockUserNotifications.slice(0, 2)}
+        totalCount={2}
+        onMarkRead={vi.fn()}
+      />
+    );
+
+    // ntf-002 is read, but with no onMarkUnread handler the item is absent.
+    const menus = screen.getAllByRole('button', {
+      name: /notification actions/i,
+    });
+    await user.click(menus[1]);
+    expect(
+      screen.queryByRole('menuitem', { name: /mark as unread/i })
+    ).not.toBeInTheDocument();
   });
 
   it('copies the absolute permalink when "Copy link" is chosen', async () => {
