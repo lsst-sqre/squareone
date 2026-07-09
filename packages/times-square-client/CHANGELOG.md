@@ -1,5 +1,11 @@
 # @lsst-sqre/times-square-client
 
+## 2.1.0
+
+### Minor Changes
+
+- [#535](https://github.com/lsst-sqre/squareone/pull/535) [`0ebcf3b`](https://github.com/lsst-sqre/squareone/commit/0ebcf3b6925c5e1863be8f8b0c7d7f8406a84f16) Thanks [@jonathansick](https://github.com/jonathansick)! - Add `normalizeGitHubContents()`, a client-side normalization pass that recursively merges duplicate sibling `directory` nodes (concatenating their contents in order) in the GitHub contents tree. The pass is applied when parsing both the `/github` and `/github-pr/...` responses, keeping the sidebar correct against Times Square deployments that predate the server-side fix (lsst-sqre/times-square#140); it is idempotent against fixed servers. New mock fixtures (`mockGitHubContentsNested`, `mockGitHubContentsDuplicateDirectories`) cover multi-segment nested directories and the duplicate-directory bug shape, and the squareone dev API route for `/times-square/api/v1/github` now serves the buggy shape so the normalizer is exercised in development.
+
 ## 2.0.0
 
 ### Patch Changes
