@@ -72,9 +72,10 @@ export type UseTimesSquarePageReturn = {
  *
  * When PR coordinates (`owner`, `repo`, `commit`) are all provided on the
  * options object, the hook fetches the PR-preview endpoint
- * (`GET /times-square/v1/github-pr/{owner}/{repo}/{commit}/{path}`), using
- * `displayPath` as the repo-relative notebook `path`. Otherwise it fetches
- * the merged-page endpoint (`GET /times-square/v1/github/{display_path}`).
+ * (`GET /v1/github-pr/{owner}/{repo}/{commit}/{path}` under the Times Square
+ * base URL), using `displayPath` as the repo-relative notebook `path`.
+ * Otherwise it fetches the merged-page endpoint
+ * (`GET /v1/github/{display_path}`).
  * Both endpoints return the identical `Page` model, so the return shape is
  * unchanged regardless of which branch is taken.
  *
