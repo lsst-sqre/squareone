@@ -46,7 +46,12 @@ export default function TimesSquareHtmlEventsProviderClient({
   const repertoireUrl = useRepertoireUrl();
   const urlParameters = useContext(TimesSquareUrlParametersContext);
   const githubSlug = urlParameters?.githubSlug ?? '';
-  const { htmlEventsUrl } = useTimesSquarePage(githubSlug, { repertoireUrl });
+  const { htmlEventsUrl } = useTimesSquarePage(githubSlug, {
+    repertoireUrl,
+    owner: urlParameters?.owner,
+    repo: urlParameters?.repo,
+    commit: urlParameters?.commit,
+  });
 
   const urlQueryString = urlParameters?.urlQueryString;
   const fullHtmlEventsUrl = htmlEventsUrl

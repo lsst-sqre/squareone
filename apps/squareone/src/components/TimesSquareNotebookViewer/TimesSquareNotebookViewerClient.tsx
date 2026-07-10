@@ -25,12 +25,22 @@ export default function TimesSquareNotebookViewerClient() {
       'TimesSquareUrlParametersContext must be used within a provider'
     );
   }
-  const { githubSlug, notebookParameters, displaySettings, tsPageUrl } =
-    context;
+  const {
+    githubSlug,
+    notebookParameters,
+    displaySettings,
+    tsPageUrl,
+    owner,
+    repo,
+    commit,
+  } = context;
 
   // First get page metadata to get htmlStatusUrl
   const { htmlStatusUrl } = useTimesSquarePage(githubSlug ?? '', {
     repertoireUrl,
+    owner,
+    repo,
+    commit,
   });
 
   // Combine notebook params with display settings for the status URL

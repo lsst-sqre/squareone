@@ -82,9 +82,15 @@ export default function TimesSquareParametersClient() {
     displaySettings,
     notebookParameters: userParameters,
     githubSlug,
+    owner,
+    repo,
+    commit,
   } = context;
   const { parameters } = useTimesSquarePage(githubSlug ?? '', {
     repertoireUrl,
+    owner,
+    repo,
+    commit,
   });
 
   const ajv = new Ajv({ coerceTypes: true });
