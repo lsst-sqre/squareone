@@ -46,12 +46,21 @@ describe('GET /api/dev/gafaelfawr/v1/users/:username/tokens/:key', () => {
   });
 
   it('returns 404 for an unknown key', async () => {
-    setDevState({ loggedIn: true });
+    setDevState({ loggedIn: true, username: 'vera' });
     const response = await GET(
       new Request('http://localhost'),
       makeParams('vera', 'gtdoesnotexist1234567')
     );
     expect(response.status).toBe(404);
+  });
+
+  it('returns 403 when requesting another user’s token', async () => {
+    setDevState({ loggedIn: true, username: 'vera' });
+    const response = await GET(
+      new Request('http://localhost'),
+      makeParams('someone-else', 'gtsession1234567890abc')
+    );
+    expect(response.status).toBe(403);
   });
 });
 
@@ -73,11 +82,20 @@ describe('DELETE /api/dev/gafaelfawr/v1/users/:username/tokens/:key', () => {
   });
 
   it('returns 404 when revoking an unknown token', async () => {
-    setDevState({ loggedIn: true });
+    setDevState({ loggedIn: true, username: 'vera' });
     const response = await DELETE(
       new Request('http://localhost', { method: 'DELETE' }),
       makeParams('vera', 'gtdoesnotexist1234567')
     );
     expect(response.status).toBe(404);
+  });
+
+  it('returns 403 when revoking another user’s token', async () => {
+    setDevState({ loggedIn: true, username: 'vera' });
+    const response = await DELETE(
+      new Request('http://localhost', { method: 'DELETE' }),
+      makeParams('someone-else', 'gtsession1234567890abc')
+    );
+    expect(response.status).toBe(403);
   });
 });

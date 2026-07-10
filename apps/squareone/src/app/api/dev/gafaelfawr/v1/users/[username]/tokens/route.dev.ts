@@ -15,10 +15,12 @@
  * `pageExtensions`), so it never reaches the production bundle.
  */
 
+import { CreateTokenRequestSchema } from '@lsst-sqre/gafaelfawr-client';
 import { NextResponse } from 'next/server';
 
 import { getDevState } from '@/lib/mocks/devstate';
 import { addDevUserToken, getDevUserTokens } from '@/lib/mocks/userTokensStore';
+import { forbiddenIfNotSelf, validationErrorResponse } from './authz.dev';
 
 export async function GET(
   _request: Request,
@@ -30,7 +32,13 @@ export async function GET(
   }
 
   const { username } = await params;
-  return NextResponse.json(getDevUserTokens(decodeURIComponent(username)));
+  const decodedUsername = decodeURIComponent(username);
+  const forbidden = forbiddenIfNotSelf(decodedUsername);
+  if (forbidden) {
+    return forbidden;
+  }
+
+  return NextResponse.json(getDevUserTokens(decodedUsername));
 }
 
 export async function POST(
@@ -43,12 +51,40 @@ export async function POST(
   }
 
   const { username } = await params;
-  const body = await request.json();
+  const decodedUsername = decodeURIComponent(username);
+  const forbidden = forbiddenIfNotSelf(decodedUsername);
+  if (forbidden) {
+    return forbidden;
+  }
 
-  const created = addDevUserToken(decodeURIComponent(username), {
-    token_name: body.token_name,
-    scopes: Array.isArray(body.scopes) ? body.scopes : [],
-    expires: body.expires ?? null,
+  // Real Gafaelfawr returns a 422 for a malformed or schema-invalid body, so
+  // parse defensively rather than letting request.json() throw a 500 or
+  // storing an unvalidated (e.g. name-less) token.
+  let payload: unknown;
+  try {
+    payload = await request.json();
+  } catch {
+    return validationErrorResponse(
+      ['body'],
+      'Invalid JSON body',
+      'value_error'
+    );
+  }
+
+  const result = CreateTokenRequestSchema.safeParse(payload);
+  if (!result.success) {
+    const issue = result.error.issues[0];
+    return validationErrorResponse(
+      ['body', ...(issue?.path ?? [])],
+      issue?.message ?? 'Invalid token creation request',
+      issue?.code ?? 'value_error'
+    );
+  }
+
+  const created = addDevUserToken(decodedUsername, {
+    token_name: result.data.token_name,
+    scopes: result.data.scopes,
+    expires: result.data.expires ?? null,
   });
 
   // Gafaelfawr returns the one-time full token string, not the stored record.

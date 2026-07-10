@@ -20,6 +20,7 @@ import {
   deleteDevUserToken,
   getDevUserTokenByKey,
 } from '@/lib/mocks/userTokensStore';
+import { forbiddenIfNotSelf } from '../authz.dev';
 
 export async function GET(
   _request: Request,
@@ -31,7 +32,13 @@ export async function GET(
   }
 
   const { username, key } = await params;
-  const token = getDevUserTokenByKey(decodeURIComponent(username), key);
+  const decodedUsername = decodeURIComponent(username);
+  const forbidden = forbiddenIfNotSelf(decodedUsername);
+  if (forbidden) {
+    return forbidden;
+  }
+
+  const token = getDevUserTokenByKey(decodedUsername, key);
 
   if (!token) {
     return NextResponse.json(
@@ -53,7 +60,13 @@ export async function DELETE(
   }
 
   const { username, key } = await params;
-  const deleted = deleteDevUserToken(decodeURIComponent(username), key);
+  const decodedUsername = decodeURIComponent(username);
+  const forbidden = forbiddenIfNotSelf(decodedUsername);
+  if (forbidden) {
+    return forbidden;
+  }
+
+  const deleted = deleteDevUserToken(decodedUsername, key);
 
   if (!deleted) {
     return NextResponse.json(
