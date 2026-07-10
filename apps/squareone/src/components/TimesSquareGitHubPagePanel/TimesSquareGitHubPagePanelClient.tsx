@@ -30,9 +30,14 @@ export default function TimesSquareGitHubPagePanelClient() {
       'TimesSquareUrlParametersContext must be used within a provider'
     );
   }
-  const { urlQueryString, githubSlug } = context;
+  const { urlQueryString, githubSlug, owner, repo, commit } = context;
   const { title, description, renderedUrl, github, isLoading, error } =
-    useTimesSquarePage(githubSlug ?? '', { repertoireUrl });
+    useTimesSquarePage(githubSlug ?? '', {
+      repertoireUrl,
+      owner,
+      repo,
+      commit,
+    });
 
   // Show loading state until client-side hydration
   if (!isClient) {
