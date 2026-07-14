@@ -22,6 +22,14 @@ function getCategoryColor(category: Broadcast['category']): string {
   }
 }
 
+// Banners arrive after a client-side fetch, so they must live in an ARIA live
+// region to be announced by a screen reader. An outage is urgent and gets an
+// assertive `role="alert"`; info/notice (and any other category) are announced
+// politely via `role="status"`.
+function getCategoryRole(category: Broadcast['category']): 'status' | 'alert' {
+  return category === 'outage' ? 'alert' : 'status';
+}
+
 /*
  * A broadcast message banner.
  */
@@ -41,6 +49,7 @@ export default function BroadcastBanner({ broadcast }: BroadcastBannerProps) {
   return (
     <div
       className={styles.container}
+      role={getCategoryRole(broadcast.category)}
       style={
         {
           '--banner-bg': getCategoryColor(broadcast.category),
