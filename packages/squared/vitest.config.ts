@@ -55,7 +55,9 @@ export default defineConfig({
             headless: true,
             instances: [{ browser: 'chromium' }],
           },
-          setupFiles: ['./.storybook/vitest.setup.ts'],
+          // Preview annotations (including addon-a11y and ./preview) are
+          // auto-provisioned by @storybook/addon-vitest since Storybook 10.3,
+          // so no setup file / setProjectAnnotations call is needed here.
           environment: 'jsdom',
         },
       }),
