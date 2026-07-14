@@ -71,7 +71,9 @@
 }
 
 .solid.primary:hover:not(:disabled):not(.disabled) {
-  background-color: var(--rsd-color-primary-400);
+  /* Darken on hover: brightening to primary-400 dropped white text to
+   * 2.40:1. primary-700 keeps white label text at 10.07:1. */
+  background-color: var(--rsd-color-primary-700);
 }
 
 .solid.primary:active:not(:disabled):not(.disabled) {
@@ -108,16 +110,19 @@
 
 /* Solid + Danger */
 .solid.danger {
-  background-color: var(--rsd-color-red-500);
+  /* White label on red: use red-600 (7.17:1 on white), not red-500
+   * (#ed4c4c, only 3.66:1). */
+  background-color: var(--rsd-color-red-600);
   color: white;
 }
 
 .solid.danger:hover:not(:disabled):not(.disabled) {
-  background-color: #dc3232;
+  /* Darken on hover to red-700 (white text 8.06:1). */
+  background-color: var(--rsd-color-red-700);
 }
 
 .solid.danger:active:not(:disabled):not(.disabled) {
-  background-color: #c92a2a;
+  background-color: var(--rsd-color-red-800);
 }
 
 /* Appearance: Outline */
@@ -172,12 +177,15 @@
 
 /* Outline + Danger */
 .outline.danger {
-  border-color: var(--rsd-color-red-500);
-  color: var(--rsd-color-red-500);
+  /* Label text on the page background: red-600 (7.17:1 on white), not
+   * red-500 (#ed4c4c, only 3.66:1). Border keeps the same token. */
+  border-color: var(--rsd-color-red-600);
+  color: var(--rsd-color-red-600);
 }
 
 .outline.danger:hover:not(:disabled):not(.disabled) {
-  background-color: var(--rsd-color-red-500);
+  /* Hover fills with red under white text: red-600 for 7.17:1. */
+  background-color: var(--rsd-color-red-600);
   color: white;
 }
 
@@ -227,11 +235,14 @@
 
 /* Text + Danger */
 .text.danger {
-  color: var(--rsd-color-red-500);
+  /* Danger label on the page background: red-600 (7.17:1 on white), not
+   * red-500 (#ed4c4c, only 3.66:1). */
+  color: var(--rsd-color-red-600);
 }
 
 .text.danger:hover:not(:disabled):not(.disabled) {
-  background-color: rgba(237, 76, 76, 0.1);
+  /* red-600 (#ad1919) at 10% opacity to match the darker label. */
+  background-color: rgba(173, 25, 25, 0.1);
 }
 
 /* Icons */

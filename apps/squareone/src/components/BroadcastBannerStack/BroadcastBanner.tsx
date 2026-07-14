@@ -16,9 +16,13 @@ function getCategoryColor(category: Broadcast['category']): string {
       // (>=4.5:1) rather than the raw brand primary-600 (4.14:1 on white).
       return 'var(--rsd-component-interactive-color)';
     case 'outage':
-      return 'var(--rsd-color-red-500)';
+      // White banner text sits on this color, so use red-600 (#ad1919,
+      // 7.17:1 on white) rather than red-500 (#ed4c4c, only 3.66:1).
+      return 'var(--rsd-color-red-600)';
     case 'notice':
-      return 'var(--rsd-color-orange-500)';
+      // White banner text sits on this color, so use orange-600 (#8f4d0a,
+      // 6.49:1 on white) rather than orange-500 (#e08d35, only 2.61:1).
+      return 'var(--rsd-color-orange-600)';
     default:
       return 'var(--rsd-color-gray-500)';
   }
