@@ -1,0 +1,17 @@
+component:
+  # Semantic accent color for text and interactive foregrounds.
+  #
+  # Resolves to primary-650, the accessible teal (>=4.5:1 on white), so
+  # components can migrate off raw `color.primary.600` references (which
+  # only reach 4.14:1) for text and interactive uses. The brand teal
+  # (primary-600) is retained for non-text accents such as focus rings,
+  # borders, and checked-state fills where the 3:1 non-text bar applies.
+  interactive:
+    color:
+      themed:
+        light:
+          value: '{color.primary.650.value}'
+          comment: 'Accessible teal accent for text/interactive foregrounds.'
+        dark:
+          value: '{color.primary.400.value}'
+          comment: 'Accessible teal accent for text/interactive foregrounds in dark theme.'

@@ -44,6 +44,8 @@ component:
       color:
         themed:
           light:
-            value: '{color.primary.600.value}'
+            value: '{component.text.color.themed.light.value}'
+            comment: 'Headlines render in body text color (gray-800) so h1/h2 are black, not brand teal.'
           dark:
-            value: '{color.primary.600.value}'
+            value: '{component.text.color.themed.dark.value}'
+            comment: 'Headlines render in dark-theme body text color, not brand teal.'
