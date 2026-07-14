@@ -36,7 +36,7 @@
 
   /* Consistent with TextInput */
   font-family: inherit;
-  border: 1px solid var(--rsd-color-gray-100);
+  border: 1px solid var(--rsd-color-gray-400);
   border-radius: var(--sqo-border-radius-1);
   background: var(--rsd-component-page-background-color);
   color: var(--rsd-component-text-color);
@@ -87,12 +87,12 @@
 
 /* Appearance variants */
 .default {
-  border-color: var(--rsd-color-gray-100);
+  border-color: var(--rsd-color-gray-400);
 }
 
 .error {
   border-color: var(--rsd-color-red-500);
-  color: var(--rsd-color-red-900);
+  color: var(--rsd-color-red-600);
 }
 
 .error:focus-visible {
@@ -102,7 +102,7 @@
 
 .success {
   border-color: var(--rsd-color-green-500);
-  color: var(--rsd-color-green-900);
+  color: var(--rsd-color-green-600);
 }
 
 .success:focus-visible {
