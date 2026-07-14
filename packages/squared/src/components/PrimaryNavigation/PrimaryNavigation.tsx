@@ -1,13 +1,40 @@
 'use client';
 
 import * as RadixNavigationMenu from '@radix-ui/react-navigation-menu';
+import { Menu } from 'lucide-react';
 import type React from 'react';
-import { forwardRef, useEffect, useRef } from 'react';
+import { forwardRef, useEffect, useId, useRef, useState } from 'react';
 import styles from './PrimaryNavigation.module.css';
 import { mergeReferences } from './utils';
 
+/**
+ * Props for {@link PrimaryNavigation}, extending the Radix Navigation Menu root
+ * props with the responsive-collapse controls.
+ */
+export type PrimaryNavigationProps = React.ComponentPropsWithoutRef<
+  typeof RadixNavigationMenu.Root
+> & {
+  /**
+   * When `true` (the default), a hamburger toggle button is rendered that
+   * collapses the navigation into a disclosure menu below the CSS breakpoint.
+   * Set to `false` to always render the full inline navigation (e.g. for a
+   * consumer that provides its own responsive treatment).
+   */
+  collapsible?: boolean;
+  /**
+   * Accessible name for the collapse toggle when the menu is closed.
+   * @default 'Open navigation menu'
+   */
+  openMenuLabel?: string;
+  /**
+   * Accessible name for the collapse toggle when the menu is open.
+   * @default 'Close navigation menu'
+   */
+  closeMenuLabel?: string;
+};
+
 export type PrimaryNavigationType = React.ForwardRefExoticComponent<
-  React.ComponentPropsWithoutRef<typeof RadixNavigationMenu.Root> &
+  PrimaryNavigationProps &
     React.RefAttributes<React.ComponentRef<typeof RadixNavigationMenu.Root>>
 > & {
   Item: typeof Item;
@@ -20,14 +47,57 @@ export type PrimaryNavigationType = React.ForwardRefExoticComponent<
 
 /**
  * Primary navigation component that provides a layout for navigation items and a viewport.
+ *
+ * Below the CSS breakpoint (`--primary-navigation-collapse-breakpoint`,
+ * `60rem` by default) the navigation collapses behind an accessible hamburger
+ * toggle: the toggle exposes `aria-expanded` and `aria-controls`, Escape closes
+ * the menu and returns focus to the toggle, and the menu items stay keyboard
+ * operable. Pass `collapsible={false}` to opt out of the collapse behavior.
  */
-export const PrimaryNavigation = forwardRef(
-  ({ className, children, ...props }, reference) => {
+export const PrimaryNavigation = forwardRef<
+  React.ComponentRef<typeof RadixNavigationMenu.Root>,
+  PrimaryNavigationProps
+>(
+  (
+    {
+      className,
+      children,
+      collapsible = true,
+      openMenuLabel = 'Open navigation menu',
+      closeMenuLabel = 'Close navigation menu',
+      ...props
+    },
+    reference
+  ) => {
     // Radix Navigation Menu doesn't position the menu content under the trigger by default.
     // This solution is based on the following issue comment:
     // https://github.com/radix-ui/primitives/issues/1462#issuecomment-2275683692
     // Essentially it uses a MutationObserver to update the position of the menu content.
     const containerReference = useRef<HTMLElement>(null);
+
+    // Disclosure state for the collapsed/hamburger menu. The toggle is only
+    // visible below the CSS breakpoint; above it the list is always shown.
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const toggleReference = useRef<HTMLButtonElement>(null);
+    const listId = useId();
+
+    // Escape closes the collapsed menu and returns focus to the toggle,
+    // mirroring the SidebarLayout mobile-menu pattern.
+    useEffect(() => {
+      if (!collapsible || !isMenuOpen) return () => {};
+
+      const handleKeyDown = (event: KeyboardEvent) => {
+        if (event.key === 'Escape') {
+          setIsMenuOpen(false);
+          toggleReference.current?.focus();
+        }
+      };
+
+      document.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.removeEventListener('keydown', handleKeyDown);
+      };
+    }, [collapsible, isMenuOpen]);
 
     useEffect(() => {
       // Constainer is the <nav> element (essentially Root)
@@ -98,13 +168,34 @@ export const PrimaryNavigation = forwardRef(
       };
     }, []);
 
+    const listClassName = collapsible
+      ? `${styles.itemList} ${styles.collapsible} ${
+          isMenuOpen ? styles.open : styles.closed
+        }`
+      : styles.itemList;
+
     return (
       <RadixNavigationMenu.Root
         ref={mergeReferences([reference, containerReference])}
         {...props}
-        className={`${styles.root} ${className || ''}`.trim()}
+        className={`${styles.root} ${
+          collapsible ? styles.rootCollapsible : ''
+        } ${className || ''}`.trim()}
       >
-        <RadixNavigationMenu.List className={styles.itemList}>
+        {collapsible && (
+          <button
+            ref={toggleReference}
+            type="button"
+            className={styles.menuToggle}
+            aria-expanded={isMenuOpen}
+            aria-controls={listId}
+            aria-label={isMenuOpen ? closeMenuLabel : openMenuLabel}
+            onClick={() => setIsMenuOpen((open) => !open)}
+          >
+            <Menu aria-hidden="true" />
+          </button>
+        )}
+        <RadixNavigationMenu.List id={listId} className={listClassName}>
           {children}
         </RadixNavigationMenu.List>
         <NavigationMenuViewport />

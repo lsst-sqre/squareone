@@ -1,6 +1,60 @@
 /* Root component styles */
 .root {
+  /* Breakpoint below which the navigation collapses to a hamburger menu.
+   * Matches the SidebarLayout mobile breakpoint (60rem) for a consistent
+   * responsive treatment across the app shell. Consumers can override this
+   * custom property to tune the collapse point. */
+  --primary-navigation-collapse-breakpoint: 60rem;
+
   position: relative;
+}
+
+/* Hamburger toggle button (visible only below the collapse breakpoint) */
+.menuToggle {
+  display: none; /* hidden above the breakpoint; shown in the media query */
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+
+  /* Reset button styles */
+  background-color: transparent;
+  border: 2px solid transparent;
+  border-radius: 0.5rem;
+  color: var(--rsd-component-header-nav-text-color);
+  cursor: pointer;
+}
+
+.menuToggle:hover {
+  color: var(--rsd-component-header-nav-text-hover-color);
+}
+
+.menuToggle:focus-visible {
+  outline: 2px solid var(--rsd-color-primary-500);
+  outline-offset: 2px;
+}
+
+.menuToggle svg {
+  display: block;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+/* Below the breakpoint: show the toggle and collapse the item list into a
+ * disclosure controlled by the toggle's open/closed state. */
+@media (max-width: 60rem) {
+  .rootCollapsible .menuToggle {
+    display: inline-flex;
+  }
+
+  .collapsible.closed {
+    display: none;
+  }
+
+  .collapsible.open {
+    display: flex;
+    flex-direction: column;
+    justify-self: stretch;
+  }
 }
 
 /* Item list container styles */
@@ -38,8 +92,9 @@
   text-decoration-color: var(--rsd-component-header-nav-text-hover-color);
 }
 
-.triggerLink:focus {
-  outline: 1px solid var(--rsd-color-primary-500);
+.triggerLink:focus-visible {
+  outline: 2px solid var(--rsd-color-primary-500);
+  outline-offset: 2px;
 }
 
 /* Styled trigger (for dropdown triggers) styles */
@@ -53,8 +108,9 @@
   border-radius: 0.5rem;
 }
 
-.styledTrigger:focus {
-  outline: 1px solid var(--rsd-color-primary-500);
+.styledTrigger:focus-visible {
+  outline: 2px solid var(--rsd-color-primary-500);
+  outline-offset: 2px;
 }
 
 .styledTrigger:hover {
@@ -115,16 +171,18 @@
 
   color: var(--rsd-component-header-nav-menulist-text-color);
 
-  outline: 1px solid transparent;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
 }
 
 .link:last-of-type {
   margin-bottom: 0;
 }
 
-.link:focus {
-  outline: 1px solid
+.link:focus-visible {
+  outline: 2px solid
     var(--rsd-component-header-nav-menulist-selected-background-color);
+  outline-offset: 2px;
 }
 
 .link:hover {
