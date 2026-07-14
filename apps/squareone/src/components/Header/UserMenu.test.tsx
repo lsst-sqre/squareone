@@ -133,6 +133,18 @@ describe('UserMenu', () => {
     );
   });
 
+  test('marks the decorative trigger chevron as aria-hidden', () => {
+    mockUser();
+
+    const { container } = renderMenu();
+
+    // The chevron is purely decorative — the trigger already reads out the
+    // username — so it must be hidden from assistive technology.
+    const chevron = container.querySelector('svg.lucide-chevron-down');
+    expect(chevron).not.toBeNull();
+    expect(chevron).toHaveAttribute('aria-hidden', 'true');
+  });
+
   test('does not show an Admin link when the user lacks exec:admin', async () => {
     const user = userEvent.setup();
     mockUser();

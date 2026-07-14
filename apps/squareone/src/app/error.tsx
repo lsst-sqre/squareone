@@ -2,7 +2,7 @@
 
 import * as Sentry from '@sentry/nextjs';
 import Link from 'next/link';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 import styles from '../components/MainContent/MainContent.module.css';
 
@@ -23,9 +23,18 @@ type ErrorProps = {
  * structure, so it can use the existing styling and navigation.
  */
 export default function ErrorPage({ error, reset }: ErrorProps) {
+  const headingRef = useRef<HTMLHeadingElement>(null);
+
   useEffect(() => {
     Sentry.captureException(error);
   }, [error]);
+
+  // Move focus to the error heading so keyboard and screen reader users are
+  // told the page changed to an error state. The heading is made focusable
+  // with tabIndex={-1} (programmatic focus only, not a Tab stop).
+  useEffect(() => {
+    headingRef.current?.focus();
+  }, []);
 
   return (
     // The single <main> landmark is owned by the root layout's AppShell; this
@@ -39,7 +48,9 @@ export default function ErrorPage({ error, reset }: ErrorProps) {
           textAlign: 'center',
         }}
       >
-        <h1>Something went wrong</h1>
+        <h1 ref={headingRef} tabIndex={-1}>
+          Something went wrong
+        </h1>
         <p
           style={{
             color: 'var(--rsd-component-text-secondary-color)',

@@ -69,7 +69,8 @@ export default function UserMenu({ pageUrl }: UserMenuProps) {
           </Badge>
         )}{' '}
         {user.username}
-        <ChevronDown />
+        {/* Decorative disclosure indicator; the trigger already names itself. */}
+        <ChevronDown aria-hidden="true" />
       </PrimaryNavigation.Trigger>
       <PrimaryNavigation.Content>
         <PrimaryNavigation.ContentItem>

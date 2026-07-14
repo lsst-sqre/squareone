@@ -21,3 +21,14 @@ test('renders the error heading', () => {
     screen.getByRole('heading', { name: /something went wrong/i })
   ).toBeInTheDocument();
 });
+
+test('moves focus to the error heading when it renders', () => {
+  // When the boundary renders, focus should land on the heading so screen
+  // reader and keyboard users are informed the page changed to an error state.
+  render(<ErrorPage error={new Error('boom')} reset={vi.fn()} />);
+
+  const heading = screen.getByRole('heading', {
+    name: /something went wrong/i,
+  });
+  expect(heading).toHaveFocus();
+});
