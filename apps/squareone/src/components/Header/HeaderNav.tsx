@@ -46,7 +46,7 @@ export default function HeaderNav() {
   const nubladoUrl = query?.getNubladoUrl() ?? '/nb/hub';
 
   return (
-    <PrimaryNavigation className={styles.nav}>
+    <PrimaryNavigation className={styles.nav} aria-label="Main">
       {showPortal && (
         <PrimaryNavigation.Item className={styles.navItem}>
           <PrimaryNavigation.TriggerLink href={portalUrl}>

@@ -61,6 +61,18 @@ beforeEach(() => {
   mockSearchParams = new URLSearchParams();
 });
 
+describe('TimesSquareGitHubNav landmark', () => {
+  it('names its navigation landmark so it is unique on the page', () => {
+    // The Times Square page also renders the header "Main" nav; naming this
+    // nav "Notebooks" keeps the two navigation landmarks distinct for axe
+    // landmark-unique.
+    renderNav();
+    expect(
+      screen.getByRole('navigation', { name: 'Notebooks' })
+    ).toBeInTheDocument();
+  });
+});
+
 /**
  * Open the nav-level tree-actions kebab menu and return the named item.
  * The menu is portaled, so items are queried from the document body.

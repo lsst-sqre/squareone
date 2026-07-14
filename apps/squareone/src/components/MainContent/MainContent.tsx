@@ -7,8 +7,12 @@ type MainContentProps = {
 };
 
 /*
- * Main content wrapper (contained within a Page component).
+ * Main content wrapper.
+ *
+ * The single `<main>` landmark is owned by the root layout's AppShell, so this
+ * wrapper renders a plain `<div>` inside that landmark rather than declaring
+ * its own `<main>` (which would create a duplicate landmark).
  */
 export default function MainContent({ children }: MainContentProps) {
-  return <main className={styles.main}>{children}</main>;
+  return <div className={styles.main}>{children}</div>;
 }

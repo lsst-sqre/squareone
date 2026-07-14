@@ -20,7 +20,11 @@ type FooterNavProps = {
  * ```
  */
 export function FooterNav({ children }: FooterNavProps) {
-  return <nav className={styles.footerNav}>{children}</nav>;
+  return (
+    <nav className={styles.footerNav} aria-label="Footer">
+      {children}
+    </nav>
+  );
 }
 
 type FundingNoticeProps = {

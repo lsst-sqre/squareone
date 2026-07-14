@@ -41,7 +41,6 @@ export default function SidebarLayout({
 }: SidebarLayoutProps) {
   // Refs for focus management
   const menuToggleRef = useRef<HTMLButtonElement>(null);
-  const mainContentRef = useRef<HTMLElement>(null);
 
   // Mobile menu disclosure state - starts closed by default
   const { toggleProps, contentProps, isExpanded } = useDisclosure({
@@ -90,12 +89,6 @@ export default function SidebarLayout({
     toggleProps.onClick();
   };
 
-  // Skip to main content handler
-  const handleSkipToMain = (event: React.MouseEvent) => {
-    event.preventDefault();
-    mainContentRef.current?.focus();
-  };
-
   // Set up keyboard event listener for the entire layout
   useEffect(() => {
     const handleDocumentKeyDown = (event: KeyboardEvent) => {
@@ -122,14 +115,6 @@ export default function SidebarLayout({
       data-testid="sidebar-layout"
       onKeyDown={handleKeyDown}
     >
-      {/* biome-ignore lint/a11y/useValidAnchor: skip link is a standard a11y pattern that navigates to #main-content */}
-      <a
-        className={styles.skipLink}
-        href="#main-content"
-        onClick={handleSkipToMain}
-      >
-        Skip to main content
-      </a>
       <header className={styles.mobileHeader} data-testid="mobile-header">
         <h2 className={styles.mobileHeaderTitle}>
           <a
@@ -165,15 +150,14 @@ export default function SidebarLayout({
           disclosureAriaLabelledby={contentProps['aria-labelledby']}
         />
       </div>
-      <main
-        className={styles.mainContentContainer}
-        ref={mainContentRef}
-        id="main-content"
-        data-testid="main-content"
-        tabIndex={-1}
-      >
+      {/*
+       * The single <main> landmark is owned by the root layout's AppShell, so
+       * this is a plain content wrapper (not a <main>) to avoid a duplicate
+       * landmark. The skip link and focus target live on the root main.
+       */}
+      <div className={styles.mainContentContainer} data-testid="main-content">
         {children}
-      </main>
+      </div>
     </div>
   );
 }

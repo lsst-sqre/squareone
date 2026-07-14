@@ -47,7 +47,7 @@ export default function BroadcastBanner({ broadcast }: BroadcastBannerProps) {
         } as React.CSSProperties
       }
     >
-      <aside className={styles.aside}>
+      <aside className={styles.aside} aria-label={broadcast.summary.gfm}>
         <div className={styles.summary}>
           <div
             className="summary-content"

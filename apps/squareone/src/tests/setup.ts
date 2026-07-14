@@ -1,5 +1,10 @@
 import '@testing-library/jest-dom';
-import { vi } from 'vitest';
+import { expect, vi } from 'vitest';
+import * as axeMatchers from 'vitest-axe/matchers';
+
+// Register vitest-axe's accessibility matcher (`toHaveNoViolations`) so unit
+// tests can assert that a rendered component has zero axe-core violations.
+expect.extend(axeMatchers);
 
 // Mock Next.js navigation
 vi.mock('next/navigation', () => ({

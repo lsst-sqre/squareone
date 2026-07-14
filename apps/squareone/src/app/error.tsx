@@ -28,7 +28,9 @@ export default function ErrorPage({ error, reset }: ErrorProps) {
   }, [error]);
 
   return (
-    <main className={styles.main}>
+    // The single <main> landmark is owned by the root layout's AppShell; this
+    // boundary renders in place of {children} inside that landmark.
+    <div className={styles.main}>
       <div
         style={{
           padding: '2rem',
@@ -78,6 +80,6 @@ export default function ErrorPage({ error, reset }: ErrorProps) {
           </Link>
         </div>
       </div>
-    </main>
+    </div>
   );
 }
