@@ -35,7 +35,11 @@ component:
             light:
               value: '{color.blue.600.value}' # blue-500 (4.44:1) fails; blue-600 clears 4.5:1
             dark:
-              value: '{component.text.link.color.themed.light.value}'
+              # Hover must go *lighter* than the resting dark link (blue-300,
+              # 9.19:1 on the dark page) — the old value re-used the light
+              # resting link (#146685), only 2.52:1 on dark and the wrong
+              # direction. blue-200 is 11.80:1 on the dark page.
+              value: '{color.blue.200.value}'
       reverse:
         color:
           value: '{component.text.link.color.themed.dark.value}'

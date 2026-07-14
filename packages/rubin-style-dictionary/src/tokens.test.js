@@ -79,6 +79,20 @@ describe('link hover token', () => {
       '#145f7a'
     );
   });
+
+  it('lightens the dark-theme link-hover color above the resting link (>=4.5:1 on dark bg)', () => {
+    // On dark backgrounds hover must move *lighter* than the resting link so
+    // the affordance reads as "brighter on hover" and stays legible. The old
+    // value re-used the light-theme resting color (#146685) — 2.52:1 on the
+    // dark page (gray-800 #1f2121) and darker than the resting blue-300
+    // (#7bcfe8, 9.19:1), i.e. the wrong direction. It retargets to blue-200
+    // (#b8e3f2, 11.80:1 on dark bg), lighter than the resting link.
+    const hover = cssVar(darkCss, '--rsd-component-text-link-hover-color');
+    expect(hover).toBeDefined();
+    // Must not fall back to the light-theme resting link color.
+    expect(hover).not.toBe('#146685');
+    expect(hover).toBe('#b8e3f2');
+  });
 });
 
 describe('headline token', () => {
