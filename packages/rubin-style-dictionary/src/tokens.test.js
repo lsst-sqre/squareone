@@ -70,6 +70,17 @@ describe('header menulist selected background', () => {
   });
 });
 
+describe('link hover token', () => {
+  it('darkens the light-theme link-hover color to blue-600 (>=4.5:1 on white)', () => {
+    // The resting link color is already blue-600-dark (#146685); the hover
+    // color must also clear 4.5:1 on white. blue-500 (#1c81a4) is only
+    // 4.44:1 and fails, so hover retargets to blue-600 (#145f7a, 7.12:1).
+    expect(cssVar(lightCss, '--rsd-component-text-link-hover-color')).toBe(
+      '#145f7a'
+    );
+  });
+});
+
 describe('headline token', () => {
   it('renders headlines in body black (#1f2121) in the light theme', () => {
     expect(cssVar(lightCss, '--rsd-component-text-headline-color')).toBe(

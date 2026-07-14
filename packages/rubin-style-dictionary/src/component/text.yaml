@@ -33,7 +33,7 @@ component:
         color:
           themed:
             light:
-              value: '{color.blue.500.value}'
+              value: '{color.blue.600.value}' # blue-500 (4.44:1) fails; blue-600 clears 4.5:1
             dark:
               value: '{component.text.link.color.themed.light.value}'
       reverse:
