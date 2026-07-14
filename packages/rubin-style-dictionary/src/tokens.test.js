@@ -56,6 +56,20 @@ describe('semantic interactive token', () => {
   });
 });
 
+describe('header menulist selected background', () => {
+  it('resolves to the accessible teal (primary-650) in the light theme', () => {
+    // The selected menulist item draws white text on this background, so it
+    // must clear 4.5:1 — primary-650 (5.98:1 on white), not the raw brand
+    // primary-600 (4.14:1).
+    expect(
+      cssVar(
+        lightCss,
+        '--rsd-component-header-nav-menulist-selected-background-color'
+      )
+    ).toBe('#046f70');
+  });
+});
+
 describe('headline token', () => {
   it('renders headlines in body black (#1f2121) in the light theme', () => {
     expect(cssVar(lightCss, '--rsd-component-text-headline-color')).toBe(

@@ -12,7 +12,9 @@ type BroadcastBannerProps = {
 function getCategoryColor(category: Broadcast['category']): string {
   switch (category) {
     case 'info':
-      return 'var(--rsd-color-primary-600)';
+      // White banner text sits on this color, so use the accessible teal
+      // (>=4.5:1) rather than the raw brand primary-600 (4.14:1 on white).
+      return 'var(--rsd-component-interactive-color)';
     case 'outage':
       return 'var(--rsd-color-red-500)';
     case 'notice':

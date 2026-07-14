@@ -64,7 +64,9 @@
 
 /* Solid + Primary */
 .solid.primary {
-  background-color: var(--rsd-color-primary-600);
+  /* White label on teal: use the accessible teal (>=4.5:1), not raw
+   * primary-600 (4.14:1 on white). */
+  background-color: var(--rsd-component-interactive-color);
   color: white;
 }
 
@@ -135,12 +137,15 @@
 
 /* Outline + Primary */
 .outline.primary {
+  /* Border is a non-text accent (3:1 bar) so it keeps the brand teal; the
+   * label text uses the accessible teal to clear 4.5:1. */
   border-color: var(--rsd-color-primary-600);
-  color: var(--rsd-color-primary-600);
+  color: var(--rsd-component-interactive-color);
 }
 
 .outline.primary:hover:not(:disabled):not(.disabled) {
-  background-color: var(--rsd-color-primary-600);
+  /* Hover fills with teal under white text: accessible teal for 4.5:1. */
+  background-color: var(--rsd-component-interactive-color);
   color: white;
 }
 
@@ -194,7 +199,8 @@
 
 /* Text + Primary */
 .text.primary {
-  color: var(--rsd-color-primary-600);
+  /* Teal label on the page background: accessible teal for 4.5:1. */
+  color: var(--rsd-component-interactive-color);
 }
 
 .text.primary:hover:not(:disabled):not(.disabled) {

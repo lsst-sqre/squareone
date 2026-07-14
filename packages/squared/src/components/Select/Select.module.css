@@ -238,7 +238,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--rsd-color-primary-600);
+  /* Selected-option checkmark glyph: accessible teal so it reads as text. */
+  color: var(--rsd-component-interactive-color);
 }
 
 .itemIndicator svg {

@@ -1,6 +1,6 @@
 import type { Broadcast } from '@lsst-sqre/semaphore-client';
 import { render, screen } from '@testing-library/react';
-import { expect, test } from 'vitest';
+import { describe, expect, it, test } from 'vitest';
 import { axe } from 'vitest-axe';
 import BroadcastBanner from './BroadcastBanner';
 
@@ -99,4 +99,43 @@ test('renders nothing without a broadcast', () => {
   const { container } = render(<BroadcastBanner />);
 
   expect(container).toBeEmptyDOMElement();
+});
+
+const broadcastData = {
+  id: '1234',
+  summary: {
+    gfm: 'Hello world.',
+    html: '<p>Hello world.</p>',
+  },
+  active: true,
+  enabled: true,
+  stale: false,
+  category: 'other' as const,
+};
+
+describe('BroadcastBanner', () => {
+  it('paints the info category with the accessible interactive teal token', () => {
+    // The info banner draws white text on the category color, so the
+    // background must be the accessible teal (>=4.5:1), not the raw brand
+    // primary-600 (which only reaches 4.14:1 against white).
+    const { container } = render(
+      <BroadcastBanner broadcast={{ ...broadcastData, category: 'info' }} />
+    );
+    const banner = container.firstChild as HTMLElement;
+    expect(banner.style.getPropertyValue('--banner-bg')).toBe(
+      'var(--rsd-component-interactive-color)'
+    );
+  });
+
+  it('keeps the outage category on the darker red for white-text contrast', () => {
+    const { container } = render(
+      <BroadcastBanner broadcast={{ ...broadcastData, category: 'outage' }} />
+    );
+    const banner = container.firstChild as HTMLElement;
+    // Migration of the red/orange danger/notice colors is a separate task;
+    // this only pins that the info migration did not disturb outage.
+    expect(banner.style.getPropertyValue('--banner-bg')).toBe(
+      'var(--rsd-color-red-500)'
+    );
+  });
 });
