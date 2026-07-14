@@ -1,8 +1,21 @@
+/*
+ * Mobile-first: stack the navigation sidebar above the page content so the
+ * fixed-width (18rem) sidebar never sits beside the content and forces
+ * horizontal scrolling on narrow viewports (WCAG 1.4.10; PRD #550 stream 2).
+ * The row layout is reintroduced at the shared 60rem collapse breakpoint used
+ * by SidebarLayout and PrimaryNavigation.
+ */
 .layout {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 2rem;
   height: 100%;
+}
+
+@media (min-width: 60rem) {
+  .layout {
+    flex-direction: row;
+  }
 }
 
 .layout main {
