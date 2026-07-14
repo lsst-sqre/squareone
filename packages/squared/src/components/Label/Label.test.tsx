@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { axe } from 'vitest-axe';
 import Label from './Label';
 
 describe('Label', () => {
@@ -93,5 +94,22 @@ describe('Label', () => {
 
     await user.click(label);
     expect(input).toHaveFocus();
+  });
+
+  it('has no axe accessibility violations', async () => {
+    const { container } = render(
+      <div>
+        <Label htmlFor="test-input">Test Label</Label>
+        <input id="test-input" type="text" />
+      </div>
+    );
+
+    // The color-contrast rule relies on canvas rendering, which jsdom does not
+    // implement; contrast is covered by the Storybook a11y checks that run in a
+    // real browser. Disable it here so the unit-level sweep stays meaningful.
+    const results = await axe(container, {
+      rules: { 'color-contrast': { enabled: false } },
+    });
+    expect(results).toHaveNoViolations();
   });
 });

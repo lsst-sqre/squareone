@@ -1,4 +1,10 @@
 import '@testing-library/jest-dom';
+import { expect } from 'vitest';
+import * as axeMatchers from 'vitest-axe/matchers';
+
+// Register vitest-axe's accessibility matcher (`toHaveNoViolations`) so unit
+// tests can assert that a rendered component has zero axe-core violations.
+expect.extend(axeMatchers);
 
 // Polyfills for JSDOM environment needed by Radix UI components
 Object.defineProperty(Element.prototype, 'hasPointerCapture', {

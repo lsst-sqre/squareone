@@ -39,6 +39,17 @@ module.exports = (phase) => {
           source: '/auth/api/v1/login',
           destination: '/api/dev/login-info',
         },
+        // Mock Gafaelfawr per-user token detail / revoke (must precede the
+        // collection rewrite so the more specific :key path matches first)
+        {
+          source: '/auth/api/v1/users/:username/tokens/:key',
+          destination: '/api/dev/gafaelfawr/v1/users/:username/tokens/:key',
+        },
+        // Mock Gafaelfawr per-user token list / create
+        {
+          source: '/auth/api/v1/users/:username/tokens',
+          destination: '/api/dev/gafaelfawr/v1/users/:username/tokens',
+        },
         // Mock Repertoire (this is never triggered by a production ingress)
         {
           source: '/repertoire/discovery',
