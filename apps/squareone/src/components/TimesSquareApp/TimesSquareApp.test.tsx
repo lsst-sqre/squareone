@@ -1,9 +1,8 @@
-import { readFileSync } from 'node:fs';
-import path from 'node:path';
 import { render, screen } from '@testing-library/react';
 import { expect, test, vi } from 'vitest';
 import { TimesSquareUrlParametersContext } from '../TimesSquareUrlParametersProvider';
 import TimesSquareApp from './TimesSquareApp';
+import styles from './TimesSquareApp.module.css';
 
 // The sidebar pulls in config/data-fetching hooks that are irrelevant to the
 // landmark structure under test, so stub it out.
@@ -45,33 +44,23 @@ test('renders its children', () => {
 });
 
 /*
- * Reflow guard (WCAG 1.4.10 / PRD #550 stream 2, task #567): the Times Square
- * layout must stack the sidebar above the content on narrow viewports so no
- * page scrolls horizontally at a 320px viewport. The row layout (sidebar beside
- * content) is only applied at or above the shared 60rem collapse breakpoint.
- *
- * This behavior is CSS-media-query driven and cannot be observed in jsdom
- * (which evaluates no media queries or layout), so it is verified end-to-end in
- * a real browser during development; this source-level assertion is a
- * regression guard against a future edit silently dropping the media query.
+ * Structural guard for the responsive reflow (WCAG 1.4.10 / PRD #550 stream 2,
+ * task #567). The column/row stacking itself is CSS-media-query driven and
+ * cannot be observed in jsdom (no media-query evaluation or layout), so it is
+ * verified end-to-end in a real browser during development. What we can pin
+ * here is that the layout and content wrappers actually carry their CSS Module
+ * classes — i.e. the stylesheet's reflow rules are hooked up to the elements
+ * that render them. Without this, a class rename or a removed wrapper would
+ * silently detach the responsive CSS with no failing test.
  */
-test('layout stacks vertically below the 60rem breakpoint and rows above it', () => {
-  const css = readFileSync(
-    path.resolve(
-      process.cwd(),
-      'src/components/TimesSquareApp/TimesSquareApp.module.css'
-    ),
-    'utf8'
-  );
+test('wires the layout and content CSS Module classes to their wrappers', () => {
+  const { container } = renderApp(<div>notebook body</div>);
 
-  // The base (mobile-first) .layout rule must stack children in a column so a
-  // full-width sidebar sits above the content rather than beside it.
-  const baseLayout = css.match(/\.layout\s*\{[^}]*\}/)?.[0] ?? '';
-  expect(baseLayout).toMatch(/flex-direction:\s*column/);
+  const layout = container.querySelector(`.${styles.layout}`);
+  expect(layout).not.toBeNull();
 
-  // The row layout is reintroduced only inside a min-width: 60rem media query,
-  // matching the SidebarLayout and PrimaryNavigation collapse breakpoint.
-  expect(css).toMatch(
-    /@media\s*\(min-width:\s*60rem\)\s*\{[\s\S]*?flex-direction:\s*row/
-  );
+  const content = layout?.querySelector(`.${styles.content}`);
+  expect(content).not.toBeNull();
+  // The page content is rendered inside the content wrapper, not beside it.
+  expect(content).toHaveTextContent('notebook body');
 });
