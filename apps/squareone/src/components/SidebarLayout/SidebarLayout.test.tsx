@@ -33,7 +33,27 @@ test('renders with required props', () => {
 
   expect(screen.getAllByText('Settings')).toHaveLength(2); // Both mobile header and sidebar
   expect(screen.getByText('Main Content')).toBeInTheDocument();
-  expect(screen.getByRole('main')).toBeInTheDocument();
+  // The single <main> landmark is owned by the root layout's AppShell, not by
+  // SidebarLayout, so there must be exactly one main per page (the root one).
+  expect(screen.queryByRole('main')).not.toBeInTheDocument();
+});
+
+test('names the sidebar navigation landmark after the sidebar title', () => {
+  // A settings/admin page has both the header "Main" nav and this sidebar
+  // nav; naming the sidebar nav keeps the landmarks unique for axe.
+  render(
+    <SidebarLayout
+      sidebarTitle="Settings"
+      navSections={mockNavSections}
+      currentPath="/settings/profile"
+    >
+      <div>Main Content</div>
+    </SidebarLayout>
+  );
+
+  expect(
+    screen.getByRole('navigation', { name: 'Settings' })
+  ).toBeInTheDocument();
 });
 
 test('displays navigation items', () => {
@@ -70,7 +90,12 @@ test('displays mobile menu toggle', () => {
   ).toBeInTheDocument();
 });
 
-test('includes skip link for accessibility', () => {
+test('renders a skip-sidebar-navigation link targeting the page content', () => {
+  // The root AppShell's "Skip to main content" link targets the <main> that
+  // wraps this layout (including the sidebar nav). This in-page bypass lets
+  // keyboard users jump past the sidebar nav to the page content without
+  // introducing a second <main> landmark. It must not reuse the 'main-content'
+  // id (that belongs to the root main).
   render(
     <SidebarLayout
       sidebarTitle="Settings"
@@ -81,9 +106,23 @@ test('includes skip link for accessibility', () => {
     </SidebarLayout>
   );
 
+  const skipLink = screen.getByRole('link', {
+    name: /skip sidebar navigation/i,
+  });
+  expect(skipLink).toBeInTheDocument();
+  expect(skipLink).toHaveAttribute('href', '#sidebar-page-content');
+
+  // SidebarLayout must not render a second "Skip to main content" link.
   expect(
-    screen.getByRole('link', { name: /skip to main content/i })
-  ).toBeInTheDocument();
+    screen.queryByRole('link', { name: /skip to main content/i })
+  ).not.toBeInTheDocument();
+
+  // The focus target is the content container: it carries the matching id and
+  // is programmatically focusable, but is NOT a second <main> landmark.
+  const contentContainer = screen.getByTestId('main-content');
+  expect(contentContainer).toHaveAttribute('id', 'sidebar-page-content');
+  expect(contentContainer).toHaveAttribute('tabindex', '-1');
+  expect(screen.queryByRole('main')).not.toBeInTheDocument();
 });
 
 test('handles empty navigation sections', () => {

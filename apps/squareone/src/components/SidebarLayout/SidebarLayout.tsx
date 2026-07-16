@@ -41,7 +41,7 @@ export default function SidebarLayout({
 }: SidebarLayoutProps) {
   // Refs for focus management
   const menuToggleRef = useRef<HTMLButtonElement>(null);
-  const mainContentRef = useRef<HTMLElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   // Mobile menu disclosure state - starts closed by default
   const { toggleProps, contentProps, isExpanded } = useDisclosure({
@@ -90,10 +90,12 @@ export default function SidebarLayout({
     toggleProps.onClick();
   };
 
-  // Skip to main content handler
-  const handleSkipToMain = (event: React.MouseEvent) => {
+  // Skip-sidebar link handler - moves focus into the page content container,
+  // bypassing the sidebar navigation. This provides an in-page bypass without
+  // adding a second <main> landmark (the root AppShell owns the only <main>).
+  const handleSkipSidebar = (event: React.MouseEvent) => {
     event.preventDefault();
-    mainContentRef.current?.focus();
+    contentRef.current?.focus();
   };
 
   // Set up keyboard event listener for the entire layout
@@ -122,13 +124,19 @@ export default function SidebarLayout({
       data-testid="sidebar-layout"
       onKeyDown={handleKeyDown}
     >
-      {/* biome-ignore lint/a11y/useValidAnchor: skip link is a standard a11y pattern that navigates to #main-content */}
+      {/*
+       * In-page bypass: because the root AppShell's skip link targets the
+       * <main> that wraps this whole layout (including the sidebar nav), this
+       * link lets keyboard users jump past the sidebar navigation straight to
+       * the page content without introducing a second <main> landmark.
+       */}
+      {/* biome-ignore lint/a11y/useValidAnchor: skip link is a standard a11y pattern that navigates to #sidebar-page-content */}
       <a
         className={styles.skipLink}
-        href="#main-content"
-        onClick={handleSkipToMain}
+        href="#sidebar-page-content"
+        onClick={handleSkipSidebar}
       >
-        Skip to main content
+        Skip sidebar navigation
       </a>
       <header className={styles.mobileHeader} data-testid="mobile-header">
         <h2 className={styles.mobileHeaderTitle}>
@@ -165,15 +173,22 @@ export default function SidebarLayout({
           disclosureAriaLabelledby={contentProps['aria-labelledby']}
         />
       </div>
-      <main
-        className={styles.mainContentContainer}
-        ref={mainContentRef}
-        id="main-content"
-        data-testid="main-content"
+      {/*
+       * The single <main> landmark is owned by the root layout's AppShell, so
+       * this is a plain content wrapper (not a <main>) to avoid a duplicate
+       * landmark. The root main owns the "Skip to main content" link; this
+       * container is the focus target for the local "Skip sidebar navigation"
+       * link above, so it carries an id (not 'main-content') and tabIndex={-1}.
+       */}
+      <div
+        ref={contentRef}
+        id="sidebar-page-content"
         tabIndex={-1}
+        className={styles.mainContentContainer}
+        data-testid="main-content"
       >
         {children}
-      </main>
+      </div>
     </div>
   );
 }

@@ -1,6 +1,78 @@
 /* Root component styles */
 .root {
+  /* The navigation collapses to a hamburger menu below a fixed desktop
+   * breakpoint (see the media query below), chosen to match the SidebarLayout
+   * desktop breakpoint for a consistent responsive treatment across the app
+   * shell. That breakpoint is 66rem, not 60rem: the app's :root font-size is
+   * 1.1rem, so a 60rem layout container renders at ~1056px, but media queries
+   * measure rem against the browser's 16px default. 66rem (= 60rem x 1.1) is
+   * therefore where the desktop layouts actually fit, so the inline nav
+   * collapses to the hamburger before it runs out of horizontal room. Pass
+   * `collapsible={false}` to opt out of the collapse behavior. */
   position: relative;
+}
+
+/* Hamburger toggle button (visible only below the collapse breakpoint) */
+.menuToggle {
+  display: none; /* hidden above the breakpoint; shown in the media query */
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+
+  /* Reset button styles */
+  background-color: transparent;
+  border: 2px solid transparent;
+  border-radius: 0.5rem;
+  color: var(--rsd-component-header-nav-text-color);
+  cursor: pointer;
+}
+
+.menuToggle:hover {
+  color: var(--rsd-component-header-nav-text-hover-color);
+}
+
+/* Focus ring comes from the global :focus-visible baseline in
+ * @lsst-sqre/global-css base.css (loaded by consuming apps and Storybook). No
+ * local override needed here. */
+
+.menuToggle svg {
+  display: block;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+/* Below the breakpoint: show the toggle and collapse the item list into a
+ * disclosure controlled by the toggle's open/closed state. The max-width stops
+ * just short of 66rem (65.9375rem) so this collapse range and the desktop
+ * `min-width: 66rem` layouts in SidebarLayout/TimesSquareApp are mutually
+ * exclusive — desktop starts at exactly 66rem. (66rem = 60rem layout width x
+ * the 1.1rem :root font-size; media-query rem is 16px.) */
+@media (max-width: 65.9375rem) {
+  .rootCollapsible .menuToggle {
+    display: inline-flex;
+  }
+
+  .collapsible.closed {
+    display: none;
+  }
+
+  .collapsible.open {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+  }
+
+  /* Clear the horizontal row margins so every stacked item aligns on the
+   * same left edge. The doubled `.collapsible.open .item` specificity (0,3,0)
+   * beats both squared's base `.item` (0,1,0) and any consumer `.navItem` /
+   * `.navItem:first-of-type` overrides (0,1,0)/(0,2,0). Vertical spacing then
+   * comes from the list `gap`. */
+  .collapsible.open .item {
+    margin: 0;
+  }
 }
 
 /* Item list container styles */
@@ -26,6 +98,9 @@
   border-radius: 0.5rem;
   padding: 2px 4px;
   display: inline-block; /* For consistency with MenuTrigger button */
+  /* Keep each label on one line so items never wrap mid-row while the flex
+   * row is under shrink pressure just above the collapse breakpoint. */
+  white-space: nowrap;
 }
 
 .triggerLink:hover {
@@ -38,9 +113,8 @@
   text-decoration-color: var(--rsd-component-header-nav-text-hover-color);
 }
 
-.triggerLink:focus {
-  outline: 1px solid var(--rsd-color-primary-500);
-}
+/* Focus ring comes from the global :focus-visible baseline in
+ * @lsst-sqre/global-css base.css. No local override needed here. */
 
 /* Styled trigger (for dropdown triggers) styles */
 .styledTrigger {
@@ -51,11 +125,14 @@
   background-color: transparent;
   border: none;
   border-radius: 0.5rem;
+
+  /* Keep the label and its inline chevron together on one line so the chevron
+   * never drops below the text under shrink pressure near the breakpoint. */
+  white-space: nowrap;
 }
 
-.styledTrigger:focus {
-  outline: 1px solid var(--rsd-color-primary-500);
-}
+/* Focus ring comes from the global :focus-visible baseline in
+ * @lsst-sqre/global-css base.css. No local override needed here. */
 
 .styledTrigger:hover {
   color: var(--rsd-component-header-nav-text-hover-color);
@@ -115,16 +192,21 @@
 
   color: var(--rsd-component-header-nav-menulist-text-color);
 
-  outline: 1px solid transparent;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
 }
 
 .link:last-of-type {
   margin-bottom: 0;
 }
 
-.link:focus {
-  outline: 1px solid
+/* Intentional override of the global :focus-visible baseline: the dropdown
+ * menu list sits on the nav menulist background, so the ring uses the menulist
+ * selection color instead of the sitewide primary-500. */
+.link:focus-visible {
+  outline: 2px solid
     var(--rsd-component-header-nav-menulist-selected-background-color);
+  outline-offset: 2px;
 }
 
 .link:hover {

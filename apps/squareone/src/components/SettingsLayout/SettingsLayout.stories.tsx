@@ -239,17 +239,22 @@ export const ResponsiveBreakpoint: Story = {
       <div>
         <h1>Responsive Breakpoint Test</h1>
         <p>
-          This story demonstrates the responsive behavior at the 60rem (960px)
-          breakpoint. Resize your browser window to see the layout change
-          between desktop grid and mobile stacking.
+          This story demonstrates the responsive behavior at the desktop
+          breakpoint. The layout container is 60rem wide, but because the app's
+          :root font-size is 1.1rem it renders at ~1056px, so the grid engages
+          at a 66rem (~1056px) media query. Resize your browser window to see
+          the layout change between desktop grid and mobile stacking.
         </p>
         <div
           style={{ padding: '2rem', background: '#f0f0f0', margin: '2rem 0' }}
         >
           <h2>Layout Information</h2>
           <ul>
-            <li>Desktop (≥60rem): Grid layout with 18rem sidebar + content</li>
-            <li>Mobile (&lt;60rem): Vertical stacking with collapsible menu</li>
+            <li>
+              Desktop (≥66rem ≈ 1056px): Grid layout with 18rem sidebar +
+              content
+            </li>
+            <li>Mobile (&lt;66rem): Vertical stacking with collapsible menu</li>
           </ul>
         </div>
       </div>

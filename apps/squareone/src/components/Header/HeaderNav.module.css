@@ -1,8 +1,20 @@
+.headerNav {
+  display: flex;
+  width: 100%;
+  align-items: flex-start; /* hamburger + user menu pinned to the top row */
+  gap: 1rem;
+}
+
 .nav {
+  flex: 1 1 0; /* fills space so the user menu is pushed right */
+  min-width: 0;
   margin: 0;
   padding: 0;
-  width: 100%;
   font-size: 1.2rem;
+}
+
+.userNav {
+  flex: 0 0 auto; /* content-width, sits at the right edge */
 }
 
 .navItem {

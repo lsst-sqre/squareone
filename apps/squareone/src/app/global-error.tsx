@@ -1,7 +1,7 @@
 'use client';
 
 import * as Sentry from '@sentry/nextjs';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 type GlobalErrorProps = {
   error: Error & { digest?: string };
@@ -20,14 +20,28 @@ type GlobalErrorProps = {
  * Errors are automatically reported to Sentry for monitoring.
  */
 export default function GlobalError({ error, reset }: GlobalErrorProps) {
+  const headingRef = useRef<HTMLHeadingElement>(null);
+
   useEffect(() => {
     Sentry.captureException(error);
   }, [error]);
 
+  // Move focus to the error heading so keyboard and screen reader users are
+  // told the page changed to an error state. The heading is made focusable
+  // with tabIndex={-1} (programmatic focus only, not a Tab stop).
+  useEffect(() => {
+    headingRef.current?.focus();
+  }, []);
+
   return (
     <html lang="en">
       <body>
-        <div
+        {/*
+         * This boundary replaces the root layout (and its AppShell <main>), so
+         * it supplies its own <main> landmark to keep the page's content inside
+         * a landmark region.
+         */}
+        <main
           style={{
             padding: '2rem',
             textAlign: 'center',
@@ -39,7 +53,9 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
             fontFamily: 'system-ui, sans-serif',
           }}
         >
-          <h1>Something went wrong!</h1>
+          <h1 ref={headingRef} tabIndex={-1}>
+            Something went wrong!
+          </h1>
           <p style={{ color: '#666', marginBottom: '1.5rem' }}>
             An unexpected error occurred. Our team has been notified.
           </p>
@@ -58,7 +74,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
           >
             Try again
           </button>
-        </div>
+        </main>
       </body>
     </html>
   );

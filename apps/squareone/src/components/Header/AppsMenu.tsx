@@ -18,7 +18,8 @@ export default function AppsMenu() {
   return (
     <>
       <PrimaryNavigation.Trigger>
-        Apps <ChevronDown />
+        {/* Decorative disclosure indicator; the trigger already reads "Apps". */}
+        Apps <ChevronDown aria-hidden="true" />
       </PrimaryNavigation.Trigger>
       <PrimaryNavigation.Content>
         {appLinks.map((link, index) => (

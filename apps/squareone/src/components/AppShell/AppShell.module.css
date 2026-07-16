@@ -1,0 +1,29 @@
+/* Skip link: visually hidden until focused, then revealed at the top-left. */
+.skipLink {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: var(--rsd-color-primary-700);
+  color: var(--rsd-color-gray-000);
+  padding: var(--sqo-space-xs-fixed);
+  z-index: 1000;
+  text-decoration: none;
+  border-radius: var(--sqo-border-radius-1);
+  font-weight: bold;
+}
+
+.skipLink:focus {
+  top: 6px;
+  outline: 2px solid var(--rsd-color-primary-100);
+  outline-offset: 2px;
+}
+
+/*
+ * The single root main landmark is a layout-neutral block wrapper: it adds no
+ * spacing of its own (page content owns its centering/max-width) but must be a
+ * real box rather than `display: contents` so that, with `tabindex="-1"`, it
+ * can receive focus when the skip link targets it.
+ */
+.main {
+  display: block;
+}

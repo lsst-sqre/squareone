@@ -9,11 +9,11 @@
   color: var(--rsd-component-header-nav-text-color);
 }
 
-/* Use doubled selector for higher specificity (0,2,0) to override
-   PrimaryNavigation.Item's .item class (0,1,0) without !important */
+/* The login lives in its own right-aligned navigation root, so it just needs
+   to sit flush against that root's right edge. The doubled selector (0,2,0)
+   beats PrimaryNavigation's base .item margin (0,1,0) without !important. */
 .loginNavItem.loginNavItem {
-  margin-left: auto;
-  margin-right: 0;
+  margin: 0;
 }
 
 .loginNavItem a {

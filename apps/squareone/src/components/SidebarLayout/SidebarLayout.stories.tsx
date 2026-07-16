@@ -121,8 +121,8 @@ export const MobileLayout: Story = {
       <div>
         <h1>Mobile Layout</h1>
         <p>
-          This demonstrates the mobile layout with vertical stacking below 60rem
-          viewport width.
+          This demonstrates the mobile layout with vertical stacking below the
+          66rem (~1056px) desktop breakpoint.
         </p>
         <p>The sidebar navigation is prepared for disclosure pattern.</p>
       </div>
@@ -401,13 +401,14 @@ export const KeyboardNavigationSkipLink: Story = {
       <div>
         <h1>Keyboard Navigation Demo</h1>
         <p>
-          This story demonstrates keyboard navigation features including the
-          skip link. Press Tab to see the skip link appear, then press Enter to
-          jump to main content.
+          This story demonstrates the in-page "Skip sidebar navigation" link.
+          Press Tab to reveal it as the first focusable element, then press
+          Enter to move focus past the sidebar navigation directly into the page
+          content.
         </p>
         <p>
           The skip link is positioned absolutely and only becomes visible when
-          focused, providing an accessible way to bypass navigation.
+          focused, providing an accessible way to bypass the sidebar navigation.
         </p>
       </div>
     ),

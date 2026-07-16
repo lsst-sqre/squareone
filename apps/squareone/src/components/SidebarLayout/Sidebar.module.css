@@ -1,5 +1,8 @@
-/* Mobile: add padding for better spacing inside disclosure container */
-@media (max-width: calc(60rem - 0.001rem)) {
+/* Mobile: add padding for better spacing inside disclosure container.
+ * Breakpoint 66rem = 60rem (SidebarLayout max-width) x the 1.1rem :root
+ * font-size; media-query rem is 16px, so desktop engages when the 60rem
+ * container actually fits (~1056px). Kept in lockstep with SidebarLayout. */
+@media (max-width: calc(66rem - 0.001rem)) {
   .root {
     padding: 1rem var(--size-screen-padding-min);
     padding-left: calc(var(--size-screen-padding-min) + 0.75rem);
@@ -7,7 +10,7 @@
 }
 
 /* Desktop: sticky positioning with full viewport height and overflow */
-@media (min-width: 60rem) {
+@media (min-width: 66rem) {
   .root {
     position: sticky;
     top: 0;
@@ -26,14 +29,14 @@
 }
 
 /* Hide on mobile to prevent duplication with MobileHeaderTitle */
-@media (max-width: calc(60rem - 0.001rem)) {
+@media (max-width: calc(66rem - 0.001rem)) {
   .title {
     display: none;
   }
 }
 
 /* Desktop: add top margin */
-@media (min-width: 60rem) {
+@media (min-width: 66rem) {
   .title {
     margin-top: 1rem;
   }

@@ -1,10 +1,31 @@
+/*
+ * Mobile-first: stack the navigation sidebar above the page content so the
+ * fixed-width (18rem) sidebar never sits beside the content and forces
+ * horizontal scrolling on narrow viewports (WCAG 1.4.10; PRD #550 stream 2).
+ * The row layout is reintroduced at the shared desktop breakpoint used by
+ * SidebarLayout and PrimaryNavigation: 66rem = the 60rem layout width x the
+ * 1.1rem :root font-size. Media queries measure rem against the browser's 16px
+ * default, so 66rem is where a 60rem container actually fits (~1056px).
+ */
 .layout {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 2rem;
   height: 100%;
 }
 
-.layout main {
+@media (min-width: 66rem) {
+  .layout {
+    flex-direction: row;
+  }
+}
+
+/*
+ * Fill the flex row so the content column sizes to the available width rather
+ * than shrinking to its content. min-width: 0 lets it shrink below its content
+ * width to avoid overflowing the row (e.g. wide notebook output).
+ */
+.content {
   width: 100%;
+  min-width: 0;
 }

@@ -167,7 +167,7 @@ export default function TimesSquareGitHubNav({
   );
 
   return (
-    <nav>
+    <nav aria-label="Notebooks">
       <div className={styles.header}>
         {focusedNode && ancestorCrumbs.length > 0 && (
           <ol className={styles.breadcrumbList} aria-label="Focus breadcrumb">

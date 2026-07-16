@@ -12,7 +12,10 @@
   padding: 0 var(--size-screen-padding-min);
 }
 
-@media (min-width: 60rem) {
+/* Desktop breakpoint: 66rem = 60rem (layout) x the 1.1rem :root font-size.
+ * Media-query rem is 16px, so the 60rem container only fits at ~66rem of
+ * viewport; dropping the gutter earlier lets the banner touch the edge. */
+@media (min-width: 66rem) {
   .aside {
     padding: 0;
   }

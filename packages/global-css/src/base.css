@@ -74,6 +74,20 @@ a:hover {
 }
 
 /*
+ * Global :focus-visible baseline (WCAG 2.4.7 / 2.4.11).
+ *
+ * Every interactive element shows a >=2px outline with an offset when focused
+ * via the keyboard, so keyboard users can always see where focus is. Scoped to
+ * :focus-visible (not :focus) so pointer/mouse interaction does not draw the
+ * ring. Components may override with a stronger treatment, but this guarantees
+ * a visible indicator sitewide even for elements a component author forgot.
+ */
+:focus-visible {
+  outline: 2px solid var(--rsd-color-primary-500);
+  outline-offset: 2px;
+}
+
+/*
  * Images that can be inverted to accommodate dark themes.
  */
 img.u-invertable-image {

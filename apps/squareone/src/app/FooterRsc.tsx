@@ -28,7 +28,7 @@ export default function FooterRsc({ mdxContent }: FooterRscProps) {
           mdxContent
         ) : (
           <>
-            <nav className={styles.footerNav}>
+            <nav className={styles.footerNav} aria-label="Footer">
               <Link href="/terms">Acceptable use policy</Link>
             </nav>
             <div className={styles.fundingNotice}>

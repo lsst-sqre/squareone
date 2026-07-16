@@ -40,7 +40,7 @@ export default function Sidebar({
         </a>
       </h2>
 
-      <nav>
+      <nav aria-label={title}>
         {navSections.map((section, sectionIndex) => (
           <SidebarNavSection
             key={sectionIndex}

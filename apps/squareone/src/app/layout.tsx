@@ -23,6 +23,7 @@ import '@fontsource/source-sans-pro/400-italic.css';
 import '@fontsource/source-sans-pro/700.css';
 import '@lsst-sqre/global-css/dist/next.css';
 
+import AppShell from '../components/AppShell';
 import BroadcastBannerStack from '../components/BroadcastBannerStack';
 import Header from '../components/Header';
 import styles from '../components/Page/Page.module.css';
@@ -149,9 +150,16 @@ export default async function RootLayout({ children }: RootLayoutProps) {
               <HydrationBoundary state={dehydrate(queryClient)}>
                 <div className={styles.layout}>
                   <div className={styles.upperContainer}>
-                    <Header />
-                    <BroadcastBannerStack />
-                    {children}
+                    <AppShell
+                      chrome={
+                        <>
+                          <Header />
+                          <BroadcastBannerStack />
+                        </>
+                      }
+                    >
+                      {children}
+                    </AppShell>
                   </div>
                   <div className={styles.stickyFooterContainer}>
                     <FooterRsc mdxContent={footerMdxContent} />
