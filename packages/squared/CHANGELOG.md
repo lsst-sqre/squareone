@@ -1,5 +1,20 @@
 # @lsst-sqre/squared
 
+## 0.16.0
+
+### Minor Changes
+
+- [#591](https://github.com/lsst-sqre/squareone/pull/591) [`381d90e`](https://github.com/lsst-sqre/squareone/commit/381d90e4a10dfe330ce64005aef798d48940891d) Thanks [@jonathansick](https://github.com/jonathansick)! - Add a responsive collapsed (hamburger) mode to `PrimaryNavigation`. Below a fixed `66rem` breakpoint (chosen to match the SidebarLayout desktop breakpoint) the navigation collapses behind an accessible toggle button that carries `aria-expanded` and `aria-controls`, has a state-dependent accessible name ("Open navigation menu" / "Close navigation menu", overridable via the new `openMenuLabel`/`closeMenuLabel` props), and discloses the item list on activation. The breakpoint is `66rem` rather than `60rem` because a consuming app's `60rem`-wide layout renders at ~1056px under a `1.1rem` `:root` font-size, but CSS media queries measure `rem` against 16px; `66rem` (= 60rem × 1.1) collapses the inline nav to the hamburger before it runs out of horizontal room. Trigger labels are also kept on a single line (`white-space: nowrap`) so a label and its inline dropdown chevron never wrap while the row is under shrink pressure near the breakpoint. Escape closes the menu and returns focus to the toggle, and the menu items remain keyboard operable — mirroring the SidebarLayout mobile-menu pattern. The menu also dismisses itself when a navigation link is activated (so client-side navigation doesn't leave it expanded on the destination page) and when the viewport grows back past the breakpoint. Pass `collapsible={false}` to opt out. The component's focus outlines are also thickened from 1px to a 2px outline with a 2px offset to meet the accessibility baseline.
+
+### Patch Changes
+
+- [#588](https://github.com/lsst-sqre/squareone/pull/588) [`7845ec3`](https://github.com/lsst-sqre/squareone/commit/7845ec3e1776ade3560b927d89daaa4dcd0ab6b4) Thanks [@jonathansick](https://github.com/jonathansick)! - Add accessibility test infrastructure. `vitest-axe` is now wired into the squared unit-test toolchain: the shared `test-setup.ts` registers its `toHaveNoViolations` matcher, and the `Label` component test includes an example assertion that a rendered component has zero axe-core violations. This complements the `@storybook/addon-a11y` checks that already run in the Storybook (browser) test project, giving later accessibility work a way to self-verify at the unit level.
+
+- [#591](https://github.com/lsst-sqre/squareone/pull/591) [`8d746b5`](https://github.com/lsst-sqre/squareone/commit/8d746b5e885aec55797d8c1a35417933c611b1f0) Thanks [@jonathansick](https://github.com/jonathansick)! - Fix stacked-item alignment in `PrimaryNavigation`'s collapsed (hamburger) mode. Below the collapse breakpoint the open item list now stacks as a left-aligned column: it switches to `flex-direction: column` with `align-items: flex-start`, full width, an even vertical `gap`, and small vertical padding, and each item's horizontal row margin is reset to `0` (via a `.collapsible.open .item` rule whose specificity beats both squared's base `.item` margin and any consumer `.navItem` overrides). Previously items kept their horizontal row spacing in the vertical layout, so the first item sat flush-left while every other item was indented. Inline (above-breakpoint) layout is unchanged.
+
+- Updated dependencies [[`2239560`](https://github.com/lsst-sqre/squareone/commit/22395604119b3b999ed9ec1f6631d5265bb03d58)]:
+  - @lsst-sqre/global-css@0.2.7
+
 ## 0.15.1
 
 ### Patch Changes
