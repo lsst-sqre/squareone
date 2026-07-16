@@ -43,7 +43,7 @@ export default function TimesSquareApp({
        * The single <main> landmark is owned by the root layout's AppShell, so
        * this is a plain content wrapper to avoid a duplicate landmark.
        */}
-      <div>{children}</div>
+      <div className={styles.content}>{children}</div>
     </div>
   );
 }

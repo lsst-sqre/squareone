@@ -18,6 +18,12 @@
   }
 }
 
-.layout main {
+/*
+ * Fill the flex row so the content column sizes to the available width rather
+ * than shrinking to its content. min-width: 0 lets it shrink below its content
+ * width to avoid overflowing the row (e.g. wide notebook output).
+ */
+.content {
   width: 100%;
+  min-width: 0;
 }
