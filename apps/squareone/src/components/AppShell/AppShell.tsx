@@ -26,9 +26,11 @@ type AppShellProps = {
  * content wrappers (MainContent, SidebarLayout, TimesSquareApp) render inside
  * this landmark rather than declaring their own `<main>`.
  *
- * `display: contents` on the `<main>` keeps it layout-neutral: it contributes
- * the landmark semantics without adding a box that would disturb the existing
- * sticky-footer flex layout.
+ * The `<main>` is a layout-neutral `display: block` wrapper that adds no
+ * spacing of its own (page content owns its centering/max-width), keeping the
+ * existing sticky-footer flex layout undisturbed. It is deliberately kept a
+ * real box rather than `display: contents` so that, with `tabIndex={-1}`, it
+ * can receive programmatic focus as the skip-link target.
  */
 export default function AppShell({ chrome, children }: AppShellProps) {
   return (
