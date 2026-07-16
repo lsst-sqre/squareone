@@ -1,7 +1,55 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { afterEach, beforeEach, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 import { PrimaryNavigation } from './PrimaryNavigation';
+
+/**
+ * Install a controllable `window.matchMedia` mock so tests can drive the
+ * collapse-breakpoint `change` event that {@link PrimaryNavigation} listens to.
+ * jsdom does not implement matchMedia, and the change listeners it stores are
+ * exposed via `emit()` so a test can simulate the viewport crossing the
+ * breakpoint. Returns the controller and a restore function.
+ */
+function installMatchMediaMock(initialMatches = true) {
+  const listeners = new Set<(event: MediaQueryListEvent) => void>();
+  let matches = initialMatches;
+  const original = window.matchMedia;
+
+  window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+    get matches() {
+      return matches;
+    },
+    media: query,
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: (_event: string, listener: EventListener) => {
+      listeners.add(listener as (event: MediaQueryListEvent) => void);
+    },
+    removeEventListener: (_event: string, listener: EventListener) => {
+      listeners.delete(listener as (event: MediaQueryListEvent) => void);
+    },
+    dispatchEvent: vi.fn(),
+  })) as unknown as typeof window.matchMedia;
+
+  return {
+    /** Simulate the viewport crossing the breakpoint. */
+    emit(nextMatches: boolean) {
+      matches = nextMatches;
+      for (const listener of listeners) {
+        listener({ matches: nextMatches } as MediaQueryListEvent);
+      }
+    },
+    /** Number of currently-registered change listeners. */
+    get listenerCount() {
+      return listeners.size;
+    },
+    restore() {
+      window.matchMedia = original;
+    },
+  };
+}
 
 /**
  * Render a representative PrimaryNavigation tree with a mix of link items and a
@@ -128,6 +176,23 @@ describe('PrimaryNavigation collapsed/hamburger mode', () => {
     expect(portalLink).toHaveFocus();
   });
 
+  it('closes the menu when a navigation link is activated', async () => {
+    const user = userEvent.setup();
+    renderNav();
+
+    const toggle = screen.getByRole('button', {
+      name: 'Open navigation menu',
+    });
+    await user.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+
+    // Clicking a nav link (a client-side <Link>/anchor) should collapse the
+    // menu so the destination page doesn't render with it still expanded.
+    await user.click(screen.getByRole('link', { name: 'Portal' }));
+
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  });
+
   it('has no axe accessibility violations in the collapsed state', async () => {
     const { container } = renderNav();
 
@@ -137,5 +202,69 @@ describe('PrimaryNavigation collapsed/hamburger mode', () => {
       rules: { 'color-contrast': { enabled: false } },
     });
     expect(results).toHaveNoViolations();
+  });
+});
+
+describe('PrimaryNavigation viewport-growth reset', () => {
+  let mediaMock: ReturnType<typeof installMatchMediaMock>;
+
+  beforeEach(() => {
+    // Start below the collapse breakpoint (query matches).
+    mediaMock = installMatchMediaMock(true);
+  });
+
+  afterEach(() => {
+    mediaMock.restore();
+  });
+
+  it('closes the menu when the viewport grows past the breakpoint', async () => {
+    const user = userEvent.setup();
+    renderNav();
+
+    const toggle = screen.getByRole('button', {
+      name: 'Open navigation menu',
+    });
+    await user.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+
+    // Simulate the viewport growing onto desktop: the query no longer matches.
+    act(() => {
+      mediaMock.emit(false);
+    });
+
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('leaves the menu untouched while still within the collapse range', async () => {
+    const user = userEvent.setup();
+    renderNav();
+
+    const toggle = screen.getByRole('button', {
+      name: 'Open navigation menu',
+    });
+    await user.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+
+    // A change event that still matches (e.g. resizing within mobile widths)
+    // must not close the menu.
+    act(() => {
+      mediaMock.emit(true);
+    });
+
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  });
+
+  it('removes the change listener on unmount', () => {
+    const { unmount } = renderNav();
+
+    expect(mediaMock.listenerCount).toBe(1);
+    unmount();
+    expect(mediaMock.listenerCount).toBe(0);
+  });
+
+  it('does not register a listener when collapsible is false', () => {
+    renderNav({ collapsible: false });
+
+    expect(mediaMock.listenerCount).toBe(0);
   });
 });

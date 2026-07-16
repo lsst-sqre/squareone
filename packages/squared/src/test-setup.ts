@@ -31,3 +31,21 @@ global.ResizeObserver = class ResizeObserver {
 
 // Mock scrollIntoView which is used by Radix UI focus management
 Element.prototype.scrollIntoView = () => {};
+
+// Mock window.matchMedia which jsdom does not implement. Components such as
+// PrimaryNavigation read it during mount. Individual tests can override this
+// with a controllable implementation to drive `change` events.
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  configurable: true,
+  value: (query: string) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: () => {},
+    removeListener: () => {},
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    dispatchEvent: () => false,
+  }),
+});

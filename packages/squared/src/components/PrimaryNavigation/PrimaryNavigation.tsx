@@ -103,6 +103,46 @@ export const PrimaryNavigation = forwardRef<
       };
     }, [collapsible, isMenuOpen]);
 
+    // Reset the disclosure state when the viewport grows past the collapse
+    // breakpoint. The Header lives in the persistent App Router root layout, so
+    // without this the menu could stay "open" as the window is resized onto
+    // desktop, leaving the Escape keydown listener attached where the toggle is
+    // `display: none`. The query MUST match the CSS collapse breakpoint in
+    // PrimaryNavigation.module.css (`max-width: 59.9375rem`). Effect-only, so it
+    // is SSR-safe.
+    useEffect(() => {
+      if (!collapsible) return () => {};
+
+      const mediaQuery = window.matchMedia('(max-width: 59.9375rem)');
+
+      const handleChange = (event: MediaQueryListEvent) => {
+        // No longer in the collapse range (i.e. desktop): ensure the menu is
+        // closed so the disclosure state and Escape listener don't linger.
+        if (!event.matches) {
+          setIsMenuOpen(false);
+        }
+      };
+
+      mediaQuery.addEventListener('change', handleChange);
+      return () => {
+        mediaQuery.removeEventListener('change', handleChange);
+      };
+    }, [collapsible]);
+
+    // Close the collapsed menu when a navigation link is activated. Internal
+    // items are client-side links (e.g. Next.js <Link>) rendered inside the
+    // persistent root layout, so without this the destination page renders with
+    // the menu still expanded. A delegated handler keeps the component
+    // router-agnostic: it matches any activated anchor with an `href` (NextLink
+    // or plain <a>) without moving focus.
+    const handleListClick = (event: React.MouseEvent<HTMLUListElement>) => {
+      if (!collapsible) return;
+      const target = event.target as HTMLElement;
+      if (target.closest('a[href]')) {
+        setIsMenuOpen(false);
+      }
+    };
+
     useEffect(() => {
       // Constainer is the <nav> element (essentially Root)
       const container = containerReference.current;
@@ -199,7 +239,11 @@ export const PrimaryNavigation = forwardRef<
             <Menu aria-hidden="true" />
           </button>
         )}
-        <RadixNavigationMenu.List id={listId} className={listClassName}>
+        <RadixNavigationMenu.List
+          id={listId}
+          className={listClassName}
+          onClick={handleListClick}
+        >
           {children}
         </RadixNavigationMenu.List>
         <NavigationMenuViewport />
