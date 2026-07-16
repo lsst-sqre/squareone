@@ -87,6 +87,10 @@ export const PrimaryNavigation = forwardRef<
       if (!collapsible || !isMenuOpen) return () => {};
 
       const handleKeyDown = (event: KeyboardEvent) => {
+        // A nested Radix dropdown (Apps/user menu) dismisses on Escape via a
+        // capture-phase listener that calls preventDefault(). Honor that so a
+        // single Escape collapses only the inner dropdown, not the whole menu.
+        if (event.defaultPrevented) return;
         if (event.key === 'Escape') {
           setIsMenuOpen(false);
           toggleReference.current?.focus();

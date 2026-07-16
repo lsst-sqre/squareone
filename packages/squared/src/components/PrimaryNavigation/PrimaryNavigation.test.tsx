@@ -86,6 +86,34 @@ describe('PrimaryNavigation collapsed/hamburger mode', () => {
     expect(toggle).toHaveFocus();
   });
 
+  it('stays open when Escape was already consumed by a nested dismissable layer', async () => {
+    const user = userEvent.setup();
+    renderNav();
+
+    const toggle = screen.getByRole('button', {
+      name: 'Open navigation menu',
+    });
+    await user.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+
+    // Simulate Radix's DismissableLayer, which handles Escape on a capture-phase
+    // document listener and calls preventDefault() when it dismisses an inner
+    // dropdown. The menu-level handler must ignore such a pre-consumed event.
+    document.addEventListener(
+      'keydown',
+      (event) => {
+        if (event.key === 'Escape') event.preventDefault();
+      },
+      { capture: true, once: true }
+    );
+
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', cancelable: true })
+    );
+
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  });
+
   it('keeps navigation links keyboard operable when expanded', async () => {
     const user = userEvent.setup();
     renderNav();
