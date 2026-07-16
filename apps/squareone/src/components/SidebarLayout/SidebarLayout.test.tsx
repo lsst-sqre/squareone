@@ -90,10 +90,12 @@ test('displays mobile menu toggle', () => {
   ).toBeInTheDocument();
 });
 
-test('does not render its own skip link', () => {
-  // The skip link is owned by the root layout's AppShell so it is the first
-  // focusable element on the page. SidebarLayout must not render a second one
-  // (which was an ineffective, deep tab stop).
+test('renders a skip-sidebar-navigation link targeting the page content', () => {
+  // The root AppShell's "Skip to main content" link targets the <main> that
+  // wraps this layout (including the sidebar nav). This in-page bypass lets
+  // keyboard users jump past the sidebar nav to the page content without
+  // introducing a second <main> landmark. It must not reuse the 'main-content'
+  // id (that belongs to the root main).
   render(
     <SidebarLayout
       sidebarTitle="Settings"
@@ -104,9 +106,23 @@ test('does not render its own skip link', () => {
     </SidebarLayout>
   );
 
+  const skipLink = screen.getByRole('link', {
+    name: /skip sidebar navigation/i,
+  });
+  expect(skipLink).toBeInTheDocument();
+  expect(skipLink).toHaveAttribute('href', '#sidebar-page-content');
+
+  // SidebarLayout must not render a second "Skip to main content" link.
   expect(
     screen.queryByRole('link', { name: /skip to main content/i })
   ).not.toBeInTheDocument();
+
+  // The focus target is the content container: it carries the matching id and
+  // is programmatically focusable, but is NOT a second <main> landmark.
+  const contentContainer = screen.getByTestId('main-content');
+  expect(contentContainer).toHaveAttribute('id', 'sidebar-page-content');
+  expect(contentContainer).toHaveAttribute('tabindex', '-1');
+  expect(screen.queryByRole('main')).not.toBeInTheDocument();
 });
 
 test('handles empty navigation sections', () => {

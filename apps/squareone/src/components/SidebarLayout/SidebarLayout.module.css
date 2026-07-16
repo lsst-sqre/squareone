@@ -1,4 +1,8 @@
-/* Skip link for screen readers and keyboard navigation */
+/*
+ * In-page "Skip sidebar navigation" link: visually hidden until focused, then
+ * revealed at the top-left. Mirrors AppShell's .skipLink styling so the two
+ * skip links look and behave consistently.
+ */
 .skipLink {
   position: absolute;
   top: -40px;
