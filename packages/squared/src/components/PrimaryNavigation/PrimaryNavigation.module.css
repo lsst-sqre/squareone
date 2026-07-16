@@ -28,10 +28,9 @@
   color: var(--rsd-component-header-nav-text-hover-color);
 }
 
-.menuToggle:focus-visible {
-  outline: 2px solid var(--rsd-color-primary-500);
-  outline-offset: 2px;
-}
+/* Focus ring comes from the global :focus-visible baseline in
+ * @lsst-sqre/global-css base.css (loaded by consuming apps and Storybook). No
+ * local override needed here. */
 
 .menuToggle svg {
   display: block;
@@ -107,10 +106,8 @@
   text-decoration-color: var(--rsd-component-header-nav-text-hover-color);
 }
 
-.triggerLink:focus-visible {
-  outline: 2px solid var(--rsd-color-primary-500);
-  outline-offset: 2px;
-}
+/* Focus ring comes from the global :focus-visible baseline in
+ * @lsst-sqre/global-css base.css. No local override needed here. */
 
 /* Styled trigger (for dropdown triggers) styles */
 .styledTrigger {
@@ -123,10 +120,8 @@
   border-radius: 0.5rem;
 }
 
-.styledTrigger:focus-visible {
-  outline: 2px solid var(--rsd-color-primary-500);
-  outline-offset: 2px;
-}
+/* Focus ring comes from the global :focus-visible baseline in
+ * @lsst-sqre/global-css base.css. No local override needed here. */
 
 .styledTrigger:hover {
   color: var(--rsd-component-header-nav-text-hover-color);
@@ -194,6 +189,9 @@
   margin-bottom: 0;
 }
 
+/* Intentional override of the global :focus-visible baseline: the dropdown
+ * menu list sits on the nav menulist background, so the ring uses the menulist
+ * selection color instead of the sitewide primary-500. */
 .link:focus-visible {
   outline: 2px solid
     var(--rsd-component-header-nav-menulist-selected-background-color);
