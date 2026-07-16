@@ -2,8 +2,8 @@ import type { Broadcast } from '@lsst-sqre/semaphore-client';
 import { Button } from '@lsst-sqre/squared';
 import type React from 'react';
 import useDisclosure from 'react-a11y-disclosure';
-
 import styles from './BroadcastBanner.module.css';
+import { broadcastAccessibleName } from './broadcastLabel';
 
 type BroadcastBannerProps = {
   broadcast?: Broadcast;
@@ -43,6 +43,13 @@ export default function BroadcastBanner({ broadcast }: BroadcastBannerProps) {
     return null;
   }
 
+  // Derive a short plain-text accessible name from the Markdown summary so the
+  // landmark is not announced with literal Markdown syntax, and does not
+  // duplicate the full banner body (also announced by the live region). Fall
+  // back to a generic label if the summary reduces to no readable text.
+  const accessibleName =
+    broadcastAccessibleName(broadcast.summary.gfm) || 'Broadcast message';
+
   /* eslint-disable react/no-danger */
   /* eslint-disable react/jsx-props-no-spreading */
   return (
@@ -54,7 +61,7 @@ export default function BroadcastBanner({ broadcast }: BroadcastBannerProps) {
         } as React.CSSProperties
       }
     >
-      <aside className={styles.aside} aria-label={broadcast.summary.gfm}>
+      <aside className={styles.aside} aria-label={accessibleName}>
         <div className={styles.summary}>
           <div
             className="summary-content"

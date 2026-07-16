@@ -25,6 +25,41 @@ test('names its complementary landmark so it is unique among banners', () => {
   ).toBeInTheDocument();
 });
 
+test('derives a plain-text landmark name, not raw Markdown, from the summary', () => {
+  // The accessible name must not expose Markdown syntax (asterisks, brackets,
+  // URLs) that a screen reader would read aloud verbatim.
+  render(
+    <BroadcastBanner
+      broadcast={makeBroadcast({
+        summary: {
+          gfm: 'Scheduled maintenance on **February 1, 2025**',
+          html: '<p>Scheduled maintenance on <strong>February 1, 2025</strong></p>',
+        },
+      })}
+    />
+  );
+
+  const landmark = screen.getByRole('complementary');
+  expect(landmark).toHaveAccessibleName(
+    'Scheduled maintenance on February 1, 2025'
+  );
+  expect(landmark.getAttribute('aria-label')).not.toContain('*');
+});
+
+test('falls back to a generic landmark name when the summary has no text', () => {
+  render(
+    <BroadcastBanner
+      broadcast={makeBroadcast({
+        summary: { gfm: '   ', html: '<p></p>' },
+      })}
+    />
+  );
+
+  expect(
+    screen.getByRole('complementary', { name: 'Broadcast message' })
+  ).toBeInTheDocument();
+});
+
 test('does not carry its own live-region role', () => {
   // Live-region semantics live on the persistent containers rendered by
   // BroadcastBannerStack, which exist in the DOM before the fetch resolves.
