@@ -1,11 +1,9 @@
 /* Root component styles */
 .root {
-  /* Breakpoint below which the navigation collapses to a hamburger menu.
-   * Matches the SidebarLayout mobile breakpoint (60rem) for a consistent
-   * responsive treatment across the app shell. Consumers can override this
-   * custom property to tune the collapse point. */
-  --primary-navigation-collapse-breakpoint: 60rem;
-
+  /* The navigation collapses to a hamburger menu below a fixed 60rem
+   * breakpoint (see the media query below), chosen to match the SidebarLayout
+   * mobile breakpoint for a consistent responsive treatment across the app
+   * shell. Pass `collapsible={false}` to opt out of the collapse behavior. */
   position: relative;
 }
 

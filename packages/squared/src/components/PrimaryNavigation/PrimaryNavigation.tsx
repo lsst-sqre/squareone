@@ -48,8 +48,8 @@ export type PrimaryNavigationType = React.ForwardRefExoticComponent<
 /**
  * Primary navigation component that provides a layout for navigation items and a viewport.
  *
- * Below the CSS breakpoint (`--primary-navigation-collapse-breakpoint`,
- * `60rem` by default) the navigation collapses behind an accessible hamburger
+ * Below a fixed `60rem` breakpoint (chosen to match the SidebarLayout mobile
+ * breakpoint) the navigation collapses behind an accessible hamburger
  * toggle: the toggle exposes `aria-expanded` and `aria-controls`, Escape closes
  * the menu and returns focus to the toggle, and the menu items stay keyboard
  * operable. Pass `collapsible={false}` to opt out of the collapse behavior.
