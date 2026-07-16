@@ -121,8 +121,8 @@ export const MobileLayout: Story = {
       <div>
         <h1>Mobile Layout</h1>
         <p>
-          This demonstrates the mobile layout with vertical stacking below 60rem
-          viewport width.
+          This demonstrates the mobile layout with vertical stacking below the
+          66rem (~1056px) desktop breakpoint.
         </p>
         <p>The sidebar navigation is prepared for disclosure pattern.</p>
       </div>

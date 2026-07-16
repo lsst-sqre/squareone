@@ -26,8 +26,9 @@
   background-color: var(--rsd-color-primary-200, #bfdbfe);
 }
 
-/* Desktop: completely hidden */
-@media (min-width: 60rem) {
+/* Desktop: completely hidden. 66rem matches SidebarLayout's grid breakpoint
+ * (60rem layout width x the 1.1rem :root font-size; media-query rem is 16px). */
+@media (min-width: 66rem) {
   .toggleButton {
     display: none;
   }

@@ -108,12 +108,12 @@ export const PrimaryNavigation = forwardRef<
     // without this the menu could stay "open" as the window is resized onto
     // desktop, leaving the Escape keydown listener attached where the toggle is
     // `display: none`. The query MUST match the CSS collapse breakpoint in
-    // PrimaryNavigation.module.css (`max-width: 59.9375rem`). Effect-only, so it
+    // PrimaryNavigation.module.css (`max-width: 65.9375rem`). Effect-only, so it
     // is SSR-safe.
     useEffect(() => {
       if (!collapsible) return () => {};
 
-      const mediaQuery = window.matchMedia('(max-width: 59.9375rem)');
+      const mediaQuery = window.matchMedia('(max-width: 65.9375rem)');
 
       const handleChange = (event: MediaQueryListEvent) => {
         // No longer in the collapse range (i.e. desktop): ensure the menu is

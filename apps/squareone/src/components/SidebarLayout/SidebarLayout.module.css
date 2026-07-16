@@ -29,8 +29,14 @@
   padding: 0 var(--size-screen-padding-min);
 }
 
-/* Desktop layout: CSS Grid with sidebar and content columns */
-@media (min-width: 60rem) {
+/* Desktop layout: CSS Grid with sidebar and content columns.
+ *
+ * Breakpoint 66rem = 60rem (the max-width below) x the 1.1rem :root font-size.
+ * Media queries measure rem against the browser's 16px default, so the 60rem
+ * container only fits once the viewport reaches ~66rem (~1056px). Engaging the
+ * grid / dropping the gutter any earlier would push the two columns past the
+ * viewport edge. */
+@media (min-width: 66rem) {
   .layoutContainer {
     display: grid;
     grid-template-columns: 18rem 1fr;
@@ -68,8 +74,8 @@
   max-height: 0;
 }
 
-/* Desktop: sidebar styling - always visible */
-@media (min-width: 60rem) {
+/* Desktop: sidebar styling - always visible (66rem: see grid breakpoint above) */
+@media (min-width: 66rem) {
   .sidebarContainerClosed,
   .sidebarContainerOpen {
     max-height: none;
@@ -103,8 +109,8 @@
   z-index: 10;
 }
 
-/* Desktop: completely hidden */
-@media (min-width: 60rem) {
+/* Desktop: completely hidden (66rem: see grid breakpoint above) */
+@media (min-width: 66rem) {
   .mobileHeader {
     display: none;
   }
@@ -137,7 +143,7 @@
   padding-bottom: 2rem;
 }
 
-@media (min-width: 60rem) {
+@media (min-width: 66rem) {
   .mainContentContainer {
     padding-bottom: 3rem;
   }

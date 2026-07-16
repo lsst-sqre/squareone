@@ -1,11 +1,14 @@
 /* Root component styles */
 .root {
-  /* The navigation collapses to a hamburger menu below a fixed 60rem
-   * breakpoint (see the media query below, which matches just under 60rem so
-   * the desktop `min-width: 60rem` layouts don't overlap), chosen to match the
-   * SidebarLayout mobile breakpoint for a consistent responsive treatment
-   * across the app shell. Pass `collapsible={false}` to opt out of the collapse
-   * behavior. */
+  /* The navigation collapses to a hamburger menu below a fixed desktop
+   * breakpoint (see the media query below), chosen to match the SidebarLayout
+   * desktop breakpoint for a consistent responsive treatment across the app
+   * shell. That breakpoint is 66rem, not 60rem: the app's :root font-size is
+   * 1.1rem, so a 60rem layout container renders at ~1056px, but media queries
+   * measure rem against the browser's 16px default. 66rem (= 60rem x 1.1) is
+   * therefore where the desktop layouts actually fit, so the inline nav
+   * collapses to the hamburger before it runs out of horizontal room. Pass
+   * `collapsible={false}` to opt out of the collapse behavior. */
   position: relative;
 }
 
@@ -40,10 +43,11 @@
 
 /* Below the breakpoint: show the toggle and collapse the item list into a
  * disclosure controlled by the toggle's open/closed state. The max-width stops
- * just short of 60rem (59.9375rem) so this collapse range and the desktop
- * `min-width: 60rem` layouts in SidebarLayout/TimesSquareApp are mutually
- * exclusive — desktop starts at exactly 60rem. */
-@media (max-width: 59.9375rem) {
+ * just short of 66rem (65.9375rem) so this collapse range and the desktop
+ * `min-width: 66rem` layouts in SidebarLayout/TimesSquareApp are mutually
+ * exclusive — desktop starts at exactly 66rem. (66rem = 60rem layout width x
+ * the 1.1rem :root font-size; media-query rem is 16px.) */
+@media (max-width: 65.9375rem) {
   .rootCollapsible .menuToggle {
     display: inline-flex;
   }
@@ -94,6 +98,9 @@
   border-radius: 0.5rem;
   padding: 2px 4px;
   display: inline-block; /* For consistency with MenuTrigger button */
+  /* Keep each label on one line so items never wrap mid-row while the flex
+   * row is under shrink pressure just above the collapse breakpoint. */
+  white-space: nowrap;
 }
 
 .triggerLink:hover {
@@ -118,6 +125,10 @@
   background-color: transparent;
   border: none;
   border-radius: 0.5rem;
+
+  /* Keep the label and its inline chevron together on one line so the chevron
+   * never drops below the text under shrink pressure near the breakpoint. */
+  white-space: nowrap;
 }
 
 /* Focus ring comes from the global :focus-visible baseline in

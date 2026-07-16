@@ -4,7 +4,11 @@
   padding: 0 var(--size-screen-padding-min);
 }
 
-@media (min-width: 60rem) {
+/* Desktop breakpoint: 66rem = 60rem (layout) x the 1.1rem :root font-size.
+ * Media queries measure rem against the browser's 16px default, so the 60rem
+ * container above only fits once the viewport reaches 66rem (~1056px); dropping
+ * the gutter any earlier lets content touch the edge. */
+@media (min-width: 66rem) {
   .main {
     padding: 0;
   }
