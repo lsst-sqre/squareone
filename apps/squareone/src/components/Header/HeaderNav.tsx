@@ -46,49 +46,57 @@ export default function HeaderNav() {
   const nubladoUrl = query?.getNubladoUrl() ?? '/nb/hub';
 
   return (
-    <PrimaryNavigation className={styles.nav} aria-label="Main">
-      {showPortal && (
+    <div className={styles.headerNav}>
+      <PrimaryNavigation className={styles.nav} aria-label="Main">
+        {showPortal && (
+          <PrimaryNavigation.Item className={styles.navItem}>
+            <PrimaryNavigation.TriggerLink href={portalUrl}>
+              Portal
+            </PrimaryNavigation.TriggerLink>
+          </PrimaryNavigation.Item>
+        )}
+
+        {showNublado && (
+          <PrimaryNavigation.Item className={styles.navItem}>
+            <PrimaryNavigation.TriggerLink href={nubladoUrl}>
+              Notebooks
+            </PrimaryNavigation.TriggerLink>
+          </PrimaryNavigation.Item>
+        )}
+
         <PrimaryNavigation.Item className={styles.navItem}>
-          <PrimaryNavigation.TriggerLink href={portalUrl}>
-            Portal
+          <InternalTriggerLink href="/api-aspect">APIs</InternalTriggerLink>
+        </PrimaryNavigation.Item>
+
+        {enableAppsMenu && (
+          <PrimaryNavigation.Item className={styles.navItem}>
+            <AppsMenu />
+          </PrimaryNavigation.Item>
+        )}
+
+        <PrimaryNavigation.Item className={styles.navItem}>
+          <InternalTriggerLink href="/docs">Documentation</InternalTriggerLink>
+        </PrimaryNavigation.Item>
+
+        <PrimaryNavigation.Item className={styles.navItem}>
+          <InternalTriggerLink href="/support">Support</InternalTriggerLink>
+        </PrimaryNavigation.Item>
+
+        <PrimaryNavigation.Item className={styles.navItem}>
+          <PrimaryNavigation.TriggerLink href="https://community.lsst.org">
+            Community
           </PrimaryNavigation.TriggerLink>
         </PrimaryNavigation.Item>
-      )}
+      </PrimaryNavigation>
 
-      {showNublado && (
-        <PrimaryNavigation.Item className={styles.navItem}>
-          <PrimaryNavigation.TriggerLink href={nubladoUrl}>
-            Notebooks
-          </PrimaryNavigation.TriggerLink>
-        </PrimaryNavigation.Item>
-      )}
-
-      <PrimaryNavigation.Item className={styles.navItem}>
-        <InternalTriggerLink href="/api-aspect">APIs</InternalTriggerLink>
-      </PrimaryNavigation.Item>
-
-      {enableAppsMenu && (
-        <PrimaryNavigation.Item className={styles.navItem}>
-          <AppsMenu />
-        </PrimaryNavigation.Item>
-      )}
-
-      <PrimaryNavigation.Item className={styles.navItem}>
-        <InternalTriggerLink href="/docs">Documentation</InternalTriggerLink>
-      </PrimaryNavigation.Item>
-
-      <PrimaryNavigation.Item className={styles.navItem}>
-        <InternalTriggerLink href="/support">Support</InternalTriggerLink>
-      </PrimaryNavigation.Item>
-
-      <PrimaryNavigation.Item className={styles.navItem}>
-        <PrimaryNavigation.TriggerLink href="https://community.lsst.org">
-          Community
-        </PrimaryNavigation.TriggerLink>
-      </PrimaryNavigation.Item>
-
-      <Login pageUrl={currentUrl} />
-    </PrimaryNavigation>
+      <PrimaryNavigation
+        className={styles.userNav}
+        collapsible={false}
+        aria-label="User menu"
+      >
+        <Login pageUrl={currentUrl} />
+      </PrimaryNavigation>
+    </div>
   );
 }
 

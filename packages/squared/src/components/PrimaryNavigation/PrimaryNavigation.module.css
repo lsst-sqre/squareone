@@ -53,7 +53,19 @@
   .collapsible.open {
     display: flex;
     flex-direction: column;
-    justify-self: stretch;
+    align-items: flex-start;
+    width: 100%;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+  }
+
+  /* Clear the horizontal row margins so every stacked item aligns on the
+   * same left edge. The doubled `.collapsible.open .item` specificity (0,3,0)
+   * beats both squared's base `.item` (0,1,0) and any consumer `.navItem` /
+   * `.navItem:first-of-type` overrides (0,1,0)/(0,2,0). Vertical spacing then
+   * comes from the list `gap`. */
+  .collapsible.open .item {
+    margin: 0;
   }
 }
 
