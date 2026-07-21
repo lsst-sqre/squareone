@@ -63,7 +63,9 @@
 
 /* Active/Selected state */
 .trigger[data-state="active"] {
-  color: var(--rsd-color-primary-600);
+  /* Selected tab label text uses the accessible teal (>=4.5:1); the
+   * underline is a non-text accent (3:1 bar) and keeps the brand teal. */
+  color: var(--rsd-component-interactive-color);
   border-bottom-color: var(--rsd-color-primary-600);
 }
 

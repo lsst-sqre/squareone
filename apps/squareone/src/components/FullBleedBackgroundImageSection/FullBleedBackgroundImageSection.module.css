@@ -2,6 +2,14 @@
  * Section with a full-bleed background image for content areas.
  */
 .section {
+  /* Scrim defaults. A 50% black scrim composites the brightest region of the
+   * background photo (~rgb(207, 206, 214)) to ~rgb(104, 103, 107), lifting
+   * white hero text to ~5.6:1 — above the WCAG 1.4.3 4.5:1 bar. Both are CSS
+   * variables so a consumer can tune the treatment, but the defaults must
+   * keep white text accessible over any region of the image. */
+  --scrim-color: #000000;
+  --scrim-opacity: 0.5;
+
   color: var(--text-color, #ffffff);
   background-color: var(--fallback-color, #333333);
   background-image: var(--image-path, url("/lsst-stills-0014.jpg"));
@@ -16,4 +24,28 @@
   margin-left: -50vw;
   margin-right: -50vw;
   margin-top: 0;
+}
+
+/*
+ * Scrim overlay: an absolutely-positioned darkening layer between the
+ * background image and the content, so white text meets contrast over bright
+ * image regions without changing the photo itself.
+ */
+.section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: var(--scrim-color, #000000);
+  opacity: var(--scrim-opacity, 0.5);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/*
+ * Content layer stacks above the scrim so the darkening never falls on top of
+ * the hero text.
+ */
+.content {
+  position: relative;
+  z-index: 1;
 }

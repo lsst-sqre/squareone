@@ -149,7 +149,8 @@
 }
 
 .summaryToggle:hover .summaryText {
-  color: var(--rsd-color-primary-600);
+  /* Teal summary text on hover: accessible teal for 4.5:1. */
+  color: var(--rsd-component-interactive-color);
 }
 
 /* The chevron sits at the top of the (potentially wrapping) summary. */
@@ -217,7 +218,8 @@
   padding: 0;
   border: none;
   background: none;
-  color: var(--rsd-color-primary-600);
+  /* Link-style teal text: accessible teal for 4.5:1. */
+  color: var(--rsd-component-interactive-color);
   font: inherit;
   text-decoration: underline;
   cursor: pointer;

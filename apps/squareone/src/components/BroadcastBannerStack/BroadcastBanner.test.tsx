@@ -1,6 +1,6 @@
 import type { Broadcast } from '@lsst-sqre/semaphore-client';
 import { render, screen } from '@testing-library/react';
-import { expect, test } from 'vitest';
+import { describe, expect, it, test } from 'vitest';
 import { axe } from 'vitest-axe';
 import BroadcastBanner from './BroadcastBanner';
 
@@ -99,4 +99,55 @@ test('renders nothing without a broadcast', () => {
   const { container } = render(<BroadcastBanner />);
 
   expect(container).toBeEmptyDOMElement();
+});
+
+const broadcastData = {
+  id: '1234',
+  summary: {
+    gfm: 'Hello world.',
+    html: '<p>Hello world.</p>',
+  },
+  active: true,
+  enabled: true,
+  stale: false,
+  category: 'other' as const,
+};
+
+describe('BroadcastBanner', () => {
+  it('paints the info category with the accessible interactive teal token', () => {
+    // The info banner draws white text on the category color, so the
+    // background must be the accessible teal (>=4.5:1), not the raw brand
+    // primary-600 (which only reaches 4.14:1 against white).
+    const { container } = render(
+      <BroadcastBanner broadcast={{ ...broadcastData, category: 'info' }} />
+    );
+    const banner = container.firstChild as HTMLElement;
+    expect(banner.style.getPropertyValue('--banner-bg')).toBe(
+      'var(--rsd-component-interactive-color)'
+    );
+  });
+
+  it('paints the outage category with red-600 for white-text contrast', () => {
+    const { container } = render(
+      <BroadcastBanner broadcast={{ ...broadcastData, category: 'outage' }} />
+    );
+    const banner = container.firstChild as HTMLElement;
+    // White banner text sits on this color, so use red-600 (#ad1919, 7.17:1
+    // on white) rather than red-500 (#ed4c4c, only 3.66:1).
+    expect(banner.style.getPropertyValue('--banner-bg')).toBe(
+      'var(--rsd-color-red-600)'
+    );
+  });
+
+  it('paints the notice category with orange-600 for white-text contrast', () => {
+    const { container } = render(
+      <BroadcastBanner broadcast={{ ...broadcastData, category: 'notice' }} />
+    );
+    const banner = container.firstChild as HTMLElement;
+    // White banner text sits on this color, so use orange-600 (#8f4d0a,
+    // 6.49:1 on white) rather than orange-500 (#e08d35, only 2.61:1).
+    expect(banner.style.getPropertyValue('--banner-bg')).toBe(
+      'var(--rsd-color-orange-600)'
+    );
+  });
 });

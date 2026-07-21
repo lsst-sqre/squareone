@@ -50,7 +50,8 @@
 
 /* Solid variant - primary */
 .solid.primary {
-  background-color: var(--rsd-color-primary-600);
+  /* White text on teal: accessible teal (>=4.5:1), not raw primary-600. */
+  background-color: var(--rsd-component-interactive-color);
   color: var(--rsd-color-gray-000);
 }
 
@@ -99,7 +100,8 @@
 /* Soft variant - primary */
 .soft.primary {
   background-color: var(--rsd-color-primary-200);
-  color: var(--rsd-color-primary-600);
+  /* Teal text on the light-teal tint: accessible teal lifts 3.66:1 -> 5.29:1. */
+  color: var(--rsd-component-interactive-color);
 }
 
 /* Soft variant - blue */
@@ -147,8 +149,10 @@
 /* Outline variant - primary */
 .outline.primary {
   background-color: var(--rsd-component-page-background-color);
+  /* Border is a non-text accent (3:1 bar) and keeps the brand teal; the
+   * label text uses the accessible teal to clear 4.5:1. */
   border-color: var(--rsd-color-primary-600);
-  color: var(--rsd-color-primary-600);
+  color: var(--rsd-component-interactive-color);
 }
 
 /* Outline variant - blue */
