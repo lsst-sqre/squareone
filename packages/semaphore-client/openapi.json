@@ -3,7 +3,7 @@
   "info": {
     "title": "Semaphore",
     "description": "Semaphore is the user message and notification system for the Rubin Science Platform.\n\nYou can find Semaphore's user and developer documentation at [https://semaphore.lsst.io](https://semaphore.lsst.io). Semaphore is developed at [https://github.com/lsst-sqre/semaphore](https://github.com/lsst-sqre/semaphore)",
-    "version": "0.1.dev1+g482752235"
+    "version": "2.0.0"
   },
   "paths": {
     "/": {
@@ -268,12 +268,12 @@
         }
       }
     },
-    "/semaphore/v1/notifications": {
+    "/semaphore/v1/notifications/messages": {
       "get": {
         "tags": ["notifications"],
         "summary": "List notifications",
         "description": "List all current notifications for the authenticated user.",
-        "operationId": "list_notifications_semaphore_v1_notifications_get",
+        "operationId": "list_notifications_semaphore_v1_notifications_messages_get",
         "parameters": [
           {
             "name": "cursor",
@@ -328,7 +328,7 @@
                   "items": {
                     "$ref": "#/components/schemas/UserNotificationSummary"
                   },
-                  "title": "Response List Notifications Semaphore V1 Notifications Get"
+                  "title": "Response List Notifications Semaphore V1 Notifications Messages Get"
                 }
               }
             }
@@ -344,12 +344,12 @@
         }
       }
     },
-    "/semaphore/v1/notifications/{id}": {
+    "/semaphore/v1/notifications/messages/{id}": {
       "get": {
         "tags": ["notifications"],
-        "summary": "Get admin notification",
-        "description": "Retrieve a specific admin notification.",
-        "operationId": "get_notification_semaphore_v1_notifications__id__get",
+        "summary": "Get notification",
+        "description": "Retrieve a specific notification.",
+        "operationId": "get_notification_semaphore_v1_notifications_messages__id__get",
         "parameters": [
           {
             "name": "id",
@@ -396,6 +396,231 @@
         },
         "responses": {
           "204": { "description": "Successful Response" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/semaphore/v1/notifications/unread": {
+      "post": {
+        "tags": ["notifications"],
+        "summary": "Mark notifications unread",
+        "description": "Mark a list of notifications unread. Notifications that do not exist or that are not marked as read are silently ignored. Returning errors for nonexistent notifications is not useful since there may be race conditions with services revoking notifications.",
+        "operationId": "post_notification_unread_semaphore_v1_notifications_unread_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserNotificationUnread"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": { "description": "Successful Response" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/semaphore/v1/services/{service}/notifications": {
+      "post": {
+        "tags": ["notifications"],
+        "summary": "Create notification",
+        "description": "Send a notification from a service to a user.",
+        "operationId": "service_create_notification_semaphore_v1_services__service__notifications_post",
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Service" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserNotification"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserNotificationWithUrl"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["notifications"],
+        "summary": "List service notifications",
+        "description": "List all current notifications from a specific service.",
+        "operationId": "service_list_notifications_semaphore_v1_services__service__notifications_get",
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Service" }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^p?[0-9]+_[0-9]+$" },
+                { "type": "null" }
+              ],
+              "title": "Cursor",
+              "description": "Pagination cursor",
+              "examples": ["1614985055_4234"]
+            },
+            "description": "Pagination cursor"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "integer", "minimum": 1 },
+                { "type": "null" }
+              ],
+              "title": "Row limit",
+              "description": "Maximum number of notifications to return.",
+              "examples": [500]
+            },
+            "description": "Maximum number of notifications to return."
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "$ref": "#/components/schemas/UtcDatetime" },
+                { "type": "null" }
+              ],
+              "title": "Not before",
+              "description": "Only show entries at or after this time.",
+              "examples": ["2021-03-05T14:59:52Z"]
+            },
+            "description": "Only show entries at or after this time."
+          },
+          {
+            "name": "until",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "$ref": "#/components/schemas/UtcDatetime" },
+                { "type": "null" }
+              ],
+              "title": "Not after",
+              "description": "Only show entries before or at this time.",
+              "examples": ["2021-03-05T14:59:52Z"]
+            },
+            "description": "Only show entries before or at this time."
+          },
+          {
+            "name": "recipient",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "title": "Recipient",
+              "description": "Limit notifications to this recipient.",
+              "examples": ["username"]
+            },
+            "description": "Limit notifications to this recipient."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserNotificationWithUrl"
+                  },
+                  "title": "Response Service List Notifications Semaphore V1 Services  Service  Notifications Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/semaphore/v1/services/{service}/notifications/{id}": {
+      "get": {
+        "tags": ["notifications"],
+        "summary": "Get service notification",
+        "description": "Retrieve a specific notification from a service.",
+        "operationId": "service_get_notification_semaphore_v1_services__service__notifications__id__get",
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Service" }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Id" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserNotification" }
+              }
+            }
+          },
           "422": {
             "description": "Validation Error",
             "content": {
@@ -679,7 +904,8 @@
             "type": "array",
             "uniqueItems": true,
             "title": "Notification IDs",
-            "description": "These notifications will be marked as read at the current time if they are not already marked as read."
+            "description": "These notifications will be marked as read at the current time if they are not already marked as read.",
+            "examples": [["58", "57", "56", "59"]]
           }
         },
         "type": "object",
@@ -731,6 +957,22 @@
         "required": ["id", "created", "read", "summary", "url"],
         "title": "UserNotificationSummary",
         "description": "User notification with a formatted summary but no body.\n\nReturned in lists of notifications to display to a user. Includes a URL\nfrom which the full notification including the formatted body can be\nreturned."
+      },
+      "UserNotificationUnread": {
+        "properties": {
+          "ids": {
+            "items": { "type": "string" },
+            "type": "array",
+            "uniqueItems": true,
+            "title": "Notification IDs",
+            "description": "These notifications will be marked as unread if they are currently marked as read.",
+            "examples": [["58", "57", "56", "59"]]
+          }
+        },
+        "type": "object",
+        "required": ["ids"],
+        "title": "UserNotificationUnread",
+        "description": "Notification IDs to mark as unread."
       },
       "UserNotificationWithUrl": {
         "properties": {

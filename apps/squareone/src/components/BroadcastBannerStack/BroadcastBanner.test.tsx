@@ -60,6 +60,28 @@ test('falls back to a generic landmark name when the summary has no text', () =>
   ).toBeInTheDocument();
 });
 
+test('shows a disclosure button when the broadcast has a body', () => {
+  render(
+    <BroadcastBanner
+      broadcast={makeBroadcast({
+        body: { gfm: 'More details here.', html: '<p>More details here.</p>' },
+      })}
+    />
+  );
+
+  expect(screen.getByRole('button', { name: 'Show more' })).toBeInTheDocument();
+});
+
+test('omits the disclosure button when the body is null', () => {
+  // The live API sends body: null for broadcasts without body content
+  // (DM-55599); there is nothing extra to disclose.
+  render(<BroadcastBanner broadcast={makeBroadcast({ body: null })} />);
+
+  expect(
+    screen.queryByRole('button', { name: /show more/i })
+  ).not.toBeInTheDocument();
+});
+
 test('does not carry its own live-region role', () => {
   // Live-region semantics live on the persistent containers rendered by
   // BroadcastBannerStack, which exist in the DOM before the fetch resolves.

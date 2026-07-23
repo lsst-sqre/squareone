@@ -35,7 +35,8 @@ const mockInfoBroadcast: Broadcast = {
 };
 
 /**
- * A mock notice broadcast message.
+ * A mock notice broadcast message with a null body, as sent by the live API
+ * for broadcasts without body content.
  */
 const mockNoticeBroadcast: Broadcast = {
   id: 'broadcast-003',
@@ -43,6 +44,7 @@ const mockNoticeBroadcast: Broadcast = {
     gfm: 'Please review the updated [data rights policy](https://example.com/policy).',
     html: '<p>Please review the updated <a href="https://example.com/policy">data rights policy</a>.</p>',
   },
+  body: null,
   active: true,
   enabled: true,
   stale: false,
