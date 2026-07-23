@@ -4,6 +4,8 @@
 
 import * as Sentry from '@sentry/nextjs';
 
+import { pinoLogsIntegrationOptions } from './src/lib/sentry/pinoLogsConfig';
+
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
 
@@ -15,6 +17,17 @@ Sentry.init({
 
   // Define how likely traces are sampled.
   tracesSampleRate: parseFloat(process.env.SENTRY_TRACES_SAMPLE_RATE || '0'),
+
+  // Enable Sentry Structured Logs so the pino bridge below can ship server-side
+  // pino records to Sentry Logs (searchable, trace-linked). This does not by
+  // itself create issues or alerts.
+  enableLogs: true,
+
+  // Bridge server-side pino warn/error records to Sentry Logs only. The bridge
+  // never creates Sentry issues or fires alerts (error.levels is empty); the
+  // explicit reportError channel remains the sole alerting path, so there is no
+  // double-capture. See src/lib/sentry/pinoLogsConfig.ts.
+  integrations: [Sentry.pinoIntegration(pinoLogsIntegrationOptions)],
 
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,

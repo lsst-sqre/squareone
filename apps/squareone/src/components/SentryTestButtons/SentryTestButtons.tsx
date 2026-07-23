@@ -15,13 +15,38 @@ import styles from './SentryTestButtons.module.css';
  *   boundaries, so the throw is deferred to the next render instead.
  * - "Capture handled exception" reports a handled exception with
  *   `Sentry.captureException` without interrupting the page.
+ * - "Emit server log" POSTs to `/admin/sentry/emit-log`, whose route handler
+ *   emits server-side pino warn/error records. The `Sentry.pinoIntegration()`
+ *   bridge ships those to Sentry Logs (not issues), so this verifies the
+ *   pino→Sentry Logs transport in the server build.
  */
 export default function SentryTestButtons() {
   const [shouldThrow, setShouldThrow] = useState(false);
+  const [emitLogStatus, setEmitLogStatus] = useState<string | null>(null);
 
   if (shouldThrow) {
     throw new Error('Sentry Test Error');
   }
+
+  const handleEmitLog = async () => {
+    setEmitLogStatus('Emitting…');
+    try {
+      const response = await fetch('/admin/sentry/emit-log', {
+        method: 'POST',
+      });
+      setEmitLogStatus(
+        response.ok
+          ? `Emitted server log (HTTP ${response.status})`
+          : `Failed to emit server log (HTTP ${response.status})`
+      );
+    } catch (error) {
+      setEmitLogStatus(
+        `Failed to emit server log: ${
+          error instanceof Error ? error.message : 'unknown error'
+        }`
+      );
+    }
+  };
 
   return (
     <div className={styles.buttons}>
@@ -37,6 +62,16 @@ export default function SentryTestButtons() {
       >
         Capture handled exception
       </Button>
+      <Button
+        type="button"
+        appearance="outline"
+        onClick={() => {
+          void handleEmitLog();
+        }}
+      >
+        Emit server log
+      </Button>
+      {emitLogStatus && <output>{emitLogStatus}</output>}
     </div>
   );
 }
