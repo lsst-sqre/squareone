@@ -83,6 +83,9 @@ importers:
       '@fontsource/source-sans-pro':
         specifier: ^4.5.11
         version: 4.5.11
+      '@lsst-sqre/api-client-core':
+        specifier: workspace:*
+        version: link:../../packages/api-client-core
       '@lsst-sqre/gafaelfawr-client':
         specifier: workspace:*
         version: link:../../packages/gafaelfawr-client
@@ -446,6 +449,9 @@ importers:
 
   packages/semaphore-client:
     dependencies:
+      '@lsst-sqre/api-client-core':
+        specifier: workspace:*
+        version: link:../api-client-core
       zod:
         specifier: ^3.24.0
         version: 3.25.76

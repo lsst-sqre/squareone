@@ -1,3 +1,8 @@
+import {
+  type ReportContext,
+  type ReportError,
+  reportingQueryFn,
+} from '@lsst-sqre/api-client-core';
 import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query';
 import {
   fetchAdminNotification,
@@ -23,9 +28,24 @@ export type BroadcastsQueryConfig = {
   refetchOnWindowFocus?: boolean;
   refetchOnReconnect?: boolean;
   logger?: Logger;
+  /**
+   * Hook invoked for report-worthy failures (contract drift, 5xx, server-side
+   * network errors). Injected by the app so this package stays Sentry-agnostic;
+   * see `@lsst-sqre/api-client-core`'s `reportingQueryFn`.
+   */
+  reportError?: ReportError;
+  /** Context (e.g. `{ site, package }`) forwarded to `reportError`. */
+  context?: ReportContext;
+  /**
+   * Runtime override forwarded to the error classifier: controls whether
+   * network-level failures are report-worthy. Defaults to auto-detection.
+   */
+  isServer?: boolean;
 };
 
-const defaultConfig: Required<Omit<BroadcastsQueryConfig, 'logger'>> = {
+const defaultConfig: Required<
+  Omit<BroadcastsQueryConfig, 'logger' | 'reportError' | 'context' | 'isServer'>
+> = {
   staleTime: 60 * 1000, // 60s
   gcTime: 10 * 60 * 1000, // 10 min
   refetchInterval: 60 * 1000, // 60s polling
@@ -44,6 +64,9 @@ export const broadcastsQueryOptions = (
     refetchOnWindowFocus,
     refetchOnReconnect,
     logger: log,
+    reportError,
+    context,
+    isServer,
   } = {
     ...defaultConfig,
     ...config,
@@ -58,14 +81,18 @@ export const broadcastsQueryOptions = (
 
   return queryOptions({
     queryKey: ['broadcasts', semaphoreUrl] as const,
-    queryFn: async (): Promise<BroadcastsResponse> => {
-      try {
-        return await fetchBroadcasts(semaphoreUrl, { logger });
-      } catch (error) {
-        logger.error({ err: error }, 'Failed to fetch broadcasts');
-        return getEmptyBroadcasts();
-      }
-    },
+    // Delegate to the shared reporting wrapper: it fetches, returns the empty
+    // fallback on any failure (graceful degradation preserved), logs every
+    // failure, and invokes the injected `reportError` for report-worthy ones
+    // (ZodError contract drift, 5xx, server-side network errors).
+    queryFn: reportingQueryFn<BroadcastsResponse>({
+      fetchFn: () => fetchBroadcasts(semaphoreUrl, { logger }),
+      fallback: getEmptyBroadcasts(),
+      logger,
+      reportError,
+      context,
+      isServer,
+    }),
     enabled: !!semaphoreUrl,
     staleTime,
     gcTime,

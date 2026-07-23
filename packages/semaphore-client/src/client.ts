@@ -19,20 +19,12 @@ import type {
   UserNotificationsPage,
 } from './types';
 
-/**
- * Minimal logger interface compatible with pino's calling convention.
- */
-export type Logger = {
-  debug: (obj: Record<string, unknown>, msg: string) => void;
-  warn: (obj: Record<string, unknown>, msg: string) => void;
-  error: (obj: Record<string, unknown>, msg: string) => void;
-};
+// The `Logger` type's single source of truth now lives in
+// `@lsst-sqre/api-client-core`; re-export it here so existing
+// `@lsst-sqre/semaphore-client` imports keep compiling.
+export type { Logger } from '@lsst-sqre/api-client-core';
 
-const defaultLogger: Logger = {
-  debug: (obj, msg) => console.log(msg, obj),
-  warn: (obj, msg) => console.warn(msg, obj),
-  error: (obj, msg) => console.error(msg, obj),
-};
+import { defaultLogger, type Logger } from '@lsst-sqre/api-client-core';
 
 export class SemaphoreError extends Error {
   constructor(

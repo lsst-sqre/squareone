@@ -1,13 +1,24 @@
 'use client';
 
 import { useBroadcasts } from '@lsst-sqre/semaphore-client';
+import { useMemo } from 'react';
 import { useSemaphoreUrl } from '@/hooks/useSemaphoreUrl';
+import { makeReportError } from '@/lib/sentry/reportError';
 import BroadcastBanner from './BroadcastBanner';
 
 export default function BroadcastBannerStack() {
   const semaphoreUrl = useSemaphoreUrl();
 
-  const { broadcasts, isPending, isError } = useBroadcasts(semaphoreUrl ?? '');
+  // Inject the app's Sentry-backed reporter so report-worthy broadcast
+  // failures (e.g. the DM-55599 ZodError) reach Sentry with site context tags.
+  // Client-side dedupe caps this at one capture per browser session despite
+  // 60 s polling.
+  const reportError = useMemo(() => makeReportError({ isServer: false }), []);
+
+  const { broadcasts, isPending, isError } = useBroadcasts(semaphoreUrl ?? '', {
+    reportError,
+    context: { site: 'broadcasts', package: 'semaphore-client' },
+  });
 
   // ARIA polite/assertive live regions only reliably announce content that is
   // inserted after the region already exists in the DOM. Because broadcasts

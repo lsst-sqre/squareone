@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@fontsource/source-sans-pro": "^4.5.11",
+    "@lsst-sqre/api-client-core": "workspace:*",
     "@lsst-sqre/gafaelfawr-client": "workspace:*",
     "@lsst-sqre/global-css": "workspace:*",
     "@lsst-sqre/repertoire-client": "workspace:*",

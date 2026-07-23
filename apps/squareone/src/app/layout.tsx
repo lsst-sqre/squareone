@@ -31,6 +31,7 @@ import { ConfigProvider } from '../contexts/rsc';
 import { getStaticConfig } from '../lib/config/rsc';
 import logger from '../lib/logger';
 import { compileFooterMdxForRsc } from '../lib/mdx/rsc';
+import { makeReportError } from '../lib/sentry/reportError';
 import { getAppVersion } from '../lib/version';
 import FooterRsc from './FooterRsc';
 import PlausibleWrapper from './PlausibleWrapper';
@@ -112,6 +113,9 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           broadcastsQueryOptions(semaphoreUrl, {
             refetchInterval: 0, // Server-side: no polling
             logger,
+            isServer: true,
+            reportError: makeReportError({ isServer: true }),
+            context: { site: 'broadcasts', package: 'semaphore-client' },
           })
         );
       }
