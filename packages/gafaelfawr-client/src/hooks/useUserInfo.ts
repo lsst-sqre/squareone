@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { DEFAULT_GAFAELFAWR_URL } from '../client';
 import { createUserInfoQuery, type UserInfoQuery } from '../query';
-import { userInfoQueryOptions } from '../query-options';
+import { type AuthQueryConfig, userInfoQueryOptions } from '../query-options';
 import type { UserInfo } from '../schemas';
 
 import { useGafaelfawrUrl } from './useGafaelfawrUrl';
@@ -43,6 +43,10 @@ export type UseUserInfoReturn = {
  *
  * @param repertoireUrl - Optional repertoire URL for service discovery.
  *                        If not provided, uses default Gafaelfawr URL.
+ * @param config - Optional query config. Pass `reportError` / `context` to route
+ *                 report-worthy failures (contract drift, 5xx, server-side
+ *                 network errors) to an injected reporter; auth 401/403 stay
+ *                 quiet. The app injects a Sentry-backed reporter here.
  *
  * @example
  * ```tsx
@@ -68,12 +72,15 @@ export type UseUserInfoReturn = {
  * }
  * ```
  */
-export function useUserInfo(repertoireUrl?: string): UseUserInfoReturn {
+export function useUserInfo(
+  repertoireUrl?: string,
+  config?: AuthQueryConfig
+): UseUserInfoReturn {
   const gafaelfawrUrl = useGafaelfawrUrl(repertoireUrl);
   const effectiveUrl = repertoireUrl ? gafaelfawrUrl : DEFAULT_GAFAELFAWR_URL;
 
   const { data, error, isPending, isLoading, refetch } = useQuery(
-    userInfoQueryOptions(effectiveUrl)
+    userInfoQueryOptions(effectiveUrl, config)
   );
 
   // Determine if user is logged in based on username presence

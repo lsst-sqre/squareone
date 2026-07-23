@@ -113,7 +113,7 @@ export { type GafaelfawrQueryKeys, gafaelfawrKeys } from './query-keys';
 // Query Options (TanStack Query Integration)
 // =============================================================================
 
-export type { Logger } from './query-options';
+export type { AuthQueryConfig, Logger } from './query-options';
 export {
   loginInfoQueryOptions,
   tokenDetailsQueryOptions,
