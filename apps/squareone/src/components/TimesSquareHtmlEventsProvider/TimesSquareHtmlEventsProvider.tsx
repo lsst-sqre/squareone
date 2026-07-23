@@ -19,6 +19,11 @@ export type TimesSquareHtmlEventsContextValue = {
   executionDuration: number | null;
   htmlHash: string | null;
   htmlUrl: string | null;
+  /**
+   * True once the SSE connection has permanently failed after exhausting the
+   * bounded reconnect budget. Consumers can surface a terminal-failure state.
+   */
+  connectionFailed: boolean;
 };
 
 export const TimesSquareHtmlEventsContext = React.createContext<
@@ -40,6 +45,7 @@ const TimesSquareHtmlEventsProviderClient = dynamic(
         executionDuration: null,
         htmlHash: null,
         htmlUrl: null,
+        connectionFailed: false,
       };
       // Return a provider that will be used by parent component with children
       return (
