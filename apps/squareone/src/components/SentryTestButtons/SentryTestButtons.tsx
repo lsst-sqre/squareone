@@ -15,6 +15,10 @@ import styles from './SentryTestButtons.module.css';
  *   boundaries, so the throw is deferred to the next render instead.
  * - "Capture handled exception" reports a handled exception with
  *   `Sentry.captureException` without interrupting the page.
+ * - "Emit server log" POSTs to `/admin/sentry/emit-log`, whose route handler
+ *   emits server-side pino warn/error records. The `Sentry.pinoIntegration()`
+ *   bridge ships those to Sentry Logs (not issues), so this verifies the
+ *   pino→Sentry Logs transport in the server build.
  */
 export default function SentryTestButtons() {
   const [shouldThrow, setShouldThrow] = useState(false);
@@ -36,6 +40,15 @@ export default function SentryTestButtons() {
         }
       >
         Capture handled exception
+      </Button>
+      <Button
+        type="button"
+        appearance="outline"
+        onClick={() => {
+          void fetch('/admin/sentry/emit-log', { method: 'POST' });
+        }}
+      >
+        Emit server log
       </Button>
     </div>
   );
