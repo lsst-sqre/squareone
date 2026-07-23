@@ -69,6 +69,15 @@
   text-decoration: underline;
 }
 
+.deleteError {
+  margin-bottom: var(--sqo-space-md-fixed);
+  padding: var(--sqo-space-sm-fixed) var(--sqo-space-md-fixed);
+  background-color: var(--rsd-color-red-100);
+  border: 1px solid var(--rsd-color-red-500);
+  border-radius: var(--sqo-border-radius-2);
+  color: var(--rsd-color-red-900);
+}
+
 .scopesBadges {
   display: flex;
   flex-wrap: wrap;

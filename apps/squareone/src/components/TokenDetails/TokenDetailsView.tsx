@@ -2,8 +2,9 @@ import { useDeleteToken, useTokenDetails } from '@lsst-sqre/gafaelfawr-client';
 import type { BadgeColor } from '@lsst-sqre/squared';
 import { Badge, Button } from '@lsst-sqre/squared';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
+import { makeReportError } from '@/lib/sentry/reportError';
 import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
 import DeleteTokenModal from '../AccessTokensView/DeleteTokenModal';
 import TokenDate from '../TokenDate';
@@ -48,19 +49,32 @@ export default function TokenDetailsView({
   );
   const { deleteToken, isDeleting } = useDeleteToken(repertoireUrl);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteError, setDeleteError] = useState<Error | null>(null);
+
+  // Inject the app's Sentry-backed reporter so a report-worthy delete failure
+  // (5xx, contract drift) reaches Sentry with site context tags, matching the
+  // sibling AccessTokenItem/SessionTokenItem capture pattern.
+  const reportError = useMemo(() => makeReportError({ isServer: false }), []);
 
   const handleDeleteClick = () => {
     setIsDeleteModalOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
+    setDeleteError(null);
     try {
       await deleteToken(username, tokenKey);
       setIsDeleteModalOpen(false);
       onDeleteSuccess?.();
     } catch (err) {
-      console.error('Failed to delete token:', err);
+      // Keep the modal closed but surface the failure so the still-listed token
+      // does not look silently deleted, and report the exception to Sentry.
       setIsDeleteModalOpen(false);
+      setDeleteError(err as Error);
+      reportError(err, {
+        site: 'token-details-delete',
+        package: 'gafaelfawr-client',
+      });
     }
   };
 
@@ -159,6 +173,12 @@ export default function TokenDetailsView({
             Delete
           </Button>
         </div>
+
+        {deleteError && (
+          <div className={styles.deleteError} role="alert">
+            Failed to delete token: {deleteError.message}
+          </div>
+        )}
 
         <div className={styles.metadataGrid}>
           <div className={styles.metadataRow}>

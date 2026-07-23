@@ -18,6 +18,12 @@ vi.mock('@lsst-sqre/gafaelfawr-client', async (importOriginal) => {
 });
 vi.mock('../../hooks/useRepertoireUrl');
 
+// Pin the app's Sentry reporter so we can assert it fires on delete failure.
+const mockReportError = vi.fn();
+vi.mock('@/lib/sentry/reportError', () => ({
+  makeReportError: () => mockReportError,
+}));
+
 vi.mock('../TokenDate/formatters', () => ({
   formatTokenExpiration: vi.fn((expires) => {
     if (expires === null || expires === undefined) {
@@ -304,15 +310,16 @@ describe('TokenDetailsView', () => {
     });
   });
 
-  it('handles delete error gracefully', async () => {
+  it('surfaces a user-facing error when deletion fails', async () => {
     const user = userEvent.setup();
-    const consoleErrorSpy = vi
-      .spyOn(console, 'error')
-      .mockImplementation(() => {});
     mockDeleteToken.mockRejectedValue(new Error('Delete failed'));
 
     render(
-      <TokenDetailsView username="testuser" tokenKey="abc123xyz456789012345" />
+      <TokenDetailsView
+        username="testuser"
+        tokenKey="abc123xyz456789012345"
+        onDeleteSuccess={mockOnDeleteSuccess}
+      />
     );
 
     // Open modal
@@ -323,11 +330,79 @@ describe('TokenDetailsView', () => {
     const confirmButton = await screen.findByText('Delete token');
     await user.click(confirmButton);
 
+    // A user-facing error message is surfaced (not a silent close).
     await waitFor(() => {
-      expect(consoleErrorSpy).toHaveBeenCalled();
+      expect(screen.getByRole('alert')).toHaveTextContent(/Delete failed/i);
     });
 
-    consoleErrorSpy.mockRestore();
+    // The token stays listed and the success callback never fires.
+    expect(mockOnDeleteSuccess).not.toHaveBeenCalled();
+    expect(screen.getByText('My Laptop Token')).toBeInTheDocument();
+  });
+
+  it('does not leave the confirmation modal open after a failed delete', async () => {
+    const user = userEvent.setup();
+    mockDeleteToken.mockRejectedValue(new Error('Delete failed'));
+
+    render(
+      <TokenDetailsView username="testuser" tokenKey="abc123xyz456789012345" />
+    );
+
+    const deleteButton = screen.getByRole('button', { name: /delete/i });
+    await user.click(deleteButton);
+
+    const confirmButton = await screen.findByText('Delete token');
+    await user.click(confirmButton);
+
+    // Once the error is shown, the confirmation control is gone (modal closed)
+    // but the token remains, so the delete did not silently succeed.
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toBeInTheDocument();
+    });
+    expect(screen.queryByText('Delete token')).not.toBeInTheDocument();
+  });
+
+  it('reports the exception when deletion fails', async () => {
+    const user = userEvent.setup();
+    const error = new Error('Delete failed');
+    mockDeleteToken.mockRejectedValue(error);
+
+    render(
+      <TokenDetailsView username="testuser" tokenKey="abc123xyz456789012345" />
+    );
+
+    const deleteButton = screen.getByRole('button', { name: /delete/i });
+    await user.click(deleteButton);
+
+    const confirmButton = await screen.findByText('Delete token');
+    await user.click(confirmButton);
+
+    await waitFor(() => {
+      expect(mockReportError).toHaveBeenCalledWith(
+        error,
+        expect.objectContaining({ site: 'token-details-delete' })
+      );
+    });
+  });
+
+  it('does not report when deletion succeeds', async () => {
+    const user = userEvent.setup();
+    mockDeleteToken.mockResolvedValue(undefined);
+
+    render(
+      <TokenDetailsView username="testuser" tokenKey="abc123xyz456789012345" />
+    );
+
+    const deleteButton = screen.getByRole('button', { name: /delete/i });
+    await user.click(deleteButton);
+
+    const confirmButton = await screen.findByText('Delete token');
+    await user.click(confirmButton);
+
+    await waitFor(() => {
+      expect(mockDeleteToken).toHaveBeenCalled();
+    });
+    expect(mockReportError).not.toHaveBeenCalled();
   });
 
   it('displays "No scopes" when token has empty scopes array', () => {
