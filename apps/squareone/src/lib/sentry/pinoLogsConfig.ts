@@ -22,7 +22,7 @@ export const pinoLogsIntegrationOptions: Parameters<
   typeof Sentry.pinoIntegration
 >[0] = {
   // Sentry Logs channel: ship these levels as structured logs.
-  log: { levels: ['trace', 'debug', 'info', 'warn', 'error', 'fatal'] },
+  log: { levels: ['warn', 'error'] },
   // Issue-creating channel: intentionally empty so the bridge never opens an
   // issue or fires an alert. Do not populate — see reportError for alerting.
   error: { levels: [] },

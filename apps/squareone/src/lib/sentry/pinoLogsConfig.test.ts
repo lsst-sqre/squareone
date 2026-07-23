@@ -3,12 +3,12 @@ import { describe, expect, test } from 'vitest';
 import { pinoLogsIntegrationOptions } from './pinoLogsConfig';
 
 describe('pinoLogsIntegrationOptions', () => {
-  test('routes warn and error through the Sentry Logs (log) channel', () => {
+  test('routes exactly warn and error through the Sentry Logs (log) channel', () => {
     // The log channel is what pinoIntegration ships to Sentry Logs via
-    // _INTERNAL_captureLog. warn/error must be present so those records become
-    // searchable, trace-linked structured logs.
-    expect(pinoLogsIntegrationOptions.log?.levels).toContain('warn');
-    expect(pinoLogsIntegrationOptions.log?.levels).toContain('error');
+    // _INTERNAL_captureLog. The bridge is scoped to warn/error only, so pin the
+    // exact list: shipping lower levels (info/debug/trace) would flood Sentry
+    // Logs contrary to the documented design.
+    expect(pinoLogsIntegrationOptions.log?.levels).toEqual(['warn', 'error']);
   });
 
   test('never routes any level through the error (issue-creating) channel', () => {
