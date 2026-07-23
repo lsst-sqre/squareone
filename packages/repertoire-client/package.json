@@ -28,6 +28,7 @@
     "fetch-openapi": "curl -o openapi.json https://data.lsst.cloud/repertoire/openapi.json"
   },
   "dependencies": {
+    "@lsst-sqre/api-client-core": "workspace:*",
     "zod": "^3.24.0"
   },
   "peerDependencies": {
