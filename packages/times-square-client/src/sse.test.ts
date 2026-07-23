@@ -8,7 +8,7 @@ vi.mock('@microsoft/fetch-event-source', () => ({
   fetchEventSource: fetchEventSourceMock,
 }));
 
-import { subscribeToHtmlEvents } from './sse';
+import { SseInvalidEventError, subscribeToHtmlEvents } from './sse';
 
 /** The options object handed to the most recent fetchEventSource call. */
 function lastFetchEventSourceOptions() {
@@ -71,7 +71,7 @@ describe('subscribeToHtmlEvents onmessage', () => {
     expect(onError).not.toHaveBeenCalled();
   });
 
-  it('invokes onError with an Error when a JSON event fails schema parse', () => {
+  it('invokes onError with an SseInvalidEventError when a JSON event fails schema parse', () => {
     const onEvent = vi.fn();
     const onError = vi.fn();
     subscribeToHtmlEvents('https://example.com/events', undefined, {
@@ -85,6 +85,32 @@ describe('subscribeToHtmlEvents onmessage', () => {
 
     expect(onEvent).not.toHaveBeenCalled();
     expect(onError).toHaveBeenCalledTimes(1);
-    expect(onError.mock.calls[0][0]).toBeInstanceOf(Error);
+    const reported = onError.mock.calls[0][0];
+    // Event-level validation failures use the named, non-fatal subtype so
+    // consumers can distinguish them from connection-level errors.
+    expect(reported).toBeInstanceOf(SseInvalidEventError);
+    expect(reported.name).toBe('SseInvalidEventError');
+    // The originating ZodError rides along as `cause` for the classifier.
+    expect(reported.cause).toBeDefined();
+  });
+
+  it('fires onError once per invalid event (non-fatal, may repeat)', () => {
+    const onEvent = vi.fn();
+    const onError = vi.fn();
+    subscribeToHtmlEvents('https://example.com/events', undefined, {
+      onEvent,
+      onError,
+    });
+
+    const { onmessage } = lastFetchEventSourceOptions();
+    // A drifted stream emits several invalid events; each surfaces once and the
+    // subscription is not torn down between them.
+    onmessage({ data: JSON.stringify({ unexpected: 'shape' }) });
+    onmessage({ data: JSON.stringify({ still: 'wrong' }) });
+
+    expect(onError).toHaveBeenCalledTimes(2);
+    for (const call of onError.mock.calls) {
+      expect(call[0]).toBeInstanceOf(SseInvalidEventError);
+    }
   });
 });

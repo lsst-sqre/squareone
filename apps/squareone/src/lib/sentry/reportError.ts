@@ -36,15 +36,30 @@ export function __resetReportErrorDedupe(): void {
 }
 
 /**
- * Build a stable dedupe key from a report context. Falls back to a constant so
- * a context-free report still dedupes against itself.
+ * Identify an error for deduplication purposes. Uses the error's class name
+ * (e.g. `ZodError`, `SemaphoreError`) so distinct failure modes are told apart;
+ * falls back to the primitive type for non-`Error` throwables.
  */
-function dedupeKey(context: ReportContext): string {
+function errorIdentity(err: unknown): string {
+  return err instanceof Error ? err.name : typeof err;
+}
+
+/**
+ * Build a stable dedupe key from an error and its report context. The context
+ * (site/package tags) identifies the call site; the error's class name is
+ * folded in so that distinct failure modes at the same site each capture once
+ * per window rather than the first error masking later, different ones (e.g. a
+ * transient 503 masking a later ZodError from contract drift). Falls back to a
+ * constant context component so a context-free report still dedupes against
+ * itself.
+ */
+function dedupeKey(err: unknown, context: ReportContext): string {
   const keys = Object.keys(context).sort();
-  if (keys.length === 0) {
-    return '__default__';
-  }
-  return keys.map((k) => `${k}=${String(context[k])}`).join('&');
+  const contextKey =
+    keys.length === 0
+      ? '__default__'
+      : keys.map((k) => `${k}=${String(context[k])}`).join('&');
+  return `${errorIdentity(err)}|${contextKey}`;
 }
 
 /** Options controlling {@link makeReportError}'s runtime-dependent behavior. */
@@ -76,7 +91,7 @@ export function makeReportError(
   const isServer = options.isServer ?? detectIsServer();
 
   return (err: unknown, context: ReportContext = {}): void => {
-    const key = dedupeKey(context);
+    const key = dedupeKey(err, context);
     const now = Date.now();
     const previous = lastReportedAt.get(key);
 

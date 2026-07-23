@@ -16,7 +16,33 @@ import { type HtmlEvent, HtmlEventSchema } from './schemas';
 export type HtmlEventCallback = (event: HtmlEvent) => void;
 
 /**
+ * Error raised for a single SSE event whose JSON fails schema validation.
+ *
+ * Distinct from connection-level errors (which arrive as plain `Error`s from
+ * `onopen`/`onerror`) so a consumer can tell an event-level contract-drift
+ * problem apart from a transport failure. Crucially, an `SseInvalidEventError`
+ * is **non-fatal**: the SSE stream stays open, and a server emitting a run of
+ * drifted events will trigger `onError` once per invalid event. Consumers must
+ * therefore treat this subtype as non-terminal — do not tear down or reconnect
+ * the subscription on it — and are responsible for throttling any downstream
+ * side effect (e.g. Sentry capture) so a noisy stream cannot flood. The
+ * originating `ZodError` is attached as `cause`.
+ */
+export class SseInvalidEventError extends Error {
+  constructor(message: string, options?: { cause?: unknown }) {
+    super(message, options);
+    this.name = 'SseInvalidEventError';
+  }
+}
+
+/**
  * Callback invoked when an error occurs.
+ *
+ * May fire more than once over a subscription's lifetime. Connection-level
+ * failures arrive as plain `Error`s; per-event schema-validation failures
+ * arrive as {@link SseInvalidEventError} (non-fatal — see its docs). Consumers
+ * that treat `onError` as a fatal/connection signal should check the error
+ * subtype before acting.
  */
 export type SseErrorCallback = (error: Error) => void;
 
@@ -128,13 +154,18 @@ export function subscribeToHtmlEvents(
         }
         // A JSON event that fails schema validation is API contract drift, not
         // a benign heartbeat. Surface it through onError (rather than silently
-        // dropping it) so the app can route it to Sentry via a report hook. The
-        // ZodError is attached as `cause` so the reporter's error classifier can
-        // still see it while onError keeps its `Error` contract.
+        // dropping it) so the app can route it to Sentry via a report hook. It
+        // is emitted as a named `SseInvalidEventError` subtype so consumers can
+        // distinguish it from connection-level errors and treat it as non-fatal
+        // (the stream stays open); note this may fire once per invalid event on
+        // a drifted stream, so consumers should throttle any downstream capture.
+        // The ZodError is attached as `cause` so the reporter's error classifier
+        // can still see it while onError keeps its `Error` contract.
         onError?.(
-          new Error('Invalid SSE event data: schema validation failed', {
-            cause: result.error,
-          })
+          new SseInvalidEventError(
+            'Invalid SSE event data: schema validation failed',
+            { cause: result.error }
+          )
         );
         return;
       }

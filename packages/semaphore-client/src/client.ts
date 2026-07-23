@@ -1,3 +1,4 @@
+import { defaultLogger, type Logger } from '@lsst-sqre/api-client-core';
 import { z } from 'zod';
 import {
   type BroadcastsResponse,
@@ -23,8 +24,6 @@ import type {
 // `@lsst-sqre/api-client-core`; re-export it here so existing
 // `@lsst-sqre/semaphore-client` imports keep compiling.
 export type { Logger } from '@lsst-sqre/api-client-core';
-
-import { defaultLogger, type Logger } from '@lsst-sqre/api-client-core';
 
 export class SemaphoreError extends Error {
   constructor(

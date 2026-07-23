@@ -74,4 +74,60 @@ describe('reportError', () => {
 
     expect(captureException).toHaveBeenCalledTimes(2);
   });
+
+  test('distinct error classes at the same call site each capture', () => {
+    // The DM-55599 scenario: a transient failure must not mask a later,
+    // different failure mode (e.g. contract drift) at the same call site.
+    const reportError = makeReportError({ isServer: false });
+    const context = { site: 'broadcasts', package: 'semaphore-client' };
+
+    class TransientError extends Error {
+      constructor(message: string) {
+        super(message);
+        this.name = 'TransientError';
+      }
+    }
+    class ContractError extends Error {
+      constructor(message: string) {
+        super(message);
+        this.name = 'ContractError';
+      }
+    }
+
+    reportError(new TransientError('503'), context);
+    reportError(new ContractError('schema drift'), context);
+
+    expect(captureException).toHaveBeenCalledTimes(2);
+  });
+
+  test('identical error classes at the same call site still dedupe', () => {
+    const reportError = makeReportError({ isServer: false });
+    const context = { site: 'broadcasts', package: 'semaphore-client' };
+
+    class ContractError extends Error {
+      constructor(message: string) {
+        super(message);
+        this.name = 'ContractError';
+      }
+    }
+
+    reportError(new ContractError('first'), context);
+    reportError(new ContractError('second'), context);
+
+    expect(captureException).toHaveBeenCalledTimes(1);
+  });
+
+  test('non-Error throwables dedupe by their primitive type', () => {
+    const reportError = makeReportError({ isServer: false });
+    const context = { site: 'broadcasts' };
+
+    // Two distinct strings share the `string` identity → one capture.
+    reportError('boom', context);
+    reportError('kaboom', context);
+    expect(captureException).toHaveBeenCalledTimes(1);
+
+    // A different primitive type is a distinct identity → captured.
+    reportError(42, context);
+    expect(captureException).toHaveBeenCalledTimes(2);
+  });
 });

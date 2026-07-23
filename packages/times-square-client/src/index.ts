@@ -133,6 +133,7 @@ export {
   createHtmlEventsUrl,
   type HtmlEventCallback,
   type SseErrorCallback,
+  SseInvalidEventError,
   type SubscribeOptions,
   subscribeToHtmlEvents,
 } from './sse';
