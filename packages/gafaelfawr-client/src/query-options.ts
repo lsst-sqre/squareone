@@ -4,22 +4,14 @@
  * These factory functions return queryOptions objects that can be used
  * with useQuery or prefetched in server components.
  */
+import {
+  defaultLogger,
+  type Logger,
+  type ReportContext,
+  type ReportError,
+  reportingQueryFn,
+} from '@lsst-sqre/api-client-core';
 import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query';
-
-/**
- * Minimal logger interface compatible with pino's calling convention.
- */
-export type Logger = {
-  debug: (obj: Record<string, unknown>, msg: string) => void;
-  warn: (obj: Record<string, unknown>, msg: string) => void;
-  error: (obj: Record<string, unknown>, msg: string) => void;
-};
-
-const defaultLogger: Logger = {
-  debug: (obj, msg) => console.log(msg, obj),
-  warn: (obj, msg) => console.warn(msg, obj),
-  error: (obj, msg) => console.error(msg, obj),
-};
 
 import {
   DEFAULT_GAFAELFAWR_URL,
@@ -34,6 +26,32 @@ import { gafaelfawrKeys } from './query-keys';
 import type { LoginInfo, TokenInfo, UserInfo } from './schemas';
 import type { TokenHistoryFilters, TokenHistoryPage } from './types';
 
+// Re-export Logger from api-client-core so existing
+// `import { Logger } from '@lsst-sqre/gafaelfawr-client'` sites keep compiling.
+export type { Logger };
+
+/**
+ * Configuration for the auth-related query options
+ * ({@link userInfoQueryOptions}, {@link loginInfoQueryOptions}).
+ */
+export type AuthQueryConfig = {
+  logger?: Logger;
+  /**
+   * Hook invoked for report-worthy failures (contract drift, 5xx, server-side
+   * network errors). Injected by the app so this package stays Sentry-agnostic;
+   * see `@lsst-sqre/api-client-core`'s `reportingQueryFn`. Expected auth
+   * failures (401/403) never reach this hook.
+   */
+  reportError?: ReportError;
+  /** Context (e.g. `{ site, package }`) forwarded to `reportError`. */
+  context?: ReportContext;
+  /**
+   * Runtime override forwarded to the error classifier: controls whether
+   * network-level failures are report-worthy. Defaults to auto-detection.
+   */
+  isServer?: boolean;
+};
+
 // =============================================================================
 // User Info Query
 // =============================================================================
@@ -47,22 +65,27 @@ import type { TokenHistoryFilters, TokenHistoryPage } from './types';
  */
 export const userInfoQueryOptions = (
   baseUrl: string = DEFAULT_GAFAELFAWR_URL,
-  options?: { logger?: Logger }
+  options?: AuthQueryConfig
 ) => {
-  const log = options?.logger ?? defaultLogger;
+  const logger = options?.logger ?? defaultLogger;
+  const { reportError, context, isServer } = options ?? {};
 
   return queryOptions<UserInfo>({
     queryKey: gafaelfawrKeys.userInfo(),
-    queryFn: async () => {
-      try {
-        return await fetchUserInfo(baseUrl);
-      } catch (error) {
-        // Return empty user info for unauthenticated users
-        // This allows components to check isLoggedIn without handling errors
-        log.error({ err: error }, 'Failed to fetch user info');
-        return getEmptyUserInfo();
-      }
-    },
+    // Delegate to the shared reporting wrapper: it fetches, returns empty user
+    // info on any failure (so components keep checking `isLoggedIn` — an auth
+    // 401/403 stays a quiet, expected "not logged in"), logs every failure, and
+    // invokes the injected `reportError` for report-worthy ones only (ZodError
+    // contract drift, 5xx, server-side network errors). This makes an API
+    // outage distinguishable from a genuine not-logged-in state.
+    queryFn: reportingQueryFn<UserInfo>({
+      fetchFn: () => fetchUserInfo(baseUrl),
+      fallback: getEmptyUserInfo(),
+      logger,
+      reportError,
+      context,
+      isServer,
+    }),
     staleTime: 30_000, // 30 seconds
     gcTime: 5 * 60_000, // 5 minutes
     refetchOnWindowFocus: true,
@@ -81,20 +104,26 @@ export const userInfoQueryOptions = (
  */
 export const loginInfoQueryOptions = (
   baseUrl: string = DEFAULT_GAFAELFAWR_URL,
-  options?: { logger?: Logger }
+  options?: AuthQueryConfig
 ) => {
-  const log = options?.logger ?? defaultLogger;
+  const logger = options?.logger ?? defaultLogger;
+  const { reportError, context, isServer } = options ?? {};
 
   return queryOptions<LoginInfo | null>({
     queryKey: gafaelfawrKeys.loginInfo(),
-    queryFn: async () => {
-      try {
-        return await fetchLoginInfo(baseUrl);
-      } catch (error) {
-        log.error({ err: error }, 'Failed to fetch login info');
-        return null;
-      }
-    },
+    // Delegate to the shared reporting wrapper: it returns null on any failure
+    // (an auth 401/403 stays a quiet, expected null login info), logs every
+    // failure, and reports only report-worthy ones (ZodError contract drift,
+    // 5xx, server-side network errors). A silently-null `csrfToken` from a
+    // non-auth failure is thus now operator-visible in Sentry.
+    queryFn: reportingQueryFn<LoginInfo | null>({
+      fetchFn: () => fetchLoginInfo(baseUrl),
+      fallback: null,
+      logger,
+      reportError,
+      context,
+      isServer,
+    }),
     staleTime: 30_000, // 30 seconds
     gcTime: 5 * 60_000, // 5 minutes
     refetchOnWindowFocus: true,

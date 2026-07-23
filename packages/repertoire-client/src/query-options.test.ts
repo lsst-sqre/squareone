@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { ZodError } from 'zod';
 import { clearDiscoveryCache, getEmptyDiscovery } from './client';
 import { mockDiscovery } from './mock-discovery';
 import { discoveryQueryOptions } from './query-options';
@@ -191,7 +192,7 @@ describe('discoveryQueryOptions', () => {
       consoleError.mockRestore();
     });
 
-    it('logs error with [Discovery] prefix', async () => {
+    it('logs the failure with the caught error', async () => {
       const mockFetch = vi
         .fn()
         .mockRejectedValue(new Error('Network request failed'));
@@ -206,11 +207,124 @@ describe('discoveryQueryOptions', () => {
       await queryFn(createMockContext(url));
 
       expect(consoleError).toHaveBeenCalledWith(
-        'Failed to fetch discovery',
+        'API query failed',
         expect.objectContaining({ err: expect.any(Error) })
       );
 
       consoleError.mockRestore();
+    });
+  });
+
+  describe('reportError wiring (DM-55604)', () => {
+    afterEach(() => {
+      clearDiscoveryCache();
+      vi.restoreAllMocks();
+    });
+
+    /** Stub `fetch` with an OK response carrying the given JSON body. */
+    function mockFetchJson(body: unknown) {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(async () => ({
+          ok: true,
+          status: 200,
+          statusText: 'OK',
+          json: async () => body,
+        }))
+      );
+    }
+
+    /** Stub `fetch` with a non-OK HTTP response of the given status. */
+    function mockFetchStatus(status: number) {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(async () => ({
+          ok: false,
+          status,
+          statusText: 'Error',
+          json: async () => ({}),
+        }))
+      );
+    }
+
+    it('invokes reportError on a ZodError (contract drift) and still falls back', async () => {
+      // A payload missing the required `services` field makes
+      // DiscoverySchema.parse throw a ZodError — API contract drift.
+      mockFetchJson({ applications: ['portal'] });
+      const reportError = vi.fn();
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      const opts = discoveryQueryOptions('https://example.com/repertoire', {
+        reportError,
+        context: { site: 'service-discovery', package: 'repertoire-client' },
+      });
+      // biome-ignore lint/style/noNonNullAssertion: test assertion
+      const result = await opts.queryFn!({} as never);
+
+      // Graceful empty-discovery fallback preserved.
+      expect(result).toEqual(getEmptyDiscovery());
+      // reportError fired with the ZodError and the site context.
+      expect(reportError).toHaveBeenCalledTimes(1);
+      const [err, context] = reportError.mock.calls[0];
+      expect(err).toBeInstanceOf(ZodError);
+      expect(context).toMatchObject({
+        site: 'service-discovery',
+        package: 'repertoire-client',
+      });
+    });
+
+    it('invokes reportError on a 5xx and still falls back', async () => {
+      mockFetchStatus(503);
+      const reportError = vi.fn();
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      const opts = discoveryQueryOptions('https://example.com/repertoire', {
+        reportError,
+        context: { site: 'service-discovery' },
+      });
+      // biome-ignore lint/style/noNonNullAssertion: test assertion
+      const result = await opts.queryFn!({} as never);
+
+      expect(result).toEqual(getEmptyDiscovery());
+      expect(reportError).toHaveBeenCalledTimes(1);
+    });
+
+    it('stays quiet on an expected auth failure (401)', async () => {
+      mockFetchStatus(401);
+      const reportError = vi.fn();
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      const opts = discoveryQueryOptions('https://example.com/repertoire', {
+        reportError,
+        context: { site: 'service-discovery' },
+      });
+      // biome-ignore lint/style/noNonNullAssertion: test assertion
+      const result = await opts.queryFn!({} as never);
+
+      expect(result).toEqual(getEmptyDiscovery());
+      expect(reportError).not.toHaveBeenCalled();
+    });
+
+    it('reports a server-side network failure when isServer is set', async () => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(async () => {
+          throw new TypeError('fetch failed');
+        })
+      );
+      const reportError = vi.fn();
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      const opts = discoveryQueryOptions('https://example.com/repertoire', {
+        reportError,
+        isServer: true,
+        context: { site: 'service-discovery' },
+      });
+      // biome-ignore lint/style/noNonNullAssertion: test assertion
+      const result = await opts.queryFn!({} as never);
+
+      expect(result).toEqual(getEmptyDiscovery());
+      expect(reportError).toHaveBeenCalledTimes(1);
     });
   });
 

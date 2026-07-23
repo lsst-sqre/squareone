@@ -11,7 +11,8 @@ import {
 } from '@lsst-sqre/squared';
 import { ChevronDown } from 'lucide-react';
 import NextLink from 'next/link';
-
+import { useMemo } from 'react';
+import { makeReportError } from '@/lib/sentry/reportError';
 import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
 import { useSemaphoreUrl } from '../../hooks/useSemaphoreUrl';
 import { useStaticConfig } from '../../hooks/useStaticConfig';
@@ -24,7 +25,18 @@ type UserMenuProps = {
 export default function UserMenu({ pageUrl }: UserMenuProps) {
   const { user } = useGafaelfawrUser();
   const repertoireUrl = useRepertoireUrl();
-  const { query } = useLoginInfo(repertoireUrl);
+
+  // Inject the app's Sentry-backed reporter so report-worthy login-info failures
+  // (ZodError contract drift, 5xx, server-side network errors) reach Sentry —
+  // making a silently-null `csrfToken` from a non-auth failure operator-visible.
+  // Auth 401/403 stay quiet (null login info unchanged). This menu mounts for
+  // every logged-in page view, so it is the app-wide chokepoint for the
+  // login-info query.
+  const reportError = useMemo(() => makeReportError({ isServer: false }), []);
+  const { query } = useLoginInfo(repertoireUrl, {
+    reportError,
+    context: { site: 'login-info', package: 'gafaelfawr-client' },
+  });
   const logoutUrl = getLogoutUrl(pageUrl.toString());
 
   const { enableUserNotifications, userNotificationsPollIntervalSeconds } =

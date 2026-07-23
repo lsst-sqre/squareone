@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { DEFAULT_GAFAELFAWR_URL } from '../client';
 import { createLoginInfoQuery, type LoginInfoQuery } from '../query';
-import { loginInfoQueryOptions } from '../query-options';
+import { type AuthQueryConfig, loginInfoQueryOptions } from '../query-options';
 import type { LoginInfo } from '../schemas';
 
 import { useGafaelfawrUrl } from './useGafaelfawrUrl';
@@ -42,6 +42,11 @@ export type UseLoginInfoReturn = {
  *
  * @param repertoireUrl - Optional repertoire URL for service discovery.
  *                        If not provided, uses default Gafaelfawr URL.
+ * @param config - Optional query config. Pass `reportError` / `context` to route
+ *                 report-worthy failures (contract drift, 5xx, server-side
+ *                 network errors) to an injected reporter; auth 401/403 stay
+ *                 quiet. This makes a silently-null `csrfToken` from a non-auth
+ *                 failure operator-visible.
  *
  * @example
  * ```tsx
@@ -59,12 +64,15 @@ export type UseLoginInfoReturn = {
  * }
  * ```
  */
-export function useLoginInfo(repertoireUrl?: string): UseLoginInfoReturn {
+export function useLoginInfo(
+  repertoireUrl?: string,
+  config?: AuthQueryConfig
+): UseLoginInfoReturn {
   const gafaelfawrUrl = useGafaelfawrUrl(repertoireUrl);
   const effectiveUrl = repertoireUrl ? gafaelfawrUrl : DEFAULT_GAFAELFAWR_URL;
 
   const { data, error, isPending, isLoading, refetch } = useQuery(
-    loginInfoQueryOptions(effectiveUrl)
+    loginInfoQueryOptions(effectiveUrl, config)
   );
 
   // Create query helper if data is available

@@ -1,20 +1,10 @@
+import { defaultLogger, type Logger } from '@lsst-sqre/api-client-core';
 import { DiscoverySchema, type ServiceDiscovery } from './schemas';
 
-/**
- * Minimal logger interface compatible with pino's calling convention.
- * Accepts an optional logger; defaults to console-based output.
- */
-export type Logger = {
-  debug: (obj: Record<string, unknown>, msg: string) => void;
-  warn: (obj: Record<string, unknown>, msg: string) => void;
-  error: (obj: Record<string, unknown>, msg: string) => void;
-};
-
-const defaultLogger: Logger = {
-  debug: (obj, msg) => console.log(msg, obj),
-  warn: (obj, msg) => console.warn(msg, obj),
-  error: (obj, msg) => console.error(msg, obj),
-};
+// The `Logger` type's single source of truth now lives in
+// `@lsst-sqre/api-client-core`; re-export it here so existing
+// `@lsst-sqre/repertoire-client` imports keep compiling.
+export type { Logger } from '@lsst-sqre/api-client-core';
 
 export class RepertoireError extends Error {
   constructor(

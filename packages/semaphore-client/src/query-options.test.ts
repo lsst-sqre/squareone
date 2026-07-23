@@ -1,4 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { ZodError } from 'zod';
+import { clearBroadcastsCache } from './client';
 import { broadcastsQueryOptions } from './query-options';
 
 describe('broadcastsQueryOptions', () => {
@@ -40,5 +42,78 @@ describe('broadcastsQueryOptions', () => {
     // biome-ignore lint/style/noNonNullAssertion: test assertion
     const result = await opts.queryFn!({} as never);
     expect(result).toEqual([]);
+  });
+
+  describe('reportError wiring (DM-55599 archetype)', () => {
+    afterEach(() => {
+      clearBroadcastsCache();
+      vi.restoreAllMocks();
+    });
+
+    /** Stub `fetch` with an OK response carrying the given JSON body. */
+    function mockFetchJson(body: unknown) {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(async () => ({
+          ok: true,
+          status: 200,
+          statusText: 'OK',
+          json: async () => body,
+        }))
+      );
+    }
+
+    /** Stub `fetch` with a non-OK HTTP response of the given status. */
+    function mockFetchStatus(status: number) {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(async () => ({
+          ok: false,
+          status,
+          statusText: 'Error',
+          json: async () => ({}),
+        }))
+      );
+    }
+
+    it('invokes reportError on a ZodError (contract drift) and still falls back', async () => {
+      // A malformed payload makes BroadcastsResponseSchema.parse throw a
+      // ZodError — the exact DM-55599 scenario.
+      mockFetchJson({ not: 'a broadcasts array' });
+      const reportError = vi.fn();
+
+      const opts = broadcastsQueryOptions('https://example.com/semaphore', {
+        reportError,
+        context: { site: 'broadcasts', package: 'semaphore-client' },
+      });
+      // biome-ignore lint/style/noNonNullAssertion: test assertion
+      const result = await opts.queryFn!({} as never);
+
+      // Graceful fallback preserved.
+      expect(result).toEqual([]);
+      // reportError fired with the ZodError and the site context.
+      expect(reportError).toHaveBeenCalledTimes(1);
+      const [err, context] = reportError.mock.calls[0];
+      expect(err).toBeInstanceOf(ZodError);
+      expect(context).toMatchObject({
+        site: 'broadcasts',
+        package: 'semaphore-client',
+      });
+    });
+
+    it('stays quiet on an expected auth failure (401)', async () => {
+      mockFetchStatus(401);
+      const reportError = vi.fn();
+
+      const opts = broadcastsQueryOptions('https://example.com/semaphore', {
+        reportError,
+        context: { site: 'broadcasts' },
+      });
+      // biome-ignore lint/style/noNonNullAssertion: test assertion
+      const result = await opts.queryFn!({} as never);
+
+      expect(result).toEqual([]);
+      expect(reportError).not.toHaveBeenCalled();
+    });
   });
 });

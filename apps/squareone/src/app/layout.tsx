@@ -31,6 +31,8 @@ import { ConfigProvider } from '../contexts/rsc';
 import { getStaticConfig } from '../lib/config/rsc';
 import logger from '../lib/logger';
 import { compileFooterMdxForRsc } from '../lib/mdx/rsc';
+import { makeReportError } from '../lib/sentry/reportError';
+import { reportPrefetchError } from '../lib/sentry/reportPrefetchError';
 import { getAppVersion } from '../lib/version';
 import FooterRsc from './FooterRsc';
 import PlausibleWrapper from './PlausibleWrapper';
@@ -91,7 +93,12 @@ export default async function RootLayout({ children }: RootLayoutProps) {
   if (config.repertoireUrl) {
     logger.debug('Prefetching service discovery');
     await queryClient.prefetchQuery(
-      discoveryQueryOptions(config.repertoireUrl, { logger })
+      discoveryQueryOptions(config.repertoireUrl, {
+        logger,
+        isServer: true,
+        reportError: makeReportError({ isServer: true }),
+        context: { site: 'service-discovery', package: 'repertoire-client' },
+      })
     );
     const cachedData = queryClient.getQueryData([
       'service-discovery',
@@ -112,18 +119,33 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           broadcastsQueryOptions(semaphoreUrl, {
             refetchInterval: 0, // Server-side: no polling
             logger,
+            isServer: true,
+            reportError: makeReportError({ isServer: true }),
+            context: { site: 'broadcasts', package: 'semaphore-client' },
           })
         );
       }
     } catch (error) {
+      // This catch guards the discovery-URL resolution feeding the broadcasts
+      // prefetch (the raw `fetchServiceDiscovery` + `getSemaphoreUrl`). Log
+      // every failure, then report the report-worthy ones (contract drift,
+      // 5xx, and — server-side — network failures) so a silent prefetch
+      // outage still surfaces in Sentry rather than only in pino logs.
       logger.error({ err: error }, 'Failed to prefetch broadcasts');
+      reportPrefetchError(error, {
+        site: 'broadcasts-prefetch',
+        package: 'squareone',
+      });
     }
   } else {
     logger.debug('No repertoireUrl configured, skipping service discovery');
   }
 
-  // Compile footer MDX once at layout level
-  const footerMdxContent = await compileFooterMdxForRsc();
+  // Compile footer MDX once at layout level. A missing footer file degrades to
+  // null silently; an MDX compile error also degrades but is reported.
+  const footerMdxContent = await compileFooterMdxForRsc({
+    reportError: makeReportError({ isServer: true }),
+  });
 
   // Surface the build identity in the served HTML so a running build is
   // identifiable from the page source. Revision degrades to "unknown" when

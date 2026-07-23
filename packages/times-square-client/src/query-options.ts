@@ -4,22 +4,14 @@
  * These factory functions return queryOptions objects that can be used
  * with useQuery or prefetched in server components.
  */
+import {
+  defaultLogger,
+  type Logger,
+  type ReportContext,
+  type ReportError,
+  reportingQueryFn,
+} from '@lsst-sqre/api-client-core';
 import { queryOptions } from '@tanstack/react-query';
-
-/**
- * Minimal logger interface compatible with pino's calling convention.
- */
-export type Logger = {
-  debug: (obj: Record<string, unknown>, msg: string) => void;
-  warn: (obj: Record<string, unknown>, msg: string) => void;
-  error: (obj: Record<string, unknown>, msg: string) => void;
-};
-
-const defaultLogger: Logger = {
-  debug: (obj, msg) => console.log(msg, obj),
-  warn: (obj, msg) => console.warn(msg, obj),
-  error: (obj, msg) => console.error(msg, obj),
-};
 
 import {
   DEFAULT_TIMES_SQUARE_URL,
@@ -42,6 +34,32 @@ import type {
   Page,
   PageSummary,
 } from './schemas';
+
+// Re-export Logger from api-client-core so existing
+// `import { Logger } from '@lsst-sqre/times-square-client'` sites keep compiling.
+export type { Logger };
+
+/**
+ * Configuration for the GitHub-contents query options
+ * ({@link githubContentsQueryOptions}, {@link githubPrContentsQueryOptions}).
+ */
+export type GitHubContentsQueryConfig = {
+  logger?: Logger;
+  /**
+   * Hook invoked for report-worthy failures (contract drift, 5xx, server-side
+   * network errors). Injected by the app so this package stays Sentry-agnostic;
+   * see `@lsst-sqre/api-client-core`'s `reportingQueryFn`. Expected failures
+   * (401/403) never reach this hook.
+   */
+  reportError?: ReportError;
+  /** Context (e.g. `{ site, package }`) forwarded to `reportError`. */
+  context?: ReportContext;
+  /**
+   * Runtime override forwarded to the error classifier: controls whether
+   * network-level failures are report-worthy. Defaults to auto-detection.
+   */
+  isServer?: boolean;
+};
 
 // =============================================================================
 // Page Queries
@@ -154,20 +172,26 @@ export const htmlStatusUrlQueryOptions = (
  */
 export const githubContentsQueryOptions = (
   baseUrl: string = DEFAULT_TIMES_SQUARE_URL,
-  options?: { logger?: Logger }
+  options?: GitHubContentsQueryConfig
 ) => {
-  const log = options?.logger ?? defaultLogger;
+  const logger = options?.logger ?? defaultLogger;
+  const { reportError, context, isServer } = options ?? {};
 
   return queryOptions<GitHubContentsRoot>({
     queryKey: timesSquareKeys.githubContents(),
-    queryFn: async () => {
-      try {
-        return await fetchGitHubContents(baseUrl);
-      } catch (error) {
-        log.error({ err: error }, 'Failed to fetch GitHub contents');
-        return getEmptyGitHubContents();
-      }
-    },
+    // Delegate to the shared reporting wrapper: it returns empty contents on
+    // any failure (preserving the graceful-degradation nav tree), logs every
+    // failure, and invokes the injected `reportError` only for report-worthy
+    // ones (ZodError contract drift, 5xx, server-side network errors) — so a
+    // Times Square outage no longer silently collapses the nav tree.
+    queryFn: reportingQueryFn<GitHubContentsRoot>({
+      fetchFn: () => fetchGitHubContents(baseUrl),
+      fallback: getEmptyGitHubContents(),
+      logger,
+      reportError,
+      context,
+      isServer,
+    }),
     enabled: !!baseUrl,
     staleTime: 30_000, // 30 seconds
     gcTime: 5 * 60_000, // 5 minutes
@@ -215,23 +239,27 @@ export const githubPrContentsQueryOptions = (
   repo: string,
   commit: string,
   baseUrl: string = DEFAULT_TIMES_SQUARE_URL,
-  options?: { logger?: Logger }
+  options?: GitHubContentsQueryConfig
 ) => {
-  const log = options?.logger ?? defaultLogger;
+  const logger = options?.logger ?? defaultLogger;
+  const { reportError, context, isServer } = options ?? {};
 
   return queryOptions<GitHubPrContents>({
     queryKey: timesSquareKeys.githubPrContents(owner, repo, commit),
-    queryFn: async () => {
-      try {
-        return await fetchGitHubPrContents(baseUrl, owner, repo, commit);
-      } catch (error) {
-        log.error(
-          { err: error, owner, repo, commit },
-          'Failed to fetch GitHub PR contents'
-        );
-        return getEmptyGitHubPrContents();
-      }
-    },
+    // Delegate to the shared reporting wrapper: it returns empty PR contents on
+    // any failure (preserving the graceful-degradation empty-PR view), logs
+    // every failure, and invokes the injected `reportError` only for
+    // report-worthy ones (ZodError contract drift, 5xx, server-side network
+    // errors). The `owner`/`repo`/`commit` identifiers ride along in the
+    // forwarded context so the reporter can tag the failing PR preview.
+    queryFn: reportingQueryFn<GitHubPrContents>({
+      fetchFn: () => fetchGitHubPrContents(baseUrl, owner, repo, commit),
+      fallback: getEmptyGitHubPrContents(),
+      logger,
+      reportError,
+      context: { owner, repo, commit, ...context },
+      isServer,
+    }),
     enabled: !!owner && !!repo && !!commit && !!baseUrl,
     staleTime: 10_000, // 10 seconds
     gcTime: 5 * 60_000, // 5 minutes

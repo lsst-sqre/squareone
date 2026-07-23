@@ -113,7 +113,7 @@ export { type TimesSquareQueryKeys, timesSquareKeys } from './query-keys';
 // Query Options
 // =============================================================================
 
-export type { Logger } from './query-options';
+export type { GitHubContentsQueryConfig, Logger } from './query-options';
 export {
   githubContentsQueryOptions,
   githubPageQueryOptions,
@@ -133,6 +133,7 @@ export {
   createHtmlEventsUrl,
   type HtmlEventCallback,
   type SseErrorCallback,
+  SseInvalidEventError,
   type SubscribeOptions,
   subscribeToHtmlEvents,
 } from './sse';

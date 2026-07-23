@@ -19,6 +19,7 @@ module.exports = (phase) => {
       : ['tsx', 'ts', 'jsx', 'js'],
     transpilePackages: [
       '@lsst-sqre/squared',
+      '@lsst-sqre/api-client-core',
       '@lsst-sqre/repertoire-client',
       '@lsst-sqre/gafaelfawr-client',
       '@lsst-sqre/semaphore-client',
