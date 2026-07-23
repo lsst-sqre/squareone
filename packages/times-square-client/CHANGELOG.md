@@ -1,5 +1,21 @@
 # @lsst-sqre/times-square-client
 
+## 3.0.0
+
+### Minor Changes
+
+- [#608](https://github.com/lsst-sqre/squareone/pull/608) [`3ed93f1`](https://github.com/lsst-sqre/squareone/commit/3ed93f1cd46cb72de6da0db4099ceee8b404d24a) Thanks [@jonathansick](https://github.com/jonathansick)! - Report handled-but-critical Times Square query and SSE errors to Sentry (DM-55604). The `githubContentsQueryOptions` and `githubPrContentsQueryOptions` factories now run through the shared `reportingQueryFn` from `@lsst-sqre/api-client-core`: they still degrade gracefully (empty nav tree / empty-PR contents on any failure), but report-worthy failures (a `ZodError` from API contract drift, a 5xx, or a server-side network error) now invoke an injectable `reportError` hook, while expected failures (401/403) stay quiet. Both factories gain `reportError` / `context` / `isServer` config keys (mirroring `broadcastsQueryOptions` and `discoveryQueryOptions`), exposed through a new `GitHubContentsQueryConfig` type; the PR-contents query folds its `owner`/`repo`/`commit` identifiers into the forwarded context so the reporter can tag the failing PR preview.
+
+  `subscribeToHtmlEvents` no longer silently drops SSE events that fail `HtmlEventSchema` validation. A JSON event that fails schema parse is API contract drift, not a benign heartbeat, so it now invokes the subscription's `onError` callback with an `Error` carrying the underlying `ZodError` as `cause` — letting the app route the failure to Sentry. Non-JSON heartbeats are still ignored.
+
+  `@lsst-sqre/times-square-client` now re-exports the `Logger` type from `@lsst-sqre/api-client-core` so existing imports keep compiling.
+
+### Patch Changes
+
+- Updated dependencies [[`e41ac1f`](https://github.com/lsst-sqre/squareone/commit/e41ac1f152655e3241a44726dd79560d427ce967), [`9c50664`](https://github.com/lsst-sqre/squareone/commit/9c50664c7a78ed2f42b8a00accaa4437617c7883)]:
+  - @lsst-sqre/api-client-core@0.2.0
+  - @lsst-sqre/repertoire-client@0.4.0
+
 ## 2.2.0
 
 ### Minor Changes

@@ -1,5 +1,18 @@
 # @lsst-sqre/repertoire-client
 
+## 0.4.0
+
+### Minor Changes
+
+- [#608](https://github.com/lsst-sqre/squareone/pull/608) [`9c50664`](https://github.com/lsst-sqre/squareone/commit/9c50664c7a78ed2f42b8a00accaa4437617c7883) Thanks [@jonathansick](https://github.com/jonathansick)! - Report handled-but-critical service-discovery errors to Sentry (DM-55604). The repertoire-client discovery `queryFn` now runs through the shared `reportingQueryFn` from `@lsst-sqre/api-client-core`: it still degrades gracefully to an empty discovery result on any failure, but report-worthy failures (a `ZodError` from API contract drift, a 5xx, or a server-side network error) now invoke an injectable `reportError` hook, while expected auth failures (401/403) stay quiet. `discoveryQueryOptions` gains `reportError` / `context` / `isServer` config keys (mirroring `broadcastsQueryOptions`), and `@lsst-sqre/repertoire-client` re-exports the `Logger` type from `@lsst-sqre/api-client-core` so existing imports keep compiling.
+
+  The squareone app's `layout.tsx` RSC prefetch now wires `makeReportError({ isServer: true })` into the discovery prefetch, and its broadcasts-prefetch `catch` no longer silently pino-logs discovery-URL-resolution failures: a new `reportPrefetchError` helper classifies the caught error and reports the report-worthy ones (including server-side network failures) to Sentry so a silent prefetch outage surfaces rather than staying hidden in the server logs.
+
+### Patch Changes
+
+- Updated dependencies [[`e41ac1f`](https://github.com/lsst-sqre/squareone/commit/e41ac1f152655e3241a44726dd79560d427ce967)]:
+  - @lsst-sqre/api-client-core@0.2.0
+
 ## 0.3.0
 
 ### Minor Changes

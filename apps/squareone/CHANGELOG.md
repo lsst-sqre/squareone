@@ -1,5 +1,32 @@
 # squareone
 
+## 0.37.0
+
+### Minor Changes
+
+- [#608](https://github.com/lsst-sqre/squareone/pull/608) [`04c597b`](https://github.com/lsst-sqre/squareone/commit/04c597b4e2d425dc1667d922eb96e4368083fa81) Thanks [@jonathansick](https://github.com/jonathansick)! - Report handled-but-critical broadcast errors to Sentry (DM-55604). The semaphore-client broadcasts `queryFn` now runs through the shared `reportingQueryFn` from `@lsst-sqre/api-client-core`: it still degrades gracefully to an empty broadcasts list on any failure, but report-worthy failures (a `ZodError` from API contract drift — the DM-55599 scenario — a 5xx, or a server-side network error) now invoke an injectable `reportError` hook, while expected auth failures (401/403) stay quiet. The squareone app supplies that hook via a new `makeReportError` in `src/lib/sentry/`, which calls `Sentry.captureException` with site/package context tags and is guarded by an in-memory dedupe window (once per session client-side, once per ~15-minute window server-side) so 60 s polling cannot flood Sentry during an outage. It is wired at both broadcast call sites: the `layout.tsx` RSC prefetch and the client-side `BroadcastBannerStack`. `@lsst-sqre/semaphore-client` now re-exports the `Logger` type from `@lsst-sqre/api-client-core` so existing imports keep compiling.
+
+- [#608](https://github.com/lsst-sqre/squareone/pull/608) [`9c50664`](https://github.com/lsst-sqre/squareone/commit/9c50664c7a78ed2f42b8a00accaa4437617c7883) Thanks [@jonathansick](https://github.com/jonathansick)! - Report handled-but-critical service-discovery errors to Sentry (DM-55604). The repertoire-client discovery `queryFn` now runs through the shared `reportingQueryFn` from `@lsst-sqre/api-client-core`: it still degrades gracefully to an empty discovery result on any failure, but report-worthy failures (a `ZodError` from API contract drift, a 5xx, or a server-side network error) now invoke an injectable `reportError` hook, while expected auth failures (401/403) stay quiet. `discoveryQueryOptions` gains `reportError` / `context` / `isServer` config keys (mirroring `broadcastsQueryOptions`), and `@lsst-sqre/repertoire-client` re-exports the `Logger` type from `@lsst-sqre/api-client-core` so existing imports keep compiling.
+
+  The squareone app's `layout.tsx` RSC prefetch now wires `makeReportError({ isServer: true })` into the discovery prefetch, and its broadcasts-prefetch `catch` no longer silently pino-logs discovery-URL-resolution failures: a new `reportPrefetchError` helper classifies the caught error and reports the report-worthy ones (including server-side network failures) to Sentry so a silent prefetch outage surfaces rather than staying hidden in the server logs.
+
+- [#608](https://github.com/lsst-sqre/squareone/pull/608) [`58e6dbb`](https://github.com/lsst-sqre/squareone/commit/58e6dbbc5a43748b087839e0fec8977ddb09af53) Thanks [@jonathansick](https://github.com/jonathansick)! - Report handled-but-critical auth query errors to Sentry (DM-55604). The gafaelfawr-client `userInfoQueryOptions` and `loginInfoQueryOptions` now run through the shared `reportingQueryFn` from `@lsst-sqre/api-client-core`: they still degrade gracefully (empty user info / null login info on any failure, so `isLoggedIn=false` and null-login-info behavior are unchanged), but report-worthy failures (a `ZodError` from API contract drift, a 5xx, or a server-side network error) now invoke an injectable `reportError` hook, while expected auth failures (401/403) stay quiet. This means an API outage is no longer indistinguishable from "not logged in", and a silently-null `csrfToken` from a non-auth failure becomes operator-visible. Both query options gain `reportError` / `context` / `isServer` config keys (mirroring `broadcastsQueryOptions` and `discoveryQueryOptions`), exposed through a new `AuthQueryConfig` type; `@lsst-sqre/gafaelfawr-client` now re-exports the `Logger` type from `@lsst-sqre/api-client-core` so existing imports keep compiling. The `useUserInfo` and `useLoginInfo` hooks accept an optional query config and forward it to the query options.
+
+  The squareone app now injects a Sentry-backed `makeReportError` reporter at the header's `Login` (user-info) and `UserMenu` (login-info) components — the app-wide chokepoints for these queries — so report-worthy auth-query failures reach Sentry tagged with `site`/`package` context.
+
+### Patch Changes
+
+- [#595](https://github.com/lsst-sqre/squareone/pull/595) [`64abdbb`](https://github.com/lsst-sqre/squareone/commit/64abdbb9fe2982de940817ce5b9aba884cffde58) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump js-yaml from 5.0.0 to 5.2.1 in the security-patch group across 1 directory
+
+- [#597](https://github.com/lsst-sqre/squareone/pull/597) [`3d29d31`](https://github.com/lsst-sqre/squareone/commit/3d29d3107d17a75d8f4fba5cce3a0c82ef520a6a) Thanks [@jonathansick](https://github.com/jonathansick)! - Fix broadcast parsing for broadcasts with a null body (DM-55599). The Semaphore API always includes the `body` field and sends `null` when a broadcast has no body content, but the zod `BroadcastSchema` only allowed the field to be omitted, so any broadcast with a null body failed parsing and no broadcasts were displayed. The schema now accepts a null (or omitted) body, and the broadcast banner omits the "Show more" disclosure button when there is no body to disclose. Also refreshed the Semaphore `openapi.json` to the current production schema (2.0.0).
+
+- Updated dependencies [[`e41ac1f`](https://github.com/lsst-sqre/squareone/commit/e41ac1f152655e3241a44726dd79560d427ce967), [`04c597b`](https://github.com/lsst-sqre/squareone/commit/04c597b4e2d425dc1667d922eb96e4368083fa81), [`9c50664`](https://github.com/lsst-sqre/squareone/commit/9c50664c7a78ed2f42b8a00accaa4437617c7883), [`3ed93f1`](https://github.com/lsst-sqre/squareone/commit/3ed93f1cd46cb72de6da0db4099ceee8b404d24a), [`58e6dbb`](https://github.com/lsst-sqre/squareone/commit/58e6dbbc5a43748b087839e0fec8977ddb09af53), [`3d29d31`](https://github.com/lsst-sqre/squareone/commit/3d29d3107d17a75d8f4fba5cce3a0c82ef520a6a)]:
+  - @lsst-sqre/api-client-core@0.2.0
+  - @lsst-sqre/semaphore-client@0.6.0
+  - @lsst-sqre/repertoire-client@0.4.0
+  - @lsst-sqre/times-square-client@3.0.0
+  - @lsst-sqre/gafaelfawr-client@3.0.0
+
 ## 0.36.2
 
 ### Patch Changes
