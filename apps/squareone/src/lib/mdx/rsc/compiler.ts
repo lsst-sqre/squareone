@@ -6,6 +6,7 @@
  * serialize/hydrate, RSC MDX compilation returns React elements directly.
  */
 
+import type { ReportError } from '@lsst-sqre/api-client-core';
 import { compileMDX } from 'next-mdx-remote/rsc';
 import type { ComponentType, ReactElement } from 'react';
 
@@ -81,21 +82,46 @@ export async function compileMdxForRsc(
   };
 }
 
+/** Options for {@link compileFooterMdxForRsc}. */
+export type CompileFooterMdxOptions = {
+  /**
+   * Optional error reporter (e.g. Sentry) for report-worthy footer failures.
+   * An MDX compile error is forwarded so a broken footer template surfaces;
+   * a missing (optional) footer file is never reported.
+   */
+  reportError?: ReportError;
+};
+
+/** Message prefix thrown by the base MDX loader when the file is absent. */
+const MISSING_MDX_PREFIX = 'MDX file not found:';
+
+/** True when `error` is the loader's "file absent" signal (an optional footer). */
+function isMissingMdxFileError(error: unknown): boolean {
+  return error instanceof Error && error.message.startsWith(MISSING_MDX_PREFIX);
+}
+
 /**
  * Compile footer MDX content for RSC rendering.
  *
- * Loads and compiles footer.mdx with footer-specific components.
- * Returns null if the footer MDX file is not found (graceful fallback).
+ * Loads and compiles footer.mdx with footer-specific components. The footer is
+ * optional, so a missing file yields a `null` footer silently. Any other
+ * failure — most notably an MDX compile/syntax error in a footer that *does*
+ * exist — also degrades to a `null` footer, but is reported via `reportError`
+ * so the broken template surfaces rather than vanishing quietly.
  *
- * @returns Compiled footer content or null if not found
+ * @param options - See {@link CompileFooterMdxOptions}.
+ * @returns Compiled footer content, or null if not found or unrenderable.
  *
  * @example
  * ```tsx
- * const footerContent = await compileFooterMdxForRsc();
+ * const footerContent = await compileFooterMdxForRsc({ reportError });
  * return footerContent ? footerContent : <DefaultFooter />;
  * ```
  */
-export async function compileFooterMdxForRsc(): Promise<ReactElement | null> {
+export async function compileFooterMdxForRsc(
+  options: CompileFooterMdxOptions = {}
+): Promise<ReactElement | null> {
+  const { reportError } = options;
   const { footerMdxComponents } = await import('../../utils/mdxComponents');
 
   try {
@@ -104,8 +130,13 @@ export async function compileFooterMdxForRsc(): Promise<ReactElement | null> {
       components: footerMdxComponents,
     });
     return content;
-  } catch {
-    // Graceful fallback - footer MDX is optional
+  } catch (error) {
+    // A missing footer file is expected (the footer is optional): degrade to
+    // null silently. Anything else (e.g. an MDX syntax error in a footer that
+    // exists) is a real problem — report it, but still degrade gracefully.
+    if (!isMissingMdxFileError(error)) {
+      reportError?.(error, { site: 'footer-mdx', package: 'squareone' });
+    }
     return null;
   }
 }

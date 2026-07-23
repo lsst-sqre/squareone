@@ -5,6 +5,7 @@ import { resolveApiEndpoints } from '../../lib/apiEndpoints';
 import { getStaticConfig } from '../../lib/config/rsc';
 import logger from '../../lib/logger';
 import { commonMdxComponents, compileMdxForRsc } from '../../lib/mdx/rsc';
+import { makeReportError } from '../../lib/sentry/reportError';
 
 const pageDescription =
   'Integrate Rubin data into your analysis tools with APIs.';
@@ -30,6 +31,7 @@ export default async function ApiAspectPage() {
   const apiEndpointsResult = await resolveApiEndpoints({
     repertoireUrl: config.repertoireUrl,
     logger,
+    reportError: makeReportError({ isServer: true }),
   });
 
   // Bind the resolved listing into the <ApiEndpoints/> MDX component so the

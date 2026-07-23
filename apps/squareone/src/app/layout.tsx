@@ -141,8 +141,11 @@ export default async function RootLayout({ children }: RootLayoutProps) {
     logger.debug('No repertoireUrl configured, skipping service discovery');
   }
 
-  // Compile footer MDX once at layout level
-  const footerMdxContent = await compileFooterMdxForRsc();
+  // Compile footer MDX once at layout level. A missing footer file degrades to
+  // null silently; an MDX compile error also degrades but is reported.
+  const footerMdxContent = await compileFooterMdxForRsc({
+    reportError: makeReportError({ isServer: true }),
+  });
 
   // Surface the build identity in the served HTML so a running build is
   // identifiable from the page source. Revision degrades to "unknown" when
