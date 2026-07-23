@@ -126,6 +126,16 @@ export function subscribeToHtmlEvents(
         } else {
           console.warn('[TimesSquare SSE] Invalid event data:', result.error);
         }
+        // A JSON event that fails schema validation is API contract drift, not
+        // a benign heartbeat. Surface it through onError (rather than silently
+        // dropping it) so the app can route it to Sentry via a report hook. The
+        // ZodError is attached as `cause` so the reporter's error classifier can
+        // still see it while onError keeps its `Error` contract.
+        onError?.(
+          new Error('Invalid SSE event data: schema validation failed', {
+            cause: result.error,
+          })
+        );
         return;
       }
 

@@ -28,6 +28,7 @@
     "fetch-openapi": "curl -o openapi.json https://times-square.lsst.io/_static/openapi.json"
   },
   "dependencies": {
+    "@lsst-sqre/api-client-core": "workspace:*",
     "@microsoft/fetch-event-source": "^2.0.1",
     "zod": "^3.24.0"
   },
