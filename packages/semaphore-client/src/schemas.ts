@@ -19,7 +19,9 @@ export const BroadcastCategorySchema = z.enum(['outage', 'info', 'notice']);
 export const BroadcastSchema = z.object({
   id: z.string(),
   summary: FormattedTextSchema,
-  body: FormattedTextSchema.optional(),
+  // The API always includes `body` but sends null when the broadcast has no
+  // body content; also tolerate an omitted field.
+  body: FormattedTextSchema.nullish(),
   active: z.boolean(),
   enabled: z.boolean(),
   stale: z.boolean(),

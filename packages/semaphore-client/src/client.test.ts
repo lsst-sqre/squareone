@@ -61,6 +61,30 @@ describe('fetchBroadcasts', () => {
     ).rejects.toThrow(SemaphoreError);
   });
 
+  it('parses broadcasts with a null body (DM-55599)', async () => {
+    const broadcastWithNullBody = {
+      active: true,
+      body: null,
+      category: 'notice',
+      enabled: true,
+      id: 'github.com/lsst-sqre/rsp_broadcast/broadcasts/110_major_change.md',
+      stale: false,
+      summary: {
+        gfm: 'Platform unavailable 2026-07-27 (Monday)',
+        html: '<p>Platform unavailable 2026-07-27 (Monday)</p>\n',
+      },
+    };
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
+      new Response(JSON.stringify([broadcastWithNullBody]), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    );
+
+    const result = await fetchBroadcasts('https://example.com/semaphore');
+    expect(result).toEqual([broadcastWithNullBody]);
+  });
+
   it('throws on Zod validation error for invalid data', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
       new Response(JSON.stringify([{ id: 123, summary: 'not-an-object' }]), {
