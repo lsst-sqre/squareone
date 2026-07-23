@@ -1,5 +1,18 @@
 # @lsst-sqre/semaphore-client
 
+## 0.6.0
+
+### Minor Changes
+
+- [#608](https://github.com/lsst-sqre/squareone/pull/608) [`04c597b`](https://github.com/lsst-sqre/squareone/commit/04c597b4e2d425dc1667d922eb96e4368083fa81) Thanks [@jonathansick](https://github.com/jonathansick)! - Report handled-but-critical broadcast errors to Sentry (DM-55604). The semaphore-client broadcasts `queryFn` now runs through the shared `reportingQueryFn` from `@lsst-sqre/api-client-core`: it still degrades gracefully to an empty broadcasts list on any failure, but report-worthy failures (a `ZodError` from API contract drift — the DM-55599 scenario — a 5xx, or a server-side network error) now invoke an injectable `reportError` hook, while expected auth failures (401/403) stay quiet. The squareone app supplies that hook via a new `makeReportError` in `src/lib/sentry/`, which calls `Sentry.captureException` with site/package context tags and is guarded by an in-memory dedupe window (once per session client-side, once per ~15-minute window server-side) so 60 s polling cannot flood Sentry during an outage. It is wired at both broadcast call sites: the `layout.tsx` RSC prefetch and the client-side `BroadcastBannerStack`. `@lsst-sqre/semaphore-client` now re-exports the `Logger` type from `@lsst-sqre/api-client-core` so existing imports keep compiling.
+
+### Patch Changes
+
+- [#597](https://github.com/lsst-sqre/squareone/pull/597) [`3d29d31`](https://github.com/lsst-sqre/squareone/commit/3d29d3107d17a75d8f4fba5cce3a0c82ef520a6a) Thanks [@jonathansick](https://github.com/jonathansick)! - Fix broadcast parsing for broadcasts with a null body (DM-55599). The Semaphore API always includes the `body` field and sends `null` when a broadcast has no body content, but the zod `BroadcastSchema` only allowed the field to be omitted, so any broadcast with a null body failed parsing and no broadcasts were displayed. The schema now accepts a null (or omitted) body, and the broadcast banner omits the "Show more" disclosure button when there is no body to disclose. Also refreshed the Semaphore `openapi.json` to the current production schema (2.0.0).
+
+- Updated dependencies [[`e41ac1f`](https://github.com/lsst-sqre/squareone/commit/e41ac1f152655e3241a44726dd79560d427ce967)]:
+  - @lsst-sqre/api-client-core@0.2.0
+
 ## 0.5.0
 
 ### Minor Changes

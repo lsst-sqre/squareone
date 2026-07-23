@@ -1,7 +1,7 @@
 {
   "name": "@lsst-sqre/api-client-core",
   "description": "Shared primitives for Rubin Science Platform API client packages: the Logger type, error classification, and a reporting query-function wrapper",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "main": "./src/index.ts",
   "module": "./src/index.ts",
