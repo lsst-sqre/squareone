@@ -1,5 +1,11 @@
 # squareone
 
+## 0.37.1
+
+### Patch Changes
+
+- [#611](https://github.com/lsst-sqre/squareone/pull/611) [`781b613`](https://github.com/lsst-sqre/squareone/commit/781b61310fa5ffa398ddb5a47417d112ce8da1ca) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump next from 16.2.10 to 16.2.11 in the security-patch group across 1 directory
+
 ## 0.37.0
 
 ### Minor Changes
