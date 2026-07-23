@@ -1,3 +1,4 @@
+import { fetchEventSource } from '@microsoft/fetch-event-source';
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -41,6 +42,8 @@ vi.mock('../../hooks/useRepertoireUrl', () => ({
 import TimesSquareHtmlEventsProviderClient, {
   MAX_SSE_RECONNECT_ATTEMPTS,
 } from './TimesSquareHtmlEventsProviderClient';
+
+const fetchEventSourceMock = vi.mocked(fetchEventSource);
 
 describe('TimesSquareHtmlEventsProviderClient SSE terminal failure', () => {
   beforeEach(() => {
@@ -88,5 +91,55 @@ describe('TimesSquareHtmlEventsProviderClient SSE terminal failure', () => {
     expect(mockReportError.mock.calls[0][1]).toMatchObject({
       site: 'times-square-sse',
     });
+  });
+
+  it('does not leak an unhandled rejection when the terminal throw rejects fetchEventSource', async () => {
+    // The real @microsoft/fetch-event-source rejects the promise it returned
+    // once onerror throws (dispose(); reject(innerErr)). Reproduce that exact
+    // shape: resolve the captured onerror to the caller, then reject with the
+    // thrown error — mirroring the library's terminal-failure path.
+    fetchEventSourceMock.mockImplementationOnce(
+      (_input, init): Promise<void> => {
+        capturedInit = init as FetchEventSourceInit;
+        return new Promise<void>((_resolve, reject) => {
+          const terminalError = new Error('connection refused');
+          // Drive onerror up to and past the retry budget synchronously, then
+          // reject exactly as the library does when onerror throws.
+          for (let i = 0; i < MAX_SSE_RECONNECT_ATTEMPTS - 1; i++) {
+            init.onerror?.(terminalError);
+          }
+          try {
+            init.onerror?.(terminalError);
+          } catch (thrown) {
+            reject(thrown);
+          }
+        });
+      }
+    );
+
+    const unhandledRejections: unknown[] = [];
+    const onUnhandled = (reason: unknown) => {
+      unhandledRejections.push(reason);
+    };
+    process.on('unhandledRejection', onUnhandled);
+
+    try {
+      render(
+        <TimesSquareHtmlEventsProviderClient>
+          <div>child</div>
+        </TimesSquareHtmlEventsProviderClient>
+      );
+
+      // The terminal-failure alert renders once the effect subscribes.
+      expect(await screen.findByRole('alert')).toBeInTheDocument();
+
+      // Give the microtask/macrotask queue a chance to flush any rejection the
+      // runtime would report as unhandled.
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(unhandledRejections).toEqual([]);
+    } finally {
+      process.off('unhandledRejection', onUnhandled);
+    }
   });
 });

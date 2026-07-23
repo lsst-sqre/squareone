@@ -340,6 +340,32 @@ describe('TokenDetailsView', () => {
     expect(screen.getByText('My Laptop Token')).toBeInTheDocument();
   });
 
+  it('renders a normalized message when a non-Error throwable is thrown', async () => {
+    const user = userEvent.setup();
+    // A non-Error rejection (e.g. a thrown string) must not render
+    // "Failed to delete token: undefined".
+    mockDeleteToken.mockRejectedValue('boom');
+
+    render(
+      <TokenDetailsView
+        username="testuser"
+        tokenKey="abc123xyz456789012345"
+        onDeleteSuccess={mockOnDeleteSuccess}
+      />
+    );
+
+    const deleteButton = screen.getByRole('button', { name: /delete/i });
+    await user.click(deleteButton);
+
+    const confirmButton = await screen.findByText('Delete token');
+    await user.click(confirmButton);
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent(/Unknown error/i);
+    });
+    expect(screen.getByRole('alert')).not.toHaveTextContent(/undefined/i);
+  });
+
   it('does not leave the confirmation modal open after a failed delete', async () => {
     const user = userEvent.setup();
     mockDeleteToken.mockRejectedValue(new Error('Delete failed'));

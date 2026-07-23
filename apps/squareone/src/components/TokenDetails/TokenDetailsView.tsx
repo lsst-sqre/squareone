@@ -69,8 +69,10 @@ export default function TokenDetailsView({
     } catch (err) {
       // Keep the modal closed but surface the failure so the still-listed token
       // does not look silently deleted, and report the exception to Sentry.
+      // Normalize non-Error throwables so the user-facing alert never renders
+      // "undefined"; the raw error is still forwarded to Sentry below.
       setIsDeleteModalOpen(false);
-      setDeleteError(err as Error);
+      setDeleteError(err instanceof Error ? err : new Error('Unknown error'));
       reportError(err, {
         site: 'token-details-delete',
         package: 'gafaelfawr-client',
