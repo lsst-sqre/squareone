@@ -54,6 +54,24 @@ describe('SentryTestButtons', () => {
     ).toBeInTheDocument();
   });
 
+  test('"Emit server log" POSTs to the emit-log route so the server logs a warn/error', async () => {
+    const fetchMock = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValue(new Response(null, { status: 200 }));
+
+    render(<SentryTestButtons />);
+
+    await userEvent.click(
+      screen.getByRole('button', { name: /emit server log/i })
+    );
+
+    expect(fetchMock).toHaveBeenCalledWith('/admin/sentry/emit-log', {
+      method: 'POST',
+    });
+
+    fetchMock.mockRestore();
+  });
+
   test('"Throw uncaught error" throws "Sentry Test Error" for the error boundary to catch', async () => {
     // React logs the boundary-caught error to console.error; silence it so the
     // expected throw doesn't produce noisy output.
