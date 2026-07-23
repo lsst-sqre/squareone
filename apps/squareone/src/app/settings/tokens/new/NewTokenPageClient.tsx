@@ -8,8 +8,9 @@ import {
 } from '@lsst-sqre/gafaelfawr-client';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
+import { makeReportError } from '@/lib/sentry/reportError';
 import AuthRequired from '../../../../components/AuthRequired';
 import { TokenCreationErrorDisplay } from '../../../../components/TokenCreationErrorDisplay';
 import {
@@ -57,6 +58,11 @@ function NewTokenContent() {
     isLoading: tokensLoading,
     invalidate: invalidateTokens,
   } = useUserTokens(loginInfo?.username, repertoireUrl);
+
+  // Inject the app's Sentry-backed reporter so a report-worthy submit failure
+  // (5xx, contract drift) reaches Sentry with site context tags. The existing
+  // user-facing `creationError` UX is unchanged.
+  const reportError = useMemo(() => makeReportError({ isServer: false }), []);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [createdToken, setCreatedToken] = useState<string | null>(null);
@@ -113,6 +119,10 @@ function NewTokenContent() {
       invalidateTokens();
     } catch (error) {
       console.error('Token creation failed:', error);
+      reportError(error, {
+        site: 'new-token-submit',
+        package: 'gafaelfawr-client',
+      });
     } finally {
       setIsSubmitting(false);
     }
