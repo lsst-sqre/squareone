@@ -1,5 +1,15 @@
 # squareone
 
+## 0.37.2
+
+### Patch Changes
+
+- [#613](https://github.com/lsst-sqre/squareone/pull/613) [`2eb705b`](https://github.com/lsst-sqre/squareone/commit/2eb705bc8823aeece35b9aac79e7e7d338394a4a) Thanks [@jonathansick](https://github.com/jonathansick)! - Add a curated label for the `alerts` service ("Alerts") on the API Aspect page, replacing the raw `alerts` service name in dataset endpoint listings.
+
+- [#613](https://github.com/lsst-sqre/squareone/pull/613) [`17429e8`](https://github.com/lsst-sqre/squareone/commit/17429e8bd953fb90108732b405e9defc6764aa6e) Thanks [@jonathansick](https://github.com/jonathansick)! - Order dataset groups on the API Aspect page by release recency instead of Repertoire's discovery order. Full data releases (`dr1`, `dr2`, …) rank above data previews, releases sort newest-first within each family (DP2 > DP1 > DP0.3 > DP0.2), and the evergreen Prompt dataset is always pinned second. Unrecognized datasets append after the releases in discovery order.
+
+- [#613](https://github.com/lsst-sqre/squareone/pull/613) [`150fba5`](https://github.com/lsst-sqre/squareone/commit/150fba52c6420bb2dc5d0dc566dc108d0caae741) Thanks [@jonathansick](https://github.com/jonathansick)! - Add a display name mapping for the `dp2` dataset ("Data Preview 2") on the API Aspect page, so DP2 endpoints are grouped under a friendly title when Repertoire begins advertising the dataset.
+
 ## 0.37.1
 
 ### Patch Changes
