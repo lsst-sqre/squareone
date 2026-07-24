@@ -94,6 +94,7 @@ export const presentationMap: PresentationMap = {
   },
   datasetDisplayNames: {
     dp1: 'Data Preview 1',
+    dp2: 'Data Preview 2',
     dp02: 'Data Preview 0.2',
     dp03: 'Data Preview 0.3',
     prompt: 'Prompt',

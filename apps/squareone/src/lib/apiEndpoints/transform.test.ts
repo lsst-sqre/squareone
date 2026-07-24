@@ -28,6 +28,16 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
     expect(dp1?.description).toContain('Data Preview 1 contains');
   });
 
+  test('maps the dp2 dataset key to its display name', () => {
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: { dp2: { services: {} } },
+    } as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery);
+    expect(group.displayName).toBe('Data Preview 2');
+  });
+
   test('falls back to the raw dataset key for an unmapped dataset', () => {
     const discovery = {
       ...getEmptyDiscovery(),
