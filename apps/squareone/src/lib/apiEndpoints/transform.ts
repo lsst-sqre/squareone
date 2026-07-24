@@ -2,6 +2,7 @@ import type { ServiceDiscovery } from '@lsst-sqre/repertoire-client';
 
 import {
   presentationMap as defaultPresentationMap,
+  orderDatasetKeys,
   type PresentationMap,
   selectServiceUrl,
 } from './presentation';
@@ -11,9 +12,11 @@ import type { ApiEndpointGroup } from './types';
  * Transform Repertoire service discovery into the `/api-aspect` listing,
  * applying the curated {@link PresentationMap}.
  *
- * Emits one {@link ApiEndpointGroup} per discovered dataset, in discovery
- * order. Each group resolves the dataset display name (falling back to the raw
- * key) and carries the dataset `docs_url` and `description`. Every service
+ * Emits one {@link ApiEndpointGroup} per discovered dataset, ordered by
+ * {@link orderDatasetKeys} (releases newest-first, `prompt` pinned second,
+ * unrecognized datasets after in discovery order). Each group resolves the
+ * dataset display name (falling back to the raw key) and carries the dataset
+ * `docs_url` and `description`. Every service
  * under a dataset is rendered: mapped services get the curated label, IVOA
  * standard link and name, and version-selected URL; services absent from the
  * map fall back to the raw service name, the base URL, and a null IVOA link.
@@ -29,31 +32,34 @@ export function serviceDiscoveryToApiEndpointGroups(
 ): ApiEndpointGroup[] {
   const datasets = discovery.datasets ?? {};
 
-  return Object.entries(datasets).map(([datasetKey, dataset]) => ({
-    datasetKey,
-    displayName: presentation.datasetDisplayNames[datasetKey] ?? datasetKey,
-    docsUrl: dataset.docs_url ?? null,
-    description: dataset.description ?? null,
-    endpoints: Object.entries(dataset.services ?? {}).map(
-      ([serviceName, service]) => {
-        const curated = presentation.services[serviceName];
-        if (!curated) {
+  return orderDatasetKeys(Object.keys(datasets)).map((datasetKey) => {
+    const dataset = datasets[datasetKey];
+    return {
+      datasetKey,
+      displayName: presentation.datasetDisplayNames[datasetKey] ?? datasetKey,
+      docsUrl: dataset.docs_url ?? null,
+      description: dataset.description ?? null,
+      endpoints: Object.entries(dataset.services ?? {}).map(
+        ([serviceName, service]) => {
+          const curated = presentation.services[serviceName];
+          if (!curated) {
+            return {
+              label: serviceName,
+              url: service.url,
+              ivoaUrl: null,
+              ivoaName: null,
+            };
+          }
           return {
-            label: serviceName,
-            url: service.url,
-            ivoaUrl: null,
-            ivoaName: null,
+            label: curated.label,
+            url: selectServiceUrl(service, curated.url),
+            ivoaUrl: curated.ivoaUrl ?? null,
+            ivoaName: curated.ivoaName ?? null,
           };
         }
-        return {
-          label: curated.label,
-          url: selectServiceUrl(service, curated.url),
-          ivoaUrl: curated.ivoaUrl ?? null,
-          ivoaName: curated.ivoaName ?? null,
-        };
-      }
-    ),
-  }));
+      ),
+    };
+  });
 }
 
 export type { ApiEndpoint, ApiEndpointGroup } from './types';

@@ -9,13 +9,77 @@ import type { PresentationMap } from './presentation';
 import { serviceDiscoveryToApiEndpointGroups } from './transform';
 
 describe('serviceDiscoveryToApiEndpointGroups', () => {
-  test('produces one group per dataset, in discovery order', () => {
+  test('produces one group per dataset, in curated dataset order', () => {
     const groups = serviceDiscoveryToApiEndpointGroups(mockDiscovery);
 
     expect(groups.map((group) => group.datasetKey)).toEqual([
       'dp1',
-      'dp02',
       'dp03',
+      'dp02',
+    ]);
+  });
+
+  test('orders datasets newest-first with prompt pinned second', () => {
+    const discovery = {
+      ...getEmptyDiscovery(),
+      // Discovery order is deliberately scrambled relative to the curated
+      // order.
+      datasets: {
+        dp02: { services: {} },
+        dp1: { services: {} },
+        prompt: { services: {} },
+        dp03: { services: {} },
+        dp2: { services: {} },
+      },
+    } as ServiceDiscovery;
+
+    const groups = serviceDiscoveryToApiEndpointGroups(discovery);
+    expect(groups.map((group) => group.datasetKey)).toEqual([
+      'dp2',
+      'prompt',
+      'dp1',
+      'dp03',
+      'dp02',
+    ]);
+  });
+
+  test('ranks future full data releases above all data previews', () => {
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp2: { services: {} },
+        dr1: { services: {} },
+        prompt: { services: {} },
+        dr2: { services: {} },
+        dp1: { services: {} },
+      },
+    } as ServiceDiscovery;
+
+    const groups = serviceDiscoveryToApiEndpointGroups(discovery);
+    expect(groups.map((group) => group.datasetKey)).toEqual([
+      'dr2',
+      'prompt',
+      'dr1',
+      'dp2',
+      'dp1',
+    ]);
+  });
+
+  test('appends datasets absent from the curated order, in discovery order', () => {
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        zebra: { services: {} },
+        dp1: { services: {} },
+        aardvark: { services: {} },
+      },
+    } as ServiceDiscovery;
+
+    const groups = serviceDiscoveryToApiEndpointGroups(discovery);
+    expect(groups.map((group) => group.datasetKey)).toEqual([
+      'dp1',
+      'zebra',
+      'aardvark',
     ]);
   });
 
