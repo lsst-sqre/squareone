@@ -91,14 +91,71 @@ export const presentationMap: PresentationMap = {
       ivoaName: 'GMS',
       url: 'base',
     },
+    alerts: {
+      label: 'Alerts',
+      url: 'base',
+    },
   },
   datasetDisplayNames: {
     dp1: 'Data Preview 1',
+    dp2: 'Data Preview 2',
     dp02: 'Data Preview 0.2',
     dp03: 'Data Preview 0.3',
     prompt: 'Prompt',
   },
 };
+
+/** Full data releases outrank every data preview regardless of number. */
+const DR_FAMILY_OFFSET = 1_000_000;
+
+/**
+ * Rank a release dataset key for display ordering; higher ranks sort earlier.
+ *
+ * Full data releases (`dr1`, `dr2`, …) outrank all data previews; within a
+ * family, newer releases outrank older. Data preview digits with a leading
+ * zero are fractional DP0.x releases (`dp03` -> 0.3), so `dp2` > `dp1` >
+ * `dp03` > `dp02`. Returns null for keys that don't match a release pattern
+ * (including `prompt`, which {@link orderDatasetKeys} pins specially).
+ */
+export function datasetReleaseRank(key: string): number | null {
+  const dr = /^dr(\d+)$/.exec(key);
+  if (dr) {
+    return DR_FAMILY_OFFSET + Number(dr[1]);
+  }
+  const dp = /^dp(\d+)$/.exec(key);
+  if (dp) {
+    const digits = dp[1];
+    return digits.startsWith('0')
+      ? Number(`0.${digits.slice(1)}`)
+      : Number(digits);
+  }
+  return null;
+}
+
+/**
+ * Order dataset keys for `/api-aspect` display.
+ *
+ * Recognized releases sort newest-first per {@link datasetReleaseRank}, with
+ * keys that don't match a release pattern following in their given (discovery)
+ * order. The evergreen `prompt` dataset is then pinned to the second position.
+ */
+export function orderDatasetKeys(keys: string[]): string[] {
+  const releases = keys
+    .map((key) => ({ key, rank: datasetReleaseRank(key) }))
+    .filter(
+      (entry): entry is { key: string; rank: number } => entry.rank !== null
+    )
+    .sort((a, b) => b.rank - a.rank)
+    .map((entry) => entry.key);
+  const unrecognized = keys.filter(
+    (key) => key !== 'prompt' && datasetReleaseRank(key) === null
+  );
+  const ordered = [...releases, ...unrecognized];
+  if (keys.includes('prompt')) {
+    ordered.splice(1, 0, 'prompt');
+  }
+  return ordered;
+}
 
 /**
  * Select the endpoint URL for a discovered service per its curated selector.
