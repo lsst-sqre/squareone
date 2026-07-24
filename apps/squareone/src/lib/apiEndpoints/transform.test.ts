@@ -38,6 +38,30 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
     expect(group.displayName).toBe('Data Preview 2');
   });
 
+  test('maps the alerts service to its curated label', () => {
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            alerts: {
+              url: 'https://data.lsst.cloud/api/alerts',
+              versions: {},
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery);
+    expect(group.endpoints[0]).toEqual({
+      label: 'Alerts',
+      url: 'https://data.lsst.cloud/api/alerts',
+      ivoaUrl: null,
+      ivoaName: null,
+    });
+  });
+
   test('falls back to the raw dataset key for an unmapped dataset', () => {
     const discovery = {
       ...getEmptyDiscovery(),

@@ -91,6 +91,10 @@ export const presentationMap: PresentationMap = {
       ivoaName: 'GMS',
       url: 'base',
     },
+    alerts: {
+      label: 'Alerts',
+      url: 'base',
+    },
   },
   datasetDisplayNames: {
     dp1: 'Data Preview 1',
