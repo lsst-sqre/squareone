@@ -1,5 +1,17 @@
 # squareone
 
+## 0.37.3
+
+### Patch Changes
+
+- [#615](https://github.com/lsst-sqre/squareone/pull/615) [`0f53b8a`](https://github.com/lsst-sqre/squareone/commit/0f53b8a52adb9cba95488ed396dca6fbd5286dc6) Thanks [@jonathansick](https://github.com/jonathansick)! - Update the homepage hero background image
+
+  The homepage hero now uses [Rubin's first-light image of the Virgo cluster](https://rubin.canto.com/v/Resources/album/P2QMF?display=curatedView&viewIndex=2&gSortingForward=false&gOrderProp=createDate&referenceTo=&from=curatedView&column=image&id=32ejonfcf955v6luvhdvbd746c&origin=classic) (`first-light-virgo.jpg`, 3840×2160) in place of the previous construction-era photographs. The unused images (`Quint-DSC1187.jpg` and `lsst-stills-0014.jpg`) are removed, and `FullBleedBackgroundImageSection` now centers its background image (`background-position: center`) so the visible crop keeps the middle of the image at all viewport sizes.
+
+- [#616](https://github.com/lsst-sqre/squareone/pull/616) [`0f437a6`](https://github.com/lsst-sqre/squareone/commit/0f437a62e02cd57b0b310e7df067da39e944cf34) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump js-yaml from 5.2.1 to 5.2.2 in the security-patch group across 1 directory
+
+- [#615](https://github.com/lsst-sqre/squareone/pull/615) [`a7c1595`](https://github.com/lsst-sqre/squareone/commit/a7c159567fa545d956d222b2f6cc29731b9b3aaf) Thanks [@jonathansick](https://github.com/jonathansick)! - Retitle the `prompt` dataset to "Prompt Products" on the `/api-aspect` page, matching our canonical terminology. The development `docs.mdx` content is also synced with the new idfprod production content (DP2, Prompt Products, DP1, and DP0 data cards plus an `lsst.images` software card).
+
 ## 0.37.2
 
 ### Patch Changes
