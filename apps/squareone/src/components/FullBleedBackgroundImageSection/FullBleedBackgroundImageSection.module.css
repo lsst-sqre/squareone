@@ -4,8 +4,9 @@
 .section {
   color: var(--text-color, #ffffff);
   background-color: var(--fallback-color, #333333);
-  background-image: var(--image-path, url("/lsst-stills-0014.jpg"));
+  background-image: var(--image-path, url("/first-light-virgo.jpg"));
   background-size: cover;
+  background-position: center;
 
   /* Full-width in a constrained parent
    * https://css-tricks.com/full-width-containers-limited-width-parents/ */
