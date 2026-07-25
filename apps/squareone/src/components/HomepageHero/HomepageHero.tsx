@@ -44,7 +44,7 @@ export default function HomepageHero() {
 
   return (
     <FullBleedBackgroundImageSection
-      imagePath="/Quint-DSC1187.jpg"
+      imagePath="/first-light-virgo.jpg"
       fallbackColor="#333333"
       textColor="#ffffff"
     >
