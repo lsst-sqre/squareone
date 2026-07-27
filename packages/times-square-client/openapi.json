@@ -3,7 +3,7 @@
   "info": {
     "title": "Times Square",
     "description": "**Times Square is a Rubin Science Platform (RSP) service for displaying parameterized Jupyter Notebooks as websites.**\n\nExcellent applications for Times Square include:\n\n- Engineering dashboards\n- Quick-look data previewing\n- Reports that incorporate live data sources\n\nThe design and architecture of Times Square is described in [The Times Square service for publishing parameterized Jupyter Notebooks in the Rubin Science platform](https://sqr-062.lsst.io).\nTimes Square uses Noteburst ([GitHub](https://github.com/lsst-sqre/noteburst), [SQR-065](https://sqr-065.lsst.io)) to execute Jupyter Notebooks in Nublado (JupyterLab) instances, thereby mechanizing the RSP's notebook aspect.\n\nThis Times Square API service is developed at [https://github.com/lsst-sqre/times-square](https://github.com/lsst-sqre/times-square).\nThe user interface is developed separately at [https://github.com/lsst-sqre/times-square-ui](https://github.com/lsst-sqre/times-square-ui).\n",
-    "version": "0.23.1.dev24+g576ef1393"
+    "version": "0.24.2.dev9+g3ee2b2a55"
   },
   "paths": {
     "/healthcheck": {
@@ -1372,7 +1372,9 @@
             "title": "Location"
           },
           "msg": { "type": "string", "title": "Message" },
-          "type": { "type": "string", "title": "Error Type" }
+          "type": { "type": "string", "title": "Error Type" },
+          "input": { "title": "Input" },
+          "ctx": { "type": "object", "title": "Context" }
         },
         "type": "object",
         "required": ["loc", "msg", "type"],
