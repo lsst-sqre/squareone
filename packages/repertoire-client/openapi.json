@@ -3,7 +3,7 @@
   "info": {
     "title": "Repertoire",
     "description": "Service discovery for the Rubin Science Platform",
-    "version": "2.0.0"
+    "version": "2.1.0"
   },
   "paths": {
     "/repertoire/": {
@@ -107,7 +107,7 @@
       "get": {
         "summary": "IVOA Publishing Registry",
         "description": "Handle an OAI-PMH request.\n\nAccepts any OAI-PMH verb as a query parameter (GET) or form field\n(POST) and returns the corresponding XML response.  All responses\n(including errors) use HTTP 200 as specified in OAI-PMH.",
-        "operationId": "get_oai_api_registry_post",
+        "operationId": "get_oai_api_registry_get",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -118,7 +118,7 @@
       "post": {
         "summary": "IVOA Publishing Registry",
         "description": "Handle an OAI-PMH request.\n\nAccepts any OAI-PMH verb as a query parameter (GET) or form field\n(POST) and returns the corresponding XML response.  All responses\n(including errors) use HTTP 200 as specified in OAI-PMH.",
-        "operationId": "get_oai_api_registry_post",
+        "operationId": "get_oai_api_registry_get",
         "responses": {
           "200": {
             "description": "Successful Response",
