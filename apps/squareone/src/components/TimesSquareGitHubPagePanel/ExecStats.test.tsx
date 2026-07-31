@@ -26,6 +26,7 @@ const completeContext: TimesSquareHtmlEventsContextValue = {
   htmlHash: 'abc123',
   htmlUrl: 'https://example.com/html',
   connectionFailed: false,
+  executionError: null,
 };
 
 function renderExecStats(context: TimesSquareHtmlEventsContextValue) {

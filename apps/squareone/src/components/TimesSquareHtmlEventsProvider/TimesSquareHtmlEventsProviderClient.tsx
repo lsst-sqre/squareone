@@ -2,8 +2,13 @@
  * Client-only TimesSquareHtmlEventsProvider component - handles SSE events on client side only.
  */
 
-import { useTimesSquarePage } from '@lsst-sqre/times-square-client';
-import { fetchEventSource } from '@microsoft/fetch-event-source';
+import {
+  createHtmlEventsUrl,
+  type HtmlEvent,
+  SseConnectionFailedError,
+  subscribeToHtmlEvents,
+  useTimesSquarePage,
+} from '@lsst-sqre/times-square-client';
 import {
   type ReactNode,
   useContext,
@@ -22,25 +27,16 @@ import {
 import styles from './TimesSquareHtmlEventsProviderClient.module.css';
 
 /**
- * Maximum number of SSE reconnect attempts before the connection is treated as
- * a terminal failure. `fetchEventSource` retries indefinitely by default; this
- * bounds that so a persistently unreachable endpoint stops silently retrying
- * and instead surfaces a user-facing error and a single Sentry capture.
+ * Maximum number of consecutive SSE connection failures before the subscription
+ * is treated as a terminal failure. The underlying transport retries
+ * indefinitely by default; this bounds that so a persistently unreachable
+ * endpoint stops silently retrying and instead surfaces a user-facing error and
+ * a single Sentry capture.
  */
-export const MAX_SSE_RECONNECT_ATTEMPTS = 5;
+const MAX_SSE_RECONNECT_ATTEMPTS = 5;
 
-/** Base backoff (ms) between SSE reconnect attempts. */
+/** Base backoff (ms) between SSE reconnect attempts; scales linearly. */
 const SSE_RECONNECT_BACKOFF_MS = 1000;
-
-type HtmlEvent = {
-  date_submitted: string;
-  date_started: string;
-  date_finished: string;
-  execution_status: string;
-  execution_duration: number;
-  html_hash: string;
-  html_url: string;
-};
 
 type TimesSquareHtmlEventsProviderClientProps = {
   children: ReactNode;
@@ -70,99 +66,59 @@ export default function TimesSquareHtmlEventsProviderClient({
     commit: urlParameters?.commit,
   });
 
+  // The page's own query string carries both notebook parameters and the
+  // reserved `ts_`-prefixed display settings; the events endpoint takes them
+  // all, so forward the whole set.
   const urlQueryString = urlParameters?.urlQueryString;
-  const fullHtmlEventsUrl = htmlEventsUrl
-    ? `${htmlEventsUrl}?${urlQueryString}`
-    : null;
+  const fullHtmlEventsUrl = useMemo(() => {
+    if (!htmlEventsUrl) return null;
+    const params = Object.fromEntries(
+      new URLSearchParams(urlQueryString ?? '')
+    );
+    return createHtmlEventsUrl(htmlEventsUrl, params);
+  }, [htmlEventsUrl, urlQueryString]);
 
   useEffect(() => {
     // Don't run SSE on server side
-    if (!isClient) return () => {};
+    if (!isClient || !fullHtmlEventsUrl) return () => {};
 
-    const abortController = new AbortController();
-    // Per-subscription reconnect bookkeeping. `reconnectAttempts` bounds
-    // fetchEventSource's otherwise-infinite retry loop; `reported` throttles
-    // capture so a persistent outage produces a single Sentry event rather than
-    // one per reconnect attempt.
-    let reconnectAttempts = 0;
+    // Throttles capture so a persistent outage produces a single Sentry event
+    // rather than one per reconnect attempt.
     let reported = false;
 
     // Reset any prior terminal-failure state when (re)subscribing.
     setConnectionFailed(false);
 
-    async function runEffect(): Promise<void> {
-      if (htmlEventsUrl && fullHtmlEventsUrl) {
-        try {
-          await fetchEventSource(fullHtmlEventsUrl, {
-            method: 'GET',
-            signal: abortController.signal,
-            async onopen(res) {
-              if (res.status >= 400 && res.status < 500 && res.status !== 429) {
-                console.error(`Client side error ${fullHtmlEventsUrl}`, res);
-              }
-            },
-            onmessage(event) {
-              let parsedData: HtmlEvent;
-              try {
-                parsedData = JSON.parse(event.data);
-              } catch (_error) {
-                return;
-              }
-              setHtmlEvent(parsedData);
+    return subscribeToHtmlEvents(fullHtmlEventsUrl, undefined, {
+      onEvent: setHtmlEvent,
+      onError(error) {
+        console.error(
+          `Error fetching Times Square events SSE ${fullHtmlEventsUrl}`,
+          error
+        );
 
-              if (
-                parsedData.execution_status === 'complete' &&
-                parsedData.html_hash
-              ) {
-                abortController.abort();
-              }
-            },
-            onclose() {},
-            onerror(err) {
-              console.error(
-                `Error fetching Times Square events SSE ${fullHtmlEventsUrl}`,
-                err
-              );
-
-              // Capture the connection error at most once per subscription so a
-              // sustained outage does not flood Sentry across reconnect attempts.
-              if (!reported) {
-                reported = true;
-                reportError(err, {
-                  site: 'times-square-sse',
-                  package: 'times-square-client',
-                });
-              }
-
-              reconnectAttempts += 1;
-              if (reconnectAttempts >= MAX_SSE_RECONNECT_ATTEMPTS) {
-                // Throwing from onerror stops fetchEventSource from reconnecting:
-                // the connection is now in a terminal-failure state.
-                setConnectionFailed(true);
-                throw err instanceof Error ? err : new Error(String(err));
-              }
-              // Returning a number retries after that backoff.
-              return SSE_RECONNECT_BACKOFF_MS * reconnectAttempts;
-            },
-          });
-        } catch (_err) {
-          // The terminal-failure path throws from onerror to stop
-          // fetchEventSource from reconnecting, which rejects this promise.
-          // That outcome is expected and already surfaced to the user via
-          // `connectionFailed` and reported to Sentry via reportError, so
-          // swallow it here to avoid an unhandled promise rejection (which
-          // would otherwise add console noise and a duplicate, untagged
-          // Sentry capture through the global onunhandledrejection handler).
+        if (error instanceof SseConnectionFailedError) {
+          // The terminal signal from the bounded-reconnect budget. Its `cause`
+          // was already captured as the first error of this run, so surface the
+          // user-facing state without a second, duplicate Sentry event.
+          setConnectionFailed(true);
+          return;
         }
-      }
-    }
-    runEffect();
 
-    return () => {
-      // Clean up: close the event source connection
-      abortController.abort();
-    };
-  }, [fullHtmlEventsUrl, htmlEventsUrl, isClient, reportError]);
+        // Capture at most once per subscription so a sustained outage — or a
+        // stream of schema-invalid events — does not flood Sentry.
+        if (!reported) {
+          reported = true;
+          reportError(error, {
+            site: 'times-square-sse',
+            package: 'times-square-client',
+          });
+        }
+      },
+      maxReconnectAttempts: MAX_SSE_RECONNECT_ATTEMPTS,
+      reconnectBackoffMs: SSE_RECONNECT_BACKOFF_MS,
+    });
+  }, [fullHtmlEventsUrl, isClient, reportError]);
 
   const contextValue = useMemo(
     (): TimesSquareHtmlEventsContextValue => ({
@@ -174,6 +130,7 @@ export default function TimesSquareHtmlEventsProviderClient({
       htmlHash: htmlEvent ? htmlEvent.html_hash : null,
       htmlUrl: htmlEvent ? htmlEvent.html_url : null,
       connectionFailed,
+      executionError: htmlEvent ? htmlEvent.execution_error : null,
     }),
     [htmlEvent, connectionFailed]
   );

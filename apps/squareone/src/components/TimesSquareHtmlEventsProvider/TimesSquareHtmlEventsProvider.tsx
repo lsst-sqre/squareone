@@ -3,6 +3,7 @@
  * Uses client-only component to handle SWR hooks safely.
  */
 
+import type { ExecutionError } from '@lsst-sqre/times-square-client';
 import dynamic from 'next/dynamic';
 import React from 'react';
 
@@ -24,6 +25,12 @@ export type TimesSquareHtmlEventsContextValue = {
    * bounded reconnect budget. Consumers can surface a terminal-failure state.
    */
   connectionFailed: boolean;
+  /**
+   * The terminal notebook-execution failure reported by Times Square, or null
+   * while execution is pending or has succeeded (DM-55470). Deployments
+   * predating DM-55470 omit the field entirely, which also normalizes to null.
+   */
+  executionError: ExecutionError | null;
 };
 
 export const TimesSquareHtmlEventsContext = React.createContext<
@@ -46,6 +53,7 @@ const TimesSquareHtmlEventsProviderClient = dynamic(
         htmlHash: null,
         htmlUrl: null,
         connectionFailed: false,
+        executionError: null,
       };
       // Return a provider that will be used by parent component with children
       return (
