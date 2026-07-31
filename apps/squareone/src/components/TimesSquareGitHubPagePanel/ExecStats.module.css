@@ -9,3 +9,9 @@
   font-size: 0.8rem;
   margin-bottom: 0;
 }
+
+.error {
+  font-size: 0.8rem;
+  margin-bottom: 0;
+  color: var(--rsd-color-red-900);
+}
