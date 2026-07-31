@@ -666,7 +666,7 @@ importers:
         specifier: workspace:*
         version: link:../tsconfig
       '@tanstack/react-query':
-        specifier: ^5.62.8
+        specifier: ^5.82.0
         version: 5.90.20(react@19.2.8)
       '@testing-library/react':
         specifier: ^16.1.0

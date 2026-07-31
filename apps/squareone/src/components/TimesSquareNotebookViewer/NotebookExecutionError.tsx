@@ -60,8 +60,12 @@ export default function NotebookExecutionError({
   isRerunPending,
   rerunFailed,
 }: NotebookExecutionErrorProps) {
-  const { icon: Icon, tone } =
-    presentations[executionError.code] ?? genericPresentation;
+  // `code` is API-supplied, so the lookup is guarded by an own-property check:
+  // a plain `presentations[code]` would resolve inherited `Object.prototype`
+  // members (`constructor`, `toString`, …) and bypass the generic fallback.
+  const { icon: Icon, tone } = Object.hasOwn(presentations, executionError.code)
+    ? presentations[executionError.code]
+    : genericPresentation;
 
   return (
     // The panel replaces the viewer's loading state once execution fails, so it

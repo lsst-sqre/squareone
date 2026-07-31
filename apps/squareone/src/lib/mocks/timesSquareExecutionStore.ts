@@ -10,7 +10,7 @@
 // colocated with the rest of the dev tooling so it never reaches the
 // production build.
 
-import type { ExecutionError } from '@lsst-sqre/times-square-client';
+import { mockExecutionError } from '@lsst-sqre/times-square-client';
 
 /** Magic `?a=` value that reports a still-executing page instance. */
 export const PENDING_A_VALUE = '2';
@@ -24,16 +24,11 @@ export type MockExecutionState = 'complete' | 'in_progress' | 'failed';
 /**
  * The terminal failure reported for {@link FAILING_A_VALUE}.
  *
- * Mirrors a realistic Times Square `execution_error`: `code` is one of the
- * documented values and `title`/`message` are the API's own user-facing copy,
- * which Squareone renders verbatim.
+ * Re-exported from the client package's fixtures so the dev mocks, the
+ * package's own tests, and the app's component tests all describe the same
+ * `execution_error` instead of maintaining copies that can drift.
  */
-export const mockExecutionError: ExecutionError = {
-  code: 'timeout',
-  title: 'Notebook execution timed out',
-  message:
-    'The notebook did not finish executing within the allowed time. Try again, or simplify the notebook so it completes faster.',
-};
+export { mockExecutionError };
 
 /**
  * How long a re-run request keeps a page instance in the executing state.

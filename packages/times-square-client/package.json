@@ -34,7 +34,7 @@
   },
   "peerDependencies": {
     "@lsst-sqre/repertoire-client": "workspace:*",
-    "@tanstack/react-query": "^5",
+    "@tanstack/react-query": "^5.82.0",
     "react": "^18 || ^19"
   },
   "devDependencies": {
@@ -43,7 +43,7 @@
     "@lsst-sqre/eslint-config": "workspace:*",
     "@lsst-sqre/repertoire-client": "workspace:*",
     "@lsst-sqre/tsconfig": "workspace:*",
-    "@tanstack/react-query": "^5.62.8",
+    "@tanstack/react-query": "^5.82.0",
     "@testing-library/react": "^16.1.0",
     "@types/react": "^19.2.18",
     "react": "^19.2.8",
