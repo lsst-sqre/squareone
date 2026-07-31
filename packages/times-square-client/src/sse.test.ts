@@ -8,7 +8,11 @@ vi.mock('@microsoft/fetch-event-source', () => ({
   fetchEventSource: fetchEventSourceMock,
 }));
 
-import { SseInvalidEventError, subscribeToHtmlEvents } from './sse';
+import {
+  SseConnectionFailedError,
+  SseInvalidEventError,
+  subscribeToHtmlEvents,
+} from './sse';
 
 /** The options object handed to the most recent fetchEventSource call. */
 function lastFetchEventSourceOptions() {
@@ -16,8 +20,14 @@ function lastFetchEventSourceOptions() {
   return calls[calls.length - 1][1] as {
     onmessage: (event: { data: string }) => void;
     onopen: (response: Response) => Promise<void>;
-    onerror: (error: unknown) => void;
+    onerror: (error: unknown) => number | undefined;
+    signal: AbortSignal;
   };
+}
+
+/** A minimal successful SSE response for driving `onopen`. */
+function okResponse(): Response {
+  return { ok: true, status: 200, statusText: 'OK' } as Response;
 }
 
 // A valid HtmlEvent payload (matches HtmlEventSchema).
@@ -112,5 +122,99 @@ describe('subscribeToHtmlEvents onmessage', () => {
     for (const call of onError.mock.calls) {
       expect(call[0]).toBeInstanceOf(SseInvalidEventError);
     }
+  });
+});
+
+describe('subscribeToHtmlEvents bounded reconnect', () => {
+  it('terminates with SseConnectionFailedError once maxReconnectAttempts is reached', () => {
+    const onEvent = vi.fn();
+    const onError = vi.fn();
+    subscribeToHtmlEvents('https://example.com/events', undefined, {
+      onEvent,
+      onError,
+      maxReconnectAttempts: 2,
+    });
+
+    const { onerror, signal } = lastFetchEventSourceOptions();
+    const first = new Error('connection reset');
+    expect(onerror(first)).toBeUndefined();
+    expect(signal.aborted).toBe(false);
+
+    // The second consecutive failure hits the limit: fetch-event-source is told
+    // to stop reconnecting (by throwing) and the stream is aborted.
+    const second = new Error('connection reset again');
+    expect(() => onerror(second)).toThrow();
+    expect(signal.aborted).toBe(true);
+
+    // The underlying error is still reported for each failure, plus a final
+    // distinguishable terminal error carrying the last failure as `cause`.
+    expect(onError).toHaveBeenCalledTimes(3);
+    expect(onError.mock.calls[0][0]).toBe(first);
+    expect(onError.mock.calls[1][0]).toBe(second);
+    const terminal = onError.mock.calls[2][0];
+    expect(terminal).toBeInstanceOf(SseConnectionFailedError);
+    expect(terminal.name).toBe('SseConnectionFailedError');
+    expect(terminal.cause).toBe(second);
+    expect(terminal.attempts).toBe(2);
+  });
+
+  it('applies a configurable backoff delay that grows with each attempt', () => {
+    const onEvent = vi.fn();
+    subscribeToHtmlEvents('https://example.com/events', undefined, {
+      onEvent,
+      maxReconnectAttempts: 5,
+      reconnectBackoffMs: 250,
+    });
+
+    const { onerror } = lastFetchEventSourceOptions();
+
+    expect(onerror(new Error('boom'))).toBe(250);
+    expect(onerror(new Error('boom'))).toBe(500);
+    expect(onerror(new Error('boom'))).toBe(750);
+  });
+
+  it('leaves retry behavior unbounded and undelayed by default', () => {
+    const onEvent = vi.fn();
+    const onError = vi.fn();
+    subscribeToHtmlEvents('https://example.com/events', undefined, {
+      onEvent,
+      onError,
+    });
+
+    const { onerror, signal } = lastFetchEventSourceOptions();
+
+    // No reconnect options: every failure is reported as a plain Error, the
+    // transport's own retry interval is left in place (no number returned), and
+    // the subscription never gives up.
+    for (let i = 0; i < 10; i++) {
+      expect(onerror(new Error(`boom ${i}`))).toBeUndefined();
+    }
+
+    expect(signal.aborted).toBe(false);
+    expect(onError).toHaveBeenCalledTimes(10);
+    for (const call of onError.mock.calls) {
+      expect(call[0]).not.toBeInstanceOf(SseConnectionFailedError);
+    }
+  });
+
+  it('resets the failure count after a connection opens successfully', async () => {
+    const onEvent = vi.fn();
+    const onError = vi.fn();
+    subscribeToHtmlEvents('https://example.com/events', undefined, {
+      onEvent,
+      onError,
+      maxReconnectAttempts: 2,
+    });
+
+    const { onerror, onopen, signal } = lastFetchEventSourceOptions();
+
+    onerror(new Error('boom'));
+    await onopen(okResponse());
+
+    // The reconnect succeeded, so the next failure starts a fresh run rather
+    // than tripping the limit.
+    expect(onerror(new Error('boom again'))).toBeUndefined();
+    expect(signal.aborted).toBe(false);
+    expect(onError).toHaveBeenCalledTimes(2);
   });
 });

@@ -137,6 +137,7 @@ export {
 export {
   createHtmlEventsUrl,
   type HtmlEventCallback,
+  SseConnectionFailedError,
   type SseErrorCallback,
   SseInvalidEventError,
   type SubscribeOptions,

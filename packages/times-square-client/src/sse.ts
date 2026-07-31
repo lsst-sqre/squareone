@@ -36,13 +36,38 @@ export class SseInvalidEventError extends Error {
 }
 
 /**
+ * Error raised when a subscription gives up reconnecting and terminates.
+ *
+ * Only ever raised when {@link SubscribeOptions.maxReconnectAttempts} is set:
+ * once that many consecutive connection failures have occurred the stream is
+ * aborted and this error is reported through `onError` as the subscription's
+ * final signal. Unlike the plain connection `Error`s that precede it (one per
+ * failed attempt) and unlike {@link SseInvalidEventError}, this error is
+ * **terminal** — no further events, errors, or reconnects follow it, so a
+ * consumer can use it to drive a `connectionFailed` UI state and a once-only
+ * error capture. The last underlying connection error is attached as `cause`.
+ */
+export class SseConnectionFailedError extends Error {
+  /** Number of consecutive failed connection attempts before giving up. */
+  readonly attempts: number;
+
+  constructor(message: string, options: { cause?: unknown; attempts: number }) {
+    super(message, { cause: options.cause });
+    this.name = 'SseConnectionFailedError';
+    this.attempts = options.attempts;
+  }
+}
+
+/**
  * Callback invoked when an error occurs.
  *
  * May fire more than once over a subscription's lifetime. Connection-level
  * failures arrive as plain `Error`s; per-event schema-validation failures
- * arrive as {@link SseInvalidEventError} (non-fatal — see its docs). Consumers
- * that treat `onError` as a fatal/connection signal should check the error
- * subtype before acting.
+ * arrive as {@link SseInvalidEventError} (non-fatal — see its docs); and a
+ * bounded-reconnect subscription that has given up reports a final
+ * {@link SseConnectionFailedError} (terminal — see its docs). Consumers that
+ * treat `onError` as a fatal/connection signal should check the error subtype
+ * before acting.
  */
 export type SseErrorCallback = (error: Error) => void;
 
@@ -60,6 +85,24 @@ export type SubscribeOptions = {
   signal?: AbortSignal;
   /** Whether to auto-abort when execution completes (default: true) */
   autoAbortOnComplete?: boolean;
+  /**
+   * Maximum number of consecutive connection failures before the subscription
+   * gives up (optional).
+   *
+   * When set, reaching this many consecutive failures aborts the stream and
+   * reports a terminal {@link SseConnectionFailedError} through `onError`. The
+   * counter resets whenever a connection opens successfully. When omitted (the
+   * default), the underlying transport reconnects indefinitely.
+   */
+  maxReconnectAttempts?: number;
+  /**
+   * Base delay in milliseconds between reconnect attempts (optional).
+   *
+   * The delay scales linearly with the number of consecutive failures, so a
+   * value of 1000 waits 1 s, then 2 s, then 3 s. When omitted (the default),
+   * the underlying transport's own retry interval is used.
+   */
+  reconnectBackoffMs?: number;
   /** Optional structured logger */
   logger?: Logger;
 };
@@ -104,10 +147,19 @@ export function subscribeToHtmlEvents(
     onComplete,
     signal,
     autoAbortOnComplete = true,
+    maxReconnectAttempts,
+    reconnectBackoffMs,
     logger: log,
   } = options ?? { onEvent: () => {} };
 
   const abortController = new AbortController();
+  // Consecutive connection failures since the last successful open. Bounds the
+  // otherwise-infinite reconnect loop when `maxReconnectAttempts` is set, and
+  // scales the backoff delay when `reconnectBackoffMs` is set.
+  let consecutiveFailures = 0;
+  // Set once the subscription has terminally given up, so the promise rejection
+  // that follows isn't reported a second time.
+  let connectionFailed = false;
   const fullUrl = buildUrlWithParams(eventsUrl, params);
 
   // Link external signal to internal abort controller
@@ -122,6 +174,12 @@ export function subscribeToHtmlEvents(
     credentials: 'include',
 
     async onopen(response) {
+      if (response.ok) {
+        // A successful open ends any run of failures, so `maxReconnectAttempts`
+        // bounds *consecutive* failures rather than the subscription's lifetime.
+        consecutiveFailures = 0;
+        return;
+      }
       if (
         response.status >= 400 &&
         response.status < 500 &&
@@ -190,18 +248,52 @@ export function subscribeToHtmlEvents(
 
     onerror(error) {
       // Only report errors if we haven't aborted
-      if (!abortController.signal.aborted) {
-        const sseError =
-          error instanceof Error
-            ? error
-            : new Error(`SSE error: ${String(error)}`);
-        onError?.(sseError);
+      if (abortController.signal.aborted) {
+        return undefined;
       }
+
+      const sseError =
+        error instanceof Error
+          ? error
+          : new Error(`SSE error: ${String(error)}`);
+      onError?.(sseError);
+
+      consecutiveFailures += 1;
+
+      if (
+        maxReconnectAttempts !== undefined &&
+        consecutiveFailures >= maxReconnectAttempts
+      ) {
+        connectionFailed = true;
+        onError?.(
+          new SseConnectionFailedError(
+            `SSE connection failed after ${consecutiveFailures} consecutive attempts`,
+            { cause: sseError, attempts: consecutiveFailures }
+          )
+        );
+        abortController.abort();
+        // Throwing from onerror is fetch-event-source's signal to stop
+        // reconnecting; returning (even after aborting) would schedule another
+        // attempt. The resulting promise rejection is swallowed below.
+        throw sseError;
+      }
+
+      // Returning a number delays the next attempt by that many milliseconds;
+      // returning undefined leaves the transport's own retry interval in place.
+      return reconnectBackoffMs === undefined
+        ? undefined
+        : reconnectBackoffMs * consecutiveFailures;
     },
   }).catch((error) => {
     // Catch any unhandled errors from fetchEventSource
     // AbortError is expected when we clean up
     if (error instanceof Error && error.name === 'AbortError') {
+      return;
+    }
+    // The bounded-reconnect terminal path throws from onerror to stop
+    // reconnecting, which rejects this promise. That outcome is expected and
+    // already surfaced via SseConnectionFailedError, so don't report it twice.
+    if (connectionFailed) {
       return;
     }
     onError?.(error instanceof Error ? error : new Error(String(error)));
