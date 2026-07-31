@@ -295,6 +295,20 @@ export const HtmlEventSchema = z.object({
   execution_error: ExecutionErrorSchema.nullable().default(null),
 });
 
+/**
+ * Response to a successful HTML soft-deletion (re-run request).
+ * From DELETE /v1/pages/{page}/html
+ *
+ * The soft delete clears the cached rendering — including a cached
+ * `execution_error` (DM-55470) — and schedules a fresh execution in the
+ * background. The returned URLs identify the page instance whose rendering is
+ * being recomputed.
+ */
+export const DeleteHtmlResponseSchema = z.object({
+  html_url: z.string(),
+  html_events_url: z.string(),
+});
+
 // =============================================================================
 // Error Schemas
 // =============================================================================
@@ -370,6 +384,7 @@ export type PageSummary = z.infer<typeof PageSummarySchema>;
 export type Page = z.infer<typeof PageSchema>;
 export type HtmlStatus = z.infer<typeof HtmlStatusSchema>;
 export type HtmlEvent = z.infer<typeof HtmlEventSchema>;
+export type DeleteHtmlResponse = z.infer<typeof DeleteHtmlResponseSchema>;
 export type ErrorDetail = z.infer<typeof ErrorDetailSchema>;
 export type ErrorModel = z.infer<typeof ErrorModelSchema>;
 export type ValidationError = z.infer<typeof ValidationErrorSchema>;

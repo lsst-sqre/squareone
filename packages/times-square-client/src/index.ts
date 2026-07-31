@@ -14,6 +14,9 @@
 export {
   // Types (inferred from schemas)
   type ContentNode,
+  // HTML soft delete (re-run)
+  type DeleteHtmlResponse,
+  DeleteHtmlResponseSchema,
   type ErrorDetail,
   // Error schemas
   ErrorDetailSchema,
@@ -79,6 +82,8 @@ export {
 export {
   buildUrlWithParams,
   DEFAULT_TIMES_SQUARE_URL,
+  deleteHtmlByUrl,
+  deletePageHtml,
   fetchGitHubContents,
   fetchGitHubHtmlStatus,
   fetchGitHubPage,
@@ -129,6 +134,13 @@ export {
   pageQueryOptions,
   pagesQueryOptions,
 } from './query-options';
+
+// =============================================================================
+// Mutation Options
+// =============================================================================
+
+export type { RerunPageVariables } from './mutation-options';
+export { rerunPageMutationOptions } from './mutation-options';
 
 // =============================================================================
 // SSE
@@ -198,11 +210,14 @@ export {
   type UseGitHubPrContentsReturn,
   type UseHtmlStatusOptions,
   type UseHtmlStatusReturn,
+  type UseRerunPageOptions,
+  type UseRerunPageReturn,
   type UseTimesSquarePageOptions,
   type UseTimesSquarePageReturn,
   useGitHubContents,
   useGitHubPrContents,
   useHtmlStatus,
+  useRerunPage,
   useTimesSquarePage,
   useTimesSquareUrl,
 } from './hooks';

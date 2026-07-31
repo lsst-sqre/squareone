@@ -75,6 +75,18 @@ export const timesSquareKeys = {
     ] as const,
 
   // ===========================================================================
+  // Mutations
+  // ===========================================================================
+
+  /**
+   * Mutation key for the page re-run (HTML soft delete) mutation.
+   *
+   * Lets consumers observe in-flight re-runs with `useIsMutating` /
+   * `useMutationState` without holding a reference to the mutation itself.
+   */
+  rerunPage: () => [...timesSquareKeys.all, 'rerun-page'] as const,
+
+  // ===========================================================================
   // GitHub Contents
   // ===========================================================================
 

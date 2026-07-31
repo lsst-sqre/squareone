@@ -23,6 +23,12 @@ export {
 } from './useHtmlStatus';
 
 export {
+  type UseRerunPageOptions,
+  type UseRerunPageReturn,
+  useRerunPage,
+} from './useRerunPage';
+
+export {
   type UseTimesSquarePageOptions,
   type UseTimesSquarePageReturn,
   useTimesSquarePage,
