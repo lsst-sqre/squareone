@@ -105,11 +105,37 @@ export const pageQueryOptions = (
 // HTML Status Queries
 // =============================================================================
 
+/** Poll cadence, in milliseconds, while a notebook is still executing. */
+const HTML_STATUS_POLL_INTERVAL_MS = 1000;
+
+/**
+ * The shape of the cached query that {@link htmlStatusRefetchInterval} reads.
+ *
+ * TanStack Query hands the full `Query` to `refetchInterval`; only the cached
+ * status matters here, so this structural type keeps the helper usable by both
+ * html-status option builders regardless of their differing query key types.
+ */
+type HtmlStatusQuerySnapshot = { state: { data?: HtmlStatus } };
+
+/**
+ * Poll cadence for the html-status queries.
+ *
+ * A non-null `execution_error` is terminal (DM-55470): Times Square will not
+ * change the status again on its own, so polling stops rather than hammering
+ * the endpoint for the lifetime of the page. A re-run invalidates the query,
+ * which drops the cached error and resumes polling at the normal cadence.
+ */
+const htmlStatusRefetchInterval = (
+  query: HtmlStatusQuerySnapshot
+): number | false =>
+  query.state.data?.execution_error ? false : HTML_STATUS_POLL_INTERVAL_MS;
+
 /**
  * Query options for fetching HTML rendering status.
  *
  * Uses polling (refetchInterval) to track notebook execution progress.
- * The 1-second interval matches the current SWR implementation.
+ * The 1-second interval matches the current SWR implementation; polling
+ * stops once the status reports a terminal `execution_error`.
  *
  * @param pageName - Page name/slug
  * @param params - Optional notebook parameters
@@ -124,8 +150,8 @@ export const htmlStatusQueryOptions = (
     queryKey: timesSquareKeys.htmlStatusForPage(pageName, params),
     queryFn: () => fetchHtmlStatus(baseUrl, pageName, params),
     enabled: !!pageName && !!baseUrl,
-    // Poll every second to track execution progress
-    refetchInterval: 1000,
+    // Poll every second to track execution progress; stop on a terminal error
+    refetchInterval: htmlStatusRefetchInterval,
     staleTime: 0, // Always consider stale to ensure polling works
     gcTime: 60_000, // 1 minute
     refetchOnWindowFocus: true,
@@ -138,7 +164,8 @@ export const htmlStatusQueryOptions = (
  * This is useful when you already have the html_status_url from page metadata
  * and want to avoid an extra API call to fetch the page first.
  *
- * Uses polling (refetchInterval) to track notebook execution progress.
+ * Uses polling (refetchInterval) to track notebook execution progress; polling
+ * stops once the status reports a terminal `execution_error`.
  *
  * @param htmlStatusUrl - Direct URL to the HTML status endpoint
  * @param params - Optional notebook parameters to append to URL
@@ -151,8 +178,8 @@ export const htmlStatusUrlQueryOptions = (
     queryKey: timesSquareKeys.htmlStatusByUrl(htmlStatusUrl, params),
     queryFn: () => fetchHtmlStatusByUrl(htmlStatusUrl, params),
     enabled: !!htmlStatusUrl,
-    // Poll every second to track execution progress
-    refetchInterval: 1000,
+    // Poll every second to track execution progress; stop on a terminal error
+    refetchInterval: htmlStatusRefetchInterval,
     staleTime: 0, // Always consider stale to ensure polling works
     gcTime: 60_000, // 1 minute
     refetchOnWindowFocus: true,
