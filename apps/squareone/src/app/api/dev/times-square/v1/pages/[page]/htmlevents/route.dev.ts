@@ -6,6 +6,10 @@
 
 import { loadAppConfig } from '@/lib/config/loader';
 import { createRouteLogger } from '@/lib/logger';
+import {
+  mockExecutionError,
+  resolveExecutionState,
+} from '@/lib/mocks/timesSquareExecutionStore';
 
 const log = createRouteLogger('times-square/pages/[page]/htmlevents');
 
@@ -23,14 +27,19 @@ export async function GET(
 
     const pageBaseUrl = `${timesSquareUrl}/v1/pages/${page}`;
 
-    // Mock execution data based on the parameter 'a'
-    const executionStatus = a === '2' ? 'in_progress' : 'complete';
+    // Mock execution data based on the parameter 'a': `2` keeps the execution
+    // in progress and `3` fails it terminally. A failed execution still
+    // reaches `complete` — it just produces no HTML, so `html_hash` is null and
+    // `execution_error` carries the failure. A re-run (DELETE on the html
+    // route) overrides the state while the instance re-executes.
+    const executionState = resolveExecutionState(page, a);
+    const isFinished = executionState !== 'in_progress';
+    const executionStatus = isFinished ? 'complete' : 'in_progress';
     const dateSubmitted = '2024-01-15T10:00:00Z';
     const dateStarted = '2024-01-15T10:00:01Z';
-    const dateFinished =
-      executionStatus === 'complete' ? '2024-01-15T10:00:15Z' : null;
-    const executionDuration = executionStatus === 'complete' ? 14.2 : null;
-    const htmlHash = executionStatus === 'complete' ? 'abc123def456' : null;
+    const dateFinished = isFinished ? '2024-01-15T10:00:15Z' : null;
+    const executionDuration = isFinished ? 14.2 : null;
+    const htmlHash = executionState === 'complete' ? 'abc123def456' : null;
 
     const eventData = {
       date_submitted: dateSubmitted,
@@ -40,6 +49,8 @@ export async function GET(
       execution_duration: executionDuration,
       html_hash: htmlHash,
       html_url: `${pageBaseUrl}/html?a=${a}`,
+      execution_error:
+        executionState === 'failed' ? { ...mockExecutionError } : null,
     };
 
     const encoder = new TextEncoder();
