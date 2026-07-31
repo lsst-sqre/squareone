@@ -3,7 +3,7 @@
   "info": {
     "title": "Times Square",
     "description": "**Times Square is a Rubin Science Platform (RSP) service for displaying parameterized Jupyter Notebooks as websites.**\n\nExcellent applications for Times Square include:\n\n- Engineering dashboards\n- Quick-look data previewing\n- Reports that incorporate live data sources\n\nThe design and architecture of Times Square is described in [The Times Square service for publishing parameterized Jupyter Notebooks in the Rubin Science platform](https://sqr-062.lsst.io).\nTimes Square uses Noteburst ([GitHub](https://github.com/lsst-sqre/noteburst), [SQR-065](https://sqr-065.lsst.io)) to execute Jupyter Notebooks in Nublado (JupyterLab) instances, thereby mechanizing the RSP's notebook aspect.\n\nThis Times Square API service is developed at [https://github.com/lsst-sqre/times-square](https://github.com/lsst-sqre/times-square).\nThe user interface is developed separately at [https://github.com/lsst-sqre/times-square-ui](https://github.com/lsst-sqre/times-square-ui).\n",
-    "version": "0.24.2.dev9+g3ee2b2a55"
+    "version": "0.25.0"
   },
   "paths": {
     "/healthcheck": {
@@ -1056,6 +1056,29 @@
         "type": "object",
         "title": "HTTPValidationError"
       },
+      "HtmlExecutionError": {
+        "properties": {
+          "code": {
+            "$ref": "#/components/schemas/NotebookExecutionErrorCode",
+            "title": "Execution error code",
+            "description": "A machine-readable code identifying the failure class."
+          },
+          "title": {
+            "type": "string",
+            "title": "Execution error title",
+            "description": "A short, human-readable title for the failure."
+          },
+          "message": {
+            "type": "string",
+            "title": "Execution error message",
+            "description": "A human-readable description of the failure."
+          }
+        },
+        "type": "object",
+        "required": ["code", "title", "message"],
+        "title": "HtmlExecutionError",
+        "description": "A terminal notebook execution failure surfaced on the API.\n\nThis field is populated when a notebook could not be executed (an\ninfrastructure-level failure or an expired result), rather than when a\nnotebook cell raised an exception (which still yields a renderable\nnotebook)."
+      },
       "HtmlStatus": {
         "properties": {
           "available": {
@@ -1075,6 +1098,14 @@
             "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "HTML content hash",
             "description": "A SHA256 hash of the HTML content. Clients can use this hash to determine if they are showing the current version of the HTML rendering. This field is null if the HTML is not available."
+          },
+          "execution_error": {
+            "anyOf": [
+              { "$ref": "#/components/schemas/HtmlExecutionError" },
+              { "type": "null" }
+            ],
+            "title": "Execution error",
+            "description": "A terminal notebook execution failure, or null if the notebook did not fail to execute. When non-null, the render is terminal (the client can stop polling) even though `available` is false. This field is additive and backward compatible."
           }
         },
         "type": "object",
@@ -1114,6 +1145,12 @@
         "required": ["name", "version"],
         "title": "Metadata",
         "description": "Metadata about a package."
+      },
+      "NotebookExecutionErrorCode": {
+        "type": "string",
+        "enum": ["timeout", "jupyter_error", "unknown", "result_unavailable"],
+        "title": "NotebookExecutionErrorCode",
+        "description": "Machine-readable codes for a terminal notebook execution failure.\n\nThis is a Times Square-owned enum for the public API so that the API is\nnot directly coupled to Noteburst's internal `NoteburstErrorCodes`. The\nfirst three values mirror `NoteburstErrorCodes`; ``result_unavailable``\ncovers the arq result-expiry case where Noteburst no longer has a result."
       },
       "Page": {
         "properties": {
