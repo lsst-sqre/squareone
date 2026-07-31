@@ -6,6 +6,7 @@
  */
 
 import { Button } from '@lsst-sqre/squared';
+import { useRerunPage } from '@lsst-sqre/times-square-client';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import React from 'react';
 
@@ -15,11 +16,21 @@ import styles from './ExecStats.module.css';
 
 export default function ExecStats() {
   const htmlEvent = React.useContext(TimesSquareHtmlEventsContext);
-  const [recomputeFailed, setRecomputeFailed] = React.useState(false);
+
+  // The recompute goes through the package's shared soft-delete mutation, so
+  // this path and the execution-error re-run path stay on one transport (and
+  // one cache-invalidation policy). The by-URL call shape needs no service
+  // discovery, so the hook takes no repertoire URL here.
+  const {
+    rerunPageAsync,
+    isError: recomputeFailed,
+    isPending: recomputePending,
+  } = useRerunPage();
 
   // Inject the app's Sentry-backed reporter so a report-worthy recompute
   // failure (5xx, network error) reaches Sentry with site context tags,
-  // deduped by the reporter's per-session window.
+  // deduped by the reporter's per-session window. The mutation hook is
+  // deliberately Sentry-agnostic, so reporting stays here at the call site.
   const reportError = React.useMemo(
     () => makeReportError({ isServer: false }),
     []
@@ -39,28 +50,13 @@ export default function ExecStats() {
       return;
     }
 
-    // The recompute request is no longer fire-and-forget: check the response
-    // and surface / report any failure so a failed recompute is visible to the
-    // user rather than silently doing nothing.
-    setRecomputeFailed(false);
+    // The recompute request is not fire-and-forget: the mutation rejects on a
+    // non-ok response or a network error, and the rejection is surfaced to the
+    // user (via the mutation's own error state) and reported to Sentry. A new
+    // attempt resets that state, so a successful retry clears the message.
     try {
-      const response = await fetch(htmlEvent.htmlUrl, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      if (!response.ok) {
-        setRecomputeFailed(true);
-        reportError(
-          new Error(
-            `Recompute request failed: ${response.status} ${response.statusText}`
-          ),
-          { site: 'times-square-recompute', package: 'times-square-client' }
-        );
-      }
+      await rerunPageAsync({ htmlUrl: htmlEvent.htmlUrl });
     } catch (err) {
-      setRecomputeFailed(true);
       reportError(err, {
         site: 'times-square-recompute',
         package: 'times-square-client',
@@ -87,7 +83,12 @@ export default function ExecStats() {
           </time>{' '}
           in {formattedDuration} seconds.
         </p>
-        <Button appearance="outline" tone="primary" onClick={handleRecompute}>
+        <Button
+          appearance="outline"
+          tone="primary"
+          disabled={recomputePending}
+          onClick={handleRecompute}
+        >
           Recompute
         </Button>
         {recomputeFailed && (
