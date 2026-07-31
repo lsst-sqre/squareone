@@ -64,6 +64,50 @@ export default function ExecStats() {
     }
   };
 
+  // A failed run reports `execution_status: 'complete'` with a non-null
+  // `execution_error`, so the failure is checked before the completed branch —
+  // otherwise the panel would claim the notebook was computed successfully.
+  // Like the viewer's failure panel, this renders the API's own `title` and
+  // authors no per-code copy of its own. The Recompute button stays: it is the
+  // recovery path out of the failed state.
+  if (htmlEvent.executionError) {
+    return (
+      <div className={styles.container}>
+        <p className={styles.failure}>{htmlEvent.executionError.title}</p>
+        {/* A failed run may settle without a finish time; the timestamp line
+            is dropped rather than rendered empty. Duration is meaningless for
+            a run that never produced a result, so it is omitted either way. */}
+        {htmlEvent.dateFinished && (
+          <p className={styles.content}>
+            Failed{' '}
+            <time
+              dateTime={htmlEvent.dateFinished}
+              title={htmlEvent.dateFinished}
+            >
+              {formatDistanceToNow(parseISO(htmlEvent.dateFinished), {
+                addSuffix: true,
+              })}
+            </time>
+            .
+          </p>
+        )}
+        <Button
+          appearance="outline"
+          tone="primary"
+          disabled={recomputePending}
+          onClick={handleRecompute}
+        >
+          Recompute
+        </Button>
+        {recomputeFailed && (
+          <p className={styles.error} role="alert">
+            Failed to request a recompute. Please try again.
+          </p>
+        )}
+      </div>
+    );
+  }
+
   if (htmlEvent.executionStatus === 'complete') {
     if (!htmlEvent.dateFinished) {
       return null;

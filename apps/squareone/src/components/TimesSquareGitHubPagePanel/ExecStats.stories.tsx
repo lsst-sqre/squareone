@@ -1,17 +1,11 @@
+import { mockExecutionError } from '@lsst-sqre/times-square-client';
 import type { Meta, StoryFn } from '@storybook/nextjs-vite';
 
-import { TimesSquareHtmlEventsContext } from '../TimesSquareHtmlEventsProvider';
+import {
+  TimesSquareHtmlEventsContext,
+  type TimesSquareHtmlEventsContextValue,
+} from '../TimesSquareHtmlEventsProvider';
 import ExecStats from './ExecStats';
-
-type HtmlEventContextProps = {
-  dateSubmitted: string | null;
-  dateStarted: string | null;
-  dateFinished: string | null;
-  executionStatus: string | null;
-  executionDuration: number | null;
-  htmlHash: string | null;
-  htmlUrl: string | null;
-};
 
 export default {
   component: ExecStats,
@@ -32,7 +26,7 @@ export default {
   },
 } as Meta<typeof ExecStats>;
 
-const Template: StoryFn<HtmlEventContextProps> = (args) => (
+const Template: StoryFn<TimesSquareHtmlEventsContextValue> = (args) => (
   <TimesSquareHtmlEventsContext.Provider value={args}>
     <ExecStats />
   </TimesSquareHtmlEventsContext.Provider>
@@ -47,6 +41,28 @@ Default.args = {
   executionDuration: 10.12,
   htmlHash: null,
   htmlUrl: 'https://example.com/html',
+  connectionFailed: false,
+  executionError: null,
+};
+
+/*
+ * A failed run reports `execution_status: 'complete'` with a non-null
+ * `execution_error`; the panel summarizes the failure instead of claiming the
+ * notebook was computed.
+ */
+export const Failed = Template.bind({});
+Failed.args = {
+  ...Default.args,
+  executionDuration: 14.2,
+  executionError: mockExecutionError,
+};
+
+/** A failed run that settled without reporting a finish time. */
+export const FailedWithoutFinishTime = Template.bind({});
+FailedWithoutFinishTime.args = {
+  ...Failed.args,
+  dateFinished: null,
+  executionDuration: null,
 };
 
 export const InProgressNew = Template.bind({});
@@ -58,6 +74,8 @@ InProgressNew.args = {
   executionDuration: null,
   htmlHash: null,
   htmlUrl: 'https://example.com/html',
+  connectionFailed: false,
+  executionError: null,
 };
 
 export const InProgressExisting = Template.bind({});
@@ -69,4 +87,6 @@ InProgressExisting.args = {
   executionDuration: 10.12,
   htmlHash: null,
   htmlUrl: 'https://example.com/html',
+  connectionFailed: false,
+  executionError: null,
 };

@@ -1,3 +1,4 @@
+import { mockExecutionError } from '@lsst-sqre/times-square-client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -30,6 +31,16 @@ const completeContext: TimesSquareHtmlEventsContextValue = {
   executionError: null,
 };
 
+/*
+ * A failed run still reports `execution_status: 'complete'` — the failure is
+ * carried by `execution_error` alone (DM-55470).
+ */
+const failedContext: TimesSquareHtmlEventsContextValue = {
+  ...completeContext,
+  executionDuration: 14.2,
+  executionError: mockExecutionError,
+};
+
 /** Body shape returned by the Times Square soft-delete endpoint. */
 const deleteResponseBody = JSON.stringify({
   html_url: 'https://example.com/html',
@@ -48,6 +59,80 @@ function renderExecStats(context: TimesSquareHtmlEventsContextValue) {
     </QueryClientProvider>
   );
 }
+
+describe('ExecStats execution failure', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('summarizes the failure with the API title instead of a computed duration', () => {
+    renderExecStats(failedContext);
+
+    expect(screen.getByText(mockExecutionError.title)).toBeInTheDocument();
+    expect(screen.queryByText(/Computed/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/seconds/)).not.toBeInTheDocument();
+  });
+
+  it('shows when the run finished', () => {
+    const { container } = renderExecStats(failedContext);
+
+    const time = container.querySelector('time');
+    expect(time).toHaveAttribute('datetime', failedContext.dateFinished);
+  });
+
+  it('omits the timestamp when the failed run has no finish time', () => {
+    const { container } = renderExecStats({
+      ...failedContext,
+      dateFinished: null,
+      executionDuration: null,
+    });
+
+    expect(screen.getByText(mockExecutionError.title)).toBeInTheDocument();
+    expect(container.querySelector('time')).toBeNull();
+  });
+
+  it('keeps the recompute path available in the failed state', async () => {
+    const user = userEvent.setup();
+    const fetchSpy = vi
+      .spyOn(global, 'fetch')
+      .mockResolvedValue(new Response(deleteResponseBody, { status: 200 }));
+
+    renderExecStats(failedContext);
+
+    await user.click(screen.getByRole('button', { name: /recompute/i }));
+
+    await waitFor(() => {
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+    });
+    expect(fetchSpy.mock.calls[0][0]).toBe('https://example.com/html');
+    expect(fetchSpy.mock.calls[0][1]).toMatchObject({ method: 'DELETE' });
+  });
+
+  it('surfaces a failed recompute request from the failed state', async () => {
+    const user = userEvent.setup();
+    vi.spyOn(global, 'fetch').mockResolvedValue(
+      new Response(null, { status: 500, statusText: 'Internal Server Error' })
+    );
+
+    renderExecStats(failedContext);
+
+    await user.click(screen.getByRole('button', { name: /recompute/i }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(/recompute/i);
+  });
+
+  it('renders the computed summary when there is no execution error', () => {
+    renderExecStats(completeContext);
+
+    expect(screen.getByText(/Computed/)).toHaveTextContent(
+      /Computed .* in 10\.1 seconds\./
+    );
+  });
+});
 
 describe('ExecStats recompute', () => {
   beforeEach(() => {
