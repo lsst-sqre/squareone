@@ -41,6 +41,29 @@ const validHtmlEvent = {
   html_url: 'https://example.com/html',
 };
 
+// A terminal successful event: execution completed and HTML is available.
+const completeHtmlEvent = {
+  ...validHtmlEvent,
+  date_finished: '2025-01-01T00:00:09Z',
+  execution_status: 'complete',
+  execution_duration: 8.5,
+  html_hash: 'abc123def456789012345678901234567890abcd',
+};
+
+// A terminal failed event: execution finished with an error and no HTML.
+const failedHtmlEvent = {
+  ...validHtmlEvent,
+  date_finished: '2025-01-01T00:00:09Z',
+  execution_status: 'complete',
+  execution_duration: 8.5,
+  html_hash: null,
+  execution_error: {
+    code: 'timeout',
+    title: 'Notebook execution timed out',
+    message: 'The notebook did not finish executing within the allowed time.',
+  },
+};
+
 beforeEach(() => {
   fetchEventSourceMock.mockReset();
   // fetchEventSource returns a promise that resolves when the stream ends.
@@ -122,6 +145,98 @@ describe('subscribeToHtmlEvents onmessage', () => {
     for (const call of onError.mock.calls) {
       expect(call[0]).toBeInstanceOf(SseInvalidEventError);
     }
+  });
+});
+
+describe('subscribeToHtmlEvents auto-abort', () => {
+  it('completes and aborts on an event carrying an execution_error', () => {
+    const onEvent = vi.fn();
+    const onComplete = vi.fn();
+    subscribeToHtmlEvents('https://example.com/events', undefined, {
+      onEvent,
+      onComplete,
+    });
+
+    const { onmessage, signal } = lastFetchEventSourceOptions();
+    onmessage({ data: JSON.stringify(failedHtmlEvent) });
+
+    // The terminal event still reaches the consumer before the subscription
+    // tears down, so the UI can render the failure it describes.
+    expect(onEvent).toHaveBeenCalledTimes(1);
+    expect(onEvent.mock.calls[0][0]).toMatchObject({
+      execution_error: { code: 'timeout' },
+    });
+    expect(onComplete).toHaveBeenCalledTimes(1);
+    expect(onEvent.mock.invocationCallOrder[0]).toBeLessThan(
+      onComplete.mock.invocationCallOrder[0]
+    );
+    expect(signal.aborted).toBe(true);
+  });
+
+  it('completes and aborts on a successful complete event', () => {
+    const onEvent = vi.fn();
+    const onComplete = vi.fn();
+    subscribeToHtmlEvents('https://example.com/events', undefined, {
+      onEvent,
+      onComplete,
+    });
+
+    const { onmessage, signal } = lastFetchEventSourceOptions();
+    onmessage({ data: JSON.stringify(completeHtmlEvent) });
+
+    expect(onEvent).toHaveBeenCalledTimes(1);
+    expect(onComplete).toHaveBeenCalledTimes(1);
+    expect(signal.aborted).toBe(true);
+  });
+
+  it('stays open for a non-terminal event', () => {
+    const onEvent = vi.fn();
+    const onComplete = vi.fn();
+    subscribeToHtmlEvents('https://example.com/events', undefined, {
+      onEvent,
+      onComplete,
+    });
+
+    const { onmessage, signal } = lastFetchEventSourceOptions();
+    onmessage({ data: JSON.stringify(validHtmlEvent) });
+
+    expect(onEvent).toHaveBeenCalledTimes(1);
+    expect(onComplete).not.toHaveBeenCalled();
+    expect(signal.aborted).toBe(false);
+  });
+
+  it('leaves the stream open on failure when autoAbortOnComplete is false', () => {
+    const onEvent = vi.fn();
+    const onComplete = vi.fn();
+    subscribeToHtmlEvents('https://example.com/events', undefined, {
+      onEvent,
+      onComplete,
+      autoAbortOnComplete: false,
+    });
+
+    const { onmessage, signal } = lastFetchEventSourceOptions();
+    onmessage({ data: JSON.stringify(failedHtmlEvent) });
+
+    // Opting out disables both terminal conditions, not just the success one.
+    expect(onEvent).toHaveBeenCalledTimes(1);
+    expect(onComplete).not.toHaveBeenCalled();
+    expect(signal.aborted).toBe(false);
+  });
+
+  it('leaves the stream open on success when autoAbortOnComplete is false', () => {
+    const onEvent = vi.fn();
+    const onComplete = vi.fn();
+    subscribeToHtmlEvents('https://example.com/events', undefined, {
+      onEvent,
+      onComplete,
+      autoAbortOnComplete: false,
+    });
+
+    const { onmessage, signal } = lastFetchEventSourceOptions();
+    onmessage({ data: JSON.stringify(completeHtmlEvent) });
+
+    expect(onComplete).not.toHaveBeenCalled();
+    expect(signal.aborted).toBe(false);
   });
 });
 

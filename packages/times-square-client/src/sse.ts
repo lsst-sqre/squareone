@@ -79,11 +79,24 @@ export type SubscribeOptions = {
   onEvent: HtmlEventCallback;
   /** Called when an error occurs (optional) */
   onError?: SseErrorCallback;
-  /** Called when execution completes (optional) */
+  /**
+   * Called when execution reaches a terminal state (optional).
+   *
+   * Fires for both outcomes: a successful render and a terminal
+   * `execution_error`. The terminal event itself is always delivered to
+   * `onEvent` first, so a consumer can read the failure off that event.
+   */
   onComplete?: () => void;
   /** AbortSignal for external cancellation (optional) */
   signal?: AbortSignal;
-  /** Whether to auto-abort when execution completes (default: true) */
+  /**
+   * Whether to auto-abort when execution reaches a terminal state
+   * (default: true).
+   *
+   * Setting this to `false` disables the teardown for *both* terminal
+   * outcomes — success and `execution_error` alike — leaving the stream open
+   * for the caller to close.
+   */
   autoAbortOnComplete?: boolean;
   /**
    * Maximum number of consecutive connection failures before the subscription
@@ -111,8 +124,11 @@ export type SubscribeOptions = {
  * Subscribe to HTML events for a notebook execution.
  *
  * Opens an SSE connection to the Times Square API and invokes callbacks
- * as events are received. The connection is automatically closed when
- * the execution completes (status === 'complete' and html_hash is present).
+ * as events are received. The connection is automatically closed once the
+ * execution reaches a terminal state — either success (status === 'complete'
+ * with an html_hash) or a terminal failure (a non-null execution_error). The
+ * terminal event is delivered to `onEvent` before `onComplete` fires and the
+ * stream is aborted. Pass `autoAbortOnComplete: false` to disable both.
  *
  * @param eventsUrl - The full URL to the html/events endpoint
  * @param params - Optional parameters to append to the URL
@@ -231,12 +247,16 @@ export function subscribeToHtmlEvents(
       const htmlEvent = result.data;
       onEvent(htmlEvent);
 
-      // Auto-abort when execution completes
-      if (
-        autoAbortOnComplete &&
-        htmlEvent.execution_status === 'complete' &&
-        htmlEvent.html_hash
-      ) {
+      // Auto-abort once execution reaches a terminal state. That is either a
+      // successful render (`complete` with an html_hash) or a terminal
+      // execution_error (DM-55470) — a failed run reports `complete` with no
+      // html_hash, so the success condition alone would leave the stream open
+      // forever. Either way the event above has already been delivered, so the
+      // consumer sees the terminal event before the subscription tears down.
+      const succeeded =
+        htmlEvent.execution_status === 'complete' && htmlEvent.html_hash;
+      const failed = htmlEvent.execution_error !== null;
+      if (autoAbortOnComplete && (succeeded || failed)) {
         onComplete?.();
         abortController.abort();
       }
