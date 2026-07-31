@@ -19,6 +19,10 @@ export {
   ErrorDetailSchema,
   type ErrorModel,
   ErrorModelSchema,
+  // Execution error (DM-55470)
+  EXECUTION_ERROR_CODES,
+  type ExecutionError,
+  ExecutionErrorSchema,
   type ExecutionStatus,
   // Enum schemas
   ExecutionStatusSchema,
@@ -54,6 +58,7 @@ export {
   HtmlEventSchema,
   type HtmlStatus,
   HtmlStatusSchema,
+  type KnownExecutionErrorCode,
   type Metadata,
   MetadataSchema,
   type Page,
@@ -145,6 +150,7 @@ export {
 export {
   createMockContentNode,
   mockEmptyGitHubPrContents,
+  mockExecutionError,
   mockGitHubCheckFailure,
   mockGitHubCheckInProgress,
   mockGitHubCheckSuccess,
@@ -154,9 +160,11 @@ export {
   mockGitHubPr,
   mockGitHubPrContents,
   mockHtmlEventComplete,
+  mockHtmlEventFailed,
   mockHtmlEventInProgress,
   mockHtmlEventQueued,
   mockHtmlStatusAvailable,
+  mockHtmlStatusFailed,
   mockHtmlStatusPending,
   mockPage,
   mockPageSummaries,

@@ -5,6 +5,7 @@
  */
 import type {
   ContentNode,
+  ExecutionError,
   GitHubCheckRunSummary,
   GitHubContentsRoot,
   GitHubPr,
@@ -106,12 +107,23 @@ export const mockPageSummaries: PageSummary[] = [
 // =============================================================================
 
 /**
+ * Mock terminal execution error (DM-55470).
+ */
+export const mockExecutionError: ExecutionError = {
+  code: 'timeout',
+  title: 'Notebook execution timed out',
+  message:
+    'The notebook did not finish executing within the allowed time. Try again, or simplify the notebook so it completes faster.',
+};
+
+/**
  * Mock HTML status when rendering is available.
  */
 export const mockHtmlStatusAvailable: HtmlStatus = {
   available: true,
   html_url: 'https://data.lsst.cloud/times-square/v1/pages/summit-weather/html',
   html_hash: 'abc123def456789012345678901234567890abcd',
+  execution_error: null,
 };
 
 /**
@@ -121,6 +133,20 @@ export const mockHtmlStatusPending: HtmlStatus = {
   available: false,
   html_url: 'https://data.lsst.cloud/times-square/v1/pages/summit-weather/html',
   html_hash: null,
+  execution_error: null,
+};
+
+/**
+ * Mock HTML status for a terminal execution failure (DM-55470).
+ *
+ * Matches the server contract: on failure `available` is `false` and
+ * `html_hash` is `null`.
+ */
+export const mockHtmlStatusFailed: HtmlStatus = {
+  available: false,
+  html_url: 'https://data.lsst.cloud/times-square/v1/pages/summit-weather/html',
+  html_hash: null,
+  execution_error: mockExecutionError,
 };
 
 // =============================================================================
@@ -138,6 +164,7 @@ export const mockHtmlEventQueued: HtmlEvent = {
   execution_duration: null,
   html_hash: null,
   html_url: 'https://data.lsst.cloud/times-square/v1/pages/summit-weather/html',
+  execution_error: null,
 };
 
 /**
@@ -151,6 +178,7 @@ export const mockHtmlEventInProgress: HtmlEvent = {
   execution_duration: null,
   html_hash: null,
   html_url: 'https://data.lsst.cloud/times-square/v1/pages/summit-weather/html',
+  execution_error: null,
 };
 
 /**
@@ -164,6 +192,24 @@ export const mockHtmlEventComplete: HtmlEvent = {
   execution_duration: 8.5,
   html_hash: 'abc123def456789012345678901234567890abcd',
   html_url: 'https://data.lsst.cloud/times-square/v1/pages/summit-weather/html',
+  execution_error: null,
+};
+
+/**
+ * Mock HTML event for a terminal execution failure (DM-55470).
+ *
+ * The execution reaches `complete` but produces no HTML: `html_hash` is
+ * `null` and `execution_error` carries the user-facing failure copy.
+ */
+export const mockHtmlEventFailed: HtmlEvent = {
+  date_submitted: new Date(Date.now() - 10000).toISOString(),
+  date_started: new Date(Date.now() - 8000).toISOString(),
+  date_finished: new Date().toISOString(),
+  execution_status: 'complete',
+  execution_duration: 8.5,
+  html_hash: null,
+  html_url: 'https://data.lsst.cloud/times-square/v1/pages/summit-weather/html',
+  execution_error: mockExecutionError,
 };
 
 // =============================================================================
