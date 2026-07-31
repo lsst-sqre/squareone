@@ -73,7 +73,7 @@
 
 .error {
   border-color: var(--rsd-color-red-500);
-  color: var(--rsd-color-red-900);
+  color: var(--rsd-color-red-600);
 }
 
 .error:focus-visible {
