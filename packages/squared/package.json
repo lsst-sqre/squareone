@@ -82,7 +82,7 @@
     "msw-storybook-addon": "^2.0.7",
     "new-component": "^5.0.2",
     "next": "^16.2.12",
-    "playwright": "^1.62.0",
+    "playwright": "^1.62.1",
     "react-hook-form": "^7.71.1",
     "storybook": "10.4.6",
     "typescript": "^5.9.3",
