@@ -15,6 +15,9 @@ const config: StorybookConfig = {
     getAbsolutePath('@storybook/addon-themes'),
     getAbsolutePath('@storybook/addon-a11y'),
     getAbsolutePath('@storybook/addon-vitest'),
+    // Bare specifier: msw-storybook-addon@3 does not expose ./package.json in
+    // its exports map, so getAbsolutePath() cannot resolve it.
+    'msw-storybook-addon',
   ],
 
   framework: {

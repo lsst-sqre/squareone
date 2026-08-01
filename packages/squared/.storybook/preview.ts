@@ -1,6 +1,6 @@
 import { withThemeByDataAttribute } from '@storybook/addon-themes';
 import type { Preview } from '@storybook/react-vite';
-import { initialize, mswLoader } from 'msw-storybook-addon';
+import { mswLoader } from 'msw-storybook-addon/csf3';
 
 // Import font assets and stylesheets with @font-face declarations
 import '@fontsource/source-sans-pro/400.css';
@@ -8,9 +8,6 @@ import '@fontsource/source-sans-pro/400-italic.css';
 import '@fontsource/source-sans-pro/700.css';
 import '@lsst-sqre/global-css/dist/next.css';
 import 'react-day-picker/style.css';
-
-// Initialize MSW
-initialize();
 
 const preview: Preview = {
   parameters: {
@@ -31,7 +28,7 @@ const preview: Preview = {
     },
   },
   // Provide the MSW addon loader globally
-  loaders: [mswLoader],
+  loaders: [mswLoader()],
 };
 
 export default preview;
