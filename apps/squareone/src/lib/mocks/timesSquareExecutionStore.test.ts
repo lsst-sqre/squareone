@@ -17,6 +17,7 @@ describe('resolveExecutionState', () => {
     expect(resolveExecutionState('mypage', '1')).toBe('complete');
     expect(resolveExecutionState('mypage', '2')).toBe('in_progress');
     expect(resolveExecutionState('mypage', '3')).toBe('failed');
+    expect(resolveExecutionState('mypage', '4')).toBe('idle');
   });
 
   it('reports a re-running instance as in progress until the window elapses', () => {

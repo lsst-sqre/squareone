@@ -56,4 +56,18 @@ describe('GET /api/dev/times-square/v1/pages/:page/htmlevents', () => {
     expect(event.html_hash).toBeNull();
     expect(event.execution_error).toBeNull();
   });
+
+  it('reports an idle instance with all-null execution fields', async () => {
+    const event = await getEvent('mypage', '?a=4');
+
+    expect(event.date_submitted).toBeNull();
+    expect(event.date_started).toBeNull();
+    expect(event.date_finished).toBeNull();
+    expect(event.execution_status).toBeNull();
+    expect(event.execution_duration).toBeNull();
+    expect(event.html_hash).toBeNull();
+    expect(event.execution_error).toBeNull();
+    // Only the URL is populated when there is no job and no rendering.
+    expect(event.html_url).toContain('/v1/pages/mypage/html');
+  });
 });

@@ -281,14 +281,25 @@ export const HtmlStatusSchema = z.object({
  * HTML event from SSE stream.
  * From GET /v1/pages/{page}/html/events
  *
+ * Every field describing an execution is nullable. The stream emits an event
+ * on a fixed interval regardless of state, so when a page instance has neither
+ * a Noteburst job nor a cached rendering — a page instance that has not been
+ * queued yet, or one whose job and HTML have both aged out — the server sends
+ * an event with `date_submitted`, `date_started`, `date_finished`,
+ * `execution_status`, `execution_duration`, and `html_hash` all `null`. Only
+ * `html_url` is always populated. This mirrors Times Square's `HtmlEventsModel`
+ * ("None if no job is ongoing" / "None if the notebook has not been queued to
+ * executed yet"); the SSE payload is not described in the OpenAPI spec, so it
+ * cannot be checked against the vendored `openapi.json`.
+ *
  * `execution_error` (DM-55470) is optional-nullable and defaults to `null`;
  * see {@link HtmlStatusSchema} for the backward-compatibility rationale.
  */
 export const HtmlEventSchema = z.object({
-  date_submitted: z.string(),
+  date_submitted: z.string().nullable(),
   date_started: z.string().nullable(),
   date_finished: z.string().nullable(),
-  execution_status: ExecutionStatusSchema,
+  execution_status: ExecutionStatusSchema.nullable(),
   execution_duration: z.number().nullable(),
   html_hash: z.string().nullable(),
   html_url: z.string(),

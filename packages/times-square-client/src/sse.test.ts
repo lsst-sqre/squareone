@@ -104,6 +104,39 @@ describe('subscribeToHtmlEvents onmessage', () => {
     expect(onError).not.toHaveBeenCalled();
   });
 
+  it('delivers an idle event with no job and no rendering without reporting drift', () => {
+    const onEvent = vi.fn();
+    const onError = vi.fn();
+    const onComplete = vi.fn();
+    subscribeToHtmlEvents('https://example.com/events', undefined, {
+      onEvent,
+      onError,
+      onComplete,
+    });
+
+    const { onmessage, signal } = lastFetchEventSourceOptions();
+    // A page instance with neither a Noteburst job nor a cached rendering. This
+    // is a healthy, non-terminal state, not contract drift (DM-55470).
+    onmessage({
+      data: JSON.stringify({
+        date_submitted: null,
+        date_started: null,
+        date_finished: null,
+        execution_status: null,
+        execution_duration: null,
+        html_hash: null,
+        html_url: 'https://example.com/html',
+      }),
+    });
+
+    expect(onError).not.toHaveBeenCalled();
+    expect(onEvent).toHaveBeenCalledTimes(1);
+    expect(onEvent.mock.calls[0][0]).toMatchObject({ execution_status: null });
+    // Nothing has been submitted yet, so the stream must stay open.
+    expect(onComplete).not.toHaveBeenCalled();
+    expect(signal.aborted).toBe(false);
+  });
+
   it('invokes onError with an SseInvalidEventError when a JSON event fails schema parse', () => {
     const onEvent = vi.fn();
     const onError = vi.fn();

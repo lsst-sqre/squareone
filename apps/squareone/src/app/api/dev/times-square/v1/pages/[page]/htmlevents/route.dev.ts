@@ -28,15 +28,24 @@ export async function GET(
     const pageBaseUrl = `${timesSquareUrl}/v1/pages/${page}`;
 
     // Mock execution data based on the parameter 'a': `2` keeps the execution
-    // in progress and `3` fails it terminally. A failed execution still
-    // reaches `complete` — it just produces no HTML, so `html_hash` is null and
-    // `execution_error` carries the failure. A re-run (DELETE on the html
-    // route) overrides the state while the instance re-executes.
+    // in progress, `3` fails it terminally, and `4` reports an idle instance. A
+    // failed execution still reaches `complete` — it just produces no HTML, so
+    // `html_hash` is null and `execution_error` carries the failure. A re-run
+    // (DELETE on the html route) overrides the state while the instance
+    // re-executes.
     const executionState = resolveExecutionState(page, a);
-    const isFinished = executionState !== 'in_progress';
-    const executionStatus = isFinished ? 'complete' : 'in_progress';
-    const dateSubmitted = '2024-01-15T10:00:00Z';
-    const dateStarted = '2024-01-15T10:00:01Z';
+    // An idle instance has neither a job nor a rendering, so every execution
+    // field is null and only `html_url` is populated — the payload Times Square
+    // emits before anything has been queued.
+    const isIdle = executionState === 'idle';
+    const isFinished = executionState !== 'in_progress' && !isIdle;
+    const executionStatus = isIdle
+      ? null
+      : isFinished
+        ? 'complete'
+        : 'in_progress';
+    const dateSubmitted = isIdle ? null : '2024-01-15T10:00:00Z';
+    const dateStarted = isIdle ? null : '2024-01-15T10:00:01Z';
     const dateFinished = isFinished ? '2024-01-15T10:00:15Z' : null;
     const executionDuration = isFinished ? 14.2 : null;
     const htmlHash = executionState === 'complete' ? 'abc123def456' : null;

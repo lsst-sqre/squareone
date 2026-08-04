@@ -400,6 +400,26 @@ describe('HtmlEventSchema', () => {
     expect(result.date_started).toBeNull();
     expect(result.date_finished).toBeNull();
   });
+
+  it('parses an idle event with no job and no cached rendering', () => {
+    // Times Square emits this when a page instance has neither a Noteburst job
+    // nor a cached rendering: every execution field is null and only html_url
+    // is populated. Requiring date_submitted/execution_status here made the
+    // stream report contract drift against a healthy server (DM-55470).
+    const result = HtmlEventSchema.parse({
+      date_submitted: null,
+      date_started: null,
+      date_finished: null,
+      execution_status: null,
+      execution_duration: null,
+      html_hash: null,
+      html_url: 'https://example.com/html',
+    });
+    expect(result.date_submitted).toBeNull();
+    expect(result.execution_status).toBeNull();
+    expect(result.html_url).toBe('https://example.com/html');
+    expect(result.execution_error).toBeNull();
+  });
 });
 
 describe('HtmlEventSchema execution_error', () => {

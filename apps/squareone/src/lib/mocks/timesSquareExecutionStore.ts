@@ -18,8 +18,18 @@ export const PENDING_A_VALUE = '2';
 /** Magic `?a=` value that reports a terminally failed page instance. */
 export const FAILING_A_VALUE = '3';
 
+/**
+ * Magic `?a=` value that reports a page instance with nothing to say yet.
+ *
+ * Times Square emits an SSE event on a fixed interval whether or not there is
+ * anything to report, so a page instance with neither a Noteburst job nor a
+ * cached rendering yields an event whose execution fields are all null. Without
+ * a mock for it the dev environment never produces that payload (DM-55470).
+ */
+export const IDLE_A_VALUE = '4';
+
 /** Mocked execution state of a page instance. */
-export type MockExecutionState = 'complete' | 'in_progress' | 'failed';
+export type MockExecutionState = 'complete' | 'in_progress' | 'failed' | 'idle';
 
 /**
  * The terminal failure reported for {@link FAILING_A_VALUE}.
@@ -96,6 +106,9 @@ export function resolveExecutionState(
   }
   if (a === FAILING_A_VALUE) {
     return 'failed';
+  }
+  if (a === IDLE_A_VALUE) {
+    return 'idle';
   }
   return 'complete';
 }
