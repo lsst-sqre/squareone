@@ -140,6 +140,33 @@ describe('ExecStats execution failure', () => {
   });
 });
 
+describe('ExecStats relative timestamps', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('keeps advancing while the page stays open', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    // 20 s after the run finished, so the summary starts on the first phrasing.
+    vi.setSystemTime(new Date('2021-09-01T12:00:30Z'));
+
+    renderExecStats(completeContext);
+
+    expect(screen.getByText(/Computed/)).toHaveTextContent(
+      /less than a minute ago/
+    );
+
+    // The events stream closes on a terminal event, so nothing else re-renders
+    // the panel — without its own tick the phrasing would freeze here for as
+    // long as the page is open.
+    await act(async () => {
+      vi.advanceTimersByTime(5 * 60_000);
+    });
+
+    expect(screen.getByText(/Computed/)).toHaveTextContent(/5 minutes ago/);
+  });
+});
+
 describe('ExecStats reported execution', () => {
   it.each([
     'queued',

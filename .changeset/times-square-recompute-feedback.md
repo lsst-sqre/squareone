@@ -8,6 +8,8 @@ Re-establish the HTML-events subscription when a re-run is requested, so the run
 
 A recompute that the server never reports no longer strands the panel. The requested state falls back to the last reported execution after 30 seconds, so the Recompute button always comes back.
 
+Keep the panel's relative timestamps advancing. "Computed less than a minute ago" stayed that way for as long as the page was open: `formatDistanceToNow` is evaluated at render time, and since the events stream started closing on a terminal event (January 2025) nothing re-renders the panel afterwards — the stream's heartbeat had been doing it as a side effect. The panel now re-renders on its own 30 s tick, which also keeps a failed run's "Failed … ago" current.
+
 The dev mock's events stream now behaves like Times Square's: it emits on a fixed 1 s interval and holds the connection open until the client aborts, resolving the instance's state per event. It had sent a single event and closed, which ends the subscription for good — the transport only reconnects after an error — so an execution that changed state later was never reported, and the re-run flow could not be exercised in dev.
 
 Queued runs are reported instead of rendering nothing. The panel handled `execution_status: 'in_progress'` but fell through `'queued'` to an empty panel, so a run reported as queued — the state a fresh recompute passes through — briefly erased the panel's contents. Both statuses now share the in-progress message, so a recompute reads as one continuous computation. The button is no longer separately disabled while a request is in flight, since the in-progress message replaces it entirely.

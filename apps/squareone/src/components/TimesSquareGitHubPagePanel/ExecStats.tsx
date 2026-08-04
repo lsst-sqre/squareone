@@ -30,6 +30,31 @@ import styles from './ExecStats.module.css';
 const RECOMPUTE_WAIT_TIMEOUT_MS = 30_000;
 
 /**
+ * How often the panel re-renders so its relative timestamps stay current.
+ *
+ * `formatDistanceToNow` is evaluated at render time, so "Computed less than a
+ * minute ago" only advances when something re-renders the panel. Until the
+ * events stream started closing on a terminal event, its heartbeat did that as
+ * a side effect; now nothing does, and the phrasing would stay frozen for as
+ * long as the page is open. 30 s keeps it within one step of the truth without
+ * a per-second render.
+ */
+const RELATIVE_TIME_REFRESH_MS = 30_000;
+
+/** Re-render on a slow tick so rendered relative times keep advancing. */
+function useRelativeTimeRefresh(): void {
+  const [, setTick] = React.useState(0);
+
+  React.useEffect(() => {
+    const timer = setInterval(
+      () => setTick((tick) => tick + 1),
+      RELATIVE_TIME_REFRESH_MS
+    );
+    return () => clearInterval(timer);
+  }, []);
+}
+
+/**
  * Fingerprint the execution an events payload describes.
  *
  * A recompute is confirmed by the *next* execution the server reports, not by
@@ -51,6 +76,8 @@ function executionSignature(
 
 export default function ExecStats() {
   const htmlEvent = React.useContext(TimesSquareHtmlEventsContext);
+
+  useRelativeTimeRefresh();
 
   // The recompute goes through the package's shared soft-delete mutation, so
   // this path and the execution-error re-run path stay on one transport (and
