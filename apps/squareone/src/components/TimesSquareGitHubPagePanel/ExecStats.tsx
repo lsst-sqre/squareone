@@ -11,8 +11,43 @@ import { formatDistanceToNow, parseISO } from 'date-fns';
 import React from 'react';
 
 import { makeReportError } from '@/lib/sentry/reportError';
-import { TimesSquareHtmlEventsContext } from '../TimesSquareHtmlEventsProvider';
+import {
+  TimesSquareHtmlEventsContext,
+  type TimesSquareHtmlEventsContextValue,
+} from '../TimesSquareHtmlEventsProvider';
 import styles from './ExecStats.module.css';
+
+/**
+ * How long the panel keeps reporting a requested recompute before falling back
+ * to the last reported execution.
+ *
+ * A soft delete schedules a fresh execution, so the events stream normally
+ * reports the new run within an event interval or two and supersedes the
+ * requested state on its own. This bound only matters if that never happens:
+ * without it the panel would claim a computation is running forever, and the
+ * Recompute button — the way out — would never come back.
+ */
+const RECOMPUTE_WAIT_TIMEOUT_MS = 30_000;
+
+/**
+ * Fingerprint the execution an events payload describes.
+ *
+ * A recompute is confirmed by the *next* execution the server reports, not by
+ * the soft delete's own response: until the new run is registered the stream
+ * keeps describing the run that is being replaced. Comparing this fingerprint
+ * against the one captured at request time detects that hand-off whichever way
+ * it arrives — a queued/in-progress run, a new finish time, or a new rendering.
+ */
+function executionSignature(
+  htmlEvent: TimesSquareHtmlEventsContextValue
+): string {
+  return [
+    htmlEvent.executionStatus,
+    htmlEvent.dateFinished,
+    htmlEvent.htmlHash,
+    htmlEvent.executionError?.code,
+  ].join('|');
+}
 
 export default function ExecStats() {
   const htmlEvent = React.useContext(TimesSquareHtmlEventsContext);
@@ -36,6 +71,41 @@ export default function ExecStats() {
     []
   );
 
+  // Execution fingerprint captured when a recompute was accepted, or null when
+  // no recompute is awaiting confirmation from the events stream.
+  const [requestedSignature, setRequestedSignature] = React.useState<
+    string | null
+  >(null);
+
+  const signature = htmlEvent ? executionSignature(htmlEvent) : null;
+
+  // The events stream still describes the run being replaced, so the recompute
+  // has yet to be confirmed.
+  const awaitingRecompute =
+    requestedSignature !== null && requestedSignature === signature;
+
+  React.useEffect(() => {
+    if (requestedSignature === null) {
+      return undefined;
+    }
+
+    // A differing fingerprint means the server has picked the recompute up, so
+    // its own reporting drives the panel from here. Dropping the captured
+    // fingerprint also keeps a later payload that happens to look identical
+    // (the dev mocks settle back to a fixed completed run) from reviving the
+    // requested state.
+    if (requestedSignature !== signature) {
+      setRequestedSignature(null);
+      return undefined;
+    }
+
+    const timer = setTimeout(
+      () => setRequestedSignature(null),
+      RECOMPUTE_WAIT_TIMEOUT_MS
+    );
+    return () => clearTimeout(timer);
+  }, [requestedSignature, signature]);
+
   // Return null if context is not available yet
   if (!htmlEvent) {
     return null;
@@ -56,6 +126,7 @@ export default function ExecStats() {
     // attempt resets that state, so a successful retry clears the message.
     try {
       await rerunPageAsync({ htmlUrl: htmlEvent.htmlUrl });
+      setRequestedSignature(executionSignature(htmlEvent));
     } catch (err) {
       reportError(err, {
         site: 'times-square-recompute',
@@ -63,6 +134,31 @@ export default function ExecStats() {
       });
     }
   };
+
+  // A computation the user asked for is reported from the click onwards: while
+  // the soft delete is in flight, then until the events stream reports the run
+  // it scheduled. Without this the panel kept summarizing the previous run, so
+  // a click produced no visible response until the next execution was reported
+  // — several seconds later, on a page whose HTML is still the old rendering.
+  // Server-reported queued and in-progress runs share the state, so a recompute
+  // reads as one continuous computation, and a queued run — which the panel
+  // used to render as nothing at all — is reported too.
+  const isComputing =
+    recomputePending ||
+    awaitingRecompute ||
+    htmlEvent.executionStatus === 'queued' ||
+    htmlEvent.executionStatus === 'in_progress';
+
+  if (isComputing) {
+    return (
+      <div className={styles.container}>
+        {/* biome-ignore lint/a11y/useSemanticElements: <output> is for form calculation results, not a status message about a background notebook execution */}
+        <p className={styles.content} role="status">
+          Computing…
+        </p>
+      </div>
+    );
+  }
 
   // A failed run reports `execution_status: 'complete'` with a non-null
   // `execution_error`, so the failure is checked before the completed branch —
@@ -91,12 +187,7 @@ export default function ExecStats() {
             .
           </p>
         )}
-        <Button
-          appearance="outline"
-          tone="primary"
-          disabled={recomputePending}
-          onClick={handleRecompute}
-        >
+        <Button appearance="outline" tone="primary" onClick={handleRecompute}>
           Recompute
         </Button>
         {recomputeFailed && (
@@ -127,12 +218,7 @@ export default function ExecStats() {
           </time>{' '}
           in {formattedDuration} seconds.
         </p>
-        <Button
-          appearance="outline"
-          tone="primary"
-          disabled={recomputePending}
-          onClick={handleRecompute}
-        >
+        <Button appearance="outline" tone="primary" onClick={handleRecompute}>
           Recompute
         </Button>
         {recomputeFailed && (
@@ -140,14 +226,6 @@ export default function ExecStats() {
             Failed to request a recompute. Please try again.
           </p>
         )}
-      </div>
-    );
-  }
-
-  if (htmlEvent.executionStatus === 'in_progress') {
-    return (
-      <div className={styles.container}>
-        <p>Computing…</p>
       </div>
     );
   }

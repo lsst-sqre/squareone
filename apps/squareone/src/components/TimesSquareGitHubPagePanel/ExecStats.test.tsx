@@ -1,6 +1,6 @@
 import { mockExecutionError } from '@lsst-sqre/times-square-client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -51,13 +51,19 @@ function renderExecStats(context: TimesSquareHtmlEventsContextValue) {
   const queryClient = new QueryClient({
     defaultOptions: { mutations: { retry: false } },
   });
-  return render(
+  const ui = (value: TimesSquareHtmlEventsContextValue) => (
     <QueryClientProvider client={queryClient}>
-      <TimesSquareHtmlEventsContext.Provider value={context}>
+      <TimesSquareHtmlEventsContext.Provider value={value}>
         <ExecStats />
       </TimesSquareHtmlEventsContext.Provider>
     </QueryClientProvider>
   );
+  const view = render(ui(context));
+  return {
+    ...view,
+    /** Push a new events payload, as the SSE subscription would. */
+    emit: (next: TimesSquareHtmlEventsContextValue) => view.rerender(ui(next)),
+  };
 }
 
 describe('ExecStats execution failure', () => {
@@ -134,12 +140,32 @@ describe('ExecStats execution failure', () => {
   });
 });
 
+describe('ExecStats reported execution', () => {
+  it.each([
+    'queued',
+    'in_progress',
+  ] as const)('reports a %s run as a computation in progress', (executionStatus) => {
+    renderExecStats({
+      ...completeContext,
+      executionStatus,
+      dateFinished: null,
+      executionDuration: null,
+      htmlHash: null,
+    });
+
+    expect(screen.getByRole('status')).toHaveTextContent('Computing…');
+  });
+});
+
 describe('ExecStats recompute', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   afterEach(() => {
+    // Restored unconditionally: a test that installs fake timers and then fails
+    // would otherwise leave them installed for the rest of the file.
+    vi.useRealTimers();
     vi.restoreAllMocks();
   });
 
@@ -216,6 +242,137 @@ describe('ExecStats recompute', () => {
     });
     expect(mockReportError).not.toHaveBeenCalled();
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('reports the computation as soon as the request is accepted', async () => {
+    const user = userEvent.setup();
+    vi.spyOn(global, 'fetch').mockResolvedValue(
+      new Response(deleteResponseBody, { status: 200 })
+    );
+
+    renderExecStats(completeContext);
+
+    await user.click(screen.getByRole('button', { name: /recompute/i }));
+
+    // The click is answered before the events stream reports anything new: the
+    // previous run's summary is replaced by a status message.
+    expect(await screen.findByRole('status')).toHaveTextContent('Computing…');
+    expect(screen.queryByText(/Computed/)).not.toBeInTheDocument();
+  });
+
+  it('reports the computation requested from the failed state', async () => {
+    const user = userEvent.setup();
+    vi.spyOn(global, 'fetch').mockResolvedValue(
+      new Response(deleteResponseBody, { status: 200 })
+    );
+
+    renderExecStats(failedContext);
+
+    await user.click(screen.getByRole('button', { name: /recompute/i }));
+
+    expect(await screen.findByRole('status')).toHaveTextContent('Computing…');
+    expect(
+      screen.queryByText(mockExecutionError.title)
+    ).not.toBeInTheDocument();
+  });
+
+  it('keeps reporting the computation while the stream still describes the previous run', async () => {
+    const user = userEvent.setup();
+    vi.spyOn(global, 'fetch').mockResolvedValue(
+      new Response(deleteResponseBody, { status: 200 })
+    );
+
+    const { emit } = renderExecStats(completeContext);
+
+    await user.click(screen.getByRole('button', { name: /recompute/i }));
+    expect(await screen.findByRole('status')).toBeInTheDocument();
+
+    // The soft delete leaves the previous rendering in place, so the stream
+    // repeats it until the new run is registered.
+    emit({ ...completeContext });
+
+    expect(screen.getByRole('status')).toHaveTextContent('Computing…');
+  });
+
+  it('hands over to the run the server reports', async () => {
+    const user = userEvent.setup();
+    vi.spyOn(global, 'fetch').mockResolvedValue(
+      new Response(deleteResponseBody, { status: 200 })
+    );
+
+    const { emit } = renderExecStats(completeContext);
+
+    await user.click(screen.getByRole('button', { name: /recompute/i }));
+    expect(await screen.findByRole('status')).toBeInTheDocument();
+
+    emit({
+      ...completeContext,
+      executionStatus: 'in_progress',
+      dateFinished: null,
+      executionDuration: null,
+      htmlHash: null,
+    });
+    expect(screen.getByRole('status')).toHaveTextContent('Computing…');
+
+    emit({
+      ...completeContext,
+      dateFinished: '2021-09-01T12:05:00Z',
+      executionDuration: 12.5,
+      htmlHash: 'def456',
+    });
+
+    expect(screen.getByText(/Computed/)).toHaveTextContent(
+      /Computed .* in 12\.5 seconds\./
+    );
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+  });
+
+  it('keeps the summary and the button when the request fails', async () => {
+    const user = userEvent.setup();
+    vi.spyOn(global, 'fetch').mockResolvedValue(
+      new Response(null, { status: 500, statusText: 'Internal Server Error' })
+    );
+
+    renderExecStats(completeContext);
+
+    await user.click(screen.getByRole('button', { name: /recompute/i }));
+
+    // Nothing was scheduled, so the panel must not claim a computation is
+    // running; the retry path stays in reach.
+    expect(await screen.findByRole('alert')).toBeInTheDocument();
+    expect(screen.queryByText('Computing…')).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /recompute/i })
+    ).toBeInTheDocument();
+  });
+
+  it('stops reporting the computation if the stream never picks it up', async () => {
+    // `shouldAdvanceTime` keeps the clock ticking for user-event and the
+    // mutation's own promises while still allowing a jump to the timeout.
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const user = userEvent.setup({
+      advanceTimers: (ms) => vi.advanceTimersByTime(ms),
+    });
+    vi.spyOn(global, 'fetch').mockResolvedValue(
+      new Response(deleteResponseBody, { status: 200 })
+    );
+
+    renderExecStats(completeContext);
+
+    await user.click(screen.getByRole('button', { name: /recompute/i }));
+    expect(await screen.findByRole('status')).toBeInTheDocument();
+
+    // A recompute the server never reports must not leave the panel claiming a
+    // computation forever — and must not strand the Recompute button.
+    await act(async () => {
+      vi.advanceTimersByTime(30_000);
+    });
+
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    expect(screen.getByText(/Computed/)).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /recompute/i })
+    ).toBeInTheDocument();
   });
 
   it('clears a previous failure when a retry succeeds', async () => {

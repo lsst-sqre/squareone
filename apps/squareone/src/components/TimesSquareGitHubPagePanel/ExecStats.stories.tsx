@@ -65,6 +65,24 @@ FailedWithoutFinishTime.args = {
   executionDuration: null,
 };
 
+/**
+ * A run the server has accepted but not started. The panel reports it the same
+ * way it reports an in-progress run, so a recompute reads as one continuous
+ * computation rather than briefly rendering nothing.
+ */
+export const Queued = Template.bind({});
+Queued.args = {
+  dateSubmitted: '2021-09-01T12:00:10Z',
+  dateStarted: null,
+  dateFinished: null,
+  executionStatus: 'queued',
+  executionDuration: null,
+  htmlHash: null,
+  htmlUrl: 'https://example.com/html',
+  connectionFailed: false,
+  executionError: null,
+};
+
 export const InProgressNew = Template.bind({});
 InProgressNew.args = {
   dateSubmitted: '2021-09-01T12:00:10Z',
