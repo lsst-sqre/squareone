@@ -7,8 +7,10 @@ import {
   type HtmlEvent,
   SseConnectionFailedError,
   subscribeToHtmlEvents,
+  timesSquareKeys,
   useTimesSquarePage,
 } from '@lsst-sqre/times-square-client';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   type ReactNode,
   useContext,
@@ -41,6 +43,16 @@ const SSE_RECONNECT_BACKOFF_MS = 1000;
 type TimesSquareHtmlEventsProviderClientProps = {
   children: ReactNode;
 };
+
+/** Whether a mutation is the package's page re-run (html soft delete). */
+function isRerunPageMutation(mutationKey: unknown): boolean {
+  const rerunKey = timesSquareKeys.rerunPage();
+  return (
+    Array.isArray(mutationKey) &&
+    mutationKey.length === rerunKey.length &&
+    rerunKey.every((segment, index) => mutationKey[index] === segment)
+  );
+}
 
 export default function TimesSquareHtmlEventsProviderClient({
   children,
@@ -77,6 +89,31 @@ export default function TimesSquareHtmlEventsProviderClient({
     );
     return createHtmlEventsUrl(htmlEventsUrl, params);
   }, [htmlEventsUrl, urlQueryString]);
+
+  // Bumped to re-establish the subscription. The transport aborts the stream
+  // once execution reaches a terminal state (a rendering or a failure), which
+  // is right while nothing more can happen to the page instance — but a re-run
+  // schedules a new execution, and without a fresh subscription no event would
+  // ever report it: the panel would keep describing the run that was replaced.
+  // The re-run mutation already invalidates the html-status queries; the events
+  // stream is not in the query cache, so the mutation cache is watched directly
+  // here. Every re-run path (the panel's Recompute, the viewer's failure-panel
+  // Re-run) goes through that one mutation, so none of them has to know that
+  // this provider exists.
+  const [eventsEpoch, setEventsEpoch] = useState(0);
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    return queryClient.getMutationCache().subscribe((event) => {
+      if (event.type !== 'updated' || event.action.type !== 'success') {
+        return;
+      }
+      if (!isRerunPageMutation(event.mutation.options.mutationKey)) {
+        return;
+      }
+      setEventsEpoch((epoch) => epoch + 1);
+    });
+  }, [queryClient]);
 
   useEffect(() => {
     // Don't run SSE on server side
@@ -118,7 +155,7 @@ export default function TimesSquareHtmlEventsProviderClient({
       maxReconnectAttempts: MAX_SSE_RECONNECT_ATTEMPTS,
       reconnectBackoffMs: SSE_RECONNECT_BACKOFF_MS,
     });
-  }, [fullHtmlEventsUrl, isClient, reportError]);
+  }, [fullHtmlEventsUrl, isClient, reportError, eventsEpoch]);
 
   const contextValue = useMemo(
     (): TimesSquareHtmlEventsContextValue => ({

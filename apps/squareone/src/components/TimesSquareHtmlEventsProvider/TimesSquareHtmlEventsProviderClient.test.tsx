@@ -5,10 +5,13 @@ import type {
 import {
   mockHtmlEventFailed,
   SseConnectionFailedError,
+  useRerunPage,
 } from '@lsst-sqre/times-square-client';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Capture the arguments the provider hands to the package transport so the test
 // can drive its callbacks directly and assert the subscription options.
@@ -59,6 +62,39 @@ import { TimesSquareUrlParametersContext } from '../TimesSquareUrlParametersProv
 import { TimesSquareHtmlEventsContext } from './TimesSquareHtmlEventsProvider';
 import TimesSquareHtmlEventsProviderClient from './TimesSquareHtmlEventsProviderClient';
 
+/**
+ * Render inside a query client, as the app does.
+ *
+ * The provider watches the re-run mutation through this client, so tests that
+ * drive a re-run share it with the component under test.
+ */
+function renderProvider(ui: React.ReactElement) {
+  return render(
+    <QueryClientProvider
+      client={
+        new QueryClient({ defaultOptions: { mutations: { retry: false } } })
+      }
+    >
+      {ui}
+    </QueryClientProvider>
+  );
+}
+
+/** Requests a page re-run through the package's shared mutation. */
+function RerunProbe() {
+  const { rerunPageAsync } = useRerunPage();
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        rerunPageAsync({ htmlUrl: 'https://example.com/html' }).catch(() => {});
+      }}
+    >
+      re-run
+    </button>
+  );
+}
+
 /** Surfaces the execution-error context field for assertions. */
 function ExecutionErrorProbe() {
   const context = React.useContext(TimesSquareHtmlEventsContext);
@@ -87,7 +123,7 @@ describe('TimesSquareHtmlEventsProviderClient subscription', () => {
   });
 
   it('subscribes through the package transport with bounded reconnects', async () => {
-    render(
+    renderProvider(
       <TimesSquareHtmlEventsProviderClient>
         <div>child</div>
       </TimesSquareHtmlEventsProviderClient>
@@ -105,7 +141,7 @@ describe('TimesSquareHtmlEventsProviderClient subscription', () => {
   });
 
   it('appends the page URL query parameters to the events URL', async () => {
-    render(
+    renderProvider(
       <TimesSquareUrlParametersContext.Provider
         value={
           {
@@ -128,13 +164,80 @@ describe('TimesSquareHtmlEventsProviderClient subscription', () => {
   });
 });
 
+describe('TimesSquareHtmlEventsProviderClient re-run resubscription', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('resubscribes once a re-run is accepted', async () => {
+    const user = userEvent.setup();
+    vi.spyOn(global, 'fetch').mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          html_url: 'https://example.com/html',
+          html_events_url: 'https://example.com/html/events',
+        }),
+        { status: 200 }
+      )
+    );
+
+    renderProvider(
+      <TimesSquareHtmlEventsProviderClient>
+        <RerunProbe />
+      </TimesSquareHtmlEventsProviderClient>
+    );
+
+    await waitForSubscription();
+    expect(subscribeSpy).toHaveBeenCalledTimes(1);
+
+    // The transport aborts the stream on a terminal event, so without this the
+    // run a re-run schedules would never be reported: the panel would keep
+    // describing the execution that was replaced.
+    await user.click(screen.getByRole('button', { name: /re-run/i }));
+
+    await waitFor(() => {
+      expect(subscribeSpy).toHaveBeenCalledTimes(2);
+    });
+    expect(unsubscribeSpy).toHaveBeenCalled();
+    expect(subscribeSpy.mock.calls[1][0]).toBe(
+      'https://example.com/html/events'
+    );
+  });
+
+  it('does not resubscribe when the re-run request fails', async () => {
+    const user = userEvent.setup();
+    vi.spyOn(global, 'fetch').mockResolvedValue(
+      new Response(null, { status: 500, statusText: 'Internal Server Error' })
+    );
+
+    renderProvider(
+      <TimesSquareHtmlEventsProviderClient>
+        <RerunProbe />
+      </TimesSquareHtmlEventsProviderClient>
+    );
+
+    await waitForSubscription();
+
+    await user.click(screen.getByRole('button', { name: /re-run/i }));
+
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
+    expect(subscribeSpy).toHaveBeenCalledTimes(1);
+  });
+});
+
 describe('TimesSquareHtmlEventsProviderClient SSE terminal failure', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it('renders a terminal-failure alert only once the connection gives up', async () => {
-    render(
+    renderProvider(
       <TimesSquareHtmlEventsProviderClient>
         <div>child</div>
       </TimesSquareHtmlEventsProviderClient>
@@ -161,7 +264,7 @@ describe('TimesSquareHtmlEventsProviderClient SSE terminal failure', () => {
   });
 
   it('captures the first connection error once per subscription', async () => {
-    render(
+    renderProvider(
       <TimesSquareHtmlEventsProviderClient>
         <div>child</div>
       </TimesSquareHtmlEventsProviderClient>
@@ -196,7 +299,7 @@ describe('TimesSquareHtmlEventsProviderClient execution errors', () => {
   });
 
   it('exposes the execution error from a terminal event on the context', async () => {
-    render(
+    renderProvider(
       <TimesSquareHtmlEventsProviderClient>
         <ExecutionErrorProbe />
       </TimesSquareHtmlEventsProviderClient>
