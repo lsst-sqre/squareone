@@ -10,6 +10,11 @@
  * compared against the committed `packages/<client>/openapi.json`. Both specs are
  * normalized first (parsed, then re-serialized with recursively sorted object
  * keys) so differences in key order or whitespace don't produce false positives.
+ * Array order is otherwise preserved, with one exception: primitive-element
+ * arrays inside an `examples` value are sorted, because some services serialize
+ * their examples from an unordered collection (a Python set) and so emit a
+ * different element order on each redeploy. See `canonicalize` for the exact
+ * extent of that exception.
  *
  * The comparison excludes `info.version`: an RSP service redeploy commonly bumps
  * its spec's `info.version` (e.g. a setuptools-scm dev version) with no change to
@@ -80,18 +85,51 @@ function extractSpecUrl(fetchScript) {
 }
 
 /**
- * Recursively sort object keys to produce a canonical representation. Array
- * order is preserved (it is semantically significant in OpenAPI); only object
- * keys are reordered so that key-order / whitespace differences compare equal.
+ * True for JSON scalars (string, number, boolean, null) — anything that is not
+ * an object or array.
  */
-function canonicalize(value) {
+function isPrimitive(value) {
+  return value === null || typeof value !== 'object';
+}
+
+/**
+ * Order a primitive-element array deterministically by its elements' JSON
+ * encodings, so that `1` and `"1"` remain distinguishable.
+ */
+function sortPrimitives(items) {
+  return items
+    .map((item) => ({ item, key: JSON.stringify(item) }))
+    .sort((a, b) => (a.key < b.key ? -1 : a.key > b.key ? 1 : 0))
+    .map((entry) => entry.item);
+}
+
+/**
+ * Recursively sort object keys to produce a canonical representation, so that
+ * key-order / whitespace differences compare equal.
+ *
+ * Array order is preserved (it is semantically significant in OpenAPI) with one
+ * exception: primitive-element arrays inside an `examples` value are sorted.
+ * Some upstream services serialize `examples` from an unordered collection
+ * (e.g. a Python set), so their element order varies from one process to the
+ * next and would otherwise register as drift. The exception applies to the
+ * `examples` array itself and to primitive-element arrays nested directly
+ * inside it (`examples: [["58", "57"]]`); it does not reach through object
+ * elements, and an `examples` array holding composite values keeps its own
+ * order.
+ *
+ * `inExamples` is internal recursion state — callers pass a value only.
+ */
+function canonicalize(value, inExamples = false) {
   if (Array.isArray(value)) {
-    return value.map(canonicalize);
+    const items = value.map((item) => canonicalize(item, inExamples));
+    return inExamples && items.every(isPrimitive)
+      ? sortPrimitives(items)
+      : items;
   }
   if (value && typeof value === 'object') {
     const sorted = {};
     for (const key of Object.keys(value).sort()) {
-      sorted[key] = canonicalize(value[key]);
+      sorted[key] = canonicalize(value[key], key === 'examples');
     }
     return sorted;
   }

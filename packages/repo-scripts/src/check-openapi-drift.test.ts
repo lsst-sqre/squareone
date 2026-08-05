@@ -30,6 +30,29 @@ function baseSpec() {
   };
 }
 
+// A spec shaped like the Semaphore false-drift case: a schema property whose
+// `examples` value is serialized upstream from an unordered Python collection,
+// so its element order varies from one process/pod to the next.
+function specWithIdsExamples(examples: unknown) {
+  return {
+    openapi: '3.1.0',
+    info: {
+      title: 'Semaphore',
+      version: '2.0.0',
+    },
+    components: {
+      schemas: {
+        UserNotificationRead: {
+          type: 'object',
+          properties: {
+            ids: { type: 'array', examples },
+          },
+        },
+      },
+    },
+  };
+}
+
 describe('classifySpecs', () => {
   it('returns "ok" for identical specs', () => {
     expect(classifySpecs(baseSpec(), baseSpec())).toBe('ok');
@@ -61,6 +84,61 @@ describe('classifySpecs', () => {
       name: { type: 'string' },
       title: { type: 'string' },
     };
+
+    expect(classifySpecs(committed, live)).toBe('drift');
+  });
+
+  it('returns "ok" when only the order of an examples array differs', () => {
+    const committed = specWithIdsExamples(['58', '57', '56', '59']);
+    const live = specWithIdsExamples(['58', '56', '57', '59']);
+
+    expect(classifySpecs(committed, live)).toBe('ok');
+  });
+
+  it('returns "ok" when an array nested inside examples is reordered', () => {
+    // The literal Semaphore shape: the single example *is* the id list.
+    const committed = specWithIdsExamples([['58', '57', '56', '59']]);
+    const live = specWithIdsExamples([['58', '56', '57', '59']]);
+
+    expect(classifySpecs(committed, live)).toBe('ok');
+  });
+
+  it('returns "version-only" when examples order and info.version differ', () => {
+    const committed = specWithIdsExamples([['58', '57', '56', '59']]);
+    const live = specWithIdsExamples([['58', '56', '57', '59']]);
+    live.info.version = '2.0.1';
+
+    expect(classifySpecs(committed, live)).toBe('version-only');
+  });
+
+  it('returns "drift" when examples membership changes', () => {
+    const committed = specWithIdsExamples([['58', '57', '56', '59']]);
+    const live = specWithIdsExamples([['58', '57', '56', '60']]);
+
+    expect(classifySpecs(committed, live)).toBe('drift');
+  });
+
+  it('returns "drift" when a non-examples array is reordered', () => {
+    const committed = specWithIdsExamples(['58']);
+    const live = specWithIdsExamples(['58']);
+    // `enum` order is not normalized — only `examples` gets the exception.
+    (
+      committed.components.schemas.UserNotificationRead.properties
+        .ids as Record<string, unknown>
+    ).enum = ['a', 'b'];
+    (
+      live.components.schemas.UserNotificationRead.properties.ids as Record<
+        string,
+        unknown
+      >
+    ).enum = ['b', 'a'];
+
+    expect(classifySpecs(committed, live)).toBe('drift');
+  });
+
+  it('returns "drift" when an examples array of objects is reordered', () => {
+    const committed = specWithIdsExamples([{ a: 1 }, { b: 2 }]);
+    const live = specWithIdsExamples([{ b: 2 }, { a: 1 }]);
 
     expect(classifySpecs(committed, live)).toBe('drift');
   });
