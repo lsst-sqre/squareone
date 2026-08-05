@@ -11,6 +11,20 @@ import type { Logger } from './query-options';
 import { type HtmlEvent, HtmlEventSchema } from './schemas';
 
 /**
+ * Upper bound on the multiplier applied to `reconnectBackoffMs`.
+ *
+ * The backoff grows linearly with the number of consecutive failures, but that
+ * count is only bounded when `maxReconnectAttempts` is also set. A consumer
+ * that sets `reconnectBackoffMs` alone would otherwise see the delay climb
+ * without limit through a long outage — minutes between attempts, and growing —
+ * so a reconnect could be pending long after the service came back. Capping the
+ * multiplier keeps the worst-case wait at a predictable
+ * `MAX_RECONNECT_BACKOFF_MULTIPLIER * reconnectBackoffMs`, which still backs off
+ * enough to spare a struggling server while staying responsive to recovery.
+ */
+const MAX_RECONNECT_BACKOFF_MULTIPLIER = 10;
+
+/**
  * Callback invoked when an HTML event is received.
  */
 export type HtmlEventCallback = (event: HtmlEvent) => void;
@@ -112,8 +126,12 @@ export type SubscribeOptions = {
    * Base delay in milliseconds between reconnect attempts (optional).
    *
    * The delay scales linearly with the number of consecutive failures, so a
-   * value of 1000 waits 1 s, then 2 s, then 3 s. When omitted (the default),
-   * the underlying transport's own retry interval is used.
+   * value of 1000 waits 1 s, then 2 s, then 3 s. The growth is capped at
+   * {@link MAX_RECONNECT_BACKOFF_MULTIPLIER} (10) times the base delay, so that
+   * same value plateaus at 10 s no matter how long an outage runs — without the
+   * cap, a subscription with no `maxReconnectAttempts` would back off
+   * indefinitely. When omitted (the default), the underlying transport's own
+   * retry interval is used.
    */
   reconnectBackoffMs?: number;
   /** Optional structured logger */
@@ -300,9 +318,12 @@ export function subscribeToHtmlEvents(
 
       // Returning a number delays the next attempt by that many milliseconds;
       // returning undefined leaves the transport's own retry interval in place.
+      // The multiplier is capped so the delay plateaus instead of growing
+      // without bound when `maxReconnectAttempts` is unset.
       return reconnectBackoffMs === undefined
         ? undefined
-        : reconnectBackoffMs * consecutiveFailures;
+        : reconnectBackoffMs *
+            Math.min(consecutiveFailures, MAX_RECONNECT_BACKOFF_MULTIPLIER);
     },
   }).catch((error) => {
     // Catch any unhandled errors from fetchEventSource

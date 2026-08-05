@@ -321,6 +321,28 @@ describe('subscribeToHtmlEvents bounded reconnect', () => {
     expect(onerror(new Error('boom'))).toBe(750);
   });
 
+  it('caps the backoff delay so it stops growing during a long outage', () => {
+    const onEvent = vi.fn();
+    subscribeToHtmlEvents('https://example.com/events', undefined, {
+      onEvent,
+      // No maxReconnectAttempts: the failure count is unbounded, so only the
+      // multiplier cap keeps the delay from climbing forever.
+      reconnectBackoffMs: 250,
+    });
+
+    const { onerror } = lastFetchEventSourceOptions();
+
+    // Linear growth up to the 10x cap.
+    for (let attempt = 1; attempt <= 10; attempt++) {
+      expect(onerror(new Error('boom'))).toBe(250 * attempt);
+    }
+
+    // Every further failure plateaus at the capped delay.
+    for (let i = 0; i < 20; i++) {
+      expect(onerror(new Error('boom'))).toBe(2500);
+    }
+  });
+
   it('leaves retry behavior unbounded and undelayed by default', () => {
     const onEvent = vi.fn();
     const onError = vi.fn();
