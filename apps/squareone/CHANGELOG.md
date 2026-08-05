@@ -1,5 +1,96 @@
 # squareone
 
+## 0.38.0
+
+### Minor Changes
+
+- [#610](https://github.com/lsst-sqre/squareone/pull/610) [`7afe8bb`](https://github.com/lsst-sqre/squareone/commit/7afe8bb580572d5fd41841b2e52af29ceb1d4edf) Thanks [@jonathansick](https://github.com/jonathansick)! - Add Sentry capture and user-facing error states to the Times Square UI (DM-55604). `ExecStats` recompute is no longer fire-and-forget: it checks the response, shows a user-facing failure message, and reports the exception via `makeReportError`. `TimesSquareHtmlEventsProviderClient` now bounds its SSE reconnect attempts and enters a terminal-failure state (surfaced to the user) after the budget is exhausted, capturing the connection error once per subscription instead of retrying silently forever.
+
+- [#610](https://github.com/lsst-sqre/squareone/pull/610) [`f11dc17`](https://github.com/lsst-sqre/squareone/commit/f11dc17cb61e4927ee0e0db9179656014ea39570) Thanks [@jonathansick](https://github.com/jonathansick)! - Add Sentry capture and a user-facing error state to the token pages (DM-55604). `TokenDetailsView` no longer silently closes the delete confirmation modal when a delete fails: it surfaces a user-facing error message (so the still-listed token does not look silently deleted) and reports the exception to Sentry via `makeReportError`, matching the sibling `AccessTokenItem`/`SessionTokenItem` `onDeleteError` capture pattern. `NewTokenPageClient` now reports the token-creation submit exception it previously only `console.error`ed; its existing user-facing `creationError` UX is unchanged.
+
+- [#631](https://github.com/lsst-sqre/squareone/pull/631) [`10544bd`](https://github.com/lsst-sqre/squareone/commit/10544bd271fb72c7876a53c5d7f8f075005fcbcb) Thanks [@jonathansick](https://github.com/jonathansick)! - Adopt the Times Square `execution_error` contract in the Times Square UI (DM-55470). `TimesSquareHtmlEventsProvider` no longer carries its own SSE transport: the client provider subscribes through `@lsst-sqre/times-square-client`'s `subscribeToHtmlEvents` and builds its URL with `createHtmlEventsUrl`, so events are schema-validated by the package instead of being parsed inline. The bounded-reconnect budget (5 consecutive connection failures, 1 s linear backoff), the terminal `connectionFailed` alert, and the once-per-subscription Sentry capture (tagged `site: times-square-sse`) behave as before, now driven by the package's terminal `SseConnectionFailedError`. The events context gains an `executionError` field carrying the API's terminal failure object (`code`, `title`, `message`), `null` while execution is pending or has succeeded — including against Times Square deployments predating DM-55470, which omit the field.
+
+  The page panel's execution summary no longer reports a failed run as a success. Because Times Square reports a failure as `execution_status: 'complete'` with a non-null `execution_error`, `ExecStats` had been rendering "Computed … in N seconds." for a notebook that never produced a result. It now reads the events context's `executionError` and, when it is non-null, renders a failure summary carrying the API's own `title` — the same verbatim-copy policy as the viewer's failure panel, with no Squareone-authored per-code wording — followed by when the run finished (dropped when the failed run carries no finish time) and no duration phrasing. The Recompute button remains, since it is the recovery path out of the failed state. When `executionError` is null, the summary is unchanged.
+
+  The panel's Recompute action now issues its request through the package's shared re-run mutation (`useRerunPage`) instead of a raw `DELETE fetch`, so both re-run paths share one transport, credentialed request, and html-status cache invalidation. The failure message and the Sentry capture (tagged `site: times-square-recompute`) are unchanged, and the button is disabled while a re-run request is in flight.
+
+  The notebook viewer no longer shows an endless "Loading…" for a notebook that failed to execute. When `useHtmlStatus` reports a terminal `execution_error`, `TimesSquareNotebookViewerClient` — which serves both the notebook viewer and the GitHub page-panel paths — renders a new `NotebookExecutionError` panel carrying the API's own `title` and `message`; Squareone authors no per-code guidance of its own, and `code` only selects the panel's icon and accent tone (with an unrecognized code from a newer Times Square falling back to a generic treatment). The panel's Re-run button soft-deletes the page instance through `useRerunPage`, targeting the page's `html_url` with the instance's notebook parameters and display settings; the mutation's invalidation drops the cached failure, so the viewer returns to its loading state, polling resumes, and a subsequent successful render displays the HTML. A failed re-run request surfaces an inline message and is captured in Sentry (tagged `site: times-square-rerun`). Against a Times Square deployment predating DM-55470, whose responses omit `execution_error`, the viewer behaves exactly as before.
+
+  The development-mode Times Square mocks make that flow exercisable without a live Times Square. The magic `?a=` notebook parameter gains a failure case — `a=3` reports a terminal `timeout` `execution_error` (with `available: false` and `html_hash: null`) from both the `htmlstatus` route and the SSE `htmlevents` route, while `a=1` (success) and `a=2` (pending) keep their existing behavior — and the mock html route now answers `DELETE` with the spec's `DeleteHtmlResponse` instead of a 405, so the Re-run button works. A mocked re-run clears the instance's cached outcome for 15 seconds, so the viewer drops back to its loading state and resumes polling before the instance settles again. The mock page-metadata routes (`/v1/pages/:page`, `/v1/github/:path`, and the PR-preview variant) now return schema-valid `Page` payloads, which the schema-parsing client had been rejecting — leaving the dev notebook viewer stuck on "Loading…".
+
+  Error and failure text now uses a color that actually exists. Several stylesheets — the new `ExecStats` failure/error summaries, the SSE connection alert, and the token detail page's delete-error and error panels — set their text color from `--rsd-color-red-900`, which the rubin-style-dictionary red scale does not define (it ends at 800), so the declaration was dropped and the text silently inherited the surrounding body color. They now use `--rsd-color-red-600` ("Dark red for solid backgrounds and text"), which pairs with the red-500 borders and red-100 backgrounds already in use and clears WCAG AA on both white and red-100.
+
+### Patch Changes
+
+- [#641](https://github.com/lsst-sqre/squareone/pull/641) [`2aa972f`](https://github.com/lsst-sqre/squareone/commit/2aa972f8be42649cfe0b09381c4a6450bc884f24) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @changesets/cli from 2.31.0 to 2.31.1
+
+- [#639](https://github.com/lsst-sqre/squareone/pull/639) [`01d32e2`](https://github.com/lsst-sqre/squareone/commit/01d32e27b7ac313126aed3a8f53b5793de0692b8) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-a11y from 10.4.6 to 10.5.4
+
+- [#639](https://github.com/lsst-sqre/squareone/pull/639) [`01d32e2`](https://github.com/lsst-sqre/squareone/commit/01d32e27b7ac313126aed3a8f53b5793de0692b8) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-docs from 10.4.6 to 10.5.4
+
+- [#639](https://github.com/lsst-sqre/squareone/pull/639) [`01d32e2`](https://github.com/lsst-sqre/squareone/commit/01d32e27b7ac313126aed3a8f53b5793de0692b8) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-links from 10.4.6 to 10.5.4
+
+- [#639](https://github.com/lsst-sqre/squareone/pull/639) [`01d32e2`](https://github.com/lsst-sqre/squareone/commit/01d32e27b7ac313126aed3a8f53b5793de0692b8) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-onboarding from 10.4.6 to 10.5.4
+
+- [#639](https://github.com/lsst-sqre/squareone/pull/639) [`01d32e2`](https://github.com/lsst-sqre/squareone/commit/01d32e27b7ac313126aed3a8f53b5793de0692b8) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-themes from 10.4.6 to 10.5.4
+
+- [#641](https://github.com/lsst-sqre/squareone/pull/641) [`2aa972f`](https://github.com/lsst-sqre/squareone/commit/2aa972f8be42649cfe0b09381c4a6450bc884f24) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @turbo/gen from 2.10.0 to 2.10.7
+
+- [#637](https://github.com/lsst-sqre/squareone/pull/637) [`4727568`](https://github.com/lsst-sqre/squareone/commit/4727568aeae9280d2836a0eced07f103a0ef2441) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @types/react-dom from 19.2.3 to 19.2.4
+
+- [#637](https://github.com/lsst-sqre/squareone/pull/637) [`4727568`](https://github.com/lsst-sqre/squareone/commit/4727568aeae9280d2836a0eced07f103a0ef2441) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @types/react from 19.2.17 to 19.2.18
+
+- [#643](https://github.com/lsst-sqre/squareone/pull/643) [`bca87ff`](https://github.com/lsst-sqre/squareone/commit/bca87ff3292ca5fbc81ede66aa127a15c099607a) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump actions/setup-node from 6 to 7
+
+- [#638](https://github.com/lsst-sqre/squareone/pull/638) [`207ca57`](https://github.com/lsst-sqre/squareone/commit/207ca57ee6cb9c7d2ace6155108e122b5d68e242) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump eslint-config-next from 16.2.9 to 16.2.12
+
+- [#641](https://github.com/lsst-sqre/squareone/pull/641) [`2aa972f`](https://github.com/lsst-sqre/squareone/commit/2aa972f8be42649cfe0b09381c4a6450bc884f24) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump eslint-config-turbo from 2.10.0 to 2.10.7
+
+- [#643](https://github.com/lsst-sqre/squareone/pull/643) [`bca87ff`](https://github.com/lsst-sqre/squareone/commit/bca87ff3292ca5fbc81ede66aa127a15c099607a) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump github/codeql-action from 4 to 4.37.3
+
+- [#638](https://github.com/lsst-sqre/squareone/pull/638) [`207ca57`](https://github.com/lsst-sqre/squareone/commit/207ca57ee6cb9c7d2ace6155108e122b5d68e242) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump next from 16.2.11 to 16.2.12
+
+- [#640](https://github.com/lsst-sqre/squareone/pull/640) [`bcaa17c`](https://github.com/lsst-sqre/squareone/commit/bcaa17ca2bf62cc6885d59e4340353a25cefe899) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump playwright from 1.61.1 to 1.62.0 in the playwright group
+
+- [#637](https://github.com/lsst-sqre/squareone/pull/637) [`4727568`](https://github.com/lsst-sqre/squareone/commit/4727568aeae9280d2836a0eced07f103a0ef2441) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump react-dom from 19.2.7 to 19.2.8
+
+- [#637](https://github.com/lsst-sqre/squareone/pull/637) [`4727568`](https://github.com/lsst-sqre/squareone/commit/4727568aeae9280d2836a0eced07f103a0ef2441) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump react from 19.2.7 to 19.2.8
+
+- [#644](https://github.com/lsst-sqre/squareone/pull/644) [`d673082`](https://github.com/lsst-sqre/squareone/commit/d673082c48753a07ee5fa09793379c418001aeed) Thanks [@jonathansick](https://github.com/jonathansick)! - Resolve 12 open Dependabot security advisories in transitive dependencies
+
+  Adds a root `pnpm.overrides` block pinning patched versions of
+  `brace-expansion`, `js-yaml`, `postcss`, `immutable`, and `fast-uri`, and
+  moves the vitest family to 4.1.10 within its existing `^4.1.0` range. All of
+  these were transitive-only dependencies that Dependabot could not update on
+  its own — five alerts reported `update_not_possible` and the rest never
+  produced a pull request.
+
+- [#631](https://github.com/lsst-sqre/squareone/pull/631) [`fc7dd2d`](https://github.com/lsst-sqre/squareone/commit/fc7dd2d621ea73b5591c25341a08ff599d113c26) Thanks [@jonathansick](https://github.com/jonathansick)! - Report the computation a Times Square Recompute button starts. Clicking Recompute in the page panel produced no visible response: the panel kept summarizing the previous run ("Computed … in N seconds.") on a page whose HTML is still the old rendering, because a recompute is only observable once the events stream reports the run the soft delete scheduled — several seconds later, after an event interval or two. `ExecStats` now reports the computation from the click onwards, while the soft-delete request is in flight and then until the stream describes a different execution than the one captured at request time (a queued or in-progress run, a new finish time, a new rendering, or a new failure). The status message is announced to assistive technology (`role="status"`). If the request fails, no computation is claimed: the summary and the Recompute button stay put alongside the existing failure message, which is unchanged, as is the Sentry capture tagged `site: times-square-recompute`.
+
+  Re-establish the HTML-events subscription when a re-run is requested, so the run it schedules is actually reported. The transport aborts the stream once execution reaches a terminal state — a rendering or a failure — which is right while nothing more can happen to the page instance, but it left the events context frozen on the run being replaced: after a recompute no event ever arrived, so the panel sat on its requested state until the fallback fired and then reported the _previous_ run's timing. `TimesSquareHtmlEventsProviderClient` now watches the mutation cache for a successful re-run and resubscribes. Every re-run path goes through that one mutation, so neither the page panel's Recompute nor the viewer's failure-panel Re-run has to know the provider exists — the same division of labor as the html-status invalidation the mutation already performs.
+
+  A recompute that the server never reports no longer strands the panel. The requested state falls back to the last reported execution after 30 seconds, so the Recompute button always comes back.
+
+  Keep the panel's relative timestamps advancing. "Computed less than a minute ago" stayed that way for as long as the page was open: `formatDistanceToNow` is evaluated at render time, and since the events stream started closing on a terminal event (January 2025) nothing re-renders the panel afterwards — the stream's heartbeat had been doing it as a side effect. The panel now re-renders on its own 30 s tick, which also keeps a failed run's "Failed … ago" current.
+
+  The dev mock's events stream now behaves like Times Square's: it emits on a fixed 1 s interval and holds the connection open until the client aborts, resolving the instance's state per event. It had sent a single event and closed, which ends the subscription for good — the transport only reconnects after an error — so an execution that changed state later was never reported, and the re-run flow could not be exercised in dev.
+
+  Queued runs are reported instead of rendering nothing. The panel handled `execution_status: 'in_progress'` but fell through `'queued'` to an empty panel, so a run reported as queued — the state a fresh recompute passes through — briefly erased the panel's contents. Both statuses now share the in-progress message, so a recompute reads as one continuous computation. The button is no longer separately disabled while a request is in flight, since the in-progress message replaces it entirely.
+
+- [#631](https://github.com/lsst-sqre/squareone/pull/631) [`1a9e547`](https://github.com/lsst-sqre/squareone/commit/1a9e54771fcac50fb906f69e9e92f891434c4d95) Thanks [@jonathansick](https://github.com/jonathansick)! - Accept the idle HTML-events payload from Times Square. `HtmlEventSchema` required a non-null `date_submitted` and `execution_status`, but Times Square's `HtmlEventsModel` declares both as nullable and the SSE stream emits an event on a fixed interval whether or not there is anything to report. A page instance with neither a Noteburst job nor a cached rendering therefore yields an event with `date_submitted`, `date_started`, `date_finished`, `execution_status`, `execution_duration`, and `html_hash` all null — only `html_url` is populated. Both fields are now `.nullable()`, matching the other execution fields.
+
+  Against a healthy server this made `subscribeToHtmlEvents` drop the event and report an `SseInvalidEventError` as API contract drift. Consumers already typed `dateSubmitted` and `executionStatus` as nullable and render nothing for a null status, so no downstream behavior changes. The SSE payload is not described in Times Square's OpenAPI spec — the endpoint declares an untyped `text/event-stream` response — so this mismatch could not be caught by re-vendoring `openapi.json`.
+
+  The dev mocks gain an idle state so the payload is reproducible without a live Times Square: `?a=4` (`IDLE_A_VALUE`) reports a page instance that has nothing to say yet, alongside the existing pending (`2`) and failing (`3`) magic values.
+
+- [#641](https://github.com/lsst-sqre/squareone/pull/641) [`2aa972f`](https://github.com/lsst-sqre/squareone/commit/2aa972f8be42649cfe0b09381c4a6450bc884f24) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump turbo from 2.10.0 to 2.10.7
+
+- Updated dependencies [[`9f5604b`](https://github.com/lsst-sqre/squareone/commit/9f5604b8a0caf825fbb11211a203ac25eb186335), [`b8947fe`](https://github.com/lsst-sqre/squareone/commit/b8947fed47273e1bb52d7716e656a8ecb9924917), [`4b89dca`](https://github.com/lsst-sqre/squareone/commit/4b89dca40072e19ef793ff2feac837564f726331), [`1a9e547`](https://github.com/lsst-sqre/squareone/commit/1a9e54771fcac50fb906f69e9e92f891434c4d95)]:
+  - @lsst-sqre/repertoire-client@0.4.1
+  - @lsst-sqre/times-square-client@3.1.0
+  - @lsst-sqre/squared@0.16.1
+  - @lsst-sqre/gafaelfawr-client@3.0.1
+
 ## 0.37.3
 
 ### Patch Changes

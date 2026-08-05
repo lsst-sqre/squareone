@@ -1,5 +1,12 @@
 # @lsst-sqre/gafaelfawr-client
 
+## 3.0.1
+
+### Patch Changes
+
+- Updated dependencies [[`9f5604b`](https://github.com/lsst-sqre/squareone/commit/9f5604b8a0caf825fbb11211a203ac25eb186335)]:
+  - @lsst-sqre/repertoire-client@0.4.1
+
 ## 3.0.0
 
 ### Minor Changes
