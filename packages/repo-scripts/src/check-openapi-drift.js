@@ -112,10 +112,10 @@ function sortPrimitives(items) {
  * Some upstream services serialize `examples` from an unordered collection
  * (e.g. a Python set), so their element order varies from one process to the
  * next and would otherwise register as drift. The exception applies to the
- * `examples` array itself and to primitive-element arrays nested directly
- * inside it (`examples: [["58", "57"]]`); it does not reach through object
- * elements, and an `examples` array holding composite values keeps its own
- * order.
+ * `examples` array itself and to any primitive-element array reachable from it
+ * through array nesting alone (`examples: [["58", "57"]]`); it does not reach
+ * through object elements, and an `examples` array holding composite values
+ * keeps its own order.
  *
  * `inExamples` is internal recursion state — callers pass a value only.
  */
