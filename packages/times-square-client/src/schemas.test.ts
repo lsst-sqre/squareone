@@ -4,18 +4,23 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  mockExecutionError,
   mockGitHubCheckSuccess,
   mockGitHubContents,
   mockGitHubPr,
   mockGitHubPrContents,
   mockHtmlEventComplete,
+  mockHtmlEventFailed,
   mockHtmlStatusAvailable,
+  mockHtmlStatusFailed,
   mockPage,
   mockPageSummary,
 } from './mock-data';
 import {
   ErrorDetailSchema,
   ErrorModelSchema,
+  EXECUTION_ERROR_CODES,
+  ExecutionErrorSchema,
   ExecutionStatusSchema,
   FormattedTextSchema,
   GitHubCheckRunConclusionSchema,
@@ -61,6 +66,45 @@ describe('ExecutionStatusSchema', () => {
   it('rejects invalid statuses', () => {
     expect(() => ExecutionStatusSchema.parse('running')).toThrow();
     expect(() => ExecutionStatusSchema.parse('done')).toThrow();
+  });
+});
+
+describe('ExecutionErrorSchema', () => {
+  it('parses an error with a known code', () => {
+    const result = ExecutionErrorSchema.parse({
+      code: 'timeout',
+      title: 'Execution timed out',
+      message: 'The notebook did not finish within the time limit.',
+    });
+    expect(result.code).toBe('timeout');
+    expect(result.title).toBe('Execution timed out');
+    expect(result.message).toBe(
+      'The notebook did not finish within the time limit.'
+    );
+  });
+
+  it('accepts unknown code strings for forward compatibility', () => {
+    const result = ExecutionErrorSchema.parse({
+      code: 'some_future_code',
+      title: 'Something went wrong',
+      message: 'Details from a newer Times Square deployment.',
+    });
+    expect(result.code).toBe('some_future_code');
+  });
+
+  it('rejects a non-string code', () => {
+    expect(() =>
+      ExecutionErrorSchema.parse({ code: 42, title: 'T', message: 'M' })
+    ).toThrow();
+  });
+
+  it('exports the known code values', () => {
+    expect(EXECUTION_ERROR_CODES).toEqual([
+      'timeout',
+      'jupyter_error',
+      'unknown',
+      'result_unavailable',
+    ]);
   });
 });
 
@@ -292,6 +336,48 @@ describe('HtmlStatusSchema', () => {
   });
 });
 
+describe('HtmlStatusSchema execution_error', () => {
+  const base = {
+    available: false,
+    html_url: 'https://example.com/html',
+    html_hash: null,
+  };
+
+  it('parses a status with execution_error present', () => {
+    const result = HtmlStatusSchema.parse({
+      ...base,
+      execution_error: {
+        code: 'timeout',
+        title: 'Execution timed out',
+        message: 'The notebook did not finish within the time limit.',
+      },
+    });
+    expect(result.execution_error).toEqual({
+      code: 'timeout',
+      title: 'Execution timed out',
+      message: 'The notebook did not finish within the time limit.',
+    });
+  });
+
+  it('parses a status with execution_error explicitly null', () => {
+    const result = HtmlStatusSchema.parse({ ...base, execution_error: null });
+    expect(result.execution_error).toBeNull();
+  });
+
+  it('defaults execution_error to null when the key is absent', () => {
+    // Pre-DM-55470 Times Square deployments omit the key entirely.
+    const result = HtmlStatusSchema.parse(base);
+    expect(result.execution_error).toBeNull();
+  });
+
+  it('parses the failed-status mock fixture', () => {
+    const result = HtmlStatusSchema.parse(mockHtmlStatusFailed);
+    expect(result.available).toBe(false);
+    expect(result.html_hash).toBeNull();
+    expect(result.execution_error).toEqual(mockExecutionError);
+  });
+});
+
 describe('HtmlEventSchema', () => {
   it('parses complete event', () => {
     const result = HtmlEventSchema.parse(mockHtmlEventComplete);
@@ -313,6 +399,68 @@ describe('HtmlEventSchema', () => {
     expect(result.execution_status).toBe('queued');
     expect(result.date_started).toBeNull();
     expect(result.date_finished).toBeNull();
+  });
+
+  it('parses an idle event with no job and no cached rendering', () => {
+    // Times Square emits this when a page instance has neither a Noteburst job
+    // nor a cached rendering: every execution field is null and only html_url
+    // is populated. Requiring date_submitted/execution_status here made the
+    // stream report contract drift against a healthy server (DM-55470).
+    const result = HtmlEventSchema.parse({
+      date_submitted: null,
+      date_started: null,
+      date_finished: null,
+      execution_status: null,
+      execution_duration: null,
+      html_hash: null,
+      html_url: 'https://example.com/html',
+    });
+    expect(result.date_submitted).toBeNull();
+    expect(result.execution_status).toBeNull();
+    expect(result.html_url).toBe('https://example.com/html');
+    expect(result.execution_error).toBeNull();
+  });
+});
+
+describe('HtmlEventSchema execution_error', () => {
+  const base = {
+    date_submitted: '2024-01-15T10:30:00Z',
+    date_started: '2024-01-15T10:30:02Z',
+    date_finished: '2024-01-15T10:30:12Z',
+    execution_status: 'complete' as const,
+    execution_duration: 10,
+    html_hash: null,
+    html_url: 'https://example.com/html',
+  };
+
+  it('parses an event with execution_error present', () => {
+    const result = HtmlEventSchema.parse({
+      ...base,
+      execution_error: {
+        code: 'jupyter_error',
+        title: 'Notebook execution failed',
+        message: 'The kernel raised an exception.',
+      },
+    });
+    expect(result.execution_error?.code).toBe('jupyter_error');
+  });
+
+  it('parses an event with execution_error explicitly null', () => {
+    const result = HtmlEventSchema.parse({ ...base, execution_error: null });
+    expect(result.execution_error).toBeNull();
+  });
+
+  it('defaults execution_error to null when the key is absent', () => {
+    // Pre-DM-55470 Times Square deployments omit the key entirely.
+    const result = HtmlEventSchema.parse(base);
+    expect(result.execution_error).toBeNull();
+  });
+
+  it('parses the failed-event mock fixture', () => {
+    const result = HtmlEventSchema.parse(mockHtmlEventFailed);
+    expect(result.execution_status).toBe('complete');
+    expect(result.html_hash).toBeNull();
+    expect(result.execution_error).toEqual(mockExecutionError);
   });
 });
 

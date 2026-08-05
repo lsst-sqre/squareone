@@ -51,9 +51,46 @@ export const ExecutionStatusSchema = z.enum([
   'complete',
 ]);
 
+/**
+ * Known `execution_error.code` values reported by Times Square (DM-55470).
+ *
+ * The schema deliberately parses `code` as a plain string rather than an
+ * enum so that codes introduced by newer Times Square deployments still
+ * validate. Use this const for exhaustive handling of the codes known at
+ * build time, and always fall back gracefully for anything else.
+ *
+ * - `timeout` — the notebook exceeded its execution time limit.
+ * - `jupyter_error` — the Jupyter kernel/noteburst reported an error.
+ * - `unknown` — Times Square could not classify the failure.
+ * - `result_unavailable` — the execution result could not be retrieved.
+ */
+export const EXECUTION_ERROR_CODES = [
+  'timeout',
+  'jupyter_error',
+  'unknown',
+  'result_unavailable',
+] as const;
+
+/** A known `execution_error.code` value. */
+export type KnownExecutionErrorCode = (typeof EXECUTION_ERROR_CODES)[number];
+
 // =============================================================================
 // Component Schemas
 // =============================================================================
+
+/**
+ * A terminal notebook-execution failure reported by Times Square.
+ *
+ * `code` is parsed as `z.string()` (not an enum) for forward compatibility
+ * with codes added by newer Times Square deployments; see
+ * {@link EXECUTION_ERROR_CODES} for the values known at build time.
+ * `title` and `message` are user-facing copy authored by the API.
+ */
+export const ExecutionErrorSchema = z.object({
+  code: z.string(),
+  title: z.string(),
+  message: z.string(),
+});
 
 /**
  * Formatted text that is available in both markdown and HTML.
@@ -227,25 +264,60 @@ export const PageSchema = z.object({
 /**
  * HTML status response.
  * From GET /v1/pages/{page}/htmlstatus
+ *
+ * `execution_error` (DM-55470) is optional-nullable and defaults to `null`
+ * so that responses from Times Square deployments predating DM-55470 — which
+ * omit the key entirely — still parse and normalize to `null`. A non-null
+ * value is terminal: `available` is `false` and `html_hash` is `null`.
  */
 export const HtmlStatusSchema = z.object({
   available: z.boolean(),
   html_url: z.string(),
   html_hash: z.string().nullable(),
+  execution_error: ExecutionErrorSchema.nullable().default(null),
 });
 
 /**
  * HTML event from SSE stream.
  * From GET /v1/pages/{page}/html/events
+ *
+ * Every field describing an execution is nullable. The stream emits an event
+ * on a fixed interval regardless of state, so when a page instance has neither
+ * a Noteburst job nor a cached rendering — a page instance that has not been
+ * queued yet, or one whose job and HTML have both aged out — the server sends
+ * an event with `date_submitted`, `date_started`, `date_finished`,
+ * `execution_status`, `execution_duration`, and `html_hash` all `null`. Only
+ * `html_url` is always populated. This mirrors Times Square's `HtmlEventsModel`
+ * ("None if no job is ongoing" / "None if the notebook has not been queued to
+ * executed yet"); the SSE payload is not described in the OpenAPI spec, so it
+ * cannot be checked against the vendored `openapi.json`.
+ *
+ * `execution_error` (DM-55470) is optional-nullable and defaults to `null`;
+ * see {@link HtmlStatusSchema} for the backward-compatibility rationale.
  */
 export const HtmlEventSchema = z.object({
-  date_submitted: z.string(),
+  date_submitted: z.string().nullable(),
   date_started: z.string().nullable(),
   date_finished: z.string().nullable(),
-  execution_status: ExecutionStatusSchema,
+  execution_status: ExecutionStatusSchema.nullable(),
   execution_duration: z.number().nullable(),
   html_hash: z.string().nullable(),
   html_url: z.string(),
+  execution_error: ExecutionErrorSchema.nullable().default(null),
+});
+
+/**
+ * Response to a successful HTML soft-deletion (re-run request).
+ * From DELETE /v1/pages/{page}/html
+ *
+ * The soft delete clears the cached rendering — including a cached
+ * `execution_error` (DM-55470) — and schedules a fresh execution in the
+ * background. The returned URLs identify the page instance whose rendering is
+ * being recomputed.
+ */
+export const DeleteHtmlResponseSchema = z.object({
+  html_url: z.string(),
+  html_events_url: z.string(),
 });
 
 // =============================================================================
@@ -310,6 +382,7 @@ export type GitHubCheckRunConclusion = z.infer<
 >;
 export type GitHubPrState = z.infer<typeof GitHubPrStateSchema>;
 export type ExecutionStatus = z.infer<typeof ExecutionStatusSchema>;
+export type ExecutionError = z.infer<typeof ExecutionErrorSchema>;
 export type FormattedText = z.infer<typeof FormattedTextSchema>;
 export type Person = z.infer<typeof PersonSchema>;
 export type GitHubSourceMetadata = z.infer<typeof GitHubSourceMetadataSchema>;
@@ -322,6 +395,7 @@ export type PageSummary = z.infer<typeof PageSummarySchema>;
 export type Page = z.infer<typeof PageSchema>;
 export type HtmlStatus = z.infer<typeof HtmlStatusSchema>;
 export type HtmlEvent = z.infer<typeof HtmlEventSchema>;
+export type DeleteHtmlResponse = z.infer<typeof DeleteHtmlResponseSchema>;
 export type ErrorDetail = z.infer<typeof ErrorDetailSchema>;
 export type ErrorModel = z.infer<typeof ErrorModelSchema>;
 export type ValidationError = z.infer<typeof ValidationErrorSchema>;

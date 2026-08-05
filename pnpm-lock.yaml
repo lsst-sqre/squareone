@@ -86,9 +86,6 @@ importers:
       '@lsst-sqre/times-square-client':
         specifier: workspace:*
         version: link:../../packages/times-square-client
-      '@microsoft/fetch-event-source':
-        specifier: ^2.0.1
-        version: 2.0.1
       '@sentry/nextjs':
         specifier: ^10.58.0
         version: 10.58.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.8.0(@opentelemetry/api@1.9.1))(next@16.2.12(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(sass@1.91.0))(react@19.2.8)(webpack@5.109.2(esbuild@0.28.1)(lightningcss@1.31.1))
@@ -669,7 +666,7 @@ importers:
         specifier: workspace:*
         version: link:../tsconfig
       '@tanstack/react-query':
-        specifier: ^5.62.8
+        specifier: ^5.82.0
         version: 5.90.20(react@19.2.8)
       '@testing-library/react':
         specifier: ^16.1.0

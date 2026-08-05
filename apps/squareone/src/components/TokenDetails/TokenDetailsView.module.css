@@ -75,7 +75,7 @@
   background-color: var(--rsd-color-red-100);
   border: 1px solid var(--rsd-color-red-500);
   border-radius: var(--sqo-border-radius-2);
-  color: var(--rsd-color-red-900);
+  color: var(--rsd-color-red-600);
 }
 
 .scopesBadges {
@@ -98,12 +98,12 @@
   background-color: var(--rsd-color-red-100);
   border: 1px solid var(--rsd-color-red-500);
   border-radius: var(--sqo-border-radius-2);
-  color: var(--rsd-color-red-900);
+  color: var(--rsd-color-red-600);
 }
 
 .error h2 {
   margin-top: 0;
-  color: var(--rsd-color-red-900);
+  color: var(--rsd-color-red-600);
 }
 
 .error code {

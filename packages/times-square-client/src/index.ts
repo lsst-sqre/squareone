@@ -14,11 +14,18 @@
 export {
   // Types (inferred from schemas)
   type ContentNode,
+  // HTML soft delete (re-run)
+  type DeleteHtmlResponse,
+  DeleteHtmlResponseSchema,
   type ErrorDetail,
   // Error schemas
   ErrorDetailSchema,
   type ErrorModel,
   ErrorModelSchema,
+  // Execution error (DM-55470)
+  EXECUTION_ERROR_CODES,
+  type ExecutionError,
+  ExecutionErrorSchema,
   type ExecutionStatus,
   // Enum schemas
   ExecutionStatusSchema,
@@ -54,6 +61,7 @@ export {
   HtmlEventSchema,
   type HtmlStatus,
   HtmlStatusSchema,
+  type KnownExecutionErrorCode,
   type Metadata,
   MetadataSchema,
   type Page,
@@ -74,6 +82,8 @@ export {
 export {
   buildUrlWithParams,
   DEFAULT_TIMES_SQUARE_URL,
+  deleteHtmlByUrl,
+  deletePageHtml,
   fetchGitHubContents,
   fetchGitHubHtmlStatus,
   fetchGitHubPage,
@@ -126,12 +136,20 @@ export {
 } from './query-options';
 
 // =============================================================================
+// Mutation Options
+// =============================================================================
+
+export type { RerunPageVariables } from './mutation-options';
+export { rerunPageMutationOptions } from './mutation-options';
+
+// =============================================================================
 // SSE
 // =============================================================================
 
 export {
   createHtmlEventsUrl,
   type HtmlEventCallback,
+  SseConnectionFailedError,
   type SseErrorCallback,
   SseInvalidEventError,
   type SubscribeOptions,
@@ -145,6 +163,7 @@ export {
 export {
   createMockContentNode,
   mockEmptyGitHubPrContents,
+  mockExecutionError,
   mockGitHubCheckFailure,
   mockGitHubCheckInProgress,
   mockGitHubCheckSuccess,
@@ -154,9 +173,11 @@ export {
   mockGitHubPr,
   mockGitHubPrContents,
   mockHtmlEventComplete,
+  mockHtmlEventFailed,
   mockHtmlEventInProgress,
   mockHtmlEventQueued,
   mockHtmlStatusAvailable,
+  mockHtmlStatusFailed,
   mockHtmlStatusPending,
   mockPage,
   mockPageSummaries,
@@ -189,11 +210,14 @@ export {
   type UseGitHubPrContentsReturn,
   type UseHtmlStatusOptions,
   type UseHtmlStatusReturn,
+  type UseRerunPageOptions,
+  type UseRerunPageReturn,
   type UseTimesSquarePageOptions,
   type UseTimesSquarePageReturn,
   useGitHubContents,
   useGitHubPrContents,
   useHtmlStatus,
+  useRerunPage,
   useTimesSquarePage,
   useTimesSquareUrl,
 } from './hooks';

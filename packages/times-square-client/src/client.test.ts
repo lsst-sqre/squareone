@@ -4,6 +4,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
+  deleteHtmlByUrl,
+  deletePageHtml,
   fetchGitHubContents,
   fetchGitHubPrContents,
   sanitizeDisplayPath,
@@ -248,5 +250,92 @@ describe('GitHub contents normalization on parse', () => {
       'o/r/dir/nb2',
     ]);
     expect(result.owner).toBe('o');
+  });
+});
+
+describe('HTML soft delete (re-run)', () => {
+  const deleteResponse = {
+    html_url: 'https://example.com/v1/pages/summit-weather/html',
+    html_events_url: 'https://example.com/v1/pages/summit-weather/html/events',
+  };
+
+  function stubDeleteOk(): ReturnType<typeof vi.fn> {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify(deleteResponse), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    );
+    vi.stubGlobal('fetch', fetchMock);
+    return fetchMock;
+  }
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('deletePageHtml issues a DELETE to the page html endpoint', async () => {
+    const fetchMock = stubDeleteOk();
+
+    await deletePageHtml('/times-square/api/v1', 'summit-weather');
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(url).toBe('/times-square/api/v1/pages/summit-weather/html');
+    expect(init).toMatchObject({ method: 'DELETE' });
+  });
+
+  it('deletePageHtml appends the page instance parameters', async () => {
+    const fetchMock = stubDeleteOk();
+
+    await deletePageHtml('/times-square/api/v1/', 'summit-weather', {
+      site: 'summit',
+      day_obs: '2026-07-31',
+    });
+
+    expect(fetchMock.mock.calls[0][0]).toBe(
+      '/times-square/api/v1/pages/summit-weather/html?site=summit&day_obs=2026-07-31'
+    );
+  });
+
+  it('deletePageHtml returns the parsed delete response', async () => {
+    stubDeleteOk();
+
+    const result = await deletePageHtml(
+      '/times-square/api/v1',
+      'summit-weather'
+    );
+
+    expect(result).toEqual(deleteResponse);
+  });
+
+  it('deletePageHtml throws a TimesSquareError on a failed request', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockResolvedValue(
+          new Response('{}', { status: 404, statusText: 'Not Found' })
+        )
+    );
+
+    await expect(
+      deletePageHtml('/times-square/api/v1', 'summit-weather')
+    ).rejects.toBeInstanceOf(TimesSquareError);
+  });
+
+  it('deleteHtmlByUrl issues a DELETE to the given html URL with params', async () => {
+    const fetchMock = stubDeleteOk();
+
+    await deleteHtmlByUrl(
+      'https://example.com/times-square/api/v1/pages/summit-weather/html',
+      { site: 'summit' }
+    );
+
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(url).toBe(
+      'https://example.com/times-square/api/v1/pages/summit-weather/html?site=summit'
+    );
+    expect(init).toMatchObject({ method: 'DELETE' });
   });
 });

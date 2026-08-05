@@ -10,6 +10,8 @@ import { z } from 'zod';
 import { TimesSquareError } from './errors';
 import { normalizeGitHubContents } from './normalize';
 import {
+  type DeleteHtmlResponse,
+  DeleteHtmlResponseSchema,
   type GitHubContentsRoot,
   GitHubContentsRootSchema,
   type GitHubPrContents,
@@ -333,6 +335,78 @@ export async function fetchHtmlStatusByUrl(
 
   const data = await response.json();
   return HtmlStatusSchema.parse(data);
+}
+
+// =============================================================================
+// HTML Soft Delete (re-run)
+// =============================================================================
+
+/**
+ * Request a re-run of a page instance by soft-deleting its cached HTML.
+ *
+ * Times Square keeps the stale rendering available to existing clients while a
+ * fresh execution runs in the background. The soft delete also clears a cached
+ * `execution_error`, so the next `htmlstatus` response reports
+ * `execution_error: null` and polling can resume.
+ *
+ * @endpoint DELETE /v1/pages/{page}/html
+ *
+ * @param baseUrl - Times Square base URL
+ * @param pageName - The page name/slug
+ * @param params - Optional notebook parameters identifying the page instance
+ * @returns The re-running instance's HTML and HTML-events URLs
+ * @throws TimesSquareError if request fails
+ */
+export async function deletePageHtml(
+  baseUrl: string,
+  pageName: string,
+  params?: Record<string, string>
+): Promise<DeleteHtmlResponse> {
+  const url = buildUrlWithParams(
+    `${normalizeUrl(baseUrl)}/pages/${encodeURIComponent(pageName)}/html`,
+    params
+  );
+
+  return requestHtmlDelete(url);
+}
+
+/**
+ * Request a re-run of a page instance using its `html_url` directly.
+ *
+ * Mirrors {@link fetchHtmlStatusByUrl}: consumers that already hold a
+ * fully-formed HTML URL (e.g. from page metadata or an SSE `html_url`) can skip
+ * rebuilding it from the page name and base URL.
+ *
+ * @param htmlUrl - Direct URL to the page instance's HTML endpoint
+ * @param params - Optional notebook parameters to append to the URL
+ * @returns The re-running instance's HTML and HTML-events URLs
+ * @throws TimesSquareError if request fails
+ */
+export async function deleteHtmlByUrl(
+  htmlUrl: string,
+  params?: Record<string, string>
+): Promise<DeleteHtmlResponse> {
+  return requestHtmlDelete(buildUrlWithParams(htmlUrl, params));
+}
+
+/**
+ * Issue the soft-delete request against an already-built URL.
+ */
+async function requestHtmlDelete(url: string): Promise<DeleteHtmlResponse> {
+  const response = await fetch(url, {
+    method: 'DELETE',
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new TimesSquareError(
+      `Failed to request notebook re-run: ${response.status} ${response.statusText}`,
+      response.status
+    );
+  }
+
+  const data = await response.json();
+  return DeleteHtmlResponseSchema.parse(data);
 }
 
 // =============================================================================

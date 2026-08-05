@@ -2,9 +2,17 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ZodError } from 'zod';
 import { getEmptyGitHubContents, getEmptyGitHubPrContents } from './client';
 import {
+  mockHtmlStatusAvailable,
+  mockHtmlStatusFailed,
+  mockHtmlStatusPending,
+} from './mock-data';
+import {
   githubContentsQueryOptions,
   githubPrContentsQueryOptions,
+  htmlStatusQueryOptions,
+  htmlStatusUrlQueryOptions,
 } from './query-options';
+import type { HtmlStatus } from './schemas';
 
 /**
  * Stub `fetch` with an OK response carrying the given JSON body. A body that
@@ -57,6 +65,24 @@ const validGitHubPrContents = {
 };
 
 const baseUrl = 'https://example.com/times-square/api/v1';
+
+/**
+ * Invoke a query options object's `refetchInterval` as TanStack Query does,
+ * with a minimal stand-in for the `Query` whose cached data drives the
+ * decision.
+ */
+function refetchIntervalFor(
+  opts: { refetchInterval?: unknown },
+  data: HtmlStatus | undefined
+): number | false | undefined {
+  const { refetchInterval } = opts;
+  if (typeof refetchInterval !== 'function') {
+    throw new TypeError('refetchInterval is not a function');
+  }
+  return (refetchInterval as (query: unknown) => number | false | undefined)({
+    state: { data },
+  });
+}
 
 beforeEach(() => {
   vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -220,5 +246,41 @@ describe('githubPrContentsQueryOptions', () => {
 
     expect(result).toEqual(getEmptyGitHubPrContents());
     expect(reportError).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('htmlStatusQueryOptions', () => {
+  const pageName = 'summit-weather';
+
+  it('keeps the 1 s poll cadence while no execution error is reported', () => {
+    const opts = htmlStatusQueryOptions(pageName, undefined, baseUrl);
+
+    expect(refetchIntervalFor(opts, undefined)).toBe(1000);
+    expect(refetchIntervalFor(opts, mockHtmlStatusPending)).toBe(1000);
+    expect(refetchIntervalFor(opts, mockHtmlStatusAvailable)).toBe(1000);
+  });
+
+  it('stops polling once the status carries an execution error', () => {
+    const opts = htmlStatusQueryOptions(pageName, undefined, baseUrl);
+
+    expect(refetchIntervalFor(opts, mockHtmlStatusFailed)).toBe(false);
+  });
+});
+
+describe('htmlStatusUrlQueryOptions', () => {
+  const htmlStatusUrl = `${baseUrl}/pages/summit-weather/htmlstatus`;
+
+  it('keeps the 1 s poll cadence while no execution error is reported', () => {
+    const opts = htmlStatusUrlQueryOptions(htmlStatusUrl);
+
+    expect(refetchIntervalFor(opts, undefined)).toBe(1000);
+    expect(refetchIntervalFor(opts, mockHtmlStatusPending)).toBe(1000);
+    expect(refetchIntervalFor(opts, mockHtmlStatusAvailable)).toBe(1000);
+  });
+
+  it('stops polling once the status carries an execution error', () => {
+    const opts = htmlStatusUrlQueryOptions(htmlStatusUrl);
+
+    expect(refetchIntervalFor(opts, mockHtmlStatusFailed)).toBe(false);
   });
 });

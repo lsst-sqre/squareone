@@ -7,6 +7,7 @@ import { NextResponse } from 'next/server';
 
 import { loadAppConfig } from '@/lib/config/loader';
 import { createRouteLogger } from '@/lib/logger';
+import { buildMockPage } from '@/lib/mocks/timesSquarePage';
 
 const log = createRouteLogger(
   'times-square/github-pr/[owner]/[repo]/[commit]/[...tsSlug]'
@@ -17,30 +18,17 @@ export async function GET() {
     const page = 'demo';
     const appConfig = await loadAppConfig();
     const { timesSquareUrl } = appConfig;
-    const pageBaseUrl = `${timesSquareUrl}/v1/pages/${page}`;
 
-    const content = {
+    const content = buildMockPage({
       name: page,
-      title: `Title for ${page}`,
-      description: '<p>This is the description.</p>',
-      self_url: pageBaseUrl,
-      source_url: `${pageBaseUrl}/source`,
-      rendered_url: `${pageBaseUrl}/rendered`,
-      html_url: `${pageBaseUrl}/html`,
-      html_status_url: `${pageBaseUrl}/htmlstatus`,
-      parameters: {
-        a: {
-          type: 'number',
-          default: 42,
-          description: 'A number.',
-        },
-        b: {
-          type: 'string',
-          default: 'Hello',
-          description: 'A string.',
-        },
+      timesSquareUrl,
+      github: {
+        owner: 'lsst-sqre',
+        repository: 'times-square-demo',
+        source_path: `${page}.ipynb`,
+        sidecar_path: `${page}.yaml`,
       },
-    };
+    });
 
     return NextResponse.json(content);
   } catch (error) {

@@ -10,6 +10,7 @@ import {
   htmlStatusQueryOptions,
   htmlStatusUrlQueryOptions,
 } from '../query-options';
+import type { ExecutionError } from '../schemas';
 
 import { useTimesSquareUrl } from './useTimesSquareUrl';
 
@@ -41,6 +42,14 @@ export type UseHtmlStatusReturn = {
   htmlUrl: string | null;
   /** Key for iframe to force re-render on content change */
   iframeKey: string;
+  /**
+   * Terminal notebook execution failure reported by Times Square, or `null`
+   * when execution is pending or succeeded.
+   *
+   * A non-null value is terminal: polling stops until the query is
+   * invalidated (e.g. by a re-run).
+   */
+  executionError: ExecutionError | null;
   /** Whether the query is loading */
   isLoading: boolean;
   /** Error if the query failed */
@@ -56,6 +65,10 @@ export type UseHtmlStatusReturn = {
  * notebook execution progress. It provides an `iframeKey` that changes
  * when new HTML is available, which can be used as a React key to
  * force iframe re-rendering.
+ *
+ * Polling stops when the status reports a terminal `execution_error`, which
+ * is surfaced as `executionError`; invalidating the query (e.g. after a
+ * re-run) resumes polling.
  *
  * There are two ways to use this hook:
  *
@@ -127,6 +140,7 @@ export function useHtmlStatus(
     htmlHash: data?.html_hash ?? null,
     htmlUrl: data?.html_url ?? null,
     iframeKey,
+    executionError: data?.execution_error ?? null,
     isLoading,
     error: error ?? null,
     refetch,

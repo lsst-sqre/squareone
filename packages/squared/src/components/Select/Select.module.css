@@ -51,7 +51,7 @@
 
 .trigger[aria-invalid="true"] {
   border-color: var(--rsd-color-red-500);
-  color: var(--rsd-color-red-900);
+  color: var(--rsd-color-red-600);
 }
 
 .trigger[aria-invalid="true"]:focus-visible {

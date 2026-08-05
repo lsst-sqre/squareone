@@ -10,8 +10,16 @@
   margin-bottom: 0;
 }
 
+/* Failure summary headline: the API's execution-error title. */
+.failure {
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 0;
+  color: var(--rsd-color-red-600);
+}
+
 .error {
   font-size: 0.8rem;
   margin-bottom: 0;
-  color: var(--rsd-color-red-900);
+  color: var(--rsd-color-red-600);
 }
