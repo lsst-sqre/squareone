@@ -14,3 +14,7 @@ out/
 
 # devcontainer config files are JSONC (comments + stoker-managed sentinels)
 .devcontainer/
+
+# gitignored Playwright MCP page snapshots are YAML, so the prettier:yaml
+# glob would otherwise pick them up
+.playwright-mcp/
