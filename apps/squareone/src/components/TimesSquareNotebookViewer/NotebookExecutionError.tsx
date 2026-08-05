@@ -68,15 +68,22 @@ export default function NotebookExecutionError({
     : genericPresentation;
 
   return (
-    // The panel replaces the viewer's loading state once execution fails, so it
-    // is announced as an alert. The re-run failure message below lives inside
-    // this same live region rather than declaring a nested one of its own.
-    <div className={[styles.panel, tone].join(' ')} role="alert">
-      <div className={styles.header}>
-        <Icon className={styles.icon} size={24} aria-hidden="true" />
-        <h2 className={styles.title}>{executionError.title}</h2>
+    <div className={[styles.panel, tone].join(' ')}>
+      {/*
+        The panel replaces the viewer's loading state once execution fails, so
+        the failure copy is announced as an alert. The alert wraps only that
+        text: an alert region is not meant to hold focusable content, so the
+        re-run action sits outside it (the alternative, `alertdialog`, would
+        claim a modality this panel does not have). The icon is decorative and
+        already `aria-hidden`, leaving the title and message as the announcement.
+      */}
+      <div role="alert">
+        <div className={styles.header}>
+          <Icon className={styles.icon} size={24} aria-hidden="true" />
+          <h2 className={styles.title}>{executionError.title}</h2>
+        </div>
+        <p className={styles.message}>{executionError.message}</p>
       </div>
-      <p className={styles.message}>{executionError.message}</p>
       <div className={styles.actions}>
         <Button
           appearance="outline"
@@ -87,8 +94,13 @@ export default function NotebookExecutionError({
         >
           Re-run notebook
         </Button>
+        {/*
+          Its own alert, the canonical use of the role: text inserted into the
+          page in response to the click, announced where it appears rather than
+          folded into the failure copy above.
+        */}
         {rerunFailed && (
-          <p className={styles.rerunError}>
+          <p className={styles.rerunError} role="alert">
             Failed to request a re-run. Please try again.
           </p>
         )}
