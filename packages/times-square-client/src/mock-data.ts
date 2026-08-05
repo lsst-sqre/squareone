@@ -157,7 +157,7 @@ export const mockHtmlStatusFailed: HtmlStatus = {
  * Mock HTML event for queued execution.
  */
 export const mockHtmlEventQueued: HtmlEvent = {
-  date_submitted: new Date().toISOString(),
+  date_submitted: '2024-01-15T10:30:00.000Z',
   date_started: null,
   date_finished: null,
   execution_status: 'queued',
@@ -171,8 +171,8 @@ export const mockHtmlEventQueued: HtmlEvent = {
  * Mock HTML event for in-progress execution.
  */
 export const mockHtmlEventInProgress: HtmlEvent = {
-  date_submitted: new Date(Date.now() - 5000).toISOString(),
-  date_started: new Date(Date.now() - 3000).toISOString(),
+  date_submitted: '2024-01-15T10:30:00.000Z',
+  date_started: '2024-01-15T10:30:02.000Z',
   date_finished: null,
   execution_status: 'in_progress',
   execution_duration: null,
@@ -185,9 +185,9 @@ export const mockHtmlEventInProgress: HtmlEvent = {
  * Mock HTML event for completed execution.
  */
 export const mockHtmlEventComplete: HtmlEvent = {
-  date_submitted: new Date(Date.now() - 10000).toISOString(),
-  date_started: new Date(Date.now() - 8000).toISOString(),
-  date_finished: new Date().toISOString(),
+  date_submitted: '2024-01-15T10:30:00.000Z',
+  date_started: '2024-01-15T10:30:02.000Z',
+  date_finished: '2024-01-15T10:30:10.500Z',
   execution_status: 'complete',
   execution_duration: 8.5,
   html_hash: 'abc123def456789012345678901234567890abcd',
@@ -202,9 +202,9 @@ export const mockHtmlEventComplete: HtmlEvent = {
  * `null` and `execution_error` carries the user-facing failure copy.
  */
 export const mockHtmlEventFailed: HtmlEvent = {
-  date_submitted: new Date(Date.now() - 10000).toISOString(),
-  date_started: new Date(Date.now() - 8000).toISOString(),
-  date_finished: new Date().toISOString(),
+  date_submitted: '2024-01-15T10:30:00.000Z',
+  date_started: '2024-01-15T10:30:02.000Z',
+  date_finished: '2024-01-15T10:30:10.500Z',
   execution_status: 'complete',
   execution_duration: 8.5,
   html_hash: null,
