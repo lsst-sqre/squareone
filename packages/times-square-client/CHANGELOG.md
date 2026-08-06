@@ -1,5 +1,39 @@
 # @lsst-sqre/times-square-client
 
+## 3.1.0
+
+### Minor Changes
+
+- [#631](https://github.com/lsst-sqre/squareone/pull/631) [`4b89dca`](https://github.com/lsst-sqre/squareone/commit/4b89dca40072e19ef793ff2feac837564f726331) Thanks [@jonathansick](https://github.com/jonathansick)! - Adopt the Times Square `execution_error` contract (DM-55470). `HtmlStatusSchema` and `HtmlEventSchema` now carry an optional-nullable `execution_error` object that defaults to `null`, so responses from Times Square deployments predating DM-55470 — which omit the key entirely — continue to parse. The new `ExecutionErrorSchema` parses `code` as a plain string for forward compatibility, with the codes known at build time (`timeout`, `jupyter_error`, `unknown`, `result_unavailable`) exported as the `EXECUTION_ERROR_CODES` const. Failed-state mock fixtures (`mockExecutionError`, `mockHtmlStatusFailed`, `mockHtmlEventFailed`) are available for development and testing.
+
+  A reported `execution_error` is now treated as terminal by the html-status polling path: `htmlStatusQueryOptions` and `htmlStatusUrlQueryOptions` compute `refetchInterval` from the cached status, returning `false` once `execution_error` is non-null instead of polling the endpoint forever. Invalidating the query (as a re-run does) resumes the normal 1 s cadence, and polling behavior is otherwise unchanged. `useHtmlStatus` surfaces the failure as a new `executionError` field, `null` while execution is pending or has succeeded.
+
+  The SSE path treats `execution_error` as terminal too: `subscribeToHtmlEvents` now auto-aborts on an event carrying a non-null `execution_error`, not only on a successful `complete` event with an `html_hash`. A failed run reports `complete` with no `html_hash`, so the previous condition alone left the stream open indefinitely. The terminal event is still delivered to `onEvent` first, then `onComplete` fires and the stream is aborted; `autoAbortOnComplete: false` disables both terminal conditions.
+
+  The package can now request a re-run, which is how a terminal failure is cleared. `deletePageHtml(baseUrl, pageName, params)` and `deleteHtmlByUrl(htmlUrl, params)` issue Times Square's `DELETE /v1/pages/{page}/html` soft delete and return the parsed `DeleteHtmlResponse` (`html_url`, `html_events_url`); the two call shapes mirror `fetchHtmlStatus`/`fetchHtmlStatusByUrl` so a consumer holding either a page name or a fully-formed `html_url` can re-run without rebuilding the other. `rerunPageMutationOptions(queryClient)` — the package's first mutation-options factory, in a new `mutation-options.ts` alongside `query-options.ts` — wraps them behind a `RerunPageVariables` union and, on success, invalidates every html-status query by the shared `['times-square', 'html-status']` key prefix, covering both the `htmlStatusForPage` and `htmlStatusByUrl` key shapes. That drops the cached terminal `execution_error`, so polling resumes on the refetched status. The `useRerunPage` hook is the React entry point, filling in the repertoire-discovered base URL and exposing `rerunPage`, `rerunPageAsync`, `isPending`, `isError`, `error`, and `reset`. In-flight re-runs are observable via the new `timesSquareKeys.rerunPage()` mutation key.
+
+  The `@tanstack/react-query` peer range floor is raised from `^5` to `^5.82.0`. `rerunPageMutationOptions` is built on the `mutationOptions` helper, which first shipped in `@tanstack/react-query` 5.82.0 (5.81.5, the last 5.81.x release, does not export it), so an early-5.x consumer would previously have failed at import.
+
+  The vendored `openapi.json` is re-vendored at Times Square 0.25.0 (from 0.24.2.dev9+g3ee2b2a55), the release that ships the `execution_error` contract. The only API-surface change is on the `htmlstatus` response: `HtmlStatus` gains an optional-nullable `execution_error`, backed by the new `HtmlExecutionError` (`code`, `title`, `message`) and `NotebookExecutionErrorCode` (`timeout`, `jupyter_error`, `unknown`, `result_unavailable`) schemas — exactly what `ExecutionErrorSchema` already models. The SSE `html/events` payload is not schema-modeled upstream (the endpoint declares an untyped `text/event-stream` response), so `HtmlEventSchema`'s `execution_error` remains client-side only.
+
+  `subscribeToHtmlEvents` also gained optional bounded-reconnect options. `maxReconnectAttempts` caps the number of consecutive connection failures before the subscription gives up: the stream is aborted and a terminal `SseConnectionFailedError` (carrying the last underlying error as `cause` and the failure count as `attempts`) is reported through `onError`, so a consumer can drive a connection-failed UI state and a once-only error capture. `reconnectBackoffMs` sets a base delay between reconnect attempts that scales linearly with the failure count, capped at ten times the base delay so the wait plateaus rather than climbing without bound through a long outage when `maxReconnectAttempts` is left unset. The failure counter resets whenever a connection opens successfully. Both options default to unset, leaving the transport's existing unbounded retry behavior unchanged.
+
+### Patch Changes
+
+- [#618](https://github.com/lsst-sqre/squareone/pull/618) [`9f5604b`](https://github.com/lsst-sqre/squareone/commit/9f5604b8a0caf825fbb11211a203ac25eb186335) Thanks [@jonathansick](https://github.com/jonathansick)! - Refresh the vendored OpenAPI specs for the Repertoire and Times Square clients
+
+  - `repertoire-client`: re-vendored `openapi.json` at Repertoire 2.1.0 (from 2.0.0). The only API-surface change is the `operationId` on `/api/registry`, which is now `get_oai_api_registry_get` for both the GET and POST operations. No schemas changed, so the Zod schemas and types are unaffected.
+  - `times-square-client`: re-vendored `openapi.json` at Times Square 0.24.2.dev9+g3ee2b2a55 (from 0.23.1.dev24+g576ef1393). The `ValidationError` schema gained two optional fields, `input` and `ctx`; neither is required, and `ValidationErrorSchema` strips unknown keys, so existing parsing is unchanged.
+
+- [#631](https://github.com/lsst-sqre/squareone/pull/631) [`1a9e547`](https://github.com/lsst-sqre/squareone/commit/1a9e54771fcac50fb906f69e9e92f891434c4d95) Thanks [@jonathansick](https://github.com/jonathansick)! - Accept the idle HTML-events payload from Times Square. `HtmlEventSchema` required a non-null `date_submitted` and `execution_status`, but Times Square's `HtmlEventsModel` declares both as nullable and the SSE stream emits an event on a fixed interval whether or not there is anything to report. A page instance with neither a Noteburst job nor a cached rendering therefore yields an event with `date_submitted`, `date_started`, `date_finished`, `execution_status`, `execution_duration`, and `html_hash` all null — only `html_url` is populated. Both fields are now `.nullable()`, matching the other execution fields.
+
+  Against a healthy server this made `subscribeToHtmlEvents` drop the event and report an `SseInvalidEventError` as API contract drift. Consumers already typed `dateSubmitted` and `executionStatus` as nullable and render nothing for a null status, so no downstream behavior changes. The SSE payload is not described in Times Square's OpenAPI spec — the endpoint declares an untyped `text/event-stream` response — so this mismatch could not be caught by re-vendoring `openapi.json`.
+
+  The dev mocks gain an idle state so the payload is reproducible without a live Times Square: `?a=4` (`IDLE_A_VALUE`) reports a page instance that has nothing to say yet, alongside the existing pending (`2`) and failing (`3`) magic values.
+
+- Updated dependencies [[`9f5604b`](https://github.com/lsst-sqre/squareone/commit/9f5604b8a0caf825fbb11211a203ac25eb186335)]:
+  - @lsst-sqre/repertoire-client@0.4.1
+
 ## 3.0.0
 
 ### Minor Changes

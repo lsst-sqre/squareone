@@ -1,5 +1,11 @@
 # @lsst-sqre/squared
 
+## 0.16.1
+
+### Patch Changes
+
+- [#631](https://github.com/lsst-sqre/squareone/pull/631) [`b8947fe`](https://github.com/lsst-sqre/squareone/commit/b8947fed47273e1bb52d7716e656a8ecb9924917) Thanks [@jonathansick](https://github.com/jonathansick)! - Fix the error-state text color in `TextInput`, `TextArea`, and `Select`. Their error variants set `color: var(--rsd-color-red-900)`, but rubin-style-dictionary's red scale ends at 800, so the custom property was undefined, the declaration was dropped, and error text rendered in the inherited body color instead of red. They now use `--rsd-color-red-600` ("Dark red for solid backgrounds and text"), matching the `--rsd-color-red-500` border those variants already carry.
+
 ## 0.16.0
 
 ### Minor Changes
