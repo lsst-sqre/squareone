@@ -29,9 +29,13 @@
 }
 
 /* Link styling */
+/*
+ * Footer links are underlined at rest so they are distinguishable from
+ * surrounding text by more than color alone (WCAG 1.4.1).
+ */
 .footer a {
   color: var(--rsd-component-text-link-color);
-  text-decoration: none;
+  text-decoration: underline;
 }
 
 .footer a:hover {

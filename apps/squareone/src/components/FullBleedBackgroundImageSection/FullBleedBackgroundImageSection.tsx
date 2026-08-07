@@ -29,7 +29,7 @@ export default function FullBleedBackgroundImageSection({
         } as React.CSSProperties
       }
     >
-      {children}
+      <div className={styles.content}>{children}</div>
     </section>
   );
 }
