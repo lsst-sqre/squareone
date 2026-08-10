@@ -6,8 +6,8 @@ updates:
     directory: '/'
     schedule:
       interval: 'monthly'
-      day: 'monday'
       time: '03:00'
+      timezone: 'America/New_York'
     open-pull-requests-limit: 15
     rebase-strategy: 'auto'
     commit-message:
@@ -48,46 +48,6 @@ updates:
         patterns:
           - '*'
 
-      # React ecosystem
-      react:
-        patterns:
-          - 'react'
-          - 'react-dom'
-          - '@types/react'
-          - '@types/react-dom'
-
-      # Next.js framework and plugins
-      nextjs:
-        patterns:
-          - 'next'
-          - '@next/*'
-          - 'next-*'
-          - 'eslint-config-next'
-
-      # Storybook ecosystem
-      storybook:
-        patterns:
-          - 'storybook'
-          - '@storybook/*'
-          - 'eslint-plugin-storybook'
-          - 'msw'
-          - 'msw-storybook-addon'
-
-      # Playwright browser testing
-      # (grouped to ensure GitHub Actions is also updated)
-      playwright:
-        patterns:
-          - 'playwright'
-          - '@playwright/*'
-
-      # Monorepo infrastructure (Turborepo + Changesets)
-      monorepo-infra:
-        patterns:
-          - 'turbo'
-          - '@turbo/*'
-          - 'eslint-config-turbo'
-          - '@changesets/*'
-
       # Catchall for development dependencies
       development:
         dependency-type: 'development'
@@ -105,7 +65,8 @@ updates:
     directory: '/'
     schedule:
       interval: 'monthly'
-      day: 'tuesday'
+      time: '03:00'
+      timezone: 'America/New_York'
     rebase-strategy: 'auto'
     groups:
       actions:
@@ -115,18 +76,29 @@ updates:
   # Python dependencies (pip)
   - package-ecosystem: 'pip'
     directory: '/'
+    versioning-strategy: 'increase-if-necessary'
     schedule:
       interval: 'monthly'
-      day: 'wednesday'
+      time: '03:00'
+      timezone: 'America/New_York'
     rebase-strategy: 'auto'
+    groups:
+      pip:
+        patterns:
+          - '*'
 
   # Docker base images
   - package-ecosystem: 'docker'
     directory: '/'
     schedule:
       interval: 'monthly'
-      day: 'wednesday'
+      time: '03:00'
+      timezone: 'America/New_York'
     rebase-strategy: 'auto'
+    groups:
+      docker:
+        patterns:
+          - '*'
 
 registries:
   npm-github:
