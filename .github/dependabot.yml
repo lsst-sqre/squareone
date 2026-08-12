@@ -89,12 +89,27 @@ updates:
 
   # Docker base images
   - package-ecosystem: 'docker'
-    directory: '/'
+    # The only Dockerfile is apps/squareone/Dockerfile. Under the previous
+    # `directory: '/'` Dependabot never opened a single docker PR, even with
+    # Node 24 and 26 released and majors unblocked — every Node bump in the
+    # Dockerfile's history was made by hand. Point it at the directory that
+    # actually holds the Dockerfile; `directories` globs, `directory` does not,
+    # so this keeps working if another app gains one.
+    directories:
+      - '/apps/*'
     schedule:
       interval: 'monthly'
       time: '03:00'
       timezone: 'America/New_York'
     rebase-strategy: 'auto'
+
+    # Block major version updates, matching the npm policy above. A Node major
+    # bump also requires coordinated changes to engines.node and the CI
+    # container images, so it is always a manual change.
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
+
     groups:
       docker:
         patterns:

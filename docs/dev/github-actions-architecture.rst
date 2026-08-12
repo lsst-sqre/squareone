@@ -618,19 +618,20 @@ The npm ecosystem uses broad catchall groups rather than per-package-ecosystem o
      - Documentation build dependencies.
    * - ``docker``
      - ``docker``
-     - Base images.
+     - Base images. Scoped to ``directories: ['/apps/*']`` because the only Dockerfile lives at :file:`apps/squareone/Dockerfile` — under the earlier ``directory: '/'`` no docker PR was ever opened. The ``directories`` key globs; ``directory`` does not. Majors are blocked here too.
 
 Two configuration-wide rules apply to npm:
 
-- **Major versions are blocked globally** by an ``ignore`` rule for ``version-update:semver-major``, so major upgrades are always a manual change.
+- **Major versions are blocked** by an ``ignore`` rule for ``version-update:semver-major``, so major upgrades are always a manual change. The ``docker`` ecosystem carries the same rule; ``github-actions`` and ``pip`` do not.
 - **A cooldown delays new releases** (3 days for patch, 5 for minor) to mitigate supply-chain attacks. Core framework packages (``react``, ``react-dom``, ``next``, ``@next/*``, ``typescript``) and ``@types/*`` are excluded from the cooldown; security updates bypass it automatically.
 
 .. note::
 
-   Because the ``development`` group is a monthly catchall, its PR can cross several minor versions of a tool at once, and version-pinning that lives *outside* :file:`package.json` will not be updated by Dependabot. Two known couplings must be fixed by hand on the PR branch:
+   Because the ``development`` group is a monthly catchall, its PR can cross several minor versions of a tool at once, and version-pinning that lives *outside* :file:`package.json` will not be updated by Dependabot. Three known couplings must be fixed by hand on the PR branch:
 
    - :file:`apps/squareone/Dockerfile` pins ``turbo`` for the ``turbo prune`` step; ``validate-docker-versions.js`` requires an exact match with ``package.json``. See the ``docker-version-validation`` skill.
    - :file:`biome.json` pins the Biome ``$schema`` version; ``validate-biome-schema.js`` requires it to match the installed ``@biomejs/biome``. See the ``biome-migrate`` skill.
+   - The Node base image in :file:`apps/squareone/Dockerfile` must match ``engines.node`` in the root :file:`package.json` to **major.minor** precision (patch differences are allowed). A Docker-group PR bumping the Node *minor* therefore also needs ``engines.node`` updated in the same PR; a patch bump passes on its own.
 
    Both validators run early in the ``test`` job and fail the build before the linting, type-checking, and test steps execute — so a failure in one can mask further breakage behind it. Re-run the full ``pnpm localci`` locally after fixing.
 
