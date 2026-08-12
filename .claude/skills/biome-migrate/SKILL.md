@@ -4,7 +4,7 @@ description: |
   Run `biome migrate` whenever the @biomejs/biome version changes so biome.json's
   $schema (and any deprecated config) stays in sync with the installed Biome.
   Use when processing a dependabot PR that bumps @biomejs/biome (it arrives via the
-  npm monorepo-infra group), when biome:lint/biome:format reports an info like
+  monthly npm development group), when biome:lint/biome:format reports an info like
   "Expected: <new> Found: <old> — Run the command biome migrate", or any time you
   notice biome.json's $schema version lagging the installed Biome, or when the
   "Validate Biome schema version" CI step (validate-biome-schema.js) fails.
@@ -27,13 +27,19 @@ follow-up** to any Biome version bump — most often a dependabot PR.
 
 ## When to use this skill
 
-- **Processing a dependabot PR that bumps `@biomejs/biome`.** Biome is bumped
-  through the npm **`monorepo-infra`** group (e.g. the group PR that moved
-  Biome `2.3.12` → `2.3.14`), so it rides along with other tooling bumps rather
-  than arriving as a lone "bump @biomejs/biome" PR — check each `monorepo-infra`
-  group PR's file list for a `@biomejs/biome` change. See the user-level
+- **Processing a dependabot PR that bumps `@biomejs/biome`.** Biome is a
+  devDependency, so it arrives in the npm **`development`** group — a monthly
+  catchall covering every development-type dependency (e.g. the group PR that
+  moved Biome `2.3.14` → `2.5.7` alongside 21 other packages). It never arrives
+  as a lone "bump @biomejs/biome" PR, so check each `development` group PR's
+  file list for a `@biomejs/biome` change. See the user-level
   `rubin-dependabot-triage` skill for the overall triage flow; this skill is the
   Biome-specific step to fold into it.
+
+  Because the group is a catchall on a monthly cadence, these PRs are large and
+  can cross several Biome minor versions at once — expect the migrate to rename
+  config keys, not just bump `$schema`, and expect new-in-that-version lint
+  rules and formatter changes to require follow-up fixes in the same PR.
 - **`biome:lint` / `biome:format:check` prints a schema info**, for example:
 
   ```
@@ -69,7 +75,34 @@ For a routine patch/minor bump this rewrites only the `$schema` line, e.g.:
 ```
 
 A larger version jump may also migrate renamed or deprecated config keys —
-review the full diff and keep the migrated result.
+review the full diff and keep the migrated result. The `2.3.14` → `2.5.7`
+migrate, for instance, also renamed every per-group rule preset:
+
+```diff
+   "linter": {
+     "rules": {
+-      "recommended": true,
++      "preset": "recommended",
+```
+
+## After the migrate: expect fallout from the new version
+
+`biome migrate` only reconciles the config file. The newly-installed Biome may
+also format differently or promote new rules to errors, and those show up in the
+*next* CI step rather than in the migrate itself. After migrating, run the
+formatter and linter and fold any fixes into the same commit:
+
+```bash
+pnpm run biome:format   # biome check --write — applies formatting + safe autofixes
+pnpm run biome:lint     # must report 0 errors; warnings are allowed
+```
+
+`biome:format` rewrites files in place, so review its diff rather than assuming
+it was a no-op. Anything `biome:lint` still reports as an *error* needs a real
+code change — the repo's own idioms are usually the cheapest fix. For example,
+2.5 promoted `correctness/noUnsafeOptionalChaining`, which flags
+`(init?.headers as Record<string, string>)['x-csrf-token']`; the fix was to
+adopt the two-statement form already used elsewhere in the same test suite.
 
 ## Verify
 

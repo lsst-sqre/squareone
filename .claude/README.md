@@ -236,7 +236,7 @@ Skills are modular capabilities that extend Claude's expertise with domain-speci
 
 #### biome-migrate
 
-**When to use**: Processing a dependabot PR that bumps `@biomejs/biome` (arrives via the npm `monorepo-infra` group), seeing a `biome:lint`/`biome:format` schema info ("Expected … Found … Run the command biome migrate"), a failing "Validate Biome schema version" CI step, or noticing `biome.json`'s `$schema` version lagging the installed Biome
+**When to use**: Processing a dependabot PR that bumps `@biomejs/biome` (arrives via the monthly npm `development` group), seeing a `biome:lint`/`biome:format` schema info ("Expected … Found … Run the command biome migrate"), a failing "Validate Biome schema version" CI step, or noticing `biome.json`'s `$schema` version lagging the installed Biome
 
 **Covers**:
 
@@ -244,6 +244,7 @@ Skills are modular capabilities that extend Claude's expertise with domain-speci
 - Recognizing the non-blocking info-level signal that a migrate is overdue
 - The `validate-biome-schema` enforcement check that runs in CI, on pre-commit, and in `pnpm localci`
 - Folding the migrate into a dependabot PR branch vs. a follow-up branch when the bump already merged
+- Handling fallout from the new Biome version (formatter changes, newly-promoted lint rules) in the same commit
 - Why the change needs no Changeset (repo-root tooling config)
 
 **Supporting files**:

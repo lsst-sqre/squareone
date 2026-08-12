@@ -570,7 +570,9 @@ The Dependabot configuration already blocks major version updates globally with 
 
 **Grouped updates:**
 
-When Dependabot creates grouped update PRs (e.g., "Update React ecosystem"), ``dependabot/fetch-metadata`` reports the group's highest semver change. ``dependabot-label.yaml`` labels the PR with that single highest type, so the group is auto-merged only when its highest bump is a minor or patch (no major versions in the group).
+When Dependabot creates grouped update PRs (e.g., "bump the development group with 22 updates"), ``dependabot/fetch-metadata`` reports the group's highest semver change. ``dependabot-label.yaml`` labels the PR with that single highest type, so the group is auto-merged only when its highest bump is a minor or patch (no major versions in the group).
+
+Since the monthly move, the npm groups are broad catchalls (``security-patch``, ``development``, ``runtime``) rather than per-ecosystem groups, so a single PR can span dozens of packages. A grouped PR that lands green is auto-merged as one unit, which makes the pre-merge validation on that branch the effective gate — see :ref:`dependabot-config-cadence` below.
 
 Disabling auto-merge
 ---------------------
@@ -589,6 +591,48 @@ Add a comment or label to the PR. GitHub will automatically cancel the auto-merg
 
 1. Remove or disable the :file:`.github/workflows/dependabot-auto-merge.yaml` workflow file
 2. Dependabot PRs will still receive changeset files but will require manual merge
+
+.. _dependabot-config-cadence:
+
+Dependabot cadence and groups
+------------------------------
+
+All four ecosystems in :file:`.github/dependabot.yml` update **monthly** at 03:00 America/New_York.
+The npm ecosystem uses broad catchall groups rather than per-package-ecosystem ones:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 20 25 55
+
+   * - Ecosystem
+     - Groups
+     - Notes
+   * - ``npm``
+     - ``security-patch``, ``development``, ``runtime``
+     - ``security-patch`` carries ``applies-to: security-updates`` and covers patch/minor security fixes. ``development`` and ``runtime`` apply to ordinary version updates and are catchalls keyed on ``dependency-type``, so nearly every routine bump lands in one of two large PRs per month.
+   * - ``github-actions``
+     - ``actions``
+     - Single group for all action version bumps.
+   * - ``pip``
+     - ``pip``
+     - Documentation build dependencies.
+   * - ``docker``
+     - ``docker``
+     - Base images.
+
+Two configuration-wide rules apply to npm:
+
+- **Major versions are blocked globally** by an ``ignore`` rule for ``version-update:semver-major``, so major upgrades are always a manual change.
+- **A cooldown delays new releases** (3 days for patch, 5 for minor) to mitigate supply-chain attacks. Core framework packages (``react``, ``react-dom``, ``next``, ``@next/*``, ``typescript``) and ``@types/*`` are excluded from the cooldown; security updates bypass it automatically.
+
+.. note::
+
+   Because the ``development`` group is a monthly catchall, its PR can cross several minor versions of a tool at once, and version-pinning that lives *outside* :file:`package.json` will not be updated by Dependabot. Two known couplings must be fixed by hand on the PR branch:
+
+   - :file:`apps/squareone/Dockerfile` pins ``turbo`` for the ``turbo prune`` step; ``validate-docker-versions.js`` requires an exact match with ``package.json``. See the ``docker-version-validation`` skill.
+   - :file:`biome.json` pins the Biome ``$schema`` version; ``validate-biome-schema.js`` requires it to match the installed ``@biomejs/biome``. See the ``biome-migrate`` skill.
+
+   Both validators run early in the ``test`` job and fail the build before the linting, type-checking, and test steps execute — so a failure in one can mask further breakage behind it. Re-run the full ``pnpm localci`` locally after fixing.
 
 Reusable workflows
 ==================
