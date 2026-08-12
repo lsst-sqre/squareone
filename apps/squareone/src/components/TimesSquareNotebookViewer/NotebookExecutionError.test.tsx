@@ -105,21 +105,19 @@ describe('NotebookExecutionError', () => {
   // `code` is API-supplied, so a code that collides with an `Object.prototype`
   // member must still take the generic presentation rather than resolving to an
   // inherited value (which would make the icon undefined and throw on render).
-  it.each([
-    'constructor',
-    'toString',
-    'valueOf',
-    '__proto__',
-  ])('falls back to the generic presentation for the code %s', (code) => {
-    const { container } = renderPanel(code);
+  it.each(['constructor', 'toString', 'valueOf', '__proto__'])(
+    'falls back to the generic presentation for the code %s',
+    (code) => {
+      const { container } = renderPanel(code);
 
-    expect(
-      screen.getByRole('heading', {
-        name: 'The notebook could not be executed',
-      })
-    ).toBeInTheDocument();
-    expect(container.querySelector('svg')).not.toBeNull();
-  });
+      expect(
+        screen.getByRole('heading', {
+          name: 'The notebook could not be executed',
+        })
+      ).toBeInTheDocument();
+      expect(container.querySelector('svg')).not.toBeNull();
+    }
+  );
 
   it('gives a prototype-named code the same presentation as any other unrecognized code', () => {
     const unrecognized = renderPanel('a_future_code');

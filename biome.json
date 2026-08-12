@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.3.14/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.5.7/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -52,35 +52,35 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
+      "preset": "recommended",
       "a11y": {
-        "recommended": true,
+        "preset": "recommended",
         "noSvgWithoutTitle": "warn",
         "useSemanticElements": "warn",
         "noStaticElementInteractions": "warn"
       },
       "complexity": {
-        "recommended": true,
+        "preset": "recommended",
         "noUselessFragments": "warn"
       },
       "correctness": {
-        "recommended": true,
+        "preset": "recommended",
         "noUnusedFunctionParameters": "warn",
         "noUnusedVariables": "warn",
         "noEmptyPattern": "warn"
       },
       "performance": {
-        "recommended": true
+        "preset": "recommended"
       },
       "security": {
-        "recommended": true
+        "preset": "recommended"
       },
       "style": {
-        "recommended": true,
+        "preset": "recommended",
         "noNonNullAssertion": "warn"
       },
       "suspicious": {
-        "recommended": true,
+        "preset": "recommended",
         "noExplicitAny": "warn",
         "noImplicitAnyLet": "warn"
       }
