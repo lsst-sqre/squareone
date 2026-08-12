@@ -168,20 +168,20 @@ describe('ExecStats relative timestamps', () => {
 });
 
 describe('ExecStats reported execution', () => {
-  it.each([
-    'queued',
-    'in_progress',
-  ] as const)('reports a %s run as a computation in progress', (executionStatus) => {
-    renderExecStats({
-      ...completeContext,
-      executionStatus,
-      dateFinished: null,
-      executionDuration: null,
-      htmlHash: null,
-    });
+  it.each(['queued', 'in_progress'] as const)(
+    'reports a %s run as a computation in progress',
+    (executionStatus) => {
+      renderExecStats({
+        ...completeContext,
+        executionStatus,
+        dateFinished: null,
+        executionDuration: null,
+        htmlHash: null,
+      });
 
-    expect(screen.getByRole('status')).toHaveTextContent('Computing…');
-  });
+      expect(screen.getByRole('status')).toHaveTextContent('Computing…');
+    }
+  );
 });
 
 describe('ExecStats recompute', () => {

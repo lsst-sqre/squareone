@@ -63,10 +63,10 @@ const useGafaelfawrUser = () => {
 
 export default useGafaelfawrUser;
 export type {
-  GafaelfawrUser,
-  GafaelfawrQuota,
-  GafaelfawrNotebookQuota,
   GafaelfawrApiQuota,
-  GafaelfawrTapQuota,
   GafaelfawrGroup,
+  GafaelfawrNotebookQuota,
+  GafaelfawrQuota,
+  GafaelfawrTapQuota,
+  GafaelfawrUser,
 };

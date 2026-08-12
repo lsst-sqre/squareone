@@ -58,9 +58,8 @@ describe('useMarkNotificationsRead', () => {
     );
     expect(init?.method).toBe('POST');
     expect(init?.credentials).toBe('include');
-    expect((init?.headers as Record<string, string>)['x-csrf-token']).toBe(
-      'csrf-token-abc'
-    );
+    const headers = init?.headers as Record<string, string>;
+    expect(headers['x-csrf-token']).toBe('csrf-token-abc');
     expect(JSON.parse(init?.body as string)).toEqual({ ids: ['n1', 'n2'] });
   });
 

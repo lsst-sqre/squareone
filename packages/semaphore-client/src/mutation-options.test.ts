@@ -57,9 +57,8 @@ describe('createAdminNotificationMutationOptions', () => {
       'https://example.com/semaphore/v1/admin/notifications'
     );
     expect(init?.method).toBe('POST');
-    expect((init?.headers as Record<string, string>)['x-csrf-token']).toBe(
-      'csrf-token-abc'
-    );
+    const headers = init?.headers as Record<string, string>;
+    expect(headers['x-csrf-token']).toBe('csrf-token-abc');
   });
 
   it('invalidates the admin-notifications list query on success', () => {
@@ -110,9 +109,8 @@ describe('markNotificationsReadMutationOptions', () => {
       'https://example.com/semaphore/v1/notifications/read'
     );
     expect(init?.method).toBe('POST');
-    expect((init?.headers as Record<string, string>)['x-csrf-token']).toBe(
-      'csrf-token-abc'
-    );
+    const headers = init?.headers as Record<string, string>;
+    expect(headers['x-csrf-token']).toBe('csrf-token-abc');
     expect(JSON.parse(init?.body as string)).toEqual({ ids: ['n1', 'n2'] });
   });
 
@@ -171,9 +169,8 @@ describe('markNotificationsUnreadMutationOptions', () => {
       'https://example.com/semaphore/v1/notifications/unread'
     );
     expect(init?.method).toBe('POST');
-    expect((init?.headers as Record<string, string>)['x-csrf-token']).toBe(
-      'csrf-token-abc'
-    );
+    const headers = init?.headers as Record<string, string>;
+    expect(headers['x-csrf-token']).toBe('csrf-token-abc');
     expect(JSON.parse(init?.body as string)).toEqual({ ids: ['n1', 'n2'] });
   });
 
