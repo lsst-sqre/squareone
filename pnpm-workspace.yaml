@@ -2,16 +2,27 @@ packages:
   - packages/*
   - apps/*
 
-onlyBuiltDependencies:
-  - '@parcel/watcher'
-  - '@sentry/cli'
-  - '@swc/core'
-  - core-js-pure
-  - esbuild
-  - lightningcss-cli
-  - msw
-  - sharp
-  - turbo
+# Dependencies allowed to run install scripts. pnpm 11 replaced the
+# onlyBuiltDependencies allowlist with this map and does not read the old key,
+# so every build was silently skipped until this block was filled in. The
+# entries carry over the pnpm 10 allowlist unchanged.
+#
+# unrs-resolver is new here only because pnpm 11 reports it; it was never on
+# the pnpm 10 allowlist, so its build has always been skipped and
+# eslint-import-resolver-typescript falls back to its portable resolver. It
+# stays false to hold that behaviour -- flipping it to true is a speed
+# question, not a correctness one.
+allowBuilds:
+  '@parcel/watcher': true
+  '@sentry/cli': true
+  '@swc/core': true
+  core-js-pure: true
+  esbuild: true
+  lightningcss-cli: true
+  msw: true
+  sharp: true
+  turbo: true
+  unrs-resolver: false
 
 # Overrides pin vulnerable transitive dependencies up to their patched
 # versions to resolve Dependabot security alerts. Range selectors target
