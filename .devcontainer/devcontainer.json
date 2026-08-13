@@ -18,7 +18,7 @@
 
   "remoteUser": "vscode",
 
-  "postCreateCommand": "corepack install && corepack enable && pnpm install && pip install uv",
+  "postCreateCommand": "corepack install && corepack enable && CI=true pnpm install && pip install uv",
 
   "customizations": {
     "vscode": {
