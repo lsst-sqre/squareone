@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "localci": "node packages/repo-scripts/src/validate-docker-versions.js && node packages/repo-scripts/src/validate-biome-schema.js && node packages/repo-scripts/src/validate-theme-tokens.js && node scripts/turbo-wrapper.js run biome:format:check prettier:yaml lint type-check test build && pnpm run biome:lint",
+    "localci": "node packages/repo-scripts/src/validate-docker-versions.js && node packages/repo-scripts/src/validate-pnpm-config.js && node packages/repo-scripts/src/validate-biome-schema.js && node packages/repo-scripts/src/validate-theme-tokens.js && node scripts/turbo-wrapper.js run biome:format:check prettier:yaml lint type-check test build && pnpm run biome:lint",
     "build": "node scripts/turbo-wrapper.js run build",
     "file-factory": "node packages/file-factory/dist/cli.js",
     "dev": "node scripts/turbo-wrapper.js run dev",
@@ -22,6 +22,7 @@
     "build:local": "turbo run build",
     "docs": "uv run noxfile.py -s docs",
     "validate-docker": "node packages/repo-scripts/src/validate-docker-versions.js",
+    "validate-pnpm": "node packages/repo-scripts/src/validate-pnpm-config.js",
     "validate-biome": "node packages/repo-scripts/src/validate-biome-schema.js",
     "validate-theme-tokens": "node packages/repo-scripts/src/validate-theme-tokens.js",
     "check-openapi-drift": "node packages/repo-scripts/src/check-openapi-drift.js",
@@ -60,7 +61,7 @@
   },
   "engines": {
     "node": "^22.23.2",
-    "pnpm": ">=11.21.0"
+    "pnpm": ">=11.21.0 <12"
   },
   "packageManager": "pnpm@11.21.0+sha512.521705bce689924eac72f5a3587122f362689ef6571e55ba80076fd637c11132ecffada26fad4ea79c485bfddbfd3d5a2a5b05805a77e893de71ec8a6cca3bb1"
 }

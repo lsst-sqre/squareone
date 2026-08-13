@@ -61,6 +61,9 @@ jobs:
       - name: Validate Docker versions
         run: node packages/repo-scripts/src/validate-docker-versions.js
 
+      - name: Validate pnpm configuration
+        run: node packages/repo-scripts/src/validate-pnpm-config.js
+
       - name: Validate Biome schema version
         run: node packages/repo-scripts/src/validate-biome-schema.js
 
