@@ -80,4 +80,18 @@ describe('validatePnpmConfig', () => {
     expect(validatePnpmConfig({}).ok).toBe(false);
     expect(validatePnpmConfig({ packageManager: 'yarn@4.5.0' }).ok).toBe(false);
   });
+
+  it('rejects a pnpm field shadowing pnpm-workspace.yaml', () => {
+    const result = validatePnpmConfig({
+      ...validPkg,
+      pnpm: { overrides: { lodash: '^4.17.21' } },
+    });
+    expect(result.ok).toBe(false);
+    expect(result.failures[0]).toContain('pnpm.overrides');
+  });
+
+  it('rejects even an empty pnpm field', () => {
+    const result = validatePnpmConfig({ ...validPkg, pnpm: {} });
+    expect(result.ok).toBe(false);
+  });
 });

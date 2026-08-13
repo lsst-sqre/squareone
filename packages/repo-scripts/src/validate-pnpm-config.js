@@ -15,6 +15,13 @@
  *   ceiling makes a standalone pnpm from the wrong major hard-fail the
  *   engines check instead of rewriting the lockfile incompatibly.
  *
+ * - The root package.json must not contain a "pnpm" field. pnpm 11 only
+ *   reads pnpm settings (overrides, allowBuilds, ...) from
+ *   pnpm-workspace.yaml; a "pnpm" block copy-pasted into package.json is
+ *   ignored with nothing but an easy-to-miss install-time warning. That
+ *   exact drift once left the workspace's security overrides ineffective
+ *   for months, so this check turns it into a hard failure.
+ *
  * Exit codes:
  * - 0: Configuration is valid
  * - 1: Validation failures found
@@ -87,6 +94,20 @@ function validatePnpmConfig(pkg) {
     checks.push(`engines.pnpm "${engines}" matches packageManager`);
   }
 
+  if ('pnpm' in pkg) {
+    const keys = Object.keys(pkg.pnpm ?? {})
+      .map((key) => `pnpm.${key}`)
+      .join(', ');
+    failures.push(
+      'package.json must not contain a "pnpm" field' +
+        (keys ? ` (found: ${keys})` : '') +
+        '; pnpm 11 only reads these settings from pnpm-workspace.yaml, so ' +
+        'entries here are ignored with only an install-time warning'
+    );
+  } else {
+    checks.push('no "pnpm" field shadowing pnpm-workspace.yaml');
+  }
+
   return { ok: failures.length === 0, failures, checks };
 }
 
@@ -134,12 +155,16 @@ function main() {
 
   console.log(`\n${colors.yellow}To fix:${colors.reset}`);
   console.log(
-    `  Keep packageManager as the source of truth and update engines.pnpm to`
+    `  - Keep packageManager as the source of truth and update engines.pnpm to`
   );
   console.log(
-    `  ">=<packageManager version> <(major+1)". The Dockerfile leg of the sync`
+    `    ">=<packageManager version> <(major+1)". The Dockerfile leg of the`
   );
-  console.log(`  is checked by validate-docker-versions.js.\n`);
+  console.log(`    sync is checked by validate-docker-versions.js.`);
+  console.log(
+    `  - Move any "pnpm" settings (overrides, allowBuilds, ...) from`
+  );
+  console.log(`    package.json into pnpm-workspace.yaml.\n`);
   process.exit(1);
 }
 
