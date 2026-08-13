@@ -35,8 +35,9 @@ allowBuilds:
 # path to lift it. A caret target holds the security floor and still floats.
 #
 # This block is the only home for overrides. pnpm no longer reads the "pnpm"
-# field in package.json, so an overrides block added there is silently
-# ignored and this one wins on the next lockfile write.
+# field in package.json, so an overrides block added there is ignored (pnpm
+# prints an install-time warning naming the ignored keys, but nothing fails)
+# and this one wins on the next lockfile write.
 overrides:
   '@babel/core@7': '^7.29.6'
   '@opentelemetry/core@2': '^2.8.0'
