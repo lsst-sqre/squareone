@@ -30,8 +30,16 @@ export default function SentryAdminPage() {
     <div>
       <h1>Sentry</h1>
       <p>
-        Verify the Sentry monitoring integration by triggering test errors that
-        should appear in the Sentry project.
+        Verify the Sentry monitoring integration by triggering test events.
+        “Throw uncaught error” and “Capture handled exception” both report
+        errors, which appear as issues in the Sentry project.
+      </p>
+      <p>
+        “Emit server log” is different: it makes the server emit pino warn and
+        error records, which the Sentry Logs bridge ships to Sentry{' '}
+        <strong>Logs</strong>, never to Issues. Look for them under{' '}
+        <strong>Explore &gt; Logs</strong> in Sentry, searching for the marker
+        shown in the status readout below the buttons.
       </p>
       <SentryTestButtons />
       <SentryConfigInfo />

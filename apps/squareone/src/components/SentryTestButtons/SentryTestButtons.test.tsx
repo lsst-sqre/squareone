@@ -38,6 +38,16 @@ describe('SentryTestButtons', () => {
     vi.clearAllMocks();
   });
 
+  test('mounts the status live region before it holds a message', () => {
+    render(<SentryTestButtons />);
+
+    // A live region that enters the DOM already containing its first message
+    // is announced unreliably, so the region is mounted (and empty) up front.
+    const status = screen.getByRole('status');
+    expect(status).toBeInTheDocument();
+    expect(status).toBeEmptyDOMElement();
+  });
+
   test('"Capture handled exception" sends a handled event to Sentry without breaking the page', async () => {
     render(<SentryTestButtons />);
 
@@ -76,6 +86,29 @@ describe('SentryTestButtons', () => {
     fetchMock.mockRestore();
   });
 
+  test('"Emit server log" surfaces the smoke-test marker from the response body', async () => {
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      Response.json({
+        emitted: ['warn', 'error'],
+        marker: 'sentry-logs-smoke-test',
+      })
+    );
+
+    render(<SentryTestButtons />);
+
+    await userEvent.click(
+      screen.getByRole('button', { name: /emit server log/i })
+    );
+
+    // The records deliberately never become issues, so the marker is the only
+    // handle an operator has for finding them in Sentry Logs.
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'sentry-logs-smoke-test'
+    );
+
+    fetchMock.mockRestore();
+  });
+
   test('"Emit server log" blocks a second POST while the first is in flight', async () => {
     let resolveFetch: (response: Response) => void = () => {};
     const fetchMock = vi.spyOn(globalThis, 'fetch').mockImplementation(
@@ -108,6 +141,40 @@ describe('SentryTestButtons', () => {
     expect(
       screen.getByText('Emitted server log (HTTP 200)')
     ).toBeInTheDocument();
+
+    fetchMock.mockRestore();
+  });
+
+  test('"Emit server log" marks a successful emit with the success tone', async () => {
+    const fetchMock = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValue(Response.json({ emitted: ['warn', 'error'] }));
+
+    render(<SentryTestButtons />);
+
+    await userEvent.click(
+      screen.getByRole('button', { name: /emit server log/i })
+    );
+
+    // The tone drives the readout's styling, so success and failure are not
+    // visually identical.
+    expect(screen.getByRole('status')).toHaveAttribute('data-tone', 'success');
+
+    fetchMock.mockRestore();
+  });
+
+  test('"Emit server log" marks a failed emit with the failure tone', async () => {
+    const fetchMock = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValue(new Response(null, { status: 500 }));
+
+    render(<SentryTestButtons />);
+
+    await userEvent.click(
+      screen.getByRole('button', { name: /emit server log/i })
+    );
+
+    expect(screen.getByRole('status')).toHaveAttribute('data-tone', 'failure');
 
     fetchMock.mockRestore();
   });

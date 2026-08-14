@@ -2,8 +2,45 @@
  * SentryTestButtons styles
  */
 
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
 .buttons {
   display: flex;
   flex-wrap: wrap;
   gap: var(--sqo-space-sm);
+}
+
+/*
+ * The status readout is always in the DOM so the live region is announced
+ * reliably, but it only paints a box once it carries a message; the idle tone
+ * therefore gets no box styling at all.
+ */
+.status:not([data-tone="idle"]) {
+  display: block;
+  margin-top: var(--sqo-space-sm);
+  padding: var(--sqo-space-xs) var(--sqo-space-sm);
+  border: 1px solid;
+  border-radius: var(--sqo-border-radius-2);
+}
+
+.status[data-tone="pending"] {
+  background-color: var(--rsd-color-gray-50);
+  border-color: var(--rsd-color-gray-300);
+  color: var(--rsd-color-gray-700);
+}
+
+.status[data-tone="success"] {
+  background-color: var(--rsd-color-green-100);
+  border-color: var(--rsd-color-green-500);
+  color: var(--rsd-color-green-600);
+}
+
+.status[data-tone="failure"] {
+  background-color: var(--rsd-color-red-100);
+  border-color: var(--rsd-color-red-500);
+  color: var(--rsd-color-red-600);
 }
