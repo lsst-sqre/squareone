@@ -56,19 +56,26 @@ FROM node:22.21.1-alpine AS base
 
 **Dockerfile location:**
 ```dockerfile
-RUN corepack prepare pnpm@10.20.0 --activate
+RUN corepack prepare pnpm@11.21.0 --activate
 ```
 
 **package.json source:**
 ```json
 {
-  "packageManager": "pnpm@10.20.0+sha512..."
+  "packageManager": "pnpm@11.21.0+sha512..."
 }
 ```
 
 **Validation rule:** Exact version match required
-- ✅ Docker `10.20.0` matches package.json `pnpm@10.20.0+sha512...`
-- ❌ Docker `10.20.1` does NOT match package.json `pnpm@10.20.0+sha512...`
+- ✅ Docker `11.21.0` matches package.json `pnpm@11.21.0+sha512...`
+- ❌ Docker `11.21.1` does NOT match package.json `pnpm@11.21.0+sha512...`
+
+**Note:** The pnpm version lives in a *third* place as well: `engines.pnpm` in
+the root package.json. That leg of the sync is enforced by a separate
+validator, `validate-pnpm-config.js` (`pnpm validate-pnpm`), which requires
+`engines.pnpm` to be exactly `">=<packageManager version> <(major+1)"` — so a
+pnpm bump must touch the Dockerfile, `packageManager`, and `engines.pnpm`
+together.
 
 ### 3. Turbo Version
 
@@ -158,7 +165,7 @@ Found 1 Dockerfile(s) to validate
 Validating: apps/squareone/Dockerfile
 Against: apps/squareone/package.json
   ✓ Node.js: 22.21.1 matches 22.21.1 (from constraint: ^22.21.1)
-  ✓ pnpm: 10.20.0 matches package.json
+  ✓ pnpm: 11.21.0 matches package.json
   ✓ Turbo: 2.6.0 matches package.json
 
 Summary:
@@ -177,8 +184,8 @@ Validating: apps/squareone/Dockerfile
 Against: apps/squareone/package.json
   ✓ Node.js: 22.21.1 matches 22.21.1 (from constraint: ^22.21.1)
   ✗ pnpm version mismatch:
-    Dockerfile: 10.20.1
-    package.json: 10.20.0
+    Dockerfile: 11.21.1
+    package.json: 11.21.0
   ✓ Turbo: 2.6.0 matches package.json
 
 Summary:
@@ -204,12 +211,13 @@ Follow this workflow when updating tool versions to keep everything synchronized
 1. **Update package.json:**
    ```json
    {
-     "packageManager": "pnpm@10.21.0+sha512...",
+     "packageManager": "pnpm@11.22.0+sha512...",
      "devDependencies": {
        "turbo": "2.7.0"
      },
      "engines": {
-       "node": "^22.22.0"
+       "node": "^22.22.0",
+       "pnpm": ">=11.22.0 <12"
      }
    }
    ```
@@ -217,19 +225,20 @@ Follow this workflow when updating tool versions to keep everything synchronized
 2. **Update Dockerfile to match:**
    ```dockerfile
    FROM node:22.22.0-alpine AS base
-   RUN corepack prepare pnpm@10.21.0 --activate
+   RUN corepack prepare pnpm@11.22.0 --activate
    RUN pnpm dlx turbo@2.7.0 prune --scope=squareone --docker
    ```
 
 3. **Validate changes:**
    ```bash
    pnpm validate-docker
+   pnpm validate-pnpm
    ```
 
 4. **Stage and commit:**
    ```bash
    git add package.json apps/squareone/Dockerfile
-   git commit -m "Update Node.js to 22.22.0, pnpm to 10.21.0, turbo to 2.7.0"
+   git commit -m "Update Node.js to 22.22.0, pnpm to 11.22.0, turbo to 2.7.0"
    ```
 
 ### Option 2: Update Dockerfile First
@@ -237,19 +246,20 @@ Follow this workflow when updating tool versions to keep everything synchronized
 1. **Update Dockerfile:**
    ```dockerfile
    FROM node:22.22.0-alpine AS base
-   RUN corepack prepare pnpm@10.21.0 --activate
+   RUN corepack prepare pnpm@11.22.0 --activate
    RUN pnpm dlx turbo@2.7.0 prune --scope=squareone --docker
    ```
 
 2. **Update package.json to match:**
    ```json
    {
-     "packageManager": "pnpm@10.21.0+sha512...",
+     "packageManager": "pnpm@11.22.0+sha512...",
      "devDependencies": {
        "turbo": "2.7.0"
      },
      "engines": {
-       "node": "^22.22.0"
+       "node": "^22.22.0",
+       "pnpm": ">=11.22.0 <12"
      }
    }
    ```
@@ -266,11 +276,13 @@ If you're updating just Node.js, pnpm, or Turbo (not all three):
 
 **Example: Update only pnpm version**
 ```bash
-# Edit package.json: packageManager: "pnpm@10.21.0+sha512..."
-# Edit Dockerfile: RUN corepack prepare pnpm@10.21.0 --activate
+# Edit package.json: packageManager: "pnpm@11.22.0+sha512..."
+# Edit package.json: engines.pnpm: ">=11.22.0 <12"
+# Edit Dockerfile: RUN corepack prepare pnpm@11.22.0 --activate
 pnpm validate-docker
+pnpm validate-pnpm
 git add package.json apps/squareone/Dockerfile
-git commit -m "Update pnpm to 10.21.0"
+git commit -m "Update pnpm to 11.22.0"
 ```
 
 ## Troubleshooting
@@ -280,8 +292,8 @@ git commit -m "Update pnpm to 10.21.0"
 **Problem:** You staged a Dockerfile change but the commit was blocked:
 ```
 ✗ pnpm version mismatch:
-  Dockerfile: 10.20.1
-  package.json: 10.20.0
+  Dockerfile: 11.21.1
+  package.json: 11.21.0
 ```
 
 **Solution:**
@@ -330,7 +342,7 @@ git push
 
 ### Version Found in Only One File
 
-**Warning:** `⚠ pnpm version found in only one file (Docker: 10.20.0, package.json: none)`
+**Warning:** `⚠ pnpm version found in only one file (Docker: 11.21.0, package.json: none)`
 
 **Explanation:** This is a warning (not an error). The validation found a version declaration in the Dockerfile but not in package.json, or vice versa.
 
@@ -355,7 +367,7 @@ git push
 FROM node:22.21.1-alpine
 
 # pnpm
-RUN corepack prepare pnpm@10.20.0 --activate
+RUN corepack prepare pnpm@11.21.0 --activate
 
 # Turbo
 RUN pnpm dlx turbo@2.6.0 prune ...

@@ -9,7 +9,7 @@ FROM node:22.23.2-alpine AS base
 
 RUN npm install -g corepack@latest  # Ensure latest corepack
 RUN corepack enable
-RUN corepack prepare pnpm@10.20.0 --activate
+RUN corepack prepare pnpm@11.21.0 --activate
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 RUN apk add --no-cache libc6-compat
 RUN apk update
