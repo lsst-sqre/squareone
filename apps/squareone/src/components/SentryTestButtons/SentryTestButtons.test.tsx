@@ -33,6 +33,10 @@ class TestErrorBoundary extends React.Component<
   }
 }
 
+// The spies installed below are never restored inline: the unit vitest project
+// sets `restoreMocks: true` (see vitest.config.ts), which tears every spy down
+// before the next test even when the test that installed it fails partway
+// through. The last two tests in this file guard that arrangement.
 describe('SentryTestButtons', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -82,12 +86,10 @@ describe('SentryTestButtons', () => {
       method: 'POST',
       headers: { 'X-Requested-With': 'XMLHttpRequest' },
     });
-
-    fetchMock.mockRestore();
   });
 
   test('"Emit server log" surfaces the smoke-test marker from the response body', async () => {
-    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
       Response.json({
         emitted: ['warn', 'error'],
         marker: 'sentry-logs-smoke-test',
@@ -105,8 +107,6 @@ describe('SentryTestButtons', () => {
     expect(screen.getByRole('status')).toHaveTextContent(
       'sentry-logs-smoke-test'
     );
-
-    fetchMock.mockRestore();
   });
 
   test('"Emit server log" blocks a second POST while the first is in flight', async () => {
@@ -141,14 +141,12 @@ describe('SentryTestButtons', () => {
     expect(
       screen.getByText('Emitted server log (HTTP 200)')
     ).toBeInTheDocument();
-
-    fetchMock.mockRestore();
   });
 
   test('"Emit server log" marks a successful emit with the success tone', async () => {
-    const fetchMock = vi
-      .spyOn(globalThis, 'fetch')
-      .mockResolvedValue(Response.json({ emitted: ['warn', 'error'] }));
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      Response.json({ emitted: ['warn', 'error'] })
+    );
 
     render(<SentryTestButtons />);
 
@@ -159,14 +157,12 @@ describe('SentryTestButtons', () => {
     // The tone drives the readout's styling, so success and failure are not
     // visually identical.
     expect(screen.getByRole('status')).toHaveAttribute('data-tone', 'success');
-
-    fetchMock.mockRestore();
   });
 
   test('"Emit server log" marks a failed emit with the failure tone', async () => {
-    const fetchMock = vi
-      .spyOn(globalThis, 'fetch')
-      .mockResolvedValue(new Response(null, { status: 500 }));
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(null, { status: 500 })
+    );
 
     render(<SentryTestButtons />);
 
@@ -175,16 +171,12 @@ describe('SentryTestButtons', () => {
     );
 
     expect(screen.getByRole('status')).toHaveAttribute('data-tone', 'failure');
-
-    fetchMock.mockRestore();
   });
 
   test('"Throw uncaught error" throws "Sentry Test Error" for the error boundary to catch', async () => {
     // React logs the boundary-caught error to console.error; silence it so the
     // expected throw doesn't produce noisy output.
-    const consoleError = vi
-      .spyOn(console, 'error')
-      .mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
 
     render(
       <TestErrorBoundary>
@@ -201,7 +193,25 @@ describe('SentryTestButtons', () => {
     expect(screen.getByRole('alert')).toHaveTextContent(
       'Caught: Sentry Test Error'
     );
+  });
 
-    consoleError.mockRestore();
+  // These two tests are a pair, and only mean anything in order. They pin the
+  // `restoreMocks` setting every test above relies on for teardown: an inline
+  // `mockRestore()` at the end of a test is skipped whenever an earlier
+  // assertion in that test fails, which would leave `globalThis.fetch` stubbed
+  // for every test that follows and turn one real failure into a cascade of
+  // misleading ones. `test.fails` lets the first test model such a failure
+  // without failing the suite, so the second can assert the stub was torn down
+  // regardless.
+  test.fails('a failing test may leave its fetch stub un-restored', () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(null, { status: 200 })
+    );
+
+    expect(vi.isMockFunction(globalThis.fetch)).toBe(false);
+  });
+
+  test('a failed test does not leak its fetch stub into later tests', () => {
+    expect(vi.isMockFunction(globalThis.fetch)).toBe(false);
   });
 });
