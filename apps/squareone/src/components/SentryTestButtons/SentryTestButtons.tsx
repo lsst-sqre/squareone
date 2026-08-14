@@ -18,21 +18,32 @@ import styles from './SentryTestButtons.module.css';
  * - "Emit server log" POSTs to `/admin/sentry/emit-log`, whose route handler
  *   emits server-side pino warn/error records. The `Sentry.pinoIntegration()`
  *   bridge ships those to Sentry Logs (not issues), so this verifies the
- *   pino→Sentry Logs transport in the server build.
+ *   pino→Sentry Logs transport in the server build. The button is held in
+ *   `loading` state while the POST is in flight so concurrent requests can't
+ *   race each other's status updates.
  */
 export default function SentryTestButtons() {
   const [shouldThrow, setShouldThrow] = useState(false);
   const [emitLogStatus, setEmitLogStatus] = useState<string | null>(null);
+  const [isEmittingLog, setIsEmittingLog] = useState(false);
 
   if (shouldThrow) {
     throw new Error('Sentry Test Error');
   }
 
   const handleEmitLog = async () => {
+    setIsEmittingLog(true);
     setEmitLogStatus('Emitting…');
     try {
       const response = await fetch('/admin/sentry/emit-log', {
         method: 'POST',
+        // Without this header the /admin ingress (loginRedirect: true) turns an
+        // expired session's 401 into a 302 toward CILogon, which fetch follows
+        // cross-origin and fails as an opaque CORS error. Gafaelfawr answers
+        // XHR-flagged requests with a direct 403 instead, so the status shown
+        // below reflects the real auth failure rather than a phantom transport
+        // failure on the page meant to diagnose transport.
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
       });
       setEmitLogStatus(
         response.ok
@@ -45,6 +56,8 @@ export default function SentryTestButtons() {
           error instanceof Error ? error.message : 'unknown error'
         }`
       );
+    } finally {
+      setIsEmittingLog(false);
     }
   };
 
@@ -65,6 +78,7 @@ export default function SentryTestButtons() {
       <Button
         type="button"
         appearance="outline"
+        loading={isEmittingLog}
         onClick={() => {
           void handleEmitLog();
         }}

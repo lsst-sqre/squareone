@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
@@ -65,9 +65,49 @@ describe('SentryTestButtons', () => {
       screen.getByRole('button', { name: /emit server log/i })
     );
 
+    // The X-Requested-With header makes Gafaelfawr answer an expired session
+    // with a direct 403 instead of a cross-origin 302 toward CILogon, which
+    // the default `redirect: 'follow'` fetch would chase into a CORS failure.
     expect(fetchMock).toHaveBeenCalledWith('/admin/sentry/emit-log', {
       method: 'POST',
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
     });
+
+    fetchMock.mockRestore();
+  });
+
+  test('"Emit server log" blocks a second POST while the first is in flight', async () => {
+    let resolveFetch: (response: Response) => void = () => {};
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockImplementation(
+      () =>
+        new Promise<Response>((resolve) => {
+          resolveFetch = resolve;
+        })
+    );
+
+    render(<SentryTestButtons />);
+
+    const button = screen.getByRole('button', { name: /emit server log/i });
+    await userEvent.click(button);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(button).toBeDisabled();
+    expect(button).toHaveAttribute('aria-busy', 'true');
+
+    // A rapid second click must not fire a concurrent POST whose response
+    // could race the first one's status update.
+    await userEvent.click(button);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      resolveFetch(new Response(null, { status: 200 }));
+    });
+
+    // Once the request settles the button is clickable again.
+    expect(button).toBeEnabled();
+    expect(
+      screen.getByText('Emitted server log (HTTP 200)')
+    ).toBeInTheDocument();
 
     fetchMock.mockRestore();
   });
