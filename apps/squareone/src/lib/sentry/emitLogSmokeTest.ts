@@ -20,6 +20,26 @@ export const SMOKE_TEST_LEVELS = ['warn', 'error'] as const;
 export type SmokeTestLevel = (typeof SMOKE_TEST_LEVELS)[number];
 
 /**
+ * Path of the smoke-test route handler, as the browser requests it.
+ *
+ * Mirrors the location of `app/admin/sentry/emit-log/route.ts`. The button
+ * POSTs here and the story stubs this URL, so a moved route directory is a
+ * one-line fix rather than a hunt through the component and its fixtures.
+ */
+export const EMIT_LOG_PATH = '/admin/sentry/emit-log';
+
+/**
+ * Marker attached to every record the smoke test emits.
+ *
+ * These records deliberately never become Sentry issues, so this string is the
+ * only handle an operator has for finding them in the Sentry Logs UI — which
+ * makes it a published contract with humans, not just between modules. The
+ * route stamps it onto the pino records and echoes it in the response; the
+ * readout quotes it back as the search term.
+ */
+export const SMOKE_TEST_MARKER = 'sentry-logs-smoke-test';
+
+/**
  * What became of the emitted records on their way to Sentry.
  *
  * The three outcomes are distinct on purpose: two of them can otherwise

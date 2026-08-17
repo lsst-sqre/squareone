@@ -1,5 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
+import {
+  EMIT_LOG_PATH,
+  SMOKE_TEST_MARKER,
+} from '@/lib/sentry/emitLogSmokeTest';
 import SentryTestButtons from './SentryTestButtons';
 
 const meta: Meta<typeof SentryTestButtons> = {
@@ -9,11 +13,6 @@ const meta: Meta<typeof SentryTestButtons> = {
 
 export default meta;
 type Story = StoryObj<typeof SentryTestButtons>;
-
-const EMIT_LOG_PATH = '/admin/sentry/emit-log';
-
-/** Marker the stubbed emit-log route echoes back, as the real route does. */
-const SMOKE_TEST_MARKER = 'sentry-logs-smoke-test';
 
 /** Resolve the URL of a `fetch` call regardless of which input form was used. */
 function requestUrl(input: RequestInfo | URL): string {

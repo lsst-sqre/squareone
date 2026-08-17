@@ -4,6 +4,7 @@ import { Button } from '@lsst-sqre/squared';
 import * as Sentry from '@sentry/nextjs';
 import React, { useState } from 'react';
 import {
+  EMIT_LOG_PATH,
   type EmitLogDelivery,
   isEmitLogDelivery,
   SMOKE_TEST_LEVELS,
@@ -227,7 +228,7 @@ export default function SentryTestButtons() {
     setIsEmittingLog(true);
     setEmitLogStatus({ message: 'Emitting…', tone: 'pending' });
     try {
-      const response = await fetch('/admin/sentry/emit-log', {
+      const response = await fetch(EMIT_LOG_PATH, {
         method: 'POST',
         // Without this header the /admin ingress (loginRedirect: true) turns an
         // expired session's 401 into a 302 toward CILogon, which fetch follows

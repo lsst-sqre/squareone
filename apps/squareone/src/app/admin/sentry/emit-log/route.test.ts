@@ -1,5 +1,10 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
+import {
+  EMIT_LOG_PATH,
+  SMOKE_TEST_MARKER,
+} from '@/lib/sentry/emitLogSmokeTest';
+
 // Mock the route logger so we can assert warn/error are emitted without a real
 // pino/Sentry pipeline running. This is the same server-side logger the
 // pinoIntegration bridge instruments, so exercising it here is what verifies
@@ -27,7 +32,7 @@ vi.mock('@sentry/nextjs', () => ({
 
 import { POST } from './route';
 
-describe('POST /admin/sentry/emit-log', () => {
+describe(`POST ${EMIT_LOG_PATH}`, () => {
   beforeEach(() => {
     vi.clearAllMocks();
     isLevelEnabled.mockReturnValue(true);
@@ -43,9 +48,14 @@ describe('POST /admin/sentry/emit-log', () => {
     expect(response.status).toBe(200);
 
     const body = await response.json();
+    // The marker is asserted here because it is the only field a consumer
+    // cannot derive: the readout quotes it back as the Sentry Logs search term
+    // for records that never become issues, and every other test in this repo
+    // supplies its own fixture copy.
     expect(body).toMatchObject({
       delivery: 'delivered',
       emitted: ['warn', 'error'],
+      marker: SMOKE_TEST_MARKER,
     });
   });
 
@@ -113,6 +123,9 @@ describe('POST /admin/sentry/emit-log', () => {
     const response = await POST();
     const body = await response.json();
 
-    expect(body).toMatchObject({ emitted: ['error'] });
+    expect(body).toMatchObject({
+      emitted: ['error'],
+      marker: SMOKE_TEST_MARKER,
+    });
   });
 });

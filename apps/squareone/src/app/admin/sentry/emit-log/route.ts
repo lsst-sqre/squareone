@@ -15,6 +15,7 @@ import { createRouteLogger } from '@/lib/logger';
 import {
   type EmitLogDelivery,
   SMOKE_TEST_LEVELS,
+  SMOKE_TEST_MARKER,
 } from '@/lib/sentry/emitLogSmokeTest';
 
 const log = createRouteLogger('admin/sentry/emit-log');
@@ -58,7 +59,10 @@ async function deliverToSentry(): Promise<EmitLogDelivery> {
  * ever changes, in-app checks must be added here.
  */
 export async function POST() {
-  const marker = 'sentry-logs-smoke-test';
+  // Stamped on the records and echoed in the response: these records never
+  // become Sentry issues, so the marker is how an operator finds them in the
+  // Sentry Logs UI, and how the readout knows what to tell them to search for.
+  const marker = SMOKE_TEST_MARKER;
   log.warn({ marker }, 'Sentry Logs smoke test (warn)');
   log.error({ marker }, 'Sentry Logs smoke test (error)');
 

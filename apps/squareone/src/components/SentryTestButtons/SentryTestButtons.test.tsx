@@ -3,6 +3,11 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
+import {
+  EMIT_LOG_PATH,
+  SMOKE_TEST_MARKER,
+} from '@/lib/sentry/emitLogSmokeTest';
+
 // Mock the Sentry SDK so the handled-exception path can be asserted without a
 // real Sentry client being initialized.
 vi.mock('@sentry/nextjs', () => ({
@@ -82,7 +87,7 @@ describe('SentryTestButtons', () => {
     // The X-Requested-With header makes Gafaelfawr answer an expired session
     // with a direct 403 instead of a cross-origin 302 toward CILogon, which
     // the default `redirect: 'follow'` fetch would chase into a CORS failure.
-    expect(fetchMock).toHaveBeenCalledWith('/admin/sentry/emit-log', {
+    expect(fetchMock).toHaveBeenCalledWith(EMIT_LOG_PATH, {
       method: 'POST',
       headers: { 'X-Requested-With': 'XMLHttpRequest' },
     });
@@ -93,7 +98,7 @@ describe('SentryTestButtons', () => {
       Response.json({
         delivery: 'delivered',
         emitted: ['warn', 'error'],
-        marker: 'sentry-logs-smoke-test',
+        marker: SMOKE_TEST_MARKER,
       })
     );
 
@@ -105,9 +110,7 @@ describe('SentryTestButtons', () => {
 
     // The records deliberately never become issues, so the marker is the only
     // handle an operator has for finding them in Sentry Logs.
-    expect(screen.getByRole('status')).toHaveTextContent(
-      'sentry-logs-smoke-test'
-    );
+    expect(screen.getByRole('status')).toHaveTextContent(SMOKE_TEST_MARKER);
   });
 
   test('"Emit server log" blocks a second POST while the first is in flight', async () => {
@@ -150,7 +153,7 @@ describe('SentryTestButtons', () => {
         {
           delivery: 'flush-timeout',
           emitted: ['warn', 'error'],
-          marker: 'sentry-logs-smoke-test',
+          marker: SMOKE_TEST_MARKER,
         },
         { status: 503 }
       )
@@ -176,7 +179,7 @@ describe('SentryTestButtons', () => {
         {
           delivery: 'sentry-disabled',
           emitted: ['warn', 'error'],
-          marker: 'sentry-logs-smoke-test',
+          marker: SMOKE_TEST_MARKER,
         },
         { status: 503 }
       )
@@ -201,7 +204,7 @@ describe('SentryTestButtons', () => {
       Response.json({
         delivery: 'delivered',
         emitted: [],
-        marker: 'sentry-logs-smoke-test',
+        marker: SMOKE_TEST_MARKER,
       })
     );
 
@@ -224,7 +227,7 @@ describe('SentryTestButtons', () => {
       Response.json({
         delivery: 'delivered',
         emitted: ['error'],
-        marker: 'sentry-logs-smoke-test',
+        marker: SMOKE_TEST_MARKER,
       })
     );
 
