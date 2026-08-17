@@ -3,40 +3,189 @@
 import { Button } from '@lsst-sqre/squared';
 import * as Sentry from '@sentry/nextjs';
 import React, { useState } from 'react';
+import {
+  type EmitLogDelivery,
+  isEmitLogDelivery,
+  SMOKE_TEST_LEVELS,
+} from '@/lib/sentry/emitLogSmokeTest';
 import styles from './SentryTestButtons.module.css';
 
 /**
- * Status of the most recent "Emit server log" attempt.
+ * How alarming a readout is, least to most.
  *
  * The tone is a styling hook: it lets the readout paint a delivered log
- * differently from a failed one, so the two outcomes are not visually
- * identical.
+ * differently from a gated or undelivered one, so the outcomes are not visually
+ * identical. `warning` covers the outcomes that are neither a clean success nor
+ * a transport failure — nothing reached Sentry, but nothing is broken either.
  */
+const TONE_SEVERITY = ['success', 'pending', 'warning', 'failure'] as const;
+
+type EmitLogTone = (typeof TONE_SEVERITY)[number];
+
+/** Status of the most recent "Emit server log" attempt. */
 type EmitLogStatus = {
   message: string;
-  tone: 'pending' | 'success' | 'failure';
+  tone: EmitLogTone;
 };
 
+/** A sentence of the readout, plus how alarming the fact it reports is. */
+type Finding = {
+  sentence: string;
+  tone: EmitLogTone;
+};
+
+/** The emit-log route's report, as read out of the response body. */
+type EmitLogReport = {
+  delivery: EmitLogDelivery;
+  /** Levels that actually produced a pino record (pino gates the rest). */
+  emitted: string[];
+  /** Search term for the Sentry Logs UI, when the route supplied one. */
+  marker: string | null;
+};
+
+/** The more alarming of two tones. */
+function worstTone(a: EmitLogTone, b: EmitLogTone): EmitLogTone {
+  return TONE_SEVERITY.indexOf(a) >= TONE_SEVERITY.indexOf(b) ? a : b;
+}
+
 /**
- * Read the smoke-test marker out of an emit-log response body.
+ * Parse an emit-log response body, or `null` if it isn't one.
  *
- * The route stamps the same marker onto every pino record it emits, so echoing
- * it back gives the operator an exact search term for the Sentry Logs UI. A
- * body that isn't the expected JSON must not turn a delivered log into a
- * reported failure, so anything unparseable yields `null` and the caller falls
- * back to the bare HTTP confirmation.
+ * A body that fails these checks did not come from the route handler — a proxy
+ * interstitial, or a cached older build — so the caller reports the bare HTTP
+ * outcome instead of inventing a delivery verdict from it.
  */
-async function readSmokeTestMarker(response: Response): Promise<string | null> {
-  try {
-    const body: unknown = await response.json();
-    if (body !== null && typeof body === 'object' && 'marker' in body) {
-      const { marker } = body as { marker: unknown };
-      return typeof marker === 'string' ? marker : null;
-    }
-  } catch {
-    // Not JSON (or a truncated body) — fall through to the null result.
+function readEmitLogReport(body: unknown): EmitLogReport | null {
+  if (body === null || typeof body !== 'object') return null;
+  const { delivery, emitted, marker } = body as {
+    delivery?: unknown;
+    emitted?: unknown;
+    marker?: unknown;
+  };
+  if (!isEmitLogDelivery(delivery)) return null;
+  if (
+    !Array.isArray(emitted) ||
+    !emitted.every((level) => typeof level === 'string')
+  ) {
+    return null;
   }
-  return null;
+  return {
+    delivery,
+    emitted: emitted as string[],
+    marker: typeof marker === 'string' ? marker : null,
+  };
+}
+
+/** Read a response body as JSON, or `null` if it isn't JSON at all. */
+async function readJsonBody(response: Response): Promise<unknown> {
+  try {
+    return await response.json();
+  } catch {
+    // Not JSON (or a truncated body).
+    return null;
+  }
+}
+
+/** Join level names for prose: `warn`, `warn and error`, `a, b and c`. */
+function formatLevels(levels: readonly string[]): string {
+  if (levels.length < 2) return levels.join('');
+  return `${levels.slice(0, -1).join(', ')} and ${levels[levels.length - 1]}`;
+}
+
+/**
+ * Report which levels pino actually recorded.
+ *
+ * A level below the server's `LOG_LEVEL` is noop'd at logger construction time,
+ * so a 200 can mean "nothing was written". That is a warning, not a success:
+ * the transport was never exercised for the missing levels.
+ */
+function describeEmission(emitted: string[]): Finding {
+  const gated = SMOKE_TEST_LEVELS.filter((level) => !emitted.includes(level));
+  if (gated.length === 0) {
+    return {
+      sentence: `Emitted ${formatLevels(emitted)} records.`,
+      tone: 'success',
+    };
+  }
+  if (emitted.length === 0) {
+    return {
+      sentence: `Emitted nothing — the server log level gated ${formatLevels(
+        gated
+      )}.`,
+      tone: 'warning',
+    };
+  }
+  return {
+    sentence: `Emitted ${formatLevels(
+      emitted
+    )}; the server log level gated ${formatLevels(gated)}.`,
+    tone: 'warning',
+  };
+}
+
+/**
+ * Report what became of the records on the way to Sentry.
+ *
+ * The marker search hint appears only when something was actually delivered:
+ * pointing an operator at Sentry Logs for a record that timed out, never left a
+ * DSN-less pod, or was never written is precisely the false success this readout
+ * has to avoid.
+ */
+function describeDelivery(report: EmitLogReport, status: number): Finding {
+  switch (report.delivery) {
+    case 'delivered': {
+      if (report.emitted.length === 0) {
+        return {
+          sentence: `Sentry had nothing to receive (HTTP ${status}).`,
+          tone: 'success',
+        };
+      }
+      const hint = report.marker
+        ? ` Search Sentry Logs for “${report.marker}”.`
+        : '';
+      return {
+        sentence: `Sentry accepted the flush (HTTP ${status}).${hint}`,
+        tone: 'success',
+      };
+    }
+    case 'flush-timeout':
+      return {
+        sentence: `The Sentry flush timed out, so the records may not have reached Sentry Logs (HTTP ${status}).`,
+        tone: 'failure',
+      };
+    case 'sentry-disabled':
+      return {
+        sentence: `Sentry is disabled here (no DSN), so the records only went to the server log (HTTP ${status}).`,
+        tone: 'warning',
+      };
+  }
+}
+
+/** Turn an emit-log response into the message and tone shown in the readout. */
+function describeEmitLog(response: Response, body: unknown): EmitLogStatus {
+  const report = readEmitLogReport(body);
+
+  // Without a recognizable report there is nothing to go on but the status
+  // code. A delivered log must not be reported as a failure, so a 2xx still
+  // reads as success — just without any claim about Sentry.
+  if (report === null) {
+    return response.ok
+      ? {
+          message: `Emitted server log (HTTP ${response.status})`,
+          tone: 'success',
+        }
+      : {
+          message: `Failed to emit server log (HTTP ${response.status})`,
+          tone: 'failure',
+        };
+  }
+
+  const emission = describeEmission(report.emitted);
+  const delivery = describeDelivery(report, response.status);
+  return {
+    message: `${emission.sentence} ${delivery.sentence}`,
+    tone: worstTone(emission.tone, delivery.tone),
+  };
 }
 
 /**
@@ -59,7 +208,9 @@ async function readSmokeTestMarker(response: Response): Promise<string | null> {
  * The outcome of the "Emit server log" round trip is reported in a status
  * readout that is always mounted (see the `<output>` below), so assistive tech
  * observes the live region before its first message rather than at the same
- * moment.
+ * moment. The readout reports the route's own delivery verdict rather than
+ * inferring success from the HTTP status, because a smoke test that claims
+ * delivery it cannot vouch for is worse than no smoke test.
  */
 export default function SentryTestButtons() {
   const [shouldThrow, setShouldThrow] = useState(false);
@@ -86,20 +237,10 @@ export default function SentryTestButtons() {
         // failure on the page meant to diagnose transport.
         headers: { 'X-Requested-With': 'XMLHttpRequest' },
       });
-      if (!response.ok) {
-        setEmitLogStatus({
-          message: `Failed to emit server log (HTTP ${response.status})`,
-          tone: 'failure',
-        });
-        return;
-      }
-      const marker = await readSmokeTestMarker(response);
-      setEmitLogStatus({
-        message: marker
-          ? `Emitted server log (HTTP ${response.status}). Search Sentry Logs for “${marker}”.`
-          : `Emitted server log (HTTP ${response.status})`,
-        tone: 'success',
-      });
+      // The body carries the delivery verdict even on a non-2xx (a flush
+      // timeout and a DSN-less deployment both answer 503), so it is read
+      // before the status code is judged.
+      setEmitLogStatus(describeEmitLog(response, await readJsonBody(response)));
     } catch (error) {
       setEmitLogStatus({
         message: `Failed to emit server log: ${

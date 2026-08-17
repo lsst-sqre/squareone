@@ -39,6 +39,18 @@
   color: var(--rsd-color-green-600);
 }
 
+/*
+ * The warning tone covers outcomes that are neither a clean delivery nor a
+ * transport failure: nothing reached Sentry (no DSN), or pino gated the levels
+ * the smoke test tried to emit. Orange-600 on orange-100 is 5.7:1, so the text
+ * clears WCAG AA at body size.
+ */
+.status[data-tone="warning"] {
+  background-color: var(--rsd-color-orange-100);
+  border-color: var(--rsd-color-orange-500);
+  color: var(--rsd-color-orange-600);
+}
+
 .status[data-tone="failure"] {
   background-color: var(--rsd-color-red-100);
   border-color: var(--rsd-color-red-500);

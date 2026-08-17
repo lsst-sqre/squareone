@@ -91,6 +91,7 @@ describe('SentryTestButtons', () => {
   test('"Emit server log" surfaces the smoke-test marker from the response body', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(
       Response.json({
+        delivery: 'delivered',
         emitted: ['warn', 'error'],
         marker: 'sentry-logs-smoke-test',
       })
@@ -143,9 +144,107 @@ describe('SentryTestButtons', () => {
     ).toBeInTheDocument();
   });
 
+  test('"Emit server log" reports a flush timeout as a failure, without the marker hint', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      Response.json(
+        {
+          delivery: 'flush-timeout',
+          emitted: ['warn', 'error'],
+          marker: 'sentry-logs-smoke-test',
+        },
+        { status: 503 }
+      )
+    );
+
+    render(<SentryTestButtons />);
+
+    await userEvent.click(
+      screen.getByRole('button', { name: /emit server log/i })
+    );
+
+    // Sending the operator to Sentry Logs for a record that may never have
+    // arrived is the failure mode this readout exists to prevent.
+    const status = screen.getByRole('status');
+    expect(status).toHaveAttribute('data-tone', 'failure');
+    expect(status).toHaveTextContent(/flush timed out/i);
+    expect(status).not.toHaveTextContent(/search sentry logs/i);
+  });
+
+  test('"Emit server log" warns when Sentry is disabled instead of pointing at Sentry Logs', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      Response.json(
+        {
+          delivery: 'sentry-disabled',
+          emitted: ['warn', 'error'],
+          marker: 'sentry-logs-smoke-test',
+        },
+        { status: 503 }
+      )
+    );
+
+    render(<SentryTestButtons />);
+
+    await userEvent.click(
+      screen.getByRole('button', { name: /emit server log/i })
+    );
+
+    // Without a DSN the records exist only in the pod's log, so there is
+    // nothing to search for and nothing broken either.
+    const status = screen.getByRole('status');
+    expect(status).toHaveAttribute('data-tone', 'warning');
+    expect(status).toHaveTextContent(/sentry is disabled/i);
+    expect(status).not.toHaveTextContent(/search sentry logs/i);
+  });
+
+  test('"Emit server log" warns when the server log level gated every level', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      Response.json({
+        delivery: 'delivered',
+        emitted: [],
+        marker: 'sentry-logs-smoke-test',
+      })
+    );
+
+    render(<SentryTestButtons />);
+
+    await userEvent.click(
+      screen.getByRole('button', { name: /emit server log/i })
+    );
+
+    // A flush with an empty buffer succeeds, so `delivery` alone would report
+    // this as a clean pass of a test that emitted nothing at all.
+    const status = screen.getByRole('status');
+    expect(status).toHaveAttribute('data-tone', 'warning');
+    expect(status).toHaveTextContent(/emitted nothing/i);
+    expect(status).not.toHaveTextContent(/search sentry logs/i);
+  });
+
+  test('"Emit server log" warns about a partial emit but still offers the marker', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      Response.json({
+        delivery: 'delivered',
+        emitted: ['error'],
+        marker: 'sentry-logs-smoke-test',
+      })
+    );
+
+    render(<SentryTestButtons />);
+
+    await userEvent.click(
+      screen.getByRole('button', { name: /emit server log/i })
+    );
+
+    // The error record did reach Sentry, so the search hint stays useful even
+    // though warn never made it out of pino.
+    const status = screen.getByRole('status');
+    expect(status).toHaveAttribute('data-tone', 'warning');
+    expect(status).toHaveTextContent(/gated warn/i);
+    expect(status).toHaveTextContent(/search sentry logs/i);
+  });
+
   test('"Emit server log" marks a successful emit with the success tone', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      Response.json({ emitted: ['warn', 'error'] })
+      Response.json({ delivery: 'delivered', emitted: ['warn', 'error'] })
     );
 
     render(<SentryTestButtons />);
