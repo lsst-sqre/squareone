@@ -16,10 +16,13 @@
 
 /*
  * The status readout is always in the DOM so the live region is announced
- * reliably, but it only paints a box once it carries a message; the idle tone
- * therefore gets no box styling at all.
+ * reliably, but it only paints a box once it carries a message. The tone
+ * attribute is absent until there is an outcome to report, so keying the box
+ * on the attribute's mere presence styles exactly the states that have one —
+ * and a tone added to the union later inherits the box instead of slipping
+ * through an exclusion list nobody remembered to update.
  */
-.status:not([data-tone="idle"]) {
+.status[data-tone] {
   display: block;
   margin-top: var(--sqo-space-sm);
   padding: var(--sqo-space-xs) var(--sqo-space-sm);

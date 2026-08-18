@@ -18,6 +18,10 @@ import styles from './SentryTestButtons.module.css';
  * differently from a gated or undelivered one, so the outcomes are not visually
  * identical. `warning` covers the outcomes that are neither a clean success nor
  * a transport failure — nothing reached Sentry, but nothing is broken either.
+ *
+ * Every member is a real outcome of a real attempt; there is no "nothing has
+ * happened yet" member, because that state is the absence of a status rather
+ * than a status of its own. It renders as no `data-tone` attribute at all.
  */
 const TONE_SEVERITY = ['success', 'pending', 'warning', 'failure'] as const;
 
@@ -203,8 +207,8 @@ function describeEmitLog(response: Response, body: unknown): EmitLogStatus {
  *   emits server-side pino warn/error records. The `Sentry.pinoIntegration()`
  *   bridge ships those to Sentry Logs (not issues), so this verifies the
  *   pino→Sentry Logs transport in the server build. The button is held in
- *   `loading` state while the POST is in flight so concurrent requests can't
- *   race each other's status updates.
+ *   `loading` state for exactly as long as the readout's tone is `pending`, so
+ *   concurrent requests can't race each other's status updates.
  *
  * The outcome of the "Emit server log" round trip is reported in a status
  * readout that is always mounted (see the `<output>` below), so assistive tech
@@ -223,14 +227,17 @@ export default function SentryTestButtons() {
   const [emitLogStatus, setEmitLogStatus] = useState<EmitLogStatus | null>(
     null
   );
-  const [isEmittingLog, setIsEmittingLog] = useState(false);
+  // Derived, not stored: the request is in flight exactly while the readout
+  // reports it as pending. A second `useState` would be a duplicate of this
+  // fact that some later edit could update without updating the readout —
+  // a button spinning over a settled message, or the reverse.
+  const isEmittingLog = emitLogStatus?.tone === 'pending';
 
   if (shouldThrow) {
     throw new Error('Sentry Test Error');
   }
 
   const handleEmitLog = async () => {
-    setIsEmittingLog(true);
     setEmitLogStatus({ message: 'Emitting…', tone: 'pending' });
     try {
       const response = await fetch(EMIT_LOG_PATH, {
@@ -254,8 +261,6 @@ export default function SentryTestButtons() {
         }`,
         tone: 'failure',
       });
-    } finally {
-      setIsEmittingLog(false);
     }
   };
 
@@ -309,7 +314,7 @@ export default function SentryTestButtons() {
           region gets `role="status"`. */}
       <output
         className={styles.status}
-        data-tone={emitLogStatus?.tone ?? 'idle'}
+        data-tone={emitLogStatus?.tone}
         aria-live="polite"
         aria-atomic="true"
       >

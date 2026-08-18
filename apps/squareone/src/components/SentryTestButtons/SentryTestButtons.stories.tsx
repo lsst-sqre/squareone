@@ -77,7 +77,7 @@ export const Default: Story = {
     const status = canvas.getByRole('status');
     await expect(status).toBeInTheDocument();
     await expect(status).toBeEmptyDOMElement();
-    await expect(status).toHaveAttribute('data-tone', 'idle');
+    await expect(status).not.toHaveAttribute('data-tone');
 
     // Capturing a handled exception does not break the page: the button is
     // still present afterwards. (The "Throw uncaught error" button is left

@@ -57,6 +57,16 @@ describe('SentryTestButtons', () => {
     expect(status).toBeEmptyDOMElement();
   });
 
+  test('the status readout carries no tone until there is something to report', () => {
+    render(<SentryTestButtons />);
+
+    // Every tone in the union is a real outcome of a real attempt, so an
+    // empty readout has none — it omits the attribute rather than carrying a
+    // synthetic "idle" value that the type, the CSS and this test would each
+    // have to keep agreeing about.
+    expect(screen.getByRole('status')).not.toHaveAttribute('data-tone');
+  });
+
   test('"Capture handled exception" sends a handled event to Sentry without breaking the page', async () => {
     render(<SentryTestButtons />);
 
