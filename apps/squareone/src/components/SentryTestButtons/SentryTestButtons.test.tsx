@@ -41,7 +41,7 @@ class TestErrorBoundary extends React.Component<
 // The spies installed below are never restored inline: the unit vitest project
 // sets `restoreMocks: true` (see vitest.config.ts), which tears every spy down
 // before the next test even when the test that installed it fails partway
-// through. The last two tests in this file guard that arrangement.
+// through. That arrangement is guarded by `src/tests/restoreMocks.test.ts`.
 describe('SentryTestButtons', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -335,25 +335,5 @@ describe('SentryTestButtons', () => {
     expect(screen.getByRole('alert')).toHaveTextContent(
       'Caught: Sentry Test Error'
     );
-  });
-
-  // These two tests are a pair, and only mean anything in order. They pin the
-  // `restoreMocks` setting every test above relies on for teardown: an inline
-  // `mockRestore()` at the end of a test is skipped whenever an earlier
-  // assertion in that test fails, which would leave `globalThis.fetch` stubbed
-  // for every test that follows and turn one real failure into a cascade of
-  // misleading ones. `test.fails` lets the first test model such a failure
-  // without failing the suite, so the second can assert the stub was torn down
-  // regardless.
-  test.fails('a failing test may leave its fetch stub un-restored', () => {
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      new Response(null, { status: 200 })
-    );
-
-    expect(vi.isMockFunction(globalThis.fetch)).toBe(false);
-  });
-
-  test('a failed test does not leak its fetch stub into later tests', () => {
-    expect(vi.isMockFunction(globalThis.fetch)).toBe(false);
   });
 });
