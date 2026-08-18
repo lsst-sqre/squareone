@@ -19,6 +19,14 @@ import type * as Sentry from '@sentry/nextjs';
  * reach Sentry Logs, while the chattier `info`/`debug`/`trace` levels stay out
  * so the Logs stream is not flooded.
  *
+ * Sentry Structured Logs are enabled server-side only: `enableLogs: true` lives
+ * in `sentry.server.config.js` and nowhere else, because this bridge is the
+ * only producer of Sentry Logs and it runs only in the Node runtime. The
+ * browser (`instrumentation-client.js`) and edge (`sentry.edge.config.js`)
+ * configs deliberately leave `enableLogs` unset. Note that the SDK drops
+ * `Sentry.logger.*` calls silently when `enableLogs` is off, so a runtime that
+ * ever needs to log to Sentry must turn it on in its own config first.
+ *
  * The exported type is wrapped in `NonNullable<>` because
  * `pinoIntegration`'s parameter is optional, so
  * `Parameters<typeof Sentry.pinoIntegration>[0]` alone includes `undefined` —
