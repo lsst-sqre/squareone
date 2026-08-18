@@ -19,15 +19,15 @@ const baseConfig: AppConfigContextValue = {
   mdxDir: 'src/content/pages',
 };
 
-test('generates a single flat section with the Sentry, service-token, and notification items', () => {
+test('generates a single flat section with the notification, service-token, and Sentry items in order', () => {
   const navigation = getAdminNavigation(baseConfig);
 
   expect(navigation).toHaveLength(1);
   expect(navigation[0]).toEqual({
     items: [
-      { href: '/admin/sentry', label: 'Sentry' },
-      { href: '/admin/service-tokens', label: 'Service tokens' },
       { href: '/admin/notifications', label: 'User notifications' },
+      { href: '/admin/service-tokens', label: 'Service tokens' },
+      { href: '/admin/sentry', label: 'Sentry' },
     ],
   });
 });
@@ -52,10 +52,20 @@ test('includes the user-notifications admin item', () => {
   });
 });
 
-test('keeps Sentry first so the /admin index redirect target is unchanged', () => {
+test('keeps User notifications first so /admin redirects there', () => {
   const navigation = getAdminNavigation(baseConfig);
 
   expect(navigation[0].items[0]).toEqual({
+    href: '/admin/notifications',
+    label: 'User notifications',
+  });
+});
+
+test('keeps Sentry last', () => {
+  const navigation = getAdminNavigation(baseConfig);
+  const { items } = navigation[0];
+
+  expect(items[items.length - 1]).toEqual({
     href: '/admin/sentry',
     label: 'Sentry',
   });

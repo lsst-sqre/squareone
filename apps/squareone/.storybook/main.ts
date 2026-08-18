@@ -41,6 +41,12 @@ const config: StorybookConfig = {
     config.resolve = config.resolve || {};
     config.resolve.alias = {
       ...config.resolve.alias,
+      // The app's tsconfig excludes `*.stories.tsx`, so the framework's
+      // tsconfig-paths resolution never applies the "@/*" -> "./src/*" mapping
+      // to a story file — a story importing `@/lib/...` fails to resolve even
+      // though the component beside it resolves the same specifier. Aliasing it
+      // here lets stories import app modules the way every other file does.
+      '@': path.resolve(__dirname, '../src'),
       '@lsst-sqre/rubin-style-dictionary': path.resolve(
         __dirname,
         '../../../packages/rubin-style-dictionary'

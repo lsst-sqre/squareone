@@ -32,6 +32,12 @@ export default defineConfig({
           environment: 'jsdom',
           setupFiles: ['src/tests/setup.ts'],
           globals: true,
+          // Restore spies between tests so a stub installed with `vi.spyOn`
+          // (e.g. on `globalThis.fetch`) can't survive into later tests. An
+          // inline `mockRestore()` at the end of a test is skipped whenever an
+          // assertion above it fails, which would turn one real failure into a
+          // cascade of misleading ones further down the file.
+          restoreMocks: true,
         },
       }),
       // Storybook interaction testing project

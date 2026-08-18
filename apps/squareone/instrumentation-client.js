@@ -31,6 +31,9 @@ Sentry.init({
   // Add optional integrations for additional features
   integrations: [Sentry.replayIntegration()],
 
+  // No `enableLogs` here on purpose: Sentry Structured Logs are server-only —
+  // see src/lib/sentry/pinoLogsConfig.ts.
+
   // Trace requests through any other Sentry-enabled service in the same
   // environment. By default, only requests to 'localhost' and requests that
   // start with '/' have trace headers added. Many of our requests to external

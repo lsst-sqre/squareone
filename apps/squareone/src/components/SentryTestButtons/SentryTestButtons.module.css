@@ -2,8 +2,60 @@
  * SentryTestButtons styles
  */
 
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
 .buttons {
   display: flex;
   flex-wrap: wrap;
   gap: var(--sqo-space-sm);
+}
+
+/*
+ * The status readout is always in the DOM so the live region is announced
+ * reliably, but it only paints a box once it carries a message. The tone
+ * attribute is absent until there is an outcome to report, so keying the box
+ * on the attribute's mere presence styles exactly the states that have one —
+ * and a tone added to the union later inherits the box instead of slipping
+ * through an exclusion list nobody remembered to update.
+ */
+.status[data-tone] {
+  display: block;
+  margin-top: var(--sqo-space-sm);
+  padding: var(--sqo-space-xs) var(--sqo-space-sm);
+  border: 1px solid;
+  border-radius: var(--sqo-border-radius-2);
+}
+
+.status[data-tone="pending"] {
+  background-color: var(--rsd-color-gray-50);
+  border-color: var(--rsd-color-gray-300);
+  color: var(--rsd-color-gray-700);
+}
+
+.status[data-tone="success"] {
+  background-color: var(--rsd-color-green-100);
+  border-color: var(--rsd-color-green-500);
+  color: var(--rsd-color-green-600);
+}
+
+/*
+ * The warning tone covers outcomes that are neither a clean delivery nor a
+ * transport failure: nothing reached Sentry (no DSN), or pino gated the levels
+ * the smoke test tried to emit. Orange-600 on orange-100 is 5.7:1, so the text
+ * clears WCAG AA at body size.
+ */
+.status[data-tone="warning"] {
+  background-color: var(--rsd-color-orange-100);
+  border-color: var(--rsd-color-orange-500);
+  color: var(--rsd-color-orange-600);
+}
+
+.status[data-tone="failure"] {
+  background-color: var(--rsd-color-red-100);
+  border-color: var(--rsd-color-red-500);
+  color: var(--rsd-color-red-600);
 }

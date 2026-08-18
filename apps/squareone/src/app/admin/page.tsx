@@ -25,8 +25,8 @@ export async function generateMetadata(): Promise<Metadata> {
  * Admin index route.
  *
  * Redirects to the first item in the admin sidebar navigation (currently
- * `/admin/sentry`). Reordering `getAdminNavigation()` changes the target with
- * no other code change. When the navigation is empty, renders a fallback
+ * `/admin/notifications`). Reordering `getAdminNavigation()` changes the
+ * target with no other code change. When the navigation is empty, renders a fallback
  * (with a top-level heading, since the redirect no longer takes over the page)
  * instead of redirecting.
  */

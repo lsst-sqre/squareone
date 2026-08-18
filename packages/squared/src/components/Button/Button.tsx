@@ -101,8 +101,21 @@ const Button = forwardRef<any, ButtonProps<any>>(
 
     const buttonContent = (
       <>
+        {/*
+          The spinner is decorative: `aria-busy` on the control (below) is what
+          reports the pending state to assistive tech. It deliberately carries
+          no `role="status"` / label, for two reasons. A live region that mounts
+          already holding its message is announced unreliably, so it never was a
+          dependable announcement; and a button is usually sitting beside the
+          region that reports the *outcome* of the same action, where a second
+          polite region means one action produces two competing announcements —
+          and any `getByRole('status')` covering that state resolves to two
+          elements and throws. A consumer that needs the pending state spoken
+          should own that message in its own live region, where it can also say
+          what is pending rather than just "Loading".
+        */}
         {loading && (
-          <span className={styles.spinner} role="status" aria-label="Loading">
+          <span className={styles.spinner} aria-hidden="true">
             <svg
               className={styles.spinnerSvg}
               viewBox="0 0 24 24"
