@@ -133,11 +133,37 @@ describe('Button', () => {
     });
 
     it('shows loading state and disables button', () => {
-      render(<Button loading>Loading</Button>);
+      const { container } = render(<Button loading>Loading</Button>);
       const button = screen.getByRole('button');
       expect(button).toBeDisabled();
       expect(button).toHaveAttribute('aria-busy', 'true');
-      expect(screen.getByLabelText('Loading')).toBeInTheDocument();
+      expect(container.querySelector('.spinner')).toBeInTheDocument();
+    });
+
+    it('keeps the loading spinner out of the accessibility tree', () => {
+      // The spinner is decorative; `aria-busy` on the control is what reports
+      // the pending state. A live region here would be a second one competing
+      // with whatever region the page already uses to announce the outcome of
+      // the same action — and it mounts already holding its message, which
+      // assistive tech announces unreliably in any case.
+      const { container } = render(<Button loading>Save</Button>);
+
+      expect(screen.queryByRole('status')).not.toBeInTheDocument();
+      expect(container.querySelector('.spinner')).toHaveAttribute(
+        'aria-hidden',
+        'true'
+      );
+    });
+
+    it('keeps the accessible name stable across the loading transition', () => {
+      const { rerender } = render(<Button>Save</Button>);
+      expect(screen.getByRole('button')).toHaveAccessibleName('Save');
+
+      // A labelled spinner would fold "Loading" into the button's name, so the
+      // control an assistive-tech user activated appears to rename itself mid
+      // action.
+      rerender(<Button loading>Save</Button>);
+      expect(screen.getByRole('button')).toHaveAccessibleName('Save');
     });
 
     it('applies loading class when loading', () => {

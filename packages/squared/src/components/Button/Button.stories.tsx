@@ -329,9 +329,14 @@ export const LoadingInteractionTest: Story = {
     await expect(button).toHaveAttribute('aria-busy', 'true');
     await expect(button).toBeDisabled();
 
-    // Check for spinner
-    const spinner = canvas.getByLabelText('Loading');
+    // The spinner is decorative: it renders, but stays out of the
+    // accessibility tree so it can't add a live region that competes with the
+    // page's own announcement of what the button is doing. `aria-busy` above
+    // is the only signal assistive tech gets from the button itself.
+    const spinner = canvasElement.querySelector('[aria-hidden="true"]');
     await expect(spinner).toBeInTheDocument();
+    await expect(spinner?.querySelector('svg')).toBeInTheDocument();
+    await expect(canvas.queryByRole('status')).not.toBeInTheDocument();
   },
 };
 

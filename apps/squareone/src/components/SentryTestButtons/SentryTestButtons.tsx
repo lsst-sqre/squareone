@@ -212,6 +212,11 @@ function describeEmitLog(response: Response, body: unknown): EmitLogStatus {
  * moment. The readout reports the route's own delivery verdict rather than
  * inferring success from the HTTP status, because a smoke test that claims
  * delivery it cannot vouch for is worse than no smoke test.
+ *
+ * That readout is also the only live region in play: squared's Button keeps its
+ * loading spinner out of the accessibility tree and signals the in-flight state
+ * with `aria-busy` instead, so one click yields one announcement rather than a
+ * spinner and a readout talking over each other about the same action.
  */
 export default function SentryTestButtons() {
   const [shouldThrow, setShouldThrow] = useState(false);
@@ -287,7 +292,21 @@ export default function SentryTestButtons() {
       {/* Mounted unconditionally (and empty until there is something to say)
           so the live region exists before its first message, and kept outside
           the button row so it lays out as its own block rather than stretching
-          as a flex sibling of the buttons. */}
+          as a flex sibling of the buttons.
+
+          This is an <output>, where ExecStats and BroadcastBannerStack spell
+          the same live region as `role="status"` on a p/div. That is one
+          convention, not two:
+          <output>'s implicit ARIA role *is* `status`, so all three announce
+          identically and the choice only states intent. Per spec <output>
+          "represents the result of a calculation performed by the application,
+          or the result of a user action" — which is precisely this readout: the
+          operator pressed a button on this page and this is what came back. The
+          other two are neither; ExecStats reports a background notebook run
+          nobody necessarily started from that panel, and BroadcastBannerStack
+          is a general container for server-pushed banners. Hence the rule: the
+          result of a user action on this page gets <output>, every other polite
+          region gets `role="status"`. */}
       <output
         className={styles.status}
         data-tone={emitLogStatus?.tone ?? 'idle'}

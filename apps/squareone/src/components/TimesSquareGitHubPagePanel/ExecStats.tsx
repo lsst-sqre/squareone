@@ -179,7 +179,15 @@ export default function ExecStats() {
   if (isComputing) {
     return (
       <div className={styles.container}>
-        {/* biome-ignore lint/a11y/useSemanticElements: <output> is for form calculation results, not a status message about a background notebook execution */}
+        {/* `role="status"` rather than <output>: this repo reserves <output>
+            for the result of a user action on the same page (see
+            SentryTestButtons), and this reports a background notebook
+            execution that nobody necessarily started from this panel. Both
+            spellings carry the same implicit role, so assistive tech hears no
+            difference — the element states the intent. This line used to carry
+            a biome-ignore for lint/a11y/useSemanticElements, but Biome no
+            longer pushes `role="status"` toward <output>, so the suppression
+            did nothing. */}
         <p className={styles.content} role="status">
           Computing…
         </p>

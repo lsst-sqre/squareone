@@ -147,6 +147,36 @@ describe('SentryTestButtons', () => {
     ).toBeInTheDocument();
   });
 
+  test('"Emit server log" announces the in-flight attempt through exactly one live region', async () => {
+    let resolveFetch: (response: Response) => void = () => {};
+    vi.spyOn(globalThis, 'fetch').mockImplementation(
+      () =>
+        new Promise<Response>((resolve) => {
+          resolveFetch = resolve;
+        })
+    );
+
+    render(<SentryTestButtons />);
+
+    const button = screen.getByRole('button', { name: /emit server log/i });
+    await userEvent.click(button);
+
+    // The loading button must not contribute a live region of its own: two
+    // polite regions talking over each other give one action two competing
+    // announcements, and every `getByRole('status')` in this file would throw
+    // "Found multiple elements" for the pending state.
+    expect(screen.getAllByRole('status')).toHaveLength(1);
+    expect(screen.getByRole('status')).toHaveTextContent('Emitting…');
+
+    // The button reports being busy through aria-busy instead, which is a
+    // property of the control rather than a second announcement.
+    expect(button).toHaveAttribute('aria-busy', 'true');
+
+    await act(async () => {
+      resolveFetch(new Response(null, { status: 200 }));
+    });
+  });
+
   test('"Emit server log" reports a flush timeout as a failure, without the marker hint', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(
       Response.json(

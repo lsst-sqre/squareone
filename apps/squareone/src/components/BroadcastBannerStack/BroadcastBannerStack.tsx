@@ -45,7 +45,14 @@ export default function BroadcastBannerStack() {
         ))}
       </div>
       {/* Polite region for info, notice, and any other broadcasts. */}
-      {/* biome-ignore lint/a11y/useSemanticElements: <output> is for form calculation results, not a general polite live-region container for broadcast banners */}
+      {/* `role="status"` rather than <output>: this repo reserves <output> for
+          the result of a user action on the same page (see SentryTestButtons),
+          and this is a general container for server-pushed banners nobody here
+          asked for. Both spellings carry the same implicit role, so assistive
+          tech hears no difference — the element states the intent. This line
+          used to carry a biome-ignore for lint/a11y/useSemanticElements, but
+          Biome no longer pushes `role="status"` toward <output>, so the
+          suppression did nothing. */}
       <div role="status" aria-live="polite">
         {politeBroadcasts.map((broadcast) => (
           <BroadcastBanner broadcast={broadcast} key={broadcast.id} />
