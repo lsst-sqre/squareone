@@ -11,6 +11,7 @@
 import * as Sentry from '@sentry/nextjs';
 import { NextResponse } from 'next/server';
 
+import { requireAdminIngress } from '@/lib/admin/requireAdminIngress';
 import { createRouteLogger } from '@/lib/logger';
 import {
   type EmitLogDelivery,
@@ -50,15 +51,13 @@ async function deliverToSentry(): Promise<EmitLogDelivery> {
   return (await Sentry.flush(FLUSH_TIMEOUT_MS)) ? 'delivered' : 'flush-timeout';
 }
 
-/**
- * Authorization note: this route handler performs **no** in-app authorization.
- * Access is delegated entirely to the Phalanx `GafaelfawrIngress` that fronts
- * the `/admin` path prefix — the client-side `AdminRequired` gate protects only
- * rendered pages, never route handlers. Any future route handler added under
- * `/admin` inherits the same single-layer assumption, so if that ingress rule
- * ever changes, in-app checks must be added here.
- */
-export async function POST() {
+export async function POST(request: Request) {
+  // Authorization for this handler is the /admin ingress, not in-app logic; see
+  // `requireAdminIngress` for what that assumes, enforces and does not defend
+  // against.
+  const denied = requireAdminIngress(request);
+  if (denied) return denied;
+
   // Stamped on the records and echoed in the response: these records never
   // become Sentry issues, so the marker is how an operator finds them in the
   // Sentry Logs UI, and how the readout knows what to tell them to search for.

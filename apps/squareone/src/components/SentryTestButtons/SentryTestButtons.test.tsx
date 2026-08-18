@@ -14,8 +14,19 @@ vi.mock('@sentry/nextjs', () => ({
   captureException: vi.fn(),
 }));
 
+// Wrap the shared admin fetch helper in a spy rather than replacing it: every
+// test below drives the round trip by stubbing `globalThis.fetch`, which the
+// real helper calls, while the spy records that the component reached the route
+// through the helper instead of hand-rolling a `fetch` of its own.
+vi.mock('@/lib/admin/adminFetch', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('@/lib/admin/adminFetch')>();
+  return { ...actual, adminFetch: vi.fn(actual.adminFetch) };
+});
+
 // Import after mocking.
 import * as Sentry from '@sentry/nextjs';
+import { adminFetch } from '@/lib/admin/adminFetch';
 import SentryTestButtons from './SentryTestButtons';
 
 // Minimal error boundary so the render-time throw can be observed in a test
@@ -83,10 +94,10 @@ describe('SentryTestButtons', () => {
     ).toBeInTheDocument();
   });
 
-  test('"Emit server log" POSTs to the emit-log route so the server logs a warn/error', async () => {
-    const fetchMock = vi
-      .spyOn(globalThis, 'fetch')
-      .mockResolvedValue(new Response(null, { status: 200 }));
+  test('"Emit server log" POSTs to the emit-log route through the admin fetch helper', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(null, { status: 200 })
+    );
 
     render(<SentryTestButtons />);
 
@@ -94,13 +105,11 @@ describe('SentryTestButtons', () => {
       screen.getByRole('button', { name: /emit server log/i })
     );
 
-    // The X-Requested-With header makes Gafaelfawr answer an expired session
-    // with a direct 403 instead of a cross-origin 302 toward CILogon, which
-    // the default `redirect: 'follow'` fetch would chase into a CORS failure.
-    expect(fetchMock).toHaveBeenCalledWith(EMIT_LOG_PATH, {
-      method: 'POST',
-      headers: { 'X-Requested-With': 'XMLHttpRequest' },
-    });
+    // What this component owns is the route and the method. The
+    // `X-Requested-With` header every /admin call needs — and the reason it
+    // needs it — belongs to `adminFetch`, and is asserted in its own test, so a
+    // second caller cannot adopt half of the contract.
+    expect(adminFetch).toHaveBeenCalledWith(EMIT_LOG_PATH, { method: 'POST' });
   });
 
   test('"Emit server log" surfaces the smoke-test marker from the response body', async () => {

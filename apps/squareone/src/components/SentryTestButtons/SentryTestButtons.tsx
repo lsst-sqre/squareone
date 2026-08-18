@@ -3,6 +3,7 @@
 import { Button } from '@lsst-sqre/squared';
 import * as Sentry from '@sentry/nextjs';
 import React, { useState } from 'react';
+import { adminFetch } from '@/lib/admin/adminFetch';
 import {
   EMIT_LOG_PATH,
   type EmitLogDelivery,
@@ -240,16 +241,10 @@ export default function SentryTestButtons() {
   const handleEmitLog = async () => {
     setEmitLogStatus({ message: 'Emitting…', tone: 'pending' });
     try {
-      const response = await fetch(EMIT_LOG_PATH, {
-        method: 'POST',
-        // Without this header the /admin ingress (loginRedirect: true) turns an
-        // expired session's 401 into a 302 toward CILogon, which fetch follows
-        // cross-origin and fails as an opaque CORS error. Gafaelfawr answers
-        // XHR-flagged requests with a direct 403 instead, so the status shown
-        // below reflects the real auth failure rather than a phantom transport
-        // failure on the page meant to diagnose transport.
-        headers: { 'X-Requested-With': 'XMLHttpRequest' },
-      });
+      // Every call to an /admin route handler goes through `adminFetch`, which
+      // flags it for the Gafaelfawr ingress; see that module for why an
+      // unflagged one reports an expired session as a transport failure.
+      const response = await adminFetch(EMIT_LOG_PATH, { method: 'POST' });
       // The body carries the delivery verdict even on a non-2xx (a flush
       // timeout and a DSN-less deployment both answer 503), so it is read
       // before the status code is judged.

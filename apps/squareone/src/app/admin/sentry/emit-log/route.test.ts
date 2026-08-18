@@ -1,5 +1,6 @@
-import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
+import { ADMIN_INGRESS_USER_HEADER } from '@/lib/admin/requireAdminIngress';
 import {
   EMIT_LOG_PATH,
   SMOKE_TEST_MARKER,
@@ -32,16 +33,55 @@ vi.mock('@sentry/nextjs', () => ({
 
 import { POST } from './route';
 
+/**
+ * A request as the Gafaelfawr `/admin` ingress delivers it.
+ *
+ * The handler refuses a request that did not cross that ingress (see
+ * `@/lib/admin/requireAdminIngress`), so every test that exercises the emit
+ * path has to arrive the way a real one does.
+ */
+function ingressRequest(headers: Record<string, string> = {}): Request {
+  return new Request(`https://data.example.org${EMIT_LOG_PATH}`, {
+    method: 'POST',
+    headers: { [ADMIN_INGRESS_USER_HEADER]: 'rra', ...headers },
+  });
+}
+
 describe(`POST ${EMIT_LOG_PATH}`, () => {
   beforeEach(() => {
     vi.clearAllMocks();
     isLevelEnabled.mockReturnValue(true);
     flush.mockImplementation(async () => true);
     isEnabled.mockReturnValue(true);
+    // Run the whole suite as a deployed pod would: `requireAdminIngress` stands
+    // down on the development server, which is what Vitest's NODE_ENV reports,
+    // so without this every test below would pass whether or not the request
+    // looked like it came through the ingress.
+    vi.stubEnv('NODE_ENV', 'production');
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  test('refuses a request that did not come through the /admin ingress', async () => {
+    const response = await POST(
+      new Request(`https://data.example.org${EMIT_LOG_PATH}`, {
+        method: 'POST',
+      })
+    );
+
+    expect(response.status).toBe(403);
+    // Nothing is emitted for an unauthorized caller: the smoke test writes
+    // records and drains the Sentry buffer, neither of which an unauthenticated
+    // request should be able to trigger.
+    expect(warn).not.toHaveBeenCalled();
+    expect(error).not.toHaveBeenCalled();
+    expect(flush).not.toHaveBeenCalled();
   });
 
   test('emits a server-side pino warn and error record', async () => {
-    const response = await POST();
+    const response = await POST(ingressRequest());
 
     expect(warn).toHaveBeenCalledTimes(1);
     expect(error).toHaveBeenCalledTimes(1);
@@ -69,7 +109,7 @@ describe(`POST ${EMIT_LOG_PATH}`, () => {
     );
 
     let settled = false;
-    const pending = POST().then((response) => {
+    const pending = POST(ingressRequest()).then((response) => {
       settled = true;
       return response;
     });
@@ -93,7 +133,7 @@ describe(`POST ${EMIT_LOG_PATH}`, () => {
     // detect — looks identical to a success unless the boolean is inspected.
     flush.mockImplementation(async () => false);
 
-    const response = await POST();
+    const response = await POST(ingressRequest());
 
     expect(response.status).toBe(503);
     expect(await response.json()).toMatchObject({ delivery: 'flush-timeout' });
@@ -105,7 +145,7 @@ describe(`POST ${EMIT_LOG_PATH}`, () => {
     // Sentry that can never receive anything.
     isEnabled.mockReturnValue(false);
 
-    const response = await POST();
+    const response = await POST(ingressRequest());
 
     expect(response.status).toBe(503);
     expect(await response.json()).toMatchObject({
@@ -120,7 +160,7 @@ describe(`POST ${EMIT_LOG_PATH}`, () => {
     // e.g. LOG_LEVEL=error noops log.warn at construction time.
     isLevelEnabled.mockImplementation((level: string) => level === 'error');
 
-    const response = await POST();
+    const response = await POST(ingressRequest());
     const body = await response.json();
 
     expect(body).toMatchObject({
