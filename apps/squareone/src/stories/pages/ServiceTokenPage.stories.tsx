@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { expect, userEvent, within } from 'storybook/test';
 import ServiceTokenPageClient from '../../app/admin/service-tokens/ServiceTokenPageClient';
 import { useStaticConfig } from '../../hooks/useStaticConfig';
+import { requestMethod, requestUrl } from '../support/fetchStub';
 
 // Mock login info exposing a full configured scope list that is a superset of
 // the signed-in admin's own scopes, so the form demonstrates offering every
@@ -55,13 +56,8 @@ const mockServiceTokens: TokenInfo[] = [
 const originalFetch = typeof window !== 'undefined' ? window.fetch : fetch;
 
 const mockFetch = (async (url: string | URL | Request, init?: RequestInit) => {
-  const urlString =
-    typeof url === 'string'
-      ? url
-      : url instanceof URL
-        ? url.toString()
-        : url.url;
-  const method = (init?.method ?? 'GET').toUpperCase();
+  const urlString = requestUrl(url);
+  const method = requestMethod(url, init);
 
   if (urlString.includes('/auth/api/v1/login')) {
     return {

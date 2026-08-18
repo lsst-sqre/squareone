@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { expect, within } from 'storybook/test';
 import SearchServiceTokensPageClient from '../../app/admin/service-tokens/search/SearchServiceTokensPageClient';
 import { useStaticConfig } from '../../hooks/useStaticConfig';
+import { requestMethod, requestUrl } from '../support/fetchStub';
 
 // Service tokens returned for the `?q=`-driven lookup. Tokens are the required
 // 22 characters so they pass the gafaelfawr-client schema.
@@ -36,13 +37,8 @@ const mockServiceTokens: TokenInfo[] = [
 const originalFetch = typeof window !== 'undefined' ? window.fetch : fetch;
 
 const mockFetch = (async (url: string | URL | Request, init?: RequestInit) => {
-  const urlString =
-    typeof url === 'string'
-      ? url
-      : url instanceof URL
-        ? url.toString()
-        : url.url;
-  const method = (init?.method ?? 'GET').toUpperCase();
+  const urlString = requestUrl(url);
+  const method = requestMethod(url, init);
 
   // Per-user token routes: GET lists a bot user's tokens, DELETE revokes one.
   // `bot-empty` returns no tokens so the empty-state story can render.

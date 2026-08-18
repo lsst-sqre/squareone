@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { useEffect } from 'react';
 import { expect, within } from 'storybook/test';
 import NewServiceTokenPageClient from '../../app/admin/service-tokens/new/NewServiceTokenPageClient';
+import { requestUrl } from '../support/fetchStub';
 
 // Mock login info exposing a full configured scope list that is a superset of
 // the signed-in admin's own scopes, so the form demonstrates offering every
@@ -32,12 +33,7 @@ const originalFetch = typeof window !== 'undefined' ? window.fetch : fetch;
 
 function makeMockFetch(loginInfo: typeof mockLoginInfo) {
   return (async (url: string | URL | Request) => {
-    const urlString =
-      typeof url === 'string'
-        ? url
-        : url instanceof URL
-          ? url.toString()
-          : url.url;
+    const urlString = requestUrl(url);
 
     if (urlString.includes('/auth/api/v1/login')) {
       return {

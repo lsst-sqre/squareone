@@ -4,6 +4,7 @@ import {
   EMIT_LOG_PATH,
   SMOKE_TEST_MARKER,
 } from '@/lib/sentry/emitLogSmokeTest';
+import { matchesRequest } from '@/stories/support/fetchStub';
 import SentryTestButtons from './SentryTestButtons';
 
 const meta: Meta<typeof SentryTestButtons> = {
@@ -14,22 +15,20 @@ const meta: Meta<typeof SentryTestButtons> = {
 export default meta;
 type Story = StoryObj<typeof SentryTestButtons>;
 
-/** Resolve the URL of a `fetch` call regardless of which input form was used. */
-function requestUrl(input: RequestInfo | URL): string {
-  if (typeof input === 'string') return input;
-  if (input instanceof URL) return input.href;
-  return input.url;
-}
-
 /**
- * Build a `beforeEach` that answers only the emit-log URL with `body`.
+ * Build a `beforeEach` that answers only the emit-log POST with `body`.
  *
  * The emit-log route handler only exists in the Next.js app, so under Storybook
  * a real POST 404s and a story could only ever reach the failure tone. Stubbing
- * that single URL lets a play function drive the whole round trip, readout
+ * that single request lets a play function drive the whole round trip, readout
  * included, while every other request (Storybook's own included) still goes to
  * the network. The returned cleanup restores the real `fetch` even when `play()`
  * throws, so a failing assertion can't leak the stub into the next story.
+ *
+ * The match is on the exact pathname and method rather than on the URL string,
+ * so the button remains stubbed if its request ever grows a query string — an
+ * escaped request 404s against the Storybook dev server and surfaces as a
+ * timeout in a `waitFor` well away from the cause.
  */
 function stubEmitLog(body: unknown, init?: ResponseInit) {
   return () => {
@@ -38,7 +37,11 @@ function stubEmitLog(body: unknown, init?: ResponseInit) {
       input: RequestInfo | URL,
       requestInit?: RequestInit
     ) => {
-      if (!requestUrl(input).endsWith(EMIT_LOG_PATH)) {
+      const isEmitLog = matchesRequest(input, requestInit, {
+        pathname: EMIT_LOG_PATH,
+        method: 'POST',
+      });
+      if (!isEmitLog) {
         return originalFetch(input, requestInit);
       }
       return Response.json(body, init);
