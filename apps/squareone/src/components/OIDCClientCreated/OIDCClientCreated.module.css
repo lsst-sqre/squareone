@@ -1,0 +1,73 @@
+/* OIDCClientCreated: the one-shot post-creation credential view */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rsd-space-3x, 1.5rem);
+  max-width: 800px;
+}
+
+.heading {
+  margin: 0;
+}
+
+.clientName {
+  color: var(--rsd-component-text-secondary-color);
+}
+
+.credentials {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rsd-space-3x, 1.5rem);
+}
+
+.credential {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rsd-space-1x, 0.5rem);
+}
+
+.credentialLabel {
+  font-size: var(--rsd-font-size-1, 0.875rem);
+  font-weight: 600;
+  color: var(--rsd-component-text-secondary-color);
+}
+
+.valueRow,
+.valueRowEmphasized {
+  display: flex;
+  align-items: center;
+  gap: var(--sqo-space-md-fixed);
+  padding: var(--sqo-space-md-fixed);
+  border: 1px solid var(--rsd-component-divider-color);
+  border-radius: var(--sqo-border-radius-1);
+}
+
+/* The secret is the reason this view exists, so give it the same lift the
+ * token modal gives the one value that can never be recovered. */
+.valueRowEmphasized {
+  border-color: transparent;
+  background-color: var(--rsd-color-primary-200);
+  box-shadow: var(--sqo-elevation-sm);
+}
+
+[data-theme="dark"] .valueRowEmphasized {
+  background-color: var(--rsd-color-primary-700);
+}
+
+.value {
+  flex: 1;
+  font-family: monospace;
+  overflow-wrap: anywhere;
+  line-height: 1.4;
+}
+
+.copyButton {
+  flex-shrink: 0;
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rsd-space-3x, 1.5rem);
+}
