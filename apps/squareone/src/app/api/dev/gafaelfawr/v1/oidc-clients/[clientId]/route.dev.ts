@@ -30,6 +30,14 @@ import {
   errorResponse,
 } from '../authz.dev';
 
+/**
+ * Next resolves a dynamic segment to its URL-*decoded* value in a route
+ * handler exactly as it does in a page, so `clientId` arrives ready to use.
+ * Decoding it again here would be a second pass over an already-decoded
+ * string: harmless for the UUID-shaped ids Gafaelfawr issues, but it would
+ * mangle any id holding a `%` — and `decodeURIComponent` throws `URIError` on
+ * a lone one, turning a would-be 404 into a 500 the real API never returns.
+ */
 type RouteContext = { params: Promise<{ clientId: string }> };
 
 export async function GET(_request: Request, { params }: RouteContext) {
@@ -39,10 +47,9 @@ export async function GET(_request: Request, { params }: RouteContext) {
   }
 
   const { clientId } = await params;
-  const decodedClientId = decodeURIComponent(clientId);
-  const client = getDevOidcClientById(decodedClientId);
+  const client = getDevOidcClientById(clientId);
   if (!client) {
-    return clientNotFoundResponse(decodedClientId);
+    return clientNotFoundResponse(clientId);
   }
 
   return NextResponse.json(client);
@@ -55,7 +62,6 @@ export async function PATCH(request: Request, { params }: RouteContext) {
   }
 
   const { clientId } = await params;
-  const decodedClientId = decodeURIComponent(clientId);
 
   let payload: unknown;
   try {
@@ -78,9 +84,9 @@ export async function PATCH(request: Request, { params }: RouteContext) {
   }
 
   const { username } = getDevState();
-  const updated = updateDevOidcClient(decodedClientId, result.data, username);
+  const updated = updateDevOidcClient(clientId, result.data, username);
   if (!updated) {
-    return clientNotFoundResponse(decodedClientId);
+    return clientNotFoundResponse(clientId);
   }
 
   return NextResponse.json(updated);
@@ -93,9 +99,8 @@ export async function DELETE(_request: Request, { params }: RouteContext) {
   }
 
   const { clientId } = await params;
-  const decodedClientId = decodeURIComponent(clientId);
-  if (!deleteDevOidcClient(decodedClientId)) {
-    return clientNotFoundResponse(decodedClientId);
+  if (!deleteDevOidcClient(clientId)) {
+    return clientNotFoundResponse(clientId);
   }
 
   // Gafaelfawr responds 204 No Content on a successful delete.

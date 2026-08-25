@@ -47,17 +47,25 @@ const client: OIDCClient = {
 
 const mockRefetch = vi.fn();
 
-/** Point the detail query at a given outcome. */
+/**
+ * Point the detail query at a given outcome.
+ *
+ * The result is derived from the id the hook is *called* with, the way the
+ * real hook derives it from that id's cache entry. That is what makes the
+ * delete tests below meaningful: a page that paused its query by blanking the
+ * id would lose the client here, exactly as it does against real TanStack
+ * Query, where a blanked id is a different query key.
+ */
 function mockQuery(overrides: Partial<ReturnType<typeof useOidcClient>> = {}) {
-  vi.mocked(useOidcClient).mockReturnValue({
-    client,
+  vi.mocked(useOidcClient).mockImplementation((queriedClientId) => ({
+    client: queriedClientId ? client : undefined,
     isLoading: false,
     isPending: false,
     error: null,
     isNotFound: false,
     refetch: mockRefetch,
     ...overrides,
-  });
+  }));
 }
 
 /** Point the update mutation at a given outcome and return its spy. */
@@ -95,6 +103,11 @@ function mockDelete(
 /** The client id the detail query was last asked for. */
 function lastQueriedClientId() {
   return vi.mocked(useOidcClient).mock.lastCall?.[0];
+}
+
+/** Whether the detail query was last asked to fetch. */
+function lastQueryEnabled() {
+  return vi.mocked(useOidcClient).mock.lastCall?.[2]?.enabled;
 }
 
 /** Open the delete confirmation modal and return it. */
@@ -291,16 +304,27 @@ describe('OIDCClientDetailPageClient', () => {
     });
   });
 
-  test('stops querying a client whose deletion is in flight', async () => {
+  test('pauses the client query while a deletion is in flight, without losing the client', async () => {
     // The mutation removes the client's cache entry on success. An observer
     // still subscribed at that moment refetches it straight into a 404 — a
-    // self-inflicted error report for a delete that worked. Disabling the
-    // query as soon as the request starts closes that window.
+    // self-inflicted error report for a delete that worked. Pausing the query
+    // as soon as the request starts closes that window.
+    const user = userEvent.setup({ delay: 10 });
     mockDelete(async () => undefined, { isDeleting: true });
     render(<OIDCClientDetailPageClient clientId={CLIENT_ID} />);
 
-    expect(lastQueriedClientId()).toBeUndefined();
-    // The cached client is still on screen behind the modal.
+    const dialog = await openDeleteModal(user);
+
+    // Paused through `enabled`, with the client id — and so the query key —
+    // left alone. Blanking the id to pause it would move the query to a
+    // different key and drop the cached client for the whole DELETE round
+    // trip, replacing the detail view and this deliberately non-dismissable
+    // confirmation with a spurious "failed to load" state.
+    expect(lastQueriedClientId()).toBe(CLIENT_ID);
+    expect(lastQueryEnabled()).toBe(false);
+    expect(
+      within(dialog).getByText(/chronograf dashboards/i)
+    ).toBeInTheDocument();
     expect(screen.getByLabelText(/return uri/i)).toBeInTheDocument();
   });
 
@@ -316,7 +340,7 @@ describe('OIDCClientDetailPageClient', () => {
     await waitFor(() => {
       expect(mockPush).toHaveBeenCalledWith('/admin/oidc-clients');
     });
-    expect(lastQueriedClientId()).toBeUndefined();
+    expect(lastQueryEnabled()).toBe(false);
     // Something honest stands in while the route transition completes, rather
     // than a "failed to load" state for a client that was deliberately removed.
     expect(
@@ -359,5 +383,8 @@ describe('OIDCClientDetailPageClient', () => {
     expect(
       within(dialog).getByRole('button', { name: /cancel/i })
     ).toBeInTheDocument();
+    // The client is still there, so the query resumes rather than staying
+    // paused on a page the operator is going to keep using.
+    expect(lastQueryEnabled()).toBe(true);
   });
 });

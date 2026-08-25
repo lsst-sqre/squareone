@@ -333,21 +333,45 @@ export const oidcClientsQueryOptions = (
 };
 
 /**
+ * Configuration for the single-client query, adding a caller-controlled pause
+ * to the shared logging / error-reporting options.
+ */
+export type OidcClientQueryConfig = AuthQueryConfig & {
+  /**
+   * Extra gate on fetching, ANDed with the built-in "a client id is known"
+   * check. This is the way to pause the query — while a delete of this client
+   * is in flight, say — because it leaves the client id, and therefore the
+   * query key, alone: the cached client survives the pause and stays on
+   * screen. Blanking the id instead would move the query to a different key
+   * and lose it. Defaults to enabled.
+   */
+  enabled?: boolean;
+};
+
+/**
  * Query options for one OpenID Connect client.
  *
  * Disabled until a client id is known, so a detail page can call it before its
- * route params resolve.
+ * route params resolve, and pausable through `options.enabled` without
+ * disturbing the cache entry.
  *
  * @param clientId - Server-assigned client identifier
  * @param baseUrl - Gafaelfawr API base URL
- * @param options - Logging / error-reporting configuration
+ * @param options - Logging / error-reporting configuration, plus an optional
+ *   `enabled` gate
  */
 export const oidcClientQueryOptions = (
   clientId: string,
   baseUrl: string = DEFAULT_GAFAELFAWR_URL,
-  options?: AuthQueryConfig
+  options?: OidcClientQueryConfig
 ) => {
-  const { logger, reportError, context, isServer } = options ?? {};
+  const {
+    logger,
+    reportError,
+    context,
+    isServer,
+    enabled = true,
+  } = options ?? {};
 
   return queryOptions<OIDCClient>({
     queryKey: gafaelfawrKeys.oidcClient(baseUrl, clientId),
@@ -358,7 +382,7 @@ export const oidcClientQueryOptions = (
       context,
       isServer,
     }),
-    enabled: !!clientId,
+    enabled: !!clientId && enabled,
     retry: retryUnlessClientError,
     staleTime: 10_000, // 10 seconds
     gcTime: 5 * 60_000, // 5 minutes

@@ -22,7 +22,12 @@ const validBody = {
   description: 'Renamed relying party',
 };
 
-/** Build the route context Next.js passes, with its promised params. */
+/**
+ * Build the route context Next.js passes, with its promised params.
+ *
+ * Next hands a route handler the URL-*decoded* segment, so `clientId` here is
+ * the decoded id — the same value the `[id]` page receives for the same URL.
+ */
 function context(clientId: string) {
   return { params: Promise.resolve({ clientId }) };
 }
@@ -60,6 +65,18 @@ describe('GET /api/dev/gafaelfawr/v1/oidc-clients/:clientId', () => {
     expect(response.status).toBe(404);
     const body = (await response.json()) as { detail: { msg: string }[] };
     expect(body.detail[0].msg).toContain('nope');
+  });
+
+  it('takes the id Next already decoded rather than decoding it again', async () => {
+    // A lone `%` survives Next's own decode and reaches the handler intact.
+    // Decoding it a second time here would throw `URIError` and answer 500 —
+    // a status the real API never returns for an id that simply does not
+    // exist.
+    const response = await GET(new Request(BASE), context('100% legacy'));
+
+    expect(response.status).toBe(404);
+    const body = (await response.json()) as { detail: { msg: string }[] };
+    expect(body.detail[0].msg).toContain('100% legacy');
   });
 
   it('answers 403 without admin:oidc', async () => {

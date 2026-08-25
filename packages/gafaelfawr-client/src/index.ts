@@ -131,7 +131,11 @@ export { type GafaelfawrQueryKeys, gafaelfawrKeys } from './query-keys';
 // Query Options (TanStack Query Integration)
 // =============================================================================
 
-export type { AuthQueryConfig, Logger } from './query-options';
+export type {
+  AuthQueryConfig,
+  Logger,
+  OidcClientQueryConfig,
+} from './query-options';
 export {
   loginInfoQueryOptions,
   oidcClientQueryOptions,

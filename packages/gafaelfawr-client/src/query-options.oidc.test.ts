@@ -156,6 +156,22 @@ describe('oidcClientQueryOptions', () => {
     expect(oidcClientQueryOptions('abc', BASE).enabled).toBe(true);
   });
 
+  it('pauses on a false enabled override without moving the query key', () => {
+    // A caller pausing this query — a delete in flight, say — must not have to
+    // blank the client id to do it: that would change the key and drop the
+    // cached client it still wants on screen.
+    const paused = oidcClientQueryOptions('abc', BASE, { enabled: false });
+
+    expect(paused.enabled).toBe(false);
+    expect(paused.queryKey).toEqual(gafaelfawrKeys.oidcClient(BASE, 'abc'));
+  });
+
+  it('still requires a client id when enabled is overridden true', () => {
+    expect(oidcClientQueryOptions('', BASE, { enabled: true }).enabled).toBe(
+      false
+    );
+  });
+
   it('resolves with the client', async () => {
     server.use(
       http.get(`${BASE}/oidc-clients/:clientId`, () =>

@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { DEFAULT_GAFAELFAWR_URL } from '../client';
 import { GafaelfawrError } from '../errors';
-import type { AuthQueryConfig } from '../query-options';
+import type { OidcClientQueryConfig } from '../query-options';
 import { oidcClientQueryOptions } from '../query-options';
 import type { OIDCClient } from '../schemas';
 
@@ -37,11 +37,17 @@ export type UseOidcClientReturn = {
  * The query stays disabled until a client id is supplied, so a detail page may
  * call it before its route params resolve.
  *
+ * A caller that needs to stop fetching a client it still wants on screen — one
+ * whose delete is in flight, say — passes `config.enabled: false` rather than
+ * blanking the id. That keeps the query key, and so the cached client, intact
+ * for as long as the pause lasts.
+ *
  * @endpoint GET /auth/api/v1/oidc-clients/{client_id}
  *
  * @param clientId - Server-assigned client identifier
  * @param repertoireUrl - Optional repertoire URL for service discovery
- * @param config - Optional logging / error-reporting configuration
+ * @param config - Optional logging / error-reporting configuration, plus an
+ *   optional `enabled` gate on fetching
  *
  * @example
  * ```tsx
@@ -58,7 +64,7 @@ export type UseOidcClientReturn = {
 export function useOidcClient(
   clientId: string | undefined,
   repertoireUrl?: string,
-  config?: AuthQueryConfig
+  config?: OidcClientQueryConfig
 ): UseOidcClientReturn {
   const gafaelfawrUrl = useGafaelfawrUrl(repertoireUrl);
   const effectiveUrl = repertoireUrl ? gafaelfawrUrl : DEFAULT_GAFAELFAWR_URL;

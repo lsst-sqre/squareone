@@ -41,7 +41,13 @@ const CLIENT_GONE_MESSAGE =
   'This OpenID Connect client no longer exists. It may have been deleted by another administrator.';
 
 export type OIDCClientDetailPageClientProps = {
-  /** Client id from the `[id]` route segment, already URL-decoded by Next. */
+  /**
+   * Client id from the `[id]` route segment, already URL-decoded by Next —
+   * verified against Next 16, which decodes a dynamic segment exactly once for
+   * pages and route handlers alike (the dev mock routes rely on the same
+   * thing). The client package re-encodes it when building the request URL, so
+   * nothing here decodes it again.
+   */
   clientId: string;
 };
 
@@ -90,12 +96,19 @@ export default function OIDCClientDetailPageClient({
   // Stop asking for a client that is on its way out. The delete mutation drops
   // the client's cache entry on success, and an observer still subscribed at
   // that moment refetches it straight into a 404 — a self-inflicted error
-  // report for a delete that worked. Disabling the query from the moment the
-  // request starts closes that window; the already-cached client stays on
-  // screen behind the confirmation, and a *failed* delete re-enables it.
+  // report for a delete that worked. Pausing the query from the moment the
+  // request starts closes that window; a *failed* delete re-enables it.
+  //
+  // The pause goes through `enabled` and leaves the client id in place on
+  // purpose. Blanking the id would move the query to a different key, so the
+  // loaded client would vanish for the whole DELETE round trip and take the
+  // detail view and this page's non-dismissable confirmation modal with it,
+  // replaced by a spurious "failed to load" state. Same key, no fetching: the
+  // cached client stays on screen behind the confirmation.
   const { client, isLoading, error, isNotFound, refetch } = useOidcClient(
-    isDeleting || isDeleted ? undefined : clientId,
-    repertoireUrl
+    clientId,
+    repertoireUrl,
+    { enabled: !isDeleting && !isDeleted }
   );
 
   const handleSubmit = async (values: OIDCClientFormValues) => {
