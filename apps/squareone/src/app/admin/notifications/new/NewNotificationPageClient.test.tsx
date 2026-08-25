@@ -5,7 +5,21 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { useSemaphoreUrl } from '../../../../hooks/useSemaphoreUrl';
+import {
+  type AppConfigContextValue,
+  useStaticConfig,
+} from '../../../../hooks/useStaticConfig';
+import type { AdminPageScopes } from '../../../../lib/config/adminPageScopes';
 import NewNotificationPageClient from './NewNotificationPageClient';
+
+// Helper: set the resolved static config. Omitting `adminPageScopes` exercises
+// the baked-in defaults (`notifications: ['admin:notifications']`).
+function mockConfig(adminPageScopes?: AdminPageScopes) {
+  vi.mocked(useStaticConfig).mockReturnValue({
+    siteName: 'Rubin Science Platform',
+    ...(adminPageScopes ? { adminPageScopes } : {}),
+  } as AppConfigContextValue);
+}
 
 vi.mock('@lsst-sqre/gafaelfawr-client', () => ({
   useLoginInfo: vi.fn(),
@@ -21,6 +35,11 @@ vi.mock('../../../../hooks/useRepertoireUrl', () => ({
 
 vi.mock('../../../../hooks/useSemaphoreUrl', () => ({
   useSemaphoreUrl: vi.fn(),
+}));
+
+// The scope the form gate checks comes from `adminPageScopes` in the config.
+vi.mock('../../../../hooks/useStaticConfig', () => ({
+  useStaticConfig: vi.fn(),
 }));
 
 const mockPush = vi.fn();
@@ -68,6 +87,7 @@ describe('NewNotificationPageClient', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockSearchParams = new URLSearchParams();
+    mockConfig();
     mockLogin();
     mockCreate();
     vi.mocked(useSemaphoreUrl).mockReturnValue('https://example.com/semaphore');
@@ -128,6 +148,32 @@ describe('NewNotificationPageClient', () => {
     expect(
       screen.getByRole('button', { name: /send notification/i })
     ).toBeDisabled();
+  });
+
+  test('follows a deployment override of the notifications scopes', () => {
+    // Semaphore's admin scope is Helm-configurable per environment, so the form
+    // gate has to read it from config rather than hard-coding
+    // `admin:notifications`.
+    mockConfig({ notifications: ['admin:semaphore-custom'] });
+    mockLogin({
+      loginInfo: { ...mockLoginInfo, scopes: ['admin:semaphore-custom'] },
+    });
+    render(<NewNotificationPageClient />);
+
+    expect(
+      screen.queryByText(/required to send notifications/i)
+    ).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/recipient/i)).toBeEnabled();
+  });
+
+  test('names the configured scope in the note', () => {
+    mockConfig({ notifications: ['admin:semaphore-custom'] });
+    mockLogin({
+      loginInfo: { ...mockLoginInfo, scopes: ['admin:notifications'] },
+    });
+    render(<NewNotificationPageClient />);
+
+    expect(screen.getByText('admin:semaphore-custom')).toBeInTheDocument();
   });
 
   test('enables the form and shows no note when admin:notifications is present', () => {

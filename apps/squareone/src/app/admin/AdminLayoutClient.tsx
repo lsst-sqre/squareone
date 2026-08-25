@@ -24,10 +24,11 @@ type AdminLayoutClientProps = {
  * `adminPageScopes` configuration — so the sidebar never offers a page that
  * would answer 403.
  *
- * Wraps the layout in AdminRequired so every admin page inherits the
- * client-side `exec:admin` scope gate (defense-in-depth alongside the Phalanx
- * ingress). Unauthorized users see the gate's message instead of the admin
- * sidebar and content.
+ * Wraps the layout in AdminRequired so the whole section inherits the
+ * client-side gate on the union of the configured admin scopes
+ * (defense-in-depth alongside the Phalanx ingress). Someone who can reach no
+ * admin page at all sees the gate's message instead of the admin sidebar and
+ * content; each page additionally gates on its own configured scopes.
  */
 export default function AdminLayoutClient({
   children,

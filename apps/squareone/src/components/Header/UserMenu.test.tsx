@@ -17,7 +17,7 @@ vi.mock('@lsst-sqre/squared', async () => {
   };
 });
 
-// useLoginInfo provides the exec:admin scope gate for the Admin link.
+// useLoginInfo provides the scopes that gate the Admin link.
 vi.mock('@lsst-sqre/gafaelfawr-client', () => ({
   useLoginInfo: vi.fn(),
 }));
@@ -65,6 +65,7 @@ function mockLoginInfoWithScopes(scopes: string[]): UseLoginInfoReturn {
   return {
     loginInfo: null,
     query: {
+      scopes,
       hasScope: (scope: string) => scopes.includes(scope),
     } as UseLoginInfoReturn['query'],
     csrfToken: null,
@@ -117,11 +118,13 @@ describe('UserMenu', () => {
     vi.mocked(useLoginInfo).mockReturnValue(mockLoginInfoWithScopes([]));
   });
 
-  test('shows an Admin link to /admin when the user has exec:admin', async () => {
+  test('shows an Admin link to /admin for any configured admin page scope', async () => {
     const user = userEvent.setup();
     mockUser();
+    // admin:oidc grants only the OIDC clients page — there is no single
+    // "admin" scope, so any page's scope is enough to offer the link.
     vi.mocked(useLoginInfo).mockReturnValue(
-      mockLoginInfoWithScopes(['exec:admin'])
+      mockLoginInfoWithScopes(['admin:oidc'])
     );
 
     renderMenu();
@@ -145,7 +148,7 @@ describe('UserMenu', () => {
     expect(chevron).toHaveAttribute('aria-hidden', 'true');
   });
 
-  test('does not show an Admin link when the user lacks exec:admin', async () => {
+  test('does not show an Admin link when the user holds no admin scope', async () => {
     const user = userEvent.setup();
     mockUser();
     vi.mocked(useLoginInfo).mockReturnValue(

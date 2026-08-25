@@ -4,6 +4,7 @@ import {
   ADMIN_PAGE_IDS,
   type AdminPageScopesConfig,
   DEFAULT_ADMIN_PAGE_SCOPES,
+  getRequiredAdminScopes,
   hasAdminPageAccess,
   hasAnyAdminAccess,
   resolveAdminPageScopes,
@@ -128,5 +129,50 @@ describe('hasAnyAdminAccess', () => {
     expect(hasAnyAdminAccess(config, ['exec:admin', 'admin:token'])).toBe(
       false
     );
+  });
+});
+
+describe('getRequiredAdminScopes', () => {
+  test("returns one page's configured scopes when given a page id", () => {
+    expect(getRequiredAdminScopes({}, 'serviceTokens')).toEqual([
+      'admin:token',
+    ]);
+  });
+
+  test("returns the union of every page's scopes when given no page id", () => {
+    expect(getRequiredAdminScopes({})).toEqual([
+      'admin:notifications',
+      'admin:token',
+      'admin:oidc',
+      'exec:admin',
+    ]);
+  });
+
+  test('lists a scope shared by several pages only once', () => {
+    const config: AdminPageScopesConfig = {
+      adminPageScopes: {
+        notifications: ['exec:admin'],
+        serviceTokens: ['exec:admin', 'admin:token'],
+      },
+    };
+
+    expect(getRequiredAdminScopes(config)).toEqual([
+      'exec:admin',
+      'admin:token',
+      'admin:oidc',
+    ]);
+  });
+
+  test('is empty when every page is configured with an empty scope list', () => {
+    const config: AdminPageScopesConfig = {
+      adminPageScopes: {
+        notifications: [],
+        serviceTokens: [],
+        oidcClients: [],
+        sentry: [],
+      },
+    };
+
+    expect(getRequiredAdminScopes(config)).toEqual([]);
   });
 });

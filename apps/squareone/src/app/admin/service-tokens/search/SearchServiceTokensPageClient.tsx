@@ -29,7 +29,8 @@ const SEARCH_URL = `${LANDING_URL}/search`;
  * {@link AccessTokensView} with no per-token details link (the
  * `/settings/tokens/<key>` route does not resolve for service tokens).
  *
- * The page sits behind the `exec:admin` gate inherited from the admin layout.
+ * The page sits behind the `serviceTokens` page-scope gate applied by
+ * `page.tsx`.
  */
 export default function SearchServiceTokensPageClient() {
   const router = useRouter();

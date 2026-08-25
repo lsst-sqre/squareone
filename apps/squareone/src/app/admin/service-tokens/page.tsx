@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 
+import AdminRequired from '../../../components/AdminRequired';
 import { getStaticConfig } from '../../../lib/config/rsc';
 import ServiceTokenPageClient from './ServiceTokenPageClient';
 
@@ -23,9 +24,14 @@ export async function generateMetadata(): Promise<Metadata> {
  *
  * Server component that mirrors the Sentry admin page: it derives the page
  * metadata from the resolved app config and renders the client component that
- * holds the page UI. The page sits inside the admin section, so it inherits the
- * `AdminRequired` / `exec:admin` gate from the admin layout.
+ * holds the page UI. The page gates itself on the `serviceTokens` page scopes
+ * so a direct visit by someone whose scopes reach a different admin page is
+ * refused here rather than 403-ing request by request.
  */
 export default function ServiceTokenPage() {
-  return <ServiceTokenPageClient />;
+  return (
+    <AdminRequired pageId="serviceTokens">
+      <ServiceTokenPageClient />
+    </AdminRequired>
+  );
 }

@@ -16,13 +16,22 @@ vi.mock('next/navigation', () => ({
   usePathname: () => '/admin/sentry',
 }));
 
+// AdminRequired resolves `adminPageScopes` through the config hook rather than
+// the config prop this layout threads to the navigation.
+vi.mock('../../hooks/useStaticConfig', () => ({
+  useStaticConfig: vi.fn(),
+}));
+
 import type {
   UseLoginInfoReturn,
   UseUserInfoReturn,
 } from '@lsst-sqre/gafaelfawr-client';
 // Import after mocking.
 import { useLoginInfo, useUserInfo } from '@lsst-sqre/gafaelfawr-client';
-import type { AppConfigContextValue } from '../../hooks/useStaticConfig';
+import {
+  type AppConfigContextValue,
+  useStaticConfig,
+} from '../../hooks/useStaticConfig';
 import AdminLayoutClient from './AdminLayoutClient';
 
 const config = { siteName: 'Rubin Science Platform' } as AppConfigContextValue;
@@ -53,6 +62,7 @@ function renderWithScopes(scopes: string[]) {
     refetch: vi.fn(),
   });
   vi.mocked(useLoginInfo).mockReturnValue(mockLoginInfoWithScopes(scopes));
+  vi.mocked(useStaticConfig).mockReturnValue(config);
 
   render(<AdminLayoutClient config={config}>Admin Content</AdminLayoutClient>);
 }

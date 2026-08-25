@@ -49,9 +49,14 @@ How the mapping is applied
 Access is **any-of**: a user may use a page when they hold at least one of the scopes listed for it.
 That mapping drives the whole section:
 
+- The header user menu offers an "Admin" link to anyone who can reach at least one admin page.
 - The admin sidebar lists only the pages the signed-in user holds a scope for, so nobody is offered a page that would answer ``403``.
 - ``/admin`` redirects to the first page in that filtered list. Someone holding only ``admin:oidc`` lands directly on ``/admin/oidc-clients``.
-- A user who can reach no admin page at all sees a "No admin pages are available for your account" message instead of a redirect.
+- A user who can reach no admin page at all sees a "No admin pages are available for your account" message instead of a redirect, and no "Admin" link in the user menu.
+- Each admin page gates on its own entry. Someone who arrives at a page directly — from a bookmark, or a link shared by a colleague with different scopes — without a scope that page lists sees an "Unauthorized" note naming the scopes that would have granted access, in place of the page. There is no redirect: the person asked for that page, so the answer is about that page.
+
+There is no single "admin" scope.
+``exec:admin`` opens the admin section only because the ``sentry`` page's default scope list happens to name it; point ``sentry`` at another scope and ``exec:admin`` grants nothing on its own.
 
 Navigation *order* is code-defined and not configurable, so the redirect target for a user who can see several pages follows the order in the sidebar.
 Which admin pages exist is likewise fixed by the application: ``adminPageScopes`` controls access to pages, not their presence.

@@ -244,6 +244,9 @@ describe('shell render determinism', () => {
     vi.mocked(useLoginInfo).mockReturnValue({
       loginInfo: null,
       query: {
+        // An admin: exec:admin is one of the scopes `adminPageScopes` maps to
+        // an admin page, so the menu renders its Admin link.
+        scopes: ['exec:admin'],
         hasScope: (scope: string): boolean => scope === 'exec:admin',
       } as UseLoginInfoReturn['query'],
       csrfToken: null,

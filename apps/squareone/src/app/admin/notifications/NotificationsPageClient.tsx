@@ -20,7 +20,8 @@ import { useSemaphoreUrl } from '../../../hooks/useSemaphoreUrl';
  * {@link NotificationFilters} and {@link NotificationsTableView}; this
  * component only wires data and callbacks together.
  *
- * The page sits behind the `exec:admin` gate inherited from the admin layout.
+ * The page sits behind the `notifications` page-scope gate applied by
+ * `page.tsx`.
  * While discovery is pending the Semaphore URL is `undefined`, which keeps the
  * underlying query disabled (graceful degradation, as broadcasts already do).
  */

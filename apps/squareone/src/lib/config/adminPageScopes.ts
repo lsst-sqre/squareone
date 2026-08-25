@@ -119,9 +119,28 @@ export function hasAnyAdminAccess(
   config: AdminPageScopesConfig | undefined,
   userScopes: readonly string[]
 ): boolean {
+  return getRequiredAdminScopes(config).some((scope) =>
+    userScopes.includes(scope)
+  );
+}
+
+/**
+ * The scopes that grant access to `pageId` — or, with no `pageId`, to the
+ * admin section as a whole.
+ *
+ * Access is any-of, so this is the list a gate checks against and, when it
+ * refuses, the list it can name to the person it just turned away. The
+ * section-wide list is the union of every page's scopes in
+ * {@link ADMIN_PAGE_IDS} order, deduplicated so a scope shared by two pages is
+ * only offered once.
+ */
+export function getRequiredAdminScopes(
+  config: AdminPageScopesConfig | undefined,
+  pageId?: AdminPageId
+): string[] {
   const resolved = resolveAdminPageScopes(config);
 
-  return ADMIN_PAGE_IDS.some((pageId) =>
-    resolved[pageId].some((scope) => userScopes.includes(scope))
-  );
+  if (pageId) return resolved[pageId];
+
+  return [...new Set(ADMIN_PAGE_IDS.flatMap((id) => resolved[id]))];
 }

@@ -7,7 +7,7 @@ import {
 import { Note } from '@lsst-sqre/squared';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useState } from 'react';
-
+import ScopeList from '../../../../components/ScopeList';
 import ServiceTokenForm, {
   type ServiceTokenFormInitialValues,
   type ServiceTokenFormValues,
@@ -15,16 +15,15 @@ import ServiceTokenForm, {
 import { TokenCreationErrorDisplay } from '../../../../components/TokenCreationErrorDisplay';
 import TokenSuccessModal from '../../../../components/TokenSuccessModal';
 import { useRepertoireUrl } from '../../../../hooks/useRepertoireUrl';
+import { useStaticConfig } from '../../../../hooks/useStaticConfig';
+import {
+  getRequiredAdminScopes,
+  hasAdminPageAccess,
+} from '../../../../lib/config/adminPageScopes';
 import {
   calculateExpirationDate,
   parseExpirationFromQuery,
 } from '../../../../lib/tokens/expiration';
-
-/**
- * Gafaelfawr scope required to create service tokens via the admin
- * `POST /auth/api/v1/tokens` endpoint.
- */
-const TOKEN_ADMIN_SCOPE = 'admin:token';
 
 /**
  * Where to return after a successful creation or a cancel. Mirrors the
@@ -40,15 +39,16 @@ const LANDING_URL = '/admin/service-tokens';
  * closing the modal (or cancelling the form) returns to the service-tokens
  * landing page. API errors surface through {@link TokenCreationErrorDisplay}.
  *
- * The page sits behind the `exec:admin` gate inherited from the admin layout, and
- * additionally checks `loginInfo.scopes` for `admin:token` — without it, an
- * explanatory banner is shown and the form is disabled rather than letting a
- * submit fail with a silent 403.
+ * The page gates itself on the `serviceTokens` page scopes, and the form
+ * re-checks the same configured scopes against `loginInfo.scopes` — without
+ * them an explanatory banner is shown and the form is disabled rather than
+ * letting a submit fail with a silent 403.
  */
 export default function NewServiceTokenPageClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const repertoireUrl = useRepertoireUrl();
+  const config = useStaticConfig();
 
   const {
     loginInfo,
@@ -169,21 +169,29 @@ export default function NewServiceTokenPageClient() {
       </p>
     );
   } else {
-    // The page stays inside the `exec:admin` admin section, but creating a
-    // service token additionally requires the `admin:token` scope. When it is
-    // absent we explain why and disable the form rather than letting a submit
-    // fail with a silent 403.
-    const hasAdminToken = loginInfo.scopes.includes(TOKEN_ADMIN_SCOPE);
+    // Which scope Gafaelfawr's admin token endpoint requires is configured per
+    // deployment (`adminPageScopes.serviceTokens`), so the form asks the same
+    // question the page's gate does rather than hard-coding `admin:token`.
+    // Reaching this page already implies the scope; the check stays because it
+    // is what keeps the form from ever mounting in a state whose submit would
+    // 403, whatever gate sits above it.
+    const hasAdminToken = hasAdminPageAccess(
+      config,
+      loginInfo.scopes,
+      'serviceTokens'
+    );
+    const requiredScopes = getRequiredAdminScopes(config, 'serviceTokens');
 
     content = (
       <>
         {!hasAdminToken && (
           <Note type="warning">
             <p>
-              You do not have the <code>{TOKEN_ADMIN_SCOPE}</code> scope, which
-              is required to create service tokens. The form below is disabled.
-              Ask an administrator to grant you the{' '}
-              <code>{TOKEN_ADMIN_SCOPE}</code> scope.
+              You do not have <ScopeList scopes={requiredScopes} />, which is
+              required to create service tokens. The form below is disabled. Ask
+              an administrator to grant you{' '}
+              {requiredScopes.length > 1 ? 'one of those scopes' : 'that scope'}
+              .
             </p>
           </Note>
         )}

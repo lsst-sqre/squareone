@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 
+import AdminRequired from '../../../components/AdminRequired';
 import SentryConfigInfo from '../../../components/SentryConfigInfo';
 import SentryTestButtons from '../../../components/SentryTestButtons';
 import { getStaticConfig } from '../../../lib/config/rsc';
@@ -24,25 +25,30 @@ export async function generateMetadata(): Promise<Metadata> {
  * Renders the Sentry test buttons that exercise the error-reporting pipeline,
  * plus a read-only summary of the runtime Sentry configuration (and a link to
  * the Sentry dashboard when the org/project are configured).
+ *
+ * The page gates itself on the `sentry` page scopes, so a direct visit by
+ * someone whose scopes reach a different admin page is refused in-page.
  */
 export default function SentryAdminPage() {
   return (
-    <div>
-      <h1>Sentry</h1>
-      <p>
-        Verify the Sentry monitoring integration by triggering test events.
-        “Throw uncaught error” and “Capture handled exception” both report
-        errors, which appear as issues in the Sentry project.
-      </p>
-      <p>
-        “Emit server log” is different: it makes the server emit pino warn and
-        error records, which the Sentry Logs bridge ships to Sentry{' '}
-        <strong>Logs</strong>, never to Issues. Look for them under{' '}
-        <strong>Explore &gt; Logs</strong> in Sentry, searching for the marker
-        shown in the status readout below the buttons.
-      </p>
-      <SentryTestButtons />
-      <SentryConfigInfo />
-    </div>
+    <AdminRequired pageId="sentry">
+      <div>
+        <h1>Sentry</h1>
+        <p>
+          Verify the Sentry monitoring integration by triggering test events.
+          “Throw uncaught error” and “Capture handled exception” both report
+          errors, which appear as issues in the Sentry project.
+        </p>
+        <p>
+          “Emit server log” is different: it makes the server emit pino warn and
+          error records, which the Sentry Logs bridge ships to Sentry{' '}
+          <strong>Logs</strong>, never to Issues. Look for them under{' '}
+          <strong>Explore &gt; Logs</strong> in Sentry, searching for the marker
+          shown in the status readout below the buttons.
+        </p>
+        <SentryTestButtons />
+        <SentryConfigInfo />
+      </div>
+    </AdminRequired>
   );
 }

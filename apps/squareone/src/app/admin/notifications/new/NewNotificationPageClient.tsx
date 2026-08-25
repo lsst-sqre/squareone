@@ -10,14 +10,14 @@ import NotificationForm, {
   type NotificationFormInitialValues,
   type NotificationFormValues,
 } from '../../../../components/NotificationForm';
+import ScopeList from '../../../../components/ScopeList';
 import { useRepertoireUrl } from '../../../../hooks/useRepertoireUrl';
 import { useSemaphoreUrl } from '../../../../hooks/useSemaphoreUrl';
-
-/**
- * Semaphore scope required to create notifications via the admin
- * `POST /semaphore/v1/admin/notifications` endpoint.
- */
-const NOTIFICATIONS_ADMIN_SCOPE = 'admin:notifications';
+import { useStaticConfig } from '../../../../hooks/useStaticConfig';
+import {
+  getRequiredAdminScopes,
+  hasAdminPageAccess,
+} from '../../../../lib/config/adminPageScopes';
 
 /**
  * Where to return after a successful (non-"draft another") send or a cancel.
@@ -33,10 +33,10 @@ const LANDING_URL = '/admin/notifications';
  * parameters (`recipient`, `summary`, `body`) pre-fill the form so notifications
  * can be drafted from operational run books.
  *
- * The page sits behind the `exec:admin` gate inherited from the admin layout and
- * additionally checks `loginInfo.scopes` for `admin:notifications` — without it,
- * an explanatory `Note` is shown and the form is disabled rather than letting a
- * submit fail with a silent 403.
+ * The page gates itself on the `notifications` page scopes, and the form
+ * re-checks the same configured scopes against `loginInfo.scopes` — without
+ * them an explanatory `Note` is shown and the form is disabled rather than
+ * letting a submit fail with a silent 403.
  *
  * On submit: when "draft another" is checked the form stays put, clears, and
  * shows its own success confirmation; when unchecked the page redirects to the
@@ -48,6 +48,7 @@ export default function NewNotificationPageClient() {
   const searchParams = useSearchParams();
   const repertoireUrl = useRepertoireUrl();
   const semaphoreUrl = useSemaphoreUrl();
+  const config = useStaticConfig();
 
   const {
     loginInfo,
@@ -115,13 +116,18 @@ export default function NewNotificationPageClient() {
       </p>
     );
   } else {
-    // The page stays inside the `exec:admin` admin section, but sending a
-    // notification additionally requires the `admin:notifications` scope. When
-    // it is absent we explain why and disable the form rather than letting a
-    // submit fail with a silent 403.
-    const hasAdminNotifications = loginInfo.scopes.includes(
-      NOTIFICATIONS_ADMIN_SCOPE
+    // Which scope Semaphore's admin endpoint requires is configured per
+    // deployment (`adminPageScopes.notifications`), so the form asks the same
+    // question the page's gate does rather than hard-coding
+    // `admin:notifications`. Reaching this page already implies the scope; the
+    // check stays because it is what keeps the form from ever mounting in a
+    // state whose submit would 403, whatever gate sits above it.
+    const hasAdminNotifications = hasAdminPageAccess(
+      config,
+      loginInfo.scopes,
+      'notifications'
     );
+    const requiredScopes = getRequiredAdminScopes(config, 'notifications');
 
     // Semaphore's base URL is resolved asynchronously via Repertoire service
     // discovery, so it is `undefined` while discovery is pending or when
@@ -136,10 +142,11 @@ export default function NewNotificationPageClient() {
         {!hasAdminNotifications && (
           <Note type="warning">
             <p>
-              You do not have the <code>{NOTIFICATIONS_ADMIN_SCOPE}</code>{' '}
-              scope, which is required to send notifications. The form below is
-              disabled. Ask an administrator to grant you the{' '}
-              <code>{NOTIFICATIONS_ADMIN_SCOPE}</code> scope.
+              You do not have <ScopeList scopes={requiredScopes} />, which is
+              required to send notifications. The form below is disabled. Ask an
+              administrator to grant you{' '}
+              {requiredScopes.length > 1 ? 'one of those scopes' : 'that scope'}
+              .
             </p>
           </Note>
         )}

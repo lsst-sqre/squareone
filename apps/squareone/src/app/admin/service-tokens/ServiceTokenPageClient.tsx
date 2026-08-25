@@ -17,7 +17,8 @@ import ManageServiceTokens from './ManageServiceTokens';
  * tokens. The creation form itself (and its `admin:token` gate) lives on the
  * `/new` page, so this landing page needs no login info.
  *
- * The page sits behind the `exec:admin` gate inherited from the admin layout.
+ * The page sits behind the `serviceTokens` page-scope gate applied by
+ * `page.tsx`.
  */
 export default function ServiceTokenPageClient() {
   return (
