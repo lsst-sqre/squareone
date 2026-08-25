@@ -1,4 +1,4 @@
-// stoker-managed: sandbox:stoker/devcontainer.json:6f7f37331d365cea
+// stoker-managed: sandbox:stoker/devcontainer.json:5e5557b7f513420f
 {
   "name": "stoker-default-lsst-sqre-squareone",
   "image": "mcr.microsoft.com/devcontainers/base:bookworm",
