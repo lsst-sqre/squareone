@@ -11,6 +11,9 @@ export type {
   Group,
   LoginInfo,
   NotebookQuota,
+  OIDCClient,
+  OIDCClientUpdate,
+  OIDCClientWithSecret,
   Quota,
   Scope,
   TokenChangeAction,
@@ -88,6 +91,39 @@ export type CreateServiceTokenVariables = {
   uid?: number | null;
   gid?: number | null;
   groups?: import('./schemas').Group[];
+  csrfToken: string;
+  baseUrl: string;
+};
+
+/**
+ * Variables for the create-OIDC-client mutation.
+ *
+ * `baseUrl` travels with the variables (rather than being closed over) so the
+ * mutation config stays a plain object the hooks can share, matching the
+ * token mutations.
+ */
+export type CreateOidcClientVariables = {
+  request: import('./schemas').OIDCClientUpdate;
+  csrfToken: string;
+  baseUrl: string;
+};
+
+/**
+ * Variables for the update-OIDC-client mutation.
+ *
+ * `request` is the client's complete updatable state, not a sparse diff:
+ * Gafaelfawr's PATCH requires `return_uri` and `description` on every call.
+ */
+export type UpdateOidcClientVariables = {
+  clientId: string;
+  request: import('./schemas').OIDCClientUpdate;
+  csrfToken: string;
+  baseUrl: string;
+};
+
+/** Variables for the delete-OIDC-client mutation. */
+export type DeleteOidcClientVariables = {
+  clientId: string;
   csrfToken: string;
   baseUrl: string;
 };

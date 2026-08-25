@@ -7,6 +7,9 @@ import {
   formatValidationError,
   GafaelfawrError,
   getErrorMessageForStatus,
+  isOidcNotConfiguredError,
+  OidcNotConfiguredError,
+  toGafaelfawrErrorInfo,
 } from './errors';
 
 describe('GafaelfawrError', () => {
@@ -51,12 +54,23 @@ describe('formatValidationError', () => {
     expect(result).toBe('body.token_name: field required');
   });
 
-  it('handles missing location', () => {
+  it('returns the bare message when there is no location', () => {
+    // Gafaelfawr's ErrorModel omits (or nulls) `loc` for whole-request errors
+    // such as a 403, where a "unknown: " prefix would be noise in the UI.
     const result = formatValidationError({
       msg: 'invalid value',
       type: 'value_error',
     });
-    expect(result).toBe('unknown: invalid value');
+    expect(result).toBe('invalid value');
+  });
+
+  it('returns the bare message when the location is empty', () => {
+    const result = formatValidationError({
+      loc: [],
+      msg: 'invalid value',
+      type: 'value_error',
+    });
+    expect(result).toBe('invalid value');
   });
 
   it('formats array of validation errors', () => {
@@ -77,7 +91,7 @@ describe('formatValidationError', () => {
       { loc: null, msg: 'error 1', type: 'error' },
       { msg: 'error 2', type: 'error' },
     ]);
-    expect(result).toBe('unknown: error 1; unknown: error 2');
+    expect(result).toBe('error 1; error 2');
   });
 });
 
@@ -107,5 +121,72 @@ describe('getErrorMessageForStatus', () => {
     expect(getErrorMessageForStatus(418, 'Custom message')).toBe(
       'Custom message'
     );
+  });
+});
+
+describe('OidcNotConfiguredError', () => {
+  it('is a GafaelfawrError carrying a 404 status', () => {
+    const error = new OidcNotConfiguredError();
+    expect(error).toBeInstanceOf(GafaelfawrError);
+    expect(error.statusCode).toBe(404);
+    expect(error.name).toBe('OidcNotConfiguredError');
+  });
+
+  it('has a default message naming the missing OpenID Connect server', () => {
+    expect(new OidcNotConfiguredError().message).toMatch(/OpenID Connect/i);
+  });
+
+  it('accepts a server-supplied message', () => {
+    const error = new OidcNotConfiguredError('Not configured here');
+    expect(error.message).toBe('Not configured here');
+  });
+});
+
+describe('isOidcNotConfiguredError', () => {
+  it('identifies the not-configured error', () => {
+    expect(isOidcNotConfiguredError(new OidcNotConfiguredError())).toBe(true);
+  });
+
+  it('rejects a plain 404 GafaelfawrError', () => {
+    // A 404 from a *detail* endpoint means "no such client", which the UI must
+    // present differently from "this environment has no OIDC server".
+    expect(
+      isOidcNotConfiguredError(new GafaelfawrError('Not found', 404))
+    ).toBe(false);
+  });
+
+  it('rejects non-errors', () => {
+    expect(isOidcNotConfiguredError(null)).toBe(false);
+    expect(isOidcNotConfiguredError('nope')).toBe(false);
+  });
+});
+
+describe('toGafaelfawrErrorInfo', () => {
+  it('preserves the status and message of a GafaelfawrError', () => {
+    const info = toGafaelfawrErrorInfo(
+      new GafaelfawrError('Permission denied', 403, { detail: 'nope' })
+    );
+    expect(info).toEqual({
+      status: 403,
+      message: 'Permission denied',
+      details: { detail: 'nope' },
+    });
+  });
+
+  it('defaults a status-less GafaelfawrError to 500', () => {
+    expect(toGafaelfawrErrorInfo(new GafaelfawrError('Boom')).status).toBe(500);
+  });
+
+  it('reports a non-Gafaelfawr error as a status-0 network failure', () => {
+    const info = toGafaelfawrErrorInfo(new TypeError('Failed to fetch'));
+    expect(info.status).toBe(0);
+    expect(info.message).toBe('Failed to fetch');
+  });
+
+  it('reports a thrown non-Error as a generic network failure', () => {
+    expect(toGafaelfawrErrorInfo('boom')).toEqual({
+      status: 0,
+      message: 'Network error',
+    });
   });
 });

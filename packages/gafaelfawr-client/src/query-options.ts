@@ -5,6 +5,7 @@
  * with useQuery or prefetched in server components.
  */
 import {
+  classifyError,
   defaultLogger,
   type Logger,
   type ReportContext,
@@ -16,14 +17,17 @@ import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query';
 import {
   DEFAULT_GAFAELFAWR_URL,
   fetchLoginInfo,
+  fetchOidcClient,
+  fetchOidcClients,
   fetchTokenChangeHistory,
   fetchTokenDetails,
   fetchUserInfo,
   fetchUserTokens,
   getEmptyUserInfo,
 } from './client';
+import { GafaelfawrError } from './errors';
 import { gafaelfawrKeys } from './query-keys';
-import type { LoginInfo, TokenInfo, UserInfo } from './schemas';
+import type { LoginInfo, OIDCClient, TokenInfo, UserInfo } from './schemas';
 import type { TokenHistoryFilters, TokenHistoryPage } from './types';
 
 // Re-export Logger from api-client-core so existing
@@ -236,3 +240,129 @@ export const tokenHistoryQueryOptions = (
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
   });
+
+// =============================================================================
+// OpenID Connect Client Queries
+// =============================================================================
+
+/**
+ * Wrap a fetch so failures are logged and reported, then **rethrown**.
+ *
+ * {@link reportingQueryFn} degrades to a fallback value, which is right for the
+ * ambient auth queries but wrong here: the OIDC admin UI has to tell "no OIDC
+ * server in this environment" from "you lack `admin:oidc`" from "the request
+ * failed", so the error has to reach the component. This keeps the same
+ * classification and `reportError` path — only the swallowing differs.
+ */
+function reportingThrowingQueryFn<T>(options: {
+  fetchFn: () => Promise<T>;
+  logger?: Logger;
+  reportError?: ReportError;
+  context?: ReportContext;
+  isServer?: boolean;
+}): () => Promise<T> {
+  const {
+    fetchFn,
+    logger = defaultLogger,
+    reportError,
+    context = {},
+    isServer,
+  } = options;
+
+  return async (): Promise<T> => {
+    try {
+      return await fetchFn();
+    } catch (err) {
+      logger.error({ err, ...context }, 'API query failed');
+      if (classifyError(err, { isServer }) === 'report-worthy') {
+        reportError?.(err, context);
+      }
+      throw err;
+    }
+  };
+}
+
+/**
+ * Retry policy for the OIDC client queries.
+ *
+ * A 4xx here is an answer, not a blip: 403 means the caller lacks
+ * `admin:oidc`, and 404 means either no OIDC server or no such client. Retrying
+ * those only delays the UI's empty/error state, so only 5xx and network-level
+ * failures are retried.
+ */
+function retryUnlessClientError(failureCount: number, error: Error): boolean {
+  const status =
+    error instanceof GafaelfawrError ? error.statusCode : undefined;
+  if (status !== undefined && status >= 400 && status < 500) {
+    return false;
+  }
+  return failureCount < 3;
+}
+
+/**
+ * Query options for listing a deployment's OpenID Connect clients.
+ *
+ * Unlike the auth queries, failures reject rather than degrading to an empty
+ * list — the caller distinguishes `OidcNotConfiguredError` (render the
+ * "not enabled here" state) from a 403 or a transport failure.
+ *
+ * @param baseUrl - Gafaelfawr API base URL
+ * @param options - Logging / error-reporting configuration
+ */
+export const oidcClientsQueryOptions = (
+  baseUrl: string = DEFAULT_GAFAELFAWR_URL,
+  options?: AuthQueryConfig
+) => {
+  const { logger, reportError, context, isServer } = options ?? {};
+
+  return queryOptions<OIDCClient[]>({
+    queryKey: gafaelfawrKeys.oidcClients(baseUrl),
+    queryFn: reportingThrowingQueryFn<OIDCClient[]>({
+      fetchFn: () => fetchOidcClients(baseUrl),
+      logger,
+      reportError,
+      context,
+      isServer,
+    }),
+    retry: retryUnlessClientError,
+    staleTime: 10_000, // 10 seconds
+    gcTime: 5 * 60_000, // 5 minutes
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+  });
+};
+
+/**
+ * Query options for one OpenID Connect client.
+ *
+ * Disabled until a client id is known, so a detail page can call it before its
+ * route params resolve.
+ *
+ * @param clientId - Server-assigned client identifier
+ * @param baseUrl - Gafaelfawr API base URL
+ * @param options - Logging / error-reporting configuration
+ */
+export const oidcClientQueryOptions = (
+  clientId: string,
+  baseUrl: string = DEFAULT_GAFAELFAWR_URL,
+  options?: AuthQueryConfig
+) => {
+  const { logger, reportError, context, isServer } = options ?? {};
+
+  return queryOptions<OIDCClient>({
+    queryKey: gafaelfawrKeys.oidcClient(baseUrl, clientId),
+    queryFn: reportingThrowingQueryFn<OIDCClient>({
+      fetchFn: () => fetchOidcClient(clientId, baseUrl),
+      logger,
+      reportError,
+      context,
+      isServer,
+    }),
+    enabled: !!clientId,
+    retry: retryUnlessClientError,
+    staleTime: 10_000, // 10 seconds
+    gcTime: 5 * 60_000, // 5 minutes
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+  });
+};

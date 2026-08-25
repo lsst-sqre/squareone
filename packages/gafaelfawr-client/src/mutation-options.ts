@@ -3,13 +3,28 @@
  *
  * These are used with useMutation to handle token creation and deletion.
  */
-import { createServiceToken, createToken, deleteToken } from './client';
+import {
+  createOidcClient,
+  createServiceToken,
+  createToken,
+  deleteOidcClient,
+  deleteToken,
+  updateOidcClient,
+} from './client';
 import { gafaelfawrKeys } from './query-keys';
-import type { AdminTokenRequest, CreateTokenResponse } from './schemas';
 import type {
+  AdminTokenRequest,
+  CreateTokenResponse,
+  OIDCClient,
+  OIDCClientWithSecret,
+} from './schemas';
+import type {
+  CreateOidcClientVariables,
   CreateServiceTokenVariables,
   CreateTokenVariables,
+  DeleteOidcClientVariables,
   DeleteTokenVariables,
+  UpdateOidcClientVariables,
 } from './types';
 
 /**
@@ -145,5 +160,66 @@ export const deleteTokenMutationConfig = {
    */
   getRemoveKeys: (username: string, tokenKey: string) => [
     gafaelfawrKeys.tokenDetail(username, tokenKey),
+  ],
+};
+
+/**
+ * Mutation options for registering a new OpenID Connect client.
+ *
+ * The resolved value carries the one-time `client_secret`; callers must show it
+ * to the operator immediately, since Gafaelfawr never discloses it again and
+ * has no rotate endpoint.
+ */
+export const createOidcClientMutationConfig = {
+  mutationFn: async (
+    variables: CreateOidcClientVariables
+  ): Promise<OIDCClientWithSecret> => {
+    const { request, csrfToken, baseUrl } = variables;
+    return createOidcClient(request, csrfToken, baseUrl);
+  },
+
+  /** Query keys to invalidate on success: the deployment's client list. */
+  getInvalidateKeys: (baseUrl: string) => [gafaelfawrKeys.oidcClients(baseUrl)],
+};
+
+/**
+ * Mutation options for updating an OpenID Connect client.
+ *
+ * Invalidates both the list and this client's detail entry, since the detail
+ * key is a sibling of the list key rather than a child of it.
+ */
+export const updateOidcClientMutationConfig = {
+  mutationFn: async (
+    variables: UpdateOidcClientVariables
+  ): Promise<OIDCClient> => {
+    const { clientId, request, csrfToken, baseUrl } = variables;
+    return updateOidcClient(clientId, request, csrfToken, baseUrl);
+  },
+
+  /** Query keys to invalidate on success. */
+  getInvalidateKeys: (baseUrl: string, clientId: string) => [
+    gafaelfawrKeys.oidcClients(baseUrl),
+    gafaelfawrKeys.oidcClient(baseUrl, clientId),
+  ],
+};
+
+/**
+ * Mutation options for deleting an OpenID Connect client.
+ *
+ * The deleted client's detail entry is removed rather than invalidated — a
+ * refetch would only 404 — while the list is invalidated so it refetches.
+ */
+export const deleteOidcClientMutationConfig = {
+  mutationFn: async (variables: DeleteOidcClientVariables): Promise<void> => {
+    const { clientId, csrfToken, baseUrl } = variables;
+    return deleteOidcClient(clientId, csrfToken, baseUrl);
+  },
+
+  /** Query keys to invalidate on success. */
+  getInvalidateKeys: (baseUrl: string) => [gafaelfawrKeys.oidcClients(baseUrl)],
+
+  /** Query keys to drop from the cache on success. */
+  getRemoveKeys: (baseUrl: string, clientId: string) => [
+    gafaelfawrKeys.oidcClient(baseUrl, clientId),
   ],
 };

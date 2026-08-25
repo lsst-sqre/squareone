@@ -22,6 +22,7 @@ let DEV_STATE: DevState = {
     'exec:admin',
     'admin:token',
     'admin:notifications',
+    'admin:oidc',
     'read:tap',
     'exec:notebook',
     'read:image',

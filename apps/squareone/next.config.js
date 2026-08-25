@@ -51,6 +51,18 @@ module.exports = (phase) => {
           source: '/auth/api/v1/users/:username/tokens',
           destination: '/api/dev/gafaelfawr/v1/users/:username/tokens',
         },
+        // Mock Gafaelfawr OIDC client detail / update / delete (must precede
+        // the collection rewrite so the more specific :clientId path matches
+        // first)
+        {
+          source: '/auth/api/v1/oidc-clients/:clientId',
+          destination: '/api/dev/gafaelfawr/v1/oidc-clients/:clientId',
+        },
+        // Mock Gafaelfawr OIDC client list / create
+        {
+          source: '/auth/api/v1/oidc-clients',
+          destination: '/api/dev/gafaelfawr/v1/oidc-clients',
+        },
         // Mock Repertoire (this is never triggered by a production ingress)
         {
           source: '/repertoire/discovery',

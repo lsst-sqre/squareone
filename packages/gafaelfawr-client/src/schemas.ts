@@ -132,6 +132,64 @@ export const TokenChangeHistoryEntrySchema = z.object({
 });
 
 // =============================================================================
+// OpenID Connect Clients
+// =============================================================================
+
+/**
+ * Public data about a registered OpenID Connect relying party.
+ *
+ * From `GET /auth/api/v1/oidc-clients` (list) and
+ * `GET /auth/api/v1/oidc-clients/{client_id}` (detail).
+ *
+ * `created` and `last_modified` are Gafaelfawr `UtcDatetime` values — ISO 8601
+ * date-time strings — validated with offsets allowed, since the server may
+ * serialize UTC as either `Z` or `+00:00`. They are deliberately left as
+ * strings rather than coerced to `Date` so the parsed value stays JSON-
+ * serializable across the RSC boundary; callers format them themselves.
+ *
+ * Never carries `client_secret`: Gafaelfawr returns the secret only from the
+ * create call (see {@link OIDCClientWithSecretSchema}).
+ */
+export const OIDCClientSchema = z.object({
+  return_uri: z.string().min(1),
+  description: z.string().min(1),
+  notes: z.string().nullable().optional(),
+  client_id: z.string().min(1),
+  last_modified_by: z.string().min(1),
+  created: z.string().datetime({ offset: true }),
+  last_modified: z.string().datetime({ offset: true }),
+  url: z.string().nullable().optional(),
+});
+
+/**
+ * A newly created OpenID Connect client, including its secret.
+ *
+ * From `POST /auth/api/v1/oidc-clients` (201). The `client_secret` is returned
+ * **only** here and can never be read back, so the UI must show it once and
+ * tell the operator to store it.
+ */
+export const OIDCClientWithSecretSchema = OIDCClientSchema.extend({
+  client_secret: z.string().min(1),
+});
+
+/**
+ * The OpenID Connect client fields a caller may set.
+ *
+ * Body of both `POST /auth/api/v1/oidc-clients` and
+ * `PATCH /auth/api/v1/oidc-clients/{client_id}`. Despite the PATCH verb,
+ * Gafaelfawr requires `return_uri` and `description` on every update, so an
+ * edit sends the complete updatable state rather than a sparse diff.
+ *
+ * `client_id`, `created`, `last_modified`, and `last_modified_by` are all
+ * server-assigned and therefore absent here.
+ */
+export const OIDCClientUpdateSchema = z.object({
+  return_uri: z.string().min(1),
+  description: z.string().min(1),
+  notes: z.string().nullable().optional(),
+});
+
+// =============================================================================
 // Request Schemas
 // =============================================================================
 
@@ -222,6 +280,9 @@ export type TokenInfo = z.infer<typeof TokenInfoSchema>;
 export type TokenChangeHistoryEntry = z.infer<
   typeof TokenChangeHistoryEntrySchema
 >;
+export type OIDCClient = z.infer<typeof OIDCClientSchema>;
+export type OIDCClientWithSecret = z.infer<typeof OIDCClientWithSecretSchema>;
+export type OIDCClientUpdate = z.infer<typeof OIDCClientUpdateSchema>;
 export type CreateTokenRequest = z.infer<typeof CreateTokenRequestSchema>;
 export type AdminTokenRequest = z.infer<typeof AdminTokenRequestSchema>;
 export type CreateTokenResponse = z.infer<typeof CreateTokenResponseSchema>;

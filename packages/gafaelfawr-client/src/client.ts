@@ -6,7 +6,11 @@
  */
 import { z } from 'zod';
 
-import { formatValidationError, GafaelfawrError } from './errors';
+import {
+  formatValidationError,
+  GafaelfawrError,
+  OidcNotConfiguredError,
+} from './errors';
 import {
   type AdminTokenRequest,
   type CreateTokenRequest,
@@ -15,6 +19,11 @@ import {
   ErrorResponseSchema,
   type LoginInfo,
   LoginInfoSchema,
+  type OIDCClient,
+  OIDCClientSchema,
+  type OIDCClientUpdate,
+  type OIDCClientWithSecret,
+  OIDCClientWithSecretSchema,
   type TokenChangeHistoryEntry,
   TokenChangeHistoryEntrySchema,
   type TokenInfo,
@@ -416,6 +425,223 @@ export async function deleteToken(
     }
 
     throw new GafaelfawrError(errorMessage, response.status);
+  }
+}
+
+// =============================================================================
+// OpenID Connect Clients
+// =============================================================================
+
+/**
+ * Read the most specific error message a failed response offers.
+ *
+ * Gafaelfawr returns an `ErrorModel` (`{ detail: [...] }`) with 403/404/422, so
+ * prefer that over the bare status line. Falls back to `fallback` when the body
+ * is missing, unparseable, or shaped differently (e.g. an ingress-generated
+ * error page).
+ */
+async function readErrorMessage(
+  response: Response,
+  fallback: string
+): Promise<string> {
+  try {
+    const errorData = await response.json();
+    const parsed = ErrorResponseSchema.safeParse(errorData);
+    if (parsed.success) {
+      return formatValidationError(parsed.data.detail);
+    }
+  } catch {
+    // Ignore JSON parse errors and use the fallback message.
+  }
+  return fallback;
+}
+
+/**
+ * Throw the right error for a failed OIDC-client response.
+ *
+ * `notConfiguredOn404` distinguishes Gafaelfawr's two meanings of 404 on this
+ * API: on the collection endpoints it means the environment has no OpenID
+ * Connect server, which callers render as a dedicated empty state; on the
+ * per-client routes it means no such client, an ordinary 404.
+ */
+async function throwOidcError(
+  response: Response,
+  fallback: string,
+  { notConfiguredOn404 }: { notConfiguredOn404: boolean }
+): Promise<never> {
+  const message = await readErrorMessage(
+    response,
+    `${fallback}: ${response.status} ${response.statusText}`
+  );
+  if (notConfiguredOn404 && response.status === 404) {
+    throw new OidcNotConfiguredError(message);
+  }
+  throw new GafaelfawrError(message, response.status);
+}
+
+/**
+ * Fetch every registered OpenID Connect client.
+ *
+ * @param baseUrl - Gafaelfawr API base URL
+ * @returns All OIDC clients (without secrets)
+ * @throws OidcNotConfiguredError if this environment has no OIDC server
+ * @throws GafaelfawrError for any other failure
+ */
+export async function fetchOidcClients(baseUrl: string): Promise<OIDCClient[]> {
+  const url = `${normalizeUrl(baseUrl)}/oidc-clients`;
+
+  const response = await fetch(url, {
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    await throwOidcError(response, 'Failed to fetch OIDC clients', {
+      notConfiguredOn404: true,
+    });
+  }
+
+  const data = await response.json();
+  return z.array(OIDCClientSchema).parse(data);
+}
+
+/**
+ * Fetch a single OpenID Connect client.
+ *
+ * @param clientId - Server-assigned client identifier
+ * @param baseUrl - Gafaelfawr API base URL
+ * @returns The client (without its secret, which is never readable again)
+ * @throws GafaelfawrError if the request fails or the client does not exist
+ */
+export async function fetchOidcClient(
+  clientId: string,
+  baseUrl: string
+): Promise<OIDCClient> {
+  const url = `${normalizeUrl(baseUrl)}/oidc-clients/${encodeURIComponent(clientId)}`;
+
+  const response = await fetch(url, {
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    await throwOidcError(response, 'Failed to fetch OIDC client', {
+      notConfiguredOn404: false,
+    });
+  }
+
+  const data = await response.json();
+  return OIDCClientSchema.parse(data);
+}
+
+/**
+ * Register a new OpenID Connect client.
+ *
+ * The returned `client_secret` is the only time Gafaelfawr discloses it — there
+ * is no rotate endpoint — so callers must surface it to the operator once and
+ * not persist it anywhere else.
+ *
+ * @param request - The client fields to set
+ * @param csrfToken - CSRF token from login info
+ * @param baseUrl - Gafaelfawr API base URL
+ * @returns The created client, including its one-time secret
+ * @throws OidcNotConfiguredError if this environment has no OIDC server
+ * @throws GafaelfawrError for any other failure (403, 422, …)
+ */
+export async function createOidcClient(
+  request: OIDCClientUpdate,
+  csrfToken: string,
+  baseUrl: string
+): Promise<OIDCClientWithSecret> {
+  const url = `${normalizeUrl(baseUrl)}/oidc-clients`;
+
+  const response = await fetch(url, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-csrf-token': csrfToken,
+    },
+    body: JSON.stringify(request),
+  });
+
+  if (!response.ok) {
+    await throwOidcError(response, 'Failed to create OIDC client', {
+      notConfiguredOn404: true,
+    });
+  }
+
+  const data = await response.json();
+  return OIDCClientWithSecretSchema.parse(data);
+}
+
+/**
+ * Update an existing OpenID Connect client.
+ *
+ * Gafaelfawr exposes this as PATCH but requires `return_uri` and `description`
+ * on every call, so `request` carries the client's complete updatable state
+ * rather than only the changed fields.
+ *
+ * @param clientId - Server-assigned client identifier
+ * @param request - The full set of updatable fields
+ * @param csrfToken - CSRF token from login info
+ * @param baseUrl - Gafaelfawr API base URL
+ * @returns The updated client
+ * @throws GafaelfawrError if the request fails or the client does not exist
+ */
+export async function updateOidcClient(
+  clientId: string,
+  request: OIDCClientUpdate,
+  csrfToken: string,
+  baseUrl: string
+): Promise<OIDCClient> {
+  const url = `${normalizeUrl(baseUrl)}/oidc-clients/${encodeURIComponent(clientId)}`;
+
+  const response = await fetch(url, {
+    method: 'PATCH',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-csrf-token': csrfToken,
+    },
+    body: JSON.stringify(request),
+  });
+
+  if (!response.ok) {
+    await throwOidcError(response, 'Failed to update OIDC client', {
+      notConfiguredOn404: false,
+    });
+  }
+
+  const data = await response.json();
+  return OIDCClientSchema.parse(data);
+}
+
+/**
+ * Delete an OpenID Connect client.
+ *
+ * @param clientId - Server-assigned client identifier
+ * @param csrfToken - CSRF token from login info
+ * @param baseUrl - Gafaelfawr API base URL
+ * @throws GafaelfawrError if the request fails or the client does not exist
+ */
+export async function deleteOidcClient(
+  clientId: string,
+  csrfToken: string,
+  baseUrl: string
+): Promise<void> {
+  const url = `${normalizeUrl(baseUrl)}/oidc-clients/${encodeURIComponent(clientId)}`;
+
+  const response = await fetch(url, {
+    method: 'DELETE',
+    credentials: 'include',
+    headers: {
+      'x-csrf-token': csrfToken,
+    },
+  });
+
+  if (!response.ok) {
+    await throwOidcError(response, 'Failed to delete OIDC client', {
+      notConfiguredOn404: false,
+    });
   }
 }
 

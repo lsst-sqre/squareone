@@ -5,6 +5,7 @@
  */
 import type {
   LoginInfo,
+  OIDCClient,
   TokenChangeHistoryEntry,
   TokenInfo,
   UserInfo,
@@ -233,3 +234,34 @@ export function generateMockToken(
     ...overrides,
   };
 }
+
+/**
+ * Mock OpenID Connect clients.
+ *
+ * Shared by the package's tests, Storybook stories, and the squareone dev
+ * server's in-memory `oidcClientsStore`, so all three exercise the same shapes.
+ * Timestamps are fixed (not relative to `Date.now()`) so snapshots and the dev
+ * list stay stable across runs.
+ */
+export const mockOidcClients: OIDCClient[] = [
+  {
+    client_id: 'a1b2c3d4-0000-4000-8000-000000000001',
+    return_uri: 'https://chronograf.example.org/oauth/callback',
+    description: 'Chronograf dashboards',
+    notes: 'Owned by the SQuaRE team; rotate before the next release.',
+    url: 'https://chronograf.example.org/',
+    last_modified_by: 'vera',
+    created: '2026-01-14T09:30:00Z',
+    last_modified: '2026-03-02T16:45:00Z',
+  },
+  {
+    client_id: 'a1b2c3d4-0000-4000-8000-000000000002',
+    return_uri: 'https://argocd.example.org/auth/callback',
+    description: 'Argo CD',
+    notes: null,
+    url: null,
+    last_modified_by: 'rubin',
+    created: '2026-02-20T11:05:00Z',
+    last_modified: '2026-02-20T11:05:00Z',
+  },
+];
