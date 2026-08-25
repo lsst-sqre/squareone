@@ -1,0 +1,64 @@
+/* OIDCClientDetailPageClient: metadata, edit, and delete for one OIDC client */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sqo-space-md, 16px);
+  max-width: 800px;
+}
+
+.backLink {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.metadata {
+  margin: 0;
+}
+
+/* The id is long and opaque, so the copy button sits with it rather than
+ * making the operator select the text by hand. */
+.idRow {
+  display: flex;
+  align-items: center;
+  gap: var(--sqo-space-sm, 12px);
+  flex-wrap: wrap;
+}
+
+.mono {
+  font-family: monospace;
+  overflow-wrap: anywhere;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sqo-space-sm, 12px);
+  align-items: flex-start;
+  padding-top: var(--sqo-space-md, 16px);
+  border-top: 1px solid var(--rsd-component-divider-color);
+}
+
+.section h2 {
+  margin: 0;
+}
+
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sqo-space-xs);
+  padding: var(--sqo-space-xl);
+  text-align: center;
+  color: var(--rsd-component-text-secondary-color);
+}
+
+.errorDetail {
+  font-size: 0.875rem;
+  color: var(--rsd-component-text-secondary-color);
+}
+
+.errorHeading {
+  margin-top: 0;
+}

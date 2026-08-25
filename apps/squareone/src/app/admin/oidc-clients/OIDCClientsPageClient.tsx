@@ -9,14 +9,8 @@ import { Button, ErrorMessage, Note } from '@lsst-sqre/squared';
 import OIDCClientsTable from '../../../components/OIDCClientsTable';
 import { Lede } from '../../../components/Typography';
 import { useRepertoireUrl } from '../../../hooks/useRepertoireUrl';
+import { OIDC_API_SCOPE } from '../../../lib/oidc/clientErrors';
 import styles from './OIDCClientsPageClient.module.css';
-
-/**
- * The scope Gafaelfawr itself requires on every OpenID Connect client
- * endpoint. Unlike the `adminPageScopes` mapping that decides who is offered
- * this page, this one is fixed by the API, so a 403 here can name it outright.
- */
-const OIDC_API_SCOPE = 'admin:oidc';
 
 /**
  * Client container for the `/admin/oidc-clients` listing page.

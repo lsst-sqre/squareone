@@ -2,7 +2,6 @@
 
 import type { OIDCClientWithSecret } from '@lsst-sqre/gafaelfawr-client';
 import {
-  toGafaelfawrErrorInfo,
   useCreateOidcClient,
   useLoginInfo,
 } from '@lsst-sqre/gafaelfawr-client';
@@ -22,40 +21,17 @@ import {
   getRequiredAdminScopes,
   hasAdminPageAccess,
 } from '../../../../lib/config/adminPageScopes';
+import { describeOidcClientFailure } from '../../../../lib/oidc/clientErrors';
 
 /** Where Cancel returns to. */
 const LANDING_URL = '/admin/oidc-clients';
 
 /**
- * The scope Gafaelfawr itself requires on every OpenID Connect client
- * endpoint. Unlike the `adminPageScopes` mapping that decides who is offered
- * this page, this one is fixed by the API, so a 403 here can name it outright.
+ * What a 404 means on the *collection* endpoint this page posts to: not "no
+ * such client" but "this environment has no OpenID Connect server at all".
  */
-const OIDC_API_SCOPE = 'admin:oidc';
-
-/**
- * Turn a failed creation into the sentence the form should show inline.
- *
- * Most failures — a 422 above all, the common one here — already carry
- * Gafaelfawr's own `ErrorModel` detail, which names the offending field and is
- * far more useful than anything this page could invent, so those pass through
- * verbatim. The two exceptions are the statuses whose bare message says
- * nothing actionable: a 403 is really "you are missing a scope", and a 404 on
- * this endpoint means the environment has no OpenID Connect server at all.
- */
-function describeCreateFailure(error: unknown): string {
-  const { status, message } = toGafaelfawrErrorInfo(error);
-
-  if (status === 403) {
-    return `Gafaelfawr refused this request: your account does not hold the ${OIDC_API_SCOPE} scope that the OpenID Connect client API requires. Contact your administrator to request it.`;
-  }
-
-  if (status === 404) {
-    return 'The OpenID Connect server is not configured in this environment, so clients cannot be registered here. Ask your Phalanx administrator to enable it.';
-  }
-
-  return message;
-}
+const NOT_CONFIGURED_MESSAGE =
+  'The OpenID Connect server is not configured in this environment, so clients cannot be registered here. Ask your Phalanx administrator to enable it.';
 
 /**
  * Client component for the `/admin/oidc-clients/new` page.
@@ -106,7 +82,9 @@ export default function NewOIDCClientPageClient() {
     } catch (error) {
       // Rethrown rather than swallowed: the form renders the message inline
       // and keeps the operator's input, which is what makes a 422 fixable.
-      throw new Error(describeCreateFailure(error));
+      throw new Error(
+        describeOidcClientFailure(error, { notFound: NOT_CONFIGURED_MESSAGE })
+      );
     }
   };
 
