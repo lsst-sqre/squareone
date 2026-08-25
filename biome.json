@@ -12,7 +12,8 @@
       "!!**/package.json",
       "!**/*.ejs",
       "!**/next-env.d.ts",
-      "!**/.devcontainer/**/*.json"
+      "!**/.devcontainer/**/*.json",
+      "!**/.claude/workflows"
     ]
   },
   "formatter": {
