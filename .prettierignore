@@ -18,3 +18,7 @@ out/
 # gitignored Playwright MCP page snapshots are YAML, so the prettier:yaml
 # glob would otherwise pick them up
 .playwright-mcp/
+
+# stoker-vendored issue templates carry a `stoker-managed:` checksum header;
+# reformatting them breaks the sentinel on every commit
+.github/ISSUE_TEMPLATE/
