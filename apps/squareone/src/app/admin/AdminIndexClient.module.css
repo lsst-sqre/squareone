@@ -1,0 +1,4 @@
+.loading {
+  padding: var(--sqo-space-md-fixed);
+  color: var(--rsd-component-text-secondary-color);
+}

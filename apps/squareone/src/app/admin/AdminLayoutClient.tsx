@@ -1,10 +1,12 @@
 'use client';
 
+import { useLoginInfo } from '@lsst-sqre/gafaelfawr-client';
 import { usePathname } from 'next/navigation';
-import { type ReactNode, useMemo } from 'react';
+import type { ReactNode } from 'react';
 import { getAdminNavigation } from '../../components/AdminLayout/adminNavigation';
 import AdminRequired from '../../components/AdminRequired';
 import { SidebarLayout } from '../../components/SidebarLayout';
+import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
 import type { AppConfigContextValue } from '../../hooks/useStaticConfig';
 
 type AdminLayoutClientProps = {
@@ -17,7 +19,10 @@ type AdminLayoutClientProps = {
  *
  * Receives config as a prop from the server component layout. Uses
  * usePathname() from next/navigation (App Router) to get the current path for
- * navigation highlighting. The admin navigation is flat (no categories).
+ * navigation highlighting. The admin navigation is flat (no categories) and is
+ * filtered to the pages the signed-in user holds scopes for, per the
+ * `adminPageScopes` configuration — so the sidebar never offers a page that
+ * would answer 403.
  *
  * Wraps the layout in AdminRequired so every admin page inherits the
  * client-side `exec:admin` scope gate (defense-in-depth alongside the Phalanx
@@ -29,9 +34,13 @@ export default function AdminLayoutClient({
   config,
 }: AdminLayoutClientProps) {
   const pathname = usePathname();
+  const repertoireUrl = useRepertoireUrl();
+  const { query } = useLoginInfo(repertoireUrl);
 
-  // Dynamically generate navigation based on config
-  const navSections = useMemo(() => getAdminNavigation(config), [config]);
+  // Navigation is derived from config and the user's scopes on every render:
+  // it is a filter over a handful of static items, and nothing downstream keys
+  // an effect on the array's identity.
+  const navSections = getAdminNavigation(config, query?.scopes ?? []);
 
   return (
     <AdminRequired>

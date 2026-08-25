@@ -2,6 +2,8 @@
 // Using require() for server-side modules to avoid dynamic import issues in production builds
 import logger from '../logger';
 
+import type { AdminPageScopes } from './adminPageScopes';
+
 const fs = require('node:fs');
 const path = require('node:path');
 const yaml = require('js-yaml');
@@ -77,6 +79,14 @@ export interface AppConfig {
    * default (300) when absent.
    */
   userNotificationsPollIntervalSeconds: number;
+  /**
+   * Gafaelfawr scopes granting access to each admin page, keyed by the fixed
+   * page ids in `adminPageScopes.ts`. Optional: the schema fills in defaults
+   * for a config that omits it, and `resolveAdminPageScopes()` falls back to
+   * the same defaults, so consumers must go through that helper rather than
+   * reading this field directly.
+   */
+  adminPageScopes?: AdminPageScopes;
   mdxDir: string; // New: configurable MDX directory
   sentryDsn?: string; // Injected from environment
   sentryTracesSampleRate?: number;
