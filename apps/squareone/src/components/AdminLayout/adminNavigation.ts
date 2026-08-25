@@ -27,6 +27,11 @@ const ADMIN_NAV_ITEMS: AdminNavItem[] = [
     href: '/admin/service-tokens',
     label: 'Service tokens',
   },
+  {
+    pageId: 'oidcClients',
+    href: '/admin/oidc-clients',
+    label: 'OIDC clients',
+  },
   { pageId: 'sentry', href: '/admin/sentry', label: 'Sentry' },
 ];
 

@@ -20,9 +20,14 @@ const baseConfig: AppConfigContextValue = {
 };
 
 /** Scopes covering every admin page that currently has a nav item. */
-const ALL_ADMIN_SCOPES = ['admin:notifications', 'admin:token', 'exec:admin'];
+const ALL_ADMIN_SCOPES = [
+  'admin:notifications',
+  'admin:token',
+  'admin:oidc',
+  'exec:admin',
+];
 
-test('generates a single flat section with the notification, service-token, and Sentry items in order', () => {
+test('generates a single flat section with every admin item in order', () => {
   const navigation = getAdminNavigation(baseConfig, ALL_ADMIN_SCOPES);
 
   expect(navigation).toHaveLength(1);
@@ -30,9 +35,28 @@ test('generates a single flat section with the notification, service-token, and 
     items: [
       { href: '/admin/notifications', label: 'User notifications' },
       { href: '/admin/service-tokens', label: 'Service tokens' },
+      { href: '/admin/oidc-clients', label: 'OIDC clients' },
       { href: '/admin/sentry', label: 'Sentry' },
     ],
   });
+});
+
+test('places OIDC clients immediately after Service tokens', () => {
+  const hrefs = getAdminNavigation(baseConfig, ALL_ADMIN_SCOPES)[0].items.map(
+    (item) => item.href
+  );
+
+  expect(hrefs.indexOf('/admin/oidc-clients')).toBe(
+    hrefs.indexOf('/admin/service-tokens') + 1
+  );
+});
+
+test('shows only OIDC clients for a user holding admin:oidc alone', () => {
+  const navigation = getAdminNavigation(baseConfig, ['admin:oidc']);
+
+  expect(navigation).toEqual([
+    { items: [{ href: '/admin/oidc-clients', label: 'OIDC clients' }] },
+  ]);
 });
 
 test('keeps User notifications first so /admin redirects there', () => {
@@ -144,16 +168,22 @@ test('hides a page configured with an empty scope list', () => {
   expect(items.map((item) => item.href)).toEqual([
     '/admin/notifications',
     '/admin/service-tokens',
+    '/admin/oidc-clients',
   ]);
 });
 
-test('does not yet expose an OIDC clients item', () => {
-  // The oidcClients page id and its default scope exist ahead of the page
-  // itself; the nav item lands with the page.
-  const items = getAdminNavigation(baseConfig, [
-    ...ALL_ADMIN_SCOPES,
-    'admin:oidc',
-  ]).flatMap((section) => section.items);
+test('hides OIDC clients in an environment that switches the page off', () => {
+  // An environment without Gafaelfawr's OpenID Connect server sets
+  // `oidcClients: []` rather than shipping a nav item that only ever leads to
+  // the not-configured note.
+  const config: AppConfigContextValue = {
+    ...baseConfig,
+    adminPageScopes: { oidcClients: [] },
+  };
+
+  const items = getAdminNavigation(config, ALL_ADMIN_SCOPES).flatMap(
+    (section) => section.items
+  );
 
   expect(items.map((item) => item.href)).not.toContain('/admin/oidc-clients');
 });

@@ -1,0 +1,42 @@
+/* OIDCClientsTable: admin OpenID Connect client listing */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sqo-space-md);
+  width: 100%;
+  /* A flex item's default `min-width: auto` refuses to shrink below its
+   * content, which would let the table push the whole page wide instead of
+   * scrolling inside DataTable's own overflow container. */
+  min-width: 0;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* The description is the row's title: keep it reading as text, with the
+ * standard link affordance on hover. */
+.descriptionLink {
+  color: inherit;
+  text-decoration: none;
+}
+
+.descriptionLink:hover {
+  color: var(--rsd-component-text-link-color);
+  text-decoration: underline;
+}
+
+/* The identifiers sit beneath their primary row, so mute them slightly and
+ * keep them off the row's visual anchor. */
+.identifiers {
+  font-size: 0.875rem;
+}
+
+/* Client ids and return URIs are opaque machine values: set them in the mono
+ * face so they are scannable and can't be confused with the prose above. */
+.mono {
+  font-size: 0.9375em;
+  overflow-wrap: anywhere;
+}
