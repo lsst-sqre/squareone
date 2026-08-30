@@ -61,6 +61,8 @@
   text-decoration: underline;
 }
 
+/* Links stay white on hover: dimming to #dddddd dropped white-on-banner
+ * contrast below 4.5:1. The underline already distinguishes links. */
 .container a:hover {
-  color: #dddddd;
+  color: white;
 }

@@ -75,7 +75,8 @@
 
 .sortIcon {
   flex-shrink: 0;
-  color: var(--rsd-color-primary-600);
+  /* Active-sort indicator glyph: accessible teal so it reads as text (>=4.5:1). */
+  color: var(--rsd-component-interactive-color);
 }
 
 /* Inactive (sortable but not currently sorted) indicator is muted. */
