@@ -28,43 +28,57 @@ const clients: OIDCClient[] = [
 ];
 
 describe('OIDCClientsTable', () => {
-  test('renders a primary and an identifiers row for each client', () => {
+  test('columns are exactly the client id and when it last changed', () => {
     render(<OIDCClientsTable clients={clients} />);
 
     const table = screen.getByRole('table');
-    // One header row plus a primary and a detail row per client.
+    expect(
+      within(table)
+        .getAllByRole('columnheader')
+        .map((header) => header.textContent)
+    ).toEqual(['Client ID', 'Last modified']);
+    // The description moved to the addendum row and the last modifier is not
+    // worth a column of its own.
+    expect(screen.queryByText('vera')).not.toBeInTheDocument();
+  });
+
+  test('renders a primary and an addendum row for each client', () => {
+    render(<OIDCClientsTable clients={clients} />);
+
+    const table = screen.getByRole('table');
+    // One header row plus a primary and an addendum row per client.
     expect(within(table).getAllByRole('row')).toHaveLength(
       clients.length * 2 + 1
     );
-
-    expect(screen.getByText('Chronograf dashboards')).toBeInTheDocument();
-    expect(screen.getByText('vera')).toBeInTheDocument();
   });
 
-  test('carries each client’s identifiers beneath its primary row', () => {
-    // client_id and return_uri are long, opaque, and copy-pasted rather than
-    // scanned, so they sit in a labeled full-width row rather than columns.
-    render(<OIDCClientsTable clients={clients} />);
-
-    expect(screen.getAllByText('Client ID')).toHaveLength(clients.length);
-    expect(
-      screen.getByText('a1b2c3d4-0000-4000-8000-000000000001')
-    ).toBeInTheDocument();
-    expect(screen.getAllByText('Return URI')).toHaveLength(clients.length);
-    expect(
-      screen.getByText('https://chronograf.example.org/oauth/callback')
-    ).toBeInTheDocument();
-  });
-
-  test('links each description to that client’s detail route', () => {
+  test('links each client id to that client’s detail route', () => {
     render(<OIDCClientsTable clients={clients} />);
 
     expect(
-      screen.getByRole('link', { name: 'Chronograf dashboards' })
+      screen.getByRole('link', { name: 'a1b2c3d4-0000-4000-8000-000000000001' })
     ).toHaveAttribute(
       'href',
       '/admin/oidc-clients/a1b2c3d4-0000-4000-8000-000000000001'
     );
+    // The description is prose in the addendum row, not a second link.
+    expect(
+      screen.queryByRole('link', { name: 'Chronograf dashboards' })
+    ).not.toBeInTheDocument();
+  });
+
+  test('carries the description and return URI as unlabelled prose beneath the row', () => {
+    render(<OIDCClientsTable clients={clients} />);
+
+    expect(screen.getByText('Chronograf dashboards')).toBeInTheDocument();
+    expect(
+      screen.getByText('https://chronograf.example.org/oauth/callback')
+    ).toBeInTheDocument();
+    // No key/value labels: the only "Client ID" on the page is the column
+    // header, and nothing labels the return URI.
+    expect(screen.getAllByText('Client ID')).toHaveLength(1);
+    expect(screen.queryByText('Return URI')).not.toBeInTheDocument();
+    expect(screen.queryByText(/^Description/)).not.toBeInTheDocument();
   });
 
   test('formats last modified as a stable UTC timestamp', () => {

@@ -1,10 +1,5 @@
 import type { OIDCClient } from '@lsst-sqre/gafaelfawr-client';
-import {
-  Button,
-  DataTable,
-  type DataTableProps,
-  KeyValueList,
-} from '@lsst-sqre/squared';
+import { Button, DataTable, type DataTableProps } from '@lsst-sqre/squared';
 import { PlusCircle } from 'lucide-react';
 import Link from 'next/link';
 
@@ -26,16 +21,16 @@ export type OIDCClientsTableProps = {
 
 const columns: DataTableProps<OIDCClient>['columns'] = [
   {
-    accessorKey: 'description',
-    header: 'Description',
-    // The description is the client's human-readable name, so it carries the
-    // link to the detail page rather than the opaque client id below it.
+    accessorKey: 'client_id',
+    header: 'Client ID',
+    // The client id is what an admin looks a row up by, so it is the row's
+    // title and carries the link to the detail page.
     cell: (info) => (
       <Link
         href={`${OIDC_CLIENTS_BASE_HREF}/${encodeURIComponent(
-          info.row.original.client_id
+          info.getValue<string>()
         )}`}
-        className={styles.descriptionLink}
+        className={styles.clientIdLink}
       >
         {info.getValue<string>()}
       </Link>
@@ -46,19 +41,21 @@ const columns: DataTableProps<OIDCClient>['columns'] = [
     header: 'Last modified',
     cell: (info) => formatUtcTimestamp(info.getValue<string>()),
   },
-  { accessorKey: 'last_modified_by', header: 'Last modified by' },
 ];
 
 /**
  * Presentational listing of a deployment's OpenID Connect clients.
  *
  * Each client is a two-row unit, following the admin notifications listing: a
- * primary row of the description (linking to that client's detail page) with
- * who last modified it when, and a full-width secondary row carrying the
- * client's `client_id` and `return_uri`. Those two are long, opaque, and
- * copy-pasted rather than scanned, so as columns they would either shred
- * mid-token or push the table wider than the admin content column; beneath the
- * row they stay whole and the sortable columns stay readable.
+ * primary row of the `client_id` (linking to that client's detail page) and
+ * when the client last changed, over a full-width addendum row carrying the
+ * description and `return_uri` as prose. The client id leads because it is the
+ * value an admin arrives with — from a Phalanx values file, a Gafaelfawr log
+ * line, or a failing redirect — and so is what they scan the column for; the
+ * description explains a row once it has been found, and reads better as a
+ * sentence beneath it than squeezed into a column. Keeping the id and the URI
+ * in the mono face, wrapping rather than truncating, lets both stay whole
+ * without pushing the table past the admin content column.
  *
  * Sorting is over the whole collection: Gafaelfawr returns every client in one
  * response, so there is no unloaded page for a client-side sort to miss.
@@ -93,19 +90,10 @@ export default function OIDCClientsTable({
         aria-label="OpenID Connect clients"
         emptyContent="No OpenID Connect clients are registered in this environment yet."
         renderDetailRow={(client) => (
-          <KeyValueList
-            className={styles.identifiers}
-            items={[
-              {
-                key: 'Client ID',
-                value: <code className={styles.mono}>{client.client_id}</code>,
-              },
-              {
-                key: 'Return URI',
-                value: <code className={styles.mono}>{client.return_uri}</code>,
-              },
-            ]}
-          />
+          <div className={styles.details}>
+            <p className={styles.description}>{client.description}</p>
+            <code className={styles.returnUri}>{client.return_uri}</code>
+          </div>
         )}
       />
     </div>

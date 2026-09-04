@@ -67,12 +67,14 @@ describe('OIDCClientsPageClient', () => {
     render(<OIDCClientsPageClient />);
 
     expect(screen.getByRole('table')).toBeInTheDocument();
+    // The client id is the row's title and carries the detail-route link.
     expect(
-      screen.getByRole('link', { name: 'Chronograf dashboards' })
+      screen.getByRole('link', { name: 'a1b2c3d4-0000-4000-8000-000000000001' })
     ).toHaveAttribute(
       'href',
       '/admin/oidc-clients/a1b2c3d4-0000-4000-8000-000000000001'
     );
+    expect(screen.getByText('Chronograf dashboards')).toBeInTheDocument();
   });
 
   test('resolves Gafaelfawr through Repertoire discovery', () => {

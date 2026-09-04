@@ -18,8 +18,8 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * The loaded listing: each client a primary row of description and
- * last-modified metadata over a full-width row carrying its identifiers.
+ * The loaded listing: each client a primary row of client id and last-modified
+ * metadata over a full-width addendum row of description and return URI.
  */
 export const Loaded: Story = {
   args: {
@@ -28,16 +28,16 @@ export const Loaded: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    // Every fixture is listed, with its opaque identifying columns.
+    // Every fixture is listed, with its description and return URI beneath.
     await expect(canvas.getByText('Chronograf dashboards')).toBeInTheDocument();
     await expect(canvas.getByText('Argo CD')).toBeInTheDocument();
     await expect(
       canvas.getByText('https://argocd.example.org/auth/callback')
     ).toBeInTheDocument();
 
-    // The description carries the link to the per-client detail route.
+    // The client id carries the link to the per-client detail route.
     await expect(
-      canvas.getByRole('link', { name: 'Chronograf dashboards' })
+      canvas.getByRole('link', { name: mockOidcClients[0].client_id })
     ).toHaveAttribute(
       'href',
       `/admin/oidc-clients/${mockOidcClients[0].client_id}`
@@ -57,18 +57,24 @@ export const Loaded: Story = {
  * collection in one response, so this is a complete sort rather than a
  * per-page one.
  */
-export const SortedByDescription: Story = {
-  name: 'Sorted by description',
+export const SortedByLastModified: Story = {
+  name: 'Sorted by last modified',
   args: {
     clients: mockOidcClients,
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    await userEvent.click(canvas.getByRole('button', { name: /description/i }));
+    // The fixtures arrive most-recently-modified first, so an ascending sort
+    // is a real reordering.
+    await userEvent.click(
+      canvas.getByRole('button', { name: /last modified/i })
+    );
 
     const rows = canvas.getAllByRole('row').slice(1);
-    await expect(within(rows[0]).getByText('Argo CD')).toBeInTheDocument();
+    await expect(
+      within(rows[0]).getByText('2026-02-20 11:05 UTC')
+    ).toBeInTheDocument();
   },
 };
 

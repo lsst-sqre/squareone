@@ -16,27 +16,43 @@
   justify-content: flex-end;
 }
 
-/* The description is the row's title: keep it reading as text, with the
- * standard link affordance on hover. */
-.descriptionLink {
+/* The client id is the row's title — the value an admin scans the column for —
+ * so it carries the link to that client's detail page. Keep it reading as a
+ * machine value in the mono face, with the standard link affordance on hover,
+ * and let a long id wrap inside the column rather than widening the table. */
+.clientIdLink {
   color: inherit;
   text-decoration: none;
+  font-family: monospace;
+  font-size: 0.9375em;
+  overflow-wrap: anywhere;
 }
 
-.descriptionLink:hover {
+.clientIdLink:hover {
   color: var(--rsd-component-text-link-color);
   text-decoration: underline;
 }
 
-/* The identifiers sit beneath their primary row, so mute them slightly and
- * keep them off the row's visual anchor. */
-.identifiers {
+/* The addendum sits beneath its primary row explaining the client, so mute it
+ * slightly and keep it off the row's visual anchor. */
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sqo-space-xxs);
   font-size: 0.875rem;
+  color: var(--rsd-component-text-secondary-color);
 }
 
-/* Client ids and return URIs are opaque machine values: set them in the mono
- * face so they are scannable and can't be confused with the prose above. */
-.mono {
+/* The description is prose, not a labelled field: it reads as the sentence
+ * that explains the client id above it. */
+.description {
+  margin: 0;
+}
+
+/* The return URI is an opaque machine value: set it in the mono face so it is
+ * scannable and can't be confused with the prose above, and let a long one wrap
+ * inside the cell rather than widening the table. */
+.returnUri {
   font-size: 0.9375em;
   overflow-wrap: anywhere;
 }
