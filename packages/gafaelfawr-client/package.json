@@ -43,12 +43,12 @@
     "@lsst-sqre/repertoire-client": "workspace:*",
     "@lsst-sqre/tsconfig": "workspace:*",
     "@tanstack/react-query": "^5.90.20",
-    "@testing-library/react": "^16.3.2",
+    "@testing-library/react": "^16.3.3",
     "@types/react": "^19.2.18",
     "msw": "2.15.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "typescript": "^5.7.2",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.11"
   }
 }
