@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 
+import AdminRequired from '@/components/AdminRequired';
 import { getStaticConfig } from '@/lib/config/rsc';
 
 import NotificationDetailPageClient from './NotificationDetailPageClient';
@@ -30,13 +31,17 @@ export async function generateMetadata({
  *
  * Server component that mirrors the other admin pages: it derives the page
  * metadata from the resolved app config and the route id, then renders the
- * client container that fetches and displays the notification. The page sits
- * inside the admin section, so it inherits the `AdminRequired` / `exec:admin`
- * gate from the admin layout.
+ * client container that fetches and displays the notification. The page gates
+ * itself on the `notifications` page scopes, so a direct visit without them is
+ * refused in-page.
  */
 export default async function NotificationDetailPage({
   params,
 }: NotificationDetailPageProps) {
   const { id } = await params;
-  return <NotificationDetailPageClient id={id} />;
+  return (
+    <AdminRequired pageId="notifications">
+      <NotificationDetailPageClient id={id} />
+    </AdminRequired>
+  );
 }

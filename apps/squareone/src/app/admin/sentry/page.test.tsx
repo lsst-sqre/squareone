@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import type React from 'react';
 import { describe, expect, test, vi } from 'vitest';
 
 // Stub the child components so these tests exercise only the page's own copy;
@@ -8,6 +9,14 @@ vi.mock('../../../components/SentryTestButtons', () => ({
 }));
 vi.mock('../../../components/SentryConfigInfo', () => ({
   default: () => <div data-testid="sentry-config-info" />,
+}));
+
+// The page's scope gate is a pass-through here: these tests are about the
+// page's own copy. The gate's behaviour is covered by AdminRequired's tests,
+// and `src/tests/adminPageGates.test.ts` is what proves this page still
+// declares one.
+vi.mock('../../../components/AdminRequired', () => ({
+  default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 // Import after mocking.

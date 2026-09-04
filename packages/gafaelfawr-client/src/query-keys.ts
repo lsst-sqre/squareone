@@ -55,6 +55,26 @@ export const gafaelfawrKeys = {
    */
   tokenHistoryList: (username: string, filters?: Record<string, unknown>) =>
     [...gafaelfawrKeys.tokenHistory(), username, filters ?? {}] as const,
+
+  /**
+   * OpenID Connect client list for one Gafaelfawr deployment.
+   *
+   * The base URL is part of the key because it is resolved at runtime from
+   * repertoire service discovery: two deployments' client lists must not share
+   * a cache entry.
+   */
+  oidcClients: (baseUrl: string) =>
+    [...gafaelfawrKeys.all, 'oidc-clients', baseUrl] as const,
+
+  /**
+   * A single OpenID Connect client.
+   *
+   * A sibling of {@link gafaelfawrKeys.oidcClients}, not a child, so
+   * invalidating the list does not implicitly invalidate every detail entry —
+   * the mutations name both keys explicitly instead.
+   */
+  oidcClient: (baseUrl: string, clientId: string) =>
+    [...gafaelfawrKeys.all, 'oidc-client', baseUrl, clientId] as const,
 };
 
 /**

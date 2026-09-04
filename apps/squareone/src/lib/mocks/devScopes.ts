@@ -17,6 +17,7 @@ export const AVAILABLE_SCOPES: Scope[] = [
   { name: 'exec:admin', description: 'Administer the Science Platform' },
   { name: 'admin:token', description: 'Administer user tokens' },
   { name: 'admin:notifications', description: 'Send user notifications' },
+  { name: 'admin:oidc', description: 'Administer OpenID Connect clients' },
   { name: 'read:tap', description: 'Query TAP services' },
   { name: 'exec:notebook', description: 'Run notebooks in Nublado' },
   { name: 'read:image', description: 'Read images from the archive' },

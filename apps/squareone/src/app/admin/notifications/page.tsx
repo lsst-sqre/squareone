@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 
+import AdminRequired from '../../../components/AdminRequired';
 import { getStaticConfig } from '../../../lib/config/rsc';
 import NotificationsPageClient from './NotificationsPageClient';
 
@@ -24,9 +25,9 @@ export async function generateMetadata(): Promise<Metadata> {
  *
  * Server component that mirrors the other admin pages: it derives the page
  * metadata from the resolved app config and renders the client container that
- * fetches and displays the notifications. The page sits inside the admin
- * section, so it inherits the `AdminRequired` / `exec:admin` gate from the
- * admin layout.
+ * fetches and displays the notifications. The page gates itself on the
+ * `notifications` page scopes, so a direct visit without them is refused
+ * in-page.
  *
  * The client container reads the filter state from the URL query string via
  * `useSearchParams()` (through `useAdminNotificationFilters`), so it must sit
@@ -35,8 +36,10 @@ export async function generateMetadata(): Promise<Metadata> {
  */
 export default function NotificationsPage() {
   return (
-    <Suspense>
-      <NotificationsPageClient />
-    </Suspense>
+    <AdminRequired pageId="notifications">
+      <Suspense>
+        <NotificationsPageClient />
+      </Suspense>
+    </AdminRequired>
   );
 }

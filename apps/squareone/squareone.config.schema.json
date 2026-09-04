@@ -163,6 +163,50 @@
       "minimum": 30,
       "default": 300
     },
+    "adminPageScopes": {
+      "type": "object",
+      "title": "Admin page scopes",
+      "description": "Maps each admin page to the Gafaelfawr scopes that grant access to it. A user may use a page when they hold **any** of the scopes listed for it; configuring an empty list hides the page from everyone. Page ids are fixed by the application, so an unrecognized id is a configuration error. Omit this key — or any individual page within it — to use the defaults shown below, which match Gafaelfawr's out-of-the-box admin scopes. This mapping controls the admin sidebar navigation, the page each user lands on from /admin, and the in-page authorization gate; it does not change the order of the navigation or which admin pages exist.",
+      "propertyNames": {
+        "enum": ["notifications", "serviceTokens", "oidcClients", "sentry"]
+      },
+      "properties": {
+        "notifications": {
+          "type": "array",
+          "title": "Scopes for the user-notifications admin page",
+          "description": "Scopes granting access to /admin/notifications, which sends user notifications through Semaphore.",
+          "items": { "type": "string" },
+          "default": ["admin:notifications"]
+        },
+        "serviceTokens": {
+          "type": "array",
+          "title": "Scopes for the service-tokens admin page",
+          "description": "Scopes granting access to /admin/service-tokens, which manages Gafaelfawr service tokens.",
+          "items": { "type": "string" },
+          "default": ["admin:token"]
+        },
+        "oidcClients": {
+          "type": "array",
+          "title": "Scopes for the OpenID Connect clients admin page",
+          "description": "Scopes granting access to /admin/oidc-clients, which manages Gafaelfawr's OpenID Connect clients.",
+          "items": { "type": "string" },
+          "default": ["admin:oidc"]
+        },
+        "sentry": {
+          "type": "array",
+          "title": "Scopes for the Sentry admin page",
+          "description": "Scopes granting access to /admin/sentry, which links to the Sentry dashboard and exercises error and log reporting.",
+          "items": { "type": "string" },
+          "default": ["exec:admin"]
+        }
+      },
+      "default": {
+        "notifications": ["admin:notifications"],
+        "serviceTokens": ["admin:token"],
+        "oidcClients": ["admin:oidc"],
+        "sentry": ["exec:admin"]
+      }
+    },
     "headerLogoUrl": {
       "type": "string",
       "title": "Header logo URL",

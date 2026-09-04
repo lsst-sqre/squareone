@@ -99,6 +99,39 @@ describe('gafaelfawrKeys', () => {
     });
   });
 
+  describe('oidcClients', () => {
+    it('keys the list by the resolved Gafaelfawr base URL', () => {
+      expect(gafaelfawrKeys.oidcClients('/auth/api/v1')).toEqual([
+        'gafaelfawr',
+        'oidc-clients',
+        '/auth/api/v1',
+      ]);
+    });
+
+    it('separates deployments', () => {
+      expect(gafaelfawrKeys.oidcClients('/auth/api/v1')).not.toEqual(
+        gafaelfawrKeys.oidcClients('https://data-dev.example.org/auth/api/v1')
+      );
+    });
+  });
+
+  describe('oidcClient', () => {
+    it('keys a detail by base URL and client id', () => {
+      expect(gafaelfawrKeys.oidcClient('/auth/api/v1', 'abc')).toEqual([
+        'gafaelfawr',
+        'oidc-client',
+        '/auth/api/v1',
+        'abc',
+      ]);
+    });
+
+    it('is not a prefix match of the list key', () => {
+      const list = gafaelfawrKeys.oidcClients('/auth/api/v1');
+      const detail = gafaelfawrKeys.oidcClient('/auth/api/v1', 'abc');
+      expect(detail.slice(0, list.length)).not.toEqual(list);
+    });
+  });
+
   describe('key hierarchy', () => {
     it('user info key starts with all key', () => {
       expect(gafaelfawrKeys.userInfo().slice(0, 1)).toEqual(gafaelfawrKeys.all);
@@ -120,6 +153,15 @@ describe('gafaelfawrKeys', () => {
       expect(gafaelfawrKeys.tokenHistoryList('user').slice(0, 2)).toEqual(
         gafaelfawrKeys.tokenHistory()
       );
+    });
+
+    it('oidc keys start with the root key', () => {
+      expect(gafaelfawrKeys.oidcClients('/auth/api/v1').slice(0, 1)).toEqual(
+        gafaelfawrKeys.all
+      );
+      expect(
+        gafaelfawrKeys.oidcClient('/auth/api/v1', 'abc').slice(0, 1)
+      ).toEqual(gafaelfawrKeys.all);
     });
   });
 });

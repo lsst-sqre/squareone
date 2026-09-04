@@ -25,7 +25,7 @@
     "type-check": "tsc --noEmit",
     "lint": "eslint . --ext .ts,.tsx",
     "clean": "rm -rf node_modules",
-    "fetch-openapi": "curl -o openapi.json https://data.lsst.cloud/auth/openapi.json"
+    "fetch-openapi": "curl -o openapi.json https://data-dev.lsst.cloud/auth/openapi.json"
   },
   "dependencies": {
     "@lsst-sqre/api-client-core": "workspace:*",
@@ -45,6 +45,7 @@
     "@tanstack/react-query": "^5.90.20",
     "@testing-library/react": "^16.3.2",
     "@types/react": "^19.2.18",
+    "msw": "2.15.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "typescript": "^5.7.2",

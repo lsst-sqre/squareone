@@ -48,6 +48,12 @@ export {
   LoginInfoSchema,
   type NotebookQuota,
   NotebookQuotaSchema,
+  type OIDCClient,
+  OIDCClientSchema,
+  type OIDCClientUpdate,
+  OIDCClientUpdateSchema,
+  type OIDCClientWithSecret,
+  OIDCClientWithSecretSchema,
   type Quota,
   QuotaSchema,
   type Scope,
@@ -67,11 +73,14 @@ export {
 } from './schemas';
 
 export type {
+  CreateOidcClientVariables,
   CreateServiceTokenVariables,
   CreateTokenVariables,
+  DeleteOidcClientVariables,
   DeleteTokenVariables,
   TokenHistoryFilters,
   TokenHistoryPage,
+  UpdateOidcClientVariables,
 } from './types';
 
 // =============================================================================
@@ -79,16 +88,21 @@ export type {
 // =============================================================================
 
 export {
+  createOidcClient,
   createServiceToken,
   createToken,
   DEFAULT_GAFAELFAWR_URL,
+  deleteOidcClient,
   deleteToken,
   fetchLoginInfo,
+  fetchOidcClient,
+  fetchOidcClients,
   fetchTokenChangeHistory,
   fetchTokenDetails,
   fetchUserInfo,
   fetchUserTokens,
   getEmptyUserInfo,
+  updateOidcClient,
 } from './client';
 
 // =============================================================================
@@ -99,8 +113,12 @@ export {
   formatValidationError,
   GafaelfawrError,
   getErrorMessageForStatus,
+  isOidcNotConfiguredError,
+  type OidcClientMutationError,
+  OidcNotConfiguredError,
   type TokenCreationError,
   type TokenDeletionError,
+  toGafaelfawrErrorInfo,
 } from './errors';
 
 // =============================================================================
@@ -113,9 +131,15 @@ export { type GafaelfawrQueryKeys, gafaelfawrKeys } from './query-keys';
 // Query Options (TanStack Query Integration)
 // =============================================================================
 
-export type { AuthQueryConfig, Logger } from './query-options';
+export type {
+  AuthQueryConfig,
+  Logger,
+  OidcClientQueryConfig,
+} from './query-options';
 export {
   loginInfoQueryOptions,
+  oidcClientQueryOptions,
+  oidcClientsQueryOptions,
   tokenDetailsQueryOptions,
   tokenHistoryQueryOptions,
   userInfoQueryOptions,
@@ -127,9 +151,12 @@ export {
 // =============================================================================
 
 export {
+  createOidcClientMutationConfig,
   createServiceTokenMutationConfig,
   createTokenMutationConfig,
+  deleteOidcClientMutationConfig,
   deleteTokenMutationConfig,
+  updateOidcClientMutationConfig,
 } from './mutation-options';
 
 // =============================================================================
@@ -153,6 +180,7 @@ export {
   generateMockToken,
   generateMockTokenKey,
   mockLoginInfo,
+  mockOidcClients,
   mockTokenDetail,
   mockTokenHistory,
   mockTokens,
@@ -168,21 +196,31 @@ export {
   type CreateServiceTokenParams,
   type CreateTokenParams,
   extractTokenNames,
+  type UseCreateOidcClientReturn,
   type UseCreateServiceTokenReturn,
   type UseCreateTokenReturn,
+  type UseDeleteOidcClientReturn,
   type UseDeleteTokenReturn,
   type UseLoginInfoReturn,
+  type UseOidcClientReturn,
+  type UseOidcClientsReturn,
   type UseTokenChangeHistoryReturn,
   type UseTokenDetailsReturn,
+  type UseUpdateOidcClientReturn,
   type UseUserInfoReturn,
   type UseUserTokensReturn,
+  useCreateOidcClient,
   useCreateServiceToken,
   useCreateToken,
+  useDeleteOidcClient,
   useDeleteToken,
   useGafaelfawrUrl,
   useLoginInfo,
+  useOidcClient,
+  useOidcClients,
   useTokenChangeHistory,
   useTokenDetails,
+  useUpdateOidcClient,
   useUserInfo,
   useUserTokens,
 } from './hooks';

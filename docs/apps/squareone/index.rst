@@ -13,4 +13,5 @@ If you want to learn how to contribute to the Squareone codebase itself, see the
    writing-mdx
    footer-customization
    comanage-landing-pages
+   admin
    config-ref

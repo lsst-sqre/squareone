@@ -16,7 +16,7 @@ import { makeReportError } from '@/lib/sentry/reportError';
 import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
 import { useSemaphoreUrl } from '../../hooks/useSemaphoreUrl';
 import { useStaticConfig } from '../../hooks/useStaticConfig';
-import { ADMIN_SCOPE } from '../AdminRequired';
+import { hasAnyAdminAccess } from '../../lib/config/adminPageScopes';
 
 type UserMenuProps = {
   pageUrl: URL;
@@ -39,8 +39,9 @@ export default function UserMenu({ pageUrl }: UserMenuProps) {
   });
   const logoutUrl = getLogoutUrl(pageUrl.toString());
 
+  const config = useStaticConfig();
   const { enableUserNotifications, userNotificationsPollIntervalSeconds } =
-    useStaticConfig();
+    config;
   const semaphoreUrl = useSemaphoreUrl();
 
   // The unread count drives the trigger badge and the menu-item label. The
@@ -53,9 +54,11 @@ export default function UserMenu({ pageUrl }: UserMenuProps) {
   );
   const unreadCount = count ?? 0;
 
-  // Only admins (holders of the exec:admin scope) see the Admin link, mirroring
-  // the client-side gate on the admin pages themselves.
-  const isAdmin = query?.hasScope(ADMIN_SCOPE) ?? false;
+  // The link appears for anyone who can reach at least one admin page under
+  // the deployment's `adminPageScopes` mapping — the same union rule
+  // `AdminRequired` applies to the section, so the link never leads to the
+  // gate's unauthorized state.
+  const isAdmin = hasAnyAdminAccess(config, query?.scopes ?? []);
 
   // User data should be available when this component is rendered
   // since Login component handles the hydration logic

@@ -16,6 +16,9 @@ import {
   ErrorResponseSchema,
   GroupSchema,
   LoginInfoSchema,
+  OIDCClientSchema,
+  OIDCClientUpdateSchema,
+  OIDCClientWithSecretSchema,
   TokenChangeHistoryEntrySchema,
   TokenInfoSchema,
   TokenTypeSchema,
@@ -356,5 +359,121 @@ describe('ErrorResponseSchema', () => {
     });
     expect(Array.isArray(result.detail)).toBe(true);
     expect((result.detail as unknown[]).length).toBe(2);
+  });
+});
+
+describe('OIDCClientSchema', () => {
+  const validClient = {
+    return_uri: 'https://example.org/oauth2/callback',
+    description: 'Example relying party',
+    notes: 'Owned by the science platform team',
+    client_id: 'oidc-client-abc123',
+    last_modified_by: 'vera',
+    created: '2026-01-02T03:04:05Z',
+    last_modified: '2026-02-03T04:05:06+00:00',
+    url: 'https://example.org/',
+  };
+
+  it('parses a complete client', () => {
+    const result = OIDCClientSchema.parse(validClient);
+    expect(result.client_id).toBe('oidc-client-abc123');
+    expect(result.return_uri).toBe('https://example.org/oauth2/callback');
+    expect(result.last_modified_by).toBe('vera');
+  });
+
+  it('accepts null notes and url', () => {
+    const result = OIDCClientSchema.parse({
+      ...validClient,
+      notes: null,
+      url: null,
+    });
+    expect(result.notes).toBeNull();
+    expect(result.url).toBeNull();
+  });
+
+  it('accepts omitted notes and url', () => {
+    const { notes: _notes, url: _url, ...withoutOptional } = validClient;
+    const result = OIDCClientSchema.parse(withoutOptional);
+    expect(result.notes).toBeUndefined();
+    expect(result.url).toBeUndefined();
+  });
+
+  it('rejects a non-ISO created timestamp', () => {
+    expect(() =>
+      OIDCClientSchema.parse({ ...validClient, created: 'yesterday' })
+    ).toThrow();
+  });
+
+  it('rejects a missing client_id', () => {
+    const { client_id: _clientId, ...withoutId } = validClient;
+    expect(() => OIDCClientSchema.parse(withoutId)).toThrow();
+  });
+
+  it('does not carry a client_secret', () => {
+    const result = OIDCClientSchema.parse({
+      ...validClient,
+      client_secret: 'should-be-stripped',
+    });
+    expect(result).not.toHaveProperty('client_secret');
+  });
+});
+
+describe('OIDCClientWithSecretSchema', () => {
+  const validClientWithSecret = {
+    return_uri: 'https://example.org/oauth2/callback',
+    description: 'Example relying party',
+    notes: null,
+    client_id: 'oidc-client-abc123',
+    last_modified_by: 'vera',
+    created: '2026-01-02T03:04:05Z',
+    last_modified: '2026-01-02T03:04:05Z',
+    url: null,
+    client_secret: 'super-secret-value',
+  };
+
+  it('parses a created client including its one-time secret', () => {
+    const result = OIDCClientWithSecretSchema.parse(validClientWithSecret);
+    expect(result.client_secret).toBe('super-secret-value');
+    expect(result.client_id).toBe('oidc-client-abc123');
+  });
+
+  it('rejects a response missing the secret', () => {
+    const { client_secret: _secret, ...withoutSecret } = validClientWithSecret;
+    expect(() => OIDCClientWithSecretSchema.parse(withoutSecret)).toThrow();
+  });
+});
+
+describe('OIDCClientUpdateSchema', () => {
+  it('parses a minimal update', () => {
+    const result = OIDCClientUpdateSchema.parse({
+      return_uri: 'https://example.org/oauth2/callback',
+      description: 'Example relying party',
+    });
+    expect(result.description).toBe('Example relying party');
+    expect(result.notes).toBeUndefined();
+  });
+
+  it('accepts null notes', () => {
+    const result = OIDCClientUpdateSchema.parse({
+      return_uri: 'https://example.org/oauth2/callback',
+      description: 'Example relying party',
+      notes: null,
+    });
+    expect(result.notes).toBeNull();
+  });
+
+  it('rejects an empty return_uri', () => {
+    expect(() =>
+      OIDCClientUpdateSchema.parse({ return_uri: '', description: 'x' })
+    ).toThrow();
+  });
+
+  it('rejects an empty description', () => {
+    expect(() =>
+      OIDCClientUpdateSchema.parse({
+        return_uri: 'https://example.org/cb',
+        description: '',
+      })
+    ).toThrow();
   });
 });

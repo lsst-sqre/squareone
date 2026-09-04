@@ -1,1 +1,1 @@
-export { ADMIN_SCOPE, default } from './AdminRequired';
+export { default } from './AdminRequired';

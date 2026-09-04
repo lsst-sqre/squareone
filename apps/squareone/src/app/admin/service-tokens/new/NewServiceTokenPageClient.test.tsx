@@ -8,7 +8,21 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
+import {
+  type AppConfigContextValue,
+  useStaticConfig,
+} from '../../../../hooks/useStaticConfig';
+import type { AdminPageScopes } from '../../../../lib/config/adminPageScopes';
 import NewServiceTokenPageClient from './NewServiceTokenPageClient';
+
+// Helper: set the resolved static config. Omitting `adminPageScopes` exercises
+// the baked-in defaults (`serviceTokens: ['admin:token']`).
+function mockConfig(adminPageScopes?: AdminPageScopes) {
+  vi.mocked(useStaticConfig).mockReturnValue({
+    siteName: 'Rubin Science Platform',
+    ...(adminPageScopes ? { adminPageScopes } : {}),
+  } as AppConfigContextValue);
+}
 
 vi.mock('@lsst-sqre/gafaelfawr-client', async (importOriginal) => {
   const actual =
@@ -22,6 +36,11 @@ vi.mock('@lsst-sqre/gafaelfawr-client', async (importOriginal) => {
 
 vi.mock('../../../../hooks/useRepertoireUrl', () => ({
   useRepertoireUrl: (): string | undefined => undefined,
+}));
+
+// The scope the form gate checks comes from `adminPageScopes` in the config.
+vi.mock('../../../../hooks/useStaticConfig', () => ({
+  useStaticConfig: vi.fn(),
 }));
 
 const mockPush = vi.fn();
@@ -80,6 +99,7 @@ describe('NewServiceTokenPageClient', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockSearchParams = new URLSearchParams();
+    mockConfig();
     mockLogin();
     mockCreate();
   });
@@ -225,6 +245,30 @@ describe('NewServiceTokenPageClient', () => {
     expect(
       screen.getByRole('button', { name: /create service token/i })
     ).toBeDisabled();
+  });
+
+  test('follows a deployment override of the serviceTokens scopes', () => {
+    // The scope guarding Gafaelfawr's admin token endpoint is Helm-configurable
+    // per environment, so the form gate has to read it from config rather than
+    // hard-coding `admin:token`.
+    mockConfig({ serviceTokens: ['admin:tokens-custom'] });
+    mockLogin({
+      loginInfo: { ...mockLoginInfo, scopes: ['admin:tokens-custom'] },
+    });
+    render(<NewServiceTokenPageClient />);
+
+    expect(
+      screen.queryByText(/required to create service tokens/i)
+    ).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/bot username/i)).toBeEnabled();
+  });
+
+  test('names the configured scope in the banner', () => {
+    mockConfig({ serviceTokens: ['admin:tokens-custom'] });
+    mockLogin({ loginInfo: { ...mockLoginInfo, scopes: ['admin:token'] } });
+    render(<NewServiceTokenPageClient />);
+
+    expect(screen.getByText('admin:tokens-custom')).toBeInTheDocument();
   });
 
   test('enables the form and shows no banner when admin:token is present', () => {

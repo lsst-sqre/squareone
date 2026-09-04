@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { DataTable } from './DataTable';
+import styles from './DataTable.module.css';
 
 type Row = { name: string; count: number };
 
@@ -204,6 +205,26 @@ describe('DataTable', () => {
     );
 
     expect(container.querySelector('.custom-class')).toBeInTheDocument();
+  });
+
+  it('right-aligns the header and body cells of a meta.align: right column', () => {
+    const alignedColumns: ColumnDef<Row>[] = [
+      { accessorKey: 'name', header: 'Name' },
+      { accessorKey: 'count', header: 'Count', meta: { align: 'right' } },
+    ];
+    render(<DataTable columns={alignedColumns} data={data} />);
+
+    expect(screen.getByRole('columnheader', { name: /Count/ })).toHaveClass(
+      styles.alignRight
+    );
+    expect(screen.getByText('3').closest('td')).toHaveClass(styles.alignRight);
+    // Columns without the opt-in stay left-aligned.
+    expect(screen.getByRole('columnheader', { name: /Name/ })).not.toHaveClass(
+      styles.alignRight
+    );
+    expect(screen.getByText('Alpha').closest('td')).not.toHaveClass(
+      styles.alignRight
+    );
   });
 });
 

@@ -105,6 +105,18 @@
   vertical-align: top;
 }
 
+/* Right-aligned column, opted into via the column def's `meta.align`. Applied
+ * to both the header cell and the body cells so the header sits over its
+ * values; the sort button keeps its full-bleed click target and shifts its
+ * label + indicator to the trailing edge instead. */
+.alignRight {
+  text-align: right;
+}
+
+.alignRight .sortButton {
+  justify-content: flex-end;
+}
+
 /* The full-width secondary row hugs its primary row: reduced top padding and
  * no separator of its own (the .rowGroup carries the separator). */
 .detailRow {

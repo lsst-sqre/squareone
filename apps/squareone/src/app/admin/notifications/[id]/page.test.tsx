@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import type React from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 // Mock the RSC config loader so generateMetadata can run without the
@@ -11,6 +12,14 @@ vi.mock('@/lib/config/rsc', () => ({
 // isolation to assert the route id is plumbed through.
 vi.mock('./NotificationDetailPageClient', () => ({
   default: ({ id }: { id: string }) => <div data-testid="client">id:{id}</div>,
+}));
+
+// The page's scope gate is a pass-through here: this suite is about the route
+// id reaching the container. The gate's behaviour is covered by AdminRequired's
+// tests, and `src/tests/adminPageGates.test.ts` is what proves this page still
+// declares one.
+vi.mock('@/components/AdminRequired', () => ({
+  default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 // Import after mocking.

@@ -22,6 +22,14 @@ previewLink: 'https://rsp.lsst.io/roadmap.html'
 # production default remains false (schema default; Phalanx configs opt in).
 enableUserNotifications: true
 userNotificationsPollIntervalSeconds: 300
+# Gafaelfawr scopes granting access to each admin page. Spelled out here (the
+# same values the schema defaults to) so the dev site documents the mapping and
+# so toggling scopes in /dev exercises the admin nav filtering.
+adminPageScopes:
+  notifications: ['admin:notifications']
+  serviceTokens: ['admin:token']
+  oidcClients: ['admin:oidc']
+  sentry: ['exec:admin']
 # New configuration for filesystem-based MDX content
 mdxDir: 'src/content/pages'
 sentryTracesSampleRate: 0
