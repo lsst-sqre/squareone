@@ -68,6 +68,13 @@ updates:
       time: '03:00'
       timezone: 'America/New_York'
     rebase-strategy: 'auto'
+
+    ignore:
+      # changesets/action v2 requires the Changesets CLI v3 and renames its
+      # inputs; the repo is on CLI v2. Lift this once the release workflow has
+      # been migrated to CLI v3.
+      - dependency-name: 'changesets/action'
+        update-types: ['version-update:semver-major']
     groups:
       actions:
         patterns:
