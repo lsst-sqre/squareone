@@ -6,6 +6,7 @@ import {
   getCoreRowModel,
   getSortedRowModel,
   type OnChangeFn,
+  type RowData,
   type RowSelectionState,
   type SortingState,
   useReactTable,
@@ -15,6 +16,20 @@ import React from 'react';
 import { Button } from '../Button';
 import { Checkbox } from '../Checkbox';
 import styles from './DataTable.module.css';
+
+declare module '@tanstack/react-table' {
+  // TanStack's extension point for per-column options: augmenting ColumnMeta
+  // is its documented way to add them, and merging requires repeating the
+  // interface's type parameters even though this member uses neither.
+  interface ColumnMeta<TData extends RowData, TValue> {
+    /**
+     * Horizontal alignment for the column's header and body cells. Defaults
+     * to left; use `'right'` for numeric or timestamp columns whose values
+     * compare down the column.
+     */
+    align?: 'left' | 'right';
+  }
+}
 
 export type DataTableProps<TData> = {
   /**
@@ -161,6 +176,15 @@ function createSelectionColumn<TData>(
   };
 }
 
+/** Body-cell class, honoring the column's `meta.align` opt-in. */
+function bodyCellClassName(cell: {
+  column: { columnDef: { meta?: { align?: 'left' | 'right' } } };
+}): string {
+  return cell.column.columnDef.meta?.align === 'right'
+    ? [styles.cell, styles.alignRight].join(' ')
+    : styles.cell;
+}
+
 function SortIndicator({ direction }: { direction: SortDirection }) {
   if (direction === 'asc') {
     return (
@@ -296,13 +320,17 @@ export function DataTable<TData>({
                       header.column.columnDef.header,
                       header.getContext()
                     );
+                const headerCellClassName =
+                  header.column.columnDef.meta?.align === 'right'
+                    ? [styles.headerCell, styles.alignRight].join(' ')
+                    : styles.headerCell;
 
                 return (
                   <th
                     key={header.id}
                     scope="col"
                     aria-sort={ariaSort}
-                    className={styles.headerCell}
+                    className={headerCellClassName}
                   >
                     {canSort && !header.isPlaceholder ? (
                       <button
@@ -340,7 +368,7 @@ export function DataTable<TData>({
             <tbody key={row.id} className={styles.rowGroup}>
               <tr className={styles.primaryRow}>
                 {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className={styles.cell}>
+                  <td key={cell.id} className={bodyCellClassName(cell)}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}
@@ -357,7 +385,7 @@ export function DataTable<TData>({
             {rows.map((row) => (
               <tr key={row.id} className={styles.row}>
                 {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className={styles.cell}>
+                  <td key={cell.id} className={bodyCellClassName(cell)}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}

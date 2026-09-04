@@ -40,6 +40,9 @@ const columns: DataTableProps<OIDCClient>['columns'] = [
     accessorKey: 'last_modified',
     header: 'Last modified',
     cell: (info) => formatUtcTimestamp(info.getValue<string>()),
+    // With only two columns, the timestamp reads more naturally anchored to
+    // the table's trailing edge than floating mid-row after the client id.
+    meta: { align: 'right' },
   },
 ];
 
