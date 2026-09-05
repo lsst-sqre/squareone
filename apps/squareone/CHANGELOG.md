@@ -1,5 +1,85 @@
 # squareone
 
+## 0.39.0
+
+### Minor Changes
+
+- [#678](https://github.com/lsst-sqre/squareone/pull/678) [`3d86df5`](https://github.com/lsst-sqre/squareone/commit/3d86df5da4117bbf41adbc2b53799abcffe70457) Thanks [@jonathansick](https://github.com/jonathansick)! - Gate the admin section and each admin page on the scopes configured in `adminPageScopes` instead of a hard-coded `exec:admin`. There is no longer a single "admin" scope: the header's "Admin" link and the section-wide `AdminRequired` gate admit anyone who can reach at least one admin page, and `exec:admin` opens the section only because the `sentry` page defaults to it. Deployments using Gafaelfawr's standard admin scopes see no change; an environment that points a page at a different scope now has that scope honored everywhere.
+
+  Each admin page additionally gates on its own configured scopes, so visiting `/admin/service-tokens` without a scope that page lists renders an "Unauthorized" note naming the scopes that would have granted access, rather than a page whose every request answers 403. The notifications and service-token compose forms read the same configured scopes for their in-form gate.
+
+- [#678](https://github.com/lsst-sqre/squareone/pull/678) [`8e6bd98`](https://github.com/lsst-sqre/squareone/commit/8e6bd988597b8c137d15788f7945d241982b035d) Thanks [@jonathansick](https://github.com/jonathansick)! - Add the `adminPageScopes` configuration key, mapping each admin page to the Gafaelfawr scopes that grant access to it (any-of semantics), and make the admin navigation follow it. Gafaelfawr's per-endpoint scopes are Helm-configurable per environment and are not discoverable at runtime, so the scope guarding each admin API is now configuration rather than a hard-coded constant. Deployments need no config change: the defaults (`notifications: admin:notifications`, `serviceTokens: admin:token`, `oidcClients: admin:oidc`, `sentry: exec:admin`) match Gafaelfawr's standard admin scopes, and a config may override only the pages it cares about. Page ids are fixed in code, so an unrecognized id fails schema validation at startup; configuring a page with an empty scope list hides it from everyone.
+
+  The admin sidebar now lists only the pages the signed-in user holds a scope for, so nobody is offered a page that would answer 403, and `/admin` redirects client-side to the first page that user can actually see (someone holding only `admin:notifications` lands on `/admin/notifications`) — rendering a "No admin pages are available for your account" state when nothing is visible. Navigation order stays code-defined. See the new "Admin section access" page in the deployment guide.
+
+- [#678](https://github.com/lsst-sqre/squareone/pull/678) [`36894f0`](https://github.com/lsst-sqre/squareone/commit/36894f0f7fb2bac4dd92cda97e174b36397ca23d) Thanks [@jonathansick](https://github.com/jonathansick)! - Add the OpenID Connect client API surface to `@lsst-sqre/gafaelfawr-client`: `OIDCClientSchema`, `OIDCClientWithSecretSchema`, and `OIDCClientUpdateSchema`; the `fetchOidcClients` / `fetchOidcClient` / `createOidcClient` / `updateOidcClient` / `deleteOidcClient` functions; `oidcClientsQueryOptions` and `oidcClientQueryOptions` with the `['gafaelfawr', 'oidc-clients', url]` and `['gafaelfawr', 'oidc-client', url, id]` keys; the matching create/update/delete mutation configs; and the `useOidcClients`, `useOidcClient`, `useCreateOidcClient`, `useUpdateOidcClient`, and `useDeleteOidcClient` hooks. All calls send session credentials, mutations carry `x-csrf-token`, and failures surface as `GafaelfawrError` with the HTTP status.
+
+  Gafaelfawr overloads 404 on this API, so the collection endpoints raise a distinguishable `OidcNotConfiguredError` ("this environment has no OpenID Connect server") while a per-client 404 stays an ordinary "no such client". `useOidcClients` exposes that as `isNotConfigured`, and `useOidcClient` exposes `isNotFound`. Unlike the ambient auth queries, these queries reject rather than degrading to a fallback — the admin UI has to tell "not configured" from "you lack `admin:oidc`" from "the request failed" — while still routing report-worthy failures through the shared `classifyError` / `reportError` path, and they do not retry 4xx responses.
+
+  The package's vendored `openapi.json` is refreshed from the Gafaelfawr spec, and `fetch-openapi` temporarily points at `data-dev.lsst.cloud` — the OIDC client API has not reached `data.lsst.cloud` yet, so the script must move back once the release lands.
+
+  `formatValidationError` now renders a location-less error as its bare message instead of prefixing it with `unknown:`, which Gafaelfawr's `ErrorModel` produces for whole-request errors such as a 403.
+
+  The squareone dev server gains mocks for the new endpoints — `/auth/api/v1/oidc-clients` and `/auth/api/v1/oidc-clients/:clientId` rewrites backed by an in-memory store seeded from the package's shared fixtures, with a generated `client_secret` on create — and the `/dev` panel now lists `admin:oidc`, on by default, so the whole create/read/update/delete cycle (and its 403, 404, and 422 paths) is exercisable without a live Gafaelfawr.
+
+- [#678](https://github.com/lsst-sqre/squareone/pull/678) [`6d59867`](https://github.com/lsst-sqre/squareone/commit/6d5986711236307fde59d3c3874895f937caef51) Thanks [@jonathansick](https://github.com/jonathansick)! - Add the `/admin/oidc-clients/new` page for registering an OpenID Connect client with this environment's Gafaelfawr. The form asks for a return URI (required, and validated client-side as an absolute URL, since a redirect target without a scheme is meaningless outside the browser that typed it), a description (required), and optional notes. Like the listing, the page is gated on the scopes configured for the `oidcClients` page id, and the form is additionally disabled — with an explanatory note — for anyone whose scopes would make every submit a 403.
+
+  On success the form is replaced by a one-shot view showing the new `client_id` and `client_secret`, each with a copy button, warning that the secret cannot be shown again. Gafaelfawr returns the secret only with the 201 and has no endpoint to rotate it, so the view replaces the form rather than floating over it as a dismissable modal: the only ways past it are the two links out of it, to the client's detail page or back to the listing. The secret lives in component state alone and is gone on reload.
+
+  A failed submit renders inline without discarding the operator's input, so a 422 naming a field can be corrected in place; the message is Gafaelfawr's own, except for a 403 (which names the `admin:oidc` scope the API requires) and a 404 (which explains that this environment has no OpenID Connect server).
+
+- [#678](https://github.com/lsst-sqre/squareone/pull/678) [`17085e6`](https://github.com/lsst-sqre/squareone/commit/17085e6b77124b07e5e279a00756c1e7d420912d) Thanks [@jonathansick](https://github.com/jonathansick)! - Add the `/admin/oidc-clients/[id]` detail page, completing the OpenID Connect client admin flow. The page shows the client's server-assigned metadata — `client_id` with a copy button, its URL, when it was created and last modified, and by whom — above the same form the creation page uses, now in edit mode, and a Delete button. Editing sends Gafaelfawr's PATCH, which replaces the client's whole updatable state rather than a diff, and confirms inline with refreshed metadata; emptying the notes field clears the notes rather than silently leaving them. Deleting asks for confirmation in a modal that spells out the stakes — a client secret can never be recovered, so a replacement is a different client every relying party must be reconfigured for — and returns to the listing, which no longer includes the client.
+
+  The page never shows a client secret: Gafaelfawr discloses it only with the creation response and has no endpoint to rotate it.
+
+  Load failures are distinguished the way the listing distinguishes them: an unknown id is a stale link, so it renders a not-found note with a way back rather than a retry that could never succeed; a 403 names the `admin:oidc` scope Gafaelfawr's API requires; anything else gets the message and a retry. Failed saves and deletes render inline — a save keeps the operator's input so a 422 naming a field can be corrected in place, and a failed delete is reported inside the confirmation modal so it can be retried or backed out of. Like the rest of the section, the page is gated on the scopes configured for the `oidcClients` page id.
+
+- [#678](https://github.com/lsst-sqre/squareone/pull/678) [`0a2246a`](https://github.com/lsst-sqre/squareone/commit/0a2246af9828a5d837c90aeeca88c4d83d361879) Thanks [@jonathansick](https://github.com/jonathansick)! - Add the `/admin/oidc-clients` listing page, which lists the OpenID Connect clients registered with this environment's Gafaelfawr. Each client shows its `client_id` — the value an admin looks a row up by, linking to that client's detail page — alongside when it last changed, with its description and `return_uri` on a full-width row beneath, and a "New client" button leads to the creation flow. The page appears in the admin sidebar as "OIDC clients", after "Service tokens", for anyone holding the scopes configured for the `oidcClients` page id (`admin:oidc` by default).
+
+  Gafaelfawr's failures on this API are not interchangeable, so the page distinguishes them. A 404 means the environment has no OpenID Connect server configured at all, which is a deployment fact rather than a fault: it renders as an informational note, with no retry that could never succeed. A 403 means Gafaelfawr disagrees with the `adminPageScopes` mapping that admitted the reader, so it names the `admin:oidc` scope the API itself requires. Anything else — a 5xx, a network failure — gets the message and a retry button.
+
+- [#609](https://github.com/lsst-sqre/squareone/pull/609) [`0e36259`](https://github.com/lsst-sqre/squareone/commit/0e36259cdff58cb4590fe91ae83d0744596a3fff) Thanks [@jonathansick](https://github.com/jonathansick)! - Bridge server-side pino warn-and-above records to Sentry Logs (DM-55604). `sentry.server.config.js` now sets `enableLogs: true` and adds `Sentry.pinoIntegration()`, configured (via `src/lib/sentry/pinoLogsConfig.ts`) to ship pino records to Sentry **Logs** only — the issue-creating `error.levels` channel is left empty, so server-side `logger.warn`/`logger.error`/`logger.fatal` records become searchable, trace-linked structured logs without creating Sentry issues or firing Slack alerts. The explicit `reportError` path remains the sole alerting channel, so there is no double-capture. A new `/admin/sentry/emit-log` route handler emits a warn+error record, and an "Emit server log" button on the `/admin/sentry` page POSTs to it, so the transport can be verified in a real server build. That route handler, like every future one under `/admin`, does no in-app authorization — it relies on the Gafaelfawr ingress that fronts the prefix — so it now refuses (403) any request that reached the pod without passing through that ingress.
+
+### Patch Changes
+
+- [#650](https://github.com/lsst-sqre/squareone/pull/650) [`ad306d6`](https://github.com/lsst-sqre/squareone/commit/ad306d63331d4912abc5b08b4df71cec8cd53324) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @biomejs/biome from 2.3.14 to 2.5.11
+
+- [#681](https://github.com/lsst-sqre/squareone/pull/681) [`181a17f`](https://github.com/lsst-sqre/squareone/commit/181a17fc9f8c386831540f9a209b076d994990aa) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @faker-js/faker from 9.9.0 to 10.5.0
+
+- [#683](https://github.com/lsst-sqre/squareone/pull/683) [`0bfb3b5`](https://github.com/lsst-sqre/squareone/commit/0bfb3b556fb5267e89380b3ebcb8475531a48209) Thanks [@jonathansick](https://github.com/jonathansick)! - Bump @turbo/gen from 2.10.8 to 2.10.12
+
+- [#650](https://github.com/lsst-sqre/squareone/pull/650) [`ad306d6`](https://github.com/lsst-sqre/squareone/commit/ad306d63331d4912abc5b08b4df71cec8cd53324) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @types/node from 22.19.11 to 22.20.1
+
+- [#609](https://github.com/lsst-sqre/squareone/pull/609) [`e3fabb8`](https://github.com/lsst-sqre/squareone/commit/e3fabb83ddd8dadca074eab4c72c43822343750e) Thanks [@jonathansick](https://github.com/jonathansick)! - Reorder the admin sidebar navigation so User notifications comes first and Sentry last (User notifications, Service tokens, Sentry). Because the `/admin` index redirects to the first navigation item, `/admin` now lands on `/admin/notifications` instead of `/admin/sentry`.
+
+- [#678](https://github.com/lsst-sqre/squareone/pull/678) [`3a5e800`](https://github.com/lsst-sqre/squareone/commit/3a5e80046431ab3b4f75b41a11c94ef3da538701) Thanks [@jonathansick](https://github.com/jonathansick)! - DataTable columns can now opt into right alignment via the column def's `meta: { align: 'right' }`, which right-aligns both the header (including its sort button's label and indicator) and the column's body cells. Useful for numeric or timestamp columns whose values compare down the column. The OIDC clients admin table uses it to anchor its "Last modified" column to the table's trailing edge.
+
+- [#650](https://github.com/lsst-sqre/squareone/pull/650) [`ad306d6`](https://github.com/lsst-sqre/squareone/commit/ad306d63331d4912abc5b08b4df71cec8cd53324) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump dotenv from 17.2.4 to 17.4.2
+
+- [#650](https://github.com/lsst-sqre/squareone/pull/650) [`ad306d6`](https://github.com/lsst-sqre/squareone/commit/ad306d63331d4912abc5b08b4df71cec8cd53324) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump eslint from 9.39.2 to 9.39.5
+
+- [#648](https://github.com/lsst-sqre/squareone/pull/648) [`1459c7d`](https://github.com/lsst-sqre/squareone/commit/1459c7d7234768a5d60d9e41f8d78e4e49146b8f) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump github/codeql-action from 4.37.3 to 4.37.9
+
+- [#650](https://github.com/lsst-sqre/squareone/pull/650) [`ad306d6`](https://github.com/lsst-sqre/squareone/commit/ad306d63331d4912abc5b08b4df71cec8cd53324) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump lightningcss-cli from 1.31.1 to 1.33.0
+
+- [#650](https://github.com/lsst-sqre/squareone/pull/650) [`ad306d6`](https://github.com/lsst-sqre/squareone/commit/ad306d63331d4912abc5b08b4df71cec8cd53324) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump lightningcss from 1.31.1 to 1.33.0
+
+- [#652](https://github.com/lsst-sqre/squareone/pull/652) [`b8bf53e`](https://github.com/lsst-sqre/squareone/commit/b8bf53ebda7646d85dc478f972ea6869321fb6ce) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump node from 22.21.1-alpine to 22.23.2-alpine in /apps/squareone in the docker group across 1 directory
+
+- [#654](https://github.com/lsst-sqre/squareone/pull/654) [`dcd85d7`](https://github.com/lsst-sqre/squareone/commit/dcd85d76da07e53fb506f0e9260d389d3ae13ee1) Thanks [@jonathansick](https://github.com/jonathansick)! - Upgrade pnpm from 10.20.0 to 11.21.0. The squareone Docker image now builds under pnpm 11 with a rewritten lockfile, and the security overrides moved from package.json to pnpm-workspace.yaml (the only location pnpm 11 reads), which activates them for the first time.
+
+- [#650](https://github.com/lsst-sqre/squareone/pull/650) [`ad306d6`](https://github.com/lsst-sqre/squareone/commit/ad306d63331d4912abc5b08b4df71cec8cd53324) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump turbo from 2.10.7 to 2.10.12
+
+- [#650](https://github.com/lsst-sqre/squareone/pull/650) [`ad306d6`](https://github.com/lsst-sqre/squareone/commit/ad306d63331d4912abc5b08b4df71cec8cd53324) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump vite from 7.3.5 to 7.3.6
+
+- [#684](https://github.com/lsst-sqre/squareone/pull/684) [`ee59171`](https://github.com/lsst-sqre/squareone/commit/ee5917184e563e092137a96e837f0c37b831805a) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump vitest from 4.1.10 to 4.1.11
+
+- [#650](https://github.com/lsst-sqre/squareone/pull/650) [`ad306d6`](https://github.com/lsst-sqre/squareone/commit/ad306d63331d4912abc5b08b4df71cec8cd53324) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump webpack from 5.107.2 to 5.110.2
+
+- Updated dependencies [[`2e4cbf4`](https://github.com/lsst-sqre/squareone/commit/2e4cbf45d16d32e36b5f37b473f711179c14bf41), [`3a5e800`](https://github.com/lsst-sqre/squareone/commit/3a5e80046431ab3b4f75b41a11c94ef3da538701), [`36894f0`](https://github.com/lsst-sqre/squareone/commit/36894f0f7fb2bac4dd92cda97e174b36397ca23d)]:
+  - @lsst-sqre/squared@0.17.0
+  - @lsst-sqre/gafaelfawr-client@3.1.0
+
 ## 0.38.0
 
 ### Minor Changes
