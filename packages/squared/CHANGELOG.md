@@ -1,5 +1,15 @@
 # @lsst-sqre/squared
 
+## 0.17.0
+
+### Minor Changes
+
+- [#678](https://github.com/lsst-sqre/squareone/pull/678) [`3a5e800`](https://github.com/lsst-sqre/squareone/commit/3a5e80046431ab3b4f75b41a11c94ef3da538701) Thanks [@jonathansick](https://github.com/jonathansick)! - DataTable columns can now opt into right alignment via the column def's `meta: { align: 'right' }`, which right-aligns both the header (including its sort button's label and indicator) and the column's body cells. Useful for numeric or timestamp columns whose values compare down the column. The OIDC clients admin table uses it to anchor its "Last modified" column to the table's trailing edge.
+
+### Patch Changes
+
+- [#609](https://github.com/lsst-sqre/squareone/pull/609) [`2e4cbf4`](https://github.com/lsst-sqre/squareone/commit/2e4cbf45d16d32e36b5f37b473f711179c14bf41) Thanks [@jonathansick](https://github.com/jonathansick)! - Button's loading spinner is now decorative (`aria-hidden`) instead of a `role="status"` live region. A button in its `loading` state usually sits beside the region that announces the outcome of the same action, and two polite regions gave one action two competing announcements — while any `getByRole('status')` query covering the pending state resolved to two elements and threw. The pending state is still reported to assistive tech by `aria-busy` on the control, which the button already set, and dropping the spinner's `aria-label="Loading"` also keeps the button's accessible name stable across the loading transition. Consumers that need the pending state spoken should render their own live region, where they can say what is pending.
+
 ## 0.16.1
 
 ### Patch Changes
