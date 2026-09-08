@@ -26,14 +26,6 @@ jobs:
           client-id: ${{ vars.SQUAREONE_CI_GH_APP_CLIENT_ID }}
           private-key: ${{ secrets.SQUAREONE_CI_GH_APP_PRIVATE_KEY }}
 
-      - name: Get GitHub App User ID
-        id: get_user_id
-        run: |
-          USER_ID=$(gh api "/users/squareone-ci[bot]" --jq .id)
-          echo "user-id=$USER_ID" >> "$GITHUB_OUTPUT"
-        env:
-          GH_TOKEN: ${{ steps.generate_token.outputs.token }}
-
       - name: Checkout Repo
         uses: actions/checkout@v7
         with:
@@ -48,6 +40,8 @@ jobs:
           cache: 'pnpm'
 
       - name: Authenticate GitHub Packages
+        # changesets/action v2 no longer writes ~/.npmrc from NPM_TOKEN, so the
+        # workflow provides the registry credentials itself.
         run: |
           cat << EOF > "$HOME/.npmrc"
             //npm.pkg.github.com/:_authToken=$NPM_TOKEN
@@ -58,17 +52,11 @@ jobs:
       - name: Install Dependencies
         run: pnpm install
 
-      - name: Configure git identity for GitHub App
-        run: |
-          git config --global user.name "squareone-ci[bot]"
-          git config --global user.email "${{ steps.get_user_id.outputs.user-id }}+squareone-ci[bot]@users.noreply.github.com"
-
       - name: Create Release Pull Request
-        uses: changesets/action@v1
+        uses: changesets/action@v2
         with:
-          publish: pnpm run ci:publish
-          version: pnpm run ci:version
-          setupGitUser: false
-        env:
-          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
-          NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # v2 requires the custom token on this input; the GITHUB_TOKEN env var
+          # and the credentials from actions/checkout are no longer honoured.
+          github-token: ${{ steps.generate_token.outputs.token }}
+          publish-script: pnpm run ci:publish
+          version-script: pnpm run ci:version
