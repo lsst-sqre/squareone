@@ -234,25 +234,29 @@ GitHub App authentication
 Uses the ``actions/create-github-app-token@v3`` action to generate a GitHub token from the Squareone CI GitHub App credentials (the ``SQUAREONE_CI_GH_APP_CLIENT_ID`` variable and the ``SQUAREONE_CI_GH_APP_PRIVATE_KEY`` secret).
 This token is used instead of the default ``GITHUB_TOKEN`` because commits made with the default token don't trigger subsequent GitHub Actions workflows.
 
+The token is passed to the changesets action through its ``github-token`` input.
+As of ``changesets/action`` v2, this input is the only way to supply a custom token: the ``GITHUB_TOKEN`` environment variable and the credentials configured by ``actions/checkout`` are no longer honored.
+
 GitHub Packages authentication
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Creates a :file:`~/.npmrc` file to authenticate with GitHub Packages using the GitHub App token.
+Creates a :file:`~/.npmrc` file to authenticate with GitHub Packages using the workflow's default ``GITHUB_TOKEN``.
 This allows the workflow to publish npm packages to the GitHub Packages registry.
+``changesets/action`` v2 no longer writes :file:`.npmrc` itself from an ``NPM_TOKEN`` environment variable, so this step is what makes ``changeset publish`` able to authenticate.
 
-Git identity configuration
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Release commits and tags
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-Manually configures Git identity for the GitHub App bot user:
+``changesets/action`` v2 pushes the release commit and the release tags through the GitHub API rather than the Git CLI.
+Commits and tags created this way are signed with GitHub's GPG key and are attributed to the owner of the ``github-token`` — the ``squareone-ci[bot]`` app user.
+Because the identity comes from the token, the workflow no longer needs to look up the bot's user ID or run ``git config`` to set an author identity, and the ``setupGitUser`` input that v1 required is gone.
 
-- User name: ``squareone-ci[bot]``
-- Email: ``<user-id>+squareone-ci[bot]@users.noreply.github.com``
+Attribution still matters: commits authored by the GitHub App trigger subsequent workflow runs, whereas commits authored by the default ``GITHUB_TOKEN`` would not.
 
-The ``<user-id>`` is the bot account's user ID, fetched at runtime with ``gh api "/users/squareone-ci[bot]" --jq .id``.
-This is a distinct value from the GitHub App's numeric App ID (and from its Client ID).
+.. note::
 
-The changesets action is configured with ``setupGitUser: false`` to use this manually configured identity instead of the action's default.
-This configuration ensures that commits made by the changesets action are properly attributed to the GitHub App bot user so that they can trigger GitHub Actions workflows.
+   If the API push mode ever becomes a problem, setting the action's ``push-with-git-cli: true`` input restores the v1 behavior of pushing over the Git CLI.
+   In that mode the workflow would again need to configure a Git identity, since the pushed commits are created locally.
 
 .. _ci-changesets-prepare-release:
 
