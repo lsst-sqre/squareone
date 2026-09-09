@@ -18,8 +18,8 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * The loaded listing: each client a primary row of client id and last-modified
- * metadata over a full-width addendum row of description and return URI.
+ * The loaded listing: each client a primary row of description and
+ * last-modified metadata over a full-width addendum row of the return URI.
  */
 export const Loaded: Story = {
   args: {
@@ -28,20 +28,24 @@ export const Loaded: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    // Every fixture is listed, with its description and return URI beneath.
+    // Every fixture is listed, with its return URI beneath.
     await expect(canvas.getByText('Chronograf dashboards')).toBeInTheDocument();
     await expect(canvas.getByText('Argo CD')).toBeInTheDocument();
     await expect(
       canvas.getByText('https://argocd.example.org/auth/callback')
     ).toBeInTheDocument();
 
-    // The client id carries the link to the per-client detail route.
+    // The description carries the link to the per-client detail route; the
+    // opaque client id is left to that page.
     await expect(
-      canvas.getByRole('link', { name: mockOidcClients[0].client_id })
+      canvas.getByRole('link', { name: mockOidcClients[0].description })
     ).toHaveAttribute(
       'href',
       `/admin/oidc-clients/${mockOidcClients[0].client_id}`
     );
+    await expect(
+      canvas.queryByText(mockOidcClients[0].client_id)
+    ).not.toBeInTheDocument();
 
     // Timestamps render in the app's stable UTC form, not the viewer's zone.
     await expect(canvas.getByText('2026-03-02 16:45 UTC')).toBeInTheDocument();
