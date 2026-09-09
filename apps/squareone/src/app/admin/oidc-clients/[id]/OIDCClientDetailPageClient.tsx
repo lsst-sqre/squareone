@@ -249,8 +249,10 @@ export default function OIDCClientDetailPageClient({
           {
             key: 'Client ID',
             value: (
-              <span className={styles.idRow}>
-                <code className={styles.mono}>{client.client_id}</code>
+              <span className={styles.idBox}>
+                <code className={styles.idValue} title={client.client_id}>
+                  {client.client_id}
+                </code>
                 <ClipboardButton
                   text={client.client_id}
                   label="Copy"
@@ -258,6 +260,7 @@ export default function OIDCClientDetailPageClient({
                   size="sm"
                   ariaLabel="Copy client ID to clipboard"
                   variant="secondary"
+                  className={styles.copyButton}
                 />
               </span>
             ),
