@@ -52,7 +52,7 @@
 }
 
 .titleLink:focus {
-  outline: 2px solid var(--rsd-color-primary-600, #0066cc);
+  outline: 2px solid var(--rsd-color-primary-600, #058b8c);
   outline-offset: 2px;
   border-radius: 2px;
 }

@@ -1,7 +1,10 @@
 .input {
   border-width: 2px;
   border-style: solid;
-  border-color: var(--rsd-color-gray-500);
+  /* gray-400 (#82898B) is 4.55:1 on the dark page and 3.56:1 on white —
+     >=3:1 in both themes and consistent with the squared form controls.
+     gray-500 was only 3.13:1 on dark (a marginal non-text pass). */
+  border-color: var(--rsd-color-gray-400);
   padding: 5px 10px;
   border-radius: 5px;
   appearance: none;

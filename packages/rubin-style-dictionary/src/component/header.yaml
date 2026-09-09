@@ -32,6 +32,9 @@ component:
             color:
               themed:
                 light:
-                  value: '{color.primary.600.value}'
+                  # Selected menulist items draw white text on this fill, so it
+                  # must clear 4.5:1: primary-650 (accessible teal, 5.98:1 on
+                  # white) rather than the raw brand primary-600 (4.14:1).
+                  value: '{color.primary.650.value}'
                 dark:
                   value: '{color.primary.700.value}'

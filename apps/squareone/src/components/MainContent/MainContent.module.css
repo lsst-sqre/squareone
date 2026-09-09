@@ -13,3 +13,17 @@
     padding: 0;
   }
 }
+
+/*
+ * Underline links that appear inside running text (paragraphs, list items,
+ * definitions, block quotes) so they are distinguishable from surrounding
+ * body text by more than color alone (WCAG 1.4.1; axe link-in-text-block).
+ *
+ * Scoping to text-block elements deliberately excludes the homepage service
+ * cards and other card-as-link patterns rendered in MainContent, whose <a>
+ * wraps a heading/illustration rather than sitting inside a text block —
+ * those remain underline-free. Nav/menu links live outside MainContent.
+ */
+.main :is(p, li, dd, blockquote) a {
+  text-decoration: underline;
+}

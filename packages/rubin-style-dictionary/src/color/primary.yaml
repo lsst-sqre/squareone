@@ -23,6 +23,9 @@ color:
     '600':
       value: '{color.imagotype.dark.value}'
       comment: 'Base dark teal from imagotype'
+    '650':
+      value: '#046F70' # H:181 S:96 B:44 — 5.98:1 on white
+      comment: 'Accessible teal for text/interactive foregrounds (>=4.5:1 on white)'
     '700':
       value: '#0C4A47' # H:177 S:84 B:29
       comment: 'Dark teal'
