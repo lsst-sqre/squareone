@@ -1,5 +1,25 @@
 # squareone
 
+## 0.39.2
+
+### Patch Changes
+
+- [#688](https://github.com/lsst-sqre/squareone/pull/688) [`0253e32`](https://github.com/lsst-sqre/squareone/commit/0253e321b0c2da340f136359cfeb429626f44c6b) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-a11y from 10.5.10 to 10.6.0
+
+- [#688](https://github.com/lsst-sqre/squareone/pull/688) [`0253e32`](https://github.com/lsst-sqre/squareone/commit/0253e321b0c2da340f136359cfeb429626f44c6b) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-docs from 10.5.10 to 10.6.0
+
+- [#688](https://github.com/lsst-sqre/squareone/pull/688) [`0253e32`](https://github.com/lsst-sqre/squareone/commit/0253e321b0c2da340f136359cfeb429626f44c6b) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @storybook/addon-links from 10.5.10 to 10.6.0
+
+- [#690](https://github.com/lsst-sqre/squareone/pull/690) [`9d2f4fc`](https://github.com/lsst-sqre/squareone/commit/9d2f4fc85b96ee2b2342c86f8db438d736ab97f6) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump next from 16.2.12 to 16.3.3
+
+- [#689](https://github.com/lsst-sqre/squareone/pull/689) [`80cb611`](https://github.com/lsst-sqre/squareone/commit/80cb611cfb1eae63f4f83068410cb14b41030b04) Thanks [@jonathansick](https://github.com/jonathansick)! - On the OIDC client detail page, the client ID now sits in a read-only box that clips long IDs to the value column instead of wrapping, with the copy button pinned at its trailing edge. The box scrolls horizontally and carries the full ID in its tooltip.
+
+- [#689](https://github.com/lsst-sqre/squareone/pull/689) [`739e10b`](https://github.com/lsst-sqre/squareone/commit/739e10b97c0a3c35b9a441533602258996f98fc1) Thanks [@jonathansick](https://github.com/jonathansick)! - The `/admin/oidc-clients` listing now leads each row with the client's description, linked to its detail page, instead of the opaque client ID. The client ID is no longer shown in the listing (it remains on the detail page), and the return URI stays as the addendum beneath each row.
+
+- [#690](https://github.com/lsst-sqre/squareone/pull/690) [`9d2f4fc`](https://github.com/lsst-sqre/squareone/commit/9d2f4fc85b96ee2b2342c86f8db438d736ab97f6) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump sharp from 0.34.5 to 0.35.4
+
+- [#688](https://github.com/lsst-sqre/squareone/pull/688) [`0253e32`](https://github.com/lsst-sqre/squareone/commit/0253e321b0c2da340f136359cfeb429626f44c6b) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump webpack from 5.109.2 to 5.110.3
+
 ## 0.39.1
 
 ### Patch Changes
