@@ -1,7 +1,6 @@
 {
   "extends": "@lsst-sqre/tsconfig/next.json",
   "compilerOptions": {
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     },
