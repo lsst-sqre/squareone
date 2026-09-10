@@ -24,7 +24,9 @@ function createMockUserInfoReturn(overrides: {
   isPending?: boolean;
 }): UseUserInfoReturn {
   return {
-    userInfo: overrides.isLoggedIn ? { username: 'testuser' } : undefined,
+    userInfo: overrides.isLoggedIn
+      ? { username: 'testuser', groups: [] }
+      : undefined,
     query: null,
     isLoggedIn: overrides.isLoggedIn ?? false,
     isLoading: overrides.isLoading ?? false,

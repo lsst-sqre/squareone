@@ -75,7 +75,12 @@ export async function POST(
   if (!result.success) {
     const issue = result.error.issues[0];
     return validationErrorResponse(
-      ['body', ...(issue?.path ?? [])],
+      [
+        'body',
+        ...(issue?.path ?? []).filter(
+          (segment): segment is string | number => typeof segment !== 'symbol'
+        ),
+      ],
       issue?.message ?? 'Invalid token creation request',
       issue?.code ?? 'value_error'
     );
