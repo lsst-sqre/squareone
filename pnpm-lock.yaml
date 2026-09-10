@@ -669,9 +669,6 @@ importers:
       swr:
         specifier: ^2.3.8
         version: 2.3.8(react@19.2.8)
-      unfetch:
-        specifier: ^4.2.0
-        version: 4.2.0
     devDependencies:
       '@lsst-sqre/eslint-config':
         specifier: workspace:*
@@ -7193,9 +7190,6 @@ packages:
   undici@8.10.2:
     resolution: {integrity: sha512-/y4/bH9YNU5hi9NIrpOuvGXFcxrj3CMrV+/AYpowAYTpHn8gX/XPFjNy766FPoYY0miQhdW977JFWKGNhBdwyQ==}
     engines: {node: '>=22.19.0'}
-
-  unfetch@4.2.0:
-    resolution: {integrity: sha512-F9p7yYCn6cIW9El1zi0HI6vqpeIvBsr3dSuRO6Xuppb1u5rXpCPmMvLSyECLhybr9isec8Ohl0hPekMVrEinDA==}
 
   unified@11.0.5:
     resolution: {integrity: sha512-xKvGhPWw3k84Qjh8bI3ZeJjqnyadK+GEFtazSfZv/rKeTkTjOJho6mFqh2SM96iIcZokxiOpg78GazTSg8+KHA==}
@@ -14702,8 +14696,6 @@ snapshots:
     optional: true
 
   undici@8.10.2: {}
-
-  unfetch@4.2.0: {}
 
   unified@11.0.5:
     dependencies:
