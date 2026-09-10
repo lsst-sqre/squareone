@@ -21,9 +21,9 @@ export default defineConfig({
         },
         // The app's tsconfig uses jsx: "preserve" (Next transforms it with the
         // automatic runtime). Match that here so components that use JSX without
-        // importing React render under vitest's esbuild transform too.
-        esbuild: {
-          jsx: 'automatic',
+        // importing React render under Vite's Oxc transform too.
+        oxc: {
+          jsx: { runtime: 'automatic' },
         },
         test: {
           name: 'unit',
