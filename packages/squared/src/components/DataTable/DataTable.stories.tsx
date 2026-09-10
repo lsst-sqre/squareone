@@ -78,6 +78,9 @@ export const Default: Story = {
 // global to `dark` so the toolbar renders the story with `data-theme="dark"`
 // (toggle the toolbar theme to compare against the light stories above).
 export const Dark: Story = {
+  // Pins the theme global to dark, which in docs mode would flip the shared
+  // <html data-theme> for every story on the page; keep it out of autodocs.
+  tags: ['!autodocs'],
   globals: {
     theme: 'dark',
   },

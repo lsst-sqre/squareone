@@ -252,6 +252,9 @@ export const CustomTrigger: Story = {
 // with `data-theme="dark"` (toggle the toolbar theme to compare against the
 // light stories above). Opens the menu so the muted group label is visible.
 export const Dark: Story = {
+  // Pins the theme global to dark, which in docs mode would flip the shared
+  // <html data-theme> for every story on the page; keep it out of autodocs.
+  tags: ['!autodocs'],
   globals: {
     theme: 'dark',
   },

@@ -290,6 +290,9 @@ export const MixedTokenTypes = {
  * against the light stories above). Includes the total-count footer.
  */
 export const Dark = {
+  // Pins the theme global to dark, which in docs mode would flip the shared
+  // <html data-theme> for every story on the page; keep it out of autodocs.
+  tags: ['!autodocs'],
   globals: {
     theme: 'dark',
   },
@@ -308,6 +311,9 @@ export const Dark = {
  * dark mode alongside the semantic `.errorState` red heading.
  */
 export const DarkError = {
+  // Pins the theme global to dark, which in docs mode would flip the shared
+  // <html data-theme> for every story on the page; keep it out of autodocs.
+  tags: ['!autodocs'],
   globals: {
     theme: 'dark',
   },
