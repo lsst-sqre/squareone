@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import type { ColumnDef, RowSelectionState } from '@tanstack/react-table';
+import type { RowSelectionState } from '@tanstack/react-table';
 import { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Badge } from '../Badge';
-import { DataTable } from './DataTable';
+import { DataTable, type DataTableColumnDef } from './DataTable';
 
 type NotificationRow = {
   recipient: string;
@@ -12,7 +12,7 @@ type NotificationRow = {
   summary: string;
 };
 
-const columns: ColumnDef<NotificationRow>[] = [
+const columns: DataTableColumnDef<NotificationRow>[] = [
   { accessorKey: 'recipient', header: 'Recipient' },
   { accessorKey: 'sender', header: 'Sender' },
   { accessorKey: 'created', header: 'Created' },
@@ -103,7 +103,7 @@ export const Dark: Story = {
 export const WithRenderedCells: Story = {
   name: 'With rendered cells',
   render: () => {
-    const richColumns: ColumnDef<NotificationRow>[] = [
+    const richColumns: DataTableColumnDef<NotificationRow>[] = [
       { accessorKey: 'recipient', header: 'Recipient' },
       {
         accessorKey: 'sender',
@@ -123,7 +123,7 @@ export const WithRenderedCells: Story = {
 export const WithDetailRow: Story = {
   name: 'With detail row',
   render: () => {
-    const primaryColumns: ColumnDef<NotificationRow>[] = [
+    const primaryColumns: DataTableColumnDef<NotificationRow>[] = [
       { accessorKey: 'recipient', header: 'Recipient' },
       { accessorKey: 'sender', header: 'Sender' },
       { accessorKey: 'created', header: 'Created' },

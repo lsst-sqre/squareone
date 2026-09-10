@@ -1,14 +1,14 @@
-import type { ColumnDef, RowSelectionState } from '@tanstack/react-table';
+import type { RowSelectionState } from '@tanstack/react-table';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { DataTable } from './DataTable';
+import { DataTable, type DataTableColumnDef } from './DataTable';
 import styles from './DataTable.module.css';
 
 type Row = { name: string; count: number };
 
-const columns: ColumnDef<Row>[] = [
+const columns: DataTableColumnDef<Row>[] = [
   { accessorKey: 'name', header: 'Name' },
   { accessorKey: 'count', header: 'Count' },
 ];
@@ -208,7 +208,7 @@ describe('DataTable', () => {
   });
 
   it('right-aligns the header and body cells of a meta.align: right column', () => {
-    const alignedColumns: ColumnDef<Row>[] = [
+    const alignedColumns: DataTableColumnDef<Row>[] = [
       { accessorKey: 'name', header: 'Name' },
       { accessorKey: 'count', header: 'Count', meta: { align: 'right' } },
     ];
