@@ -44,9 +44,9 @@
     "react-a11y-disclosure": "^0.2.0",
     "react-dom": "^19.2.8",
     "react-hook-form": "^7.71.1",
-    "remark": "^14.0.2",
-    "remark-gfm": "^3.0.1",
-    "remark-html": "^15.0.1"
+    "remark": "^15.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-html": "^16.0.1"
   },
   "devDependencies": {
     "@lsst-sqre/tsconfig": "workspace:*",
