@@ -253,7 +253,7 @@ export const PageSchema = z.object({
   html_status_url: z.string(),
   html_events_url: z.string(),
   // Parameters are JSON Schema definitions - keep flexible
-  parameters: z.record(z.record(z.unknown())),
+  parameters: z.record(z.string(), z.record(z.string(), z.unknown())),
   github: GitHubSourceMetadataSchema.nullable(),
 });
 

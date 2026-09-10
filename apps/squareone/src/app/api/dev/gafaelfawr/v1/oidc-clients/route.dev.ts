@@ -58,7 +58,12 @@ export async function POST(request: Request) {
       422,
       issue?.message ?? 'Invalid OIDC client payload',
       issue?.code ?? 'value_error',
-      ['body', ...(issue?.path ?? [])]
+      [
+        'body',
+        ...(issue?.path ?? []).filter(
+          (segment): segment is string | number => typeof segment !== 'symbol'
+        ),
+      ]
     );
   }
 

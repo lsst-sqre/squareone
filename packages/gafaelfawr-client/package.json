@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "@lsst-sqre/api-client-core": "workspace:*",
-    "zod": "^3.24.0"
+    "zod": "^4.5.4"
   },
   "peerDependencies": {
     "@lsst-sqre/repertoire-client": "workspace:*",
@@ -37,7 +37,7 @@
     "react": "^18 || ^19"
   },
   "devDependencies": {
-    "@anatine/zod-mock": "^3.13.4",
+    "zod-schema-faker": "^2.1.1",
     "@faker-js/faker": "^10.5.0",
     "@lsst-sqre/eslint-config": "workspace:*",
     "@lsst-sqre/repertoire-client": "workspace:*",

@@ -105,41 +105,35 @@ export type ArtifactCreationResult = z.infer<
 >;
 
 /**
+ * A lifecycle hook: receives the creation result and may run async work.
+ */
+export type ArtifactHook = (result: ArtifactCreationResult) => Promise<void>;
+
+/**
+ * Schema for a lifecycle hook. Zod cannot validate a function's signature at
+ * runtime, so this only checks that the value is a function; the signature is
+ * enforced at the type level via {@link ArtifactHook}.
+ */
+const ArtifactHookSchema = z.custom<ArtifactHook>(
+  (value) => typeof value === 'function',
+  { message: 'Expected a function' }
+);
+
+/**
  * Lifecycle hooks configuration
- * Note: Functions cannot be validated by Zod at runtime, so we use z.any() for functions
  */
 export const HooksConfigSchema = z
   .object({
     /** Runs after any artifact is created */
-    afterCreate: z
-      .function()
-      .args(ArtifactCreationResultSchema)
-      .returns(z.promise(z.void()))
-      .optional(),
+    afterCreate: ArtifactHookSchema.optional(),
     /** Runs after a component is created */
-    afterComponent: z
-      .function()
-      .args(ArtifactCreationResultSchema)
-      .returns(z.promise(z.void()))
-      .optional(),
+    afterComponent: ArtifactHookSchema.optional(),
     /** Runs after a hook is created */
-    afterHook: z
-      .function()
-      .args(ArtifactCreationResultSchema)
-      .returns(z.promise(z.void()))
-      .optional(),
+    afterHook: ArtifactHookSchema.optional(),
     /** Runs after a context is created */
-    afterContext: z
-      .function()
-      .args(ArtifactCreationResultSchema)
-      .returns(z.promise(z.void()))
-      .optional(),
+    afterContext: ArtifactHookSchema.optional(),
     /** Runs after a page is created */
-    afterPage: z
-      .function()
-      .args(ArtifactCreationResultSchema)
-      .returns(z.promise(z.void()))
-      .optional(),
+    afterPage: ArtifactHookSchema.optional(),
   })
   .default({});
 export type HooksConfig = z.infer<typeof HooksConfigSchema>;
@@ -149,13 +143,13 @@ export type HooksConfig = z.infer<typeof HooksConfigSchema>;
  */
 export const FileFactoryConfigSchema = z.object({
   /** Component generation configuration */
-  component: ComponentConfigSchema.default({}),
+  component: ComponentConfigSchema.prefault({}),
   /** Hook generation configuration */
-  hook: HookConfigSchema.default({}),
+  hook: HookConfigSchema.prefault({}),
   /** Context generation configuration */
-  context: ContextConfigSchema.default({}),
+  context: ContextConfigSchema.prefault({}),
   /** Page generation configuration */
-  page: PageConfigSchema.default({}),
+  page: PageConfigSchema.prefault({}),
   /** Lifecycle hooks */
   hooks: HooksConfigSchema,
 });

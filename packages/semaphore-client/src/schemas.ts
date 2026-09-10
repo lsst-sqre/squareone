@@ -46,8 +46,8 @@ export const BroadcastsResponseSchema = z.array(BroadcastSchema);
  */
 export const UserNotificationSchema = z.object({
   id: z.string(),
-  created: z.string().datetime({ offset: true }),
-  read: z.string().datetime({ offset: true }).nullable(),
+  created: z.iso.datetime({ offset: true }),
+  read: z.iso.datetime({ offset: true }).nullable(),
   sender: z.string(),
   recipient: z.string(),
   summary: z.string(),
@@ -77,8 +77,8 @@ export const UserNotificationWithUrlSchema = UserNotificationSchema.extend({
  */
 export const UserNotificationSummarySchema = z.object({
   id: z.string(),
-  created: z.string().datetime({ offset: true }),
-  read: z.string().datetime({ offset: true }).nullable(),
+  created: z.iso.datetime({ offset: true }),
+  read: z.iso.datetime({ offset: true }).nullable(),
   summary: FormattedTextSchema,
   url: z.string(),
 });
@@ -94,8 +94,8 @@ export const UserNotificationSummarySchema = z.object({
  */
 export const UserNotificationFormattedSchema = z.object({
   id: z.string(),
-  created: z.string().datetime({ offset: true }),
-  read: z.string().datetime({ offset: true }).nullable(),
+  created: z.iso.datetime({ offset: true }),
+  read: z.iso.datetime({ offset: true }).nullable(),
   summary: FormattedTextSchema,
   body: FormattedTextSchema.nullable(),
 });

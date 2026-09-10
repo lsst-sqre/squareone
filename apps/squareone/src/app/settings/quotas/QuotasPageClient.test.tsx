@@ -37,7 +37,7 @@ function makeConfig(overrides: Partial<AppConfig> = {}): AppConfig {
 // its children.
 function makeUserInfoReturn(): UseUserInfoReturn {
   return {
-    userInfo: { username: 'testuser' },
+    userInfo: { username: 'testuser', groups: [] },
     query: null,
     isLoggedIn: true,
     isLoading: false,

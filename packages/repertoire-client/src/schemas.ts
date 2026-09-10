@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 // URI validation helper (1-2083 chars per OpenAPI spec)
-const uriSchema = z.string().url().min(1).max(2083);
+const uriSchema = z.url().min(1).max(2083);
 
 // API Version (used in service versions)
 export const ApiVersionSchema = z.object({
@@ -12,7 +12,7 @@ export const ApiVersionSchema = z.object({
 export const DataServiceSchema = z.object({
   url: uriSchema,
   openapi: uriSchema.nullable().optional(),
-  versions: z.record(ApiVersionSchema).default({}),
+  versions: z.record(z.string(), ApiVersionSchema).default({}),
 });
 
 // Dataset
@@ -20,7 +20,7 @@ export const DatasetSchema = z.object({
   butler_config: uriSchema.nullable().optional(),
   description: z.string().nullable().optional(),
   docs_url: uriSchema.nullable().optional(),
-  services: z.record(DataServiceSchema).default({}),
+  services: z.record(z.string(), DataServiceSchema).default({}),
 });
 
 // Internal Service (gafaelfawr, semaphore, etc.)
@@ -28,7 +28,7 @@ export const DatasetSchema = z.object({
 export const InternalServiceSchema = z.object({
   url: uriSchema,
   openapi: uriSchema.nullable().optional(),
-  versions: z.record(ApiVersionSchema).default({}),
+  versions: z.record(z.string(), ApiVersionSchema).default({}),
 });
 
 // UI Service (portal, nublado, times-square, etc.)
@@ -39,8 +39,8 @@ export const UiServiceSchema = z.object({
 
 // Services container
 export const ServicesSchema = z.object({
-  internal: z.record(InternalServiceSchema).default({}),
-  ui: z.record(UiServiceSchema).default({}),
+  internal: z.record(z.string(), InternalServiceSchema).default({}),
+  ui: z.record(z.string(), UiServiceSchema).default({}),
 });
 
 // InfluxDB Database with pointer (credentials_url instead of actual credentials)
@@ -58,11 +58,11 @@ export const InfluxDatabaseSchema = z.object({
 // Root Discovery response
 export const DiscoverySchema = z.object({
   applications: z.array(z.string()).default([]),
-  datasets: z.record(DatasetSchema).default({}),
+  datasets: z.record(z.string(), DatasetSchema).default({}),
   // Added in Repertoire 2.0.0; human-readable name of the environment, intended
   // for status/error reporting only (not a hostname, not used to build URLs).
   environment_name: z.string().nullable().optional(),
-  influxdb_databases: z.record(InfluxDatabaseSchema).default({}),
+  influxdb_databases: z.record(z.string(), InfluxDatabaseSchema).default({}),
   services: ServicesSchema,
 });
 
