@@ -12,22 +12,62 @@
   font-size: 0.875rem;
 }
 
+/* The list's default top alignment would leave the "Client ID" label sitting
+ * above the id, since the id's box adds a border and padding before its text.
+ * Aligning rows on the baseline keeps every label level with its value, boxed
+ * or not. */
 .metadata {
   margin: 0;
+  align-items: baseline;
 }
 
-/* The id is long and opaque, so the copy button sits with it rather than
- * making the operator select the text by hand. */
-.idRow {
+/* Real-world client ids run long (a 32-hex prefix plus a hostname), and the
+ * id is an opaque string whose only real use here is copy-and-paste. So set it
+ * in a read-only, input-like box that clips to the value column instead of
+ * wrapping onto a second line, with the copy button pinned at the trailing
+ * edge where it always lands in the same place. The box scrolls horizontally
+ * for anyone who wants to inspect the rest, and its `title` carries the whole
+ * value. */
+.idBox {
+  --id-box-inline-padding: var(--sqo-space-sm, 12px);
+  --id-box-border-width: 1px;
+
   display: flex;
   align-items: center;
   gap: var(--sqo-space-sm, 12px);
-  flex-wrap: wrap;
+  /* Without this the box's nowrap content would size the value column to the
+   * whole id rather than clipping within it. */
+  min-width: 0;
+  /* Pull the box's border and padding into the gutter so the id's first
+   * character sits on the same left edge as the other values in the list,
+   * rather than being inset by the box's own chrome. The right edge stays put:
+   * an auto-width block grows by the negative margin, not shifts. */
+  margin-left: calc(
+    -1 *
+    (var(--id-box-inline-padding) + var(--id-box-border-width))
+  );
+  padding: var(--sqo-space-xs, 8px) var(--id-box-inline-padding);
+  border: var(--id-box-border-width) solid var(--rsd-component-divider-color);
+  border-radius: var(--sqo-border-radius-1);
 }
 
-.mono {
+/* The grid's `1fr` value column still lets a nowrap child expand it, so
+ * release the definition cell from its content's minimum width. */
+.metadata dd {
+  min-width: 0;
+}
+
+.idValue {
+  flex: 1;
+  min-width: 0;
   font-family: monospace;
-  overflow-wrap: anywhere;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  overflow-x: auto;
+}
+
+.copyButton {
+  flex-shrink: 0;
 }
 
 .section {

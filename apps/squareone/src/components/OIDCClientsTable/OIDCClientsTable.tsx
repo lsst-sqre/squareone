@@ -21,16 +21,17 @@ export type OIDCClientsTableProps = {
 
 const columns: DataTableProps<OIDCClient>['columns'] = [
   {
-    accessorKey: 'client_id',
-    header: 'Client ID',
-    // The client id is what an admin looks a row up by, so it is the row's
-    // title and carries the link to the detail page.
+    accessorKey: 'description',
+    header: 'Description',
+    // The description is what an admin recognizes a client by — "Argo CD",
+    // "Chronograf dashboards" — so it is the row's title and carries the
+    // link to the detail page, where the client id lives.
     cell: (info) => (
       <Link
         href={`${OIDC_CLIENTS_BASE_HREF}/${encodeURIComponent(
-          info.getValue<string>()
+          info.row.original.client_id
         )}`}
-        className={styles.clientIdLink}
+        className={styles.descriptionLink}
       >
         {info.getValue<string>()}
       </Link>
@@ -41,7 +42,7 @@ const columns: DataTableProps<OIDCClient>['columns'] = [
     header: 'Last modified',
     cell: (info) => formatUtcTimestamp(info.getValue<string>()),
     // With only two columns, the timestamp reads more naturally anchored to
-    // the table's trailing edge than floating mid-row after the client id.
+    // the table's trailing edge than floating mid-row after the description.
     meta: { align: 'right' },
   },
 ];
@@ -50,15 +51,15 @@ const columns: DataTableProps<OIDCClient>['columns'] = [
  * Presentational listing of a deployment's OpenID Connect clients.
  *
  * Each client is a two-row unit, following the admin notifications listing: a
- * primary row of the `client_id` (linking to that client's detail page) and
+ * primary row of the description (linking to that client's detail page) and
  * when the client last changed, over a full-width addendum row carrying the
- * description and `return_uri` as prose. The client id leads because it is the
- * value an admin arrives with — from a Phalanx values file, a Gafaelfawr log
- * line, or a failing redirect — and so is what they scan the column for; the
- * description explains a row once it has been found, and reads better as a
- * sentence beneath it than squeezed into a column. Keeping the id and the URI
- * in the mono face, wrapping rather than truncating, lets both stay whole
- * without pushing the table past the admin content column.
+ * `return_uri`. The description leads because it is how an admin recognizes a
+ * client — "Argo CD", "Chronograf dashboards" — and so is what they scan the
+ * column for. The opaque `client_id` is deliberately not shown here: it is
+ * only meaningful when copying it into a values file or matching it against a
+ * log line, and the detail page presents it for that. Keeping the URI in the
+ * mono face, wrapping rather than truncating, lets it stay whole without
+ * pushing the table past the admin content column.
  *
  * Sorting is over the whole collection: Gafaelfawr returns every client in one
  * response, so there is no unloaded page for a client-side sort to miss.
@@ -93,10 +94,7 @@ export default function OIDCClientsTable({
         aria-label="OpenID Connect clients"
         emptyContent="No OpenID Connect clients are registered in this environment yet."
         renderDetailRow={(client) => (
-          <div className={styles.details}>
-            <p className={styles.description}>{client.description}</p>
-            <code className={styles.returnUri}>{client.return_uri}</code>
-          </div>
+          <code className={styles.returnUri}>{client.return_uri}</code>
         )}
       />
     </div>
