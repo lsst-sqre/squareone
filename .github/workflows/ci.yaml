@@ -11,6 +11,13 @@ name: CI
       - 'renovate/**'
       - 'tickets/**'
       - 'u/**'
+      # changesets/action v2 pushes release commits through the GitHub API
+      # and, when it force-updates changeset-release/main, briefly creates
+      # changesets-ghcommit-temp/changeset-release/main and deletes it
+      # seconds later. The push still triggers this workflow, and by the time
+      # the changes job runs, the ref is gone and paths-filter fails. The
+      # real branch gets its own run.
+      - 'changesets-ghcommit-temp/**'
   pull_request: {}
 
 permissions:

@@ -5,6 +5,9 @@ name: 'Chromatic: Squared'
     branches-ignore:
       - 'dependabot/**'
       - 'renovate/**'
+      # Transient branch created by changesets/action v2 while it updates
+      # changeset-release/main; it is deleted seconds after the push.
+      - 'changesets-ghcommit-temp/**'
     tags-ignore:
       - '*'
 
