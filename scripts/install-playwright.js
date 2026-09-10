@@ -53,14 +53,13 @@ console.log(
 const { spawn } = require('node:child_process');
 
 // Install only chromium (the browser we actually use in tests)
-const proc = spawn(
-  'pnpm',
-  ['exec', 'playwright', 'install', 'chromium', '--with-deps'],
-  {
-    stdio: 'inherit',
-    shell: true,
-  }
-);
+// A single command string keeps `shell: true` (needed for pnpm.cmd on
+// Windows) without tripping Node 24's DEP0190 warning about passing an
+// args array alongside the shell option.
+const proc = spawn('pnpm exec playwright install chromium --with-deps', {
+  stdio: 'inherit',
+  shell: true,
+});
 
 proc.on('error', (error) => {
   console.error('❌ Failed to start Playwright installation:', error.message);

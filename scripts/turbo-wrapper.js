@@ -9,7 +9,7 @@ const PLAIN_ENV_FILE = '.env';
 
 function checkCommandExists(command) {
   return new Promise((resolve) => {
-    const proc = spawn(command, ['--version'], {
+    const proc = spawn(`${command} --version`, {
       stdio: 'ignore',
       shell: true,
     });
@@ -78,8 +78,10 @@ async function runTurbo(args) {
     commandArgs = args;
   }
 
-  // Spawn the turbo process
-  const proc = spawn(command, commandArgs, {
+  // Spawn the turbo process. Join the command line ourselves: with
+  // `shell: true` Node would concatenate the args anyway, and Node 24 warns
+  // (DEP0190) when handed an args array alongside the shell option.
+  const proc = spawn([command, ...commandArgs].join(' '), {
     stdio: 'inherit',
     shell: true,
     cwd: rootDir,

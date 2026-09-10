@@ -10,7 +10,7 @@ This directory contains the GitHub Codespaces / VS Code Dev Container configurat
 
 ## What's Included
 
-- Node.js 22 with pnpm via Corepack
+- Node.js 24 with pnpm via Corepack
 - Python 3.13 with uv for documentation building
 - Git and GitHub CLI
 - VS Code extensions: ESLint, Prettier, TypeScript, Python, Ruff, Vitest, MDX, Copilot
