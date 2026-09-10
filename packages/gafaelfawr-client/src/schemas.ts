@@ -47,9 +47,9 @@ export const NotebookQuotaSchema = z.object({
 
 /** User quota schema */
 export const QuotaSchema = z.object({
-  api: z.record(z.number()).default({}),
+  api: z.record(z.string(), z.number()).default({}),
   notebook: NotebookQuotaSchema.nullable().optional(),
-  tap: z.record(z.object({ concurrent: z.number() })).default({}),
+  tap: z.record(z.string(), z.object({ concurrent: z.number() })).default({}),
 });
 
 /** Scope description schema (from login config) */
@@ -156,8 +156,8 @@ export const OIDCClientSchema = z.object({
   notes: z.string().nullable().optional(),
   client_id: z.string().min(1),
   last_modified_by: z.string().min(1),
-  created: z.string().datetime({ offset: true }),
-  last_modified: z.string().datetime({ offset: true }),
+  created: z.iso.datetime({ offset: true }),
+  last_modified: z.iso.datetime({ offset: true }),
   url: z.string().nullable().optional(),
 });
 
