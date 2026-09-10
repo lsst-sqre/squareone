@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import type { ColumnDef, RowSelectionState } from '@tanstack/react-table';
+import type { RowSelectionState } from '@tanstack/react-table';
 import { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Badge } from '../Badge';
-import { DataTable } from './DataTable';
+import { DataTable, type DataTableColumnDef } from './DataTable';
 
 type NotificationRow = {
   recipient: string;
@@ -12,7 +12,7 @@ type NotificationRow = {
   summary: string;
 };
 
-const columns: ColumnDef<NotificationRow>[] = [
+const columns: DataTableColumnDef<NotificationRow>[] = [
   { accessorKey: 'recipient', header: 'Recipient' },
   { accessorKey: 'sender', header: 'Sender' },
   { accessorKey: 'created', header: 'Created' },
@@ -78,6 +78,9 @@ export const Default: Story = {
 // global to `dark` so the toolbar renders the story with `data-theme="dark"`
 // (toggle the toolbar theme to compare against the light stories above).
 export const Dark: Story = {
+  // Pins the theme global to dark, which in docs mode would flip the shared
+  // <html data-theme> for every story on the page; keep it out of autodocs.
+  tags: ['!autodocs'],
   globals: {
     theme: 'dark',
   },
@@ -103,7 +106,7 @@ export const Dark: Story = {
 export const WithRenderedCells: Story = {
   name: 'With rendered cells',
   render: () => {
-    const richColumns: ColumnDef<NotificationRow>[] = [
+    const richColumns: DataTableColumnDef<NotificationRow>[] = [
       { accessorKey: 'recipient', header: 'Recipient' },
       {
         accessorKey: 'sender',
@@ -123,7 +126,7 @@ export const WithRenderedCells: Story = {
 export const WithDetailRow: Story = {
   name: 'With detail row',
   render: () => {
-    const primaryColumns: ColumnDef<NotificationRow>[] = [
+    const primaryColumns: DataTableColumnDef<NotificationRow>[] = [
       { accessorKey: 'recipient', header: 'Recipient' },
       { accessorKey: 'sender', header: 'Sender' },
       { accessorKey: 'created', header: 'Created' },

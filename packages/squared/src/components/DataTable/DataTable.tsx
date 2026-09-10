@@ -2,14 +2,21 @@
 
 import {
   type ColumnDef,
+  createSortedRowModel,
   flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
+  metaHelper,
   type OnChangeFn,
   type RowData,
   type RowSelectionState,
+  rowSelectionFeature,
+  rowSortingFeature,
   type SortingState,
-  useReactTable,
+  sortFn_alphanumeric,
+  sortFn_basic,
+  sortFn_datetime,
+  sortFn_text,
+  tableFeatures,
+  useTable,
 } from '@tanstack/react-table';
 import { ChevronDown, ChevronsUpDown, ChevronUp } from 'lucide-react';
 import React from 'react';
@@ -17,31 +24,56 @@ import { Button } from '../Button';
 import { Checkbox } from '../Checkbox';
 import styles from './DataTable.module.css';
 
-declare module '@tanstack/react-table' {
-  // TanStack's extension point for per-column options: augmenting ColumnMeta
-  // is its documented way to add them, and merging requires repeating the
-  // interface's type parameters even though this member uses neither.
-  interface ColumnMeta<TData extends RowData, TValue> {
-    /**
-     * Horizontal alignment for the column's header and body cells. Defaults
-     * to left; use `'right'` for numeric or timestamp columns whose values
-     * compare down the column.
-     */
-    align?: 'left' | 'right';
-  }
-}
-
-export type DataTableProps<TData> = {
+/**
+ * Per-column options `DataTable` understands via a column definition's `meta`.
+ */
+export type DataTableColumnMeta = {
   /**
-   * Column definitions, as TanStack Table `ColumnDef`s.
-   *
-   * The value type is `any` per column rather than one shared generic, so a
-   * heterogeneous set of columns — each with its own accessor value type —
-   * can be passed without widening them all to a single type. This is
-   * TanStack's idiomatic signature for table wrapper components.
+   * Horizontal alignment for the column's header and body cells. Defaults
+   * to left; use `'right'` for numeric or timestamp columns whose values
+   * compare down the column.
    */
+  align?: 'left' | 'right';
+};
+
+// The TanStack Table feature bundle for every DataTable: client-side sorting
+// and row selection, plus the sort functions that a column's default `'auto'`
+// sort resolves to. The `columnMeta` slot types `meta` per table instead of
+// augmenting TanStack's ColumnMeta interface globally.
+const dataTableFeatures = tableFeatures({
+  rowSortingFeature,
+  rowSelectionFeature,
+  sortedRowModel: createSortedRowModel(),
+  sortFns: {
+    alphanumeric: sortFn_alphanumeric,
+    datetime: sortFn_datetime,
+    text: sortFn_text,
+    basic: sortFn_basic,
+  },
+  columnMeta: metaHelper<DataTableColumnMeta>(),
+});
+
+/** The TanStack feature set a {@link DataTable} is built with. */
+export type DataTableFeatures = typeof dataTableFeatures;
+
+/**
+ * A column definition for {@link DataTable}, bound to its feature set.
+ *
+ * The value type is `any` per column rather than one shared generic, so a
+ * heterogeneous set of columns — each with its own accessor value type — can
+ * be passed without widening them all to a single type. This is TanStack's
+ * idiomatic signature for table wrapper components.
+ */
+export type DataTableColumnDef<TData extends RowData> = ColumnDef<
+  DataTableFeatures,
+  TData,
   // biome-ignore lint/suspicious/noExplicitAny: per-column value types; TanStack's idiomatic wrapper signature
-  columns: ColumnDef<TData, any>[];
+  any
+>;
+
+export type DataTableProps<TData extends RowData> = {
+  /** Column definitions; see {@link DataTableColumnDef}. */
+  columns: DataTableColumnDef<TData>[];
   /**
    * The currently-loaded rows.
    *
@@ -142,9 +174,9 @@ type SortDirection = false | 'asc' | 'desc';
  * are selected) and each cell toggles its own row through TanStack's
  * row-selection model.
  */
-function createSelectionColumn<TData>(
+function createSelectionColumn<TData extends RowData>(
   getRowLabel?: (row: TData) => string
-): ColumnDef<TData, unknown> {
+): ColumnDef<DataTableFeatures, TData, unknown> {
   return {
     id: 'select',
     enableSorting: false,
@@ -234,7 +266,7 @@ function SortIndicator({ direction }: { direction: SortDirection }) {
  * />
  * ```
  */
-export function DataTable<TData>({
+export function DataTable<TData extends RowData>({
   columns,
   data,
   initialSorting = [],
@@ -267,7 +299,8 @@ export function DataTable<TData>({
     [selectionEnabled, columns, getRowLabel]
   );
 
-  const table = useReactTable({
+  const table = useTable({
+    features: dataTableFeatures,
     data,
     columns: tableColumns,
     state: {
@@ -279,8 +312,6 @@ export function DataTable<TData>({
     ...(selectionEnabled
       ? { enableRowSelection: true, onRowSelectionChange }
       : {}),
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
   });
 
   const rows = table.getRowModel().rows;
@@ -367,7 +398,7 @@ export function DataTable<TData>({
           rows.map((row) => (
             <tbody key={row.id} className={styles.rowGroup}>
               <tr className={styles.primaryRow}>
-                {row.getVisibleCells().map((cell) => (
+                {row.getAllCells().map((cell) => (
                   <td key={cell.id} className={bodyCellClassName(cell)}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
@@ -384,7 +415,7 @@ export function DataTable<TData>({
           <tbody>
             {rows.map((row) => (
               <tr key={row.id} className={styles.row}>
-                {row.getVisibleCells().map((cell) => (
+                {row.getAllCells().map((cell) => (
                   <td key={cell.id} className={bodyCellClassName(cell)}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>

@@ -322,6 +322,9 @@ export const AllActionTypes = {
 // against the light stories above). Uses an edit entry so both the labels and
 // the old→new change rows (which exercise `.oldValue`/`.changesHeading`) show.
 export const Dark = {
+  // Pins the theme global to dark, which in docs mode would flip the shared
+  // <html data-theme> for every story on the page; keep it out of autodocs.
+  tags: ['!autodocs'],
   globals: {
     theme: 'dark',
   },
