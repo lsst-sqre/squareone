@@ -8,7 +8,12 @@
     "moduleResolution": "bundler",
     "outDir": "./dist",
     "rootDir": "./src",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    // tsup's declaration build (rollup-plugin-dts) still injects `baseUrl`,
+    // which TypeScript 6 reports as a deprecation error. Nothing in this
+    // package relies on it. Drop this once the build no longer uses tsup or
+    // tsup stops setting it; TypeScript 7 removes the option entirely.
+    "ignoreDeprecations": "6.0"
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist", "**/*.test.ts"]
