@@ -9,8 +9,13 @@ FROM node:24.21.0-alpine AS base
 
 RUN npm install -g corepack@latest  # Ensure latest corepack
 RUN corepack enable
-RUN corepack prepare pnpm@11.21.0 --activate
+RUN corepack prepare pnpm@12.3.4 --activate
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+# pnpm 12's npm package is a launcher that fetches the native pnpm binary on
+# first run and keeps it beside itself in the corepack cache. Run it once here
+# so the binary lands in the cache that the runner stage copies, where
+# COREPACK_ENABLE_NETWORK=0 would otherwise make the first `pnpm` call fail.
+RUN pnpm --version
 RUN apk add --no-cache libc6-compat
 RUN apk update
 ENV CI=1
@@ -84,6 +89,13 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV COREPACK_ENABLE_NETWORK=0
 ENV COREPACK_HOME=/app/.cache/corepack
+# pnpm's verifyDepsBeforeRun defaults to `install`, so `pnpm run` first checks
+# node_modules against the lockfile and reinstalls when it cannot confirm they
+# match. pnpm 11 passed that check in this image; pnpm 12 reports that it
+# cannot verify the tree and then fails trying to reinstall into root-owned
+# node_modules. The runtime image is immutable and the installer stage already
+# produced the exact tree that ships here, so skip the check.
+ENV PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN=false
 
 # Don't run production as root
 RUN addgroup --system --gid 1001 nodejs
