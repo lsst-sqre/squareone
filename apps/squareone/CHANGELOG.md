@@ -1,5 +1,32 @@
 # squareone
 
+## 0.39.3
+
+### Patch Changes
+
+- [#702](https://github.com/lsst-sqre/squareone/pull/702) [`c88b72d`](https://github.com/lsst-sqre/squareone/commit/c88b72da868d3c7a91486f60026708fa0e27c6f3) Thanks [@jonathansick](https://github.com/jonathansick)! - Keep the dark-theme Storybook stories out of the autodocs pages. Each component's `Dark` story pins the theme global to dark, and in docs mode every story on the page shares one `<html data-theme>`, so the last story to mount flipped the whole docs page to dark even with the toolbar set to light. Those stories are now tagged `!autodocs`; they remain in the sidebar and in Chromatic.
+
+- [#702](https://github.com/lsst-sqre/squareone/pull/702) [`c15e77b`](https://github.com/lsst-sqre/squareone/commit/c15e77b87af11bb9c0a2acaa72a6461eb4ae9e07) Thanks [@jonathansick](https://github.com/jonathansick)! - Update react-day-picker from 9 to 10 and date-fns from 3 to 4. The `DateTimePicker` calendar now passes react-day-picker's current `classNames` keys. Its previous keys used the pre-v9 names, which react-day-picker 9 had silently ignored, so the selected-day highlight, today marker, outside-month dimming, and disabled-day styling are applied again.
+
+- [#702](https://github.com/lsst-sqre/squareone/pull/702) [`a89320e`](https://github.com/lsst-sqre/squareone/commit/a89320e0e832aa5da79657d99896f46f120d88bf) Thanks [@jonathansick](https://github.com/jonathansick)! - Update lucide-react from 0.563 to 1.43 and @fontsource/source-sans-pro from 4 to 5. Every icon in use still exists under the same name, and the font package keeps the same `400.css`, `400-italic.css`, and `700.css` entry points and the same `Source Sans Pro` family name.
+
+- [#692](https://github.com/lsst-sqre/squareone/pull/692) [`a779bf7`](https://github.com/lsst-sqre/squareone/commit/a779bf74a4b0900c2da31cb5a0bb553ff0392915) Thanks [@jonathansick](https://github.com/jonathansick)! - Update the Node.js runtime from 22 to the 24 LTS line (24.21.0). The Docker image, GitHub Actions workflows (via `.nvmrc`), the devcontainer, the `engines` field, and `@types/node` all move together.
+
+- [#694](https://github.com/lsst-sqre/squareone/pull/694) [`b87b23d`](https://github.com/lsst-sqre/squareone/commit/b87b23d78db99af7ffb97fa57636438f572782ee) Thanks [@jonathansick](https://github.com/jonathansick)! - Update the pinned package manager from pnpm 11.21.0 to pnpm 12.3.4 in `packageManager`, the `engines` range, and the Docker image's corepack setup. The Docker base stage now runs pnpm once after preparing it so that pnpm 12's native binary is cached for the network-restricted runtime stage.
+
+- [#701](https://github.com/lsst-sqre/squareone/pull/701) [`23b2abe`](https://github.com/lsst-sqre/squareone/commit/23b2abe9815290e594693793f170285955ea84a1) Thanks [@jonathansick](https://github.com/jonathansick)! - Update remark from 14 to 15, remark-gfm from 3 to 4, and remark-html from 15 to 16. The Markdown-to-HTML pipelines behind broadcast banners, notification summaries, and the compose preview are unchanged in behavior, and `remark-html` still sanitizes by default. The bump moves these packages onto unified 11, the same core `next-mdx-remote` and `@mdx-js/mdx` already use, so the dependency tree no longer carries a second copy of the unified and micromark stack.
+
+- [#696](https://github.com/lsst-sqre/squareone/pull/696) [`d1fe661`](https://github.com/lsst-sqre/squareone/commit/d1fe66182b24081cb33893c29e23d0c379c7481e) Thanks [@jonathansick](https://github.com/jonathansick)! - Update TypeScript from 5.9 to 6.0, the bridge release before the native TypeScript 7 compiler. The shared `base.json` preset now uses `moduleResolution: "bundler"` instead of the removed `node` (node10) mode, and squareone drops the deprecated `baseUrl` in favor of a relative `paths` entry. Both options stop working in TypeScript 7.
+
+- [#695](https://github.com/lsst-sqre/squareone/pull/695) [`99d9b58`](https://github.com/lsst-sqre/squareone/commit/99d9b588e3f103d29f0d955c1a50333579efc3c3) Thanks [@jonathansick](https://github.com/jonathansick)! - Update the test and Storybook toolchain to Vite 8, which builds with Rolldown and Oxc instead of Rollup and esbuild. `@vitejs/plugin-react` moves to 6 (which requires Vite 8) and jsdom moves from 26 to 30, now declared explicitly by every package whose tests run in a jsdom environment. The squareone unit-test project sets its JSX runtime through Vite's `oxc` option instead of the deprecated `esbuild` option, and squared's Vite config is renamed to `vite.config.mts` so it loads under Vite's upcoming native config loader.
+- Updated dependencies [[`c88b72d`](https://github.com/lsst-sqre/squareone/commit/c88b72da868d3c7a91486f60026708fa0e27c6f3), [`c15e77b`](https://github.com/lsst-sqre/squareone/commit/c15e77b87af11bb9c0a2acaa72a6461eb4ae9e07), [`a110918`](https://github.com/lsst-sqre/squareone/commit/a110918f9d865d13e4e875f86965a946f7ce1c51), [`a89320e`](https://github.com/lsst-sqre/squareone/commit/a89320e0e832aa5da79657d99896f46f120d88bf), [`a779bf7`](https://github.com/lsst-sqre/squareone/commit/a779bf74a4b0900c2da31cb5a0bb553ff0392915), [`48ba8dc`](https://github.com/lsst-sqre/squareone/commit/48ba8dcd265353a3fee0be9e44514d7b84a3f6a1), [`d1fe661`](https://github.com/lsst-sqre/squareone/commit/d1fe66182b24081cb33893c29e23d0c379c7481e), [`99d9b58`](https://github.com/lsst-sqre/squareone/commit/99d9b588e3f103d29f0d955c1a50333579efc3c3), [`4589fc6`](https://github.com/lsst-sqre/squareone/commit/4589fc60c884b64837c4c53029dbdae503ce77ae)]:
+  - @lsst-sqre/squared@0.18.0
+  - @lsst-sqre/gafaelfawr-client@3.2.0
+  - @lsst-sqre/repertoire-client@0.5.0
+  - @lsst-sqre/semaphore-client@0.7.0
+  - @lsst-sqre/times-square-client@3.2.0
+  - @lsst-sqre/api-client-core@0.3.0
+
 ## 0.39.2
 
 ### Patch Changes
