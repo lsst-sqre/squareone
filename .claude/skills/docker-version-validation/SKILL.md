@@ -35,7 +35,7 @@ The validation system checks three critical version synchronization points:
 
 **Dockerfile location:**
 ```dockerfile
-FROM node:22.21.1-alpine AS base
+FROM node:24.21.0-alpine AS base
 ```
 
 **package.json source:**
@@ -56,19 +56,19 @@ FROM node:22.21.1-alpine AS base
 
 **Dockerfile location:**
 ```dockerfile
-RUN corepack prepare pnpm@11.21.0 --activate
+RUN corepack prepare pnpm@12.3.4 --activate
 ```
 
 **package.json source:**
 ```json
 {
-  "packageManager": "pnpm@11.21.0+sha512..."
+  "packageManager": "pnpm@12.3.4+sha512..."
 }
 ```
 
 **Validation rule:** Exact version match required
-- ✅ Docker `11.21.0` matches package.json `pnpm@11.21.0+sha512...`
-- ❌ Docker `11.21.1` does NOT match package.json `pnpm@11.21.0+sha512...`
+- ✅ Docker `12.3.4` matches package.json `pnpm@12.3.4+sha512...`
+- ❌ Docker `12.3.5` does NOT match package.json `pnpm@12.3.4+sha512...`
 
 **Note:** The pnpm version lives in a *third* place as well: `engines.pnpm` in
 the root package.json. That leg of the sync is enforced by a separate
@@ -165,7 +165,7 @@ Found 1 Dockerfile(s) to validate
 Validating: apps/squareone/Dockerfile
 Against: apps/squareone/package.json
   ✓ Node.js: 22.21.1 matches 22.21.1 (from constraint: ^22.21.1)
-  ✓ pnpm: 11.21.0 matches package.json
+  ✓ pnpm: 12.3.4 matches package.json
   ✓ Turbo: 2.6.0 matches package.json
 
 Summary:
@@ -184,8 +184,8 @@ Validating: apps/squareone/Dockerfile
 Against: apps/squareone/package.json
   ✓ Node.js: 22.21.1 matches 22.21.1 (from constraint: ^22.21.1)
   ✗ pnpm version mismatch:
-    Dockerfile: 11.21.1
-    package.json: 11.21.0
+    Dockerfile: 12.3.5
+    package.json: 12.3.4
   ✓ Turbo: 2.6.0 matches package.json
 
 Summary:
@@ -292,8 +292,8 @@ git commit -m "Update pnpm to 11.22.0"
 **Problem:** You staged a Dockerfile change but the commit was blocked:
 ```
 ✗ pnpm version mismatch:
-  Dockerfile: 11.21.1
-  package.json: 11.21.0
+  Dockerfile: 12.3.5
+  package.json: 12.3.4
 ```
 
 **Solution:**
@@ -342,7 +342,7 @@ git push
 
 ### Version Found in Only One File
 
-**Warning:** `⚠ pnpm version found in only one file (Docker: 11.21.0, package.json: none)`
+**Warning:** `⚠ pnpm version found in only one file (Docker: 12.3.4, package.json: none)`
 
 **Explanation:** This is a warning (not an error). The validation found a version declaration in the Dockerfile but not in package.json, or vice versa.
 
@@ -364,10 +364,10 @@ git push
 **Dockerfile patterns expected:**
 ```dockerfile
 # Node.js
-FROM node:22.21.1-alpine
+FROM node:24.21.0-alpine
 
 # pnpm
-RUN corepack prepare pnpm@11.21.0 --activate
+RUN corepack prepare pnpm@12.3.4 --activate
 
 # Turbo
 RUN pnpm dlx turbo@2.6.0 prune ...

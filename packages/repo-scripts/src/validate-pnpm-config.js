@@ -15,7 +15,7 @@
  *   ceiling makes a standalone pnpm from the wrong major hard-fail the
  *   engines check instead of rewriting the lockfile incompatibly.
  *
- * - The root package.json must not contain a "pnpm" field. pnpm 11 only
+ * - The root package.json must not contain a "pnpm" field. pnpm 11+ only
  *   reads pnpm settings (overrides, allowBuilds, ...) from
  *   pnpm-workspace.yaml; a "pnpm" block copy-pasted into package.json is
  *   ignored with nothing but an easy-to-miss install-time warning. That
@@ -43,7 +43,7 @@ const colors = {
 
 /**
  * Extract the X.Y.Z version from a packageManager string such as
- * "pnpm@11.21.0+sha512...".
+ * "pnpm@12.3.4+sha512...".
  * @param {string} packageManager
  * @returns {string|null}
  */
@@ -101,7 +101,7 @@ function validatePnpmConfig(pkg) {
     failures.push(
       'package.json must not contain a "pnpm" field' +
         (keys ? ` (found: ${keys})` : '') +
-        '; pnpm 11 only reads these settings from pnpm-workspace.yaml, so ' +
+        '; pnpm 11+ only reads these settings from pnpm-workspace.yaml, so ' +
         'entries here are ignored with only an install-time warning'
     );
   } else {
