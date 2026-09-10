@@ -21,6 +21,7 @@
       "outputLogs": "errors-only"
     },
     "type-check": {
+      "dependsOn": ["^type-check"],
       "outputLogs": "errors-only"
     },
     "dev": {
