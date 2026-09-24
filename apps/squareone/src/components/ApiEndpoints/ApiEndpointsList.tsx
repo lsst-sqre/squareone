@@ -26,8 +26,10 @@ type ApiEndpointsListProps = {
  * linked to its docs when available) followed by the dataset description —
  * suffixed with a "Read the documentation" link to the dataset's documentation
  * site when available — and a list of endpoints. Each endpoint name is always
- * plain text; a curated, IVOA-mapped service additionally shows a book-icon
- * link to its standard, labeled with the spec name (e.g. "IVOA TAP docs").
+ * plain text; an IVOA-mapped service additionally shows a book-icon link to
+ * its standard, labeled with the spec name (e.g. "IVOA TAP docs"), and any
+ * other service with documentation shows the same icon linking to its docs,
+ * labeled with the endpoint name (e.g. "Alert retrieval docs").
  * Each endpoint URL renders as copyable monospace code text (not a link, since
  * these are programmatic API base URLs) with an icon-only copy-to-clipboard
  * button.
@@ -80,12 +82,23 @@ export default function ApiEndpointsList({
             ) : null}
             <ul className={styles.list}>
               {group.endpoints.map((endpoint) => {
-                // Accessible label/tooltip for the book-icon link, naming the
-                // standard (e.g. "IVOA TAP docs"); falls back to a generic
-                // label if an IVOA-linked service has no curated standard name.
-                const ivoaDocLabel = endpoint.ivoaName
-                  ? `IVOA ${endpoint.ivoaName} docs`
-                  : 'IVOA doc';
+                // Book-icon docs link: an IVOA standard link is labeled by the
+                // standard (e.g. "IVOA TAP docs", or a generic "IVOA doc"
+                // without a standard name); any other docs link gets a generic
+                // label naming the endpoint (e.g. "Alert retrieval docs").
+                const docLink = endpoint.ivoaUrl
+                  ? {
+                      href: endpoint.ivoaUrl,
+                      label: endpoint.ivoaName
+                        ? `IVOA ${endpoint.ivoaName} docs`
+                        : 'IVOA doc',
+                    }
+                  : endpoint.docsUrl
+                    ? {
+                        href: endpoint.docsUrl,
+                        label: `${endpoint.label} docs`,
+                      }
+                    : null;
                 return (
                   <li
                     key={`${endpoint.label}:${endpoint.url}`}
@@ -93,12 +106,12 @@ export default function ApiEndpointsList({
                   >
                     <div className={styles.labelCell}>
                       <span className={styles.label}>{endpoint.label}</span>
-                      {endpoint.ivoaUrl ? (
+                      {docLink ? (
                         <a
-                          className={styles.ivoaLink}
-                          href={endpoint.ivoaUrl}
-                          title={ivoaDocLabel}
-                          aria-label={ivoaDocLabel}
+                          className={styles.docLink}
+                          href={docLink.href}
+                          title={docLink.label}
+                          aria-label={docLink.label}
                         >
                           <BookOpen size={16} aria-hidden="true" />
                         </a>

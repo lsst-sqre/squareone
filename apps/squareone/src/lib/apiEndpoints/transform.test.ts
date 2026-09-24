@@ -103,7 +103,24 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
     expect(group.displayName).toBe('Data Preview 2');
   });
 
-  test('maps the alerts service to its curated label', () => {
+  test('labels the prompt alerts service with its discovery title and docs link', () => {
+    const groups = serviceDiscoveryToApiEndpointGroups(mockDiscovery);
+    const prompt = groups.find((group) => group.datasetKey === 'prompt');
+
+    expect(
+      prompt?.endpoints.find(
+        (endpoint) => endpoint.url === 'https://data.lsst.cloud/api/alerts'
+      )
+    ).toEqual({
+      label: 'Alert retrieval',
+      url: 'https://data.lsst.cloud/api/alerts',
+      ivoaUrl: null,
+      ivoaName: null,
+      docsUrl: 'https://sqr-114.lsst.io/',
+    });
+  });
+
+  test('labels an untitled alerts service (Repertoire 2.x) "Alerts"', () => {
     const discovery = {
       ...getEmptyDiscovery(),
       datasets: {
@@ -124,6 +141,7 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
       url: 'https://data.lsst.cloud/api/alerts',
       ivoaUrl: null,
       ivoaName: null,
+      docsUrl: null,
     });
   });
 
@@ -164,6 +182,7 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
       url: 'https://data.lsst.cloud/api/sia/dp1/query',
       ivoaUrl: 'https://www.ivoa.net/documents/SIA/',
       ivoaName: 'SIA',
+      docsUrl: null,
     });
     // HiPS surfaces the hips-list-1.0 /list URL.
     expect(byLabel('HiPS (Hierarchical Progressive Survey)')?.url).toBe(
@@ -186,6 +205,23 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
     );
   });
 
+  test('curated services ignore the discovery title and docs url entirely', () => {
+    const groups = serviceDiscoveryToApiEndpointGroups(mockDiscovery);
+    const dp1 = groups.find((group) => group.datasetKey === 'dp1');
+
+    // mockDiscovery's cutout carries the 3.0 title "SODA image cutouts" and a
+    // docs_url; the curated label, IVOA link, and name still win.
+    expect(
+      dp1?.endpoints.find((endpoint) => endpoint.label === 'SODA Image Cutouts')
+    ).toEqual({
+      label: 'SODA Image Cutouts',
+      url: 'https://data.lsst.cloud/api/cutout',
+      ivoaUrl: 'https://www.ivoa.net/documents/SODA/20170517/REC-SODA-1.0.html',
+      ivoaName: 'SODA',
+      docsUrl: null,
+    });
+  });
+
   test('uses a single generic TAP label across datasets; the dataset gives context', () => {
     const groups = serviceDiscoveryToApiEndpointGroups(mockDiscovery);
     const dp03 = groups.find((group) => group.datasetKey === 'dp03');
@@ -197,7 +233,34 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
     expect(tap?.url).toBe('https://data.lsst.cloud/api/ssotap');
   });
 
-  test('services absent from the map fall back to raw name + base url, no IVOA link', () => {
+  test('links an unmapped service with an IVOA docs url as an IVOA standard named from its label', () => {
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            ssa: {
+              url: 'https://data.lsst.cloud/api/ssa',
+              title: 'Simple spectral access (SSA)',
+              docs_url: 'https://www.ivoa.net/documents/SSA/',
+              versions: {},
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery);
+    expect(group.endpoints[0]).toEqual({
+      label: 'Simple spectral access (SSA)',
+      url: 'https://data.lsst.cloud/api/ssa',
+      ivoaUrl: 'https://www.ivoa.net/documents/SSA/',
+      ivoaName: 'SSA',
+      docsUrl: null,
+    });
+  });
+
+  test('an untitled unmapped service (Repertoire 2.x) falls back to raw name + base url, no docs link', () => {
     const discovery = {
       ...getEmptyDiscovery(),
       datasets: {
@@ -218,6 +281,54 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
       url: 'https://data.lsst.cloud/api/mystery',
       ivoaUrl: null,
       ivoaName: null,
+      docsUrl: null,
+    });
+  });
+
+  test('labels an unmapped service with its discovery title', () => {
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            mystery: {
+              url: 'https://data.lsst.cloud/api/mystery',
+              title: 'Mystery service',
+              versions: {},
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery);
+    expect(group.endpoints[0]?.label).toBe('Mystery service');
+  });
+
+  test('links an unmapped service to its non-IVOA discovery docs url', () => {
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            mystery: {
+              url: 'https://data.lsst.cloud/api/mystery',
+              title: 'Mystery service',
+              docs_url: 'https://mystery.lsst.io/',
+              versions: {},
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery);
+    expect(group.endpoints[0]).toEqual({
+      label: 'Mystery service',
+      url: 'https://data.lsst.cloud/api/mystery',
+      ivoaUrl: null,
+      ivoaName: null,
+      docsUrl: 'https://mystery.lsst.io/',
     });
   });
 
@@ -259,6 +370,7 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
       url: 'https://example.org/tap',
       ivoaUrl: null,
       ivoaName: null,
+      docsUrl: null,
     });
   });
 
