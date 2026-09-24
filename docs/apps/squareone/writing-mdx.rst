@@ -51,6 +51,7 @@ React components
 
 You can use a limited set of React components in MDX.
 Some pages enable additional components; the documentation for those configurations specifies those components.
+For example, the ``/docs`` page adds cards and the service-discovery-driven ``<DatasetDocsCards>`` (see :doc:`docs-page`).
 The following sections describe the common components that all MDX content can use.
 
 .. warning:: Be careful with newlines and React components.
