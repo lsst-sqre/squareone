@@ -1,8 +1,11 @@
 import type {
+  DataService,
   Dataset,
+  Environment,
   InfluxDatabase,
   InternalService,
   ServiceDiscovery,
+  UiService,
 } from './types';
 
 /**
@@ -23,6 +26,36 @@ export type DatasetWithService = {
   dataset: Dataset;
   serviceUrl: string;
 };
+
+/**
+ * Any discovery service (UI, internal, or data) as far as access checks are
+ * concerned: only its `required_scopes` matter.
+ */
+export type ScopedService = {
+  readonly required_scopes?: readonly string[];
+};
+
+/**
+ * What a Gafaelfawr API quota label refers to, from
+ * {@link ServiceDiscoveryQuery.getQuotaLabelIndex}.
+ */
+export type QuotaLabelIndexEntry = {
+  /** Name of the service declaring the label (e.g., 'tap', 'cutout'). */
+  serviceName: string;
+  /** The service's short human-readable title, if it declares one. */
+  serviceTitle: string | null;
+  /** URL of the service's documentation, if it declares one. */
+  serviceDocsUrl: string | null;
+  /** Short human-readable description of what the quota counts. */
+  labelTitle: string;
+  /** If true, hide the quota from user-facing quota summaries. */
+  internal: boolean;
+};
+
+/**
+ * Quota label (a key of Gafaelfawr's `quota.api`) to service metadata.
+ */
+export type QuotaLabelIndex = Record<string, QuotaLabelIndexEntry>;
 
 /**
  * Query API for navigating service discovery data.
@@ -49,6 +82,32 @@ export class ServiceDiscoveryQuery {
     return this.discovery.applications;
   }
 
+  // === Environment queries ===
+
+  /**
+   * Get the metadata for the Phalanx environment (name, label, titles,
+   * description, docs URL).
+   * Returns null when discovery predates Repertoire 3.0.0 and so has no
+   * `environment` object.
+   */
+  getEnvironment(): Environment | null {
+    return this.discovery.environment ?? null;
+  }
+
+  /**
+   * Get the human-readable environment name, intended for status or error
+   * reporting (not for building URLs).
+   * Prefers `environment.name` (Repertoire 3.0.0) and falls back to the
+   * deprecated top-level `environment_name`; null when neither is present.
+   */
+  getEnvironmentName(): string | null {
+    return (
+      this.discovery.environment?.name ??
+      this.discovery.environment_name ??
+      null
+    );
+  }
+
   // === UI service queries ===
 
   /**
@@ -57,6 +116,13 @@ export class ServiceDiscoveryQuery {
    */
   getUiServiceUrl(name: string): string | undefined {
     return this.discovery.services.ui[name]?.url;
+  }
+
+  /**
+   * Get full UI service info including title, docs URL, and required scopes.
+   */
+  getUiService(name: string): UiService | undefined {
+    return this.discovery.services.ui[name];
   }
 
   /**
@@ -107,6 +173,15 @@ export class ServiceDiscoveryQuery {
   }
 
   /**
+   * Get a data service (e.g., 'tap', 'sia') of a specific dataset.
+   * Data services are dataset-specific: the same service name can have a
+   * different URL in each dataset.
+   */
+  getDataService(datasetId: string, name: string): DataService | undefined {
+    return this.discovery.datasets[datasetId]?.services[name];
+  }
+
+  /**
    * Check if a dataset exists.
    */
   hasDataset(id: string): boolean {
@@ -143,6 +218,65 @@ export class ServiceDiscoveryQuery {
     return this.discovery.influxdb_databases[name];
   }
 
+  // === Access checks ===
+
+  /**
+   * Check whether a user with the given Gafaelfawr scopes can use a service.
+   *
+   * Returns true when the service declares no `required_scopes`, or when
+   * `userScopes` is undefined (an anonymous visitor, or login info not yet
+   * loaded), so callers degrade to showing the service as they did before
+   * Repertoire 3.0.0. Otherwise the user must hold every required scope.
+   */
+  canAccessService(
+    service: ScopedService,
+    userScopes?: readonly string[]
+  ): boolean {
+    const required = service.required_scopes ?? [];
+    if (required.length === 0 || userScopes === undefined) {
+      return true;
+    }
+    return required.every((scope) => userScopes.includes(scope));
+  }
+
+  // === Quota queries ===
+
+  /**
+   * Index every Gafaelfawr API quota label declared by a data or internal
+   * service, so a quota label (a key of Gafaelfawr's `quota.api`) can be
+   * shown with the title and docs URL of the service it applies to.
+   *
+   * Data services are keyed by service name, not dataset, since the same
+   * service (e.g., TAP) declares the same label in every dataset. When a
+   * label is declared more than once the first occurrence wins, visiting
+   * data services (in dataset order) before internal services because they
+   * are the user-facing entries and carry richer metadata (docs URLs).
+   *
+   * Empty for Repertoire 2.x discovery, which has no quota labels.
+   */
+  getQuotaLabelIndex(): QuotaLabelIndex {
+    const index: QuotaLabelIndex = {};
+    const services: [string, DataService | InternalService][] = [
+      ...Object.values(this.discovery.datasets).flatMap((dataset) =>
+        Object.entries(dataset.services)
+      ),
+      ...Object.entries(this.discovery.services.internal),
+    ];
+    for (const [serviceName, service] of services) {
+      for (const [label, quotaLabel] of Object.entries(service.quota_labels)) {
+        if (label in index) continue;
+        index[label] = {
+          serviceName,
+          serviceTitle: service.title ?? null,
+          serviceDocsUrl: service.docs_url ?? null,
+          labelTitle: quotaLabel.title,
+          internal: quotaLabel.internal,
+        };
+      }
+    }
+    return index;
+  }
+
   // === Convenience methods for common services ===
 
   /**
@@ -175,6 +309,20 @@ export class ServiceDiscoveryQuery {
    */
   getNubladoUrl(): string | undefined {
     return this.getUiServiceUrl('nublado');
+  }
+
+  /**
+   * Get the Squareone (RSP home page) URL, e.g. 'https://data.lsst.cloud/'.
+   */
+  getSquareoneUrl(): string | undefined {
+    return this.getUiServiceUrl('squareone');
+  }
+
+  /**
+   * Get the COmanage registry (account settings) URL.
+   */
+  getComanageUrl(): string | undefined {
+    return this.getUiServiceUrl('comanage');
   }
 
   /**
