@@ -9,6 +9,9 @@
  * keeps the stories deterministic: the components render the final state on
  * their first pass, with no loading states for a play function to wait out.
  *
+ * An optional second argument overrides config keys for the story (for
+ * example `appLinks`), on top of the Storybook-wide config.
+ *
  * `mockDiscovery` points at the live RSP, so pair the decorator with
  * `holdCrossOriginFetch` as the story's `beforeEach`, which keeps any query the
  * cache does not answer from reaching it.
@@ -33,7 +36,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { type ReactNode, useState } from 'react';
 
 import { ConfigProvider } from '../../contexts/rsc';
-import { useStaticConfig } from '../../hooks/useStaticConfig';
+import {
+  type AppConfigContextValue,
+  useStaticConfig,
+} from '../../hooks/useStaticConfig';
 
 /** The (never fetched) discovery URL the seeded stories are configured with. */
 export const STORY_REPERTOIRE_URL = 'https://data.lsst.cloud/repertoire';
@@ -50,15 +56,21 @@ function loginInfoFor(visitor: StoryVisitor): LoginInfo | null {
 
 function ServiceAccessProvider({
   visitor,
+  configOverrides,
   children,
 }: {
   visitor: StoryVisitor;
+  configOverrides: Partial<AppConfigContextValue>;
   children: ReactNode;
 }) {
   // Extend the Storybook-wide config rather than restating it.
   const config = useStaticConfig();
   const [configPromise] = useState(() =>
-    Promise.resolve({ ...config, repertoireUrl: STORY_REPERTOIRE_URL })
+    Promise.resolve({
+      ...config,
+      ...configOverrides,
+      repertoireUrl: STORY_REPERTOIRE_URL,
+    })
   );
   const [queryClient] = useState(() => {
     const client = new QueryClient({
@@ -86,11 +98,20 @@ function ServiceAccessProvider({
   );
 }
 
-/** Render the story against `mockDiscovery` as `visitor`. */
-export function withServiceAccess(visitor: StoryVisitor): Decorator {
+/**
+ * Render the story against `mockDiscovery` as `visitor`, with any
+ * `configOverrides` applied to the Storybook-wide config.
+ */
+export function withServiceAccess(
+  visitor: StoryVisitor,
+  configOverrides: Partial<AppConfigContextValue> = {}
+): Decorator {
   return function ServiceAccessDecorator(Story) {
     return (
-      <ServiceAccessProvider visitor={visitor}>
+      <ServiceAccessProvider
+        visitor={visitor}
+        configOverrides={configOverrides}
+      >
         <Story />
       </ServiceAccessProvider>
     );

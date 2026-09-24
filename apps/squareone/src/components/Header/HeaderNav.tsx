@@ -86,11 +86,8 @@ export default function HeaderNav() {
           <InternalTriggerLink href="/api-aspect">APIs</InternalTriggerLink>
         </PrimaryNavigation.Item>
 
-        {enableAppsMenu && (
-          <PrimaryNavigation.Item className={styles.navItem}>
-            <AppsMenu />
-          </PrimaryNavigation.Item>
-        )}
+        {/* AppsMenu renders its own item, or nothing when it has no items. */}
+        {enableAppsMenu && <AppsMenu className={styles.navItem} />}
 
         <PrimaryNavigation.Item className={styles.navItem}>
           <InternalTriggerLink href="/docs">Documentation</InternalTriggerLink>
