@@ -33,12 +33,21 @@ export type ServicePresentation = {
  *
  * This is squareone-local curation — human labels, IVOA standard links, URL
  * selection, and dataset display names — not part of the shared discovery
- * client. Services and dataset keys absent from these maps fall back to their
- * raw discovery values (raw service name + base URL; raw dataset key).
+ * client. Curated services win entirely over discovery metadata. Services
+ * absent from `services` fall back to their discovery `title` (then
+ * {@link PresentationMap.untitledServiceLabels}, then the raw service name),
+ * discovery `docs_url`, and base URL; dataset keys absent from
+ * `datasetDisplayNames` fall back to the raw key.
  */
 export type PresentationMap = {
   /** Service name -> curated presentation. */
   services: Record<string, ServicePresentation>;
+  /**
+   * Service name -> label for a service absent from `services` whose
+   * discovery entry has no `title` (Repertoire 2.x). A discovery `title`
+   * takes precedence, so these only keep older environments readable.
+   */
+  untitledServiceLabels?: Record<string, string>;
   /** Dataset key -> display name (e.g. `dp1` -> "Data Preview 1"). */
   datasetDisplayNames: Record<string, string>;
 };
@@ -91,10 +100,11 @@ export const presentationMap: PresentationMap = {
       ivoaName: 'GMS',
       url: 'base',
     },
-    alerts: {
-      label: 'Alerts',
-      url: 'base',
-    },
+  },
+  untitledServiceLabels: {
+    // Not an IVOA standard, so not curated: Repertoire 3.0 discovery supplies
+    // its title ("Alert retrieval") and technote docs link.
+    alerts: 'Alerts',
   },
   datasetDisplayNames: {
     dp1: 'Data Preview 1',
@@ -155,6 +165,40 @@ export function orderDatasetKeys(keys: string[]): string[] {
     ordered.splice(1, 0, 'prompt');
   }
   return ordered;
+}
+
+/**
+ * Whether a documentation URL points at an IVOA standard (a page under
+ * `https://www.ivoa.net/documents/`). Malformed URLs are not IVOA links.
+ */
+export function isIvoaStandardUrl(url: string): boolean {
+  try {
+    const { hostname, pathname } = new URL(url);
+    return (
+      (hostname === 'www.ivoa.net' || hostname === 'ivoa.net') &&
+      pathname.startsWith('/documents/')
+    );
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Derive the short standard name for an IVOA doc link's accessible label from
+ * an endpoint label, for services without a curated {@link
+ * ServicePresentation.ivoaName}.
+ *
+ * A trailing single-word parenthetical is taken as the acronym (`Simple
+ * spectral access (SSA)` -> `SSA`); otherwise any parenthetical expansion is
+ * dropped (`HiPS (Hierarchical Progressive Survey)` -> `HiPS`) and the rest of
+ * the label is used as-is (`DataLink` -> `DataLink`).
+ */
+export function ivoaNameFromLabel(label: string): string {
+  const acronym = /\(\s*([^\s()]+)\s*\)\s*$/.exec(label);
+  if (acronym) {
+    return acronym[1];
+  }
+  return label.replace(/\s*\([^()]*\)/g, '').trim() || label;
 }
 
 /**
