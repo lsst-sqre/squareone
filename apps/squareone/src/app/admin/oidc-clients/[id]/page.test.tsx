@@ -41,17 +41,17 @@ import {
   type AppConfigContextValue,
   useStaticConfig,
 } from '../../../../hooks/useStaticConfig';
-import type { AppConfig } from '../../../../lib/config/loader';
+import type { StaticConfig } from '../../../../lib/config/resolveConfigDefaults';
 import { getStaticConfig } from '../../../../lib/config/rsc';
 import OIDCClientDetailPage, { generateMetadata } from './page';
 
 const CLIENT_ID = 'a1b2c3d4-0000-4000-8000-000000000001';
 
-function makeConfig(overrides: Partial<AppConfig> = {}): AppConfig {
+function makeConfig(overrides: Partial<StaticConfig> = {}): StaticConfig {
   return {
     siteName: 'Rubin Science Platform',
     ...overrides,
-  } as AppConfig;
+  } as StaticConfig;
 }
 
 async function renderPageWithScopes(scopes: string[]) {

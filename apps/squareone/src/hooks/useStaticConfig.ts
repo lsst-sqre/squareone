@@ -10,16 +10,18 @@
 import { use, useContext } from 'react';
 
 import { ConfigContext } from '../contexts/rsc/ConfigProvider';
-import type { AppConfig } from '../lib/config/loader';
+import type { StaticConfig } from '../lib/config/resolveConfigDefaults';
 
-export type { AppConfig as AppConfigContextValue } from '../lib/config/loader';
+export type { StaticConfig as AppConfigContextValue } from '../lib/config/resolveConfigDefaults';
 
 /**
  * Hook to access static configuration in client components.
  *
  * Suspends until config promise resolves (via ConfigProvider).
  *
- * @returns The static configuration object
+ * @returns The resolved static configuration object (`siteName`,
+ *   `environmentName`, and `baseUrl` already filled from discovery or
+ *   fallbacks)
  * @throws Error if used outside of ConfigProvider
  *
  * @example
@@ -34,7 +36,7 @@ export type { AppConfig as AppConfigContextValue } from '../lib/config/loader';
  * }
  * ```
  */
-export function useStaticConfig(): AppConfig {
+export function useStaticConfig(): StaticConfig {
   const rscConfigPromise = useContext(ConfigContext);
 
   if (rscConfigPromise) {

@@ -42,9 +42,26 @@ export interface SentryConfig {
   release?: string;
 }
 
+/**
+ * The validated configuration from `squareone.config.yaml` and
+ * `squareone.serverconfig.yaml`.
+ *
+ * `siteName`, `environmentName`, and `baseUrl` are optional here; consumers
+ * read the resolved `StaticConfig` (from `getStaticConfig()` or
+ * `useStaticConfig()`), where `resolveConfigDefaults()` has filled them from
+ * Repertoire discovery or fallbacks.
+ */
 export interface AppConfig {
-  siteName: string;
-  baseUrl: string;
+  /**
+   * Site name for page titles and the homepage hero. When unset, resolves to
+   * discovery's `environment.title`, else "Rubin Science Platform".
+   */
+  siteName?: string;
+  /**
+   * Base URL of the public ingress (no trailing slash). When unset, resolves
+   * to discovery's `services.ui.squareone.url`, else the request origin.
+   */
+  baseUrl?: string;
   /**
    * @deprecated Use Repertoire service discovery instead (the `useSemaphoreUrl`
    * hook resolves the Semaphore URL via `repertoireUrl`). Retained only so
@@ -54,11 +71,22 @@ export interface AppConfig {
   semaphoreUrl?: string;
   repertoireUrl?: string;
   plausibleDomain?: string;
-  environmentName: string;
+  /**
+   * Phalanx environment name, used as the Sentry environment. When unset,
+   * resolves to discovery's `environment.label`, else "unknown".
+   */
+  environmentName?: string;
   siteDescription: string;
   docsBaseUrl: string;
   timesSquareUrl: string;
-  coManageRegistryUrl: string;
+  /**
+   * @deprecated Use Repertoire service discovery instead (the COmanage
+   * registry URL is `services.ui.comanage`, via `getComanageUrl()`). Retained
+   * only so Phalanx-delivered configs that still set `coManageRegistryUrl`
+   * validate under the schema's `additionalProperties: false`; no app code
+   * reads it.
+   */
+  coManageRegistryUrl?: string;
   enableAppsMenu: boolean;
   appLinks: Array<{
     label: string;

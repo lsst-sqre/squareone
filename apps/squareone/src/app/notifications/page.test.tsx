@@ -16,16 +16,16 @@ vi.mock('next/navigation', () => ({
 
 // Import after mocking.
 import { notFound } from 'next/navigation';
-import type { AppConfig } from '../../lib/config/loader';
+import type { StaticConfig } from '../../lib/config/resolveConfigDefaults';
 import { getStaticConfig } from '../../lib/config/rsc';
 import NotificationsPage, { generateMetadata } from './page';
 
-function makeConfig(overrides: Partial<AppConfig> = {}): AppConfig {
+function makeConfig(overrides: Partial<StaticConfig> = {}): StaticConfig {
   return {
     siteName: 'Rubin Science Platform',
     enableUserNotifications: true,
     ...overrides,
-  } as AppConfig;
+  } as StaticConfig;
 }
 
 describe('NotificationsPage generateMetadata', () => {
