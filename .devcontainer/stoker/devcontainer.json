@@ -1,4 +1,4 @@
-// stoker-managed: sandbox:stoker/devcontainer.json:5e5557b7f513420f
+// stoker-managed: sandbox:stoker/devcontainer.json:2826ae0d71291889
 {
   "name": "stoker-default-lsst-sqre-squareone",
   "image": "mcr.microsoft.com/devcontainers/base:bookworm",
@@ -6,7 +6,7 @@
     "ghcr.io/devcontainers/features/git:1": {},
     "ghcr.io/devcontainers/features/github-cli:1": {},
     "ghcr.io/devcontainers/features/node:1": {
-      "version": "22",
+      "version": "24",
       "nodeGypDependencies": true,
       "installYarnUsingApt": false
     },
