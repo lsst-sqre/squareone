@@ -123,8 +123,14 @@ function makeDiscoveryReturn() {
     getPortalUrl: () => 'https://data.example.org/portal/app',
     getNubladoUrl: () => 'https://data.example.org/nb/hub',
     getSemaphoreUrl: () => 'https://data.example.org/semaphore',
-    getUiService: () => ({ required_scopes: [] as string[] }),
+    getUiService: (name: string) => ({
+      url: `https://data.example.org/${name}`,
+      required_scopes: [] as string[],
+    }),
     canAccessService: () => true,
+    // The Apps menu lists Times Square and resolves hrefs for de-duplication.
+    hasApplication: () => true,
+    getSquareoneUrl: () => 'https://data.example.org/',
   };
   return {
     discovery: {},

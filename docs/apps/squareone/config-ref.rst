@@ -41,6 +41,46 @@ Server-side Sentry follows the same ``environmentName`` resolution, so events fr
 The server resolves it once at startup, before it serves any requests: it waits at most a few seconds for service discovery, and if the Repertoire API doesn't respond in time it logs a warning and uses the ``unknown`` fallback.
 The server no longer reads the ``SQUAREONE_ENVIRONMENT_NAME`` environment variable.
 
+.. _config-apps-menu:
+
+Apps menu
+=========
+
+Setting ``enableAppsMenu`` to ``true`` adds an Apps menu to the header.
+Its items are derived from Repertoire service discovery and the user's scopes, so they don't need to be listed for each Phalanx environment:
+
+#. **Times Square** (``/times-square/``), when the ``times-square`` application is enabled.
+#. Each of the following UI services that discovery lists and that the user can access, labelled by the service's discovery ``title`` (or its name, if it has no title), in this order:
+
+   .. list-table::
+      :header-rows: 1
+      :widths: 30 70
+
+      * - Service
+        - Associated scopes
+      * - ``argocd``
+        - ``exec:admin``
+      * - ``chronograf``
+        - ``exec:admin``
+      * - ``kafdrop``
+        - ``exec:internal-tools``
+      * - ``webdav``
+        - ``write:files``
+
+   A service's ``required_scopes`` from discovery (Repertoire 3.0.0 and later) decide who can access it.
+   When discovery declares none, as for Argo CD and Chronograf, which have their own logins, the user needs the associated scopes above instead, so that these tools are not advertised to every user.
+   These items appear only once the user's scopes are known: anonymous visitors don't see them.
+
+#. The configured ``appLinks``.
+
+``appLinks`` are additive extras for apps that service discovery does not describe (for example, a deployment-specific tool).
+They are shown to every user, regardless of scopes.
+A link whose ``href`` repeats an earlier item is dropped; relative hrefs are resolved against the ``squareone`` UI service URL and trailing slashes are ignored when comparing, so an ``appLinks`` entry of ``/argo-cd/`` does not duplicate the discovered Argo CD item.
+Links for services now derived from discovery can be removed from ``appLinks``, though an entry that stays is still shown to users who can't see the discovered item.
+
+The menu is hidden when it has no items.
+When ``repertoireUrl`` is not set, the menu lists only the ``appLinks``.
+
 Deprecated keys
 ===============
 

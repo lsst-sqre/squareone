@@ -25,88 +25,28 @@ vi.mock('../../hooks/useCurrentUrl', () => ({
   default: () => new URL('https://data.lsst.cloud/'),
 }));
 
-// The login control and Apps menu have their own data dependencies and tests.
+// The login control and Apps menu have their own data dependencies and tests;
+// the Apps menu stands in as a bare navigation item so its placement shows.
 vi.mock('./Login', () => ({ default: (): null => null }));
-vi.mock('./AppsMenu', () => ({ default: (): null => null }));
+vi.mock('./AppsMenu', () => ({
+  default: () => <li data-testid="apps-menu" />,
+}));
 
-import type { UseLoginInfoReturn } from '@lsst-sqre/gafaelfawr-client';
 // Import after mocking.
-import { useLoginInfo } from '@lsst-sqre/gafaelfawr-client';
-import {
-  createDiscoveryQuery,
-  mockDiscovery,
-  type ServiceDiscovery,
-  useServiceDiscovery,
-} from '@lsst-sqre/repertoire-client';
 import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
 import {
   type AppConfigContextValue,
   useStaticConfig,
 } from '../../hooks/useStaticConfig';
+import {
+  discoveryWithoutRequiredScopes,
+  mockAnonymous,
+  mockDiscoveryState,
+  mockSignedIn,
+} from '../../tests/serviceAccessMocks';
 import HeaderNav from './HeaderNav';
 
 const REPERTOIRE_URL = 'https://data.lsst.cloud/repertoire/discovery';
-
-/** mockDiscovery as a Repertoire 2.x environment publishes it: no scopes. */
-const discoveryWithoutRequiredScopes: ServiceDiscovery = {
-  ...mockDiscovery,
-  services: {
-    ...mockDiscovery.services,
-    ui: Object.fromEntries(
-      Object.entries(mockDiscovery.services.ui).map(([name, service]) => [
-        name,
-        { ...service, required_scopes: [] as string[] },
-      ])
-    ),
-  },
-};
-
-function mockDiscoveryState({
-  discovery = mockDiscovery,
-  isPending = false,
-}: {
-  discovery?: ServiceDiscovery;
-  isPending?: boolean;
-} = {}) {
-  vi.mocked(useServiceDiscovery).mockReturnValue({
-    discovery: isPending ? undefined : discovery,
-    query: isPending ? null : createDiscoveryQuery(discovery),
-    refetch: vi.fn(),
-    isStale: false,
-    isPending,
-    isError: false,
-    error: null,
-  } as unknown as ReturnType<typeof useServiceDiscovery>);
-}
-
-/** A signed-in user holding exactly `scopes`. */
-function mockSignedIn(scopes: string[]) {
-  vi.mocked(useLoginInfo).mockReturnValue({
-    loginInfo: null,
-    query: {
-      scopes,
-      hasScope: (scope: string) => scopes.includes(scope),
-    } as UseLoginInfoReturn['query'],
-    csrfToken: null,
-    isLoading: false,
-    isPending: false,
-    error: null,
-    refetch: vi.fn(),
-  });
-}
-
-/** An anonymous visitor: Gafaelfawr answers 401, so there is no login info. */
-function mockAnonymous() {
-  vi.mocked(useLoginInfo).mockReturnValue({
-    loginInfo: null,
-    query: null,
-    csrfToken: null,
-    isLoading: false,
-    isPending: false,
-    error: null,
-    refetch: vi.fn(),
-  });
-}
 
 function navLink(name: string) {
   return screen.queryByRole('link', { name });
@@ -193,5 +133,22 @@ describe('HeaderNav', () => {
 
     expect(navLink('Portal')).toHaveAttribute('href', '/portal/app');
     expect(navLink('Notebooks')).toHaveAttribute('href', '/nb/hub');
+  });
+
+  test('renders the Apps menu as its own item when enableAppsMenu is true', () => {
+    vi.mocked(useStaticConfig).mockReturnValue({
+      enableAppsMenu: true,
+    } as AppConfigContextValue);
+
+    render(<HeaderNav />);
+
+    // AppsMenu renders its own navigation item (or nothing, with no items).
+    expect(screen.getByTestId('apps-menu').parentElement?.tagName).toBe('UL');
+  });
+
+  test('hides the Apps menu when enableAppsMenu is false', () => {
+    render(<HeaderNav />);
+
+    expect(screen.queryByTestId('apps-menu')).not.toBeInTheDocument();
   });
 });
