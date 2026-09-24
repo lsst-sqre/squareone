@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import discovery21 from './__fixtures__/discovery-2.1.0-data.json';
+import discovery30 from './__fixtures__/discovery-3.0.0-data-dev.json';
 import { getEmptyDiscovery } from './client';
 import { mockDiscovery } from './mock-discovery';
 import {
@@ -6,7 +8,18 @@ import {
   type DatasetWithService,
   ServiceDiscoveryQuery,
 } from './query';
+import { DiscoverySchema } from './schemas';
 import type { ServiceDiscovery } from './types';
+
+/** Query over the live Repertoire 3.0.0 data-dev discovery fixture. */
+function dataDevQuery(): ServiceDiscoveryQuery {
+  return createDiscoveryQuery(DiscoverySchema.parse(discovery30));
+}
+
+/** Query over the live Repertoire 2.1.0 production discovery fixture. */
+function productionQuery(): ServiceDiscoveryQuery {
+  return createDiscoveryQuery(DiscoverySchema.parse(discovery21));
+}
 
 describe('ServiceDiscoveryQuery', () => {
   describe('application queries', () => {
@@ -65,6 +78,24 @@ describe('ServiceDiscoveryQuery', () => {
 
       expect(query.hasUiService('portal')).toBe(true);
       expect(query.hasUiService('nublado')).toBe(true);
+    });
+
+    it('getUiService returns full UI service info', () => {
+      const portal = dataDevQuery().getUiService('portal');
+
+      expect(portal).toEqual({
+        url: 'https://data-dev.lsst.cloud/portal/app/',
+        title: 'Portal aspect',
+        required_scopes: ['exec:portal'],
+      });
+    });
+
+    it('getUiService returns undefined for non-existent service', () => {
+      const query = dataDevQuery();
+
+      expect(query.getUiService('nonexistent')).toBeUndefined();
+      // Times Square is only an internal service, never a UI service.
+      expect(query.getUiService('times-square')).toBeUndefined();
     });
 
     it('hasUiService returns false for non-existent services', () => {
@@ -166,21 +197,40 @@ describe('ServiceDiscoveryQuery', () => {
       expect(query.hasDataset('nonexistent')).toBe(false);
     });
 
+    it('getDataService returns a dataset-specific data service', () => {
+      const tap = dataDevQuery().getDataService('dp03', 'tap');
+
+      expect(tap?.url).toBe('https://data-dev.lsst.cloud/api/ssotap');
+      expect(tap?.required_scopes).toEqual(['read:tap']);
+    });
+
+    it('getDataService returns undefined for a missing dataset or service', () => {
+      const query = dataDevQuery();
+
+      expect(query.getDataService('nonexistent', 'tap')).toBeUndefined();
+      // dp03 is catalog-only, so it has no SIA service.
+      expect(query.getDataService('dp03', 'sia')).toBeUndefined();
+    });
+
     it('getDatasetsWithService finds datasets with TAP service', () => {
       const query = createDiscoveryQuery(mockDiscovery);
       const tapDatasets = query.getDatasetsWithService('tap');
 
-      // Every dataset (dp1, dp02, dp03) serves TAP.
-      expect(tapDatasets).toHaveLength(3);
+      // Every dataset (dp1, dp02, dp03, prompt) serves TAP.
+      expect(tapDatasets).toHaveLength(4);
       expect(tapDatasets.map((d) => d.id)).toContain('dp1');
       expect(tapDatasets.map((d) => d.id)).toContain('dp02');
       expect(tapDatasets.map((d) => d.id)).toContain('dp03');
+      expect(tapDatasets.map((d) => d.id)).toContain('prompt');
 
       const dp1 = tapDatasets.find((d) => d.id === 'dp1');
       expect(dp1?.serviceUrl).toBe('https://data.lsst.cloud/api/tap');
       // dp03 routes through the SSO TAP endpoint.
       const dp03 = tapDatasets.find((d) => d.id === 'dp03');
       expect(dp03?.serviceUrl).toBe('https://data.lsst.cloud/api/ssotap');
+      // prompt routes through the PPDB TAP endpoint.
+      const prompt = tapDatasets.find((d) => d.id === 'prompt');
+      expect(prompt?.serviceUrl).toBe('https://data.lsst.cloud/api/ppdbtap');
     });
 
     it('getDatasetsWithService finds datasets with SIA service', () => {
@@ -287,6 +337,20 @@ describe('ServiceDiscoveryQuery', () => {
       );
     });
 
+    it('getSquareoneUrl returns the squareone UI service URL', () => {
+      expect(dataDevQuery().getSquareoneUrl()).toBe(
+        'https://data-dev.lsst.cloud/'
+      );
+    });
+
+    it('getComanageUrl returns the comanage UI service URL', () => {
+      expect(dataDevQuery().getComanageUrl()).toBe(
+        'https://id-dev.lsst.cloud/'
+      );
+      // Production (2.1.0) has no COmanage registry.
+      expect(productionQuery().getComanageUrl()).toBeUndefined();
+    });
+
     it('convenience methods return undefined for missing services', () => {
       const query = createDiscoveryQuery(getEmptyDiscovery());
 
@@ -295,6 +359,8 @@ describe('ServiceDiscoveryQuery', () => {
       expect(query.getPortalUrl()).toBeUndefined();
       expect(query.getNubladoUrl()).toBeUndefined();
       expect(query.getTimesSquareUrl()).toBeUndefined();
+      expect(query.getSquareoneUrl()).toBeUndefined();
+      expect(query.getComanageUrl()).toBeUndefined();
     });
   });
 
@@ -419,6 +485,216 @@ describe('ServiceDiscoveryQuery', () => {
 
       // Original should be unchanged
       expect(mockDiscovery).toEqual(original);
+    });
+  });
+
+  describe('environment queries', () => {
+    it('getEnvironment returns the Repertoire 3.0.0 environment object', () => {
+      const environment = dataDevQuery().getEnvironment();
+
+      expect(environment?.label).toBe('idfdev');
+      expect(environment?.title).toBe('SQuaRE RSP development');
+      expect(environment?.docs_url).toBe(
+        'https://phalanx.lsst.io/environments/idfdev/'
+      );
+    });
+
+    it('getEnvironment returns null when the environment is absent', () => {
+      expect(productionQuery().getEnvironment()).toBeNull();
+      expect(createDiscoveryQuery(getEmptyDiscovery()).getEnvironment()).toBe(
+        null
+      );
+    });
+
+    it('getEnvironmentName prefers environment.name over environment_name', () => {
+      const discovery: ServiceDiscovery = {
+        ...DiscoverySchema.parse(discovery30),
+        environment_name: 'deprecated.example.org',
+      };
+
+      expect(createDiscoveryQuery(discovery).getEnvironmentName()).toBe(
+        'data-dev.lsst.cloud'
+      );
+    });
+
+    it('getEnvironmentName falls back to the deprecated environment_name', () => {
+      expect(productionQuery().getEnvironmentName()).toBe('data.lsst.cloud');
+    });
+
+    it('getEnvironmentName returns null when neither field is present', () => {
+      expect(
+        createDiscoveryQuery(getEmptyDiscovery()).getEnvironmentName()
+      ).toBeNull();
+    });
+  });
+
+  describe('canAccessService', () => {
+    const multiScopeService = {
+      url: 'https://example.org/admin-tool',
+      required_scopes: ['exec:admin', 'exec:internal-tools'],
+    };
+
+    it('grants access to anonymous users (undefined scopes)', () => {
+      const query = dataDevQuery();
+      const portal = query.getUiService('portal');
+      if (!portal) throw new Error('portal missing from fixture');
+
+      // Unknown scopes (anonymous or not yet loaded) keep today's behaviour.
+      expect(query.canAccessService(portal)).toBe(true);
+      expect(query.canAccessService(multiScopeService, undefined)).toBe(true);
+    });
+
+    it('grants access when the service requires no scopes', () => {
+      const query = dataDevQuery();
+      const argocd = query.getUiService('argocd');
+      if (!argocd) throw new Error('argocd missing from fixture');
+
+      expect(argocd.required_scopes).toEqual([]);
+      expect(query.canAccessService(argocd, [])).toBe(true);
+      expect(query.canAccessService(argocd, ['read:tap'])).toBe(true);
+    });
+
+    it('denies access when the user holds only some required scopes', () => {
+      const query = dataDevQuery();
+
+      expect(query.canAccessService(multiScopeService, ['exec:admin'])).toBe(
+        false
+      );
+      expect(query.canAccessService(multiScopeService, [])).toBe(false);
+    });
+
+    it('grants access when the user holds every required scope', () => {
+      const query = dataDevQuery();
+      const nublado = query.getUiService('nublado');
+      if (!nublado) throw new Error('nublado missing from fixture');
+
+      expect(
+        query.canAccessService(multiScopeService, [
+          'exec:internal-tools',
+          'read:tap',
+          'exec:admin',
+        ])
+      ).toBe(true);
+      expect(query.canAccessService(nublado, ['exec:notebook'])).toBe(true);
+      expect(query.canAccessService(nublado, ['exec:portal'])).toBe(false);
+    });
+  });
+
+  describe('getQuotaLabelIndex', () => {
+    it('maps data service quota labels to their service and label titles', () => {
+      const index = dataDevQuery().getQuotaLabelIndex();
+
+      expect(index.tap).toEqual({
+        serviceName: 'tap',
+        serviceTitle: 'Table access protocol (TAP)',
+        serviceDocsUrl: 'https://www.ivoa.net/documents/TAP/',
+        labelTitle: 'TAP API calls',
+        internal: false,
+      });
+      // Keyed by the quota label, not the service name.
+      expect(index['vo-cutouts']?.serviceName).toBe('cutout');
+      expect(index['vo-cutouts']?.labelTitle).toBe('SODA API calls');
+      expect(index.herald?.serviceName).toBe('alerts');
+    });
+
+    it('includes internal service quota labels', () => {
+      const index = dataDevQuery().getQuotaLabelIndex();
+
+      // muster declares neither a title nor a docs URL.
+      expect(index['muster-quota']).toEqual({
+        serviceName: 'muster',
+        serviceTitle: null,
+        serviceDocsUrl: null,
+        labelTitle: 'Quota testing',
+        internal: false,
+      });
+    });
+
+    it('indexes every quota label on data-dev exactly once', () => {
+      const index = dataDevQuery().getQuotaLabelIndex();
+
+      expect(Object.keys(index).sort()).toEqual([
+        'datalinker',
+        'herald',
+        'hips',
+        'muster-quota',
+        'sia',
+        'tap',
+        'vo-cutouts',
+      ]);
+    });
+
+    it('de-duplicates a label across datasets, first occurrence winning', () => {
+      const discovery = DiscoverySchema.parse({
+        services: { internal: {}, ui: {} },
+        datasets: {
+          dp1: {
+            services: {
+              tap: {
+                url: 'https://example.org/api/tap',
+                title: 'First TAP',
+                quota_labels: { tap: { title: 'First title' } },
+              },
+            },
+          },
+          dp02: {
+            services: {
+              tap: {
+                url: 'https://example.org/api/tap',
+                title: 'Second TAP',
+                quota_labels: { tap: { title: 'Second title' } },
+              },
+            },
+          },
+        },
+      });
+
+      const index = createDiscoveryQuery(discovery).getQuotaLabelIndex();
+
+      expect(Object.keys(index)).toEqual(['tap']);
+      expect(index.tap?.serviceTitle).toBe('First TAP');
+      expect(index.tap?.labelTitle).toBe('First title');
+    });
+
+    it('prefers the user-facing data service over an internal service', () => {
+      // On data-dev `datalinker` is declared by both the internal `datalink`
+      // service (no docs URL) and each dataset's `datalink` data service.
+      const index = dataDevQuery().getQuotaLabelIndex();
+
+      expect(index.datalinker).toEqual({
+        serviceName: 'datalink',
+        serviceTitle: 'DataLink',
+        serviceDocsUrl: 'https://www.ivoa.net/documents/DataLink/',
+        labelTitle: 'DataLink {links} requests',
+        internal: false,
+      });
+    });
+
+    it('carries the internal flag through', () => {
+      const discovery = DiscoverySchema.parse({
+        services: {
+          internal: {
+            muster: {
+              url: 'https://example.org/muster',
+              quota_labels: {
+                'muster-quota': { title: 'Quota testing', internal: true },
+              },
+            },
+          },
+          ui: {},
+        },
+      });
+
+      const index = createDiscoveryQuery(discovery).getQuotaLabelIndex();
+
+      expect(index['muster-quota']?.internal).toBe(true);
+    });
+
+    it('is empty for Repertoire 2.x discovery', () => {
+      expect(productionQuery().getQuotaLabelIndex()).toEqual({});
+      expect(
+        createDiscoveryQuery(getEmptyDiscovery()).getQuotaLabelIndex()
+      ).toEqual({});
     });
   });
 

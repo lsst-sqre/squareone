@@ -1,6 +1,69 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
-import { classifySpecs, comparableJson } from './check-openapi-drift.js';
+import {
+  classifySpecs,
+  comparableJson,
+  extractSpecUrl,
+} from './check-openapi-drift.js';
+
+describe('extractSpecUrl', () => {
+  it('returns a literal URL from a curl script', () => {
+    expect(
+      extractSpecUrl(
+        'curl -o openapi.json https://data.lsst.cloud/semaphore/openapi.json',
+        {}
+      )
+    ).toBe('https://data.lsst.cloud/semaphore/openapi.json');
+  });
+
+  it('returns null when the script has no URL', () => {
+    expect(extractSpecUrl('echo nothing to fetch', {})).toBeNull();
+    expect(extractSpecUrl(undefined, {})).toBeNull();
+  });
+
+  // A host override written as a POSIX `${VAR:-default}` expansion, so the
+  // same script works in `pnpm run` (sh) and in this checker.
+  const overridable =
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: a literal shell expansion, not a JS template
+    'curl -o openapi.json https://${REPERTOIRE_HOST:-data.lsst.cloud}/repertoire/openapi.json';
+
+  it('uses the default host when the override variable is unset', () => {
+    expect(extractSpecUrl(overridable, {})).toBe(
+      'https://data.lsst.cloud/repertoire/openapi.json'
+    );
+  });
+
+  it('uses the default host when the override variable is empty', () => {
+    expect(extractSpecUrl(overridable, { REPERTOIRE_HOST: '' })).toBe(
+      'https://data.lsst.cloud/repertoire/openapi.json'
+    );
+  });
+
+  it('uses the override host when the variable is set', () => {
+    expect(
+      extractSpecUrl(overridable, { REPERTOIRE_HOST: 'data-dev.lsst.cloud' })
+    ).toBe('https://data-dev.lsst.cloud/repertoire/openapi.json');
+  });
+
+  it("resolves repertoire-client's fetch-openapi script to production", () => {
+    const pkg = JSON.parse(
+      readFileSync(
+        new URL('../../repertoire-client/package.json', import.meta.url),
+        'utf8'
+      )
+    );
+
+    expect(extractSpecUrl(pkg.scripts['fetch-openapi'], {})).toBe(
+      'https://data.lsst.cloud/repertoire/openapi.json'
+    );
+    expect(
+      extractSpecUrl(pkg.scripts['fetch-openapi'], {
+        REPERTOIRE_HOST: 'data-dev.lsst.cloud',
+      })
+    ).toBe('https://data-dev.lsst.cloud/repertoire/openapi.json');
+  });
+});
 
 // A minimal but representative OpenAPI spec used as the baseline for the
 // comparison tests. Each case clones and mutates this to model a real scenario.

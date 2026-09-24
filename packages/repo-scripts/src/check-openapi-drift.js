@@ -71,16 +71,38 @@ const FETCH_TIMEOUT_MS = 30000;
 const rootDir = path.resolve(__dirname, '../../..');
 
 /**
+ * Expand POSIX shell parameter references (`${NAME}` and `${NAME:-default}`)
+ * against `env`, as `sh` would when pnpm runs the script. `:-` substitutes
+ * the default when the variable is unset or empty.
+ */
+function expandShellParams(text, env) {
+  return text.replace(
+    /\$\{([A-Za-z_][A-Za-z0-9_]*)(?::-([^}]*))?\}/g,
+    (_match, name, fallback) => {
+      const value = env[name];
+      if (value !== undefined && value !== '') return value;
+      return fallback ?? '';
+    }
+  );
+}
+
+/**
  * Extract the live spec URL from a package's `fetch-openapi` script.
  *
  * The script is a curl invocation such as
  *   curl -o openapi.json https://data.lsst.cloud/auth/openapi.json
  * We pull the first http(s) URL out of it, so the URL is sourced from the
  * package's own script rather than duplicated in this file.
+ *
+ * A script may take its host from an environment variable with a POSIX
+ * default, such as
+ *   curl -o openapi.json https://${REPERTOIRE_HOST:-data.lsst.cloud}/...
+ * so a spec can be vendored from (and checked against) a pre-production
+ * environment; those references are expanded against `env` first.
  */
-function extractSpecUrl(fetchScript) {
+function extractSpecUrl(fetchScript, env = process.env) {
   if (!fetchScript) return null;
-  const match = fetchScript.match(/https?:\/\/\S+/);
+  const match = expandShellParams(fetchScript, env).match(/https?:\/\/\S+/);
   return match ? match[0] : null;
 }
 

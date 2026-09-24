@@ -4,22 +4,112 @@ import { createDiscoveryQuery } from './query';
 import { DiscoverySchema } from './schemas';
 
 /**
- * These tests pin the refreshed mock to the live Repertoire 2.0.0 discovery
- * shape (datasets dp1/dp02/dp03 with real service + semantic version keys), so
- * downstream slices test against realistic data.
+ * These tests pin the mock to the live Repertoire discovery shape (datasets
+ * dp1/dp02/dp03/prompt with real service + semantic version keys) and to the
+ * Repertoire 3.0.0 metadata (environment, titles, docs URLs, required scopes,
+ * quota labels) that data-dev publishes, so downstream slices test against
+ * realistic data.
  */
-describe('mockDiscovery (Repertoire 2.0.0 shape)', () => {
+describe('mockDiscovery (Repertoire 3.0.0 shape)', () => {
   it('parses cleanly against DiscoverySchema', () => {
     const result = DiscoverySchema.safeParse(mockDiscovery);
     expect(result.success).toBe(true);
+    // The mock is already in parsed (defaults-applied) form.
+    if (result.success) {
+      expect(result.data).toEqual(mockDiscovery);
+    }
   });
 
-  it('models the live dp1/dp02/dp03 datasets', () => {
+  it('models the live dp1/dp02/dp03/prompt datasets', () => {
     expect(Object.keys(mockDiscovery.datasets).sort()).toEqual([
       'dp02',
       'dp03',
       'dp1',
+      'prompt',
     ]);
+  });
+
+  it('describes its environment, consistent with environment_name', () => {
+    const query = createDiscoveryQuery(mockDiscovery);
+    const environment = query.getEnvironment();
+
+    expect(environment?.label).toBe('idfprod');
+    expect(environment?.title).toBeTruthy();
+    expect(environment?.docs_url).toMatch(/^https:\/\/phalanx\.lsst\.io\//);
+    expect(query.getEnvironmentName()).toBe(mockDiscovery.environment_name);
+  });
+
+  it('declares the data-dev UI service scopes', () => {
+    const { ui } = mockDiscovery.services;
+
+    expect(ui.portal.required_scopes).toEqual(['exec:portal']);
+    expect(ui.nublado.required_scopes).toEqual(['exec:notebook']);
+    expect(ui.kafdrop.required_scopes).toEqual(['exec:internal-tools']);
+    expect(ui.webdav.required_scopes).toEqual(['write:files']);
+    // Argo CD and Chronograf are not Gafaelfawr-gated.
+    expect(ui.argocd.required_scopes).toEqual([]);
+    expect(ui.chronograf.required_scopes).toEqual([]);
+  });
+
+  it('titles every UI service', () => {
+    for (const [name, service] of Object.entries(mockDiscovery.services.ui)) {
+      expect(service.title, name).toBeTruthy();
+    }
+    expect(mockDiscovery.services.ui.argocd.title).toBe('Argo CD');
+  });
+
+  it('exposes the squareone and comanage UI services', () => {
+    const query = createDiscoveryQuery(mockDiscovery);
+
+    expect(query.getSquareoneUrl()).toBe('https://data.lsst.cloud/');
+    expect(query.getComanageUrl()).toBe('https://id.lsst.cloud/');
+  });
+
+  it('keeps Times Square an internal service only', () => {
+    expect(mockDiscovery.services.internal['times-square']).toBeDefined();
+    expect(mockDiscovery.services.ui['times-square']).toBeUndefined();
+  });
+
+  it('declares the data-dev quota labels', () => {
+    const index = createDiscoveryQuery(mockDiscovery).getQuotaLabelIndex();
+
+    expect(Object.keys(index).sort()).toEqual([
+      'datalinker',
+      'herald',
+      'hips',
+      'muster-quota',
+      'sia',
+      'tap',
+      'vo-cutouts',
+    ]);
+    expect(index.tap?.serviceTitle).toBe('Table access protocol (TAP)');
+    expect(index.tap?.labelTitle).toBe('TAP API calls');
+    expect(index.sia?.labelTitle).toBe('Image requests');
+    expect(index['vo-cutouts']?.labelTitle).toBe('SODA API calls');
+    // Not flagged internal on data-dev.
+    expect(index['muster-quota']?.internal).toBe(false);
+  });
+
+  it('models the prompt dataset without a docs_url', () => {
+    const prompt = mockDiscovery.datasets.prompt;
+
+    expect(prompt.docs_url).toBeUndefined();
+    expect(prompt.description).toBeTruthy();
+    expect(prompt.services.alerts.title).toBe('Alert retrieval');
+    expect(prompt.services.tap.url).toMatch(/\/ppdbtap$/);
+  });
+
+  it('carries dataset service titles, docs URLs, and scopes', () => {
+    const { dp1 } = mockDiscovery.datasets;
+
+    expect(dp1.obscore_config).toMatch(/dp1\.yaml$/);
+    expect(dp1.services.sia.title).toBe('Simple image access (SIA)');
+    expect(dp1.services.sia.docs_url).toBe(
+      'https://www.ivoa.net/documents/SIA/'
+    );
+    expect(dp1.services.sia.required_scopes).toEqual(['read:image']);
+    expect(dp1.services.tap.required_scopes).toEqual(['read:tap']);
+    expect(dp1.services.gms.required_scopes).toEqual([]);
   });
 
   it('uses semantic version keys for dataset services', () => {
