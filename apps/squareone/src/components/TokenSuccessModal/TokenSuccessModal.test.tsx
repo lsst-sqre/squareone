@@ -22,7 +22,7 @@ describe('TokenSuccessModal', () => {
     scopes: ['read:all', 'user:token'],
     expiration: { type: 'preset', value: '90d' } as ExpirationValue,
     templateUrl:
-      'https://example.com/tokens/new?name=My+Test+Token&scope=read%3Aall&scope=user%3Atoken&expiration=90d',
+      'https://example.com/tokens/new?name=My+Test+Token&scopes=read%3Aall%2Cuser%3Atoken&expiration=90d',
   };
 
   beforeEach(() => {

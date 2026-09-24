@@ -1,6 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import type { TokenFormValues } from '../components/TokenForm';
+import { parseTokenTemplateParams } from '../lib/tokens/templateUrl';
 import useTokenTemplateUrl from './useTokenTemplateUrl';
 
 /**
@@ -68,7 +69,7 @@ describe('useTokenTemplateUrl', () => {
     );
   });
 
-  it('includes single scope parameter', () => {
+  it('includes a single scope in the scopes parameter', () => {
     const values: TokenFormValues = {
       name: '',
       scopes: ['read:image'],
@@ -78,11 +79,11 @@ describe('useTokenTemplateUrl', () => {
     const { result } = renderHook(() => useTokenTemplateUrl(baseUrl, values));
 
     expect(result.current).toBe(
-      'https://example.com/settings/tokens/new?scope=read%3Aimage&expiration=never'
+      'https://example.com/settings/tokens/new?scopes=read%3Aimage&expiration=never'
     );
   });
 
-  it('includes multiple scope parameters', () => {
+  it('joins multiple scopes into one comma-separated scopes parameter', () => {
     const values: TokenFormValues = {
       name: '',
       scopes: ['read:image', 'write:notebook', 'user:token'],
@@ -92,7 +93,7 @@ describe('useTokenTemplateUrl', () => {
     const { result } = renderHook(() => useTokenTemplateUrl(baseUrl, values));
 
     expect(result.current).toBe(
-      'https://example.com/settings/tokens/new?scope=read%3Aimage&scope=write%3Anotebook&scope=user%3Atoken&expiration=never'
+      'https://example.com/settings/tokens/new?scopes=read%3Aimage%2Cwrite%3Anotebook%2Cuser%3Atoken&expiration=never'
     );
   });
 
@@ -134,7 +135,7 @@ describe('useTokenTemplateUrl', () => {
     const { result } = renderHook(() => useTokenTemplateUrl(baseUrl, values));
 
     expect(result.current).toBe(
-      'https://example.com/settings/tokens/new?name=Test+Token&scope=read%3Aall&scope=user%3Atoken&expiration=7d'
+      'https://example.com/settings/tokens/new?name=Test+Token&scopes=read%3Aall%2Cuser%3Atoken&expiration=7d'
     );
   });
 
@@ -229,7 +230,22 @@ describe('useTokenTemplateUrl', () => {
     );
 
     expect(result.current).toBe(
-      'http://localhost:3000/tokens/create?name=Test&scope=read%3Aall&expiration=90d'
+      'http://localhost:3000/tokens/create?name=Test&scopes=read%3Aall&expiration=90d'
     );
+  });
+
+  it('round-trips through the token creation page parameter parsing', () => {
+    const values: TokenFormValues = {
+      name: 'My API token',
+      scopes: ['read:image', 'read:tap', 'user:token'],
+      expiration: { type: 'preset', value: '30d' },
+    };
+
+    const { result } = renderHook(() => useTokenTemplateUrl(baseUrl, values));
+
+    // NewTokenPageClient prefills its form with parseTokenTemplateParams.
+    expect(
+      parseTokenTemplateParams(new URL(result.current).searchParams)
+    ).toEqual(values);
   });
 });

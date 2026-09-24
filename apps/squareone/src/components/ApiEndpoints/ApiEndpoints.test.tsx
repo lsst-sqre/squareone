@@ -20,6 +20,7 @@ const okResult: ApiEndpointsResult = {
             url: 'https://www.ivoa.net/documents/TAP/',
             label: 'IVOA TAP docs',
           },
+          requiredScopes: ['read:tap'],
         },
       ],
     },
