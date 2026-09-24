@@ -2,8 +2,10 @@
  * A single API endpoint rendered in the `/api-aspect` listing.
  *
  * Mapped services carry a curated `label`, a version-selected `url`, and an
- * `ivoaUrl` pointing at the relevant IVOA standard. Unmapped services fall back
- * to the raw service name as the `label`, the base `url`, and a null `ivoaUrl`.
+ * `ivoaUrl` pointing at the relevant IVOA standard. Unmapped services use the
+ * base `url` and fall back to their discovery `title` (or the raw service
+ * name) as the `label`, with their discovery `docs_url` as the `ivoaUrl` (when
+ * it is an IVOA standard) or `docsUrl` (otherwise).
  */
 export type ApiEndpoint = {
   /** Display label for the endpoint. */
@@ -11,16 +13,23 @@ export type ApiEndpoint = {
   /** Endpoint URL the label links to. */
   url: string;
   /**
-   * IVOA standard documentation link the label points to, or `null` when the
-   * service is unmapped (no curated standard link).
+   * IVOA standard documentation link for the endpoint, or `null` when there is
+   * none (neither a curated standard link nor an IVOA discovery `docs_url`).
    */
   ivoaUrl?: string | null;
   /**
    * Short standard/spec acronym for the IVOA doc link's accessible label —
-   * e.g. `TAP` yields "IVOA TAP docs". `null` when the service is unmapped
-   * (no curated standard link). Pairs with {@link ivoaUrl}.
+   * e.g. `TAP` yields "IVOA TAP docs". Curated, or derived from the label for
+   * an unmapped service; `null` when there is no {@link ivoaUrl}.
    */
   ivoaName?: string | null;
+  /**
+   * Documentation link for a service whose docs are not an IVOA standard —
+   * an uncurated service's discovery `docs_url` (e.g. the alerts service's
+   * technote). `null` when the endpoint has no such link; an endpoint links to
+   * at most one of {@link ivoaUrl} and `docsUrl`.
+   */
+  docsUrl?: string | null;
 };
 
 /**

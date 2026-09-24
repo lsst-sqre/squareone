@@ -2,6 +2,8 @@ import type { ServiceDiscovery } from '@lsst-sqre/repertoire-client';
 
 import {
   presentationMap as defaultPresentationMap,
+  isIvoaStandardUrl,
+  ivoaNameFromLabel,
   orderDatasetKeys,
   type PresentationMap,
   selectServiceUrl,
@@ -16,10 +18,16 @@ import type { ApiEndpointGroup } from './types';
  * {@link orderDatasetKeys} (releases newest-first, `prompt` pinned second,
  * unrecognized datasets after in discovery order). Each group resolves the
  * dataset display name (falling back to the raw key) and carries the dataset
- * `docs_url` and `description`. Every service
- * under a dataset is rendered: mapped services get the curated label, IVOA
- * standard link and name, and version-selected URL; services absent from the
- * map fall back to the raw service name, the base URL, and a null IVOA link.
+ * `docs_url` and `description`. Every service under a dataset is rendered:
+ *
+ * - Curated services win entirely: the curated label, IVOA standard link and
+ *   name, and version-selected URL, ignoring any discovery `title`/`docs_url`.
+ * - Services absent from the map use the base URL and are labelled by their
+ *   discovery `title`, falling back to
+ *   {@link PresentationMap.untitledServiceLabels} and then the raw service
+ *   name (Repertoire 2.x publishes no titles). A discovery `docs_url` becomes
+ *   the IVOA link (named via {@link ivoaNameFromLabel}) when it points at an
+ *   IVOA standard, otherwise a plain `docsUrl`; without one, no docs link.
  *
  * Pure and parameterized by `presentation` (defaulting to the app's curated
  * map) so tests can inject their own mapping. Empty/missing fallbacks: a
@@ -43,11 +51,18 @@ export function serviceDiscoveryToApiEndpointGroups(
         ([serviceName, service]) => {
           const curated = presentation.services[serviceName];
           if (!curated) {
+            const label =
+              service.title ??
+              presentation.untitledServiceLabels?.[serviceName] ??
+              serviceName;
+            const docsUrl = service.docs_url ?? null;
+            const isIvoa = docsUrl !== null && isIvoaStandardUrl(docsUrl);
             return {
-              label: serviceName,
+              label,
               url: service.url,
-              ivoaUrl: null,
-              ivoaName: null,
+              ivoaUrl: isIvoa ? docsUrl : null,
+              ivoaName: isIvoa ? ivoaNameFromLabel(label) : null,
+              docsUrl: isIvoa ? null : docsUrl,
             };
           }
           return {
@@ -55,6 +70,7 @@ export function serviceDiscoveryToApiEndpointGroups(
             url: selectServiceUrl(service, curated.url),
             ivoaUrl: curated.ivoaUrl ?? null,
             ivoaName: curated.ivoaName ?? null,
+            docsUrl: null,
           };
         }
       ),
