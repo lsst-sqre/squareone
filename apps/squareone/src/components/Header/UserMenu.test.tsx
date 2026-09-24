@@ -46,7 +46,7 @@ import { useUnreadNotificationCount } from '@lsst-sqre/semaphore-client';
 import { PrimaryNavigation, useGafaelfawrUser } from '@lsst-sqre/squared';
 import { useSemaphoreUrl } from '../../hooks/useSemaphoreUrl';
 import { useStaticConfig } from '../../hooks/useStaticConfig';
-import type { AppConfig } from '../../lib/config/loader';
+import type { StaticConfig } from '../../lib/config/resolveConfigDefaults';
 import UserMenu from './UserMenu';
 
 // Helper: a logged-in useGafaelfawrUser return.
@@ -77,12 +77,12 @@ function mockLoginInfoWithScopes(scopes: string[]): UseLoginInfoReturn {
 }
 
 // Helper: set the resolved static config, defaulting the notifications keys.
-function mockConfig(overrides: Partial<AppConfig> = {}) {
+function mockConfig(overrides: Partial<StaticConfig> = {}) {
   vi.mocked(useStaticConfig).mockReturnValue({
     enableUserNotifications: false,
     userNotificationsPollIntervalSeconds: 300,
     ...overrides,
-  } as AppConfig);
+  } as StaticConfig);
 }
 
 // Helper: set the unread-count hook return.

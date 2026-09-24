@@ -10,12 +10,12 @@ vi.mock('../../hooks/useStaticConfig', () => ({
 
 // Import after mocking.
 import { useStaticConfig } from '../../hooks/useStaticConfig';
-import type { AppConfig } from '../../lib/config/loader';
+import type { StaticConfig } from '../../lib/config/resolveConfigDefaults';
 import SentryConfigInfo from './SentryConfigInfo';
 
-// Build a config object with only the fields the component reads, cast to the
-// full AppConfig shape.
-function makeConfig(overrides: Partial<AppConfig> = {}): AppConfig {
+// Build a resolved config object with only the fields the component reads,
+// cast to the full StaticConfig shape.
+function makeConfig(overrides: Partial<StaticConfig> = {}): StaticConfig {
   return {
     environmentName: 'production',
     baseUrl: 'https://data.example.org',
@@ -26,7 +26,7 @@ function makeConfig(overrides: Partial<AppConfig> = {}): AppConfig {
     sentryOrg: 'rubin-observatory',
     sentryProject: 'squareone',
     ...overrides,
-  } as AppConfig;
+  } as StaticConfig;
 }
 
 describe('SentryConfigInfo', () => {

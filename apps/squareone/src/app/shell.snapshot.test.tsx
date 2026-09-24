@@ -93,10 +93,10 @@ import BroadcastBannerStack from '../components/BroadcastBannerStack';
 import Header from '../components/Header';
 import UserMenu from '../components/Header/UserMenu';
 import { useStaticConfig } from '../hooks/useStaticConfig';
-import type { AppConfig } from '../lib/config/loader';
+import type { StaticConfig } from '../lib/config/resolveConfigDefaults';
 import FooterRsc from './FooterRsc';
 
-function makeConfig(overrides: Partial<AppConfig> = {}): AppConfig {
+function makeConfig(overrides: Partial<StaticConfig> = {}): StaticConfig {
   return {
     siteName: 'Rubin Science Platform',
     baseUrl: 'https://data.example.org',
@@ -112,7 +112,7 @@ function makeConfig(overrides: Partial<AppConfig> = {}): AppConfig {
     headerLogoHeight: 50,
     headerLogoAlt: 'Rubin',
     ...overrides,
-  } as AppConfig;
+  } as StaticConfig;
 }
 
 // A fake discovery query exposing only the methods the shell calls.

@@ -8,9 +8,8 @@
   "properties": {
     "siteName": {
       "type": "string",
-      "default": "Rubin Science Platform",
       "title": "Site name",
-      "description": "Used as the basis of the HTML title tag. This should be customized for each science platform deployment."
+      "description": "Used as the basis of the HTML title tag and the homepage hero. Optional: when omitted, defaults to the environment title from Repertoire service discovery (``environment.title``), or to ``Rubin Science Platform`` when discovery is unavailable or predates Repertoire 3.0."
     },
     "siteDescription": {
       "type": "string",
@@ -20,15 +19,13 @@
     },
     "baseUrl": {
       "type": "string",
-      "default": "http://localhost:3001",
       "title": "Base URL for the public ingress",
-      "description": "Used for computing absolute URLs"
+      "description": "Used for computing absolute URLs. Does not end in /. Optional: when omitted, defaults to the Squareone UI service URL from Repertoire service discovery (``services.ui.squareone.url``, trailing slash removed), or else to the origin of each request, derived from its ``X-Forwarded-Proto``, ``X-Forwarded-Host``, and ``Host`` headers."
     },
     "environmentName": {
       "type": "string",
-      "default": "development",
       "title": "Phalanx environment name",
-      "description": "Used in telemetry"
+      "description": "Used in telemetry (the Sentry environment). Optional: when omitted, defaults to the Phalanx environment label from Repertoire service discovery (``environment.label``, such as ``idfprod``), or to ``unknown`` when discovery is unavailable or predates Repertoire 3.0."
     },
     "docsBaseUrl": {
       "type": "string",
@@ -54,7 +51,9 @@
     },
     "coManageRegistryUrl": {
       "type": "string",
-      "title": "COmanage registry URL (e.g. https://id.lsst.cloud). Omit or set as null for non-COmanage deployments."
+      "title": "COmanage registry URL",
+      "description": "Deprecated: the COmanage registry URL (e.g. https://id.lsst.cloud) is available from Repertoire service discovery as ``services.ui.comanage``, so this field is no longer read by the app. It is retained only for backwards compatibility so existing Phalanx configurations that still set it continue to validate.",
+      "deprecated": true
     },
     "plausibleDomain": {
       "type": "string",

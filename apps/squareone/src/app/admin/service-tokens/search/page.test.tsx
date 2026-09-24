@@ -7,15 +7,15 @@ vi.mock('../../../../lib/config/rsc', () => ({
 }));
 
 // Import after mocking.
-import type { AppConfig } from '../../../../lib/config/loader';
+import type { StaticConfig } from '../../../../lib/config/resolveConfigDefaults';
 import { getStaticConfig } from '../../../../lib/config/rsc';
 import { generateMetadata } from './page';
 
-function makeConfig(overrides: Partial<AppConfig> = {}): AppConfig {
+function makeConfig(overrides: Partial<StaticConfig> = {}): StaticConfig {
   return {
     siteName: 'Rubin Science Platform',
     ...overrides,
-  } as AppConfig;
+  } as StaticConfig;
 }
 
 describe('SearchServiceTokensPage generateMetadata', () => {

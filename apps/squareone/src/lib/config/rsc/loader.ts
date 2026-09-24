@@ -3,27 +3,61 @@
  *
  * This module wraps the existing loadAppConfig() with React's cache() function
  * to ensure configuration is loaded only once per request across all server
- * components in the App Router.
+ * components in the App Router. It also resolves the discovery-backed defaults
+ * (`siteName`, `environmentName`, `baseUrl`) so every consumer sees resolved
+ * values.
  */
 
+import {
+  fetchServiceDiscovery,
+  type ServiceDiscovery,
+} from '@lsst-sqre/repertoire-client';
+import { headers } from 'next/headers';
 import { cache } from 'react';
 
+import logger from '../../logger';
 import {
   type AppConfig,
   loadAppConfig as loadAppConfigBase,
   loadMdxContent as loadMdxContentBase,
   type SentryConfig,
 } from '../loader';
+import {
+  hasUnsetDefaultedKeys,
+  needsRequestHeaders,
+  resolveConfigDefaults,
+  type StaticConfig,
+} from '../resolveConfigDefaults';
 
 // Re-export types for convenience
-export type { AppConfig, SentryConfig };
+export type { AppConfig, SentryConfig, StaticConfig };
 
 /**
- * Type alias for App Router context.
- * StaticConfig is structurally identical to AppConfig, providing semantic
- * clarity in RSC contexts while maintaining compatibility.
+ * Fetch Repertoire service discovery for resolving config defaults.
+ *
+ * Returns null without fetching when Repertoire is not configured or when the
+ * config already sets every discovery-backed key. Discovery being unavailable
+ * must never fail config loading, so errors are logged and swallowed; the
+ * defaults then fall through to their non-discovery fallbacks.
+ * `fetchServiceDiscovery` caches the document across requests, so this shares
+ * the fetch made by the root layout's discovery prefetch.
  */
-export type StaticConfig = AppConfig;
+async function loadDiscoveryForDefaults(
+  config: AppConfig
+): Promise<ServiceDiscovery | null> {
+  if (!config.repertoireUrl || !hasUnsetDefaultedKeys(config)) {
+    return null;
+  }
+  try {
+    return await fetchServiceDiscovery(config.repertoireUrl, { logger });
+  } catch (err) {
+    logger.warn(
+      { err, repertoireUrl: config.repertoireUrl },
+      'Service discovery unavailable; config defaults use fallbacks'
+    );
+    return null;
+  }
+}
 
 /**
  * RSC-optimized config loader with React cache() for request deduplication.
@@ -32,7 +66,11 @@ export type StaticConfig = AppConfig;
  * even if multiple server components call this function. This provides
  * automatic request-level memoization without manual caching logic.
  *
- * @returns Promise resolving to the application configuration
+ * Unset `siteName`, `environmentName`, and `baseUrl` keys are resolved with
+ * {@link resolveConfigDefaults} from Repertoire discovery and, for `baseUrl`
+ * as a last step, from the request headers (read only when needed).
+ *
+ * @returns Promise resolving to the resolved application configuration
  *
  * @example
  * ```tsx
@@ -44,7 +82,12 @@ export type StaticConfig = AppConfig;
  * ```
  */
 export const getStaticConfig = cache(async (): Promise<StaticConfig> => {
-  return loadAppConfigBase();
+  const config = await loadAppConfigBase();
+  const discovery = await loadDiscoveryForDefaults(config);
+  const requestHeaders = needsRequestHeaders(config, discovery)
+    ? await headers()
+    : null;
+  return resolveConfigDefaults(config, discovery, requestHeaders);
 });
 
 /**
