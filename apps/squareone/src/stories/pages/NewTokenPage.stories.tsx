@@ -2,8 +2,7 @@ import { type LoginInfo, useLoginInfo } from '@lsst-sqre/gafaelfawr-client';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { TokenForm, type TokenFormValues } from '../../components/TokenForm';
-import { parseExpirationFromQuery } from '../../lib/tokens/expiration';
-import { parseTokenQueryParams } from '../../lib/tokens/queryParams';
+import { parseTokenTemplateParams } from '../../lib/tokens/templateUrl';
 import { requestUrl } from '../support/fetchStub';
 
 const mockLoginInfo: LoginInfo = {
@@ -101,35 +100,9 @@ function NewTokenPageSimulator() {
   } = useLoginInfo(undefined);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Convert URLSearchParams to ParsedUrlQuery-like object for parseTokenQueryParams
-  const query: Record<string, string | string[]> = {};
-  for (const [key, value] of searchParams.entries()) {
-    const existing = query[key];
-    if (existing) {
-      query[key] = Array.isArray(existing)
-        ? [...existing, value]
-        : [existing, value];
-    } else {
-      query[key] = value;
-    }
-  }
-  const queryParams = parseTokenQueryParams(query);
-  const formInitialValues: Partial<TokenFormValues> = {};
-
-  if (queryParams?.name) {
-    formInitialValues.name = queryParams.name;
-  }
-
-  if (queryParams?.scopes && Array.isArray(queryParams.scopes)) {
-    formInitialValues.scopes = queryParams.scopes;
-  }
-
-  if (queryParams?.expiration) {
-    const parsedExpiration = parseExpirationFromQuery(queryParams.expiration);
-    if (parsedExpiration) {
-      formInitialValues.expiration = parsedExpiration;
-    }
-  }
+  // Prefill exactly as NewTokenPageClient does.
+  const formInitialValues: Partial<TokenFormValues> =
+    parseTokenTemplateParams(searchParams);
 
   const handleSubmit = async (values: TokenFormValues) => {
     setIsSubmitting(true);
@@ -223,24 +196,28 @@ export const WithSingleScope = {
       appDirectory: true,
       navigation: {
         pathname: '/settings/tokens/new',
-        searchParams: { scope: 'read:all' },
+        searchParams: { scopes: 'read:all' },
       },
     },
   },
 };
 
+// The format template URLs (useTokenTemplateUrl) and the /api-aspect token
+// links emit.
 export const WithCommaDelimitedScopes = {
   parameters: {
     nextjs: {
       appDirectory: true,
       navigation: {
         pathname: '/settings/tokens/new',
-        searchParams: { scope: 'read:all,user:token' },
+        searchParams: { scopes: 'read:all,user:token' },
       },
     },
   },
 };
 
+// Legacy template URLs repeated a singular `scope` parameter; the page still
+// accepts them.
 export const WithRepeatedScopeParameters = {
   parameters: {
     nextjs: {
@@ -257,6 +234,7 @@ export const WithRepeatedScopeParameters = {
   },
 };
 
+// A `scopes` list and legacy `scope` parameters together are merged.
 export const WithMixedScopeFormats = {
   parameters: {
     nextjs: {
@@ -264,7 +242,7 @@ export const WithMixedScopeFormats = {
       navigation: {
         pathname: '/settings/tokens/new',
         searchParams: [
-          ['scope', 'read:all,user:token'],
+          ['scopes', 'read:all,user:token'],
           ['scope', 'exec:notebook'],
         ],
       },
@@ -292,8 +270,7 @@ export const WithAllParametersCombined = {
         pathname: '/settings/tokens/new',
         searchParams: [
           ['name', 'Complete Token'],
-          ['scope', 'read:all'],
-          ['scope', 'user:token'],
+          ['scopes', 'read:all,user:token'],
           ['expiration', '7d'],
         ],
       },
@@ -309,7 +286,7 @@ export const WithInvalidParameters = {
         pathname: '/settings/tokens/new',
         searchParams: {
           name: 'Valid Name',
-          scope: 'read:all',
+          scopes: 'read:all',
           expiration: 'invalid-expiration',
           randomParam: 'should-be-ignored',
         },
@@ -324,7 +301,7 @@ export const WithEmptyScopeValues = {
       appDirectory: true,
       navigation: {
         pathname: '/settings/tokens/new',
-        searchParams: { scope: 'read:all,,user:token' },
+        searchParams: { scopes: 'read:all,,user:token' },
       },
     },
   },
@@ -336,7 +313,7 @@ export const WithWhitespaceInScopes = {
       appDirectory: true,
       navigation: {
         pathname: '/settings/tokens/new',
-        searchParams: { scope: ' read:all , user:token ' },
+        searchParams: { scopes: ' read:all , user:token ' },
       },
     },
   },

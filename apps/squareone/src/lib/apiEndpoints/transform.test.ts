@@ -115,6 +115,7 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
       label: 'Alert retrieval',
       url: 'https://data.lsst.cloud/api/alerts',
       docs: { url: 'https://sqr-114.lsst.io/', label: 'Alert retrieval docs' },
+      requiredScopes: ['read:image'],
     });
   });
 
@@ -138,6 +139,7 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
       label: 'Alerts',
       url: 'https://data.lsst.cloud/api/alerts',
       docs: null,
+      requiredScopes: [],
     });
   });
 
@@ -181,6 +183,7 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
         url: 'https://www.ivoa.net/documents/SIA/',
         label: 'IVOA SIA docs',
       },
+      requiredScopes: ['read:image'],
     });
     // HiPS surfaces the hips-list-1.0 /list URL.
     expect(byLabel('HiPS (Hierarchical Progressive Survey)')?.url).toBe(
@@ -220,7 +223,53 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
         url: 'https://www.ivoa.net/documents/SODA/20170517/REC-SODA-1.0.html',
         label: 'IVOA SODA docs',
       },
+      requiredScopes: ['read:image'],
     });
+  });
+
+  test('carries each service discovery required scopes', () => {
+    const groups = serviceDiscoveryToApiEndpointGroups(mockDiscovery);
+    const dp1 = groups.find((group) => group.datasetKey === 'dp1');
+
+    expect(
+      Object.fromEntries(
+        (dp1?.endpoints ?? []).map((endpoint) => [
+          endpoint.label,
+          endpoint.requiredScopes,
+        ])
+      )
+    ).toEqual({
+      'SODA Image Cutouts': ['read:image'],
+      DataLink: ['read:image'],
+      // GMS declares no scope requirement.
+      'Group Membership Service (GMS)': [],
+      'HiPS (Hierarchical Progressive Survey)': ['read:image'],
+      'Simple Image Access (SIA v2)': ['read:image'],
+      'Table Access Protocol (TAP)': ['read:tap'],
+    });
+  });
+
+  test('requires no scopes when discovery omits required_scopes (Repertoire 2.x)', () => {
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            tap: { url: 'https://data.lsst.cloud/api/tap', versions: {} },
+            mystery: {
+              url: 'https://data.lsst.cloud/api/mystery',
+              versions: {},
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery);
+    expect(group.endpoints.map((endpoint) => endpoint.requiredScopes)).toEqual([
+      [],
+      [],
+    ]);
   });
 
   test('uses a single generic TAP label across datasets; the dataset gives context', () => {
@@ -259,6 +308,7 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
         url: 'https://www.ivoa.net/documents/SSA/',
         label: 'IVOA SSA docs',
       },
+      requiredScopes: [],
     });
   });
 
@@ -282,6 +332,7 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
       label: 'mystery',
       url: 'https://data.lsst.cloud/api/mystery',
       docs: null,
+      requiredScopes: [],
     });
   });
 
@@ -310,6 +361,7 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
         url: 'https://www.ivoa.net/documents/SSA/',
         label: 'IVOA ssa docs',
       },
+      requiredScopes: [],
     });
   });
 
@@ -378,6 +430,7 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
         url: 'https://mystery.lsst.io/',
         label: 'Mystery service docs',
       },
+      requiredScopes: [],
     });
   });
 
@@ -546,6 +599,7 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
       label: 'Custom TAP',
       url: 'https://example.org/tap',
       docs: null,
+      requiredScopes: [],
     });
   });
 
@@ -596,6 +650,7 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
       label: 'Spectra',
       url: 'https://example.org/spectra',
       docs: null,
+      requiredScopes: [],
     });
   });
 
@@ -652,6 +707,7 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
         url: 'https://www.ivoa.net/documents/SSA/',
         label: 'IVOA SSA docs',
       },
+      requiredScopes: [],
     });
   });
 
@@ -686,6 +742,7 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
         url: 'https://spectra.lsst.io/',
         label: 'Spectrum retrieval docs',
       },
+      requiredScopes: [],
     });
   });
 
@@ -715,6 +772,7 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
       label: 'Spectra',
       url: 'https://example.org/spectra',
       docs: { url: 'https://spectra.lsst.io/', label: 'Spectra docs' },
+      requiredScopes: [],
     });
   });
 

@@ -29,6 +29,13 @@ export type ApiEndpoint = {
    * other docs link by the endpoint label ("Alert retrieval docs").
    */
   docs: ApiEndpointDocsLink | null;
+  /**
+   * Gafaelfawr scopes the service requires, from its discovery
+   * `required_scopes` (all of them are needed to use it). Empty when the
+   * service declares none, including every service under Repertoire 2.x,
+   * which predates the field.
+   */
+  requiredScopes: string[];
 };
 
 /**
