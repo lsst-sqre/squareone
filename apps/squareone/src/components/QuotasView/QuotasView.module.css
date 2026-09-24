@@ -11,3 +11,26 @@
   margin: 0 0 1em 0;
   line-height: 1.6;
 }
+
+/* Labelled rate limits (service and label titles) can be long: let them wrap
+   rather than overflow narrow screens. */
+.rateLimits dt {
+  white-space: normal;
+}
+
+.rateLimit {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sqo-space-xs);
+}
+
+.docsLink {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: var(--rsd-component-text-link-color);
+}
+
+.docsLink:hover {
+  color: var(--rsd-component-text-link-hover-color);
+}

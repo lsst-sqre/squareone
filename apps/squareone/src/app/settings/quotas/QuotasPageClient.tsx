@@ -1,6 +1,7 @@
 'use client';
 
 import { useUserInfo } from '@lsst-sqre/gafaelfawr-client';
+import { useServiceDiscovery } from '@lsst-sqre/repertoire-client';
 
 import AuthRequired from '../../../components/AuthRequired';
 import QuotasView from '../../../components/QuotasView';
@@ -20,6 +21,9 @@ export default function QuotasPageClient() {
 function QuotasContent() {
   const repertoireUrl = useRepertoireUrl();
   const { userInfo } = useUserInfo(repertoireUrl);
+  // Labels the rate limits by service; absent while discovery loads or when it
+  // is not configured, in which case the raw quota labels are shown.
+  const { query } = useServiceDiscovery(repertoireUrl ?? '');
   const { docsBaseUrl } = useStaticConfig();
   const quotasDocsUrl = getDocsUrl(docsBaseUrl, '/guides/life/quotas.html');
 
@@ -34,7 +38,10 @@ function QuotasContent() {
       </Lede>
       {userInfo?.quota ? (
         <div style={{ marginTop: 'var(--sqo-space-lg-fixed)' }}>
-          <QuotasView quota={userInfo.quota} />
+          <QuotasView
+            quota={userInfo.quota}
+            quotaLabelIndex={query?.getQuotaLabelIndex()}
+          />
         </div>
       ) : (
         <p>Not configured</p>
