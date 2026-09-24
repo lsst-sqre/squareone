@@ -28,6 +28,9 @@ import type { ApiEndpointGroup } from './types';
  *   name (Repertoire 2.x publishes no titles). A discovery `docs_url` becomes
  *   the IVOA link (named via {@link ivoaNameFromLabel}) when it points at an
  *   IVOA standard, otherwise a plain `docsUrl`; without one, no docs link.
+ * - Every endpoint, curated or not, carries the service's discovery
+ *   `required_scopes` as `requiredScopes` (empty when discovery declares none,
+ *   as under Repertoire 2.x).
  *
  * Pure and parameterized by `presentation` (defaulting to the app's curated
  * map) so tests can inject their own mapping. Empty/missing fallbacks: a
@@ -49,6 +52,9 @@ export function serviceDiscoveryToApiEndpointGroups(
       description: dataset.description ?? null,
       endpoints: Object.entries(dataset.services ?? {}).map(
         ([serviceName, service]) => {
+          // Absent from Repertoire 2.x discovery (and from hand-built test
+          // fixtures), so default to no requirement.
+          const requiredScopes = service.required_scopes ?? [];
           const curated = presentation.services[serviceName];
           if (!curated) {
             const label =
@@ -63,6 +69,7 @@ export function serviceDiscoveryToApiEndpointGroups(
               ivoaUrl: isIvoa ? docsUrl : null,
               ivoaName: isIvoa ? ivoaNameFromLabel(label) : null,
               docsUrl: isIvoa ? null : docsUrl,
+              requiredScopes,
             };
           }
           return {
@@ -71,6 +78,7 @@ export function serviceDiscoveryToApiEndpointGroups(
             ivoaUrl: curated.ivoaUrl ?? null,
             ivoaName: curated.ivoaName ?? null,
             docsUrl: null,
+            requiredScopes,
           };
         }
       ),

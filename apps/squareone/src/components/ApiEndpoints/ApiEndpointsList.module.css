@@ -78,6 +78,7 @@
   grid-column: 1 / -1;
   grid-template-columns: subgrid;
   column-gap: var(--sqo-space-lg);
+  row-gap: var(--sqo-space-xxxs);
   padding: var(--sqo-space-xxs) 0;
   align-items: center;
 }
@@ -128,6 +129,39 @@
   flex-shrink: 0; /* button keeps its size; only the code wraps */
 }
 
+/* Required-scope pills and the token link, on their own row under the URL. */
+.scopes {
+  grid-column: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sqo-space-xxs) var(--sqo-space-xs);
+  font-size: 0.875rem;
+}
+
+.scopesLabel {
+  color: var(--rsd-component-text-secondary-color);
+}
+
+.scopeList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sqo-space-xxs);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tokenLink {
+  color: var(--rsd-component-text-link-color);
+  text-decoration: none;
+}
+
+.tokenLink:hover {
+  color: var(--rsd-component-text-link-hover-color);
+  text-decoration: underline;
+}
+
 @media (max-width: 768px) {
   .root {
     grid-template-columns: minmax(0, 1fr);
@@ -136,5 +170,9 @@
   .item {
     column-gap: 0;
     row-gap: var(--sqo-space-xxxs);
+  }
+
+  .scopes {
+    grid-column: 1;
   }
 }

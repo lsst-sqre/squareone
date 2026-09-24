@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { describe, expect, test } from 'vitest';
 
 import type { ApiEndpointGroup } from '../../lib/apiEndpoints/types';
@@ -16,16 +16,27 @@ const groups: ApiEndpointGroup[] = [
         url: 'https://data.lsst.cloud/api/tap',
         ivoaUrl: 'https://www.ivoa.net/documents/TAP/',
         ivoaName: 'TAP',
+        requiredScopes: ['read:tap'],
       },
       {
         label: 'DataLink',
         url: 'https://data.lsst.cloud/api/datalink',
         ivoaUrl: null,
         ivoaName: null,
+        requiredScopes: [],
       },
     ],
   },
 ];
+
+/** The list item rendering the endpoint with the given label. */
+function getEndpointItem(label: string): HTMLElement {
+  const item = screen.getByText(label).closest('li');
+  if (!item) {
+    throw new Error(`No list item for endpoint ${label}`);
+  }
+  return item;
+}
 
 describe('ApiEndpointsList', () => {
   test('renders the dataset display name as the section heading', () => {
@@ -121,6 +132,7 @@ describe('ApiEndpointsList', () => {
                 ivoaUrl: null,
                 ivoaName: null,
                 docsUrl: 'https://sqr-114.lsst.io/',
+                requiredScopes: [],
               },
             ],
           },
@@ -151,6 +163,60 @@ describe('ApiEndpointsList', () => {
     expect(
       screen.getAllByRole('button', { name: /copy the .* endpoint url/i })
     ).toHaveLength(2);
+  });
+
+  test('renders an endpoint required scopes as pills', () => {
+    render(<ApiEndpointsList groups={groups} />);
+
+    const tapItem = getEndpointItem('Table Access Protocol (TAP)');
+    const scopes = within(tapItem).getByRole('list', {
+      name: 'Required scopes',
+    });
+    expect(
+      within(scopes)
+        .getAllByRole('listitem')
+        .map((item) => item.textContent)
+    ).toEqual(['read:tap']);
+  });
+
+  test('links an endpoint with required scopes to a token form prefilled with them', () => {
+    render(
+      <ApiEndpointsList
+        groups={[
+          {
+            ...groups[0],
+            endpoints: [
+              {
+                label: 'Simple Image Access (SIA v2)',
+                url: 'https://data.lsst.cloud/api/sia/dp1/query',
+                requiredScopes: ['read:image', 'read:tap'],
+              },
+            ],
+          },
+        ]}
+      />
+    );
+
+    const link = screen.getByRole('link', {
+      name: 'Create a token with these scopes for Simple Image Access (SIA v2)',
+    });
+    expect(link).toHaveTextContent('Create a token with these scopes');
+    expect(link).toHaveAttribute(
+      'href',
+      '/settings/tokens/new?scopes=read%3Aimage%2Cread%3Atap'
+    );
+  });
+
+  test('shows no scope pills or token link for an endpoint without required scopes', () => {
+    render(<ApiEndpointsList groups={groups} />);
+
+    const datalinkItem = getEndpointItem('DataLink');
+    expect(
+      within(datalinkItem).queryByRole('list', { name: 'Required scopes' })
+    ).not.toBeInTheDocument();
+    expect(
+      within(datalinkItem).queryByRole('link', { name: /create a token/i })
+    ).not.toBeInTheDocument();
   });
 
   test('renders no group headings when given an empty list', () => {

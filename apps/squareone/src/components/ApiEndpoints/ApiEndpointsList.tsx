@@ -1,7 +1,13 @@
 import { ClipboardButton } from '@lsst-sqre/squared';
 import { ArrowUpRight, BookOpen } from 'lucide-react';
+import Link from 'next/link';
 
 import type { ApiEndpointGroup } from '../../lib/apiEndpoints/types';
+import {
+  buildTokenTemplateUrl,
+  NEW_TOKEN_PATH,
+} from '../../lib/tokens/templateUrl';
+import { TokenScopeBadge } from '../TokenHistory/TokenScopeBadge';
 import styles from './ApiEndpointsList.module.css';
 
 /** Heading level for the dataset section headings. */
@@ -32,7 +38,10 @@ type ApiEndpointsListProps = {
  * labeled with the endpoint name (e.g. "Alert retrieval docs").
  * Each endpoint URL renders as copyable monospace code text (not a link, since
  * these are programmatic API base URLs) with an icon-only copy-to-clipboard
- * button.
+ * button. An endpoint whose service requires Gafaelfawr scopes lists them as
+ * pills under its URL, with a "Create a token with these scopes" link to the
+ * token creation form prefilled with them; an endpoint requiring none (every
+ * endpoint under Repertoire 2.x) shows neither.
  */
 export default function ApiEndpointsList({
   groups,
@@ -130,6 +139,30 @@ export default function ApiEndpointsList({
                         className={styles.copyButton}
                       />
                     </div>
+                    {endpoint.requiredScopes.length > 0 ? (
+                      <div className={styles.scopes}>
+                        <span className={styles.scopesLabel}>Requires</span>
+                        <ul
+                          className={styles.scopeList}
+                          aria-label="Required scopes"
+                        >
+                          {endpoint.requiredScopes.map((scope) => (
+                            <li key={scope}>
+                              <TokenScopeBadge scope={scope} />
+                            </li>
+                          ))}
+                        </ul>
+                        <Link
+                          className={styles.tokenLink}
+                          href={buildTokenTemplateUrl(NEW_TOKEN_PATH, {
+                            scopes: endpoint.requiredScopes,
+                          })}
+                          aria-label={`Create a token with these scopes for ${endpoint.label}`}
+                        >
+                          Create a token with these scopes
+                        </Link>
+                      </div>
+                    ) : null}
                   </li>
                 );
               })}
