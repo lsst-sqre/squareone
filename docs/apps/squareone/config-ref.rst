@@ -81,6 +81,16 @@ Links for services now derived from discovery can be removed from ``appLinks``, 
 The menu is hidden when it has no items.
 When ``repertoireUrl`` is not set, the menu lists only the ``appLinks``.
 
+.. _config-dataset-docs-cards:
+
+Dataset documentation cards
+===========================
+
+When ``repertoireUrl`` is set, the ``/docs`` page's ``docs.mdx`` can list the datasets from Repertoire service discovery with the ``<DatasetDocsCards>`` component instead of hand-written cards.
+Each card shows the dataset's name and discovery ``description``, and links to its discovery ``docs_url`` when it has one.
+When ``repertoireUrl`` is not set, the component renders nothing.
+See :ref:`docs-page-dataset-cards`.
+
 Deprecated keys
 ===============
 
