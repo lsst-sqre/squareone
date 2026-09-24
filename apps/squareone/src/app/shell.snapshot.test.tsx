@@ -123,6 +123,8 @@ function makeDiscoveryReturn() {
     getPortalUrl: () => 'https://data.example.org/portal/app',
     getNubladoUrl: () => 'https://data.example.org/nb/hub',
     getSemaphoreUrl: () => 'https://data.example.org/semaphore',
+    getUiService: () => ({ required_scopes: [] as string[] }),
+    canAccessService: () => true,
   };
   return {
     discovery: {},
@@ -140,6 +142,18 @@ function loggedOutUserInfo(): UseUserInfoReturn {
     userInfo: undefined,
     query: null,
     isLoggedIn: false,
+    isLoading: false,
+    isPending: false,
+    error: null,
+    refetch: vi.fn(),
+  };
+}
+
+function loggedOutLoginInfo(): UseLoginInfoReturn {
+  return {
+    loginInfo: null,
+    query: null,
+    csrfToken: null,
     isLoading: false,
     isPending: false,
     error: null,
@@ -173,6 +187,7 @@ describe('shell render determinism', () => {
     vi.mocked(useStaticConfig).mockReturnValue(makeConfig());
     vi.mocked(useServiceDiscovery).mockReturnValue(makeDiscoveryReturn());
     vi.mocked(useUserInfo).mockReturnValue(loggedOutUserInfo());
+    vi.mocked(useLoginInfo).mockReturnValue(loggedOutLoginInfo());
     vi.mocked(useBroadcasts).mockReturnValue(emptyBroadcasts());
     vi.mocked(useUnreadNotificationCount).mockReturnValue(noUnreadCount());
   });

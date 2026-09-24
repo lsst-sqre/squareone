@@ -1,6 +1,11 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 
-import { matchesRequest, requestMethod, requestUrl } from './fetchStub';
+import {
+  holdCrossOriginFetch,
+  matchesRequest,
+  requestMethod,
+  requestUrl,
+} from './fetchStub';
 
 describe('requestUrl', () => {
   test('reads the URL out of every input form fetch accepts', () => {
@@ -108,5 +113,51 @@ describe('matchesRequest', () => {
     expect(
       matchesRequest('/tokens', { method: 'DELETE' }, { pathname: '/tokens' })
     ).toBe(false);
+  });
+});
+
+describe('holdCrossOriginFetch', () => {
+  test('holds cross-origin requests without sending them', async () => {
+    const realFetch = vi
+      .spyOn(window, 'fetch')
+      .mockResolvedValue(new Response('ok'));
+    const restore = holdCrossOriginFetch();
+
+    // A story's mock discovery points at the live RSP; a request there must
+    // neither reach the network nor settle into an error state.
+    const settled = vi.fn();
+    window
+      .fetch('https://data.lsst.cloud/semaphore/v1/notifications')
+      .then(settled, settled);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(settled).not.toHaveBeenCalled();
+    expect(realFetch).not.toHaveBeenCalled();
+    restore();
+  });
+
+  test('passes same-origin requests through', async () => {
+    const realFetch = vi
+      .spyOn(window, 'fetch')
+      .mockResolvedValue(new Response('ok'));
+    const restore = holdCrossOriginFetch();
+
+    const response = await window.fetch('/auth/api/v1/login');
+
+    expect(await response.text()).toBe('ok');
+    expect(realFetch).toHaveBeenCalledWith('/auth/api/v1/login', undefined);
+    restore();
+  });
+
+  test('restores the fetch it replaced', () => {
+    const realFetch = vi
+      .spyOn(window, 'fetch')
+      .mockResolvedValue(new Response('ok'));
+    const restore = holdCrossOriginFetch();
+    expect(window.fetch).not.toBe(realFetch);
+
+    restore();
+
+    expect(window.fetch).toBe(realFetch);
   });
 });
