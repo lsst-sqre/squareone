@@ -70,4 +70,21 @@ describe('compileFooterMdxForRsc', () => {
     expect(result).toBe(element);
     expect(reportError).not.toHaveBeenCalled();
   });
+
+  test('compiles the footer with the RSC footer components', async () => {
+    mockedGetMdxContent.mockResolvedValue('# Footer');
+    mockedCompileMDX.mockResolvedValue({
+      content: { type: 'div' },
+      // biome-ignore lint/suspicious/noExplicitAny: test stub for compileMDX's return shape
+    } as any);
+
+    await compileFooterMdxForRsc();
+
+    // Includes the discovery-backed <ServiceLink> alongside the footer tags.
+    const { components } = mockedCompileMDX.mock.calls[0][0];
+    expect(components).toMatchObject({
+      FooterNav: expect.anything(),
+      ServiceLink: expect.anything(),
+    });
+  });
 });

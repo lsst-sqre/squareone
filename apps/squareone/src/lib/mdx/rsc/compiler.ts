@@ -12,11 +12,9 @@ import type { ComponentType, ReactElement } from 'react';
 
 import { getMdxContent } from '../../config/rsc';
 
-// Re-export MDX component registries for convenience
-export {
-  commonMdxComponents,
-  footerMdxComponents,
-} from '../../utils/mdxComponents';
+// Re-export the RSC MDX component registries (the base registries plus
+// server-only components such as the discovery-backed <ServiceLink>).
+export { commonMdxComponents, footerMdxComponents } from './components';
 
 /**
  * Result of MDX compilation for RSC.
@@ -122,7 +120,7 @@ export async function compileFooterMdxForRsc(
   options: CompileFooterMdxOptions = {}
 ): Promise<ReactElement | null> {
   const { reportError } = options;
-  const { footerMdxComponents } = await import('../../utils/mdxComponents');
+  const { footerMdxComponents } = await import('./components');
 
   try {
     const { content } = await compileMdxForRsc({
