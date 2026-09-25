@@ -6,47 +6,59 @@ import * as Sentry from '@sentry/nextjs';
 
 import { pinoLogsIntegrationOptions } from './src/lib/sentry/pinoLogsConfig';
 
-Sentry.init({
-  dsn: process.env.SENTRY_DSN,
+/**
+ * Initialize Sentry for the Node.js server runtime. Called once from the
+ * instrumentation hook's `register()` (see instrumentation.ts).
+ *
+ * @param {object} options
+ * @param {string} options.environment - The Sentry environment: the resolved
+ *   `environmentName` from `resolveServerSentryEnvironment()`
+ *   (src/lib/sentry/serverEnvironment.ts), so server events carry the same
+ *   environment as the browser's injected Sentry config.
+ */
+export function initServerSentry({ environment }) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
 
-  // Git commit SHA baked into the image at build time (see Dockerfile). Unset
-  // in local dev, where events carry a null release.
-  release: process.env.SENTRY_RELEASE,
+    // Git commit SHA baked into the image at build time (see Dockerfile). Unset
+    // in local dev, where events carry a null release.
+    release: process.env.SENTRY_RELEASE,
 
-  environment: process.env.SQUAREONE_ENVIRONMENT_NAME || 'development',
+    environment,
 
-  // Define how likely traces are sampled.
-  tracesSampleRate: parseFloat(process.env.SENTRY_TRACES_SAMPLE_RATE || '0'),
+    // Define how likely traces are sampled.
+    tracesSampleRate: parseFloat(process.env.SENTRY_TRACES_SAMPLE_RATE || '0'),
 
-  // Enable Sentry Structured Logs so the pino bridge below can ship server-side
-  // pino records to Sentry Logs (searchable, trace-linked). This does not by
-  // itself create issues or alerts. Set here and nowhere else — rationale in
-  // src/lib/sentry/pinoLogsConfig.ts.
-  enableLogs: true,
+    // Enable Sentry Structured Logs so the pino bridge below can ship server-side
+    // pino records to Sentry Logs (searchable, trace-linked). This does not by
+    // itself create issues or alerts. Set here and nowhere else — rationale in
+    // src/lib/sentry/pinoLogsConfig.ts.
+    enableLogs: true,
 
-  // Bridge server-side pino warn/error records to Sentry Logs only. The bridge
-  // never creates Sentry issues or fires alerts (error.levels is empty); the
-  // explicit reportError channel remains the sole alerting path, so there is no
-  // double-capture. See src/lib/sentry/pinoLogsConfig.ts.
-  //
-  // Per-record cost: registering this integration subscribes process-wide to
-  // pino's `pino_asJson` tracing channel, so *every* pino record that clears
-  // pino's own level gate — not just the warn-and-above ones we ship — pays a
-  // traceSync wrapper, a JSON.parse of the serialized record, and a symbol
-  // scan before the log.levels filter drops it. Info records pay it too; the
-  // bridge is only effectively free at the shipped LOG_LEVEL=info because the
-  // app emits a single info record, the boot line in instrumentation.ts. An
-  // operator who sets LOG_LEVEL=debug on a pod that has a DSN pays it on the
-  // whole debug firehose. There is no config-only mitigation:
-  // pinoIntegration's trackLogger/untrackLogger select loggers, not levels.
-  // Lower LOG_LEVEL back to info if the overhead bites.
-  integrations: [Sentry.pinoIntegration(pinoLogsIntegrationOptions)],
+    // Bridge server-side pino warn/error records to Sentry Logs only. The bridge
+    // never creates Sentry issues or fires alerts (error.levels is empty); the
+    // explicit reportError channel remains the sole alerting path, so there is no
+    // double-capture. See src/lib/sentry/pinoLogsConfig.ts.
+    //
+    // Per-record cost: registering this integration subscribes process-wide to
+    // pino's `pino_asJson` tracing channel, so *every* pino record that clears
+    // pino's own level gate — not just the warn-and-above ones we ship — pays a
+    // traceSync wrapper, a JSON.parse of the serialized record, and a symbol
+    // scan before the log.levels filter drops it. Info records pay it too; the
+    // bridge is only effectively free at the shipped LOG_LEVEL=info because the
+    // app emits a single info record, the boot line in instrumentation.ts. An
+    // operator who sets LOG_LEVEL=debug on a pod that has a DSN pays it on the
+    // whole debug firehose. There is no config-only mitigation:
+    // pinoIntegration's trackLogger/untrackLogger select loggers, not levels.
+    // Lower LOG_LEVEL back to info if the overhead bites.
+    integrations: [Sentry.pinoIntegration(pinoLogsIntegrationOptions)],
 
-  // Setting this option to true will print useful information to the console while you're setting up Sentry.
-  debug: false,
-});
+    // Setting this option to true will print useful information to the console while you're setting up Sentry.
+    debug: false,
+  });
 
-// Surface the image tag (branch tag for branch builds, release version for
-// releases) on every event. Baked into the image as SQUAREONE_VERSION; see
-// Dockerfile. Distinct from `release`, which is the git commit SHA.
-Sentry.setContext('build', { version: process.env.SQUAREONE_VERSION });
+  // Surface the image tag (branch tag for branch builds, release version for
+  // releases) on every event. Baked into the image as SQUAREONE_VERSION; see
+  // Dockerfile. Distinct from `release`, which is the git commit SHA.
+  Sentry.setContext('build', { version: process.env.SQUAREONE_VERSION });
+}

@@ -8,7 +8,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import * as useSemaphoreUrlModule from '../../hooks/useSemaphoreUrl';
 import { useStaticConfig } from '../../hooks/useStaticConfig';
-import type { AppConfig } from '../../lib/config/loader';
+import type { StaticConfig } from '../../lib/config/resolveConfigDefaults';
 import NotificationsPageClient from './NotificationsPageClient';
 
 vi.mock('@lsst-sqre/semaphore-client', async (importOriginal) => {
@@ -138,7 +138,7 @@ describe('NotificationsPageClient', () => {
     mockSearchParams = new URLSearchParams();
     vi.mocked(useStaticConfig).mockReturnValue({
       baseUrl: 'https://example.test',
-    } as AppConfig);
+    } as StaticConfig);
     mockUseSemaphoreUrlState.mockReturnValue({
       url: 'https://semaphore.example.com',
       isResolving: false,

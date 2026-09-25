@@ -39,15 +39,15 @@ import {
   type AppConfigContextValue,
   useStaticConfig,
 } from '../../../hooks/useStaticConfig';
-import type { AppConfig } from '../../../lib/config/loader';
+import type { StaticConfig } from '../../../lib/config/resolveConfigDefaults';
 import { getStaticConfig } from '../../../lib/config/rsc';
 import ServiceTokenPage, { generateMetadata } from './page';
 
-function makeConfig(overrides: Partial<AppConfig> = {}): AppConfig {
+function makeConfig(overrides: Partial<StaticConfig> = {}): StaticConfig {
   return {
     siteName: 'Rubin Science Platform',
     ...overrides,
-  } as AppConfig;
+  } as StaticConfig;
 }
 
 function renderPageWithScopes(scopes: string[]) {

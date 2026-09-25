@@ -25,15 +25,15 @@ vi.mock('next/navigation', () => ({
 import type { UseLoginInfoReturn } from '@lsst-sqre/gafaelfawr-client';
 // Import after mocking.
 import { useLoginInfo } from '@lsst-sqre/gafaelfawr-client';
-import type { AppConfig } from '../../lib/config/loader';
+import type { StaticConfig } from '../../lib/config/resolveConfigDefaults';
 import { getStaticConfig } from '../../lib/config/rsc';
 import AdminPage, { generateMetadata } from './page';
 
-function makeConfig(overrides: Partial<AppConfig> = {}): AppConfig {
+function makeConfig(overrides: Partial<StaticConfig> = {}): StaticConfig {
   return {
     siteName: 'Rubin Science Platform',
     ...overrides,
-  } as AppConfig;
+  } as StaticConfig;
 }
 
 /** A useLoginInfo return whose query reports the given scopes. */

@@ -1,3 +1,9 @@
+# siteName, baseUrl, and environmentName are optional. When omitted they
+# default from Repertoire service discovery (environment.title,
+# services.ui.squareone.url, and environment.label), falling back to
+# "Rubin Science Platform", the request origin, and "unknown". They are set here
+# because the dev mock discovery describes data.lsst.cloud, and the dev site
+# should link back to localhost.
 siteName: 'Squareone Development Site'
 baseUrl: 'http://localhost:3000'
 environmentName: 'development'
