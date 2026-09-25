@@ -6,13 +6,24 @@ import * as Sentry from '@sentry/nextjs';
 
 export async function register() {
   if (process.env.NEXT_RUNTIME === 'nodejs') {
-    await import('./sentry.server.config');
+    // Resolve the Sentry environment the same way as the browser's injected
+    // config (config, then Repertoire discovery, then the fallback) before
+    // Sentry starts, so server and browser events agree. The discovery fetch
+    // is bounded, so an unavailable Repertoire can't hold up startup.
+    const { resolveServerSentryEnvironment } = await import(
+      './src/lib/sentry/serverEnvironment'
+    );
+    const environment = await resolveServerSentryEnvironment();
+
+    const { initServerSentry } = await import('./sentry.server.config');
+    initServerSentry({ environment });
 
     // Emit a one-time startup line carrying the build's version + revision
-    // (bound as base fields on the logger). Imported dynamically because the
-    // Pino logger is Node-only and register() also runs in the edge runtime.
+    // (bound as base fields on the logger) and the resolved Sentry
+    // environment. Imported dynamically because the Pino logger is Node-only
+    // and register() also runs in the edge runtime.
     const { default: logger } = await import('./src/lib/logger');
-    logger.info('Squareone starting');
+    logger.info({ sentryEnvironment: environment }, 'Squareone starting');
   }
 
   if (process.env.NEXT_RUNTIME === 'edge') {

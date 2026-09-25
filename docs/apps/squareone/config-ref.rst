@@ -37,6 +37,10 @@ The fallback applies when ``repertoireUrl`` is unset, when the Repertoire API is
 
 The resolved values are used everywhere the keys are: page titles, the Sentry environment and base URL (shown on the ``/admin/sentry`` page), and absolute URLs such as notification permalinks.
 
+Server-side Sentry follows the same ``environmentName`` resolution, so events from the server and the browser carry the same Sentry environment.
+The server resolves it once at startup, before it serves any requests: it waits at most a few seconds for service discovery, and if the Repertoire API doesn't respond in time it logs a warning and uses the ``unknown`` fallback.
+The server no longer reads the ``SQUAREONE_ENVIRONMENT_NAME`` environment variable.
+
 Deprecated keys
 ===============
 
