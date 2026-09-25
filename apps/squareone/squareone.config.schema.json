@@ -110,13 +110,13 @@
     "enableAppsMenu": {
       "type": "boolean",
       "title": "Enable the Apps menu",
-      "description": "Setting this option to true will enable the Apps menu in the header.",
+      "description": "Setting this option to true enables the Apps menu in the header. The menu lists Times Square (when the times-square application is enabled in Repertoire service discovery), the Argo CD, Chronograf, Kafdrop, and WebDAV UI services from service discovery that the user's scopes allow, and then any appLinks. The menu is hidden when it has no items.",
       "default": false
     },
     "appLinks": {
       "type": "array",
       "title": "Application links",
-      "description": "Links to be displayed in the Apps menu",
+      "description": "Additional links appended to the Apps menu after the items derived from Repertoire service discovery, for apps that discovery does not describe. A link whose href repeats an earlier item is dropped. These links are shown to every user, regardless of scopes. Without service discovery (no repertoireUrl), the Apps menu lists only these links.",
       "items": {
         "type": "object",
         "required": ["label", "href", "internal"],
