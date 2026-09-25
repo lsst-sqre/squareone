@@ -64,3 +64,28 @@ export function matchesRequest(
   if (requestMethod(input, init) !== method.toUpperCase()) return false;
   return new URL(requestUrl(input), window.location.href).pathname === pathname;
 }
+
+/**
+ * Hold every cross-origin `fetch` for the life of a story, as a `beforeEach`.
+ *
+ * Stories that seed their query cache from `mockDiscovery` inherit its live
+ * RSP URLs (`https://data.lsst.cloud/...`), so any query the story did not
+ * seed — or one that refetches once its seeded data goes stale — would
+ * otherwise reach the real platform. A held request never settles, so the
+ * query keeps its seeded data (or stays pending) instead of flipping into an
+ * error state. Same-origin requests, Storybook's own included, still go to the
+ * network. The returned cleanup restores the replaced `fetch`.
+ */
+export function holdCrossOriginFetch(): () => void {
+  const originalFetch = window.fetch;
+  window.fetch = ((input: RequestInfo | URL, init?: RequestInit) => {
+    const url = new URL(requestUrl(input), window.location.href);
+    if (url.origin !== window.location.origin) {
+      return new Promise<Response>(() => {});
+    }
+    return originalFetch(input, init);
+  }) as typeof window.fetch;
+  return () => {
+    window.fetch = originalFetch;
+  };
+}

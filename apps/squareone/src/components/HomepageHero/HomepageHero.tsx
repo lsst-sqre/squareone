@@ -1,5 +1,6 @@
 'use client';
 
+import { useLoginInfo } from '@lsst-sqre/gafaelfawr-client';
 import { useServiceDiscovery } from '@lsst-sqre/repertoire-client';
 import Link from 'next/link';
 
@@ -15,6 +16,11 @@ import styles from './HomepageHero.module.css';
  * Service availability is determined by the Repertoire service discovery API.
  * When repertoireUrl is not configured, all services are shown with fallback URLs.
  * When configured, only available services are displayed.
+ *
+ * Portal and Notebooks are also hidden from a signed-in user who lacks a scope
+ * the service declares in `required_scopes` (Repertoire 3.0.0). Anonymous
+ * visitors, users whose login info is still loading, and services that declare
+ * no required scopes are unaffected.
  */
 export default function HomepageHero() {
   const { showPreview, previewLink, docsBaseUrl, siteName } = useStaticConfig();
@@ -23,15 +29,29 @@ export default function HomepageHero() {
   // Service discovery - query is null when URL is empty (disabled)
   const { query, isPending } = useServiceDiscovery(repertoireUrl ?? '');
 
+  // The signed-in user's scopes; undefined when anonymous or still loading,
+  // which canAccessService treats as allowed.
+  const scopes = useLoginInfo(repertoireUrl).query?.scopes;
+  const canAccessUiService = (name: string) => {
+    const service = query?.getUiService(name);
+    return !!service && !!query?.canAccessService(service, scopes);
+  };
+
   // Determine service availability
   // When not configured, show all services (backward compatibility)
   // When configured but loading, hide services until loaded
-  // When configured and loaded, show only available services
+  // When configured and loaded, show only available services the user can use
   const isConfigured = !!repertoireUrl;
   const showPortal =
-    !isConfigured || (!isPending && query?.hasPortal({ hasUi: true }));
+    !isConfigured ||
+    (!isPending &&
+      query?.hasPortal({ hasUi: true }) &&
+      canAccessUiService('portal'));
   const showNublado =
-    !isConfigured || (!isPending && query?.hasNublado({ hasUi: true }));
+    !isConfigured ||
+    (!isPending &&
+      query?.hasNublado({ hasUi: true }) &&
+      canAccessUiService('nublado'));
 
   // Get URLs from discovery or use fallbacks
   const portalUrl = query?.getPortalUrl() ?? '/portal/app/';
