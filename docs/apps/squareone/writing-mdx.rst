@@ -52,7 +52,7 @@ React components
 You can use a limited set of React components in MDX.
 Some pages enable additional components; the documentation for those configurations specifies those components.
 For example, the ``/docs`` page adds cards and the service-discovery-driven ``<DatasetDocsCards>`` (see :doc:`docs-page`).
-The following sections describe the common components that all MDX content can use.
+The following sections describe the common components that all MDX content can use, including the service-discovery-driven :ref:`ServiceLink <mdx-service-link>`.
 
 .. warning:: Be careful with newlines and React components.
 
@@ -100,3 +100,43 @@ Wraps the content in a call-to-action button.
 .. code-block:: text
 
    <CtaLink href="https://github.com/rubin-dp0/Support/issues/new/choose">Create a GitHub issue</CtaLink>
+
+.. _mdx-service-link:
+
+ServiceLink
+-----------
+
+Links to the URL of a user-facing (UI) service from Repertoire service discovery, so that the same MDX works in every environment without hardcoding each environment's hosts.
+Set ``service`` to the service's name under ``services.ui`` in discovery, such as ``comanage`` for the COmanage account settings.
+
+When self-closing, the link text is the service's URL without its trailing slash:
+
+.. code-block:: text
+   :caption: settings__index.mdx
+
+   <Lede>Your account settings are available at <ServiceLink service="comanage" />.</Lede>
+
+On idfdev, where discovery lists the ``comanage`` URL as ``https://id-dev.lsst.cloud/``, this renders a link to that URL with the text ``https://id-dev.lsst.cloud``.
+
+Content inside ``<ServiceLink>`` becomes the link text instead:
+
+.. code-block:: text
+
+   Use the menu in the upper right corner of your <ServiceLink service="comanage">account settings</ServiceLink> page.
+
+Set ``variant="cta"`` to render the link as a call-to-action button, like ``<CtaLink>``:
+
+.. code-block:: text
+
+   <ServiceLink service="comanage" variant="cta">Manage account settings</ServiceLink>
+
+When there's no URL to link to, because ``repertoireUrl`` isn't set, the Repertoire API is unavailable, or discovery doesn't list the service, no link renders and the rest of the page renders as usual:
+
+- The content inside ``<ServiceLink>`` renders as plain text.
+- A self-closing ``<ServiceLink />`` renders nothing.
+  Where a sentence needs to read well without the link, put the link text inside ``<ServiceLink>`` instead.
+- A ``variant="cta"`` link renders nothing, not even its content.
+
+Squareone logs a failed discovery request and reports an outage to Sentry.
+It logs a warning when discovery doesn't list the service.
+All the ``<ServiceLink>`` tags on a page share one discovery request.
