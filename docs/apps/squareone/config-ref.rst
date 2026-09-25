@@ -81,11 +81,32 @@ Links for services now derived from discovery can be removed from ``appLinks``, 
 The menu is hidden when it has no items.
 When ``repertoireUrl`` is not set, the menu lists only the ``appLinks``.
 
+.. _config-dataset-docs-cards:
+
+Dataset documentation cards
+===========================
+
+When ``repertoireUrl`` is set, the ``/docs`` page's ``docs.mdx`` can list the datasets from Repertoire service discovery with the ``<DatasetDocsCards>`` component instead of hand-written cards.
+Each card shows the dataset's name and discovery ``description``, and links to its discovery ``docs_url`` when it has one.
+When ``repertoireUrl`` is not set, the component renders nothing.
+See :ref:`docs-page-dataset-cards`.
+
+.. _config-service-links:
+
+Service links
+=============
+
+When ``repertoireUrl`` is set, any page's MDX can link to a UI service's URL from Repertoire service discovery with the ``<ServiceLink service="…">`` component, instead of hardcoding each environment's host.
+For example, ``settings__index.mdx`` can link to the COmanage account settings with ``<ServiceLink service="comanage" />``.
+When ``repertoireUrl`` is not set, no link renders.
+See :ref:`mdx-service-link`.
+
 Deprecated keys
 ===============
 
 ``coManageRegistryUrl``
    The COmanage registry URL is available from Repertoire service discovery as the ``services.ui.comanage`` UI service, so Squareone no longer reads this key.
+   To link to it from MDX content, use ``<ServiceLink service="comanage" />`` (see :ref:`config-service-links`).
    It is still accepted so that existing configurations continue to validate, and can be removed from them.
 
 ``semaphoreUrl``

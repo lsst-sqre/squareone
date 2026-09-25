@@ -11,6 +11,7 @@ If you want to learn how to contribute to the Squareone codebase itself, see the
 
    branding
    writing-mdx
+   docs-page
    footer-customization
    comanage-landing-pages
    admin
