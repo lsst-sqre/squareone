@@ -108,6 +108,32 @@ describe('ApiEndpointsList', () => {
     expect(screen.getByText('DataLink')).toBeInTheDocument();
   });
 
+  test('links a non-IVOA docs url with a generic, endpoint-named docs label', () => {
+    render(
+      <ApiEndpointsList
+        groups={[
+          {
+            ...groups[0],
+            endpoints: [
+              {
+                label: 'Alert retrieval',
+                url: 'https://data.lsst.cloud/api/alerts',
+                ivoaUrl: null,
+                ivoaName: null,
+                docsUrl: 'https://sqr-114.lsst.io/',
+              },
+            ],
+          },
+        ]}
+      />
+    );
+
+    expect(
+      screen.getByRole('link', { name: 'Alert retrieval docs' })
+    ).toHaveAttribute('href', 'https://sqr-114.lsst.io/');
+    expect(screen.queryByRole('link', { name: /ivoa/i })).toBeNull();
+  });
+
   test('renders each endpoint url as code text, not a link', () => {
     render(<ApiEndpointsList groups={groups} />);
 

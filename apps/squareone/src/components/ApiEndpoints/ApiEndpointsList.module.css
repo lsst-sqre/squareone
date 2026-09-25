@@ -93,14 +93,14 @@
   font-weight: 500;
 }
 
-.ivoaLink {
+.docLink {
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
   color: var(--rsd-component-text-link-color);
 }
 
-.ivoaLink:hover {
+.docLink:hover {
   color: var(--rsd-component-text-link-hover-color);
 }
 
