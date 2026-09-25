@@ -30,6 +30,13 @@ export type ApiEndpoint = {
    * at most one of {@link ivoaUrl} and `docsUrl`.
    */
   docsUrl?: string | null;
+  /**
+   * Gafaelfawr scopes the service requires, from its discovery
+   * `required_scopes` (all of them are needed to use it). Empty when the
+   * service declares none, including every service under Repertoire 2.x,
+   * which predates the field.
+   */
+  requiredScopes: string[];
 };
 
 /**

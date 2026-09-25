@@ -117,6 +117,7 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
       ivoaUrl: null,
       ivoaName: null,
       docsUrl: 'https://sqr-114.lsst.io/',
+      requiredScopes: ['read:image'],
     });
   });
 
@@ -142,6 +143,7 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
       ivoaUrl: null,
       ivoaName: null,
       docsUrl: null,
+      requiredScopes: [],
     });
   });
 
@@ -183,6 +185,7 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
       ivoaUrl: 'https://www.ivoa.net/documents/SIA/',
       ivoaName: 'SIA',
       docsUrl: null,
+      requiredScopes: ['read:image'],
     });
     // HiPS surfaces the hips-list-1.0 /list URL.
     expect(byLabel('HiPS (Hierarchical Progressive Survey)')?.url).toBe(
@@ -219,7 +222,53 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
       ivoaUrl: 'https://www.ivoa.net/documents/SODA/20170517/REC-SODA-1.0.html',
       ivoaName: 'SODA',
       docsUrl: null,
+      requiredScopes: ['read:image'],
     });
+  });
+
+  test('carries each service discovery required scopes', () => {
+    const groups = serviceDiscoveryToApiEndpointGroups(mockDiscovery);
+    const dp1 = groups.find((group) => group.datasetKey === 'dp1');
+
+    expect(
+      Object.fromEntries(
+        (dp1?.endpoints ?? []).map((endpoint) => [
+          endpoint.label,
+          endpoint.requiredScopes,
+        ])
+      )
+    ).toEqual({
+      'SODA Image Cutouts': ['read:image'],
+      DataLink: ['read:image'],
+      // GMS declares no scope requirement.
+      'Group Membership Service (GMS)': [],
+      'HiPS (Hierarchical Progressive Survey)': ['read:image'],
+      'Simple Image Access (SIA v2)': ['read:image'],
+      'Table Access Protocol (TAP)': ['read:tap'],
+    });
+  });
+
+  test('requires no scopes when discovery omits required_scopes (Repertoire 2.x)', () => {
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            tap: { url: 'https://data.lsst.cloud/api/tap', versions: {} },
+            mystery: {
+              url: 'https://data.lsst.cloud/api/mystery',
+              versions: {},
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery);
+    expect(group.endpoints.map((endpoint) => endpoint.requiredScopes)).toEqual([
+      [],
+      [],
+    ]);
   });
 
   test('uses a single generic TAP label across datasets; the dataset gives context', () => {
@@ -257,6 +306,7 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
       ivoaUrl: 'https://www.ivoa.net/documents/SSA/',
       ivoaName: 'SSA',
       docsUrl: null,
+      requiredScopes: [],
     });
   });
 
@@ -282,6 +332,7 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
       ivoaUrl: null,
       ivoaName: null,
       docsUrl: null,
+      requiredScopes: [],
     });
   });
 
@@ -329,6 +380,7 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
       ivoaUrl: null,
       ivoaName: null,
       docsUrl: 'https://mystery.lsst.io/',
+      requiredScopes: [],
     });
   });
 
@@ -371,6 +423,7 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
       ivoaUrl: null,
       ivoaName: null,
       docsUrl: null,
+      requiredScopes: [],
     });
   });
 

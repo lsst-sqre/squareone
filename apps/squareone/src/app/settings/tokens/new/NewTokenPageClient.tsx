@@ -21,10 +21,11 @@ import TokenSuccessModal from '../../../../components/TokenSuccessModal';
 import { Lede } from '../../../../components/Typography';
 import { useRepertoireUrl } from '../../../../hooks/useRepertoireUrl';
 import useTokenTemplateUrl from '../../../../hooks/useTokenTemplateUrl';
+import { calculateExpirationDate } from '../../../../lib/tokens/expiration';
 import {
-  calculateExpirationDate,
-  parseExpirationFromQuery,
-} from '../../../../lib/tokens/expiration';
+  NEW_TOKEN_PATH,
+  parseTokenTemplateParams,
+} from '../../../../lib/tokens/templateUrl';
 
 export default function NewTokenPageClient() {
   return (
@@ -70,26 +71,10 @@ function NewTokenContent() {
     useState<TokenFormValues | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Parse query parameters for form prefilling
-  const formInitialValues: Partial<TokenFormValues> = {};
-
-  const nameParam = searchParams.get('name');
-  if (nameParam) {
-    formInitialValues.name = nameParam;
-  }
-
-  const scopesParam = searchParams.get('scopes');
-  if (scopesParam) {
-    formInitialValues.scopes = scopesParam.split(',').filter(Boolean);
-  }
-
-  const expirationParam = searchParams.get('expiration');
-  if (expirationParam) {
-    const parsedExpiration = parseExpirationFromQuery(expirationParam);
-    if (parsedExpiration) {
-      formInitialValues.expiration = parsedExpiration;
-    }
-  }
+  // Prefill the form from a template URL's query parameters (see
+  // useTokenTemplateUrl), including the legacy repeated `scope` form.
+  const formInitialValues: Partial<TokenFormValues> =
+    parseTokenTemplateParams(searchParams);
 
   const handleSubmit = async (values: TokenFormValues) => {
     if (!loginInfo) return;
@@ -141,8 +126,8 @@ function NewTokenContent() {
 
   const baseUrl =
     typeof window !== 'undefined'
-      ? `${window.location.origin}/settings/tokens/new`
-      : '/settings/tokens/new';
+      ? `${window.location.origin}${NEW_TOKEN_PATH}`
+      : NEW_TOKEN_PATH;
 
   const templateUrl = useTokenTemplateUrl(
     baseUrl,
