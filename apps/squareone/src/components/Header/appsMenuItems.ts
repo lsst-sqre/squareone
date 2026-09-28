@@ -51,6 +51,12 @@ export type DeriveAppsMenuItemsArgs = {
   appLinks: readonly AppsMenuItem[];
   /** Whether the `times-square` application is enabled. */
   timesSquareEnabled: boolean;
+  /**
+   * The app's resolved public base URL (`StaticConfig.baseUrl`), against
+   * which relative hrefs are resolved when discovery has no `squareone` UI
+   * service.
+   */
+  baseUrl: string;
 };
 
 const TIMES_SQUARE_ITEM: AppsMenuItem = {
@@ -58,12 +64,6 @@ const TIMES_SQUARE_ITEM: AppsMenuItem = {
   href: '/times-square/',
   internal: true,
 };
-
-/**
- * Stand-in origin for resolving relative hrefs when discovery has no
- * `squareone` UI service; relative hrefs then only match each other.
- */
-const FALLBACK_BASE_URL = 'https://squareone.invalid/';
 
 /**
  * Derive the Apps menu items (see the module comment for the order).
@@ -75,15 +75,19 @@ const FALLBACK_BASE_URL = 'https://squareone.invalid/';
  * the configured `appLinks` are shown regardless of scopes, as before.
  *
  * Duplicate hrefs are dropped (the first entry wins). Hrefs are compared after
- * resolving relative ones against the `squareone` UI service URL and ignoring
- * a trailing slash, so a configured `/argo-cd/` matches the discovered
- * `https://data.lsst.cloud/argo-cd`.
+ * resolving relative ones against the site's origin and ignoring a trailing
+ * slash, so a configured `/argo-cd/` matches the discovered
+ * `https://data.lsst.cloud/argo-cd`. The origin is the `squareone` UI service
+ * URL from discovery when it has one, else `baseUrl`; the two agree in
+ * production, and preferring discovery keeps local development (where
+ * `baseUrl` is localhost but the mock discovery is data.lsst.cloud) matching.
  */
 export function deriveAppsMenuItems({
   query,
   userScopes,
   appLinks,
   timesSquareEnabled,
+  baseUrl,
 }: DeriveAppsMenuItemsArgs): AppsMenuItem[] {
   const candidates: AppsMenuItem[] = [];
   if (timesSquareEnabled) {
@@ -94,10 +98,10 @@ export function deriveAppsMenuItems({
   }
   candidates.push(...appLinks);
 
-  const baseUrl = query?.getSquareoneUrl() ?? FALLBACK_BASE_URL;
+  const origin = query?.getSquareoneUrl() ?? baseUrl;
   const seen = new Set<string>();
   return candidates.filter((item) => {
-    const key = hrefKey(item.href, baseUrl);
+    const key = hrefKey(item.href, origin);
     if (seen.has(key)) return false;
     seen.add(key);
     return true;

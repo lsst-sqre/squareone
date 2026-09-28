@@ -10,6 +10,9 @@ import { APPS_MENU_SERVICES, deriveAppsMenuItems } from './appsMenuItems';
 
 const query = createDiscoveryQuery(mockDiscovery);
 
+/** The resolved `StaticConfig.baseUrl` for the mock discovery's environment. */
+const BASE_URL = 'https://data.lsst.cloud';
+
 describe('deriveAppsMenuItems', () => {
   test('leads with Times Square when the application is enabled', () => {
     const items = deriveAppsMenuItems({
@@ -17,6 +20,7 @@ describe('deriveAppsMenuItems', () => {
       userScopes: ['exec:notebook'],
       appLinks: [],
       timesSquareEnabled: true,
+      baseUrl: BASE_URL,
     });
 
     expect(items).toEqual([
@@ -32,6 +36,7 @@ describe('deriveAppsMenuItems', () => {
       userScopes: ['exec:admin'],
       appLinks: [],
       timesSquareEnabled: true,
+      baseUrl: BASE_URL,
     });
 
     expect(items).toEqual([
@@ -66,6 +71,7 @@ describe('deriveAppsMenuItems', () => {
         userScopes,
         appLinks: [],
         timesSquareEnabled: false,
+        baseUrl: BASE_URL,
       }).map((item) => item.label);
 
     expect(labelsFor(['exec:admin'])).toEqual(['Chronograf metrics viewer']);
@@ -78,6 +84,7 @@ describe('deriveAppsMenuItems', () => {
       userScopes: ['exec:admin', 'exec:internal-tools'],
       appLinks: [],
       timesSquareEnabled: true,
+      baseUrl: BASE_URL,
     }).map((item) => item.label);
 
     expect(labels).toEqual([
@@ -103,6 +110,7 @@ describe('deriveAppsMenuItems', () => {
       userScopes: ['exec:admin', 'exec:internal-tools', 'write:files'],
       appLinks: [],
       timesSquareEnabled: false,
+      baseUrl: BASE_URL,
     }).map((item) => item.href.split('/').pop());
 
     expect(names).toEqual(['argo-cd', 'chronograf', 'kafdrop', 'files']);
@@ -124,6 +132,7 @@ describe('deriveAppsMenuItems', () => {
       userScopes: ['exec:admin'],
       appLinks: [],
       timesSquareEnabled: false,
+      baseUrl: BASE_URL,
     }).map((item) => item.label);
 
     expect(labels).toEqual(['Chronograf metrics viewer']);
@@ -135,6 +144,7 @@ describe('deriveAppsMenuItems', () => {
       userScopes: undefined,
       appLinks: [],
       timesSquareEnabled: true,
+      baseUrl: BASE_URL,
     });
 
     expect(items).toEqual([
@@ -154,6 +164,7 @@ describe('deriveAppsMenuItems', () => {
       userScopes: ['exec:admin'],
       appLinks: [],
       timesSquareEnabled: false,
+      baseUrl: BASE_URL,
     }).map((item) => item.label);
 
     expect(labels).toEqual(['Argo CD', 'chronograf']);
@@ -171,6 +182,7 @@ describe('deriveAppsMenuItems', () => {
       userScopes: ['exec:admin'],
       appLinks: [fovQuicklook],
       timesSquareEnabled: true,
+      baseUrl: BASE_URL,
     });
 
     expect(items.map((item) => item.label)).toEqual([
@@ -191,6 +203,7 @@ describe('deriveAppsMenuItems', () => {
         { label: 'Nightly Digest', href: '/nightlydigest/', internal: false },
       ],
       timesSquareEnabled: true,
+      baseUrl: BASE_URL,
     });
 
     expect(items).toEqual([
@@ -202,17 +215,64 @@ describe('deriveAppsMenuItems', () => {
   test('matches a relative appLink href to the absolute discovery URL', () => {
     // Phalanx configs list Argo CD as "/argo-cd/"; discovery publishes
     // https://data.lsst.cloud/argo-cd. Relative hrefs resolve against the
-    // squareone UI service URL and a trailing slash is ignored.
+    // site's origin (here the squareone UI service URL) and a trailing slash
+    // is ignored.
     const items = deriveAppsMenuItems({
       query,
       userScopes: ['exec:admin'],
       appLinks: [{ label: 'Argo CD', href: '/argo-cd/', internal: false }],
       timesSquareEnabled: false,
+      baseUrl: BASE_URL,
     });
 
     expect(items.map((item) => item.href)).toEqual([
       'https://data.lsst.cloud/argo-cd',
       'https://data.lsst.cloud/chronograf',
+    ]);
+  });
+
+  test('resolves a relative appLink against baseUrl without a squareone service', () => {
+    // Discovery from an environment whose Repertoire rules omit the squareone
+    // UI service (or Repertoire 2.x) has no getSquareoneUrl(); the app's
+    // resolved baseUrl is the site's origin instead.
+    const withoutSquareone = createDiscoveryQuery(
+      withUiServices({ squareone: undefined })
+    );
+    expect(withoutSquareone.getSquareoneUrl()).toBeUndefined();
+
+    const items = deriveAppsMenuItems({
+      query: withoutSquareone,
+      userScopes: ['exec:admin'],
+      appLinks: [{ label: 'Argo CD', href: '/argo-cd/', internal: false }],
+      timesSquareEnabled: false,
+      baseUrl: BASE_URL,
+    });
+
+    expect(items.map((item) => item.href)).toEqual([
+      'https://data.lsst.cloud/argo-cd',
+      'https://data.lsst.cloud/chronograf',
+    ]);
+  });
+
+  test('keeps a relative appLink whose origin differs from the discovered URL', () => {
+    // Matching is by origin and path, not path alone: a relative href on
+    // another site is a different link.
+    const withoutSquareone = createDiscoveryQuery(
+      withUiServices({ squareone: undefined })
+    );
+
+    const items = deriveAppsMenuItems({
+      query: withoutSquareone,
+      userScopes: ['exec:admin'],
+      appLinks: [{ label: 'Argo CD', href: '/argo-cd/', internal: false }],
+      timesSquareEnabled: false,
+      baseUrl: 'https://other.example.org',
+    });
+
+    expect(items.map((item) => item.href)).toEqual([
+      'https://data.lsst.cloud/argo-cd',
+      'https://data.lsst.cloud/chronograf',
+      '/argo-cd/',
     ]);
   });
 
@@ -223,6 +283,7 @@ describe('deriveAppsMenuItems', () => {
       userScopes: ['exec:notebook'],
       appLinks: [{ label: 'Argo CD', href: '/argo-cd/', internal: false }],
       timesSquareEnabled: false,
+      baseUrl: BASE_URL,
     });
 
     expect(items).toEqual([
@@ -241,6 +302,7 @@ describe('deriveAppsMenuItems', () => {
       userScopes: ['exec:admin'],
       appLinks,
       timesSquareEnabled: false,
+      baseUrl: BASE_URL,
     });
 
     expect(items).toEqual(appLinks);
