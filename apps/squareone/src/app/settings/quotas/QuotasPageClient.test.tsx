@@ -155,6 +155,31 @@ describe('QuotasPageClient', () => {
     expect(screen.queryByText('muster-quota')).not.toBeInTheDocument();
   });
 
+  test('names an untitled quota label by its raw label', () => {
+    vi.mocked(useUserInfo).mockReturnValue(makeUserInfoReturn(apiQuota));
+    mockDiscoveryState({
+      discovery: {
+        ...mockDiscovery,
+        services: {
+          ...mockDiscovery.services,
+          internal: {
+            ...mockDiscovery.services.internal,
+            muster: {
+              ...mockDiscovery.services.internal.muster,
+              quota_labels: {
+                'muster-quota': { title: '', internal: false },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    render(<QuotasPageClient />);
+
+    expect(screen.getByText('muster — muster-quota')).toBeInTheDocument();
+  });
+
   test('shows raw quota labels without quota labels in discovery', () => {
     // Discovery failed (empty fallback) or a Repertoire 2.x environment.
     vi.mocked(useUserInfo).mockReturnValue(makeUserInfoReturn(apiQuota));
