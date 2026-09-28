@@ -118,6 +118,22 @@ const quotaLabelIndexWithInternalLabel: QuotaLabelIndex = {
   'muster-quota': { ...quotaLabelIndex['muster-quota'], internal: true },
 };
 
+// Two quota labels declared by one service (TAP): a second, illustrative
+// label alongside data-dev's "tap".
+const sameServiceApiQuota: Quota = {
+  api: {
+    tap: 100,
+    'tap-sync': 50,
+  },
+  notebook: null,
+  tap: {},
+};
+
+const quotaLabelIndexWithSameServiceLabels: QuotaLabelIndex = {
+  ...quotaLabelIndex,
+  'tap-sync': { ...quotaLabelIndex.tap, labelTitle: 'Synchronous queries' },
+};
+
 // Minimal quota with no sections (edge case)
 const emptyQuota: Quota = {
   api: {},
@@ -207,14 +223,40 @@ export const LabelledRateLimits: Story = {
 
     await expect(
       canvas.getByRole('link', {
-        name: 'Table access protocol (TAP) documentation',
+        name: 'Table access protocol (TAP) documentation (TAP API calls)',
       })
     ).toHaveAttribute('href', 'https://www.ivoa.net/documents/TAP/');
     await expect(
       canvas.getByRole('link', {
-        name: 'Simple image access (SIA) documentation',
+        name: 'Simple image access (SIA) documentation (Image requests)',
       })
     ).toHaveAttribute('href', 'https://www.ivoa.net/documents/SIA/');
+    await expect(canvas.getAllByRole('link')).toHaveLength(2);
+  },
+};
+
+/**
+ * Two quotas of one service: each row's documentation link names the row's
+ * label title, so screen-reader users can tell the links apart.
+ */
+export const SameServiceLabels: Story = {
+  args: {
+    quota: sameServiceApiQuota,
+    quotaLabelIndex: quotaLabelIndexWithSameServiceLabels,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await expect(
+      canvas.getByRole('link', {
+        name: 'Table access protocol (TAP) documentation (TAP API calls)',
+      })
+    ).toHaveAttribute('href', 'https://www.ivoa.net/documents/TAP/');
+    await expect(
+      canvas.getByRole('link', {
+        name: 'Table access protocol (TAP) documentation (Synchronous queries)',
+      })
+    ).toHaveAttribute('href', 'https://www.ivoa.net/documents/TAP/');
     await expect(canvas.getAllByRole('link')).toHaveLength(2);
   },
 };

@@ -19,9 +19,26 @@ describe('buildApiQuotaItems', () => {
         value: '100 requests',
         docs: {
           url: 'https://www.ivoa.net/documents/TAP/',
-          label: 'Table access protocol (TAP) documentation',
+          label: 'Table access protocol (TAP) documentation (TAP API calls)',
         },
       },
+    ]);
+  });
+
+  test('gives two quotas of one service distinct docs link names', () => {
+    // A service may declare several quota labels; each row's docs link must
+    // still be distinguishable by name.
+    const items = buildApiQuotaItems(
+      { tap: 100, 'tap-sync': 50 },
+      {
+        ...index,
+        'tap-sync': { ...index.tap, labelTitle: 'Synchronous queries' },
+      }
+    );
+
+    expect(items.map((item) => item.docs?.label)).toEqual([
+      'Table access protocol (TAP) documentation (Synchronous queries)',
+      'Table access protocol (TAP) documentation (TAP API calls)',
     ]);
   });
 
@@ -81,6 +98,18 @@ describe('buildApiQuotaItems', () => {
     expect(items.map((item) => item.key)).toEqual([
       'Table access protocol (TAP) — tap',
     ]);
+  });
+
+  test('names the docs link after the raw label for a label with no title', () => {
+    // The raw label keeps the name unique among the service's untitled labels.
+    const items = buildApiQuotaItems(
+      { tap: 100 },
+      { ...index, tap: { ...index.tap, labelTitle: '' } }
+    );
+
+    expect(items[0].docs?.label).toBe(
+      'Table access protocol (TAP) documentation (tap)'
+    );
   });
 
   test('labels every quota the index describes', () => {

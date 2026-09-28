@@ -1,7 +1,8 @@
 import { ClipboardButton } from '@lsst-sqre/squared';
-import { ArrowUpRight, BookOpen } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 
 import type { ApiEndpointGroup } from '../../lib/apiEndpoints/types';
+import DocsIconLink from '../DocsIconLink';
 import styles from './ApiEndpointsList.module.css';
 
 /** Heading level for the dataset section headings. */
@@ -94,14 +95,10 @@ export default function ApiEndpointsList({
                     <div className={styles.labelCell}>
                       <span className={styles.label}>{endpoint.label}</span>
                       {endpoint.ivoaUrl ? (
-                        <a
-                          className={styles.ivoaLink}
+                        <DocsIconLink
                           href={endpoint.ivoaUrl}
-                          title={ivoaDocLabel}
-                          aria-label={ivoaDocLabel}
-                        >
-                          <BookOpen size={16} aria-hidden="true" />
-                        </a>
+                          label={ivoaDocLabel}
+                        />
                       ) : null}
                     </div>
                     <div className={styles.url}>

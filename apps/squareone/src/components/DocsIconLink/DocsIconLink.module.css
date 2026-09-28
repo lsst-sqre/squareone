@@ -1,0 +1,12 @@
+/* Book icon in the link colour; doesn't shrink when it sits in a flex row
+ * beside text that wraps. */
+.link {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: var(--rsd-component-text-link-color);
+}
+
+.link:hover {
+  color: var(--rsd-component-text-link-hover-color);
+}

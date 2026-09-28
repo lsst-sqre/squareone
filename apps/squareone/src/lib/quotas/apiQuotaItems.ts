@@ -12,8 +12,10 @@ export type ApiQuotaDocsLink = {
   /** URL of the service's documentation. */
   url: string;
   /**
-   * Accessible name for the link, naming the service (e.g.
-   * `"Table access protocol (TAP) documentation"`).
+   * Accessible name for the link, naming the service and the row's label
+   * title so that the links of several quotas of one service are
+   * distinguishable, e.g.
+   * `"Table access protocol (TAP) documentation (TAP API calls)"`.
    */
   label: string;
 };
@@ -42,11 +44,17 @@ export type ApiQuotaItem = {
  * (discovery disabled, or Repertoire 2.x, which declares no quota labels), is
  * shown as-is.
  *
+ * The docs link is named `"<service title> documentation (<label title>)"`,
+ * not after the service alone, so each row's link has a unique accessible
+ * name even when one service declares several quota labels.
+ *
  * An empty title falls back to the raw identifier: the service name stands in
  * for a missing service title, and the quota label itself for an empty label
- * title (e.g. `"Table access protocol (TAP) — tap"`). The fallback keeps the
- * `" — <label title>"` suffix rather than dropping it, so untitled labels of
- * one service still get distinct headings.
+ * title (e.g. `"Table access protocol (TAP) — tap"`, with a docs link named
+ * `"Table access protocol (TAP) documentation (tap)"`). The fallback keeps the
+ * label title in both the heading and the link name rather than dropping it,
+ * so untitled labels of one service still get distinct headings and link
+ * names.
  *
  * Label titles are otherwise rendered verbatim. Rows are sorted by their
  * rendered key.
@@ -77,7 +85,7 @@ export function buildApiQuotaItems(
       docs: entry.serviceDocsUrl
         ? {
             url: entry.serviceDocsUrl,
-            label: `${serviceTitle} documentation`,
+            label: `${serviceTitle} documentation (${labelTitle})`,
           }
         : null,
     });
