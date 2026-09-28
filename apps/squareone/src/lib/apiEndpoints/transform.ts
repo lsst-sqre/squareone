@@ -1,5 +1,6 @@
 import type { ServiceDiscovery } from '@lsst-sqre/repertoire-client';
 
+import { serviceDisplayName } from '../discovery/serviceDisplayName';
 import {
   presentationMap as defaultPresentationMap,
   isIvoaStandardUrl,
@@ -25,7 +26,8 @@ import type { ApiEndpointGroup } from './types';
  * - Services absent from the map use the base URL and are labelled by their
  *   discovery `title`, falling back to
  *   {@link PresentationMap.untitledServiceLabels} and then the raw service
- *   name (Repertoire 2.x publishes no titles). A discovery `docs_url` becomes
+ *   name (Repertoire 2.x publishes no titles; a blank title counts as none,
+ *   per {@link serviceDisplayName}). A discovery `docs_url` becomes
  *   the IVOA link (named via {@link ivoaNameFromLabel}) when it points at an
  *   IVOA standard, otherwise a plain `docsUrl`; without one, no docs link.
  *
@@ -51,10 +53,10 @@ export function serviceDiscoveryToApiEndpointGroups(
         ([serviceName, service]) => {
           const curated = presentation.services[serviceName];
           if (!curated) {
-            const label =
-              service.title ??
-              presentation.untitledServiceLabels?.[serviceName] ??
-              serviceName;
+            const label = serviceDisplayName(
+              service.title,
+              presentation.untitledServiceLabels?.[serviceName] ?? serviceName
+            );
             const docsUrl = service.docs_url ?? null;
             const isIvoa = docsUrl !== null && isIvoaStandardUrl(docsUrl);
             return {

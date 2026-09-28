@@ -44,8 +44,8 @@ export type PresentationMap = {
   services: Record<string, ServicePresentation>;
   /**
    * Service name -> label for a service absent from `services` whose
-   * discovery entry has no `title` (Repertoire 2.x). A discovery `title`
-   * takes precedence, so these only keep older environments readable.
+   * discovery entry has no (or a blank) `title` (Repertoire 2.x). A discovery
+   * `title` takes precedence, so these only keep older environments readable.
    */
   untitledServiceLabels?: Record<string, string>;
   /** Dataset key -> display name (e.g. `dp1` -> "Data Preview 1"). */
