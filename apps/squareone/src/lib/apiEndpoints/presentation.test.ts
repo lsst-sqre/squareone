@@ -84,6 +84,19 @@ describe('isIvoaStandardUrl', () => {
     ).toBe(true);
   });
 
+  test('accepts the bare ivoa.net host as well as www.ivoa.net', () => {
+    expect(isIvoaStandardUrl('https://ivoa.net/documents/TAP/')).toBe(true);
+  });
+
+  test('accepts http as well as https', () => {
+    expect(isIvoaStandardUrl('http://www.ivoa.net/documents/TAP/')).toBe(true);
+    expect(isIvoaStandardUrl('http://ivoa.net/documents/TAP/')).toBe(true);
+  });
+
+  test('rejects schemes other than http and https', () => {
+    expect(isIvoaStandardUrl('ftp://www.ivoa.net/documents/TAP/')).toBe(false);
+  });
+
   test('rejects non-IVOA documentation sites', () => {
     expect(isIvoaStandardUrl('https://sqr-114.lsst.io/')).toBe(false);
     expect(isIvoaStandardUrl('https://www.ivoa.net/about/')).toBe(false);
@@ -102,10 +115,23 @@ describe('ivoaNameFromLabel', () => {
     expect(ivoaNameFromLabel('Table access protocol (TAP)')).toBe('TAP');
   });
 
+  test('takes the acronym from a versioned trailing parenthetical', () => {
+    expect(ivoaNameFromLabel('Simple image access (SIA v2)')).toBe('SIA');
+    expect(ivoaNameFromLabel('Table access protocol (TAP 1.1)')).toBe('TAP');
+    expect(ivoaNameFromLabel('Simple spectral access (SSA v1.0)')).toBe('SSA');
+  });
+
   test('drops a parenthetical expansion and keeps the leading name', () => {
     expect(ivoaNameFromLabel('HiPS (Hierarchical Progressive Survey)')).toBe(
       'HiPS'
     );
+  });
+
+  test('never takes the first word of a multi-word expansion as the acronym', () => {
+    expect(
+      ivoaNameFromLabel('HiPS (Hierarchical Progressive Survey 1.0)')
+    ).toBe('HiPS');
+    expect(ivoaNameFromLabel('SIA (Simple Image Access v2)')).toBe('SIA');
   });
 
   test('uses a label without a parenthetical as-is', () => {

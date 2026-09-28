@@ -186,13 +186,17 @@ export function orderDatasetKeys(keys: string[]): string[] {
 }
 
 /**
- * Whether a documentation URL points at an IVOA standard (a page under
- * `https://www.ivoa.net/documents/`). Malformed URLs are not IVOA links.
+ * Whether a documentation URL points at an IVOA standard: a page under
+ * `/documents/` on the `www.ivoa.net` or bare `ivoa.net` host (the site serves
+ * both), over `https:` or `http:` (older discovery and registry records still
+ * cite `http://` IVOA links). Any other scheme or host, and a malformed URL,
+ * is not an IVOA link.
  */
 export function isIvoaStandardUrl(url: string): boolean {
   try {
-    const { hostname, pathname } = new URL(url);
+    const { protocol, hostname, pathname } = new URL(url);
     return (
+      (protocol === 'https:' || protocol === 'http:') &&
       (hostname === 'www.ivoa.net' || hostname === 'ivoa.net') &&
       pathname.startsWith('/documents/')
     );
@@ -202,17 +206,28 @@ export function isIvoaStandardUrl(url: string): boolean {
 }
 
 /**
+ * A trailing parenthetical holding one word, optionally followed by version
+ * tokens (`v2`, `1.1`, `v1.0`), capturing the word: `(SSA)`, `(SIA v2)`,
+ * `(TAP 1.1)`.
+ */
+const TRAILING_ACRONYM = /\(\s*([^\s()]+)(?:\s+v?\d+(?:\.\d+)*)*\s*\)\s*$/i;
+
+/**
  * Derive the short standard name for an IVOA docs link's accessible label
  * from an endpoint label, for services without a curated {@link
  * ServicePresentation.ivoaName}.
  *
- * A trailing single-word parenthetical is taken as the acronym (`Simple
- * spectral access (SSA)` -> `SSA`); otherwise any parenthetical expansion is
- * dropped (`HiPS (Hierarchical Progressive Survey)` -> `HiPS`) and the rest of
- * the label is used as-is (`DataLink` -> `DataLink`).
+ * A trailing parenthetical is taken as the acronym when it holds a single
+ * word, optionally followed by version tokens only (`v2`, `1.1`, `v1.0`), and
+ * that word is returned: `Simple spectral access (SSA)` -> `SSA`, `Simple
+ * image access (SIA v2)` -> `SIA`. Any other parenthetical — including a
+ * multi-word expansion, so its first word is never mistaken for an acronym —
+ * is dropped and the rest of the label is used: `HiPS (Hierarchical
+ * Progressive Survey)` -> `HiPS`. A label without a parenthetical is used
+ * as-is (`DataLink` -> `DataLink`).
  */
 export function ivoaNameFromLabel(label: string): string {
-  const acronym = /\(\s*([^\s()]+)\s*\)\s*$/.exec(label);
+  const acronym = TRAILING_ACRONYM.exec(label);
   if (acronym) {
     return acronym[1];
   }
