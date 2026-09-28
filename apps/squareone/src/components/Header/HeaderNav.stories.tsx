@@ -1,3 +1,4 @@
+import { mockUserInfo } from '@lsst-sqre/gafaelfawr-client';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, within } from 'storybook/test';
 
@@ -8,7 +9,9 @@ import HeaderNav from './HeaderNav';
 /*
  * The header navigation rendered against `mockDiscovery`, where the portal
  * requires `exec:portal` and Nublado `exec:notebook`: Portal and Notebooks are
- * shown only to visitors who may use them.
+ * shown only to visitors who may use them. The seeded user info puts a
+ * signed-in user's menu, or an anonymous visitor's "Log in" link, in the user
+ * navigation from the first render.
  */
 const meta: Meta<typeof HeaderNav> = {
   title: 'Components/HeaderNav',
@@ -22,7 +25,10 @@ const meta: Meta<typeof HeaderNav> = {
 export default meta;
 type Story = StoryObj<typeof HeaderNav>;
 
-/** An anonymous visitor sees both entries (scopes are unknown until sign-in). */
+/**
+ * An anonymous visitor sees both entries (scopes are unknown until sign-in)
+ * and a "Log in" link rather than a user menu.
+ */
 export const Anonymous: Story = {
   decorators: [withServiceAccess(null)],
   play: async ({ canvasElement }) => {
@@ -34,10 +40,21 @@ export const Anonymous: Story = {
     await expect(
       canvas.getByRole('link', { name: 'Notebooks' })
     ).toHaveAttribute('href', 'https://data.lsst.cloud/nb');
+
+    const userNav = within(
+      canvas.getByRole('navigation', { name: 'User menu' })
+    );
+    await expect(
+      userNav.getByRole('link', { name: 'Log in' })
+    ).toBeInTheDocument();
+    await expect(userNav.queryByRole('button')).not.toBeInTheDocument();
   },
 };
 
-/** A signed-in user holding both scopes sees both entries. */
+/**
+ * A signed-in user holding both scopes sees both entries, and their user menu
+ * (named for their username) rather than a "Log in" link.
+ */
 export const SignedInWithBothScopes: Story = {
   decorators: [withServiceAccess({ scopes: ['exec:portal', 'exec:notebook'] })],
   play: async ({ canvasElement }) => {
@@ -49,6 +66,16 @@ export const SignedInWithBothScopes: Story = {
     await expect(
       canvas.getByRole('link', { name: 'Notebooks' })
     ).toBeInTheDocument();
+
+    const userNav = within(
+      canvas.getByRole('navigation', { name: 'User menu' })
+    );
+    await expect(
+      userNav.getByRole('button', { name: mockUserInfo.username })
+    ).toBeInTheDocument();
+    await expect(
+      userNav.queryByRole('link', { name: 'Log in' })
+    ).not.toBeInTheDocument();
   },
 };
 

@@ -1,0 +1,55 @@
+'use client';
+
+import {
+  type AuthQueryConfig,
+  type UseUserInfoReturn,
+  // biome-ignore lint/style/noRestrictedImports: this module is the app's one wrapper around the package hook.
+  useUserInfo as usePackageUserInfo,
+} from '@lsst-sqre/gafaelfawr-client';
+import { useMemo } from 'react';
+
+import { makeReportError } from '../lib/sentry/reportError';
+import { useRepertoireUrl } from './useRepertoireUrl';
+
+/** Sentry tags for a user-info failure, as the server prefetch sets them. */
+const USER_INFO_CONTEXT = {
+  site: 'user-info',
+  package: 'gafaelfawr-client',
+} as const;
+
+/**
+ * Query options a caller may add. The reporter and its context are always the
+ * app's own, so they are not overridable.
+ */
+export type UserInfoConfig = Omit<AuthQueryConfig, 'reportError' | 'context'>;
+
+/**
+ * The signed-in user's Gafaelfawr user info (username, name, groups, quotas),
+ * reporting report-worthy failures to Sentry.
+ *
+ * App code calls this rather than `useUserInfo` from
+ * `@lsst-sqre/gafaelfawr-client` (a lint rule enforces it). Every observer of
+ * the user-info query shares one TanStack Query entry, whose `queryFn` is the
+ * one from whichever observer last set its options, so a single observer
+ * without the reporter would leave the fetches it drives unreported. Routing
+ * every observer through this hook makes each fetch carry the app's Sentry
+ * reporter, tagged `site: user-info`: contract drift (a `ZodError`), 5xx
+ * responses, and server-side network errors reach Sentry, while an expected
+ * 401/403 stays a quiet "not logged in".
+ *
+ * The Gafaelfawr URL is discovered through the configured Repertoire URL. The
+ * reporter and context are not part of the query key, so the entry the root
+ * layout prefetches and hydrates (`prefetchUserInfo`) still answers the first
+ * render.
+ *
+ * @param config - Extra query options, such as a `logger`
+ */
+export function useUserInfo(config?: UserInfoConfig): UseUserInfoReturn {
+  const repertoireUrl = useRepertoireUrl();
+  const reportError = useMemo(() => makeReportError({ isServer: false }), []);
+  return usePackageUserInfo(repertoireUrl, {
+    ...config,
+    reportError,
+    context: USER_INFO_CONTEXT,
+  });
+}

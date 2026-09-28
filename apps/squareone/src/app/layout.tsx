@@ -29,6 +29,7 @@ import Header from '../components/Header';
 import styles from '../components/Page/Page.module.css';
 import { ConfigProvider } from '../contexts/rsc';
 import { prefetchLoginInfo } from '../lib/auth/prefetchLoginInfo';
+import { prefetchUserInfo } from '../lib/auth/prefetchUserInfo';
 import { getStaticConfig } from '../lib/config/rsc';
 import logger from '../lib/logger';
 import { compileFooterMdxForRsc } from '../lib/mdx/rsc';
@@ -64,7 +65,7 @@ type RootLayoutProps = {
  * 1. Imports global CSS (fonts, icons, design system)
  * 2. Loads configuration server-side
  * 3. Prefetches service discovery, then broadcasts and the signed-in user's
- *    login info (scopes), for hydration on the client
+ *    login info (scopes) and user info (username), for hydration on the client
  * 4. Injects Sentry config for client-side error tracking
  * 5. Sets up provider hierarchy (Plausible, Config, Theme, Query)
  * 6. Renders the page shell (Header, BroadcastBannerStack, Footer)
@@ -85,8 +86,9 @@ export default async function RootLayout({ children }: RootLayoutProps) {
   const config = await configPromise;
 
   // Create QueryClient for server-side prefetching. It is created per request,
-  // so the user-specific data it holds (login info, prefetched with the
-  // request's session cookie) is only ever dehydrated into that user's page.
+  // so the user-specific data it holds (login info and user info, prefetched
+  // with the request's session cookie) is only ever dehydrated into that
+  // user's page.
   const queryClient = new QueryClient();
 
   // Prefetch service discovery if Repertoire URL is configured
@@ -110,13 +112,15 @@ export default async function RootLayout({ children }: RootLayoutProps) {
     ]);
     logger.debug({ cachedData }, 'Prefetch complete');
 
-    // Broadcasts and login info each take their service URL from discovery
-    // and are otherwise independent, so prefetch them concurrently. Hydrating
-    // login info lets the header nav, homepage hero, and Apps menu gate
-    // scope-restricted services on their first client render.
+    // Broadcasts, login info, and user info each take their service URL from
+    // discovery and are otherwise independent, so prefetch them concurrently.
+    // Hydrating login info lets the header nav, homepage hero, and Apps menu
+    // gate scope-restricted services on their first client render; hydrating
+    // user info puts a signed-in user's menu, not "Log in", in the server HTML.
     await Promise.all([
       prefetchBroadcasts(queryClient, config.repertoireUrl),
       prefetchLoginInfo(queryClient, config.repertoireUrl),
+      prefetchUserInfo(queryClient, config.repertoireUrl),
     ]);
   } else {
     logger.debug('No repertoireUrl configured, skipping service discovery');

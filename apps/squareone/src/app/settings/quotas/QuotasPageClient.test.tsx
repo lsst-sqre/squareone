@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 // Mock the hooks so the component renders without a ConfigProvider/Suspense
 // boundary or live service discovery.
-vi.mock('@lsst-sqre/gafaelfawr-client', () => ({
+vi.mock('../../../hooks/useUserInfo', () => ({
   useUserInfo: vi.fn(),
 }));
 
@@ -27,7 +27,6 @@ vi.mock('../../../hooks/useStaticConfig', () => ({
 
 import type { Quota, UseUserInfoReturn } from '@lsst-sqre/gafaelfawr-client';
 // Import after mocking.
-import { useUserInfo } from '@lsst-sqre/gafaelfawr-client';
 import {
   getEmptyDiscovery,
   mockDiscovery,
@@ -35,6 +34,7 @@ import {
 } from '@lsst-sqre/repertoire-client';
 import { useRepertoireUrl } from '../../../hooks/useRepertoireUrl';
 import { useStaticConfig } from '../../../hooks/useStaticConfig';
+import { useUserInfo } from '../../../hooks/useUserInfo';
 import type { StaticConfig } from '../../../lib/config/resolveConfigDefaults';
 import { mockDiscoveryState } from '../../../tests/serviceAccessMocks';
 import QuotasPageClient from './QuotasPageClient';
