@@ -106,21 +106,24 @@ function getNotebookItems(notebook: NotebookQuota): KeyValueListItem[] {
  * Render an API rate-limit row, with an icon link to the service's
  * documentation after the limit when discovery provides one.
  */
-function toKeyValueListItem(item: ApiQuotaItem): KeyValueListItem {
-  if (!item.docsUrl) {
-    return { key: item.key, value: item.value };
+function toKeyValueListItem({
+  key,
+  value,
+  docs,
+}: ApiQuotaItem): KeyValueListItem {
+  if (!docs) {
+    return { key, value };
   }
-  const docsLabel = item.docsLabel ?? undefined;
   return {
-    key: item.key,
+    key,
     value: (
       <span className={styles.rateLimit}>
-        {item.value}
+        {value}
         <a
           className={styles.docsLink}
-          href={item.docsUrl}
-          title={docsLabel}
-          aria-label={docsLabel}
+          href={docs.url}
+          title={docs.label}
+          aria-label={docs.label}
         >
           <BookOpen size={16} aria-hidden="true" />
         </a>

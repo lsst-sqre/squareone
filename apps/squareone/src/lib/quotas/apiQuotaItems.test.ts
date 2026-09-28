@@ -15,11 +15,12 @@ describe('buildApiQuotaItems', () => {
 
     expect(items).toEqual([
       {
-        label: 'tap',
         key: 'Table access protocol (TAP) — TAP API calls',
         value: '100 requests',
-        docsUrl: 'https://www.ivoa.net/documents/TAP/',
-        docsLabel: 'Table access protocol (TAP) documentation',
+        docs: {
+          url: 'https://www.ivoa.net/documents/TAP/',
+          label: 'Table access protocol (TAP) documentation',
+        },
       },
     ]);
   });
@@ -29,20 +30,8 @@ describe('buildApiQuotaItems', () => {
     const items = buildApiQuotaItems({ 'muster-quota': 5, tap: 100 });
 
     expect(items).toEqual([
-      {
-        label: 'muster-quota',
-        key: 'muster-quota',
-        value: '5 requests',
-        docsUrl: null,
-        docsLabel: null,
-      },
-      {
-        label: 'tap',
-        key: 'tap',
-        value: '100 requests',
-        docsUrl: null,
-        docsLabel: null,
-      },
+      { key: 'muster-quota', value: '5 requests', docs: null },
+      { key: 'tap', value: '100 requests', docs: null },
     ]);
   });
 
@@ -62,7 +51,9 @@ describe('buildApiQuotaItems', () => {
       }
     );
 
-    expect(items.map((item) => item.label)).toEqual(['tap']);
+    expect(items.map((item) => item.key)).toEqual([
+      'Table access protocol (TAP) — TAP API calls',
+    ]);
   });
 
   test('uses the singular for a limit of one request', () => {
@@ -76,13 +67,19 @@ describe('buildApiQuotaItems', () => {
     const items = buildApiQuotaItems({ 'muster-quota': 5 }, index);
 
     expect(items).toEqual([
-      {
-        label: 'muster-quota',
-        key: 'muster — Quota testing',
-        value: '5 requests',
-        docsUrl: null,
-        docsLabel: null,
-      },
+      { key: 'muster — Quota testing', value: '5 requests', docs: null },
+    ]);
+  });
+
+  test('falls back to the raw label for a label with no title', () => {
+    // Repertoire accepts an empty quota label title.
+    const items = buildApiQuotaItems(
+      { tap: 100 },
+      { ...index, tap: { ...index.tap, labelTitle: '' } }
+    );
+
+    expect(items.map((item) => item.key)).toEqual([
+      'Table access protocol (TAP) — tap',
     ]);
   });
 

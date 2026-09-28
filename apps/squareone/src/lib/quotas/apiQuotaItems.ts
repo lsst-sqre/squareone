@@ -7,24 +7,28 @@
 import type { Quota } from '@lsst-sqre/gafaelfawr-client';
 import type { QuotaLabelIndex } from '@lsst-sqre/repertoire-client';
 
+/** A link to the documentation of the service a quota applies to. */
+export type ApiQuotaDocsLink = {
+  /** URL of the service's documentation. */
+  url: string;
+  /**
+   * Accessible name for the link, naming the service (e.g.
+   * `"Table access protocol (TAP) documentation"`).
+   */
+  label: string;
+};
+
 /** One API rate-limit row of the quotas page. */
 export type ApiQuotaItem = {
-  /** The Gafaelfawr quota label (a key of `quota.api`), e.g. `tap`. */
-  label: string;
   /**
    * The row heading: `"<service title> — <label title>"` when discovery
-   * describes the label, otherwise the raw quota label.
+   * describes the quota label, otherwise the raw quota label.
    */
   key: string;
   /** The limit, e.g. `"100 requests"`. */
   value: string;
-  /** Documentation URL of the service the quota applies to, if any. */
-  docsUrl: string | null;
-  /**
-   * Accessible name for the documentation link, naming the service (e.g.
-   * `"Table access protocol (TAP) documentation"`); null without `docsUrl`.
-   */
-  docsLabel: string | null;
+  /** Documentation of the service the quota applies to, if it has any. */
+  docs: ApiQuotaDocsLink | null;
 };
 
 /**
@@ -32,13 +36,20 @@ export type ApiQuotaItem = {
  *
  * Each quota label is looked up in the quota label index from
  * `ServiceDiscoveryQuery.getQuotaLabelIndex()`. A described label is shown as
- * `"<service title> — <label title>"` (the service name stands in for a
- * missing title) with a link to the service's docs when it has a `docs_url`;
- * a label the index flags `internal` is dropped. A label the index does not
- * describe, or every label when there is no index (discovery disabled, or
- * Repertoire 2.x, which declares no quota labels), is shown as-is.
+ * `"<service title> — <label title>"` with a link to the service's docs when
+ * it has a `docs_url`; a label the index flags `internal` is dropped. A label
+ * the index does not describe, or every label when there is no index
+ * (discovery disabled, or Repertoire 2.x, which declares no quota labels), is
+ * shown as-is.
  *
- * Label titles are rendered verbatim. Rows are sorted by their rendered key.
+ * An empty title falls back to the raw identifier: the service name stands in
+ * for a missing service title, and the quota label itself for an empty label
+ * title (e.g. `"Table access protocol (TAP) — tap"`). The fallback keeps the
+ * `" — <label title>"` suffix rather than dropping it, so untitled labels of
+ * one service still get distinct headings.
+ *
+ * Label titles are otherwise rendered verbatim. Rows are sorted by their
+ * rendered key.
  *
  * @param api - Gafaelfawr's API quotas: requests per minute by quota label.
  * @param quotaLabelIndex - Quota labels declared by service discovery.
@@ -54,18 +65,21 @@ export function buildApiQuotaItems(
 
     const value = `${limit} ${limit === 1 ? 'request' : 'requests'}`;
     if (!entry) {
-      items.push({ label, key: label, value, docsUrl: null, docsLabel: null });
+      items.push({ key: label, value, docs: null });
       continue;
     }
 
     const serviceTitle = entry.serviceTitle || entry.serviceName;
-    const docsUrl = entry.serviceDocsUrl || null;
+    const labelTitle = entry.labelTitle || label;
     items.push({
-      label,
-      key: `${serviceTitle} — ${entry.labelTitle}`,
+      key: `${serviceTitle} — ${labelTitle}`,
       value,
-      docsUrl,
-      docsLabel: docsUrl ? `${serviceTitle} documentation` : null,
+      docs: entry.serviceDocsUrl
+        ? {
+            url: entry.serviceDocsUrl,
+            label: `${serviceTitle} documentation`,
+          }
+        : null,
     });
   }
   return items.sort((a, b) => a.key.localeCompare(b.key));
