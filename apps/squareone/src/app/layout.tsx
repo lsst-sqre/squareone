@@ -28,6 +28,7 @@ import BroadcastBannerStack from '../components/BroadcastBannerStack';
 import Header from '../components/Header';
 import styles from '../components/Page/Page.module.css';
 import { ConfigProvider } from '../contexts/rsc';
+import { prefetchLoginInfo } from '../lib/auth/prefetchLoginInfo';
 import { getStaticConfig } from '../lib/config/rsc';
 import logger from '../lib/logger';
 import { compileFooterMdxForRsc } from '../lib/mdx/rsc';
@@ -62,7 +63,8 @@ type RootLayoutProps = {
  * This layout:
  * 1. Imports global CSS (fonts, icons, design system)
  * 2. Loads configuration server-side
- * 3. Prefetches service discovery data from Repertoire API
+ * 3. Prefetches service discovery, then broadcasts and the signed-in user's
+ *    login info (scopes), for hydration on the client
  * 4. Injects Sentry config for client-side error tracking
  * 5. Sets up provider hierarchy (Plausible, Config, Theme, Query)
  * 6. Renders the page shell (Header, BroadcastBannerStack, Footer)
@@ -82,7 +84,9 @@ export default async function RootLayout({ children }: RootLayoutProps) {
   const configPromise = getStaticConfig();
   const config = await configPromise;
 
-  // Create QueryClient for server-side prefetching
+  // Create QueryClient for server-side prefetching. It is created per request,
+  // so the user-specific data it holds (login info, prefetched with the
+  // request's session cookie) is only ever dehydrated into that user's page.
   const queryClient = new QueryClient();
 
   // Prefetch service discovery if Repertoire URL is configured
@@ -106,37 +110,14 @@ export default async function RootLayout({ children }: RootLayoutProps) {
     ]);
     logger.debug({ cachedData }, 'Prefetch complete');
 
-    // Prefetch broadcasts from Semaphore (URL from service discovery)
-    try {
-      const discovery = await fetchServiceDiscovery(config.repertoireUrl, {
-        logger,
-      });
-      const discoveryQuery = createDiscoveryQuery(discovery);
-      const semaphoreUrl = discoveryQuery.getSemaphoreUrl();
-
-      if (semaphoreUrl) {
-        await queryClient.prefetchQuery(
-          broadcastsQueryOptions(semaphoreUrl, {
-            refetchInterval: 0, // Server-side: no polling
-            logger,
-            isServer: true,
-            reportError: makeReportError({ isServer: true }),
-            context: { site: 'broadcasts', package: 'semaphore-client' },
-          })
-        );
-      }
-    } catch (error) {
-      // This catch guards the discovery-URL resolution feeding the broadcasts
-      // prefetch (the raw `fetchServiceDiscovery` + `getSemaphoreUrl`). Log
-      // every failure, then report the report-worthy ones (contract drift,
-      // 5xx, and — server-side — network failures) so a silent prefetch
-      // outage still surfaces in Sentry rather than only in pino logs.
-      logger.error({ err: error }, 'Failed to prefetch broadcasts');
-      reportPrefetchError(error, {
-        site: 'broadcasts-prefetch',
-        package: 'squareone',
-      });
-    }
+    // Broadcasts and login info each take their service URL from discovery
+    // and are otherwise independent, so prefetch them concurrently. Hydrating
+    // login info lets the header nav, homepage hero, and Apps menu gate
+    // scope-restricted services on their first client render.
+    await Promise.all([
+      prefetchBroadcasts(queryClient, config.repertoireUrl),
+      prefetchLoginInfo(queryClient, config.repertoireUrl),
+    ]);
   } else {
     logger.debug('No repertoireUrl configured, skipping service discovery');
   }
@@ -194,4 +175,41 @@ export default async function RootLayout({ children }: RootLayoutProps) {
       </body>
     </html>
   );
+}
+
+/**
+ * Prefetch broadcasts from Semaphore, whose URL comes from service discovery.
+ */
+async function prefetchBroadcasts(
+  queryClient: QueryClient,
+  repertoireUrl: string
+): Promise<void> {
+  try {
+    const discovery = await fetchServiceDiscovery(repertoireUrl, { logger });
+    const discoveryQuery = createDiscoveryQuery(discovery);
+    const semaphoreUrl = discoveryQuery.getSemaphoreUrl();
+
+    if (semaphoreUrl) {
+      await queryClient.prefetchQuery(
+        broadcastsQueryOptions(semaphoreUrl, {
+          refetchInterval: 0, // Server-side: no polling
+          logger,
+          isServer: true,
+          reportError: makeReportError({ isServer: true }),
+          context: { site: 'broadcasts', package: 'semaphore-client' },
+        })
+      );
+    }
+  } catch (error) {
+    // This catch guards the discovery-URL resolution feeding the broadcasts
+    // prefetch (the raw `fetchServiceDiscovery` + `getSemaphoreUrl`). Log
+    // every failure, then report the report-worthy ones (contract drift,
+    // 5xx, and — server-side — network failures) so a silent prefetch
+    // outage still surfaces in Sentry rather than only in pino logs.
+    logger.error({ err: error }, 'Failed to prefetch broadcasts');
+    reportPrefetchError(error, {
+      site: 'broadcasts-prefetch',
+      package: 'squareone',
+    });
+  }
 }

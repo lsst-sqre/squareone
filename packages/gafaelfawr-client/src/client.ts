@@ -34,6 +34,21 @@ import {
 import type { TokenHistoryFilters, TokenHistoryPage } from './types';
 
 // =============================================================================
+// Ambient auth request options
+// =============================================================================
+
+/**
+ * Extra fetch options for the ambient auth fetchers ({@link fetchUserInfo},
+ * {@link fetchLoginInfo}), merged over their default `credentials: 'include'`.
+ *
+ * `credentials: 'include'` only means something in a browser: from a server
+ * component it sends no cookie. A server-side caller forwards the incoming
+ * request's `cookie` header through `headers`, and passes `cache: 'no-store'`
+ * so the cookie-bearing response is never cached by Next's fetch layer.
+ */
+export type AuthRequestInit = Pick<RequestInit, 'headers' | 'cache'>;
+
+// =============================================================================
 // User Info
 // =============================================================================
 
@@ -41,14 +56,20 @@ import type { TokenHistoryFilters, TokenHistoryPage } from './types';
  * Fetch current user information.
  *
  * @param baseUrl - Gafaelfawr API base URL (e.g., '/auth/api/v1')
+ * @param init - Extra fetch options, e.g. a forwarded `cookie` header for a
+ *   server-side call. Omitted in the browser.
  * @returns User information if authenticated
  * @throws GafaelfawrError if request fails or user is not authenticated
  */
-export async function fetchUserInfo(baseUrl: string): Promise<UserInfo> {
+export async function fetchUserInfo(
+  baseUrl: string,
+  init?: AuthRequestInit
+): Promise<UserInfo> {
   const url = `${normalizeUrl(baseUrl)}/user-info`;
 
   const response = await fetch(url, {
     credentials: 'include',
+    ...init,
   });
 
   if (!response.ok) {
@@ -85,14 +106,20 @@ export function getEmptyUserInfo(): UserInfo {
  * Fetch login information including CSRF token and available scopes.
  *
  * @param baseUrl - Gafaelfawr API base URL
+ * @param init - Extra fetch options, e.g. a forwarded `cookie` header for a
+ *   server-side call. Omitted in the browser.
  * @returns Login info with CSRF token
  * @throws GafaelfawrError if request fails
  */
-export async function fetchLoginInfo(baseUrl: string): Promise<LoginInfo> {
+export async function fetchLoginInfo(
+  baseUrl: string,
+  init?: AuthRequestInit
+): Promise<LoginInfo> {
   const url = `${normalizeUrl(baseUrl)}/login`;
 
   const response = await fetch(url, {
     credentials: 'include',
+    ...init,
   });
 
   if (!response.ok) {

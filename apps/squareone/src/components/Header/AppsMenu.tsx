@@ -30,6 +30,12 @@ type LinkProps = {
  *
  * Without service discovery (no `repertoireUrl`) the menu lists the configured
  * `appLinks` only.
+ *
+ * The scope-gated discovery items need the user's scopes to be known. The root
+ * layout prefetches login info alongside service discovery on the server and
+ * hydrates both, so those items (and the menu itself, when they are all it
+ * lists) are present on the first client render rather than popping in once
+ * the browser's own login-info request resolves.
  */
 export default function AppsMenu({ className }: AppsMenuProps) {
   const { appLinks, baseUrl } = useStaticConfig();
