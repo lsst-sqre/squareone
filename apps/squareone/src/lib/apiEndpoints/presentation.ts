@@ -12,20 +12,30 @@ export type UrlSelector = 'base' | { versionKey: string };
 /**
  * Editorial presentation for a single discovery service, keyed by the raw
  * service name (e.g. `sia`, `tap`).
+ *
+ * Every field is optional and overrides one discovery-derived value; an absent
+ * field falls through to discovery. {@link PresentationMap} states the
+ * precedence rule.
  */
 export type ServicePresentation = {
-  /** Human-facing label shown for the endpoint. */
-  label: string;
-  /** IVOA standard documentation link the label points to, if any. */
+  /** Endpoint label. Overrides the discovery `title`. */
+  label?: string;
+  /**
+   * Label for when discovery has no (or a blank) `title`, as on Repertoire
+   * 2.x. Overrides only the raw service name as the last-resort label, so a
+   * discovery `title` still wins; ignored when {@link ServicePresentation.label}
+   * is set.
+   */
+  untitledLabel?: string;
+  /** IVOA standard documentation URL. Overrides the discovery `docs_url`. */
   ivoaUrl?: string;
   /**
-   * Short standard/spec acronym used in the docs link's accessible label —
-   * e.g. `TAP` renders the book-icon link as "IVOA TAP docs". Pairs with
-   * {@link ivoaUrl}; when omitted, the name is derived from `label` via
-   * {@link ivoaNameFromLabel}.
+   * Short standard/spec acronym used in an IVOA docs link's accessible label
+   * — e.g. `TAP` renders the book-icon link as "IVOA TAP docs". Overrides the
+   * name {@link ivoaNameFromLabel} derives from the endpoint label.
    */
   ivoaName?: string;
-  /** Which discovery URL to surface (defaults to the base `url`). */
+  /** Which discovery URL to surface, overriding the default base `url`. */
   url?: UrlSelector;
 };
 
@@ -34,21 +44,29 @@ export type ServicePresentation = {
  *
  * This is squareone-local curation — human labels, IVOA standard links, URL
  * selection, and dataset display names — not part of the shared discovery
- * client. Curated services win entirely over discovery metadata. Services
- * absent from `services` fall back to their discovery `title` (then
- * {@link PresentationMap.untitledServiceLabels}, then the raw service name),
- * discovery `docs_url`, and base URL; dataset keys absent from
- * `datasetDisplayNames` fall back to the raw key.
+ * client.
+ *
+ * Precedence: each field of a `services` entry overrides the value discovery
+ * would otherwise supply, and each absent field falls through to discovery. A
+ * service with no entry therefore takes every value from discovery. Per
+ * endpoint field:
+ *
+ * - Label: `label`, else the discovery `title`, else `untitledLabel`, else the
+ *   raw service name. A null, empty, or whitespace-only title counts as absent
+ *   (see `serviceDisplayName` in `lib/discovery`).
+ * - Docs link: `ivoaUrl`, else the discovery `docs_url`, else none. A link to
+ *   an IVOA standard (any `ivoaUrl`, or a `docs_url` passing
+ *   {@link isIvoaStandardUrl}) is labelled "IVOA <name> docs", named by
+ *   `ivoaName`, else via {@link ivoaNameFromLabel} from the resolved label;
+ *   any other link is labelled "<label> docs".
+ * - URL: the discovery URL chosen by `url` (see {@link selectServiceUrl}),
+ *   else the base `url`.
+ *
+ * Dataset keys absent from `datasetDisplayNames` fall back to the raw key.
  */
 export type PresentationMap = {
   /** Service name -> curated presentation. */
   services: Record<string, ServicePresentation>;
-  /**
-   * Service name -> label for a service absent from `services` whose
-   * discovery entry has no (or a blank) `title` (Repertoire 2.x). A discovery
-   * `title` takes precedence, so these only keep older environments readable.
-   */
-  untitledServiceLabels?: Record<string, string>;
   /** Dataset key -> display name (e.g. `dp1` -> "Data Preview 1"). */
   datasetDisplayNames: Record<string, string>;
 };
@@ -101,11 +119,10 @@ export const presentationMap: PresentationMap = {
       ivoaName: 'GMS',
       url: 'base',
     },
-  },
-  untitledServiceLabels: {
-    // Not an IVOA standard, so not curated: Repertoire 3.0 discovery supplies
-    // its title ("Alert retrieval") and technote docs link.
-    alerts: 'Alerts',
+    // Not an IVOA standard: Repertoire 3.0 discovery supplies its title
+    // ("Alert retrieval") and technote docs link, so this only names it on
+    // Repertoire 2.x, which publishes no titles.
+    alerts: { untitledLabel: 'Alerts' },
   },
   datasetDisplayNames: {
     dp1: 'Data Preview 1',

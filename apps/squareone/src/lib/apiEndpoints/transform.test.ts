@@ -447,6 +447,149 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
     });
   });
 
+  test('labels an untitled service (Repertoire 2.x) by an entry untitledLabel', () => {
+    const custom: PresentationMap = {
+      services: { spectra: { untitledLabel: 'Spectra' } },
+      datasetDisplayNames: {},
+    };
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            spectra: { url: 'https://example.org/spectra', versions: {} },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery, custom);
+    expect(group.endpoints[0]).toEqual({
+      label: 'Spectra',
+      url: 'https://example.org/spectra',
+      docs: null,
+    });
+  });
+
+  test('prefers a discovery title over an entry untitledLabel', () => {
+    const custom: PresentationMap = {
+      services: { spectra: { untitledLabel: 'Spectra' } },
+      datasetDisplayNames: {},
+    };
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            spectra: {
+              url: 'https://example.org/spectra',
+              title: 'Spectrum retrieval',
+              versions: {},
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery, custom);
+    expect(group.endpoints[0]?.label).toBe('Spectrum retrieval');
+  });
+
+  test('names an IVOA discovery docs link by the entry ivoaName', () => {
+    const custom: PresentationMap = {
+      services: { ssa: { ivoaName: 'SSA' } },
+      datasetDisplayNames: {},
+    };
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            ssa: {
+              url: 'https://example.org/ssa',
+              title: 'Simple spectral access',
+              docs_url: 'https://www.ivoa.net/documents/SSA/',
+              versions: {},
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery, custom);
+    expect(group.endpoints[0]).toEqual({
+      label: 'Simple spectral access',
+      url: 'https://example.org/ssa',
+      docs: {
+        url: 'https://www.ivoa.net/documents/SSA/',
+        label: 'IVOA SSA docs',
+      },
+    });
+  });
+
+  test('overrides only the fields an entry sets; the rest come from discovery', () => {
+    const custom: PresentationMap = {
+      services: { spectra: { url: { versionKey: 'spectra-1.0' } } },
+      datasetDisplayNames: {},
+    };
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            spectra: {
+              url: 'https://example.org/spectra',
+              title: 'Spectrum retrieval',
+              docs_url: 'https://spectra.lsst.io/',
+              versions: {
+                'spectra-1.0': { url: 'https://example.org/spectra/query' },
+              },
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery, custom);
+    expect(group.endpoints[0]).toEqual({
+      label: 'Spectrum retrieval',
+      url: 'https://example.org/spectra/query',
+      docs: {
+        url: 'https://spectra.lsst.io/',
+        label: 'Spectrum retrieval docs',
+      },
+    });
+  });
+
+  test('an entry without an ivoaUrl falls through to the discovery docs url', () => {
+    const custom: PresentationMap = {
+      services: { spectra: { label: 'Spectra' } },
+      datasetDisplayNames: {},
+    };
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            spectra: {
+              url: 'https://example.org/spectra',
+              title: 'Spectrum retrieval',
+              docs_url: 'https://spectra.lsst.io/',
+              versions: {},
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery, custom);
+    expect(group.endpoints[0]).toEqual({
+      label: 'Spectra',
+      url: 'https://example.org/spectra',
+      docs: { url: 'https://spectra.lsst.io/', label: 'Spectra docs' },
+    });
+  });
+
   test('gives an unmapped service with a blank docs url no docs link', () => {
     const discovery = {
       ...getEmptyDiscovery(),
