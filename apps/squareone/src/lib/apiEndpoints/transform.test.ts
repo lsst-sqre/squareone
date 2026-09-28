@@ -114,9 +114,7 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
     ).toEqual({
       label: 'Alert retrieval',
       url: 'https://data.lsst.cloud/api/alerts',
-      ivoaUrl: null,
-      ivoaName: null,
-      docsUrl: 'https://sqr-114.lsst.io/',
+      docs: { url: 'https://sqr-114.lsst.io/', label: 'Alert retrieval docs' },
     });
   });
 
@@ -139,9 +137,7 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
     expect(group.endpoints[0]).toEqual({
       label: 'Alerts',
       url: 'https://data.lsst.cloud/api/alerts',
-      ivoaUrl: null,
-      ivoaName: null,
-      docsUrl: null,
+      docs: null,
     });
   });
 
@@ -176,13 +172,15 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
     const byLabel = (label: string) =>
       dp1?.endpoints.find((endpoint) => endpoint.label === label);
 
-    // SIA surfaces the sia-query-2.0 /query URL and the IVOA SIA standard link.
+    // SIA surfaces the sia-query-2.0 /query URL and the IVOA SIA standard link,
+    // labelled by its curated standard name.
     expect(byLabel('Simple Image Access (SIA v2)')).toEqual({
       label: 'Simple Image Access (SIA v2)',
       url: 'https://data.lsst.cloud/api/sia/dp1/query',
-      ivoaUrl: 'https://www.ivoa.net/documents/SIA/',
-      ivoaName: 'SIA',
-      docsUrl: null,
+      docs: {
+        url: 'https://www.ivoa.net/documents/SIA/',
+        label: 'IVOA SIA docs',
+      },
     });
     // HiPS surfaces the hips-list-1.0 /list URL.
     expect(byLabel('HiPS (Hierarchical Progressive Survey)')?.url).toBe(
@@ -197,12 +195,14 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
       'https://data.lsst.cloud/api/cutout'
     );
     // DataLink and GMS link to their IVOA standards too.
-    expect(byLabel('DataLink')?.ivoaUrl).toBe(
-      'https://www.ivoa.net/documents/DataLink/'
-    );
-    expect(byLabel('Group Membership Service (GMS)')?.ivoaUrl).toBe(
-      'https://www.ivoa.net/documents/GMS/'
-    );
+    expect(byLabel('DataLink')?.docs).toEqual({
+      url: 'https://www.ivoa.net/documents/DataLink/',
+      label: 'IVOA DataLink docs',
+    });
+    expect(byLabel('Group Membership Service (GMS)')?.docs).toEqual({
+      url: 'https://www.ivoa.net/documents/GMS/',
+      label: 'IVOA GMS docs',
+    });
   });
 
   test('curated services ignore the discovery title and docs url entirely', () => {
@@ -216,9 +216,10 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
     ).toEqual({
       label: 'SODA Image Cutouts',
       url: 'https://data.lsst.cloud/api/cutout',
-      ivoaUrl: 'https://www.ivoa.net/documents/SODA/20170517/REC-SODA-1.0.html',
-      ivoaName: 'SODA',
-      docsUrl: null,
+      docs: {
+        url: 'https://www.ivoa.net/documents/SODA/20170517/REC-SODA-1.0.html',
+        label: 'IVOA SODA docs',
+      },
     });
   });
 
@@ -254,9 +255,10 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
     expect(group.endpoints[0]).toEqual({
       label: 'Simple spectral access (SSA)',
       url: 'https://data.lsst.cloud/api/ssa',
-      ivoaUrl: 'https://www.ivoa.net/documents/SSA/',
-      ivoaName: 'SSA',
-      docsUrl: null,
+      docs: {
+        url: 'https://www.ivoa.net/documents/SSA/',
+        label: 'IVOA SSA docs',
+      },
     });
   });
 
@@ -279,9 +281,7 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
     expect(group.endpoints[0]).toEqual({
       label: 'mystery',
       url: 'https://data.lsst.cloud/api/mystery',
-      ivoaUrl: null,
-      ivoaName: null,
-      docsUrl: null,
+      docs: null,
     });
   });
 
@@ -306,9 +306,10 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
     expect(group.endpoints[0]).toEqual({
       label: 'ssa',
       url: 'https://data.lsst.cloud/api/ssa',
-      ivoaUrl: 'https://www.ivoa.net/documents/SSA/',
-      ivoaName: 'ssa',
-      docsUrl: null,
+      docs: {
+        url: 'https://www.ivoa.net/documents/SSA/',
+        label: 'IVOA ssa docs',
+      },
     });
   });
 
@@ -373,9 +374,10 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
     expect(group.endpoints[0]).toEqual({
       label: 'Mystery service',
       url: 'https://data.lsst.cloud/api/mystery',
-      ivoaUrl: null,
-      ivoaName: null,
-      docsUrl: 'https://mystery.lsst.io/',
+      docs: {
+        url: 'https://mystery.lsst.io/',
+        label: 'Mystery service docs',
+      },
     });
   });
 
@@ -415,10 +417,55 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
     expect(group.endpoints[0]).toEqual({
       label: 'Custom TAP',
       url: 'https://example.org/tap',
-      ivoaUrl: null,
-      ivoaName: null,
-      docsUrl: null,
+      docs: null,
     });
+  });
+
+  test('names a curated IVOA link from its label when no ivoaName is curated', () => {
+    const custom: PresentationMap = {
+      services: {
+        ssa: {
+          label: 'Simple Spectral Access (SSA)',
+          ivoaUrl: 'https://www.ivoa.net/documents/SSA/',
+        },
+      },
+      datasetDisplayNames: {},
+    };
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: { ssa: { url: 'https://example.org/ssa', versions: {} } },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery, custom);
+    expect(group.endpoints[0]?.docs).toEqual({
+      url: 'https://www.ivoa.net/documents/SSA/',
+      label: 'IVOA SSA docs',
+    });
+  });
+
+  test('gives an unmapped service with a blank docs url no docs link', () => {
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            mystery: {
+              url: 'https://data.lsst.cloud/api/mystery',
+              title: 'Mystery service',
+              docs_url: '',
+              versions: {},
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery);
+    expect(group.endpoints[0]?.docs).toBeNull();
   });
 
   test('returns an empty array when discovery has no datasets', () => {

@@ -19,9 +19,10 @@ export type ServicePresentation = {
   /** IVOA standard documentation link the label points to, if any. */
   ivoaUrl?: string;
   /**
-   * Short standard/spec acronym used in the doc link's accessible label —
+   * Short standard/spec acronym used in the docs link's accessible label —
    * e.g. `TAP` renders the book-icon link as "IVOA TAP docs". Pairs with
-   * {@link ivoaUrl}.
+   * {@link ivoaUrl}; when omitted, the name is derived from `label` via
+   * {@link ivoaNameFromLabel}.
    */
   ivoaName?: string;
   /** Which discovery URL to surface (defaults to the base `url`). */
@@ -184,8 +185,8 @@ export function isIvoaStandardUrl(url: string): boolean {
 }
 
 /**
- * Derive the short standard name for an IVOA doc link's accessible label from
- * an endpoint label, for services without a curated {@link
+ * Derive the short standard name for an IVOA docs link's accessible label
+ * from an endpoint label, for services without a curated {@link
  * ServicePresentation.ivoaName}.
  *
  * A trailing single-word parenthetical is taken as the acronym (`Simple
