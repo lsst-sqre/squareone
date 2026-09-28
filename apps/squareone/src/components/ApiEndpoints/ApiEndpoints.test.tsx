@@ -16,7 +16,10 @@ const okResult: ApiEndpointsResult = {
         {
           label: 'Table Access Protocol (TAP)',
           url: 'https://example.org/api/tap',
-          ivoaUrl: 'https://www.ivoa.net/documents/TAP/',
+          docs: {
+            url: 'https://www.ivoa.net/documents/TAP/',
+            label: 'IVOA TAP docs',
+          },
         },
       ],
     },

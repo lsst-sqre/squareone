@@ -9,6 +9,7 @@ export { resolveApiEndpoints } from './resolve';
 export { serviceDiscoveryToApiEndpointGroups } from './transform';
 export type {
   ApiEndpoint,
+  ApiEndpointDocsLink,
   ApiEndpointGroup,
   ApiEndpointsResult,
 } from './types';

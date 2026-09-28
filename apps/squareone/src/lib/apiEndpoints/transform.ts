@@ -9,7 +9,31 @@ import {
   type PresentationMap,
   selectServiceUrl,
 } from './presentation';
-import type { ApiEndpointGroup } from './types';
+import type { ApiEndpointDocsLink, ApiEndpointGroup } from './types';
+
+/** Docs link to an IVOA standard, labelled by the standard's short name. */
+function ivoaDocsLink(url: string, name: string): ApiEndpointDocsLink {
+  return { url, label: `IVOA ${name} docs` };
+}
+
+/**
+ * Docs link for a service absent from the presentation map, from its
+ * discovery `docs_url`: an IVOA standard is named via {@link
+ * ivoaNameFromLabel}, any other docs page by the endpoint label. A missing or
+ * empty `docs_url` yields no link.
+ */
+function discoveryDocsLink(
+  docsUrl: string | null | undefined,
+  label: string
+): ApiEndpointDocsLink | null {
+  if (!docsUrl) {
+    return null;
+  }
+  if (isIvoaStandardUrl(docsUrl)) {
+    return ivoaDocsLink(docsUrl, ivoaNameFromLabel(label));
+  }
+  return { url: docsUrl, label: `${label} docs` };
+}
 
 /**
  * Transform Repertoire service discovery into the `/api-aspect` listing,
@@ -21,15 +45,18 @@ import type { ApiEndpointGroup } from './types';
  * dataset display name (falling back to the raw key) and carries the dataset
  * `docs_url` and `description`. Every service under a dataset is rendered:
  *
- * - Curated services win entirely: the curated label, IVOA standard link and
- *   name, and version-selected URL, ignoring any discovery `title`/`docs_url`.
+ * - Curated services win entirely: the curated label, IVOA standard link
+ *   (labelled "IVOA <name> docs" by the curated `ivoaName`, else a name
+ *   derived from the label), and version-selected URL, ignoring any discovery
+ *   `title`/`docs_url`.
  * - Services absent from the map use the base URL and are labelled by their
  *   discovery `title`, falling back to
  *   {@link PresentationMap.untitledServiceLabels} and then the raw service
  *   name (Repertoire 2.x publishes no titles; a blank title counts as none,
- *   per {@link serviceDisplayName}). A discovery `docs_url` becomes
- *   the IVOA link (named via {@link ivoaNameFromLabel}) when it points at an
- *   IVOA standard, otherwise a plain `docsUrl`; without one, no docs link.
+ *   per {@link serviceDisplayName}). A discovery `docs_url` becomes the
+ *   `docs` link, labelled "IVOA <name> docs" (named via
+ *   {@link ivoaNameFromLabel}) when it points at an IVOA standard, otherwise
+ *   "<label> docs"; without one, no docs link.
  *
  * Pure and parameterized by `presentation` (defaulting to the app's curated
  * map) so tests can inject their own mapping. Empty/missing fallbacks: a
@@ -57,22 +84,21 @@ export function serviceDiscoveryToApiEndpointGroups(
               service.title,
               presentation.untitledServiceLabels?.[serviceName] ?? serviceName
             );
-            const docsUrl = service.docs_url ?? null;
-            const isIvoa = docsUrl !== null && isIvoaStandardUrl(docsUrl);
             return {
               label,
               url: service.url,
-              ivoaUrl: isIvoa ? docsUrl : null,
-              ivoaName: isIvoa ? ivoaNameFromLabel(label) : null,
-              docsUrl: isIvoa ? null : docsUrl,
+              docs: discoveryDocsLink(service.docs_url, label),
             };
           }
           return {
             label: curated.label,
             url: selectServiceUrl(service, curated.url),
-            ivoaUrl: curated.ivoaUrl ?? null,
-            ivoaName: curated.ivoaName ?? null,
-            docsUrl: null,
+            docs: curated.ivoaUrl
+              ? ivoaDocsLink(
+                  curated.ivoaUrl,
+                  curated.ivoaName ?? ivoaNameFromLabel(curated.label)
+                )
+              : null,
           };
         }
       ),
@@ -80,4 +106,8 @@ export function serviceDiscoveryToApiEndpointGroups(
   });
 }
 
-export type { ApiEndpoint, ApiEndpointGroup } from './types';
+export type {
+  ApiEndpoint,
+  ApiEndpointDocsLink,
+  ApiEndpointGroup,
+} from './types';

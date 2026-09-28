@@ -14,14 +14,15 @@ const groups: ApiEndpointGroup[] = [
       {
         label: 'Table Access Protocol (TAP)',
         url: 'https://data.lsst.cloud/api/tap',
-        ivoaUrl: 'https://www.ivoa.net/documents/TAP/',
-        ivoaName: 'TAP',
+        docs: {
+          url: 'https://www.ivoa.net/documents/TAP/',
+          label: 'IVOA TAP docs',
+        },
       },
       {
         label: 'DataLink',
         url: 'https://data.lsst.cloud/api/datalink',
-        ivoaUrl: null,
-        ivoaName: null,
+        docs: null,
       },
     ],
   },
@@ -86,7 +87,7 @@ describe('ApiEndpointsList', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('renders a curated endpoint name as plain text with a spec-named IVOA doc link', () => {
+  test('renders an endpoint name as plain text with its labelled docs link', () => {
     render(<ApiEndpointsList groups={groups} />);
 
     expect(
@@ -99,7 +100,7 @@ describe('ApiEndpointsList', () => {
     );
   });
 
-  test('renders an endpoint label with no IVOA link as plain text', () => {
+  test('renders an endpoint with no docs link as plain text', () => {
     render(<ApiEndpointsList groups={groups} />);
 
     expect(
@@ -108,7 +109,7 @@ describe('ApiEndpointsList', () => {
     expect(screen.getByText('DataLink')).toBeInTheDocument();
   });
 
-  test('links a non-IVOA docs url with a generic, endpoint-named docs label', () => {
+  test('uses the docs label as the icon link tooltip', () => {
     render(
       <ApiEndpointsList
         groups={[
@@ -118,9 +119,10 @@ describe('ApiEndpointsList', () => {
               {
                 label: 'Alert retrieval',
                 url: 'https://data.lsst.cloud/api/alerts',
-                ivoaUrl: null,
-                ivoaName: null,
-                docsUrl: 'https://sqr-114.lsst.io/',
+                docs: {
+                  url: 'https://sqr-114.lsst.io/',
+                  label: 'Alert retrieval docs',
+                },
               },
             ],
           },
@@ -128,10 +130,9 @@ describe('ApiEndpointsList', () => {
       />
     );
 
-    expect(
-      screen.getByRole('link', { name: 'Alert retrieval docs' })
-    ).toHaveAttribute('href', 'https://sqr-114.lsst.io/');
-    expect(screen.queryByRole('link', { name: /ivoa/i })).toBeNull();
+    const link = screen.getByRole('link', { name: 'Alert retrieval docs' });
+    expect(link).toHaveAttribute('href', 'https://sqr-114.lsst.io/');
+    expect(link).toHaveAttribute('title', 'Alert retrieval docs');
   });
 
   test('renders each endpoint url as code text, not a link', () => {

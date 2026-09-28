@@ -61,8 +61,9 @@ type Story = StoryObj<typeof ApiEndpointsList>;
 // Rendered from mock discovery: one section per dataset with curated labels,
 // IVOA standard links, and selected URLs matching the production idfprod page.
 // Every curated RSP service maps to an IVOA standard, so each name shows a
-// book-icon "IVOA doc" link. The uncurated alerts service under Prompt Products
-// falls back to its discovery title and technote docs link.
+// book-icon link named for its standard (e.g. "IVOA TAP docs"). The uncurated
+// alerts service under Prompt Products falls back to its discovery title and
+// technote docs link ("Alert retrieval docs").
 export const FromMockDiscovery: Story = {
   args: { groups: discoveryGroups },
   play: async ({ canvasElement }) => {

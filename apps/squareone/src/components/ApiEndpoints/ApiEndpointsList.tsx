@@ -27,10 +27,9 @@ type ApiEndpointsListProps = {
  * linked to its docs when available) followed by the dataset description —
  * suffixed with a "Read the documentation" link to the dataset's documentation
  * site when available — and a list of endpoints. Each endpoint name is always
- * plain text; an IVOA-mapped service additionally shows a book-icon link to
- * its standard, labeled with the spec name (e.g. "IVOA TAP docs"), and any
- * other service with documentation shows the same icon linking to its docs,
- * labeled with the endpoint name (e.g. "Alert retrieval docs").
+ * plain text; an endpoint with documentation additionally shows a book-icon
+ * link to it, whose accessible name and tooltip are the link's precomputed
+ * label (e.g. "IVOA TAP docs" or "Alert retrieval docs").
  * Each endpoint URL renders as copyable monospace code text (not a link, since
  * these are programmatic API base URLs) with an icon-only copy-to-clipboard
  * button.
@@ -83,23 +82,6 @@ export default function ApiEndpointsList({
             ) : null}
             <ul className={styles.list}>
               {group.endpoints.map((endpoint) => {
-                // Book-icon docs link: an IVOA standard link is labeled by the
-                // standard (e.g. "IVOA TAP docs", or a generic "IVOA doc"
-                // without a standard name); any other docs link gets a generic
-                // label naming the endpoint (e.g. "Alert retrieval docs").
-                const docLink = endpoint.ivoaUrl
-                  ? {
-                      href: endpoint.ivoaUrl,
-                      label: endpoint.ivoaName
-                        ? `IVOA ${endpoint.ivoaName} docs`
-                        : 'IVOA doc',
-                    }
-                  : endpoint.docsUrl
-                    ? {
-                        href: endpoint.docsUrl,
-                        label: `${endpoint.label} docs`,
-                      }
-                    : null;
                 return (
                   <li
                     key={`${endpoint.label}:${endpoint.url}`}
@@ -107,10 +89,10 @@ export default function ApiEndpointsList({
                   >
                     <div className={styles.labelCell}>
                       <span className={styles.label}>{endpoint.label}</span>
-                      {docLink ? (
+                      {endpoint.docs ? (
                         <DocsIconLink
-                          href={docLink.href}
-                          label={docLink.label}
+                          href={endpoint.docs.url}
+                          label={endpoint.docs.label}
                         />
                       ) : null}
                     </div>
