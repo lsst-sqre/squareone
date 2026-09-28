@@ -1,13 +1,13 @@
 import type { NotebookQuota, Quota } from '@lsst-sqre/gafaelfawr-client';
 import type { QuotaLabelIndex } from '@lsst-sqre/repertoire-client';
 import { KeyValueList, type KeyValueListItem } from '@lsst-sqre/squared';
-import { BookOpen } from 'lucide-react';
 import { useMemo } from 'react';
 
 import {
   type ApiQuotaItem,
   buildApiQuotaItems,
 } from '../../lib/quotas/apiQuotaItems';
+import DocsIconLink from '../DocsIconLink';
 import styles from './QuotasView.module.css';
 
 type QuotasViewProps = {
@@ -119,14 +119,7 @@ function toKeyValueListItem({
     value: (
       <span className={styles.rateLimit}>
         {value}
-        <a
-          className={styles.docsLink}
-          href={docs.url}
-          title={docs.label}
-          aria-label={docs.label}
-        >
-          <BookOpen size={16} aria-hidden="true" />
-        </a>
+        <DocsIconLink href={docs.url} label={docs.label} />
       </span>
     ),
   };
