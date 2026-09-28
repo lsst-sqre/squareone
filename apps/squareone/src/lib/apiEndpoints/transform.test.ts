@@ -272,6 +272,29 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
     ]);
   });
 
+  test('lists a scope discovery repeats only once, in first-seen order', () => {
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            sia: {
+              url: 'https://data.lsst.cloud/api/sia/dp1/query',
+              versions: {},
+              required_scopes: ['read:image', 'read:tap', 'read:image'],
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery);
+    expect(group.endpoints[0].requiredScopes).toEqual([
+      'read:image',
+      'read:tap',
+    ]);
+  });
+
   test('uses a single generic TAP label across datasets; the dataset gives context', () => {
     const groups = serviceDiscoveryToApiEndpointGroups(mockDiscovery);
     const dp03 = groups.find((group) => group.datasetKey === 'dp03');
