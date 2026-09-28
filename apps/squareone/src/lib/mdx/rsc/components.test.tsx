@@ -23,27 +23,45 @@ import {
 } from '@lsst-sqre/repertoire-client';
 
 import { getStaticConfig } from '../../config/rsc';
-import { commonMdxComponents, footerMdxComponents } from './components';
+import {
+  commonMdxComponents,
+  DiscoveryApiEndpoints,
+  DiscoveryDatasetDocsCards,
+  footerMdxComponents,
+} from './components';
+
+type AsyncTag = (props: Record<string, unknown>) => Promise<ReactElement>;
 
 /**
- * Render the registered `<ServiceLink>` tag as MDX would, awaiting the async
- * server component to its element first (React Testing Library renders client
- * trees only).
+ * Render a discovery-backed MDX tag as MDX would, awaiting the async server
+ * component to its element first (React Testing Library renders client trees
+ * only).
  */
-async function renderServiceLinkTag(props: Record<string, unknown>) {
-  const ServiceLinkTag = commonMdxComponents.ServiceLink as (
-    tagProps: Record<string, unknown>
-  ) => Promise<ReactElement>;
-  return render(await ServiceLinkTag(props));
+async function renderTag(Tag: AsyncTag, props: Record<string, unknown> = {}) {
+  return render(await Tag(props));
+}
+
+function renderServiceLinkTag(props: Record<string, unknown>) {
+  return renderTag(commonMdxComponents.ServiceLink as AsyncTag, props);
+}
+
+function configureDiscovery() {
+  vi.mocked(getStaticConfig).mockResolvedValue({
+    repertoireUrl: 'https://example.org/repertoire',
+  } as Awaited<ReturnType<typeof getStaticConfig>>);
+  vi.mocked(fetchServiceDiscovery).mockResolvedValue(mockDiscovery);
+}
+
+function configureNoDiscovery() {
+  vi.mocked(getStaticConfig).mockResolvedValue(
+    {} as Awaited<ReturnType<typeof getStaticConfig>>
+  );
 }
 
 describe('RSC MDX components: <ServiceLink>', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(getStaticConfig).mockResolvedValue({
-      repertoireUrl: 'https://example.org/repertoire',
-    } as Awaited<ReturnType<typeof getStaticConfig>>);
-    vi.mocked(fetchServiceDiscovery).mockResolvedValue(mockDiscovery);
+    configureDiscovery();
   });
 
   test('self-closing, links to the discovered URL with it as the link text', async () => {
@@ -72,9 +90,7 @@ describe('RSC MDX components: <ServiceLink>', () => {
   });
 
   test('without a repertoireUrl, renders the children as plain text', async () => {
-    vi.mocked(getStaticConfig).mockResolvedValue(
-      {} as Awaited<ReturnType<typeof getStaticConfig>>
-    );
+    configureNoDiscovery();
 
     const { container } = await renderServiceLinkTag({
       service: 'comanage',
@@ -98,5 +114,77 @@ describe('RSC MDX components: <ServiceLink>', () => {
     expect(footerMdxComponents.ServiceLink).toBe(
       commonMdxComponents.ServiceLink
     );
+  });
+});
+
+describe('RSC MDX components: <ApiEndpoints>', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    configureDiscovery();
+  });
+
+  test('lists the discovered datasets, forwarding headingLevel', async () => {
+    await renderTag(DiscoveryApiEndpoints as AsyncTag, { headingLevel: 4 });
+
+    expect(
+      screen.getByRole('heading', { level: 4, name: 'Data Preview 1' })
+    ).toBeInTheDocument();
+    expect(fetchServiceDiscovery).toHaveBeenCalledWith(
+      'https://example.org/repertoire',
+      expect.anything()
+    );
+  });
+
+  test('without a repertoireUrl, renders nothing and skips discovery', async () => {
+    configureNoDiscovery();
+
+    const { container } = await renderTag(DiscoveryApiEndpoints as AsyncTag);
+
+    expect(container).toBeEmptyDOMElement();
+    expect(fetchServiceDiscovery).not.toHaveBeenCalled();
+  });
+});
+
+describe('RSC MDX components: <DatasetDocsCards>', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    configureDiscovery();
+  });
+
+  test('renders the children heading and a card per dataset, forwarding headingLevel', async () => {
+    await renderTag(DiscoveryDatasetDocsCards as AsyncTag, {
+      headingLevel: 4,
+      children: <h2>Data previews</h2>,
+    });
+
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Data previews' })
+    ).toBeInTheDocument();
+    expect(
+      screen
+        .getAllByRole('heading', { level: 4 })
+        .map((heading) => heading.textContent)
+    ).toEqual([
+      'Data Preview 1',
+      'Prompt Products',
+      'Data Preview 0.3',
+      'Data Preview 0.2',
+    ]);
+    expect(fetchServiceDiscovery).toHaveBeenCalledWith(
+      'https://example.org/repertoire',
+      expect.anything()
+    );
+  });
+
+  test('without a repertoireUrl, renders nothing (not even the children) and skips discovery', async () => {
+    configureNoDiscovery();
+
+    const { container } = await renderTag(
+      DiscoveryDatasetDocsCards as AsyncTag,
+      { children: <h2>Data previews</h2> }
+    );
+
+    expect(container).toBeEmptyDOMElement();
+    expect(fetchServiceDiscovery).not.toHaveBeenCalled();
   });
 });

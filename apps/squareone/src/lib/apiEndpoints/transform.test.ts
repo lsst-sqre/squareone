@@ -6,7 +6,10 @@ import {
 import { describe, expect, test } from 'vitest';
 
 import type { PresentationMap } from './presentation';
-import { serviceDiscoveryToApiEndpointGroups } from './transform';
+import {
+  serviceDiscoveryToApiEndpointGroups,
+  serviceDiscoveryToDatasetSummaries,
+} from './transform';
 
 describe('serviceDiscoveryToApiEndpointGroups', () => {
   test('produces one group per dataset, in curated dataset order', () => {
@@ -845,5 +848,120 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
 
     const [group] = serviceDiscoveryToApiEndpointGroups(discovery);
     expect(group.endpoints).toEqual([]);
+  });
+});
+
+describe('serviceDiscoveryToDatasetSummaries', () => {
+  test('summarizes each dataset, newest release first with prompt second', () => {
+    const { datasets } = mockDiscovery;
+
+    expect(serviceDiscoveryToDatasetSummaries(mockDiscovery)).toEqual([
+      {
+        datasetKey: 'dp1',
+        displayName: 'Data Preview 1',
+        description: datasets.dp1.description,
+        docsUrl: 'https://dp1.lsst.io',
+      },
+      {
+        datasetKey: 'prompt',
+        displayName: 'Prompt Products',
+        description: datasets.prompt.description,
+        // The mock prompt dataset has no docs_url, as on data-dev.
+        docsUrl: null,
+      },
+      {
+        datasetKey: 'dp03',
+        displayName: 'Data Preview 0.3',
+        description: datasets.dp03.description,
+        docsUrl: 'https://dp0-3.lsst.io',
+      },
+      {
+        datasetKey: 'dp02',
+        displayName: 'Data Preview 0.2',
+        description: datasets.dp02.description,
+        docsUrl: 'https://dp0-2.lsst.io',
+      },
+    ]);
+  });
+
+  test('heads each /api-aspect group with the same summary', () => {
+    const summaries = serviceDiscoveryToDatasetSummaries(mockDiscovery);
+
+    expect(
+      serviceDiscoveryToApiEndpointGroups(mockDiscovery).map(
+        ({ endpoints: _endpoints, ...summary }) => summary
+      )
+    ).toEqual(summaries);
+  });
+
+  test('falls back to the raw key for a dataset without a display name', () => {
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dr1: {
+          description: 'The first data release.',
+          docs_url: 'https://dr1.lsst.io',
+          services: {},
+        },
+      },
+    } as ServiceDiscovery;
+
+    expect(
+      serviceDiscoveryToDatasetSummaries(discovery, {
+        services: {},
+        datasetDisplayNames: {},
+      })
+    ).toEqual([
+      {
+        datasetKey: 'dr1',
+        displayName: 'dr1',
+        description: 'The first data release.',
+        docsUrl: 'https://dr1.lsst.io',
+      },
+    ]);
+  });
+
+  test('uses the presentation map display name when one is curated', () => {
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: { dr1: { services: {} } },
+    } as ServiceDiscovery;
+
+    const [summary] = serviceDiscoveryToDatasetSummaries(discovery, {
+      services: {},
+      datasetDisplayNames: { dr1: 'Data Release 1' },
+    });
+
+    expect(summary.displayName).toBe('Data Release 1');
+  });
+
+  test('yields null description and docs URL when discovery has neither', () => {
+    // Both fields are optional (and nullable) in the discovery schema.
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: { services: {} },
+        dp02: { description: null, docs_url: null, services: {} },
+      },
+    } as ServiceDiscovery;
+
+    expect(serviceDiscoveryToDatasetSummaries(discovery)).toEqual([
+      {
+        datasetKey: 'dp1',
+        displayName: 'Data Preview 1',
+        description: null,
+        docsUrl: null,
+      },
+      {
+        datasetKey: 'dp02',
+        displayName: 'Data Preview 0.2',
+        description: null,
+        docsUrl: null,
+      },
+    ]);
+  });
+
+  test('yields no summaries for a discovery without datasets', () => {
+    expect(serviceDiscoveryToDatasetSummaries(getEmptyDiscovery())).toEqual([]);
   });
 });

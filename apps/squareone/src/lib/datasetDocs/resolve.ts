@@ -1,67 +1,34 @@
-import { classifyError, type ReportError } from '@lsst-sqre/api-client-core';
+import { serviceDiscoveryToDatasetSummaries } from '../apiEndpoints/transform';
 import {
-  fetchServiceDiscovery,
-  type Logger,
-} from '@lsst-sqre/repertoire-client';
-
-import { serviceDiscoveryToDatasetDocs } from './transform';
+  type DiscoveryRenderOptions,
+  fetchDiscoveryForRender,
+} from '../discovery/fetchDiscoveryForRender';
 import type { DatasetDocsResult } from './types';
 
-export type ResolveDatasetDocsOptions = {
-  /** Configured Repertoire base URL, or undefined when discovery is not set. */
-  repertoireUrl?: string;
-  /** Optional server-side logger for recording fetch failures. */
-  logger?: Logger;
-  /** Optional error reporter (e.g. Sentry) for report-worthy failures. */
-  reportError?: ReportError;
-};
+export type ResolveDatasetDocsOptions = DiscoveryRenderOptions;
 
 /**
  * Resolve the dataset documentation cards for the `/docs` page server-side.
  *
- * Mirrors `resolveApiEndpoints`:
- * - no `repertoireUrl` -> `omitted` (the page leaves the cards out);
- * - a fetch/parse failure -> `unavailable` (the page shows a brief notice) and
- *   the error is logged server-side; report-worthy failures (a Repertoire 5xx
- *   outage, contract drift, or a network failure) are additionally forwarded
- *   to `reportError`;
- * - success -> `ok` with one entry per dataset from
- *   {@link serviceDiscoveryToDatasetDocs}.
- *
- * Uses the repertoire-client's existing 5-minute in-process discovery cache.
+ * Degrades gracefully via {@link fetchDiscoveryForRender}: `omitted` without a
+ * `repertoireUrl` (the page leaves the cards out), `unavailable` when the
+ * fetch fails (the page shows a brief notice; the failure is logged and, when
+ * report-worthy, reported under the `docs-dataset-discovery` site), and `ok`
+ * with one entry per dataset from {@link serviceDiscoveryToDatasetSummaries}.
  */
-export async function resolveDatasetDocs({
-  repertoireUrl,
-  logger,
-  reportError,
-}: ResolveDatasetDocsOptions): Promise<DatasetDocsResult> {
-  if (!repertoireUrl) {
-    return { status: 'omitted' };
+export async function resolveDatasetDocs(
+  options: ResolveDatasetDocsOptions
+): Promise<DatasetDocsResult> {
+  const fetched = await fetchDiscoveryForRender({
+    ...options,
+    site: 'docs-dataset-discovery',
+    purpose: 'the /docs dataset cards',
+  });
+  if (fetched.status !== 'ok') {
+    return fetched;
   }
-
-  try {
-    const discovery = await fetchServiceDiscovery(
-      repertoireUrl,
-      logger ? { logger } : undefined
-    );
-    return {
-      status: 'ok',
-      datasets: serviceDiscoveryToDatasetDocs(discovery),
-    };
-  } catch (error) {
-    logger?.error(
-      { err: error },
-      'Failed to fetch service discovery for the /docs dataset cards'
-    );
-    if (
-      reportError &&
-      classifyError(error, { isServer: true }) === 'report-worthy'
-    ) {
-      reportError(error, {
-        site: 'docs-dataset-discovery',
-        package: 'squareone',
-      });
-    }
-    return { status: 'unavailable' };
-  }
+  return {
+    status: 'ok',
+    datasets: serviceDiscoveryToDatasetSummaries(fetched.discovery),
+  };
 }
