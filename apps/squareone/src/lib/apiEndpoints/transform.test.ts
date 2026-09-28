@@ -381,6 +381,134 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
     });
   });
 
+  test('surfaces the url of an unmapped service with exactly one version', () => {
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            ssa: {
+              url: 'https://data.lsst.cloud/api/ssa',
+              versions: {
+                'ssa-1.1': { url: 'https://data.lsst.cloud/api/ssa/query' },
+              },
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery);
+    expect(group.endpoints[0]?.url).toBe(
+      'https://data.lsst.cloud/api/ssa/query'
+    );
+  });
+
+  test('surfaces the base url of an unmapped service with several versions', () => {
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            ssa: {
+              url: 'https://data.lsst.cloud/api/ssa',
+              versions: {
+                'ssa-1.0': { url: 'https://data.lsst.cloud/api/ssa/v1.0' },
+                'ssa-1.1': { url: 'https://data.lsst.cloud/api/ssa/v1.1' },
+              },
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery);
+    expect(group.endpoints[0]?.url).toBe('https://data.lsst.cloud/api/ssa');
+  });
+
+  test('surfaces the base url of an unmapped service with no versions', () => {
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            ssa: { url: 'https://data.lsst.cloud/api/ssa', versions: {} },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery);
+    expect(group.endpoints[0]?.url).toBe('https://data.lsst.cloud/api/ssa');
+  });
+
+  test('surfaces the base url of an unmapped service whose only version lacks a url', () => {
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            ssa: {
+              url: 'https://data.lsst.cloud/api/ssa',
+              versions: { 'ssa-1.1': {} },
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery);
+    expect(group.endpoints[0]?.url).toBe('https://data.lsst.cloud/api/ssa');
+  });
+
+  test('an entry without a url selector falls through to the sole version url', () => {
+    const custom: PresentationMap = {
+      services: { spectra: { label: 'Spectra' } },
+      datasetDisplayNames: {},
+    };
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            spectra: {
+              url: 'https://example.org/spectra',
+              versions: {
+                'spectra-1.0': { url: 'https://example.org/spectra/query' },
+              },
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery, custom);
+    expect(group.endpoints[0]?.url).toBe('https://example.org/spectra/query');
+  });
+
+  test('a curated base selector keeps the base url over a sole version', () => {
+    const custom: PresentationMap = {
+      services: { tap: { label: 'Custom TAP', url: 'base' } },
+      datasetDisplayNames: {},
+    };
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            tap: {
+              url: 'https://example.org/tap',
+              versions: { tables: { url: 'https://example.org/tap/tables' } },
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery, custom);
+    expect(group.endpoints[0]?.url).toBe('https://example.org/tap');
+  });
+
   test('falls back to the base url when a curated version key is missing', () => {
     const discovery = {
       ...getEmptyDiscovery(),

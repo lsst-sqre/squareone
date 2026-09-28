@@ -17,9 +17,10 @@ const discoveryGroups = serviceDiscoveryToApiEndpointGroups(mockDiscovery);
 // Services whose presentation comes from discovery rather than curation. The
 // dp1 services are absent from the curated presentation map: one with a
 // Repertoire 3.0 title and non-IVOA docs URL, one whose docs URL is an IVOA
-// standard, and one with neither (as Repertoire 2.x publishes). The prompt
-// alerts service is shaped like Repertoire 2.x too; its map entry supplies
-// only the label for an untitled alerts service.
+// standard and whose only version carries its query URL, and one with neither
+// (as Repertoire 2.x publishes). The prompt alerts service is shaped like
+// Repertoire 2.x too; its map entry supplies only the label for an untitled
+// alerts service.
 const unmappedGroups = serviceDiscoveryToApiEndpointGroups({
   ...getEmptyDiscovery(),
   datasets: {
@@ -40,7 +41,9 @@ const unmappedGroups = serviceDiscoveryToApiEndpointGroups({
           docs_url: 'https://www.ivoa.net/documents/SSA/',
           required_scopes: [],
           quota_labels: {},
-          versions: {},
+          versions: {
+            'ssa-1.1': { url: 'https://data.lsst.cloud/api/ssa/query' },
+          },
         },
         mystery: {
           url: 'https://data.lsst.cloud/api/mystery',
@@ -157,8 +160,10 @@ export const FromMockDiscovery: Story = {
 // Services absent from the curated presentation map fall back to discovery
 // metadata: the title labels the endpoint and the docs URL becomes a book-icon
 // link — named for the IVOA standard when it is one, otherwise a generic docs
-// link. A service with neither (Repertoire 2.x) shows its raw name, unlinked,
-// except alerts, which the map labels "Alerts" when discovery has no title.
+// link. A service with exactly one version (SSA) surfaces that version's URL;
+// the others, with no versions, surface their base URL. A service with neither
+// title nor docs URL (Repertoire 2.x) shows its raw name, unlinked, except
+// alerts, which the map labels "Alerts" when discovery has no title.
 export const UnmappedServiceFallbacks: Story = {
   args: { groups: unmappedGroups },
   play: async ({ canvasElement }) => {
@@ -175,6 +180,13 @@ export const UnmappedServiceFallbacks: Story = {
     await expect(
       canvas.getByRole('link', { name: 'IVOA SSA docs' })
     ).toHaveAttribute('href', 'https://www.ivoa.net/documents/SSA/');
+    // SSA's only version supplies its query URL in place of the base URL.
+    await expect(
+      canvas.getByText('https://data.lsst.cloud/api/ssa/query')
+    ).toBeInTheDocument();
+    await expect(
+      canvas.queryByText('https://data.lsst.cloud/api/ssa')
+    ).not.toBeInTheDocument();
 
     await expect(canvas.getByText('mystery')).toBeInTheDocument();
     await expect(

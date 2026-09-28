@@ -1,9 +1,11 @@
 import type { DataService } from '@lsst-sqre/repertoire-client';
 
 /**
- * Which discovery URL to surface for a curated service.
+ * Which discovery URL to surface for a curated service, overriding the URL
+ * discovery itself offers ({@link discoveryServiceUrl}).
  *
- * - `'base'` uses the service's top-level `url`.
+ * - `'base'` uses the service's top-level `url`, even when discovery publishes
+ *   a single version whose `url` would otherwise be surfaced.
  * - `{ versionKey }` prefers the named version's `url`, falling back to the
  *   base `url` when that version is absent from discovery.
  */
@@ -35,7 +37,10 @@ export type ServicePresentation = {
    * name {@link ivoaNameFromLabel} derives from the endpoint label.
    */
   ivoaName?: string;
-  /** Which discovery URL to surface, overriding the default base `url`. */
+  /**
+   * Which discovery URL to surface. Overrides the URL discovery offers (see
+   * {@link discoveryServiceUrl}).
+   */
   url?: UrlSelector;
 };
 
@@ -60,7 +65,10 @@ export type ServicePresentation = {
  *   `ivoaName`, else via {@link ivoaNameFromLabel} from the resolved label;
  *   any other link is labelled "<label> docs".
  * - URL: the discovery URL chosen by `url` (see {@link selectServiceUrl}),
- *   else the base `url`.
+ *   else the URL discovery offers (see {@link discoveryServiceUrl}): the `url`
+ *   of the service's only version when `versions` has exactly one entry, else
+ *   the base `url` (zero or several versions, or a lone version without a
+ *   `url`).
  *
  * Dataset keys absent from `datasetDisplayNames` fall back to the raw key.
  */
@@ -79,7 +87,10 @@ export type PresentationMap = {
  * section header (e.g. "Data Preview 0.3") supplies the ObsTAP/SSO/PPDB context
  * — since the same `tap` service key serves different datasets at different
  * base URLs. SIA selects the `sia-query-2.0` `/query` URL and HiPS the
- * `hips-list-1.0` `/list` URL; TAP and SODA use their base URLs.
+ * `hips-list-1.0` `/list` URL. TAP, SODA, DataLink, and GMS pin their base
+ * URLs with `'base'`, since discovery's own choice would surface the sole
+ * version TAP (`tables`) and DataLink (`datalink-links-1.1`) publish. Alerts
+ * sets no selector and so takes the URL discovery offers.
  */
 export const presentationMap: PresentationMap = {
   services: {
@@ -235,15 +246,36 @@ export function ivoaNameFromLabel(label: string): string {
 }
 
 /**
- * Select the endpoint URL for a discovered service per its curated selector.
+ * The endpoint URL discovery itself offers for a service, used when no curated
+ * {@link UrlSelector} applies.
+ *
+ * When the service's `versions` map has exactly one entry, that version's `url`
+ * is surfaced: a Repertoire 3.0 service may, like SIA or HiPS, publish its
+ * usable endpoint only under `versions`. With zero or several versions the base
+ * `url` is surfaced instead, since choosing among several needs curation and
+ * the base URL is a reasonable landing point. A lone version without a `url`
+ * also degrades to the base URL, so the endpoint is never dropped.
+ */
+export function discoveryServiceUrl(service: DataService): string {
+  const versions = Object.values(service.versions ?? {});
+  const soleVersion = versions.length === 1 ? versions[0] : undefined;
+  return soleVersion?.url ?? service.url;
+}
+
+/**
+ * Select the endpoint URL for a discovered service per its curated selector,
+ * or per {@link discoveryServiceUrl} when no selector is given.
  *
  * Missing versions degrade to the service's base URL so an unexpected discovery
  * shape never drops the endpoint.
  */
 export function selectServiceUrl(
   service: DataService,
-  selector: UrlSelector = 'base'
+  selector?: UrlSelector
 ): string {
+  if (selector === undefined) {
+    return discoveryServiceUrl(service);
+  }
   if (selector === 'base') {
     return service.url;
   }
