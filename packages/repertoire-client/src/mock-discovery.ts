@@ -4,7 +4,7 @@ import type { DataService, ServiceDiscovery } from './schemas';
  * Hand-written mock data for deterministic tests and Storybook.
  *
  * The URLs mirror the live `/discovery` response for the production RSP
- * (`data.lsst.cloud`): the `dp1`/`dp02`/`dp03`/`prompt` datasets, each
+ * (`data.lsst.cloud`): the `dp1`/`dp2`/`dp02`/`dp03`/`prompt` datasets, each
  * exposing its user-facing data services keyed by real semantic version keys
  * (`sia-query-2.0`, `soda-sync-1.0`, `soda-async-1.0`, `hips-list-1.0`,
  * `tables`, `gms-search-1.0`).
@@ -189,6 +189,25 @@ export const mockDiscovery: ServiceDiscovery = {
         gms: gmsService(),
         hips: hipsService('dp1'),
         sia: siaService('dp1'),
+        tap: tapService('tap', true),
+      },
+    },
+    dp2: {
+      description:
+        'Data Preview 2 (Early) contains catalog products and coadded images' +
+        ' from the Rubin Science Pipelines v30 processing of early' +
+        ' observations obtained with LSSTCam from April 2025 to January 2026.' +
+        ' Coadded images and catalogs cover ~3000 square degrees;' +
+        ' single-epoch catalogs cover ~15,000 square degrees.',
+      docs_url: 'https://dp2.lsst.io',
+      butler_config: `${BASE}/api/butler/repo/dp2/butler.yaml`,
+      obscore_config: `${OBSCORE_CONFIG_BASE}/edp2.yaml`,
+      services: {
+        cutout: cutoutService(),
+        datalink: datalinkService(),
+        gms: gmsService(),
+        hips: hipsService('dp2'),
+        sia: siaService('dp2'),
         tap: tapService('tap', true),
       },
     },

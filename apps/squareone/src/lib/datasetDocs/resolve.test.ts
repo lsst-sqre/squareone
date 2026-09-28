@@ -50,10 +50,10 @@ describe('resolveDatasetDocs', () => {
       status: 'ok',
       datasets: [
         {
-          datasetKey: 'dp1',
-          displayName: 'Data Preview 1',
-          description: datasets.dp1.description,
-          docsUrl: 'https://dp1.lsst.io',
+          datasetKey: 'dp2',
+          displayName: 'Data Preview 2',
+          description: datasets.dp2.description,
+          docsUrl: 'https://dp2.lsst.io',
         },
         {
           datasetKey: 'prompt',
@@ -61,6 +61,12 @@ describe('resolveDatasetDocs', () => {
           description: datasets.prompt.description,
           // The mock prompt dataset has no docs_url, as on data-dev.
           docsUrl: null,
+        },
+        {
+          datasetKey: 'dp1',
+          displayName: 'Data Preview 1',
+          description: datasets.dp1.description,
+          docsUrl: 'https://dp1.lsst.io',
         },
         {
           datasetKey: 'dp03',

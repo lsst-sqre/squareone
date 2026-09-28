@@ -64,8 +64,9 @@ export default meta;
 type Story = StoryObj<typeof DatasetDocsCards>;
 
 // Rendered from mock discovery: one card per dataset, newest release first
-// with Prompt Products pinned second. The prompt dataset has no docs_url, so
-// its card renders unlinked while the others link to their docs sites.
+// (Data Preview 2 ahead of Data Preview 1) with Prompt Products pinned second.
+// The prompt dataset has no docs_url, so its card renders unlinked while the
+// others link to their docs sites.
 export const FromMockDiscovery: Story = {
   args: {
     result: { status: 'ok', datasets: discoveryDatasets },
@@ -83,13 +84,19 @@ export const FromMockDiscovery: Story = {
         .getAllByRole('heading', { level: 3 })
         .map((heading) => heading.textContent)
     ).toEqual([
-      'Data Preview 1',
+      'Data Preview 2',
       'Prompt Products',
+      'Data Preview 1',
       'Data Preview 0.3',
       'Data Preview 0.2',
     ]);
 
     // Cards carry the discovery descriptions.
+    await expect(
+      within(getCard(canvasElement, 'Data Preview 2')).getByText(
+        /Data Preview 2 \(Early\) contains catalog products/
+      )
+    ).toBeInTheDocument();
     await expect(
       within(getCard(canvasElement, 'Data Preview 1')).getByText(
         /Data Preview 1 contains image and catalog products/
@@ -97,6 +104,9 @@ export const FromMockDiscovery: Story = {
     ).toBeInTheDocument();
 
     // A card with a docs_url links to it; the prompt card is unlinked.
+    await expect(
+      getCard(canvasElement, 'Data Preview 2').closest('a')
+    ).toHaveAttribute('href', 'https://dp2.lsst.io');
     await expect(
       getCard(canvasElement, 'Data Preview 1').closest('a')
     ).toHaveAttribute('href', 'https://dp1.lsst.io');
@@ -114,10 +124,11 @@ export const WithDocsUrls: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    await expect(canvas.getAllByRole('article')).toHaveLength(3);
+    await expect(canvas.getAllByRole('article')).toHaveLength(4);
     await expect(
       canvas.getAllByRole('link').map((link) => link.getAttribute('href'))
     ).toEqual([
+      'https://dp2.lsst.io',
       'https://dp1.lsst.io',
       'https://dp0-3.lsst.io',
       'https://dp0-2.lsst.io',
