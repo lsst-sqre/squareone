@@ -1,6 +1,11 @@
+import {
+  getEmptyDiscovery,
+  type ServiceDiscovery,
+} from '@lsst-sqre/repertoire-client';
 import { render, screen, within } from '@testing-library/react';
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 
+import { serviceDiscoveryToApiEndpointGroups } from '../../lib/apiEndpoints/transform';
 import type { ApiEndpointGroup } from '../../lib/apiEndpoints/types';
 import ApiEndpointsList from './ApiEndpointsList';
 
@@ -207,6 +212,51 @@ describe('ApiEndpointsList', () => {
       'href',
       '/settings/tokens/new?scopes=read%3Aimage%2Cread%3Atap'
     );
+  });
+
+  test('renders a scope discovery repeats as one pill and one token link parameter', () => {
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            mystery: {
+              url: 'https://data.lsst.cloud/api/mystery',
+              title: 'Mystery service',
+              versions: {},
+              required_scopes: ['read:image', 'read:tap', 'read:image'],
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+    const consoleError = vi.spyOn(console, 'error');
+
+    render(
+      <ApiEndpointsList
+        groups={serviceDiscoveryToApiEndpointGroups(discovery)}
+      />
+    );
+
+    const scopes = within(getEndpointItem('Mystery service')).getByRole(
+      'list',
+      { name: 'Required scopes' }
+    );
+    expect(
+      within(scopes)
+        .getAllByRole('listitem')
+        .map((item) => item.textContent)
+    ).toEqual(['read:image', 'read:tap']);
+    expect(
+      screen.getByRole('link', {
+        name: 'Create a token with these scopes for Mystery service',
+      })
+    ).toHaveAttribute(
+      'href',
+      '/settings/tokens/new?scopes=read%3Aimage%2Cread%3Atap'
+    );
+    // React reports duplicate list keys via console.error.
+    expect(consoleError).not.toHaveBeenCalled();
   });
 
   test('shows no scope pills or token link for an endpoint without required scopes', () => {

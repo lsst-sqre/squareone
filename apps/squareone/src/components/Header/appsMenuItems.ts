@@ -117,6 +117,8 @@ function deriveServiceItems(
   for (const [name, associatedScopes] of Object.entries(APPS_MENU_SERVICES)) {
     const service = query.getUiService(name);
     if (!service) continue;
+    // The repertoire-client schema already defaults `required_scopes` to `[]`,
+    // so `?? []` only guards hand-built fixtures that skip parsing.
     const declaredScopes = service.required_scopes ?? [];
     const requiredScopes =
       declaredScopes.length > 0 ? declaredScopes : associatedScopes;
