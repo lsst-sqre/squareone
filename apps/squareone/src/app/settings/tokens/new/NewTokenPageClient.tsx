@@ -6,12 +6,14 @@ import {
   useLoginInfo,
   useUserTokens,
 } from '@lsst-sqre/gafaelfawr-client';
+import { Note } from '@lsst-sqre/squared';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useMemo, useState } from 'react';
 
 import { makeReportError } from '@/lib/sentry/reportError';
 import AuthRequired from '../../../../components/AuthRequired';
+import ScopeList from '../../../../components/ScopeList';
 import { TokenCreationErrorDisplay } from '../../../../components/TokenCreationErrorDisplay';
 import {
   TokenForm,
@@ -22,6 +24,10 @@ import { Lede } from '../../../../components/Typography';
 import { useRepertoireUrl } from '../../../../hooks/useRepertoireUrl';
 import useTokenTemplateUrl from '../../../../hooks/useTokenTemplateUrl';
 import { calculateExpirationDate } from '../../../../lib/tokens/expiration';
+import {
+  getGrantableScopes,
+  restrictToGrantableScopes,
+} from '../../../../lib/tokens/grantableScopes';
 import {
   NEW_TOKEN_PATH,
   parseTokenTemplateParams,
@@ -72,9 +78,9 @@ function NewTokenContent() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Prefill the form from a template URL's query parameters (see
-  // useTokenTemplateUrl), including the legacy repeated `scope` form.
-  const formInitialValues: Partial<TokenFormValues> =
-    parseTokenTemplateParams(searchParams);
+  // useTokenTemplateUrl), including the legacy repeated `scope` form. Its
+  // scopes are narrowed to the ones the user can grant once login info loads.
+  const templateValues = parseTokenTemplateParams(searchParams);
 
   const handleSubmit = async (values: TokenFormValues) => {
     if (!loginInfo) return;
@@ -156,6 +162,10 @@ function NewTokenContent() {
       </p>
     );
   } else {
+    const availableScopes = getGrantableScopes(loginInfo);
+    const { values: formInitialValues, droppedScopes } =
+      restrictToGrantableScopes(templateValues, availableScopes);
+
     content = (
       <>
         <Lede>
@@ -163,15 +173,20 @@ function NewTokenContent() {
           Platform APIs.
         </Lede>
 
+        {droppedScopes.length > 0 && (
+          <Note type="warning">
+            <p>
+              This link requested{' '}
+              <ScopeList scopes={droppedScopes} conjunction="and" />, which your
+              account cannot grant.
+            </p>
+          </Note>
+        )}
+
         {creationError && <TokenCreationErrorDisplay error={creationError} />}
 
         <TokenForm
-          availableScopes={loginInfo.config.scopes.filter(
-            (scope): scope is { name: string; description: string } =>
-              scope.name !== undefined &&
-              scope.description !== undefined &&
-              loginInfo.scopes.includes(scope.name)
-          )}
+          availableScopes={availableScopes}
           initialValues={formInitialValues}
           onSubmit={handleSubmit}
           onCancel={handleCancel}

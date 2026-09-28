@@ -3,22 +3,29 @@ import React, { Fragment } from 'react';
 type ScopeListProps = {
   /** Scope names, in the order they should be read. */
   scopes: readonly string[];
+  /**
+   * The word that joins the last scope. Defaults to "or" because scope
+   * requirements in this app are usually any-of: holding one of the listed
+   * scopes is enough. Use "and" when the sentence names every scope in a set.
+   */
+  conjunction?: 'and' | 'or';
 };
 
 /**
  * The separator that precedes the scope at `index` in a list of `total`.
- *
- * "or" rather than "and" because scope requirements in this app are always
- * any-of: holding one of the listed scopes is enough.
  */
-function separatorBefore(index: number, total: number): string {
+function separatorBefore(
+  index: number,
+  total: number,
+  conjunction: 'and' | 'or'
+): string {
   if (index === 0) return '';
   if (index < total - 1) return ', ';
-  return total > 2 ? ', or ' : ' or ';
+  return total > 2 ? `, ${conjunction} ` : ` ${conjunction} `;
 }
 
 /**
- * Renders Gafaelfawr scope names as an inline any-of prose list.
+ * Renders Gafaelfawr scope names as an inline prose list.
  *
  * Each scope is marked up as `<code>` and the list is joined the way it would
  * be read aloud — `admin:token`, `admin:token or exec:admin`, `a, b, or c` —
@@ -34,12 +41,15 @@ function separatorBefore(index: number, total: number): string {
  * </p>
  * ```
  */
-export default function ScopeList({ scopes }: ScopeListProps) {
+export default function ScopeList({
+  scopes,
+  conjunction = 'or',
+}: ScopeListProps) {
   return (
     <>
       {scopes.map((scope, index) => (
         <Fragment key={scope}>
-          {separatorBefore(index, scopes.length)}
+          {separatorBefore(index, scopes.length, conjunction)}
           <code>{scope}</code>
         </Fragment>
       ))}

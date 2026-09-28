@@ -27,6 +27,14 @@ describe('ScopeList', () => {
     expect(container.textContent).toBe('a:one, b:two, or c:three');
   });
 
+  test('joins scopes with "and" when the conjunction is "and"', () => {
+    const { container } = render(
+      <ScopeList scopes={['a:one', 'b:two', 'c:three']} conjunction="and" />
+    );
+
+    expect(container.textContent).toBe('a:one, b:two, and c:three');
+  });
+
   test('renders nothing when there are no scopes', () => {
     // A page configured with an empty scope list is unreachable by anyone, so
     // the gate has no scope to name; it must not render a dangling separator.
