@@ -19,8 +19,11 @@ import styles from './HomepageHero.module.css';
  *
  * Portal and Notebooks are also hidden from a signed-in user who lacks a scope
  * the service declares in `required_scopes` (Repertoire 3.0.0). Anonymous
- * visitors, users whose login info is still loading, and services that declare
- * no required scopes are unaffected.
+ * visitors and services that declare no required scopes are unaffected.
+ *
+ * The root layout prefetches both service discovery and the user's login info
+ * (their scopes) on the server and hydrates them, so both are known on the
+ * first client render and a gated card never appears only to vanish.
  */
 export default function HomepageHero() {
   const { showPreview, previewLink, docsBaseUrl, siteName } = useStaticConfig();
@@ -29,8 +32,9 @@ export default function HomepageHero() {
   // Service discovery - query is null when URL is empty (disabled)
   const { query, isPending } = useServiceDiscovery(repertoireUrl ?? '');
 
-  // The signed-in user's scopes; undefined when anonymous or still loading,
-  // which canAccessService treats as allowed.
+  // The signed-in user's scopes (hydrated from the layout's prefetch);
+  // undefined when anonymous or still loading, which canAccessService treats as
+  // allowed.
   const scopes = useLoginInfo(repertoireUrl).query?.scopes;
   const canAccessUiService = (name: string) => {
     const service = query?.getUiService(name);
@@ -39,7 +43,8 @@ export default function HomepageHero() {
 
   // Determine service availability
   // When not configured, show all services (backward compatibility)
-  // When configured but loading, hide services until loaded
+  // When configured but loading, hide services until loaded (discovery is
+  // normally hydrated from the layout's prefetch, so this is rare)
   // When configured and loaded, show only available services the user can use
   const isConfigured = !!repertoireUrl;
   const showPortal =

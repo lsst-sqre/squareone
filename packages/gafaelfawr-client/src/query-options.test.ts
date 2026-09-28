@@ -1,7 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ZodError } from 'zod';
 import { getEmptyUserInfo } from './client';
-import { loginInfoQueryOptions, userInfoQueryOptions } from './query-options';
+import {
+  type AuthQueryConfig,
+  loginInfoQueryOptions,
+  userInfoQueryOptions,
+} from './query-options';
 
 /**
  * Stub `fetch` with an OK response carrying the given JSON body. A body that
@@ -250,5 +254,54 @@ describe('loginInfoQueryOptions', () => {
 
     expect(result).toBeNull();
     expect(reportError).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe.each([
+  {
+    name: 'userInfoQueryOptions',
+    factory: userInfoQueryOptions,
+    body: validUserInfo,
+    url: `${baseUrl}/user-info`,
+  },
+  {
+    name: 'loginInfoQueryOptions',
+    factory: loginInfoQueryOptions,
+    body: validLoginInfo,
+    url: `${baseUrl}/login`,
+  },
+])('$name request options', ({ factory, body, url }) => {
+  async function runQuery(options?: AuthQueryConfig) {
+    mockFetchJson(body);
+    // biome-ignore lint/style/noNonNullAssertion: queryFn is always defined for our factory
+    await factory(baseUrl, options).queryFn!({} as never);
+    return vi.mocked(fetch);
+  }
+
+  it('sends only credentials in the browser (no headers, not isServer)', async () => {
+    const fetchMock = await runQuery({ context: { site: 'test' } });
+
+    expect(fetchMock).toHaveBeenCalledWith(url, { credentials: 'include' });
+  });
+
+  it('forwards headers uncached', async () => {
+    const fetchMock = await runQuery({
+      headers: { cookie: 'gafaelfawr=session' },
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(url, {
+      credentials: 'include',
+      headers: { cookie: 'gafaelfawr=session' },
+      cache: 'no-store',
+    });
+  });
+
+  it('never caches a server-side call, even with no headers to forward', async () => {
+    const fetchMock = await runQuery({ isServer: true });
+
+    expect(fetchMock).toHaveBeenCalledWith(url, {
+      credentials: 'include',
+      cache: 'no-store',
+    });
   });
 });

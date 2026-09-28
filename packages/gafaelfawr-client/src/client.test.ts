@@ -80,6 +80,28 @@ describe('fetchUserInfo', () => {
 
     await expect(fetchUserInfo('/auth/api/v1')).rejects.toThrow();
   });
+
+  it('merges request init (forwarded headers, cache) over credentials', async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve(mockUserInfo),
+    });
+    vi.stubGlobal('fetch', mockFetch);
+
+    await fetchUserInfo('https://example.com/auth/api/v1', {
+      headers: { cookie: 'gafaelfawr=session' },
+      cache: 'no-store',
+    });
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      'https://example.com/auth/api/v1/user-info',
+      {
+        credentials: 'include',
+        headers: { cookie: 'gafaelfawr=session' },
+        cache: 'no-store',
+      }
+    );
+  });
 });
 
 describe('getEmptyUserInfo', () => {
@@ -126,6 +148,28 @@ describe('fetchLoginInfo', () => {
 
     await expect(fetchLoginInfo('/auth/api/v1')).rejects.toThrow(
       GafaelfawrError
+    );
+  });
+
+  it('merges request init (forwarded headers, cache) over credentials', async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve(mockLoginInfo),
+    });
+    vi.stubGlobal('fetch', mockFetch);
+
+    await fetchLoginInfo('https://example.com/auth/api/v1', {
+      headers: { cookie: 'gafaelfawr=session' },
+      cache: 'no-store',
+    });
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      'https://example.com/auth/api/v1/login',
+      {
+        credentials: 'include',
+        headers: { cookie: 'gafaelfawr=session' },
+        cache: 'no-store',
+      }
     );
   });
 });
