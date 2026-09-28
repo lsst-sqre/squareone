@@ -1,6 +1,5 @@
 'use client';
 
-import { useLoginInfo } from '@lsst-sqre/gafaelfawr-client';
 import { useCreateAdminNotification } from '@lsst-sqre/semaphore-client';
 import { Note } from '@lsst-sqre/squared';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -11,7 +10,7 @@ import NotificationForm, {
   type NotificationFormValues,
 } from '../../../../components/NotificationForm';
 import ScopeList from '../../../../components/ScopeList';
-import { useRepertoireUrl } from '../../../../hooks/useRepertoireUrl';
+import { useLoginInfo } from '../../../../hooks/useLoginInfo';
 import { useSemaphoreUrl } from '../../../../hooks/useSemaphoreUrl';
 import { useStaticConfig } from '../../../../hooks/useStaticConfig';
 import {
@@ -46,7 +45,6 @@ const LANDING_URL = '/admin/notifications';
 export default function NewNotificationPageClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const repertoireUrl = useRepertoireUrl();
   const semaphoreUrl = useSemaphoreUrl();
   const config = useStaticConfig();
 
@@ -55,7 +53,7 @@ export default function NewNotificationPageClient() {
     csrfToken,
     error: loginError,
     isLoading: loginLoading,
-  } = useLoginInfo(repertoireUrl);
+  } = useLoginInfo();
 
   const createNotification = useCreateAdminNotification(semaphoreUrl ?? '');
 

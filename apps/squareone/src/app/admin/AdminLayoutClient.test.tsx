@@ -2,9 +2,12 @@ import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 // AdminLayoutClient composes AdminRequired (login via useUserInfo, scope gate
-// via useLoginInfo) and the sidebar, so both gafaelfawr hooks are mocked.
+// via useLoginInfo) and the sidebar, so both login hooks are mocked.
 vi.mock('@lsst-sqre/gafaelfawr-client', () => ({
   useUserInfo: vi.fn(),
+}));
+
+vi.mock('../../hooks/useLoginInfo', () => ({
   useLoginInfo: vi.fn(),
 }));
 
@@ -27,7 +30,8 @@ import type {
   UseUserInfoReturn,
 } from '@lsst-sqre/gafaelfawr-client';
 // Import after mocking.
-import { useLoginInfo, useUserInfo } from '@lsst-sqre/gafaelfawr-client';
+import { useUserInfo } from '@lsst-sqre/gafaelfawr-client';
+import { useLoginInfo } from '../../hooks/useLoginInfo';
 import {
   type AppConfigContextValue,
   useStaticConfig,

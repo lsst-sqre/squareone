@@ -67,6 +67,9 @@ vi.mock('@lsst-sqre/semaphore-client', async (importOriginal) => ({
 vi.mock('@lsst-sqre/gafaelfawr-client', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@lsst-sqre/gafaelfawr-client')>()),
   useUserInfo: vi.fn(),
+}));
+
+vi.mock('../hooks/useLoginInfo', () => ({
   useLoginInfo: vi.fn(),
 }));
 
@@ -80,7 +83,7 @@ import type {
   UseLoginInfoReturn,
   UseUserInfoReturn,
 } from '@lsst-sqre/gafaelfawr-client';
-import { useLoginInfo, useUserInfo } from '@lsst-sqre/gafaelfawr-client';
+import { useUserInfo } from '@lsst-sqre/gafaelfawr-client';
 import { useServiceDiscovery } from '@lsst-sqre/repertoire-client';
 import type { Broadcast } from '@lsst-sqre/semaphore-client';
 import {
@@ -92,6 +95,7 @@ import { PrimaryNavigation, useGafaelfawrUser } from '@lsst-sqre/squared';
 import BroadcastBannerStack from '../components/BroadcastBannerStack';
 import Header from '../components/Header';
 import UserMenu from '../components/Header/UserMenu';
+import { useLoginInfo } from '../hooks/useLoginInfo';
 import { useStaticConfig } from '../hooks/useStaticConfig';
 import type { StaticConfig } from '../lib/config/resolveConfigDefaults';
 import FooterRsc from './FooterRsc';

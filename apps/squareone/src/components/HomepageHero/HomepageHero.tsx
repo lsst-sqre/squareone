@@ -1,8 +1,8 @@
 'use client';
 
-import { useLoginInfo } from '@lsst-sqre/gafaelfawr-client';
 import { useServiceDiscovery } from '@lsst-sqre/repertoire-client';
 import Link from 'next/link';
+import { useLoginInfo } from '../../hooks/useLoginInfo';
 
 import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
 import { useStaticConfig } from '../../hooks/useStaticConfig';
@@ -35,7 +35,7 @@ export default function HomepageHero() {
   // The signed-in user's scopes (hydrated from the layout's prefetch);
   // undefined when anonymous or still loading, which canAccessService treats as
   // allowed.
-  const scopes = useLoginInfo(repertoireUrl).query?.scopes;
+  const scopes = useLoginInfo().query?.scopes;
   const canAccessUiService = (name: string) => {
     const service = query?.getUiService(name);
     return !!service && !!query?.canAccessService(service, scopes);

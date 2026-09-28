@@ -1,6 +1,5 @@
 'use client';
 
-import { useLoginInfo } from '@lsst-sqre/gafaelfawr-client';
 import {
   useUserNotification,
   useUserNotifications,
@@ -9,7 +8,7 @@ import {
 import AuthRequired from '../../../components/AuthRequired';
 import { UserNotificationDetailView } from '../../../components/UserNotifications';
 import { useAutoMarkNotificationRead } from '../../../hooks/useAutoMarkNotificationRead';
-import { useRepertoireUrl } from '../../../hooks/useRepertoireUrl';
+import { useLoginInfo } from '../../../hooks/useLoginInfo';
 import { useSemaphoreUrlState } from '../../../hooks/useSemaphoreUrl';
 
 export type NotificationDetailPageClientProps = {
@@ -58,8 +57,7 @@ export default function NotificationDetailPageClient({
 
 function NotificationDetailContent({ id }: { id: string }) {
   const { url, isResolving, isUnavailable } = useSemaphoreUrlState();
-  const repertoireUrl = useRepertoireUrl();
-  const { csrfToken } = useLoginInfo(repertoireUrl);
+  const { csrfToken } = useLoginInfo();
   const { notification, isLoading, isError, error } = useUserNotification(
     url ?? '',
     id

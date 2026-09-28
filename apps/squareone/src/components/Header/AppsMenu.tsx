@@ -1,13 +1,11 @@
 'use client';
 
-import { useLoginInfo } from '@lsst-sqre/gafaelfawr-client';
 import { useServiceDiscovery } from '@lsst-sqre/repertoire-client';
 import { PrimaryNavigation } from '@lsst-sqre/squared';
 import { ChevronDown } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import type { ReactNode } from 'react';
-import { useMemo } from 'react';
-import { makeReportError } from '@/lib/sentry/reportError';
+import { useLoginInfo } from '../../hooks/useLoginInfo';
 import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
 import { useStaticConfig } from '../../hooks/useStaticConfig';
 import { deriveAppsMenuItems } from './appsMenuItems';
@@ -42,13 +40,7 @@ export default function AppsMenu({ className }: AppsMenuProps) {
   const repertoireUrl = useRepertoireUrl();
   const { query } = useServiceDiscovery(repertoireUrl ?? '');
 
-  // Pass the same Sentry reporter as UserMenu so this login-info observer
-  // doesn't swallow report-worthy failures.
-  const reportError = useMemo(() => makeReportError({ isServer: false }), []);
-  const userScopes = useLoginInfo(repertoireUrl, {
-    reportError,
-    context: { site: 'login-info', package: 'gafaelfawr-client' },
-  }).query?.scopes;
+  const userScopes = useLoginInfo().query?.scopes;
 
   const items = deriveAppsMenuItems({
     query,

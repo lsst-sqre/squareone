@@ -1,6 +1,5 @@
 'use client';
 
-import { useLoginInfo } from '@lsst-sqre/gafaelfawr-client';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
@@ -8,7 +7,7 @@ import { getAdminNavigation } from '../../components/AdminLayout/adminNavigation
 // Import the helper from its module (not the SidebarLayout barrel) so this
 // page does not pull in the SidebarLayout component itself.
 import { getFirstNavItemHref } from '../../components/SidebarLayout/getFirstNavItemHref';
-import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
+import { useLoginInfo } from '../../hooks/useLoginInfo';
 import type { AppConfigContextValue } from '../../hooks/useStaticConfig';
 
 import styles from './AdminIndexClient.module.css';
@@ -34,8 +33,7 @@ type AdminIndexClientProps = {
  */
 export default function AdminIndexClient({ config }: AdminIndexClientProps) {
   const router = useRouter();
-  const repertoireUrl = useRepertoireUrl();
-  const { query, isLoading } = useLoginInfo(repertoireUrl);
+  const { query, isLoading } = useLoginInfo();
 
   const scopes = query?.scopes ?? [];
   const target = isLoading

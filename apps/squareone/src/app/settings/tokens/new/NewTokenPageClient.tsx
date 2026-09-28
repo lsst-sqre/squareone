@@ -3,7 +3,6 @@
 import {
   extractTokenNames,
   useCreateToken,
-  useLoginInfo,
   useUserTokens,
 } from '@lsst-sqre/gafaelfawr-client';
 import { Note } from '@lsst-sqre/squared';
@@ -21,6 +20,7 @@ import {
 } from '../../../../components/TokenForm';
 import TokenSuccessModal from '../../../../components/TokenSuccessModal';
 import { Lede } from '../../../../components/Typography';
+import { useLoginInfo } from '../../../../hooks/useLoginInfo';
 import { useRepertoireUrl } from '../../../../hooks/useRepertoireUrl';
 import useTokenTemplateUrl from '../../../../hooks/useTokenTemplateUrl';
 import { calculateExpirationDate } from '../../../../lib/tokens/expiration';
@@ -50,7 +50,7 @@ function NewTokenContent() {
     loginInfo,
     error: loginError,
     isLoading: loginLoading,
-  } = useLoginInfo(repertoireUrl);
+  } = useLoginInfo();
 
   const {
     createToken,

@@ -90,6 +90,26 @@
   },
   "overrides": [
     {
+      "includes": ["**/apps/squareone/src/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "paths": {
+                  "@lsst-sqre/gafaelfawr-client": {
+                    "importNames": ["useLoginInfo"],
+                    "message": "Import useLoginInfo from the app's src/hooks/useLoginInfo instead: it attaches the Sentry reporter that every login-info observer must carry."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
       "includes": ["**/*.test.ts", "**/*.test.tsx", "**/*.stories.tsx"],
       "linter": {
         "rules": {
