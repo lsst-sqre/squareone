@@ -165,8 +165,9 @@ describe('RSC MDX components: <DatasetDocsCards>', () => {
         .getAllByRole('heading', { level: 4 })
         .map((heading) => heading.textContent)
     ).toEqual([
-      'Data Preview 1',
+      'Data Preview 2',
       'Prompt Products',
+      'Data Preview 1',
       'Data Preview 0.3',
       'Data Preview 0.2',
     ]);

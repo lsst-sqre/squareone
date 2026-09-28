@@ -216,9 +216,10 @@ describe('ServiceDiscoveryQuery', () => {
       const query = createDiscoveryQuery(mockDiscovery);
       const tapDatasets = query.getDatasetsWithService('tap');
 
-      // Every dataset (dp1, dp02, dp03, prompt) serves TAP.
-      expect(tapDatasets).toHaveLength(4);
+      // Every dataset (dp1, dp2, dp02, dp03, prompt) serves TAP.
+      expect(tapDatasets).toHaveLength(5);
       expect(tapDatasets.map((d) => d.id)).toContain('dp1');
+      expect(tapDatasets.map((d) => d.id)).toContain('dp2');
       expect(tapDatasets.map((d) => d.id)).toContain('dp02');
       expect(tapDatasets.map((d) => d.id)).toContain('dp03');
       expect(tapDatasets.map((d) => d.id)).toContain('prompt');
@@ -237,9 +238,13 @@ describe('ServiceDiscoveryQuery', () => {
       const query = createDiscoveryQuery(mockDiscovery);
       const siaDatasets = query.getDatasetsWithService('sia');
 
-      // Only the image datasets (dp1, dp02) serve SIA.
-      expect(siaDatasets).toHaveLength(2);
-      expect(siaDatasets.map((d) => d.id).sort()).toEqual(['dp02', 'dp1']);
+      // Only the image datasets (dp1, dp2, dp02) serve SIA.
+      expect(siaDatasets).toHaveLength(3);
+      expect(siaDatasets.map((d) => d.id).sort()).toEqual([
+        'dp02',
+        'dp1',
+        'dp2',
+      ]);
       const dp1 = siaDatasets.find((d) => d.id === 'dp1');
       expect(dp1?.serviceUrl).toBe('https://data.lsst.cloud/api/sia/dp1');
     });

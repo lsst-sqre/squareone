@@ -5,7 +5,7 @@ import { DiscoverySchema } from './schemas';
 
 /**
  * These tests pin the mock to the live Repertoire discovery shape (datasets
- * dp1/dp02/dp03/prompt with real service + semantic version keys) and to the
+ * dp2/dp1/dp02/dp03/prompt with real service + semantic version keys) and to the
  * Repertoire 3.0.0 metadata (environment, titles, docs URLs, required scopes,
  * quota labels) that data-dev publishes, so downstream slices test against
  * realistic data.
@@ -20,13 +20,29 @@ describe('mockDiscovery (Repertoire 3.0.0 shape)', () => {
     }
   });
 
-  it('models the live dp1/dp02/dp03/prompt datasets', () => {
+  it('models the live dp2/dp1/dp02/dp03/prompt datasets', () => {
     expect(Object.keys(mockDiscovery.datasets).sort()).toEqual([
       'dp02',
       'dp03',
       'dp1',
+      'dp2',
       'prompt',
     ]);
+  });
+
+  it('models dp2 with its docs URL and image and catalog services', () => {
+    const { dp2 } = mockDiscovery.datasets;
+
+    expect(dp2.description).toMatch(/^Data Preview 2/);
+    expect(dp2.docs_url).toBe('https://dp2.lsst.io');
+    expect(dp2.obscore_config).toMatch(/edp2\.yaml$/);
+    expect(dp2.services.tap.url).toBe('https://data.lsst.cloud/api/tap');
+    expect(dp2.services.sia.versions['sia-query-2.0'].url).toBe(
+      'https://data.lsst.cloud/api/sia/dp2/query'
+    );
+    expect(dp2.services.hips.versions['hips-list-1.0'].url).toBe(
+      'https://data.lsst.cloud/api/hips/v2/dp2/list'
+    );
   });
 
   it('describes its environment, consistent with environment_name', () => {
