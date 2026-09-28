@@ -138,5 +138,6 @@ When there's no URL to link to, because ``repertoireUrl`` isn't set, the Reperto
 - A ``variant="cta"`` link renders nothing, not even its content.
 
 Squareone logs a failed discovery request and reports an outage to Sentry.
-It logs a warning when discovery doesn't list the service.
+It logs a warning when discovery doesn't list the service, but only once per server process for each service name, because a misnamed service such as ``service="comange"`` stays wrong on every request until the MDX is fixed.
+The warning appears the first time a page with that tag renders after Squareone starts; later requests still render the fallback, but don't log it again.
 All the ``<ServiceLink>`` tags on a page share one discovery request.

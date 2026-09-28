@@ -17,7 +17,7 @@ import {
   RepertoireError,
 } from '@lsst-sqre/repertoire-client';
 
-import { resolveServiceLink } from './resolve';
+import { __resetMissingServiceWarnings, resolveServiceLink } from './resolve';
 
 function makeLogger() {
   return { debug: vi.fn(), warn: vi.fn(), error: vi.fn() };
@@ -29,6 +29,8 @@ function makeLogger() {
 describe('resolveServiceLink', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // The missing-service warning is once per process; start each test fresh.
+    __resetMissingServiceWarnings();
   });
 
   test('omits the link when no repertoireUrl is configured', async () => {
@@ -73,6 +75,60 @@ describe('resolveServiceLink', () => {
       expect.any(String)
     );
     expect(logger.error).not.toHaveBeenCalled();
+  });
+
+  test('warns once per process for a missing service, still returning missing each time', async () => {
+    const logger = makeLogger();
+    vi.mocked(fetchServiceDiscovery).mockResolvedValue(mockDiscovery);
+    const options = {
+      service: 'no-such-service',
+      repertoireUrl: 'https://example.org/repertoire',
+      logger,
+    };
+
+    const first = await resolveServiceLink(options);
+    const second = await resolveServiceLink(options);
+
+    // Every call still returns missing, so the tag renders its fallback.
+    expect(first).toEqual({ status: 'missing' });
+    expect(second).toEqual({ status: 'missing' });
+    expect(logger.warn).toHaveBeenCalledTimes(1);
+  });
+
+  test('warns once for each distinct missing service', async () => {
+    const logger = makeLogger();
+    vi.mocked(fetchServiceDiscovery).mockResolvedValue(mockDiscovery);
+    const repertoireUrl = 'https://example.org/repertoire';
+
+    for (const service of ['comange', 'no-such-service', 'comange']) {
+      await resolveServiceLink({ service, repertoireUrl, logger });
+    }
+
+    expect(logger.warn).toHaveBeenCalledTimes(2);
+    expect(logger.warn).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({ service: 'comange' }),
+      expect.any(String)
+    );
+    expect(logger.warn).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({ service: 'no-such-service' }),
+      expect.any(String)
+    );
+  });
+
+  test('still warns once a logger is passed after a logger-less call', async () => {
+    const logger = makeLogger();
+    vi.mocked(fetchServiceDiscovery).mockResolvedValue(mockDiscovery);
+    const options = {
+      service: 'no-such-service',
+      repertoireUrl: 'https://example.org/repertoire',
+    };
+
+    await resolveServiceLink(options);
+    await resolveServiceLink({ ...options, logger });
+
+    expect(logger.warn).toHaveBeenCalledTimes(1);
   });
 
   test('returns unavailable and logs the error when discovery fails', async () => {
