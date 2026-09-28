@@ -212,6 +212,21 @@ export const FromMockDiscovery: Story = {
         getEndpointItem(dp1Section, 'Group Membership Service (GMS)')
       ).queryByRole('link', { name: /create a token/i })
     ).not.toBeInTheDocument();
+
+    // TAP shares one generic label across datasets, so each row's token link
+    // and copy button name its dataset to stay distinct out of context.
+    for (const dataset of ['Data Preview 1', 'Data Preview 0.2']) {
+      await expect(
+        canvas.getByRole('link', {
+          name: `Create a token with these scopes for Table Access Protocol (TAP) in ${dataset}`,
+        })
+      ).toBeInTheDocument();
+      await expect(
+        canvas.getByRole('button', {
+          name: `Copy the Table Access Protocol (TAP) endpoint URL for ${dataset} to the clipboard`,
+        })
+      ).toBeInTheDocument();
+    }
   },
 };
 
@@ -225,7 +240,7 @@ export const EndpointWithRequiredScopes: Story = {
     await expect(getScopePills(item)).toEqual(['read:tap']);
     await expect(
       within(item).getByRole('link', {
-        name: 'Create a token with these scopes for Table Access Protocol (TAP)',
+        name: 'Create a token with these scopes for Table Access Protocol (TAP) in Data Preview 1',
       })
     ).toHaveAttribute('href', '/settings/tokens/new?scopes=read%3Atap');
   },
