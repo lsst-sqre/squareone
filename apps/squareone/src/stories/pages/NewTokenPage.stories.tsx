@@ -1,7 +1,14 @@
 import { type LoginInfo, useLoginInfo } from '@lsst-sqre/gafaelfawr-client';
+import { Note } from '@lsst-sqre/squared';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { expect, within } from 'storybook/test';
+import ScopeList from '../../components/ScopeList';
 import { TokenForm, type TokenFormValues } from '../../components/TokenForm';
+import {
+  getGrantableScopes,
+  restrictToGrantableScopes,
+} from '../../lib/tokens/grantableScopes';
 import { parseTokenTemplateParams } from '../../lib/tokens/templateUrl';
 import { requestUrl } from '../support/fetchStub';
 
@@ -63,29 +70,31 @@ function MockFetchProvider({
   mockError?: boolean;
   mockLoading?: boolean;
 }) {
+  // Install the fetch mock during render (top-down, before the login query's
+  // child effect fires, and after any outer provider so the innermost story
+  // decorator wins) and restore it on unmount.
+  if (mockError) {
+    window.fetch = async (url: string | URL | Request) => {
+      const urlString = requestUrl(url);
+      if (urlString.includes('/auth/api/v1/login')) {
+        throw new Error('Failed to load login info');
+      }
+      return originalFetch(url);
+    };
+  } else if (mockLoading) {
+    window.fetch = async () => {
+      // Return a promise that never resolves for loading state
+      return new Promise(() => {});
+    };
+  } else {
+    // biome-ignore lint/suspicious/noExplicitAny: Mock fetch needs to match global fetch type
+    window.fetch = mockFetch as any;
+  }
   useEffect(() => {
-    if (mockError) {
-      window.fetch = async (url: string | URL | Request) => {
-        const urlString = requestUrl(url);
-        if (urlString.includes('/auth/api/v1/login')) {
-          throw new Error('Failed to load login info');
-        }
-        return originalFetch(url);
-      };
-    } else if (mockLoading) {
-      window.fetch = async () => {
-        // Return a promise that never resolves for loading state
-        return new Promise(() => {});
-      };
-    } else {
-      // biome-ignore lint/suspicious/noExplicitAny: Mock fetch needs to match global fetch type
-      window.fetch = mockFetch as any;
-    }
-
     return () => {
       window.fetch = originalFetch;
     };
-  }, [mockError, mockLoading]);
+  }, []);
 
   return <>{children}</>;
 }
@@ -100,9 +109,7 @@ function NewTokenPageSimulator() {
   } = useLoginInfo(undefined);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Prefill exactly as NewTokenPageClient does.
-  const formInitialValues: Partial<TokenFormValues> =
-    parseTokenTemplateParams(searchParams);
+  const templateValues = parseTokenTemplateParams(searchParams);
 
   const handleSubmit = async (values: TokenFormValues) => {
     setIsSubmitting(true);
@@ -133,6 +140,11 @@ function NewTokenPageSimulator() {
     );
   }
 
+  // Prefill exactly as NewTokenPageClient does.
+  const availableScopes = getGrantableScopes(loginInfo);
+  const { values: formInitialValues, droppedScopes } =
+    restrictToGrantableScopes(templateValues, availableScopes);
+
   return (
     <div>
       <h1>Create an RSP access token</h1>
@@ -141,10 +153,17 @@ function NewTokenPageSimulator() {
         Platform APIs. Access tokens allow you to authenticate with services
         without using your password.
       </p>
+      {droppedScopes.length > 0 && (
+        <Note type="warning">
+          <p>
+            This link requested{' '}
+            <ScopeList scopes={droppedScopes} conjunction="and" />, which your
+            account cannot grant.
+          </p>
+        </Note>
+      )}
       <TokenForm
-        availableScopes={loginInfo.config.scopes.filter((scope) =>
-          loginInfo.scopes.includes(scope.name)
-        )}
+        availableScopes={availableScopes}
         initialValues={formInitialValues}
         onSubmit={handleSubmit}
         onCancel={handleCancel}
@@ -184,7 +203,7 @@ export const WithNamePrefilled = {
       appDirectory: true,
       navigation: {
         pathname: '/settings/tokens/new',
-        searchParams: { name: 'My API Token' },
+        query: { name: 'My API Token' },
       },
     },
   },
@@ -196,7 +215,7 @@ export const WithSingleScope = {
       appDirectory: true,
       navigation: {
         pathname: '/settings/tokens/new',
-        searchParams: { scopes: 'read:all' },
+        query: { scopes: 'read:all' },
       },
     },
   },
@@ -210,9 +229,34 @@ export const WithCommaDelimitedScopes = {
       appDirectory: true,
       navigation: {
         pathname: '/settings/tokens/new',
-        searchParams: { scopes: 'read:all,user:token' },
+        query: { scopes: 'read:all,user:token' },
       },
     },
+  },
+};
+
+// A template URL (e.g. an /api-aspect token link) can request a scope the
+// user does not hold. The page prefills only the grantable scopes and names the
+// dropped one in a notice above the form.
+export const WithUnavailableScope = {
+  parameters: {
+    nextjs: {
+      appDirectory: true,
+      navigation: {
+        pathname: '/settings/tokens/new',
+        query: { scopes: 'read:all,read:image' },
+      },
+    },
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+
+    await expect(await canvas.findByText(/cannot grant/i)).toHaveTextContent(
+      'This link requested read:image, which your account cannot grant.'
+    );
+    await expect(
+      canvas.getByRole('checkbox', { name: /read:all/ })
+    ).toBeChecked();
   },
 };
 
@@ -224,7 +268,7 @@ export const WithRepeatedScopeParameters = {
       appDirectory: true,
       navigation: {
         pathname: '/settings/tokens/new',
-        searchParams: [
+        query: [
           ['scope', 'read:all'],
           ['scope', 'user:token'],
           ['scope', 'exec:notebook'],
@@ -241,7 +285,7 @@ export const WithMixedScopeFormats = {
       appDirectory: true,
       navigation: {
         pathname: '/settings/tokens/new',
-        searchParams: [
+        query: [
           ['scopes', 'read:all,user:token'],
           ['scope', 'exec:notebook'],
         ],
@@ -256,7 +300,7 @@ export const WithExpirationPrefilled = {
       appDirectory: true,
       navigation: {
         pathname: '/settings/tokens/new',
-        searchParams: { expiration: '30d' },
+        query: { expiration: '30d' },
       },
     },
   },
@@ -268,7 +312,7 @@ export const WithAllParametersCombined = {
       appDirectory: true,
       navigation: {
         pathname: '/settings/tokens/new',
-        searchParams: [
+        query: [
           ['name', 'Complete Token'],
           ['scopes', 'read:all,user:token'],
           ['expiration', '7d'],
@@ -284,7 +328,7 @@ export const WithInvalidParameters = {
       appDirectory: true,
       navigation: {
         pathname: '/settings/tokens/new',
-        searchParams: {
+        query: {
           name: 'Valid Name',
           scopes: 'read:all',
           expiration: 'invalid-expiration',
@@ -301,7 +345,7 @@ export const WithEmptyScopeValues = {
       appDirectory: true,
       navigation: {
         pathname: '/settings/tokens/new',
-        searchParams: { scopes: 'read:all,,user:token' },
+        query: { scopes: 'read:all,,user:token' },
       },
     },
   },
@@ -313,7 +357,7 @@ export const WithWhitespaceInScopes = {
       appDirectory: true,
       navigation: {
         pathname: '/settings/tokens/new',
-        searchParams: { scopes: ' read:all , user:token ' },
+        query: { scopes: ' read:all , user:token ' },
       },
     },
   },
@@ -410,9 +454,10 @@ function LimitedScopesMockProvider({
 }: {
   children: React.ReactNode;
 }) {
+  // Installed during render, as in MockFetchProvider.
+  // biome-ignore lint/suspicious/noExplicitAny: Mock fetch needs to match global fetch type
+  window.fetch = mockFetchWithLimitedScopes as any;
   useEffect(() => {
-    // biome-ignore lint/suspicious/noExplicitAny: Mock fetch needs to match global fetch type
-    window.fetch = mockFetchWithLimitedScopes as any;
     return () => {
       window.fetch = originalFetch;
     };
