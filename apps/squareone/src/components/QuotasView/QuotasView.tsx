@@ -2,6 +2,7 @@ import type { NotebookQuota, Quota } from '@lsst-sqre/gafaelfawr-client';
 import type { QuotaLabelIndex } from '@lsst-sqre/repertoire-client';
 import { KeyValueList, type KeyValueListItem } from '@lsst-sqre/squared';
 import { BookOpen } from 'lucide-react';
+import { useMemo } from 'react';
 
 import {
   type ApiQuotaItem,
@@ -27,8 +28,10 @@ export default function QuotasView({
   // Check if we have any quota data to display
   const hasNotebookQuota =
     quota.notebook !== null && quota.notebook !== undefined;
-  const apiItems = buildApiQuotaItems(quota.api, quotaLabelIndex).map(
-    toKeyValueListItem
+  const apiItems = useMemo(
+    () =>
+      buildApiQuotaItems(quota.api, quotaLabelIndex).map(toKeyValueListItem),
+    [quota.api, quotaLabelIndex]
   );
   const hasApiQuota = apiItems.length > 0;
   const hasTapQuota = quota.tap && Object.keys(quota.tap).length > 0;

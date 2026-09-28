@@ -25,7 +25,12 @@ vi.mock('../../../hooks/useStaticConfig', () => ({
 import type { Quota, UseUserInfoReturn } from '@lsst-sqre/gafaelfawr-client';
 // Import after mocking.
 import { useUserInfo } from '@lsst-sqre/gafaelfawr-client';
-import { getEmptyDiscovery, mockDiscovery } from '@lsst-sqre/repertoire-client';
+import {
+  getEmptyDiscovery,
+  mockDiscovery,
+  ServiceDiscoveryQuery,
+} from '@lsst-sqre/repertoire-client';
+import { useRepertoireUrl } from '../../../hooks/useRepertoireUrl';
 import { useStaticConfig } from '../../../hooks/useStaticConfig';
 import type { StaticConfig } from '../../../lib/config/resolveConfigDefaults';
 import { mockDiscoveryState } from '../../../tests/serviceAccessMocks';
@@ -64,6 +69,7 @@ function makeUserInfoReturn(quota?: Quota): UseUserInfoReturn {
 describe('QuotasPageClient', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(useRepertoireUrl).mockReturnValue(undefined);
     vi.mocked(useUserInfo).mockReturnValue(makeUserInfoReturn());
     vi.mocked(useStaticConfig).mockReturnValue(makeConfig());
     mockDiscoveryState();
@@ -104,6 +110,20 @@ describe('QuotasPageClient', () => {
       screen.getByText('Simple image access (SIA) — Image requests')
     ).toBeInTheDocument();
     expect(screen.queryByText('tap')).not.toBeInTheDocument();
+  });
+
+  test('indexes the quota labels once per discovery', () => {
+    vi.mocked(useUserInfo).mockReturnValue(makeUserInfoReturn(apiQuota));
+    const getQuotaLabelIndex = vi.spyOn(
+      ServiceDiscoveryQuery.prototype,
+      'getQuotaLabelIndex'
+    );
+
+    const { rerender } = render(<QuotasPageClient />);
+    rerender(<QuotasPageClient />);
+
+    expect(getQuotaLabelIndex).toHaveBeenCalledTimes(1);
+    getQuotaLabelIndex.mockRestore();
   });
 
   test('hides rate limits whose label discovery flags internal', () => {
@@ -147,8 +167,9 @@ describe('QuotasPageClient', () => {
     expect(screen.getByText('muster-quota')).toBeInTheDocument();
   });
 
-  test('shows raw quota labels while discovery is unavailable', () => {
-    // No repertoireUrl configured, or discovery still loading.
+  test('shows raw quota labels without a repertoireUrl', () => {
+    // Without a repertoireUrl the discovery query is disabled and stays
+    // pending, so there is no discovery to wait for.
     vi.mocked(useUserInfo).mockReturnValue(makeUserInfoReturn(apiQuota));
     mockDiscoveryState({ isPending: true });
 
@@ -156,5 +177,36 @@ describe('QuotasPageClient', () => {
 
     expect(screen.getByText('tap')).toBeInTheDocument();
     expect(screen.getByText('muster-quota')).toBeInTheDocument();
+  });
+
+  test('holds the rate limits while discovery is pending', () => {
+    vi.mocked(useRepertoireUrl).mockReturnValue(
+      'https://data.example.org/repertoire/discovery'
+    );
+    vi.mocked(useUserInfo).mockReturnValue(makeUserInfoReturn(apiQuota));
+    mockDiscoveryState({ isPending: true });
+
+    render(<QuotasPageClient />);
+
+    expect(screen.queryByText('Rate limits')).not.toBeInTheDocument();
+    expect(screen.queryByText('tap')).not.toBeInTheDocument();
+    expect(screen.queryByText('muster-quota')).not.toBeInTheDocument();
+  });
+
+  test('shows the labelled rate limits once discovery resolves', () => {
+    vi.mocked(useRepertoireUrl).mockReturnValue(
+      'https://data.example.org/repertoire/discovery'
+    );
+    vi.mocked(useUserInfo).mockReturnValue(makeUserInfoReturn(apiQuota));
+    mockDiscoveryState({ isPending: true });
+
+    const { rerender } = render(<QuotasPageClient />);
+    mockDiscoveryState();
+    rerender(<QuotasPageClient />);
+
+    expect(
+      screen.getByText('Table access protocol (TAP) — TAP API calls')
+    ).toBeInTheDocument();
+    expect(screen.queryByText('tap')).not.toBeInTheDocument();
   });
 });
