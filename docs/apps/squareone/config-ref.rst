@@ -75,7 +75,7 @@ Its items are derived from Repertoire service discovery and the user's scopes, s
 
 ``appLinks`` are additive extras for apps that service discovery does not describe (for example, a deployment-specific tool).
 They are shown to every user, regardless of scopes.
-A link whose ``href`` repeats an earlier item is dropped; relative hrefs are resolved against the ``squareone`` UI service URL and trailing slashes are ignored when comparing, so an ``appLinks`` entry of ``/argo-cd/`` does not duplicate the discovered Argo CD item.
+A link whose ``href`` repeats an earlier item is dropped; relative hrefs are resolved against the site's origin (the ``squareone`` UI service URL from discovery, or else the resolved ``baseUrl``) and trailing slashes are ignored when comparing, so an ``appLinks`` entry of ``/argo-cd/`` does not duplicate the discovered Argo CD item.
 Links for services now derived from discovery can be removed from ``appLinks``, though an entry that stays is still shown to users who can't see the discovered item.
 
 The menu is hidden when it has no items.

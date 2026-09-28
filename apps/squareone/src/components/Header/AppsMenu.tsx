@@ -32,7 +32,7 @@ type LinkProps = {
  * `appLinks` only.
  */
 export default function AppsMenu({ className }: AppsMenuProps) {
-  const { appLinks } = useStaticConfig();
+  const { appLinks, baseUrl } = useStaticConfig();
   const repertoireUrl = useRepertoireUrl();
   const { query } = useServiceDiscovery(repertoireUrl ?? '');
 
@@ -49,6 +49,7 @@ export default function AppsMenu({ className }: AppsMenuProps) {
     userScopes,
     appLinks,
     timesSquareEnabled: query?.hasApplication('times-square') ?? false,
+    baseUrl,
   });
 
   if (items.length === 0) {

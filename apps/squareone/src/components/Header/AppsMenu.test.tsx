@@ -44,6 +44,7 @@ function mockAppLinks(appLinks: AppConfigContextValue['appLinks']) {
   vi.mocked(useStaticConfig).mockReturnValue({
     enableAppsMenu: true,
     appLinks,
+    baseUrl: 'https://data.lsst.cloud',
   } as AppConfigContextValue);
 }
 
