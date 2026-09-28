@@ -285,6 +285,53 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
     });
   });
 
+  test('labels an unmapped service with an empty title (Repertoire 3.0) by its raw name, never blank', () => {
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            ssa: {
+              url: 'https://data.lsst.cloud/api/ssa',
+              title: '',
+              docs_url: 'https://www.ivoa.net/documents/SSA/',
+              versions: {},
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery);
+    expect(group.endpoints[0]).toEqual({
+      label: 'ssa',
+      url: 'https://data.lsst.cloud/api/ssa',
+      ivoaUrl: 'https://www.ivoa.net/documents/SSA/',
+      ivoaName: 'ssa',
+      docsUrl: null,
+    });
+  });
+
+  test('labels an alerts service with a whitespace-only title "Alerts"', () => {
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        prompt: {
+          services: {
+            alerts: {
+              url: 'https://data.lsst.cloud/api/alerts',
+              title: '   ',
+              versions: {},
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery);
+    expect(group.endpoints[0]?.label).toBe('Alerts');
+  });
+
   test('labels an unmapped service with its discovery title', () => {
     const discovery = {
       ...getEmptyDiscovery(),

@@ -7,6 +7,8 @@
 import type { Quota } from '@lsst-sqre/gafaelfawr-client';
 import type { QuotaLabelIndex } from '@lsst-sqre/repertoire-client';
 
+import { serviceDisplayName } from '../discovery/serviceDisplayName';
+
 /** A link to the documentation of the service a quota applies to. */
 export type ApiQuotaDocsLink = {
   /** URL of the service's documentation. */
@@ -77,7 +79,10 @@ export function buildApiQuotaItems(
       continue;
     }
 
-    const serviceTitle = entry.serviceTitle || entry.serviceName;
+    const serviceTitle = serviceDisplayName(
+      entry.serviceTitle,
+      entry.serviceName
+    );
     const labelTitle = entry.labelTitle || label;
     items.push({
       key: `${serviceTitle} — ${labelTitle}`,
