@@ -1,4 +1,3 @@
-import { useLoginInfo } from '@lsst-sqre/gafaelfawr-client';
 import * as semaphoreClient from '@lsst-sqre/semaphore-client';
 import { mockUserNotifications } from '@lsst-sqre/semaphore-client';
 import { render, screen, waitFor } from '@testing-library/react';
@@ -6,6 +5,7 @@ import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { useLoginInfo } from '../../hooks/useLoginInfo';
 import * as useSemaphoreUrlModule from '../../hooks/useSemaphoreUrl';
 import { useStaticConfig } from '../../hooks/useStaticConfig';
 import type { StaticConfig } from '../../lib/config/resolveConfigDefaults';
@@ -22,7 +22,7 @@ vi.mock('@lsst-sqre/semaphore-client', async (importOriginal) => {
     fetchUserNotifications: vi.fn(),
   };
 });
-vi.mock('@lsst-sqre/gafaelfawr-client', () => ({
+vi.mock('../../hooks/useLoginInfo', () => ({
   useLoginInfo: vi.fn(),
 }));
 vi.mock('../../hooks/useSemaphoreUrl');

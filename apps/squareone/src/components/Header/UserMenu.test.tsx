@@ -18,7 +18,7 @@ vi.mock('@lsst-sqre/squared', async () => {
 });
 
 // useLoginInfo provides the scopes that gate the Admin link.
-vi.mock('@lsst-sqre/gafaelfawr-client', () => ({
+vi.mock('../../hooks/useLoginInfo', () => ({
   useLoginInfo: vi.fn(),
 }));
 
@@ -39,11 +39,11 @@ vi.mock('../../hooks/useStaticConfig', () => ({
   useStaticConfig: vi.fn(),
 }));
 
-import type { UseLoginInfoReturn } from '@lsst-sqre/gafaelfawr-client';
 // Import after mocking
-import { useLoginInfo } from '@lsst-sqre/gafaelfawr-client';
+import type { UseLoginInfoReturn } from '@lsst-sqre/gafaelfawr-client';
 import { useUnreadNotificationCount } from '@lsst-sqre/semaphore-client';
 import { PrimaryNavigation, useGafaelfawrUser } from '@lsst-sqre/squared';
+import { useLoginInfo } from '../../hooks/useLoginInfo';
 import { useSemaphoreUrl } from '../../hooks/useSemaphoreUrl';
 import { useStaticConfig } from '../../hooks/useStaticConfig';
 import type { StaticConfig } from '../../lib/config/resolveConfigDefaults';

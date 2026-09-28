@@ -10,7 +10,7 @@ vi.mock('@lsst-sqre/repertoire-client', async (importOriginal) => ({
 }));
 
 // useLoginInfo supplies the signed-in user's scopes.
-vi.mock('@lsst-sqre/gafaelfawr-client', () => ({
+vi.mock('../../hooks/useLoginInfo', () => ({
   useLoginInfo: vi.fn(),
 }));
 
@@ -23,7 +23,6 @@ vi.mock('../../hooks/useStaticConfig', () => ({
 }));
 
 // Import after mocking.
-import { useLoginInfo } from '@lsst-sqre/gafaelfawr-client';
 import { mockDiscovery } from '@lsst-sqre/repertoire-client';
 import { PrimaryNavigation } from '@lsst-sqre/squared';
 import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
@@ -158,18 +157,5 @@ describe('AppsMenu', () => {
       screen.queryByRole('button', { name: 'Apps' })
     ).not.toBeInTheDocument();
     expect(screen.queryByRole('listitem')).not.toBeInTheDocument();
-  });
-
-  test('reports login-info failures to Sentry like the user menu', () => {
-    render(
-      <PrimaryNavigation>
-        <AppsMenu />
-      </PrimaryNavigation>
-    );
-
-    expect(useLoginInfo).toHaveBeenCalledWith(REPERTOIRE_URL, {
-      reportError: expect.any(Function),
-      context: { site: 'login-info', package: 'gafaelfawr-client' },
-    });
   });
 });

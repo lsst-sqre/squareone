@@ -7,17 +7,20 @@ import type {
   TokenFormProps,
   TokenFormValues,
 } from '../../../../components/TokenForm';
+import { useLoginInfo } from '../../../../hooks/useLoginInfo';
 import * as useRepertoireUrlModule from '../../../../hooks/useRepertoireUrl';
 
 vi.mock('@lsst-sqre/gafaelfawr-client', async (importOriginal) => {
   const actual = await importOriginal<typeof gafaelfawrClient>();
   return {
     ...actual,
-    useLoginInfo: vi.fn(),
     useCreateToken: vi.fn(),
     useUserTokens: vi.fn(),
   };
 });
+vi.mock('../../../../hooks/useLoginInfo', () => ({
+  useLoginInfo: vi.fn(),
+}));
 vi.mock('../../../../hooks/useRepertoireUrl');
 vi.mock('../../../../hooks/useTokenTemplateUrl', () => ({
   default: () => 'https://example.com/template',
@@ -76,7 +79,7 @@ vi.mock('../../../../components/TokenForm', async (importOriginal) => {
 
 import NewTokenPageClient from './NewTokenPageClient';
 
-const mockUseLoginInfo = vi.mocked(gafaelfawrClient.useLoginInfo);
+const mockUseLoginInfo = vi.mocked(useLoginInfo);
 const mockUseCreateToken = vi.mocked(gafaelfawrClient.useCreateToken);
 const mockUseUserTokens = vi.mocked(gafaelfawrClient.useUserTokens);
 const mockUseRepertoireUrl = vi.mocked(useRepertoireUrlModule.useRepertoireUrl);
@@ -99,7 +102,7 @@ function mockHeldScopes(scopes: string[]) {
     },
     error: null,
     isLoading: false,
-  } as unknown as ReturnType<typeof gafaelfawrClient.useLoginInfo>);
+  } as unknown as ReturnType<typeof useLoginInfo>);
 }
 
 describe('NewTokenPageClient', () => {

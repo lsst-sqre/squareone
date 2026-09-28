@@ -1,10 +1,11 @@
-import { type LoginInfo, useLoginInfo } from '@lsst-sqre/gafaelfawr-client';
+import type { LoginInfo } from '@lsst-sqre/gafaelfawr-client';
 import { Note } from '@lsst-sqre/squared';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { expect, within } from 'storybook/test';
 import ScopeList from '../../components/ScopeList';
 import { TokenForm, type TokenFormValues } from '../../components/TokenForm';
+import { useLoginInfo } from '../../hooks/useLoginInfo';
 import {
   getGrantableScopes,
   restrictToGrantableScopes,
@@ -101,12 +102,13 @@ function MockFetchProvider({
 
 function NewTokenPageSimulator() {
   const searchParams = useSearchParams();
-  // Pass undefined for repertoireUrl since we mock fetch directly
+  // The Storybook config sets no repertoireUrl, so login info comes from the
+  // default Gafaelfawr URL, which the fetch mock answers.
   const {
     loginInfo,
     error: loginError,
     isLoading: loginLoading,
-  } = useLoginInfo(undefined);
+  } = useLoginInfo();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const templateValues = parseTokenTemplateParams(searchParams);

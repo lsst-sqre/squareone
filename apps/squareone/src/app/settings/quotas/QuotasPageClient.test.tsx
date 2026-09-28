@@ -6,6 +6,9 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 // boundary or live service discovery.
 vi.mock('@lsst-sqre/gafaelfawr-client', () => ({
   useUserInfo: vi.fn(),
+}));
+
+vi.mock('../../../hooks/useLoginInfo', () => ({
   useLoginInfo: vi.fn(),
 }));
 

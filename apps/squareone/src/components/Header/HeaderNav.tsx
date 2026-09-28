@@ -1,12 +1,12 @@
 'use client';
 
-import { useLoginInfo } from '@lsst-sqre/gafaelfawr-client';
 import { useServiceDiscovery } from '@lsst-sqre/repertoire-client';
 import { PrimaryNavigation } from '@lsst-sqre/squared';
 import NextLink from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 import useCurrentUrl from '../../hooks/useCurrentUrl';
+import { useLoginInfo } from '../../hooks/useLoginInfo';
 import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
 import { useStaticConfig } from '../../hooks/useStaticConfig';
 import AppsMenu from './AppsMenu';
@@ -46,7 +46,7 @@ export default function HeaderNav() {
   // The signed-in user's scopes (hydrated from the layout's prefetch);
   // undefined when anonymous or still loading, which canAccessService treats as
   // allowed.
-  const scopes = useLoginInfo(repertoireUrl).query?.scopes;
+  const scopes = useLoginInfo().query?.scopes;
   const canAccessUiService = (name: string) => {
     const service = query?.getUiService(name);
     return !!service && !!query?.canAccessService(service, scopes);

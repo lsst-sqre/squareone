@@ -18,6 +18,9 @@ vi.mock('./ServiceTokenPageClient', () => ({
 // (useLoginInfo) against the `adminPageScopes` config.
 vi.mock('@lsst-sqre/gafaelfawr-client', () => ({
   useUserInfo: vi.fn(),
+}));
+
+vi.mock('../../../hooks/useLoginInfo', () => ({
   useLoginInfo: vi.fn(),
 }));
 
@@ -34,7 +37,8 @@ import type {
   UseUserInfoReturn,
 } from '@lsst-sqre/gafaelfawr-client';
 // Import after mocking.
-import { useLoginInfo, useUserInfo } from '@lsst-sqre/gafaelfawr-client';
+import { useUserInfo } from '@lsst-sqre/gafaelfawr-client';
+import { useLoginInfo } from '../../../hooks/useLoginInfo';
 import {
   type AppConfigContextValue,
   useStaticConfig,
