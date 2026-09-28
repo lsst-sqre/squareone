@@ -14,9 +14,12 @@ import ApiEndpointsList from './ApiEndpointsList';
 // discovery -> display shape with the curated presentation map.
 const discoveryGroups = serviceDiscoveryToApiEndpointGroups(mockDiscovery);
 
-// A dataset whose services are all absent from the curated presentation map:
-// one with a Repertoire 3.0 title and non-IVOA docs URL, one whose docs URL is
-// an IVOA standard, and one with neither (as Repertoire 2.x publishes).
+// Services whose presentation comes from discovery rather than curation. The
+// dp1 services are absent from the curated presentation map: one with a
+// Repertoire 3.0 title and non-IVOA docs URL, one whose docs URL is an IVOA
+// standard, and one with neither (as Repertoire 2.x publishes). The prompt
+// alerts service is shaped like Repertoire 2.x too; its map entry supplies
+// only the label for an untitled alerts service.
 const unmappedGroups = serviceDiscoveryToApiEndpointGroups({
   ...getEmptyDiscovery(),
   datasets: {
@@ -47,6 +50,16 @@ const unmappedGroups = serviceDiscoveryToApiEndpointGroups({
         },
       },
     },
+    prompt: {
+      services: {
+        alerts: {
+          url: 'https://data.lsst.cloud/api/alerts',
+          required_scopes: [],
+          quota_labels: {},
+          versions: {},
+        },
+      },
+    },
   },
 } as ServiceDiscovery);
 
@@ -61,9 +74,10 @@ type Story = StoryObj<typeof ApiEndpointsList>;
 // Rendered from mock discovery: one section per dataset with curated labels,
 // IVOA standard links, and selected URLs matching the production idfprod page.
 // Every curated RSP service maps to an IVOA standard, so each name shows a
-// book-icon link named for its standard (e.g. "IVOA TAP docs"). The uncurated
-// alerts service under Prompt Products falls back to its discovery title and
-// technote docs link ("Alert retrieval docs").
+// book-icon link named for its standard (e.g. "IVOA TAP docs"). The alerts
+// service under Prompt Products, which the map names only when discovery has
+// no title, takes its discovery title and technote docs link ("Alert
+// retrieval docs").
 export const FromMockDiscovery: Story = {
   args: { groups: discoveryGroups },
   play: async ({ canvasElement }) => {
@@ -125,8 +139,8 @@ export const FromMockDiscovery: Story = {
       canvas.getAllByRole('link', { name: 'IVOA DataLink docs' })[0]
     ).toHaveAttribute('href', 'https://www.ivoa.net/documents/DataLink/');
 
-    // The uncurated alerts service (Prompt Products) is labelled by its
-    // discovery title, with a book-icon link to its non-IVOA docs.
+    // The alerts service (Prompt Products) is labelled by its discovery title,
+    // with a book-icon link to its non-IVOA docs.
     await expect(canvas.getByText('Alert retrieval')).toBeInTheDocument();
     await expect(
       canvas.getByRole('link', { name: 'Alert retrieval docs' })
@@ -143,7 +157,8 @@ export const FromMockDiscovery: Story = {
 // Services absent from the curated presentation map fall back to discovery
 // metadata: the title labels the endpoint and the docs URL becomes a book-icon
 // link — named for the IVOA standard when it is one, otherwise a generic docs
-// link. A service with neither (Repertoire 2.x) shows its raw name, unlinked.
+// link. A service with neither (Repertoire 2.x) shows its raw name, unlinked,
+// except alerts, which the map labels "Alerts" when discovery has no title.
 export const UnmappedServiceFallbacks: Story = {
   args: { groups: unmappedGroups },
   play: async ({ canvasElement }) => {
@@ -164,6 +179,11 @@ export const UnmappedServiceFallbacks: Story = {
     await expect(canvas.getByText('mystery')).toBeInTheDocument();
     await expect(
       canvas.queryByRole('link', { name: /mystery/i })
+    ).not.toBeInTheDocument();
+
+    await expect(canvas.getByText('Alerts')).toBeInTheDocument();
+    await expect(
+      canvas.queryByRole('link', { name: /alert/i })
     ).not.toBeInTheDocument();
   },
 };

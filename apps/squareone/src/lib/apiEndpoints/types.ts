@@ -14,10 +14,9 @@ export type ApiEndpointDocsLink = {
 /**
  * A single API endpoint rendered in the `/api-aspect` listing.
  *
- * Mapped services carry a curated `label`, a version-selected `url`, and a
- * `docs` link to the relevant IVOA standard. Unmapped services use the base
- * `url`, fall back to their discovery `title` (or the raw service name) as the
- * `label`, and link their discovery `docs_url` as `docs`.
+ * The transform resolves each field by merging the service's curated
+ * presentation entry over its discovery metadata, per the precedence rule
+ * documented on `PresentationMap` (`presentation.ts`).
  */
 export type ApiEndpoint = {
   /** Display label for the endpoint. */
@@ -25,10 +24,9 @@ export type ApiEndpoint = {
   /** Endpoint URL, rendered as copyable code text. */
   url: string;
   /**
-   * The endpoint's documentation link, or `null` when it has none (neither a
-   * curated IVOA standard link nor a discovery `docs_url`). An IVOA standard
-   * link is labelled by the standard's name ("IVOA TAP docs"); any other docs
-   * link by the endpoint label ("Alert retrieval docs").
+   * The endpoint's documentation link, or `null` when it has none. An IVOA
+   * standard link is labelled by the standard's name ("IVOA TAP docs"); any
+   * other docs link by the endpoint label ("Alert retrieval docs").
    */
   docs: ApiEndpointDocsLink | null;
 };

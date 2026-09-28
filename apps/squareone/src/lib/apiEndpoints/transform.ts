@@ -1,4 +1,7 @@
-import type { ServiceDiscovery } from '@lsst-sqre/repertoire-client';
+import type {
+  DataService,
+  ServiceDiscovery,
+} from '@lsst-sqre/repertoire-client';
 
 import { serviceDisplayName } from '../discovery/serviceDisplayName';
 import {
@@ -7,32 +10,55 @@ import {
   ivoaNameFromLabel,
   orderDatasetKeys,
   type PresentationMap,
+  type ServicePresentation,
   selectServiceUrl,
 } from './presentation';
-import type { ApiEndpointDocsLink, ApiEndpointGroup } from './types';
-
-/** Docs link to an IVOA standard, labelled by the standard's short name. */
-function ivoaDocsLink(url: string, name: string): ApiEndpointDocsLink {
-  return { url, label: `IVOA ${name} docs` };
-}
+import type {
+  ApiEndpoint,
+  ApiEndpointDocsLink,
+  ApiEndpointGroup,
+} from './types';
 
 /**
- * Docs link for a service absent from the presentation map, from its
- * discovery `docs_url`: an IVOA standard is named via {@link
- * ivoaNameFromLabel}, any other docs page by the endpoint label. A missing or
- * empty `docs_url` yields no link.
+ * Resolve an endpoint's docs link from its presentation `entry` and discovery
+ * `docsUrl`, per the docs rule on {@link PresentationMap}. An empty URL counts
+ * as absent.
  */
-function discoveryDocsLink(
+function resolveDocsLink(
+  entry: ServicePresentation,
   docsUrl: string | null | undefined,
   label: string
 ): ApiEndpointDocsLink | null {
-  if (!docsUrl) {
+  const url = entry.ivoaUrl || docsUrl;
+  if (!url) {
     return null;
   }
-  if (isIvoaStandardUrl(docsUrl)) {
-    return ivoaDocsLink(docsUrl, ivoaNameFromLabel(label));
+  if (entry.ivoaUrl || isIvoaStandardUrl(url)) {
+    const name = entry.ivoaName ?? ivoaNameFromLabel(label);
+    return { url, label: `IVOA ${name} docs` };
   }
-  return { url: docsUrl, label: `${label} docs` };
+  return { url, label: `${label} docs` };
+}
+
+/**
+ * Resolve one discovered service into an endpoint by merging its presentation
+ * `entry` over discovery, per the precedence rule on {@link PresentationMap}.
+ * A service without an entry passes `{}` and so takes every value from
+ * discovery.
+ */
+function resolveEndpoint(
+  serviceName: string,
+  service: DataService,
+  entry: ServicePresentation
+): ApiEndpoint {
+  const label =
+    entry.label ??
+    serviceDisplayName(service.title, entry.untitledLabel ?? serviceName);
+  return {
+    label,
+    url: selectServiceUrl(service, entry.url),
+    docs: resolveDocsLink(entry, service.docs_url, label),
+  };
 }
 
 /**
@@ -43,20 +69,11 @@ function discoveryDocsLink(
  * {@link orderDatasetKeys} (releases newest-first, `prompt` pinned second,
  * unrecognized datasets after in discovery order). Each group resolves the
  * dataset display name (falling back to the raw key) and carries the dataset
- * `docs_url` and `description`. Every service under a dataset is rendered:
- *
- * - Curated services win entirely: the curated label, IVOA standard link
- *   (labelled "IVOA <name> docs" by the curated `ivoaName`, else a name
- *   derived from the label), and version-selected URL, ignoring any discovery
- *   `title`/`docs_url`.
- * - Services absent from the map use the base URL and are labelled by their
- *   discovery `title`, falling back to
- *   {@link PresentationMap.untitledServiceLabels} and then the raw service
- *   name (Repertoire 2.x publishes no titles; a blank title counts as none,
- *   per {@link serviceDisplayName}). A discovery `docs_url` becomes the
- *   `docs` link, labelled "IVOA <name> docs" (named via
- *   {@link ivoaNameFromLabel}) when it points at an IVOA standard, otherwise
- *   "<label> docs"; without one, no docs link.
+ * `docs_url` and `description`. Every service under a dataset is rendered as
+ * an endpoint whose label, URL, and docs link merge the service's
+ * `presentation.services` entry over its discovery metadata by the precedence
+ * rule on {@link PresentationMap}: a curated field wins, and an absent field
+ * (or a service with no entry) falls through to discovery.
  *
  * Pure and parameterized by `presentation` (defaulting to the app's curated
  * map) so tests can inject their own mapping. Empty/missing fallbacks: a
@@ -77,30 +94,12 @@ export function serviceDiscoveryToApiEndpointGroups(
       docsUrl: dataset.docs_url ?? null,
       description: dataset.description ?? null,
       endpoints: Object.entries(dataset.services ?? {}).map(
-        ([serviceName, service]) => {
-          const curated = presentation.services[serviceName];
-          if (!curated) {
-            const label = serviceDisplayName(
-              service.title,
-              presentation.untitledServiceLabels?.[serviceName] ?? serviceName
-            );
-            return {
-              label,
-              url: service.url,
-              docs: discoveryDocsLink(service.docs_url, label),
-            };
-          }
-          return {
-            label: curated.label,
-            url: selectServiceUrl(service, curated.url),
-            docs: curated.ivoaUrl
-              ? ivoaDocsLink(
-                  curated.ivoaUrl,
-                  curated.ivoaName ?? ivoaNameFromLabel(curated.label)
-                )
-              : null,
-          };
-        }
+        ([serviceName, service]) =>
+          resolveEndpoint(
+            serviceName,
+            service,
+            presentation.services[serviceName] ?? {}
+          )
       ),
     };
   });
