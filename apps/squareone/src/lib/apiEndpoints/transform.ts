@@ -73,7 +73,12 @@ function resolveEndpoint(
  * an endpoint whose label, URL, and docs link merge the service's
  * `presentation.services` entry over its discovery metadata by the precedence
  * rule on {@link PresentationMap}: a curated field wins, and an absent field
- * (or a service with no entry) falls through to discovery.
+ * (or a service with no entry) falls through to discovery. From discovery, the
+ * label is the service `title` (else the raw service name), the docs link is
+ * the service `docs_url`, and the URL is the `url` of the service's only
+ * version when its `versions` map has exactly one entry, else the base `url`
+ * (choosing among several versions needs a curated `url` selector; see
+ * `discoveryServiceUrl` in `presentation.ts`).
  *
  * Pure and parameterized by `presentation` (defaulting to the app's curated
  * map) so tests can inject their own mapping. Empty/missing fallbacks: a
