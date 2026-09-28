@@ -13,3 +13,13 @@ export {
   compileMdxForRsc,
   footerMdxComponents,
 } from './compiler';
+export type {
+  ApiEndpointsTagProps,
+  DatasetDocsCardsTagProps,
+  ServiceLinkTagProps,
+} from './components';
+export {
+  DiscoveryApiEndpoints,
+  DiscoveryDatasetDocsCards,
+  DiscoveryServiceLink,
+} from './components';

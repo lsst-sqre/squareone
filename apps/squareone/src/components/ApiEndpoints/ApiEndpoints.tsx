@@ -2,7 +2,7 @@ import type { ApiEndpointsResult } from '../../lib/apiEndpoints/types';
 import styles from './ApiEndpoints.module.css';
 import ApiEndpointsList, { type HeadingLevel } from './ApiEndpointsList';
 
-type ApiEndpointsProps = {
+export type ApiEndpointsProps = {
   /** Resolved outcome of fetching/transforming service discovery. */
   result: ApiEndpointsResult;
   /**

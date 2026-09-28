@@ -6,13 +6,13 @@ import {
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, within } from 'storybook/test';
 
-import { serviceDiscoveryToDatasetDocs } from '../../lib/datasetDocs/transform';
+import { serviceDiscoveryToDatasetSummaries } from '../../lib/apiEndpoints/transform';
 import DatasetDocsCards from './DatasetDocsCards';
 
 // Drive the stories from the same transform the page uses, so they exercise
 // the real discovery -> card shape with the curated dataset display names.
 // The Repertoire 3.0.0 mock's prompt dataset has no docs_url, as on data-dev.
-const discoveryDatasets = serviceDiscoveryToDatasetDocs(mockDiscovery);
+const discoveryDatasets = serviceDiscoveryToDatasetSummaries(mockDiscovery);
 
 // Every mock dataset that has a docs_url (all but prompt).
 const linkedDatasets = discoveryDatasets.filter(
@@ -21,7 +21,7 @@ const linkedDatasets = discoveryDatasets.filter(
 
 // Datasets with descriptions but no docs_url (as data-dev publishes the prompt
 // dataset), so every card renders unlinked.
-const unlinkedDatasets = serviceDiscoveryToDatasetDocs({
+const unlinkedDatasets = serviceDiscoveryToDatasetSummaries({
   ...getEmptyDiscovery(),
   datasets: {
     dp1: {

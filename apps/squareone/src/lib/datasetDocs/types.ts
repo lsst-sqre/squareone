@@ -1,22 +1,12 @@
+import type { DatasetSummary } from '../apiEndpoints/types';
+
 /**
- * A discovered dataset rendered as a documentation card on the `/docs` page.
+ * A discovered dataset rendered as a documentation card on the `/docs` page:
+ * the same {@link DatasetSummary} that heads the dataset's `/api-aspect`
+ * group, so both pages name and link a dataset identically. The card links to
+ * `docsUrl` when it has one and renders unlinked otherwise.
  */
-export type DatasetDoc = {
-  /** Raw dataset key (`dp1`, `dp02`, `prompt`, …); used as a stable React key. */
-  datasetKey: string;
-  /**
-   * Human-facing dataset name from the presentation map's
-   * `datasetDisplayNames`, falling back to the raw key when unmapped.
-   */
-  displayName: string;
-  /** The dataset's discovery `description`, or `null` when it has none. */
-  description: string | null;
-  /**
-   * The dataset's discovery `docs_url` the card links to, or `null` when it
-   * has none (the card then renders unlinked).
-   */
-  docsUrl: string | null;
-};
+export type DatasetDoc = DatasetSummary;
 
 /**
  * The outcome of resolving the dataset documentation cards for the page.
