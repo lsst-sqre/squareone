@@ -35,6 +35,26 @@ const groups: ApiEndpointGroup[] = [
   },
 ];
 
+// The same TAP service listed under two datasets, as discovery publishes it:
+// the generic label is shared, so only the dataset tells the rows apart.
+const tapGroups: ApiEndpointGroup[] = [
+  groups[0],
+  {
+    datasetKey: 'dp02',
+    displayName: 'Data Preview 0.2',
+    docsUrl: 'https://dp0-2.lsst.io',
+    description: null,
+    endpoints: [
+      {
+        label: 'Table Access Protocol (TAP)',
+        url: 'https://data.lsst.cloud/api/tap',
+        docs: null,
+        requiredScopes: ['read:tap'],
+      },
+    ],
+  },
+];
+
 /** The list item rendering the endpoint with the given label. */
 function getEndpointItem(label: string): HTMLElement {
   const item = screen.getByText(label).closest('li');
@@ -171,6 +191,18 @@ describe('ApiEndpointsList', () => {
     ).toHaveLength(2);
   });
 
+  test('names each copy button for its endpoint and dataset', () => {
+    render(<ApiEndpointsList groups={tapGroups} />);
+
+    const names = screen
+      .getAllByRole('button', { name: /table access protocol/i })
+      .map((button) => button.getAttribute('aria-label'));
+    expect(names).toEqual([
+      'Copy the Table Access Protocol (TAP) endpoint URL for Data Preview 1 to the clipboard',
+      'Copy the Table Access Protocol (TAP) endpoint URL for Data Preview 0.2 to the clipboard',
+    ]);
+  });
+
   test('renders an endpoint required scopes as pills', () => {
     render(<ApiEndpointsList groups={groups} />);
 
@@ -205,13 +237,25 @@ describe('ApiEndpointsList', () => {
     );
 
     const link = screen.getByRole('link', {
-      name: 'Create a token with these scopes for Simple Image Access (SIA v2)',
+      name: 'Create a token with these scopes for Simple Image Access (SIA v2) in Data Preview 1',
     });
     expect(link).toHaveTextContent('Create a token with these scopes');
     expect(link).toHaveAttribute(
       'href',
       '/settings/tokens/new?scopes=read%3Aimage%2Cread%3Atap'
     );
+  });
+
+  test('names each token link for its endpoint and dataset', () => {
+    render(<ApiEndpointsList groups={tapGroups} />);
+
+    const names = screen
+      .getAllByRole('link', { name: /^create a token/i })
+      .map((link) => link.getAttribute('aria-label'));
+    expect(names).toEqual([
+      'Create a token with these scopes for Table Access Protocol (TAP) in Data Preview 1',
+      'Create a token with these scopes for Table Access Protocol (TAP) in Data Preview 0.2',
+    ]);
   });
 
   test('renders a scope discovery repeats as one pill and one token link parameter', () => {
@@ -249,7 +293,7 @@ describe('ApiEndpointsList', () => {
     ).toEqual(['read:image', 'read:tap']);
     expect(
       screen.getByRole('link', {
-        name: 'Create a token with these scopes for Mystery service',
+        name: 'Create a token with these scopes for Mystery service in Data Preview 1',
       })
     ).toHaveAttribute(
       'href',

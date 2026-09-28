@@ -125,7 +125,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--sqo-space-xxs) var(--sqo-space-xs);
-  font-size: 0.875rem;
+  font-size: var(--rsd-font-size-1, 0.875rem);
 }
 
 .scopesLabel {

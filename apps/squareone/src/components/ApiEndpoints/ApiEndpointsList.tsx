@@ -41,7 +41,9 @@ type ApiEndpointsListProps = {
  * button. An endpoint whose service requires Gafaelfawr scopes lists them as
  * pills under its URL, with a "Create a token with these scopes" link to the
  * token creation form prefilled with them; an endpoint requiring none (every
- * endpoint under Repertoire 2.x) shows neither.
+ * endpoint under Repertoire 2.x) shows neither. The copy button's and token
+ * link's accessible names include the dataset display name, because endpoint
+ * labels repeat across datasets (TAP carries one generic label everywhere).
  */
 export default function ApiEndpointsList({
   groups,
@@ -111,7 +113,7 @@ export default function ApiEndpointsList({
                         text={endpoint.url}
                         label=""
                         successLabel=""
-                        ariaLabel={`Copy the ${endpoint.label} endpoint URL to the clipboard`}
+                        ariaLabel={`Copy the ${endpoint.label} endpoint URL for ${group.displayName} to the clipboard`}
                         size="sm"
                         appearance="text"
                         tone="secondary"
@@ -136,7 +138,7 @@ export default function ApiEndpointsList({
                           href={buildTokenTemplateUrl(NEW_TOKEN_PATH, {
                             scopes: endpoint.requiredScopes,
                           })}
-                          aria-label={`Create a token with these scopes for ${endpoint.label}`}
+                          aria-label={`Create a token with these scopes for ${endpoint.label} in ${group.displayName}`}
                         >
                           Create a token with these scopes
                         </Link>
