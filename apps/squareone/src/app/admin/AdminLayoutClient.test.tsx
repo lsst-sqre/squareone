@@ -3,16 +3,12 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 // AdminLayoutClient composes AdminRequired (login via useUserInfo, scope gate
 // via useLoginInfo) and the sidebar, so both login hooks are mocked.
-vi.mock('@lsst-sqre/gafaelfawr-client', () => ({
+vi.mock('../../hooks/useUserInfo', () => ({
   useUserInfo: vi.fn(),
 }));
 
 vi.mock('../../hooks/useLoginInfo', () => ({
   useLoginInfo: vi.fn(),
-}));
-
-vi.mock('../../hooks/useRepertoireUrl', () => ({
-  useRepertoireUrl: vi.fn(() => undefined),
 }));
 
 vi.mock('next/navigation', () => ({
@@ -30,12 +26,12 @@ import type {
   UseUserInfoReturn,
 } from '@lsst-sqre/gafaelfawr-client';
 // Import after mocking.
-import { useUserInfo } from '@lsst-sqre/gafaelfawr-client';
 import { useLoginInfo } from '../../hooks/useLoginInfo';
 import {
   type AppConfigContextValue,
   useStaticConfig,
 } from '../../hooks/useStaticConfig';
+import { useUserInfo } from '../../hooks/useUserInfo';
 import AdminLayoutClient from './AdminLayoutClient';
 
 const config = { siteName: 'Rubin Science Platform' } as AppConfigContextValue;

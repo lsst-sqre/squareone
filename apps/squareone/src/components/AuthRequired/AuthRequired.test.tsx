@@ -5,17 +5,13 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import AuthRequired from './AuthRequired';
 
 // Mock the hooks
-vi.mock('@lsst-sqre/gafaelfawr-client', () => ({
+vi.mock('../../hooks/useUserInfo', () => ({
   useUserInfo: vi.fn(),
-}));
-
-vi.mock('../../hooks/useRepertoireUrl', () => ({
-  useRepertoireUrl: vi.fn(() => undefined),
 }));
 
 import type { UseUserInfoReturn } from '@lsst-sqre/gafaelfawr-client';
 // Import after mocking
-import { useUserInfo } from '@lsst-sqre/gafaelfawr-client';
+import { useUserInfo } from '../../hooks/useUserInfo';
 
 // Helper to create mock return values
 function createMockUserInfoReturn(overrides: {

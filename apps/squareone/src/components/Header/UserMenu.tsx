@@ -2,17 +2,13 @@ import React from 'react';
 /* Menu for a user profile and settings. */
 
 import { useUnreadNotificationCount } from '@lsst-sqre/semaphore-client';
-import {
-  Badge,
-  getLogoutUrl,
-  PrimaryNavigation,
-  useGafaelfawrUser,
-} from '@lsst-sqre/squared';
+import { Badge, getLogoutUrl, PrimaryNavigation } from '@lsst-sqre/squared';
 import { ChevronDown } from 'lucide-react';
 import NextLink from 'next/link';
 import { useLoginInfo } from '../../hooks/useLoginInfo';
 import { useSemaphoreUrl } from '../../hooks/useSemaphoreUrl';
 import { useStaticConfig } from '../../hooks/useStaticConfig';
+import { useUserInfo } from '../../hooks/useUserInfo';
 import { hasAnyAdminAccess } from '../../lib/config/adminPageScopes';
 
 type UserMenuProps = {
@@ -20,7 +16,9 @@ type UserMenuProps = {
 };
 
 export default function UserMenu({ pageUrl }: UserMenuProps) {
-  const { user } = useGafaelfawrUser();
+  // The same user-info query Login reads, which the root layout hydrates, so
+  // the username is in the server HTML with no request of the menu's own.
+  const username = useUserInfo().userInfo?.username;
 
   // The scopes gate the Admin link. Sentry reporting of login-info failures is
   // not this menu's job: the app's useLoginInfo hook (src/hooks) is the
@@ -49,9 +47,9 @@ export default function UserMenu({ pageUrl }: UserMenuProps) {
   // gate's unauthorized state.
   const isAdmin = hasAnyAdminAccess(config, query?.scopes ?? []);
 
-  // User data should be available when this component is rendered
-  // since Login component handles the hydration logic
-  if (!user) {
+  // Login renders the menu only for a signed-in user, whose user info carries
+  // a username.
+  if (!username) {
     return null;
   }
 
@@ -72,7 +70,7 @@ export default function UserMenu({ pageUrl }: UserMenuProps) {
             {unreadCount}
           </Badge>
         )}{' '}
-        {user.username}
+        {username}
         {/* Decorative disclosure indicator; the trigger already names itself. */}
         <ChevronDown aria-hidden="true" />
       </PrimaryNavigation.Trigger>

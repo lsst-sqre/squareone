@@ -3,19 +3,10 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
-// useGafaelfawrUser comes from @lsst-sqre/squared. Mock it while keeping the
-// real PrimaryNavigation / Badge / getLogoutUrl exports so the menu still
-// renders.
-vi.mock('@lsst-sqre/squared', async () => {
-  const actual =
-    await vi.importActual<typeof import('@lsst-sqre/squared')>(
-      '@lsst-sqre/squared'
-    );
-  return {
-    ...actual,
-    useGafaelfawrUser: vi.fn(),
-  };
-});
+// useUserInfo provides the username on the menu trigger.
+vi.mock('../../hooks/useUserInfo', () => ({
+  useUserInfo: vi.fn(),
+}));
 
 // useLoginInfo provides the scopes that gate the Admin link.
 vi.mock('../../hooks/useLoginInfo', () => ({
@@ -40,24 +31,30 @@ vi.mock('../../hooks/useStaticConfig', () => ({
 }));
 
 // Import after mocking
-import type { UseLoginInfoReturn } from '@lsst-sqre/gafaelfawr-client';
+import {
+  mockUserInfo,
+  type UseLoginInfoReturn,
+} from '@lsst-sqre/gafaelfawr-client';
 import { useUnreadNotificationCount } from '@lsst-sqre/semaphore-client';
-import { PrimaryNavigation, useGafaelfawrUser } from '@lsst-sqre/squared';
+import { PrimaryNavigation } from '@lsst-sqre/squared';
 import { useLoginInfo } from '../../hooks/useLoginInfo';
 import { useSemaphoreUrl } from '../../hooks/useSemaphoreUrl';
 import { useStaticConfig } from '../../hooks/useStaticConfig';
+import { useUserInfo } from '../../hooks/useUserInfo';
 import type { StaticConfig } from '../../lib/config/resolveConfigDefaults';
 import UserMenu from './UserMenu';
 
-// Helper: a logged-in useGafaelfawrUser return.
+// Helper: a logged-in useUserInfo return.
 function mockUser(username = 'testuser') {
-  vi.mocked(useGafaelfawrUser).mockReturnValue({
-    user: { username },
-    isLoading: false,
-    isValidating: false,
+  vi.mocked(useUserInfo).mockReturnValue({
+    userInfo: { ...mockUserInfo, username },
+    query: null,
     isLoggedIn: true,
-    error: undefined,
-  } as ReturnType<typeof useGafaelfawrUser>);
+    isLoading: false,
+    isPending: false,
+    error: null,
+    refetch: vi.fn(),
+  });
 }
 
 // Helper: a useLoginInfo return whose query reports the given scopes.

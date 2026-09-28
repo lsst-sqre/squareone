@@ -16,16 +16,12 @@ vi.mock('./NewOIDCClientPageClient', () => ({
 
 // The gate composes AuthRequired (useUserInfo) with the page scope check
 // (useLoginInfo) against the `adminPageScopes` config.
-vi.mock('@lsst-sqre/gafaelfawr-client', () => ({
+vi.mock('../../../../hooks/useUserInfo', () => ({
   useUserInfo: vi.fn(),
 }));
 
 vi.mock('../../../../hooks/useLoginInfo', () => ({
   useLoginInfo: vi.fn(),
-}));
-
-vi.mock('../../../../hooks/useRepertoireUrl', () => ({
-  useRepertoireUrl: vi.fn(() => undefined),
 }));
 
 vi.mock('../../../../hooks/useStaticConfig', () => ({
@@ -37,12 +33,12 @@ import type {
   UseUserInfoReturn,
 } from '@lsst-sqre/gafaelfawr-client';
 // Import after mocking.
-import { useUserInfo } from '@lsst-sqre/gafaelfawr-client';
 import { useLoginInfo } from '../../../../hooks/useLoginInfo';
 import {
   type AppConfigContextValue,
   useStaticConfig,
 } from '../../../../hooks/useStaticConfig';
+import { useUserInfo } from '../../../../hooks/useUserInfo';
 import type { StaticConfig } from '../../../../lib/config/resolveConfigDefaults';
 import { getStaticConfig } from '../../../../lib/config/rsc';
 import NewOIDCClientPage, { generateMetadata } from './page';
