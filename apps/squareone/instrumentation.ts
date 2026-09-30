@@ -6,6 +6,18 @@ import * as Sentry from '@sentry/nextjs';
 
 export async function register() {
   if (process.env.NEXT_RUNTIME === 'nodejs') {
+    // Work around vercel/next.js#97757 (Next 16.3 warns
+    // MaxListenersExceededWarning on every Sentry tunnel request) by raising
+    // the listener limit on tunnel responses only. Installed first, before
+    // Sentry and before the server takes requests, so the diagnostics channel
+    // subscription sees every tunnel request. See the module for the removal
+    // condition.
+    const { installTunnelResponseListenerLimit } = await import(
+      './src/lib/server/tunnelResponseListeners'
+    );
+    const { SENTRY_TUNNEL_ROUTE } = await import('./sentry.tunnel.config');
+    installTunnelResponseListenerLimit({ tunnelRoute: SENTRY_TUNNEL_ROUTE });
+
     // Resolve the Sentry environment the same way as the browser's injected
     // config (config, then Repertoire discovery, then the fallback) before
     // Sentry starts, so server and browser events agree. The discovery fetch
