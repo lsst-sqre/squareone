@@ -8,13 +8,9 @@ vi.mock('../../lib/config/rsc', () => ({
 }));
 
 // The index page resolves its redirect target from the user's Gafaelfawr
-// scopes, so mock login info (and the Repertoire URL it is fetched from).
-vi.mock('@lsst-sqre/gafaelfawr-client', () => ({
+// scopes, so mock login info.
+vi.mock('../../hooks/useLoginInfo', () => ({
   useLoginInfo: vi.fn(),
-}));
-
-vi.mock('../../hooks/useRepertoireUrl', () => ({
-  useRepertoireUrl: vi.fn(() => undefined),
 }));
 
 const replace = vi.fn();
@@ -24,7 +20,7 @@ vi.mock('next/navigation', () => ({
 
 import type { UseLoginInfoReturn } from '@lsst-sqre/gafaelfawr-client';
 // Import after mocking.
-import { useLoginInfo } from '@lsst-sqre/gafaelfawr-client';
+import { useLoginInfo } from '../../hooks/useLoginInfo';
 import type { StaticConfig } from '../../lib/config/resolveConfigDefaults';
 import { getStaticConfig } from '../../lib/config/rsc';
 import AdminPage, { generateMetadata } from './page';

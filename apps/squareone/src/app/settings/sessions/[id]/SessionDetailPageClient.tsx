@@ -1,12 +1,11 @@
 'use client';
 
-import { useLoginInfo } from '@lsst-sqre/gafaelfawr-client';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import AuthRequired from '../../../../components/AuthRequired';
 import TokenDetailsView from '../../../../components/TokenDetails';
-import { useRepertoireUrl } from '../../../../hooks/useRepertoireUrl';
+import { useLoginInfo } from '../../../../hooks/useLoginInfo';
 
 type SessionDetailPageClientProps = {
   tokenKey: string;
@@ -28,12 +27,11 @@ type SessionDetailContentProps = {
 
 function SessionDetailContent({ tokenKey }: SessionDetailContentProps) {
   const router = useRouter();
-  const repertoireUrl = useRepertoireUrl();
   const {
     loginInfo,
     error: loginError,
     isLoading: loginLoading,
-  } = useLoginInfo(repertoireUrl);
+  } = useLoginInfo();
 
   // Handle invalid token ID
   if (!tokenKey) {

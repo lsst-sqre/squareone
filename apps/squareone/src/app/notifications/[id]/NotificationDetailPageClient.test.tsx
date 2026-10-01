@@ -1,9 +1,9 @@
-import { useLoginInfo } from '@lsst-sqre/gafaelfawr-client';
 import * as semaphoreClient from '@lsst-sqre/semaphore-client';
 import { render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { useLoginInfo } from '../../../hooks/useLoginInfo';
 import * as useSemaphoreUrlModule from '../../../hooks/useSemaphoreUrl';
 import NotificationDetailPageClient from './NotificationDetailPageClient';
 
@@ -16,7 +16,7 @@ vi.mock('@lsst-sqre/semaphore-client', async (importOriginal) => {
     useMarkNotificationsRead: vi.fn(),
   };
 });
-vi.mock('@lsst-sqre/gafaelfawr-client', () => ({
+vi.mock('../../../hooks/useLoginInfo', () => ({
   useLoginInfo: vi.fn(),
 }));
 vi.mock('../../../hooks/useSemaphoreUrl');

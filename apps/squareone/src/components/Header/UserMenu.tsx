@@ -1,21 +1,14 @@
 import React from 'react';
 /* Menu for a user profile and settings. */
 
-import { useLoginInfo } from '@lsst-sqre/gafaelfawr-client';
 import { useUnreadNotificationCount } from '@lsst-sqre/semaphore-client';
-import {
-  Badge,
-  getLogoutUrl,
-  PrimaryNavigation,
-  useGafaelfawrUser,
-} from '@lsst-sqre/squared';
+import { Badge, getLogoutUrl, PrimaryNavigation } from '@lsst-sqre/squared';
 import { ChevronDown } from 'lucide-react';
 import NextLink from 'next/link';
-import { useMemo } from 'react';
-import { makeReportError } from '@/lib/sentry/reportError';
-import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
+import { useLoginInfo } from '../../hooks/useLoginInfo';
 import { useSemaphoreUrl } from '../../hooks/useSemaphoreUrl';
 import { useStaticConfig } from '../../hooks/useStaticConfig';
+import { useUserInfo } from '../../hooks/useUserInfo';
 import { hasAnyAdminAccess } from '../../lib/config/adminPageScopes';
 
 type UserMenuProps = {
@@ -23,20 +16,14 @@ type UserMenuProps = {
 };
 
 export default function UserMenu({ pageUrl }: UserMenuProps) {
-  const { user } = useGafaelfawrUser();
-  const repertoireUrl = useRepertoireUrl();
+  // The same user-info query Login reads, which the root layout hydrates, so
+  // the username is in the server HTML with no request of the menu's own.
+  const username = useUserInfo().userInfo?.username;
 
-  // Inject the app's Sentry-backed reporter so report-worthy login-info failures
-  // (ZodError contract drift, 5xx, server-side network errors) reach Sentry —
-  // making a silently-null `csrfToken` from a non-auth failure operator-visible.
-  // Auth 401/403 stay quiet (null login info unchanged). This menu mounts for
-  // every logged-in page view, so it is the app-wide chokepoint for the
-  // login-info query.
-  const reportError = useMemo(() => makeReportError({ isServer: false }), []);
-  const { query } = useLoginInfo(repertoireUrl, {
-    reportError,
-    context: { site: 'login-info', package: 'gafaelfawr-client' },
-  });
+  // The scopes gate the Admin link. Sentry reporting of login-info failures is
+  // not this menu's job: the app's useLoginInfo hook (src/hooks) is the
+  // chokepoint, attaching the reporter to every observer of the shared query.
+  const { query } = useLoginInfo();
   const logoutUrl = getLogoutUrl(pageUrl.toString());
 
   const config = useStaticConfig();
@@ -60,9 +47,9 @@ export default function UserMenu({ pageUrl }: UserMenuProps) {
   // gate's unauthorized state.
   const isAdmin = hasAnyAdminAccess(config, query?.scopes ?? []);
 
-  // User data should be available when this component is rendered
-  // since Login component handles the hydration logic
-  if (!user) {
+  // Login renders the menu only for a signed-in user, whose user info carries
+  // a username.
+  if (!username) {
     return null;
   }
 
@@ -83,7 +70,7 @@ export default function UserMenu({ pageUrl }: UserMenuProps) {
             {unreadCount}
           </Badge>
         )}{' '}
-        {user.username}
+        {username}
         {/* Decorative disclosure indicator; the trigger already names itself. */}
         <ChevronDown aria-hidden="true" />
       </PrimaryNavigation.Trigger>

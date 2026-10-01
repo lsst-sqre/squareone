@@ -1,10 +1,8 @@
 'use client';
 
-import { useUserInfo } from '@lsst-sqre/gafaelfawr-client';
-
 import AuthRequired from '../../../../components/AuthRequired';
 import { TokenHistoryView } from '../../../../components/TokenHistory';
-import { useRepertoireUrl } from '../../../../hooks/useRepertoireUrl';
+import { useUserInfo } from '../../../../hooks/useUserInfo';
 
 export default function TokenHistoryPageClient() {
   return (
@@ -15,8 +13,7 @@ export default function TokenHistoryPageClient() {
 }
 
 function TokenHistoryContent() {
-  const repertoireUrl = useRepertoireUrl();
-  const { userInfo } = useUserInfo(repertoireUrl);
+  const { userInfo } = useUserInfo();
 
   return (
     <>

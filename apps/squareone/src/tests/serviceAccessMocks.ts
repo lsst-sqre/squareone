@@ -10,16 +10,14 @@
  *   ...(await importOriginal<typeof import('@lsst-sqre/repertoire-client')>()),
  *   useServiceDiscovery: vi.fn(),
  * }));
- * vi.mock('@lsst-sqre/gafaelfawr-client', () => ({ useLoginInfo: vi.fn() }));
+ * // The app's login-info hook, src/hooks/useLoginInfo, relative to the test.
+ * vi.mock('../../hooks/useLoginInfo', () => ({ useLoginInfo: vi.fn() }));
  * ```
  *
  * Test-support only: nothing in the app bundle imports this module.
  */
 
-import {
-  type UseLoginInfoReturn,
-  useLoginInfo,
-} from '@lsst-sqre/gafaelfawr-client';
+import type { UseLoginInfoReturn } from '@lsst-sqre/gafaelfawr-client';
 import {
   createDiscoveryQuery,
   mockDiscovery,
@@ -27,6 +25,8 @@ import {
   useServiceDiscovery,
 } from '@lsst-sqre/repertoire-client';
 import { vi } from 'vitest';
+
+import { useLoginInfo } from '../hooks/useLoginInfo';
 
 /** mockDiscovery as a Repertoire 2.x environment publishes it: no scopes. */
 export const discoveryWithoutRequiredScopes: ServiceDiscovery = {

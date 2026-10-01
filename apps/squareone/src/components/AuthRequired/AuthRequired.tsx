@@ -1,9 +1,8 @@
 'use client';
 
-import { useUserInfo } from '@lsst-sqre/gafaelfawr-client';
 import React, { type ReactNode } from 'react';
 
-import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
+import { useUserInfo } from '../../hooks/useUserInfo';
 import { getLoginUrl } from '../../lib/utils/url';
 
 import styles from './AuthRequired.module.css';
@@ -48,8 +47,7 @@ export default function AuthRequired({
   children,
   loadingFallback,
 }: AuthRequiredProps) {
-  const repertoireUrl = useRepertoireUrl();
-  const { isLoggedIn, isLoading } = useUserInfo(repertoireUrl);
+  const { isLoggedIn, isLoading } = useUserInfo();
 
   // Redirect to login if not authenticated (after loading completes)
   if (!isLoading && !isLoggedIn) {

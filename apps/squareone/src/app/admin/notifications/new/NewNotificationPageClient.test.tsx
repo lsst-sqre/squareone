@@ -1,9 +1,10 @@
-import { type LoginInfo, useLoginInfo } from '@lsst-sqre/gafaelfawr-client';
+import type { LoginInfo } from '@lsst-sqre/gafaelfawr-client';
 import { useCreateAdminNotification } from '@lsst-sqre/semaphore-client';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
+import { useLoginInfo } from '../../../../hooks/useLoginInfo';
 import { useSemaphoreUrl } from '../../../../hooks/useSemaphoreUrl';
 import {
   type AppConfigContextValue,
@@ -21,7 +22,7 @@ function mockConfig(adminPageScopes?: AdminPageScopes) {
   } as AppConfigContextValue);
 }
 
-vi.mock('@lsst-sqre/gafaelfawr-client', () => ({
+vi.mock('../../../../hooks/useLoginInfo', () => ({
   useLoginInfo: vi.fn(),
 }));
 

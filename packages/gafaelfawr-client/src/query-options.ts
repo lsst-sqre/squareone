@@ -15,6 +15,7 @@ import {
 import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query';
 
 import {
+  type AuthRequestInit,
   DEFAULT_GAFAELFAWR_URL,
   fetchLoginInfo,
   fetchOidcClient,
@@ -52,9 +53,43 @@ export type AuthQueryConfig = {
   /**
    * Runtime override forwarded to the error classifier: controls whether
    * network-level failures are report-worthy. Defaults to auto-detection.
+   *
+   * `true` also makes the user-info / login-info fetch `cache: 'no-store'`
+   * (see {@link AuthQueryConfig.headers}).
    */
   isServer?: boolean;
+  /**
+   * Extra request headers for the user-info / login-info fetch. Server-side,
+   * pass the incoming request's `cookie` header: Gafaelfawr's session is a
+   * cookie, and `credentials: 'include'` sends nothing outside a browser.
+   *
+   * Whenever headers are forwarded, or `isServer` is `true`, the fetch is
+   * `cache: 'no-store'` so a cookie-bearing response is never cached by Next's
+   * fetch layer. Omit both in the browser, where the request is unchanged.
+   * The OpenID Connect client queries ignore this option.
+   */
+  headers?: HeadersInit;
 };
+
+/**
+ * Fetch options for the ambient auth queries, from their config.
+ *
+ * `undefined` in the browser (no forwarded headers, not `isServer`), so the
+ * request stays exactly `{ credentials: 'include' }`. A server-side call, or
+ * one forwarding headers, may carry a user's session cookie, so it is never
+ * cached.
+ */
+function authRequestInit(
+  options: AuthQueryConfig | undefined
+): AuthRequestInit | undefined {
+  const { headers, isServer } = options ?? {};
+  if (headers === undefined && isServer !== true) {
+    return undefined;
+  }
+  return headers === undefined
+    ? { cache: 'no-store' }
+    : { headers, cache: 'no-store' };
+}
 
 // =============================================================================
 // User Info Query
@@ -66,6 +101,8 @@ export type AuthQueryConfig = {
  * Returns empty user info on error (graceful degradation for auth checks).
  *
  * @param baseUrl - Gafaelfawr API base URL
+ * @param options - Logging / error-reporting configuration, plus the forwarded
+ *   `headers` of a server-side prefetch
  */
 export const userInfoQueryOptions = (
   baseUrl: string = DEFAULT_GAFAELFAWR_URL,
@@ -73,6 +110,7 @@ export const userInfoQueryOptions = (
 ) => {
   const logger = options?.logger ?? defaultLogger;
   const { reportError, context, isServer } = options ?? {};
+  const init = authRequestInit(options);
 
   return queryOptions<UserInfo>({
     queryKey: gafaelfawrKeys.userInfo(),
@@ -83,7 +121,7 @@ export const userInfoQueryOptions = (
     // contract drift, 5xx, server-side network errors). This makes an API
     // outage distinguishable from a genuine not-logged-in state.
     queryFn: reportingQueryFn<UserInfo>({
-      fetchFn: () => fetchUserInfo(baseUrl),
+      fetchFn: () => fetchUserInfo(baseUrl, init),
       fallback: getEmptyUserInfo(),
       logger,
       reportError,
@@ -105,6 +143,8 @@ export const userInfoQueryOptions = (
  * Query options for fetching login info (CSRF token and scopes).
  *
  * @param baseUrl - Gafaelfawr API base URL
+ * @param options - Logging / error-reporting configuration, plus the forwarded
+ *   `headers` of a server-side prefetch
  */
 export const loginInfoQueryOptions = (
   baseUrl: string = DEFAULT_GAFAELFAWR_URL,
@@ -112,6 +152,7 @@ export const loginInfoQueryOptions = (
 ) => {
   const logger = options?.logger ?? defaultLogger;
   const { reportError, context, isServer } = options ?? {};
+  const init = authRequestInit(options);
 
   return queryOptions<LoginInfo | null>({
     queryKey: gafaelfawrKeys.loginInfo(),
@@ -121,7 +162,7 @@ export const loginInfoQueryOptions = (
     // 5xx, server-side network errors). A silently-null `csrfToken` from a
     // non-auth failure is thus now operator-visible in Sentry.
     queryFn: reportingQueryFn<LoginInfo | null>({
-      fetchFn: () => fetchLoginInfo(baseUrl),
+      fetchFn: () => fetchLoginInfo(baseUrl, init),
       fallback: null,
       logger,
       reportError,

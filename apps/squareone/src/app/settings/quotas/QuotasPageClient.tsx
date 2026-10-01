@@ -1,6 +1,5 @@
 'use client';
 
-import { useUserInfo } from '@lsst-sqre/gafaelfawr-client';
 import {
   createDiscoveryQuery,
   useServiceDiscovery,
@@ -12,6 +11,7 @@ import QuotasView from '../../../components/QuotasView';
 import { Lede } from '../../../components/Typography';
 import { useRepertoireUrl } from '../../../hooks/useRepertoireUrl';
 import { useStaticConfig } from '../../../hooks/useStaticConfig';
+import { useUserInfo } from '../../../hooks/useUserInfo';
 import { getDocsUrl } from '../../../lib/utils/docsUrls';
 
 export default function QuotasPageClient() {
@@ -24,7 +24,7 @@ export default function QuotasPageClient() {
 
 function QuotasContent() {
   const repertoireUrl = useRepertoireUrl();
-  const { userInfo } = useUserInfo(repertoireUrl);
+  const { userInfo } = useUserInfo();
   // Discovery labels the rate limits by service. Without it (no repertoireUrl,
   // or a failed fetch, which resolves to the empty discovery) the raw quota
   // labels are shown.

@@ -87,6 +87,7 @@ export type {
 // Client Functions
 // =============================================================================
 
+export type { AuthRequestInit } from './client';
 export {
   createOidcClient,
   createServiceToken,

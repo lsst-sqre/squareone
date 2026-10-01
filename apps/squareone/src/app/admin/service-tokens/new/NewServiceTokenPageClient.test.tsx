@@ -1,13 +1,13 @@
 import {
   type LoginInfo,
   useCreateServiceToken,
-  useLoginInfo,
 } from '@lsst-sqre/gafaelfawr-client';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
+import { useLoginInfo } from '../../../../hooks/useLoginInfo';
 import {
   type AppConfigContextValue,
   useStaticConfig,
@@ -29,10 +29,13 @@ vi.mock('@lsst-sqre/gafaelfawr-client', async (importOriginal) => {
     await importOriginal<typeof import('@lsst-sqre/gafaelfawr-client')>();
   return {
     ...actual,
-    useLoginInfo: vi.fn(),
     useCreateServiceToken: vi.fn(),
   };
 });
+
+vi.mock('../../../../hooks/useLoginInfo', () => ({
+  useLoginInfo: vi.fn(),
+}));
 
 vi.mock('../../../../hooks/useRepertoireUrl', () => ({
   useRepertoireUrl: (): string | undefined => undefined,

@@ -1,13 +1,12 @@
 'use client';
 
-import { useUserInfo } from '@lsst-sqre/gafaelfawr-client';
 import { Button } from '@lsst-sqre/squared';
 import Link from 'next/link';
 
 import AccessTokensView from '../../../components/AccessTokensView';
 import AuthRequired from '../../../components/AuthRequired';
 import { Lede } from '../../../components/Typography';
-import { useRepertoireUrl } from '../../../hooks/useRepertoireUrl';
+import { useUserInfo } from '../../../hooks/useUserInfo';
 
 export default function TokensPageClient() {
   return (
@@ -18,8 +17,7 @@ export default function TokensPageClient() {
 }
 
 function TokensContent() {
-  const repertoireUrl = useRepertoireUrl();
-  const { userInfo } = useUserInfo(repertoireUrl);
+  const { userInfo } = useUserInfo();
 
   return (
     <>

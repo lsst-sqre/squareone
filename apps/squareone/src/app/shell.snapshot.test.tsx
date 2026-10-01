@@ -64,35 +64,36 @@ vi.mock('@lsst-sqre/semaphore-client', async (importOriginal) => ({
   useUnreadNotificationCount: vi.fn(),
 }));
 
-vi.mock('@lsst-sqre/gafaelfawr-client', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@lsst-sqre/gafaelfawr-client')>()),
+vi.mock('../hooks/useUserInfo', () => ({
   useUserInfo: vi.fn(),
+}));
+
+vi.mock('../hooks/useLoginInfo', () => ({
   useLoginInfo: vi.fn(),
 }));
 
-vi.mock('@lsst-sqre/squared', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@lsst-sqre/squared')>()),
-  useGafaelfawrUser: vi.fn(),
-}));
-
 // Imports after mocks.
-import type {
-  UseLoginInfoReturn,
-  UseUserInfoReturn,
+import {
+  getEmptyUserInfo,
+  mockUserInfo,
+  type UseLoginInfoReturn,
+  type UserInfo,
+  type UseUserInfoReturn,
 } from '@lsst-sqre/gafaelfawr-client';
-import { useLoginInfo, useUserInfo } from '@lsst-sqre/gafaelfawr-client';
 import { useServiceDiscovery } from '@lsst-sqre/repertoire-client';
 import type { Broadcast } from '@lsst-sqre/semaphore-client';
 import {
   useBroadcasts,
   useUnreadNotificationCount,
 } from '@lsst-sqre/semaphore-client';
-import { PrimaryNavigation, useGafaelfawrUser } from '@lsst-sqre/squared';
+import { PrimaryNavigation } from '@lsst-sqre/squared';
 
 import BroadcastBannerStack from '../components/BroadcastBannerStack';
 import Header from '../components/Header';
 import UserMenu from '../components/Header/UserMenu';
+import { useLoginInfo } from '../hooks/useLoginInfo';
 import { useStaticConfig } from '../hooks/useStaticConfig';
+import { useUserInfo } from '../hooks/useUserInfo';
 import type { StaticConfig } from '../lib/config/resolveConfigDefaults';
 import FooterRsc from './FooterRsc';
 
@@ -143,11 +144,16 @@ function makeDiscoveryReturn() {
   } as unknown as ReturnType<typeof useServiceDiscovery>;
 }
 
-function loggedOutUserInfo(): UseUserInfoReturn {
+/**
+ * The user-info hook's settled result for `userInfo`, as it reads the entry the
+ * root layout hydrates: a signed-in user's info, or empty user info for an
+ * anonymous visitor.
+ */
+function hydratedUserInfo(userInfo: UserInfo): UseUserInfoReturn {
   return {
-    userInfo: undefined,
+    userInfo,
     query: null,
-    isLoggedIn: false,
+    isLoggedIn: !!userInfo.username,
     isLoading: false,
     isPending: false,
     error: null,
@@ -192,21 +198,38 @@ describe('shell render determinism', () => {
     vi.clearAllMocks();
     vi.mocked(useStaticConfig).mockReturnValue(makeConfig());
     vi.mocked(useServiceDiscovery).mockReturnValue(makeDiscoveryReturn());
-    vi.mocked(useUserInfo).mockReturnValue(loggedOutUserInfo());
+    vi.mocked(useUserInfo).mockReturnValue(
+      hydratedUserInfo(getEmptyUserInfo())
+    );
     vi.mocked(useLoginInfo).mockReturnValue(loggedOutLoginInfo());
     vi.mocked(useBroadcasts).mockReturnValue(emptyBroadcasts());
     vi.mocked(useUnreadNotificationCount).mockReturnValue(noUnreadCount());
   });
 
-  test('Header renders identical markup across renders', () => {
+  test('Header renders identical markup across renders for an anonymous visitor', () => {
     const first = renderToStaticMarkup(<Header />);
     const second = renderToStaticMarkup(<Header />);
 
     expect(first).toBe(second);
-    // Sanity-check the shell actually rendered its logged-out chain (Login
-    // renders the "Log in" CTA on the server, before hasMounted swaps in the
-    // user menu) rather than an empty string that would compare trivially.
+    // Sanity-check the shell actually rendered its logged-out chain (the
+    // "Log in" link, with no user menu) rather than an empty string that would
+    // compare trivially.
     expect(first).toContain('Log in');
+    expect(first).not.toContain(mockUserInfo.username);
+    expect(first).toContain('Notebooks');
+  });
+
+  test('Header renders identical markup across renders for a signed-in user', () => {
+    vi.mocked(useUserInfo).mockReturnValue(hydratedUserInfo(mockUserInfo));
+
+    const first = renderToStaticMarkup(<Header />);
+    const second = renderToStaticMarkup(<Header />);
+
+    expect(first).toBe(second);
+    // With user info hydrated, the server render already has the user's menu
+    // in place of the "Log in" link.
+    expect(first).toContain(mockUserInfo.username);
+    expect(first).not.toContain('Log in');
     expect(first).toContain('Notebooks');
   });
 
@@ -255,13 +278,7 @@ describe('shell render determinism', () => {
   });
 
   test('UserMenu renders identical markup across renders', () => {
-    vi.mocked(useGafaelfawrUser).mockReturnValue({
-      user: { username: 'testuser' },
-      isLoading: false,
-      isValidating: false,
-      isLoggedIn: true,
-      error: undefined,
-    } as ReturnType<typeof useGafaelfawrUser>);
+    vi.mocked(useUserInfo).mockReturnValue(hydratedUserInfo(mockUserInfo));
     vi.mocked(useLoginInfo).mockReturnValue({
       loginInfo: null,
       query: {
@@ -288,6 +305,6 @@ describe('shell render determinism', () => {
     const second = renderToStaticMarkup(ui);
 
     expect(first).toBe(second);
-    expect(first).toContain('testuser');
+    expect(first).toContain(mockUserInfo.username);
   });
 });

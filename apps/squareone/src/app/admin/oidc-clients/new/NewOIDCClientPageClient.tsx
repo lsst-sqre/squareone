@@ -1,10 +1,7 @@
 'use client';
 
 import type { OIDCClientWithSecret } from '@lsst-sqre/gafaelfawr-client';
-import {
-  useCreateOidcClient,
-  useLoginInfo,
-} from '@lsst-sqre/gafaelfawr-client';
+import { useCreateOidcClient } from '@lsst-sqre/gafaelfawr-client';
 import { Note } from '@lsst-sqre/squared';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
@@ -15,6 +12,7 @@ import OIDCClientForm, {
 } from '../../../../components/OIDCClientForm';
 import ScopeList from '../../../../components/ScopeList';
 import { Lede } from '../../../../components/Typography';
+import { useLoginInfo } from '../../../../hooks/useLoginInfo';
 import { useRepertoireUrl } from '../../../../hooks/useRepertoireUrl';
 import { useStaticConfig } from '../../../../hooks/useStaticConfig';
 import {
@@ -62,7 +60,7 @@ export default function NewOIDCClientPageClient() {
     loginInfo,
     error: loginError,
     isLoading: loginLoading,
-  } = useLoginInfo(repertoireUrl);
+  } = useLoginInfo();
 
   const { createOidcClient, isCreating } = useCreateOidcClient(repertoireUrl);
 

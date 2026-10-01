@@ -1,9 +1,8 @@
 'use client';
 
-import { useLoginInfo } from '@lsst-sqre/gafaelfawr-client';
 import React, { type ReactNode } from 'react';
+import { useLoginInfo } from '../../hooks/useLoginInfo';
 
-import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
 import { useStaticConfig } from '../../hooks/useStaticConfig';
 import {
   type AdminPageId,
@@ -101,8 +100,7 @@ function AdminScopeGate({
   loadingFallback,
 }: AdminScopeGateProps) {
   const config = useStaticConfig();
-  const repertoireUrl = useRepertoireUrl();
-  const { query, isLoading } = useLoginInfo(repertoireUrl);
+  const { query, isLoading } = useLoginInfo();
 
   // Wait for login info before deciding, so authorized users never flash the
   // unauthorized state.

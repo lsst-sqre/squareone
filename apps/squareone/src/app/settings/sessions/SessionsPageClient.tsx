@@ -1,6 +1,5 @@
 'use client';
 
-import { useUserInfo } from '@lsst-sqre/gafaelfawr-client';
 import { Button, Tabs } from '@lsst-sqre/squared';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -9,6 +8,7 @@ import AuthRequired from '../../../components/AuthRequired';
 import SessionTokensView from '../../../components/SessionTokensView';
 import { Lede } from '../../../components/Typography';
 import { useRepertoireUrl } from '../../../hooks/useRepertoireUrl';
+import { useUserInfo } from '../../../hooks/useUserInfo';
 
 export default function SessionsPageClient() {
   return (
@@ -22,7 +22,7 @@ function SessionsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const repertoireUrl = useRepertoireUrl();
-  const { userInfo } = useUserInfo(repertoireUrl);
+  const { userInfo } = useUserInfo();
 
   // Get active tab from URL query parameter, default to 'web'
   const activeTab = searchParams.get('type') || 'web';

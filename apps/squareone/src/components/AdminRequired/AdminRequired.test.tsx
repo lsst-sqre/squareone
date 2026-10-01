@@ -7,13 +7,12 @@ import AdminRequired from './AdminRequired';
 // Mock the gafaelfawr hooks. AdminRequired composes AuthRequired (which checks
 // login via useUserInfo) and additionally gates on the configured admin scopes
 // via useLoginInfo.
-vi.mock('@lsst-sqre/gafaelfawr-client', () => ({
+vi.mock('../../hooks/useUserInfo', () => ({
   useUserInfo: vi.fn(),
-  useLoginInfo: vi.fn(),
 }));
 
-vi.mock('../../hooks/useRepertoireUrl', () => ({
-  useRepertoireUrl: vi.fn(() => undefined),
+vi.mock('../../hooks/useLoginInfo', () => ({
+  useLoginInfo: vi.fn(),
 }));
 
 // The scopes the gate checks come from `adminPageScopes` in the app config.
@@ -26,11 +25,12 @@ import type {
   UseUserInfoReturn,
 } from '@lsst-sqre/gafaelfawr-client';
 // Import after mocking
-import { useLoginInfo, useUserInfo } from '@lsst-sqre/gafaelfawr-client';
+import { useLoginInfo } from '../../hooks/useLoginInfo';
 import {
   type AppConfigContextValue,
   useStaticConfig,
 } from '../../hooks/useStaticConfig';
+import { useUserInfo } from '../../hooks/useUserInfo';
 import type { AdminPageScopes } from '../../lib/config/adminPageScopes';
 
 // Helper: an authenticated useUserInfo return (so AuthRequired renders through
