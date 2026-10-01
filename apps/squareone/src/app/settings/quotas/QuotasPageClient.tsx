@@ -1,6 +1,11 @@
 'use client';
 
 import { useUserInfo } from '@lsst-sqre/gafaelfawr-client';
+import {
+  createDiscoveryQuery,
+  useServiceDiscovery,
+} from '@lsst-sqre/repertoire-client';
+import { useMemo } from 'react';
 
 import AuthRequired from '../../../components/AuthRequired';
 import QuotasView from '../../../components/QuotasView';
@@ -20,6 +25,24 @@ export default function QuotasPageClient() {
 function QuotasContent() {
   const repertoireUrl = useRepertoireUrl();
   const { userInfo } = useUserInfo(repertoireUrl);
+  // Discovery labels the rate limits by service. Without it (no repertoireUrl,
+  // or a failed fetch, which resolves to the empty discovery) the raw quota
+  // labels are shown.
+  const { discovery, isPending } = useServiceDiscovery(repertoireUrl ?? '');
+  // Keyed on the discovery data, which is stable across renders; the hook
+  // recreates its query wrapper on every render.
+  const quotaLabelIndex = useMemo(
+    () =>
+      discovery
+        ? createDiscoveryQuery(discovery).getQuotaLabelIndex()
+        : undefined,
+    [discovery]
+  );
+  // With discovery configured, hold the quotas until it arrives so the rate
+  // limits first render labelled, not as raw quota labels that then re-label,
+  // re-sort, and drop internal rows. Without a repertoireUrl the disabled
+  // query stays pending, so there is nothing to wait for.
+  const isDiscoveryPending = !!repertoireUrl && isPending;
   const { docsBaseUrl } = useStaticConfig();
   const quotasDocsUrl = getDocsUrl(docsBaseUrl, '/guides/life/quotas.html');
 
@@ -33,9 +56,14 @@ function QuotasContent() {
         documentation.
       </Lede>
       {userInfo?.quota ? (
-        <div style={{ marginTop: 'var(--sqo-space-lg-fixed)' }}>
-          <QuotasView quota={userInfo.quota} />
-        </div>
+        !isDiscoveryPending && (
+          <div style={{ marginTop: 'var(--sqo-space-lg-fixed)' }}>
+            <QuotasView
+              quota={userInfo.quota}
+              quotaLabelIndex={quotaLabelIndex}
+            />
+          </div>
+        )
       ) : (
         <p>Not configured</p>
       )}
