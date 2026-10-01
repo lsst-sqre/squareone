@@ -1,26 +1,34 @@
 /**
+ * The book-icon documentation link shown beside an endpoint's name.
+ */
+export type ApiEndpointDocsLink = {
+  /** Documentation URL. */
+  url: string;
+  /**
+   * Accessible name (and tooltip) for the icon-only link — e.g. "IVOA TAP
+   * docs" for an IVOA standard, or "Alert retrieval docs" for other docs.
+   */
+  label: string;
+};
+
+/**
  * A single API endpoint rendered in the `/api-aspect` listing.
  *
- * Mapped services carry a curated `label`, a version-selected `url`, and an
- * `ivoaUrl` pointing at the relevant IVOA standard. Unmapped services fall back
- * to the raw service name as the `label`, the base `url`, and a null `ivoaUrl`.
+ * The transform resolves each field by merging the service's curated
+ * presentation entry over its discovery metadata, per the precedence rule
+ * documented on `PresentationMap` (`presentation.ts`).
  */
 export type ApiEndpoint = {
   /** Display label for the endpoint. */
   label: string;
-  /** Endpoint URL the label links to. */
+  /** Endpoint URL, rendered as copyable code text. */
   url: string;
   /**
-   * IVOA standard documentation link the label points to, or `null` when the
-   * service is unmapped (no curated standard link).
+   * The endpoint's documentation link, or `null` when it has none. An IVOA
+   * standard link is labelled by the standard's name ("IVOA TAP docs"); any
+   * other docs link by the endpoint label ("Alert retrieval docs").
    */
-  ivoaUrl?: string | null;
-  /**
-   * Short standard/spec acronym for the IVOA doc link's accessible label —
-   * e.g. `TAP` yields "IVOA TAP docs". `null` when the service is unmapped
-   * (no curated standard link). Pairs with {@link ivoaUrl}.
-   */
-  ivoaName?: string | null;
+  docs: ApiEndpointDocsLink | null;
 };
 
 /**
