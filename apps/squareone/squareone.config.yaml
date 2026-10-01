@@ -13,13 +13,12 @@ docsBaseUrl: 'https://rsp.lsst.io'
 repertoireUrl: 'http://localhost:3000/repertoire'
 timesSquareUrl: 'http://localhost:3000/times-square/api'
 coManageRegistryUrl: 'https://id.lsst.cloud'
+# The Apps menu lists Times Square and the admin tools from the dev mock
+# discovery (by the /dev persona's scopes); appLinks adds extras on top.
 enableAppsMenu: true
 appLinks:
-  - label: 'Times Square'
-    href: '/times-square/'
-    internal: true
-  - label: 'Argo CD'
-    href: '/argo-cd/'
+  - label: 'Nightly Digest'
+    href: '/nightlydigest/'
     internal: false
 showPreview: true
 previewLink: 'https://rsp.lsst.io/roadmap.html'
