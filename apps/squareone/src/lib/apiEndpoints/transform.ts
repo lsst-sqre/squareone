@@ -58,6 +58,12 @@ function resolveEndpoint(
     label,
     url: selectServiceUrl(service, entry.url),
     docs: resolveDocsLink(entry, service.docs_url, label),
+    // Deduplicated (first-seen order kept) so a scope discovery repeats
+    // renders one pill and appears once in the token template link. The
+    // repertoire-client schema already defaults `required_scopes` to `[]`
+    // (including under Repertoire 2.x, which omits it), so `?? []` only guards
+    // hand-built `as unknown as ServiceDiscovery` fixtures that skip parsing.
+    requiredScopes: [...new Set(service.required_scopes ?? [])],
   };
 }
 
@@ -79,6 +85,9 @@ function resolveEndpoint(
  * version when its `versions` map has exactly one entry, else the base `url`
  * (choosing among several versions needs a curated `url` selector; see
  * `discoveryServiceUrl` in `presentation.ts`).
+ * Every endpoint, curated or not, also carries the service's discovery
+ * `required_scopes` as `requiredScopes`, deduplicated in first-seen order
+ * (empty when discovery declares none, as under Repertoire 2.x).
  *
  * Pure and parameterized by `presentation` (defaulting to the app's curated
  * map) so tests can inject their own mapping. Empty/missing fallbacks: a

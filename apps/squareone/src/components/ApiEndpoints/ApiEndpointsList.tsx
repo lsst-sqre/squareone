@@ -1,8 +1,14 @@
 import { ClipboardButton } from '@lsst-sqre/squared';
 import { ArrowUpRight } from 'lucide-react';
+import Link from 'next/link';
 
 import type { ApiEndpointGroup } from '../../lib/apiEndpoints/types';
+import {
+  buildTokenTemplateUrl,
+  NEW_TOKEN_PATH,
+} from '../../lib/tokens/templateUrl';
 import DocsIconLink from '../DocsIconLink';
+import { TokenScopeBadge } from '../TokenHistory/TokenScopeBadge';
 import styles from './ApiEndpointsList.module.css';
 
 /** Heading level for the dataset section headings. */
@@ -32,7 +38,12 @@ type ApiEndpointsListProps = {
  * label (e.g. "IVOA TAP docs" or "Alert retrieval docs").
  * Each endpoint URL renders as copyable monospace code text (not a link, since
  * these are programmatic API base URLs) with an icon-only copy-to-clipboard
- * button.
+ * button. An endpoint whose service requires Gafaelfawr scopes lists them as
+ * pills under its URL, with a "Create a token with these scopes" link to the
+ * token creation form prefilled with them; an endpoint requiring none (every
+ * endpoint under Repertoire 2.x) shows neither. The copy button's and token
+ * link's accessible names include the dataset display name, because endpoint
+ * labels repeat across datasets (TAP carries one generic label everywhere).
  */
 export default function ApiEndpointsList({
   groups,
@@ -102,13 +113,37 @@ export default function ApiEndpointsList({
                         text={endpoint.url}
                         label=""
                         successLabel=""
-                        ariaLabel={`Copy the ${endpoint.label} endpoint URL to the clipboard`}
+                        ariaLabel={`Copy the ${endpoint.label} endpoint URL for ${group.displayName} to the clipboard`}
                         size="sm"
                         appearance="text"
                         tone="secondary"
                         className={styles.copyButton}
                       />
                     </div>
+                    {endpoint.requiredScopes.length > 0 ? (
+                      <div className={styles.scopes}>
+                        <span className={styles.scopesLabel}>Requires</span>
+                        <ul
+                          className={styles.scopeList}
+                          aria-label="Required scopes"
+                        >
+                          {endpoint.requiredScopes.map((scope) => (
+                            <li key={scope}>
+                              <TokenScopeBadge scope={scope} />
+                            </li>
+                          ))}
+                        </ul>
+                        <Link
+                          className={styles.tokenLink}
+                          href={buildTokenTemplateUrl(NEW_TOKEN_PATH, {
+                            scopes: endpoint.requiredScopes,
+                          })}
+                          aria-label={`Create a token with these scopes for ${endpoint.label} in ${group.displayName}`}
+                        >
+                          Create a token with these scopes
+                        </Link>
+                      </div>
+                    ) : null}
                   </li>
                 );
               })}

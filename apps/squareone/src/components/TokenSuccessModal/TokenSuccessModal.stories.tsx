@@ -60,7 +60,7 @@ export const Default: Story = {
       tokenName="My API Token"
       scopes={['read:all', 'user:token']}
       expiration={{ type: 'preset', value: '90d' }}
-      templateUrl="https://example.com/tokens/new?name=My+API+Token&scope=read%3Aall&scope=user%3Atoken&expiration=90d"
+      templateUrl="https://example.com/tokens/new?name=My+API+Token&scopes=read%3Aall%2Cuser%3Atoken&expiration=90d"
     />
   ),
 };
@@ -82,7 +82,7 @@ export const WithManyScopes: Story = {
         'write:notebook',
       ]}
       expiration={{ type: 'preset', value: '30d' }}
-      templateUrl="https://example.com/tokens/new?name=Comprehensive+Token&scope=admin%3Atoken&scope=exec%3Aadmin&scope=exec%3Anotebook&scope=exec%3Aportal&scope=read%3Aalertdb&scope=read%3Aimage&scope=read%3Atap&scope=user%3Atoken&scope=write%3Anotebook&expiration=30d"
+      templateUrl="https://example.com/tokens/new?name=Comprehensive+Token&scopes=admin%3Atoken%2Cexec%3Aadmin%2Cexec%3Anotebook%2Cexec%3Aportal%2Cread%3Aalertdb%2Cread%3Aimage%2Cread%3Atap%2Cuser%3Atoken%2Cwrite%3Anotebook&expiration=30d"
     />
   ),
 };
@@ -94,7 +94,7 @@ export const NeverExpires: Story = {
       tokenName="Permanent Token"
       scopes={['read:all']}
       expiration={{ type: 'never' }}
-      templateUrl="https://example.com/tokens/new?name=Permanent+Token&scope=read%3Aall&expiration=never"
+      templateUrl="https://example.com/tokens/new?name=Permanent+Token&scopes=read%3Aall&expiration=never"
     />
   ),
 };
@@ -106,7 +106,7 @@ export const ShortExpiration: Story = {
       tokenName="Temporary Testing Token"
       scopes={['exec:notebook', 'read:tap']}
       expiration={{ type: 'preset', value: '1d' }}
-      templateUrl="https://example.com/tokens/new?name=Temporary+Testing+Token&scope=exec%3Anotebook&scope=read%3Atap&expiration=1d"
+      templateUrl="https://example.com/tokens/new?name=Temporary+Testing+Token&scopes=exec%3Anotebook%2Cread%3Atap&expiration=1d"
     />
   ),
 };
@@ -118,7 +118,7 @@ export const SevenDayExpiration: Story = {
       tokenName="Seven Day Token"
       scopes={['user:token', 'read:image']}
       expiration={{ type: 'preset', value: '7d' }}
-      templateUrl="https://example.com/tokens/new?name=Seven+Day+Token&scope=user%3Atoken&scope=read%3Aimage&expiration=7d"
+      templateUrl="https://example.com/tokens/new?name=Seven+Day+Token&scopes=user%3Atoken%2Cread%3Aimage&expiration=7d"
     />
   ),
 };
@@ -130,7 +130,7 @@ export const LongTokenName: Story = {
       tokenName="This is a very long token name that might wrap to multiple lines in the display"
       scopes={['read:all', 'write:notebook', 'exec:portal']}
       expiration={{ type: 'preset', value: '7d' }}
-      templateUrl="https://example.com/tokens/new?name=This+is+a+very+long+token+name+that+might+wrap+to+multiple+lines+in+the+display&scope=read%3Aall&scope=write%3Anotebook&scope=exec%3Aportal&expiration=7d"
+      templateUrl="https://example.com/tokens/new?name=This+is+a+very+long+token+name+that+might+wrap+to+multiple+lines+in+the+display&scopes=read%3Aall%2Cwrite%3Anotebook%2Cexec%3Aportal&expiration=7d"
     />
   ),
 };
@@ -142,7 +142,7 @@ export const VeryLongToken: Story = {
       tokenName="Super Long Token"
       scopes={['read:all']}
       expiration={{ type: 'preset', value: '90d' }}
-      templateUrl="https://example.com/tokens/new?name=Super+Long+Token&scope=read%3Aall&expiration=90d"
+      templateUrl="https://example.com/tokens/new?name=Super+Long+Token&scopes=read%3Aall&expiration=90d"
     />
   ),
 };
@@ -154,7 +154,7 @@ export const MinimalConfiguration: Story = {
       tokenName="Simple"
       scopes={['read:all']}
       expiration={{ type: 'preset', value: '90d' }}
-      templateUrl="https://example.com/tokens/new?name=Simple&scope=read%3Aall&expiration=90d"
+      templateUrl="https://example.com/tokens/new?name=Simple&scopes=read%3Aall&expiration=90d"
     />
   ),
 };
