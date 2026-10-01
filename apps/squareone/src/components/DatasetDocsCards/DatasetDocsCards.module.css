@@ -1,0 +1,12 @@
+/**
+ * DatasetDocsCards styles
+ *
+ * The cards themselves are styled by the squared Card and CardGroup; this
+ * module only owns the "temporarily unavailable" notice.
+ */
+
+.notice {
+  margin: var(--sqo-space-md) 0;
+  color: var(--rsd-component-text-secondary-color);
+  font-style: italic;
+}

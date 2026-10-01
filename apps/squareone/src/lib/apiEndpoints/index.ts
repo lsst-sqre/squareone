@@ -10,10 +10,14 @@ export {
 } from './presentation';
 export type { ResolveApiEndpointsOptions } from './resolve';
 export { resolveApiEndpoints } from './resolve';
-export { serviceDiscoveryToApiEndpointGroups } from './transform';
+export {
+  serviceDiscoveryToApiEndpointGroups,
+  serviceDiscoveryToDatasetSummaries,
+} from './transform';
 export type {
   ApiEndpoint,
   ApiEndpointDocsLink,
   ApiEndpointGroup,
   ApiEndpointsResult,
+  DatasetSummary,
 } from './types';

@@ -39,20 +39,33 @@ export type ApiEndpoint = {
 };
 
 /**
+ * A discovered dataset's presentation, shared by the `/api-aspect` group
+ * headings and the `/docs` dataset cards.
+ *
+ * `serviceDiscoveryToDatasetSummaries` (`transform.ts`) emits one per
+ * discovered dataset, in curated order.
+ */
+export type DatasetSummary = {
+  /** Raw dataset key (`dp1`, `dp02`, `prompt`, …); used as a stable React key. */
+  datasetKey: string;
+  /**
+   * Human-facing dataset name from the presentation map's
+   * `datasetDisplayNames`, falling back to the raw key when unmapped.
+   */
+  displayName: string;
+  /** The dataset's discovery `description`, or `null` when it has none. */
+  description: string | null;
+  /** The dataset's discovery `docs_url`, or `null` when it has none. */
+  docsUrl: string | null;
+};
+
+/**
  * A group of API endpoints that share a section heading.
  *
  * The transform emits one group per discovered dataset. The heading renders
  * `displayName` (linked to `docsUrl` when present) followed by `description`.
  */
-export type ApiEndpointGroup = {
-  /** Raw dataset key (`dp1`, `dp02`, …); used as a stable React key. */
-  datasetKey: string;
-  /** Human-facing dataset name; falls back to the raw key when unmapped. */
-  displayName: string;
-  /** Dataset documentation URL the heading links to, when present. */
-  docsUrl?: string | null;
-  /** Dataset description rendered under the heading, when present. */
-  description?: string | null;
+export type ApiEndpointGroup = DatasetSummary & {
   /** Endpoints served by this dataset. */
   endpoints: ApiEndpoint[];
 };

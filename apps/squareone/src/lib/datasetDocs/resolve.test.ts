@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
-// Mock only fetchServiceDiscovery; keep the real mock data, types, and
-// transform inputs from the client package.
+// Mock only fetchServiceDiscovery; keep the real mock data and types from the
+// client package.
 vi.mock('@lsst-sqre/repertoire-client', async (importOriginal) => {
   const actual =
     await importOriginal<typeof import('@lsst-sqre/repertoire-client')>();
@@ -17,8 +17,7 @@ import {
   RepertoireError,
 } from '@lsst-sqre/repertoire-client';
 
-import { resolveApiEndpoints } from './resolve';
-import { serviceDiscoveryToApiEndpointGroups } from './transform';
+import { resolveDatasetDocs } from './resolve';
 
 function makeLogger() {
   return { debug: vi.fn(), warn: vi.fn(), error: vi.fn() };
@@ -27,28 +26,61 @@ function makeLogger() {
 // The shared fetch/log/report handling is covered in
 // lib/discovery/fetchDiscoveryForRender.test.ts; these tests cover the wiring:
 // the call-site log message and Sentry site, and the transform of the result.
-describe('resolveApiEndpoints', () => {
+describe('resolveDatasetDocs', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  test('omits the listing when no repertoireUrl is configured', async () => {
-    const result = await resolveApiEndpoints({ repertoireUrl: undefined });
+  test('omits the cards when no repertoireUrl is configured', async () => {
+    const result = await resolveDatasetDocs({ repertoireUrl: undefined });
 
     expect(result).toEqual({ status: 'omitted' });
     expect(fetchServiceDiscovery).not.toHaveBeenCalled();
   });
 
-  test('returns ok groups when discovery succeeds', async () => {
+  test('returns one card per dataset, newest release first with prompt second', async () => {
     vi.mocked(fetchServiceDiscovery).mockResolvedValue(mockDiscovery);
 
-    const result = await resolveApiEndpoints({
+    const result = await resolveDatasetDocs({
       repertoireUrl: 'https://example.org/repertoire',
     });
 
+    const { datasets } = mockDiscovery;
     expect(result).toEqual({
       status: 'ok',
-      groups: serviceDiscoveryToApiEndpointGroups(mockDiscovery),
+      datasets: [
+        {
+          datasetKey: 'dp2',
+          displayName: 'Data Preview 2',
+          description: datasets.dp2.description,
+          docsUrl: 'https://dp2.lsst.io',
+        },
+        {
+          datasetKey: 'prompt',
+          displayName: 'Prompt Products',
+          description: datasets.prompt.description,
+          // The mock prompt dataset has no docs_url, as on data-dev.
+          docsUrl: null,
+        },
+        {
+          datasetKey: 'dp1',
+          displayName: 'Data Preview 1',
+          description: datasets.dp1.description,
+          docsUrl: 'https://dp1.lsst.io',
+        },
+        {
+          datasetKey: 'dp03',
+          displayName: 'Data Preview 0.3',
+          description: datasets.dp03.description,
+          docsUrl: 'https://dp0-3.lsst.io',
+        },
+        {
+          datasetKey: 'dp02',
+          displayName: 'Data Preview 0.2',
+          description: datasets.dp02.description,
+          docsUrl: 'https://dp0-2.lsst.io',
+        },
+      ],
     });
   });
 
@@ -57,7 +89,7 @@ describe('resolveApiEndpoints', () => {
     const error = new Error('discovery exploded');
     vi.mocked(fetchServiceDiscovery).mockRejectedValue(error);
 
-    const result = await resolveApiEndpoints({
+    const result = await resolveDatasetDocs({
       repertoireUrl: 'https://example.org/repertoire',
       logger,
     });
@@ -65,7 +97,7 @@ describe('resolveApiEndpoints', () => {
     expect(result).toEqual({ status: 'unavailable' });
     expect(logger.error).toHaveBeenCalledWith(
       expect.objectContaining({ err: error }),
-      'Failed to fetch service discovery for /api-aspect'
+      'Failed to fetch service discovery for the /docs dataset cards'
     );
   });
 
@@ -75,7 +107,7 @@ describe('resolveApiEndpoints', () => {
     const error = new RepertoireError('discovery exploded', 503);
     vi.mocked(fetchServiceDiscovery).mockRejectedValue(error);
 
-    const result = await resolveApiEndpoints({
+    const result = await resolveDatasetDocs({
       repertoireUrl: 'https://example.org/repertoire',
       reportError,
     });
@@ -86,7 +118,7 @@ describe('resolveApiEndpoints', () => {
     const [reported, context] = reportError.mock.calls[0];
     expect(reported).toBe(error);
     expect(context).toMatchObject({
-      site: 'api-aspect-discovery',
+      site: 'docs-dataset-discovery',
       package: 'squareone',
     });
   });

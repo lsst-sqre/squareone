@@ -122,16 +122,27 @@ export const FromMockDiscovery: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    // Dataset display names render as section headings (linked to their docs).
+    // Dataset display names render as section headings (linked to their
+    // docs), newest release first with Prompt Products pinned second.
     await expect(
-      canvas.getByRole('heading', { name: 'Data Preview 1' })
-    ).toBeInTheDocument();
-    await expect(
-      canvas.getByRole('heading', { name: 'Data Preview 0.2' })
-    ).toBeInTheDocument();
+      canvas
+        .getAllByRole('heading', { level: 3 })
+        .map((heading) => heading.textContent)
+    ).toEqual([
+      'Data Preview 2',
+      'Prompt Products',
+      'Data Preview 1',
+      'Data Preview 0.3',
+      'Data Preview 0.2',
+    ]);
 
     // Each dataset surfaces a "Read the documentation" link to its docs site at
     // the end of the description.
+    await expect(
+      canvas.getByRole('link', {
+        name: 'Read the Data Preview 2 documentation',
+      })
+    ).toHaveAttribute('href', 'https://dp2.lsst.io');
     await expect(
       canvas.getByRole('link', {
         name: 'Read the Data Preview 1 documentation',
@@ -215,7 +226,11 @@ export const FromMockDiscovery: Story = {
 
     // TAP shares one generic label across datasets, so each row's token link
     // and copy button name its dataset to stay distinct out of context.
-    for (const dataset of ['Data Preview 1', 'Data Preview 0.2']) {
+    for (const dataset of [
+      'Data Preview 2',
+      'Data Preview 1',
+      'Data Preview 0.2',
+    ]) {
       await expect(
         canvas.getByRole('link', {
           name: `Create a token with these scopes for Table Access Protocol (TAP) in ${dataset}`,
