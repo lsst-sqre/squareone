@@ -33,6 +33,11 @@ jobs:
 
       - name: Check for OpenAPI spec drift
         run: pnpm run check-openapi-drift
+        env:
+          # The vendored Repertoire spec is 3.0.0, which only data-dev runs so
+          # far. Remove this override once data.lsst.cloud runs Repertoire 3.0
+          # (the repertoire-client fetch-openapi script defaults to production).
+          REPERTOIRE_HOST: data-dev.lsst.cloud
 
       - name: Report status
         if: always()

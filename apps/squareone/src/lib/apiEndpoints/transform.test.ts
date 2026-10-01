@@ -14,6 +14,7 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
 
     expect(groups.map((group) => group.datasetKey)).toEqual([
       'dp1',
+      'prompt',
       'dp03',
       'dp02',
     ]);
