@@ -19,7 +19,8 @@ This is used in the HTML ``<title>`` tag and displayed prominently in the homepa
 
    siteName: 'Rubin Science Platform'
 
-Default: ``Rubin Science Platform``
+Default: the environment title from Repertoire service discovery (``environment.title``), or ``Rubin Science Platform`` when service discovery does not provide one.
+See :ref:`the configuration reference <config-discovery-defaults>` for details.
 
 siteDescription
 ---------------

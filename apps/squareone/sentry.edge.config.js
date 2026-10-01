@@ -11,6 +11,12 @@ Sentry.init({
   // in local dev, where events carry a null release.
   release: process.env.SENTRY_RELEASE,
 
+  // Unlike the server (see sentry.server.config.js and
+  // src/lib/sentry/serverEnvironment.ts), the edge runtime still reads the
+  // environment from SQUAREONE_ENVIRONMENT_NAME rather than resolving
+  // environmentName from the config and Repertoire discovery: the app has no
+  // edge routes (no middleware, proxy, or edge route handlers), so nothing
+  // runs here to report. Resolve it like the server before adding any.
   environment: process.env.SQUAREONE_ENVIRONMENT_NAME || 'development',
 
   // Define how likely traces are sampled.

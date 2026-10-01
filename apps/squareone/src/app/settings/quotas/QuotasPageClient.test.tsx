@@ -21,16 +21,16 @@ import type { UseUserInfoReturn } from '@lsst-sqre/gafaelfawr-client';
 import { useUserInfo } from '@lsst-sqre/gafaelfawr-client';
 
 import { useStaticConfig } from '../../../hooks/useStaticConfig';
-import type { AppConfig } from '../../../lib/config/loader';
+import type { StaticConfig } from '../../../lib/config/resolveConfigDefaults';
 import QuotasPageClient from './QuotasPageClient';
 
 // Build a config object with only the fields the component reads, cast to the
-// full AppConfig shape.
-function makeConfig(overrides: Partial<AppConfig> = {}): AppConfig {
+// full StaticConfig shape.
+function makeConfig(overrides: Partial<StaticConfig> = {}): StaticConfig {
   return {
     docsBaseUrl: 'https://rsp.lsst.io',
     ...overrides,
-  } as AppConfig;
+  } as StaticConfig;
 }
 
 // Helper to create a logged-in useUserInfo return value so AuthRequired renders
