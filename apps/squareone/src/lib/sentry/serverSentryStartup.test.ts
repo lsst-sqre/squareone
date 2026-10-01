@@ -9,7 +9,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { register } from '../../../instrumentation';
 import { initServerSentry } from '../../../sentry.server.config';
+import { SENTRY_TUNNEL_ROUTE } from '../../../sentry.tunnel.config';
 import logger from '../logger';
+import { installProcessWarningLogger } from '../server/processWarnings';
+import { installTunnelResponseListenerLimit } from '../server/tunnelResponseListeners';
 import { resolveServerSentryEnvironment } from './serverEnvironment';
 
 vi.mock('@sentry/nextjs', () => ({
@@ -21,6 +24,16 @@ vi.mock('@sentry/nextjs', () => ({
 
 vi.mock('../../../sentry.server.config', () => ({
   initServerSentry: vi.fn(),
+}));
+
+vi.mock('../../../sentry.edge.config', () => ({}));
+
+vi.mock('../server/tunnelResponseListeners', () => ({
+  installTunnelResponseListenerLimit: vi.fn(),
+}));
+
+vi.mock('../server/processWarnings', () => ({
+  installProcessWarningLogger: vi.fn(),
 }));
 
 vi.mock('./serverEnvironment', () => ({
@@ -59,6 +72,56 @@ describe('register() in the Node.js runtime', () => {
       { sentryEnvironment: 'idfdev' },
       'Squareone starting'
     );
+  });
+
+  it('raises the listener limit on Sentry tunnel responses', async () => {
+    await register();
+
+    expect(installTunnelResponseListenerLimit).toHaveBeenCalledWith({
+      tunnelRoute: SENTRY_TUNNEL_ROUTE,
+    });
+  });
+
+  it('installs the tunnel listener limit before initializing Sentry', async () => {
+    await register();
+
+    const [installOrder] = vi.mocked(installTunnelResponseListenerLimit).mock
+      .invocationCallOrder;
+    const [initOrder] = vi.mocked(initServerSentry).mock.invocationCallOrder;
+    expect(installOrder).toBeLessThan(initOrder);
+  });
+
+  it('logs process warnings through the pino logger', async () => {
+    await register();
+
+    expect(installProcessWarningLogger).toHaveBeenCalledWith(logger);
+  });
+
+  it('installs the process warning logger before initializing Sentry', async () => {
+    await register();
+
+    const [installOrder] = vi.mocked(installProcessWarningLogger).mock
+      .invocationCallOrder;
+    const [initOrder] = vi.mocked(initServerSentry).mock.invocationCallOrder;
+    expect(installOrder).toBeLessThan(initOrder);
+  });
+});
+
+describe('register() in the edge runtime', () => {
+  beforeEach(() => {
+    vi.stubEnv('NEXT_RUNTIME', 'edge');
+  });
+
+  it('does not install the tunnel listener limit', async () => {
+    await register();
+
+    expect(installTunnelResponseListenerLimit).not.toHaveBeenCalled();
+  });
+
+  it('does not install the process warning logger', async () => {
+    await register();
+
+    expect(installProcessWarningLogger).not.toHaveBeenCalled();
   });
 });
 
