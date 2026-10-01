@@ -1,5 +1,6 @@
 'use client';
 
+import { useLoginInfo } from '@lsst-sqre/gafaelfawr-client';
 import { useServiceDiscovery } from '@lsst-sqre/repertoire-client';
 import { PrimaryNavigation } from '@lsst-sqre/squared';
 import NextLink from 'next/link';
@@ -24,6 +25,11 @@ type InternalTriggerLinkProps = {
  * When repertoireUrl is not configured, all services are shown with fallback URLs.
  * When configured, only available services are displayed. During loading, items
  * are shown with fallback URLs to avoid layout shift (data is prefetched anyway).
+ *
+ * Portal and Notebooks are also hidden from a signed-in user who lacks a scope
+ * the service declares in `required_scopes` (Repertoire 3.0.0). Anonymous
+ * visitors, users whose login info is still loading, and services that declare
+ * no required scopes are unaffected.
  */
 export default function HeaderNav() {
   const currentUrl = useCurrentUrl();
@@ -33,13 +39,25 @@ export default function HeaderNav() {
   // Service discovery
   const { query, isPending } = useServiceDiscovery(repertoireUrl ?? '');
 
+  // The signed-in user's scopes; undefined when anonymous or still loading,
+  // which canAccessService treats as allowed.
+  const scopes = useLoginInfo(repertoireUrl).query?.scopes;
+  const canAccessUiService = (name: string) => {
+    const service = query?.getUiService(name);
+    return !!service && !!query?.canAccessService(service, scopes);
+  };
+
   // Determine visibility - show by default when discovery not configured
   // Show during loading to avoid layout shift (data is prefetched in App Router)
   const isConfigured = !!repertoireUrl;
   const showPortal =
-    !isConfigured || isPending || query?.hasPortal({ hasUi: true });
+    !isConfigured ||
+    isPending ||
+    (query?.hasPortal({ hasUi: true }) && canAccessUiService('portal'));
   const showNublado =
-    !isConfigured || isPending || query?.hasNublado({ hasUi: true });
+    !isConfigured ||
+    isPending ||
+    (query?.hasNublado({ hasUi: true }) && canAccessUiService('nublado'));
 
   // Get URLs from discovery or use fallbacks
   const portalUrl = query?.getPortalUrl() ?? '/portal/app';
