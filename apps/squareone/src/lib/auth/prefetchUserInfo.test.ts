@@ -32,6 +32,7 @@ vi.mock('../sentry/reportError', () => ({
 const REPERTOIRE_URL = 'https://data.lsst.cloud/repertoire';
 const GAFAELFAWR_URL = createDiscoveryQuery(mockDiscovery).getGafaelfawrUrl();
 const SESSION_COOKIE = 'gafaelfawr=encrypted-session; theme=dark';
+const DELEGATED_TOKEN = 'gt-delegated-internal-token';
 
 /** The incoming request's headers, as `next/headers` reports them. */
 function givenRequestHeaders(init: Record<string, string>) {
@@ -77,6 +78,29 @@ describe('prefetchUserInfo', () => {
     expect(fetchMock).toHaveBeenCalledWith(`${GAFAELFAWR_URL}/user-info`, {
       credentials: 'include',
       headers: { cookie: SESSION_COOKIE },
+      cache: 'no-store',
+    });
+    expect(dehydratedUserInfo(queryClient)?.state.data).toEqual(mockUserInfo);
+  });
+
+  test('hydrates a signed-in user on a GafaelfawrIngress route via the delegated token', async () => {
+    // The ingress stripped the Gafaelfawr cookie from what it forwarded, so
+    // only the delegated token can authenticate, and only it is sent.
+    givenRequestHeaders({
+      cookie: 'theme=dark',
+      'x-auth-request-user': mockUserInfo.username,
+      'x-auth-request-token': DELEGATED_TOKEN,
+    });
+    const fetchMock = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValue(Response.json(mockUserInfo));
+    const queryClient = clientWithDiscovery();
+
+    await prefetchUserInfo(queryClient, REPERTOIRE_URL);
+
+    expect(fetchMock).toHaveBeenCalledWith(`${GAFAELFAWR_URL}/user-info`, {
+      credentials: 'include',
+      headers: { authorization: `Bearer ${DELEGATED_TOKEN}` },
       cache: 'no-store',
     });
     expect(dehydratedUserInfo(queryClient)?.state.data).toEqual(mockUserInfo);

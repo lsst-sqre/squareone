@@ -2,13 +2,13 @@ import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 // AdminLayoutClient composes AdminRequired (login via useUserInfo, scope gate
-// via useLoginInfo) and the sidebar, so both login hooks are mocked.
+// via useUserInfo) and the sidebar, so both auth hooks are mocked.
 vi.mock('../../hooks/useUserInfo', () => ({
   useUserInfo: vi.fn(),
 }));
 
-vi.mock('../../hooks/useLoginInfo', () => ({
-  useLoginInfo: vi.fn(),
+vi.mock('../../hooks/useUserScopes', () => ({
+  useUserScopes: vi.fn(),
 }));
 
 vi.mock('next/navigation', () => ({
@@ -22,29 +22,29 @@ vi.mock('../../hooks/useStaticConfig', () => ({
 }));
 
 import type {
-  UseLoginInfoReturn,
   UseUserInfoReturn,
+  UseUserScopesReturn,
 } from '@lsst-sqre/gafaelfawr-client';
-// Import after mocking.
-import { useLoginInfo } from '../../hooks/useLoginInfo';
 import {
   type AppConfigContextValue,
   useStaticConfig,
 } from '../../hooks/useStaticConfig';
 import { useUserInfo } from '../../hooks/useUserInfo';
+// Import after mocking.
+import { useUserScopes } from '../../hooks/useUserScopes';
 import AdminLayoutClient from './AdminLayoutClient';
 
 const config = { siteName: 'Rubin Science Platform' } as AppConfigContextValue;
 
-function mockLoginInfoWithScopes(scopes: string[]): UseLoginInfoReturn {
+// Helper: a useUserScopes return reporting the given scopes.
+function mockUserScopes(
+  scopes: string[],
+  isLoading = false
+): UseUserScopesReturn {
   return {
-    loginInfo: null,
-    query: {
-      scopes,
-      hasScope: (scope: string) => scopes.includes(scope),
-    } as UseLoginInfoReturn['query'],
-    csrfToken: null,
-    isLoading: false,
+    scopes,
+    hasScope: (scope: string) => scopes.includes(scope),
+    isLoading,
     isPending: false,
     error: null,
     refetch: vi.fn(),
@@ -61,7 +61,7 @@ function renderWithScopes(scopes: string[]) {
     error: null,
     refetch: vi.fn(),
   });
-  vi.mocked(useLoginInfo).mockReturnValue(mockLoginInfoWithScopes(scopes));
+  vi.mocked(useUserScopes).mockReturnValue(mockUserScopes(scopes));
   vi.mocked(useStaticConfig).mockReturnValue(config);
 
   render(<AdminLayoutClient config={config}>Admin Content</AdminLayoutClient>);

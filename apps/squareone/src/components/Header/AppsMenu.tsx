@@ -5,9 +5,9 @@ import { PrimaryNavigation } from '@lsst-sqre/squared';
 import { ChevronDown } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import type { ReactNode } from 'react';
-import { useLoginInfo } from '../../hooks/useLoginInfo';
 import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
 import { useStaticConfig } from '../../hooks/useStaticConfig';
+import { useUserScopes } from '../../hooks/useUserScopes';
 import { deriveAppsMenuItems } from './appsMenuItems';
 
 type AppsMenuProps = {
@@ -30,17 +30,17 @@ type LinkProps = {
  * `appLinks` only.
  *
  * The scope-gated discovery items need the user's scopes to be known. The root
- * layout prefetches login info alongside service discovery on the server and
+ * layout prefetches the scopes alongside service discovery on the server and
  * hydrates both, so those items (and the menu itself, when they are all it
  * lists) are present on the first client render rather than popping in once
- * the browser's own login-info request resolves.
+ * the browser's own login request resolves.
  */
 export default function AppsMenu({ className }: AppsMenuProps) {
   const { appLinks, baseUrl } = useStaticConfig();
   const repertoireUrl = useRepertoireUrl();
   const { query } = useServiceDiscovery(repertoireUrl ?? '');
 
-  const userScopes = useLoginInfo().query?.scopes;
+  const { scopes: userScopes } = useUserScopes();
 
   const items = deriveAppsMenuItems({
     query,

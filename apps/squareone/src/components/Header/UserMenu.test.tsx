@@ -8,9 +8,9 @@ vi.mock('../../hooks/useUserInfo', () => ({
   useUserInfo: vi.fn(),
 }));
 
-// useLoginInfo provides the scopes that gate the Admin link.
-vi.mock('../../hooks/useLoginInfo', () => ({
-  useLoginInfo: vi.fn(),
+// useUserScopes provides the scopes that gate the Admin link.
+vi.mock('../../hooks/useUserScopes', () => ({
+  useUserScopes: vi.fn(),
 }));
 
 // useUnreadNotificationCount feeds the trigger badge and menu-item label.
@@ -33,14 +33,14 @@ vi.mock('../../hooks/useStaticConfig', () => ({
 // Import after mocking
 import {
   mockUserInfo,
-  type UseLoginInfoReturn,
+  type UseUserScopesReturn,
 } from '@lsst-sqre/gafaelfawr-client';
 import { useUnreadNotificationCount } from '@lsst-sqre/semaphore-client';
 import { PrimaryNavigation } from '@lsst-sqre/squared';
-import { useLoginInfo } from '../../hooks/useLoginInfo';
 import { useSemaphoreUrl } from '../../hooks/useSemaphoreUrl';
 import { useStaticConfig } from '../../hooks/useStaticConfig';
 import { useUserInfo } from '../../hooks/useUserInfo';
+import { useUserScopes } from '../../hooks/useUserScopes';
 import type { StaticConfig } from '../../lib/config/resolveConfigDefaults';
 import UserMenu from './UserMenu';
 
@@ -57,16 +57,15 @@ function mockUser(username = 'testuser') {
   });
 }
 
-// Helper: a useLoginInfo return whose query reports the given scopes.
-function mockLoginInfoWithScopes(scopes: string[]): UseLoginInfoReturn {
+// Helper: a useUserScopes return reporting the given scopes.
+function mockUserScopes(
+  scopes: string[],
+  isLoading = false
+): UseUserScopesReturn {
   return {
-    loginInfo: null,
-    query: {
-      scopes,
-      hasScope: (scope: string) => scopes.includes(scope),
-    } as UseLoginInfoReturn['query'],
-    csrfToken: null,
-    isLoading: false,
+    scopes,
+    hasScope: (scope: string) => scopes.includes(scope),
+    isLoading,
     isPending: false,
     error: null,
     refetch: vi.fn(),
@@ -112,7 +111,7 @@ describe('UserMenu', () => {
     mockConfig();
     vi.mocked(useSemaphoreUrl).mockReturnValue('https://example.com/semaphore');
     mockUnreadCount(undefined);
-    vi.mocked(useLoginInfo).mockReturnValue(mockLoginInfoWithScopes([]));
+    vi.mocked(useUserScopes).mockReturnValue(mockUserScopes([]));
   });
 
   test('shows an Admin link to /admin for any configured admin page scope', async () => {
@@ -120,9 +119,7 @@ describe('UserMenu', () => {
     mockUser();
     // admin:oidc grants only the OIDC clients page — there is no single
     // "admin" scope, so any page's scope is enough to offer the link.
-    vi.mocked(useLoginInfo).mockReturnValue(
-      mockLoginInfoWithScopes(['admin:oidc'])
-    );
+    vi.mocked(useUserScopes).mockReturnValue(mockUserScopes(['admin:oidc']));
 
     renderMenu();
     await user.click(screen.getByRole('button', { name: /testuser/i }));
@@ -148,8 +145,8 @@ describe('UserMenu', () => {
   test('does not show an Admin link when the user holds no admin scope', async () => {
     const user = userEvent.setup();
     mockUser();
-    vi.mocked(useLoginInfo).mockReturnValue(
-      mockLoginInfoWithScopes(['read:tap', 'exec:notebook'])
+    vi.mocked(useUserScopes).mockReturnValue(
+      mockUserScopes(['read:tap', 'exec:notebook'])
     );
 
     renderMenu();

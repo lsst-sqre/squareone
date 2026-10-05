@@ -12,7 +12,11 @@ import {
   type ReportError,
   reportingQueryFn,
 } from '@lsst-sqre/api-client-core';
-import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query';
+import {
+  infiniteQueryOptions,
+  type QueryFunctionContext,
+  queryOptions,
+} from '@tanstack/react-query';
 
 import {
   type AuthRequestInit,
@@ -22,6 +26,7 @@ import {
   fetchOidcClients,
   fetchTokenChangeHistory,
   fetchTokenDetails,
+  fetchTokenInfo,
   fetchUserInfo,
   fetchUserTokens,
   getEmptyUserInfo,
@@ -170,6 +175,86 @@ export const loginInfoQueryOptions = (
       isServer,
     }),
     staleTime: 30_000, // 30 seconds
+    gcTime: 5 * 60_000, // 5 minutes
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+  });
+};
+
+// =============================================================================
+// User Scopes Query
+// =============================================================================
+
+/**
+ * Where {@link userScopesQueryOptions} learns the user's scopes.
+ *
+ * - `'login-info'` (the default): from the login-info query, which the browser
+ *   can always fetch (and a server forwarding the session cookie can too).
+ *   Reading through the query client shares one `GET /auth/api/v1/login`
+ *   with every login-info observer rather than making a second request.
+ * - `'token-info'`: from `GET /auth/api/v1/token-info` for the token in the
+ *   forwarded `authorization` header. This is the server-side source on a
+ *   GafaelfawrIngress route, where the ingress strips the session cookie (so
+ *   login info cannot be fetched) and instead delegates an internal token
+ *   whose scopes are the user's own, restricted to those the ingress asked
+ *   for.
+ */
+export type UserScopesSource = 'login-info' | 'token-info';
+
+/** Configuration for {@link userScopesQueryOptions}. */
+export type UserScopesQueryConfig = AuthQueryConfig & {
+  source?: UserScopesSource;
+};
+
+/**
+ * Query options for the signed-in user's scopes, `null` for an anonymous
+ * visitor (or when they cannot be determined: every failure degrades to null,
+ * logged and, when report-worthy, reported, as for login info).
+ *
+ * The header gates services on these scopes, so they are kept apart from
+ * login info: a server render can hydrate them from either source while the
+ * browser keeps deriving them from login info, and the entry it hydrates
+ * answers the first client render whichever source filled it.
+ *
+ * @param baseUrl - Gafaelfawr API base URL
+ * @param options - The {@link UserScopesSource} plus logging / error-reporting
+ *   configuration and the forwarded `headers` of a server-side prefetch
+ */
+export const userScopesQueryOptions = (
+  baseUrl: string = DEFAULT_GAFAELFAWR_URL,
+  options?: UserScopesQueryConfig
+) => {
+  const { source = 'login-info', ...authOptions } = options ?? {};
+
+  const fromTokenInfo = (): (() => Promise<string[] | null>) => {
+    const logger = authOptions.logger ?? defaultLogger;
+    const { reportError, context, isServer } = authOptions;
+    const init = authRequestInit(authOptions);
+    return reportingQueryFn<string[] | null>({
+      fetchFn: async () => (await fetchTokenInfo(baseUrl, init)).scopes,
+      fallback: null,
+      logger,
+      reportError,
+      context,
+      isServer,
+    });
+  };
+
+  // Login info already degrades to null, logs, and reports through its own
+  // query function, so this only lifts the scopes out of its answer.
+  const fromLoginInfo = async ({
+    client,
+  }: QueryFunctionContext): Promise<string[] | null> => {
+    const loginInfo = await client.fetchQuery(
+      loginInfoQueryOptions(baseUrl, authOptions)
+    );
+    return loginInfo?.scopes ?? null;
+  };
+
+  return queryOptions<string[] | null>({
+    queryKey: gafaelfawrKeys.userScopes(),
+    queryFn: source === 'token-info' ? fromTokenInfo() : fromLoginInfo,
+    staleTime: 30_000, // 30 seconds, as login info
     gcTime: 5 * 60_000, // 5 minutes
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,

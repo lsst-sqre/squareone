@@ -68,17 +68,17 @@ vi.mock('../hooks/useUserInfo', () => ({
   useUserInfo: vi.fn(),
 }));
 
-vi.mock('../hooks/useLoginInfo', () => ({
-  useLoginInfo: vi.fn(),
+vi.mock('../hooks/useUserScopes', () => ({
+  useUserScopes: vi.fn(),
 }));
 
 // Imports after mocks.
 import {
   getEmptyUserInfo,
   mockUserInfo,
-  type UseLoginInfoReturn,
   type UserInfo,
   type UseUserInfoReturn,
+  type UseUserScopesReturn,
 } from '@lsst-sqre/gafaelfawr-client';
 import { useServiceDiscovery } from '@lsst-sqre/repertoire-client';
 import type { Broadcast } from '@lsst-sqre/semaphore-client';
@@ -91,9 +91,9 @@ import { PrimaryNavigation } from '@lsst-sqre/squared';
 import BroadcastBannerStack from '../components/BroadcastBannerStack';
 import Header from '../components/Header';
 import UserMenu from '../components/Header/UserMenu';
-import { useLoginInfo } from '../hooks/useLoginInfo';
 import { useStaticConfig } from '../hooks/useStaticConfig';
 import { useUserInfo } from '../hooks/useUserInfo';
+import { useUserScopes } from '../hooks/useUserScopes';
 import type { StaticConfig } from '../lib/config/resolveConfigDefaults';
 import FooterRsc from './FooterRsc';
 
@@ -161,11 +161,10 @@ function hydratedUserInfo(userInfo: UserInfo): UseUserInfoReturn {
   };
 }
 
-function loggedOutLoginInfo(): UseLoginInfoReturn {
+function hydratedScopes(scopes?: string[]): UseUserScopesReturn {
   return {
-    loginInfo: null,
-    query: null,
-    csrfToken: null,
+    scopes,
+    hasScope: (scope: string): boolean => scopes?.includes(scope) ?? false,
     isLoading: false,
     isPending: false,
     error: null,
@@ -201,7 +200,7 @@ describe('shell render determinism', () => {
     vi.mocked(useUserInfo).mockReturnValue(
       hydratedUserInfo(getEmptyUserInfo())
     );
-    vi.mocked(useLoginInfo).mockReturnValue(loggedOutLoginInfo());
+    vi.mocked(useUserScopes).mockReturnValue(hydratedScopes());
     vi.mocked(useBroadcasts).mockReturnValue(emptyBroadcasts());
     vi.mocked(useUnreadNotificationCount).mockReturnValue(noUnreadCount());
   });
@@ -279,20 +278,9 @@ describe('shell render determinism', () => {
 
   test('UserMenu renders identical markup across renders', () => {
     vi.mocked(useUserInfo).mockReturnValue(hydratedUserInfo(mockUserInfo));
-    vi.mocked(useLoginInfo).mockReturnValue({
-      loginInfo: null,
-      query: {
-        // An admin: exec:admin is one of the scopes `adminPageScopes` maps to
-        // an admin page, so the menu renders its Admin link.
-        scopes: ['exec:admin'],
-        hasScope: (scope: string): boolean => scope === 'exec:admin',
-      } as UseLoginInfoReturn['query'],
-      csrfToken: null,
-      isLoading: false,
-      isPending: false,
-      error: null,
-      refetch: vi.fn(),
-    });
+    // An admin: exec:admin is one of the scopes `adminPageScopes` maps to an
+    // admin page, so the menu renders its Admin link.
+    vi.mocked(useUserScopes).mockReturnValue(hydratedScopes(['exec:admin']));
 
     const ui = (
       <PrimaryNavigation>

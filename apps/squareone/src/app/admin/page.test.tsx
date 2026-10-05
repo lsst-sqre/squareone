@@ -8,9 +8,9 @@ vi.mock('../../lib/config/rsc', () => ({
 }));
 
 // The index page resolves its redirect target from the user's Gafaelfawr
-// scopes, so mock login info.
-vi.mock('../../hooks/useLoginInfo', () => ({
-  useLoginInfo: vi.fn(),
+// scopes, so mock the scopes hook.
+vi.mock('../../hooks/useUserScopes', () => ({
+  useUserScopes: vi.fn(),
 }));
 
 const replace = vi.fn();
@@ -18,9 +18,9 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ replace }),
 }));
 
-import type { UseLoginInfoReturn } from '@lsst-sqre/gafaelfawr-client';
+import type { UseUserScopesReturn } from '@lsst-sqre/gafaelfawr-client';
 // Import after mocking.
-import { useLoginInfo } from '../../hooks/useLoginInfo';
+import { useUserScopes } from '../../hooks/useUserScopes';
 import type { StaticConfig } from '../../lib/config/resolveConfigDefaults';
 import { getStaticConfig } from '../../lib/config/rsc';
 import AdminPage, { generateMetadata } from './page';
@@ -32,15 +32,14 @@ function makeConfig(overrides: Partial<StaticConfig> = {}): StaticConfig {
   } as StaticConfig;
 }
 
-/** A useLoginInfo return whose query reports the given scopes. */
-function mockLoginInfoWithScopes(
+// Helper: a useUserScopes return reporting the given scopes.
+function mockUserScopes(
   scopes: string[],
   isLoading = false
-): UseLoginInfoReturn {
+): UseUserScopesReturn {
   return {
-    loginInfo: null,
-    query: { scopes } as UseLoginInfoReturn['query'],
-    csrfToken: null,
+    scopes,
+    hasScope: (scope: string) => scopes.includes(scope),
     isLoading,
     isPending: false,
     error: null,
@@ -79,8 +78,8 @@ describe('AdminPage redirect', () => {
   });
 
   test('redirects a user holding only admin:notifications to /admin/notifications', async () => {
-    vi.mocked(useLoginInfo).mockReturnValue(
-      mockLoginInfoWithScopes(['admin:notifications'])
+    vi.mocked(useUserScopes).mockReturnValue(
+      mockUserScopes(['admin:notifications'])
     );
 
     render(await AdminPage());
@@ -91,9 +90,7 @@ describe('AdminPage redirect', () => {
   test('redirects a user holding only admin:token to the first page they can see', async () => {
     // The nav order is code-defined, so a user who cannot see User
     // notifications lands on the next visible page rather than a 403.
-    vi.mocked(useLoginInfo).mockReturnValue(
-      mockLoginInfoWithScopes(['admin:token'])
-    );
+    vi.mocked(useUserScopes).mockReturnValue(mockUserScopes(['admin:token']));
 
     render(await AdminPage());
 
@@ -101,9 +98,7 @@ describe('AdminPage redirect', () => {
   });
 
   test('shows the empty state, and does not redirect, for a user with no admin page scopes', async () => {
-    vi.mocked(useLoginInfo).mockReturnValue(
-      mockLoginInfoWithScopes(['read:tap'])
-    );
+    vi.mocked(useUserScopes).mockReturnValue(mockUserScopes(['read:tap']));
 
     render(await AdminPage());
 
@@ -116,7 +111,7 @@ describe('AdminPage redirect', () => {
   test('renders an h1 heading with the empty state', async () => {
     // Nothing redirects the page away, so it needs a top-level heading like
     // every other page.
-    vi.mocked(useLoginInfo).mockReturnValue(mockLoginInfoWithScopes([]));
+    vi.mocked(useUserScopes).mockReturnValue(mockUserScopes([]));
 
     render(await AdminPage());
 
@@ -126,8 +121,8 @@ describe('AdminPage redirect', () => {
   });
 
   test('waits for login info before deciding, so an admin never flashes the empty state', async () => {
-    vi.mocked(useLoginInfo).mockReturnValue(
-      mockLoginInfoWithScopes([], /* isLoading */ true)
+    vi.mocked(useUserScopes).mockReturnValue(
+      mockUserScopes([], /* isLoading */ true)
     );
 
     render(await AdminPage());
@@ -138,11 +133,10 @@ describe('AdminPage redirect', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('shows the empty state when login info could not be fetched', async () => {
-    vi.mocked(useLoginInfo).mockReturnValue({
-      loginInfo: null,
-      query: null,
-      csrfToken: null,
+  test('shows the empty state when the scopes could not be fetched', async () => {
+    vi.mocked(useUserScopes).mockReturnValue({
+      scopes: undefined,
+      hasScope: () => false,
       isLoading: false,
       isPending: false,
       error: null,

@@ -40,6 +40,12 @@ module.exports = (phase) => {
           source: '/auth/api/v1/login',
           destination: '/api/dev/login-info',
         },
+        // Mock Gafaelfawr token info (the delegated token's scopes, for the
+        // server-side prefetch on a simulated GafaelfawrIngress route)
+        {
+          source: '/auth/api/v1/token-info',
+          destination: '/api/dev/gafaelfawr/v1/token-info',
+        },
         // Mock Gafaelfawr per-user token detail / revoke (must precede the
         // collection rewrite so the more specific :key path matches first)
         {

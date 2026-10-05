@@ -65,3 +65,20 @@ describe('OpenID Connect client exports', () => {
     }
   });
 });
+
+describe('user scopes exports', () => {
+  it('exports the token-info client fn and the user-scopes query options', () => {
+    expect(packageIndex.fetchTokenInfo).toBeDefined();
+    expect(packageIndex.userScopesQueryOptions).toBeDefined();
+    expect(packageIndex.gafaelfawrKeys.userScopes()).toEqual([
+      'gafaelfawr',
+      'user-scopes',
+    ]);
+  });
+
+  it('exports the hook from both the package and hooks indexes', () => {
+    for (const index of [packageIndex, hooksIndex]) {
+      expect(index.useUserScopes).toBeDefined();
+    }
+  });
+});

@@ -9,9 +9,9 @@ vi.mock('@lsst-sqre/repertoire-client', async (importOriginal) => ({
   useServiceDiscovery: vi.fn(),
 }));
 
-// useLoginInfo supplies the signed-in user's scopes.
-vi.mock('../../hooks/useLoginInfo', () => ({
-  useLoginInfo: vi.fn(),
+// useUserScopes supplies the signed-in user's scopes.
+vi.mock('../../hooks/useUserScopes', () => ({
+  useUserScopes: vi.fn(),
 }));
 
 vi.mock('../../hooks/useRepertoireUrl', () => ({

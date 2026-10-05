@@ -6,9 +6,9 @@ import NextLink from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 import useCurrentUrl from '../../hooks/useCurrentUrl';
-import { useLoginInfo } from '../../hooks/useLoginInfo';
 import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
 import { useStaticConfig } from '../../hooks/useStaticConfig';
+import { useUserScopes } from '../../hooks/useUserScopes';
 import AppsMenu from './AppsMenu';
 import styles from './HeaderNav.module.css';
 import Login from './Login';
@@ -29,11 +29,11 @@ type InternalTriggerLinkProps = {
  * the service declares in `required_scopes` (Repertoire 3.0.0). Anonymous
  * visitors and services that declare no required scopes are unaffected.
  *
- * The root layout prefetches both service discovery and the user's login info
- * (their scopes) on the server and hydrates them, so both are known on the
- * first client render and a gated entry never appears only to vanish. Should
- * either be missing from the hydrated state, entries show while it loads
- * (with fallback URLs, to avoid layout shift).
+ * The root layout prefetches both service discovery and the user's scopes on
+ * the server and hydrates them, so both are known on the first client render
+ * and a gated entry never appears only to vanish. Should either be missing
+ * from the hydrated state, entries show while it loads (with fallback URLs,
+ * to avoid layout shift).
  */
 export default function HeaderNav() {
   const currentUrl = useCurrentUrl();
@@ -46,14 +46,14 @@ export default function HeaderNav() {
   // The signed-in user's scopes (hydrated from the layout's prefetch);
   // undefined when anonymous or still loading, which canAccessService treats as
   // allowed.
-  const scopes = useLoginInfo().query?.scopes;
+  const { scopes } = useUserScopes();
   const canAccessUiService = (name: string) => {
     const service = query?.getUiService(name);
     return !!service && !!query?.canAccessService(service, scopes);
   };
 
   // Determine visibility - show by default when discovery not configured.
-  // Discovery and login info are hydrated from the root layout's prefetch, so
+  // Discovery and the scopes are hydrated from the root layout's prefetch, so
   // isPending is normally false on the first render; should discovery be
   // missing, show entries while loading to avoid layout shift.
   const isConfigured = !!repertoireUrl;

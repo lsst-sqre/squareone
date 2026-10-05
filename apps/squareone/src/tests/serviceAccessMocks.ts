@@ -1,6 +1,6 @@
 /**
- * Unit-test helpers that set what service discovery and Gafaelfawr login info
- * report, for components that show or hide entries by the user's scopes.
+ * Unit-test helpers that set what service discovery and the user's Gafaelfawr
+ * scopes report, for components that show or hide entries by those scopes.
  *
  * The helpers drive `vi.mocked(...)` hooks, so a test file using them must mock
  * both hooks itself (vi.mock is hoisted per file and cannot be shared):
@@ -10,14 +10,13 @@
  *   ...(await importOriginal<typeof import('@lsst-sqre/repertoire-client')>()),
  *   useServiceDiscovery: vi.fn(),
  * }));
- * // The app's login-info hook, src/hooks/useLoginInfo, relative to the test.
- * vi.mock('../../hooks/useLoginInfo', () => ({ useLoginInfo: vi.fn() }));
+ * // The app's scopes hook, src/hooks/useUserScopes, relative to the test.
+ * vi.mock('../../hooks/useUserScopes', () => ({ useUserScopes: vi.fn() }));
  * ```
  *
  * Test-support only: nothing in the app bundle imports this module.
  */
 
-import type { UseLoginInfoReturn } from '@lsst-sqre/gafaelfawr-client';
 import {
   createDiscoveryQuery,
   mockDiscovery,
@@ -26,7 +25,7 @@ import {
 } from '@lsst-sqre/repertoire-client';
 import { vi } from 'vitest';
 
-import { useLoginInfo } from '../hooks/useLoginInfo';
+import { useUserScopes } from '../hooks/useUserScopes';
 
 /** mockDiscovery as a Repertoire 2.x environment publishes it: no scopes. */
 export const discoveryWithoutRequiredScopes: ServiceDiscovery = {
@@ -63,13 +62,9 @@ export function mockDiscoveryState({
 
 /** A signed-in user holding exactly `scopes`. */
 export function mockSignedIn(scopes: string[]) {
-  vi.mocked(useLoginInfo).mockReturnValue({
-    loginInfo: null,
-    query: {
-      scopes,
-      hasScope: (scope: string) => scopes.includes(scope),
-    } as UseLoginInfoReturn['query'],
-    csrfToken: null,
+  vi.mocked(useUserScopes).mockReturnValue({
+    scopes,
+    hasScope: (scope: string) => scopes.includes(scope),
     isLoading: false,
     isPending: false,
     error: null,
@@ -77,12 +72,11 @@ export function mockSignedIn(scopes: string[]) {
   });
 }
 
-/** An anonymous visitor: Gafaelfawr answers 401, so there is no login info. */
+/** An anonymous visitor: Gafaelfawr answers 401, so there are no scopes. */
 export function mockAnonymous() {
-  vi.mocked(useLoginInfo).mockReturnValue({
-    loginInfo: null,
-    query: null,
-    csrfToken: null,
+  vi.mocked(useUserScopes).mockReturnValue({
+    scopes: undefined,
+    hasScope: () => false,
     isLoading: false,
     isPending: false,
     error: null,

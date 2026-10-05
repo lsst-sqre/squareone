@@ -32,6 +32,7 @@ vi.mock('../sentry/reportError', () => ({
 const REPERTOIRE_URL = 'https://data.lsst.cloud/repertoire';
 const GAFAELFAWR_URL = createDiscoveryQuery(mockDiscovery).getGafaelfawrUrl();
 const SESSION_COOKIE = 'gafaelfawr=encrypted-session; theme=dark';
+const DELEGATED_TOKEN = 'gt-delegated-internal-token';
 
 const signedInLoginInfo: LoginInfo = {
   ...mockLoginInfo,
@@ -139,6 +140,23 @@ describe('prefetchLoginInfo', () => {
       package: 'gafaelfawr-client',
     });
     expect(dehydratedLoginInfo(queryClient)?.state.data).toBeNull();
+  });
+
+  test('skips the prefetch on a GafaelfawrIngress route, leaving it to the browser', async () => {
+    // Login info is cookie-only, and the ingress stripped the cookie: a fetch
+    // with the delegated token would get a 401 and hydrate the signed-in user
+    // as anonymous. Dehydrating nothing lets the browser fetch it instead.
+    givenRequestHeaders({
+      'x-auth-request-user': 'someuser',
+      'x-auth-request-token': DELEGATED_TOKEN,
+    });
+    const fetchMock = vi.spyOn(globalThis, 'fetch');
+    const queryClient = clientWithDiscovery();
+
+    await prefetchLoginInfo(queryClient, REPERTOIRE_URL);
+
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(dehydratedLoginInfo(queryClient)).toBeUndefined();
   });
 
   test('skips the prefetch when repertoireUrl is unset', async () => {

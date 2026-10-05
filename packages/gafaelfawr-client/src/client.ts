@@ -39,12 +39,15 @@ import type { TokenHistoryFilters, TokenHistoryPage } from './types';
 
 /**
  * Extra fetch options for the ambient auth fetchers ({@link fetchUserInfo},
- * {@link fetchLoginInfo}), merged over their default `credentials: 'include'`.
+ * {@link fetchLoginInfo}, {@link fetchTokenInfo}), merged over their default
+ * `credentials: 'include'`.
  *
  * `credentials: 'include'` only means something in a browser: from a server
  * component it sends no cookie. A server-side caller forwards the incoming
- * request's `cookie` header through `headers`, and passes `cache: 'no-store'`
- * so the cookie-bearing response is never cached by Next's fetch layer.
+ * request's `cookie` header through `headers` (or, on a GafaelfawrIngress
+ * route, presents the delegated token as a bearer `authorization` header), and
+ * passes `cache: 'no-store'` so the credential-bearing response is never
+ * cached by Next's fetch layer.
  */
 export type AuthRequestInit = Pick<RequestInit, 'headers' | 'cache'>;
 
@@ -131,6 +134,49 @@ export async function fetchLoginInfo(
 
   const data = await response.json();
   return LoginInfoSchema.parse(data);
+}
+
+// =============================================================================
+// Token Info
+// =============================================================================
+
+/**
+ * Fetch metadata about the token authenticating the request.
+ *
+ * Gafaelfawr answers for whatever token the request carries, so this is how a
+ * server-side caller learns the scopes of a delegated internal token (the
+ * `X-Auth-Request-Token` a GafaelfawrIngress sends the backend): present it as
+ * `Authorization: Bearer <token>` through `init.headers`. Unlike
+ * {@link fetchLoginInfo}, this endpoint accepts bearer tokens, not only the
+ * session cookie.
+ *
+ * @param baseUrl - Gafaelfawr API base URL
+ * @param init - Extra fetch options, e.g. a bearer `authorization` header for
+ *   a server-side call. Omitted in the browser, where the session cookie
+ *   authenticates.
+ * @returns The authenticating token's metadata, including its scopes
+ * @throws GafaelfawrError if the request fails or the token is not valid
+ */
+export async function fetchTokenInfo(
+  baseUrl: string,
+  init?: AuthRequestInit
+): Promise<TokenInfo> {
+  const url = `${normalizeUrl(baseUrl)}/token-info`;
+
+  const response = await fetch(url, {
+    credentials: 'include',
+    ...init,
+  });
+
+  if (!response.ok) {
+    throw new GafaelfawrError(
+      `Failed to fetch token info: ${response.status} ${response.statusText}`,
+      response.status
+    );
+  }
+
+  const data = await response.json();
+  return TokenInfoSchema.parse(data);
 }
 
 // =============================================================================

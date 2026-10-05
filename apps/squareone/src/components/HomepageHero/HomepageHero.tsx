@@ -2,10 +2,10 @@
 
 import { useServiceDiscovery } from '@lsst-sqre/repertoire-client';
 import Link from 'next/link';
-import { useLoginInfo } from '../../hooks/useLoginInfo';
 
 import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
 import { useStaticConfig } from '../../hooks/useStaticConfig';
+import { useUserScopes } from '../../hooks/useUserScopes';
 import FullBleedBackgroundImageSection from '../FullBleedBackgroundImageSection';
 import styles from './HomepageHero.module.css';
 
@@ -21,9 +21,9 @@ import styles from './HomepageHero.module.css';
  * the service declares in `required_scopes` (Repertoire 3.0.0). Anonymous
  * visitors and services that declare no required scopes are unaffected.
  *
- * The root layout prefetches both service discovery and the user's login info
- * (their scopes) on the server and hydrates them, so both are known on the
- * first client render and a gated card never appears only to vanish.
+ * The root layout prefetches both service discovery and the user's scopes on
+ * the server and hydrates them, so both are known on the first client render
+ * and a gated card never appears only to vanish.
  */
 export default function HomepageHero() {
   const { showPreview, previewLink, docsBaseUrl, siteName } = useStaticConfig();
@@ -35,7 +35,7 @@ export default function HomepageHero() {
   // The signed-in user's scopes (hydrated from the layout's prefetch);
   // undefined when anonymous or still loading, which canAccessService treats as
   // allowed.
-  const scopes = useLoginInfo().query?.scopes;
+  const { scopes } = useUserScopes();
   const canAccessUiService = (name: string) => {
     const service = query?.getUiService(name);
     return !!service && !!query?.canAccessService(service, scopes);

@@ -11,12 +11,18 @@ import {
   fetchLoginInfo,
   fetchTokenChangeHistory,
   fetchTokenDetails,
+  fetchTokenInfo,
   fetchUserInfo,
   fetchUserTokens,
   getEmptyUserInfo,
 } from './client';
 import { GafaelfawrError } from './errors';
-import { mockLoginInfo, mockTokens, mockUserInfo } from './mock-data';
+import {
+  mockLoginInfo,
+  mockTokenDetail,
+  mockTokens,
+  mockUserInfo,
+} from './mock-data';
 
 describe('fetchUserInfo', () => {
   beforeEach(() => {
@@ -168,6 +174,66 @@ describe('fetchLoginInfo', () => {
       {
         credentials: 'include',
         headers: { cookie: 'gafaelfawr=session' },
+        cache: 'no-store',
+      }
+    );
+  });
+});
+
+describe('fetchTokenInfo', () => {
+  beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn());
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('fetches and validates the authenticating token', async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve(mockTokenDetail),
+    });
+    vi.stubGlobal('fetch', mockFetch);
+
+    const result = await fetchTokenInfo('/auth/api/v1');
+
+    expect(mockFetch).toHaveBeenCalledWith('/auth/api/v1/token-info', {
+      credentials: 'include',
+    });
+    expect(result.scopes).toEqual(mockTokenDetail.scopes);
+  });
+
+  it('throws GafaelfawrError on error', async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 401,
+      statusText: 'Unauthorized',
+    });
+    vi.stubGlobal('fetch', mockFetch);
+
+    await expect(fetchTokenInfo('/auth/api/v1')).rejects.toThrow(
+      GafaelfawrError
+    );
+  });
+
+  it('merges request init (a bearer token, cache) over credentials', async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve(mockTokenDetail),
+    });
+    vi.stubGlobal('fetch', mockFetch);
+
+    await fetchTokenInfo('https://example.com/auth/api/v1/', {
+      headers: { authorization: 'Bearer gt-delegated' },
+      cache: 'no-store',
+    });
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      'https://example.com/auth/api/v1/token-info',
+      {
+        credentials: 'include',
+        headers: { authorization: 'Bearer gt-delegated' },
         cache: 'no-store',
       }
     );

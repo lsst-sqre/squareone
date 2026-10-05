@@ -5,10 +5,10 @@ import { useUnreadNotificationCount } from '@lsst-sqre/semaphore-client';
 import { Badge, getLogoutUrl, PrimaryNavigation } from '@lsst-sqre/squared';
 import { ChevronDown } from 'lucide-react';
 import NextLink from 'next/link';
-import { useLoginInfo } from '../../hooks/useLoginInfo';
 import { useSemaphoreUrl } from '../../hooks/useSemaphoreUrl';
 import { useStaticConfig } from '../../hooks/useStaticConfig';
 import { useUserInfo } from '../../hooks/useUserInfo';
+import { useUserScopes } from '../../hooks/useUserScopes';
 import { hasAnyAdminAccess } from '../../lib/config/adminPageScopes';
 
 type UserMenuProps = {
@@ -20,10 +20,11 @@ export default function UserMenu({ pageUrl }: UserMenuProps) {
   // the username is in the server HTML with no request of the menu's own.
   const username = useUserInfo().userInfo?.username;
 
-  // The scopes gate the Admin link. Sentry reporting of login-info failures is
-  // not this menu's job: the app's useLoginInfo hook (src/hooks) is the
-  // chokepoint, attaching the reporter to every observer of the shared query.
-  const { query } = useLoginInfo();
+  // The scopes gate the Admin link; the root layout hydrates them too. Sentry
+  // reporting of scope failures is not this menu's job: the app's
+  // useUserScopes hook (src/hooks) is the chokepoint, attaching the reporter
+  // to every observer of the shared query.
+  const { scopes } = useUserScopes();
   const logoutUrl = getLogoutUrl(pageUrl.toString());
 
   const config = useStaticConfig();
@@ -45,7 +46,7 @@ export default function UserMenu({ pageUrl }: UserMenuProps) {
   // the deployment's `adminPageScopes` mapping — the same union rule
   // `AdminRequired` applies to the section, so the link never leads to the
   // gate's unauthorized state.
-  const isAdmin = hasAnyAdminAccess(config, query?.scopes ?? []);
+  const isAdmin = hasAnyAdminAccess(config, scopes ?? []);
 
   // Login renders the menu only for a signed-in user, whose user info carries
   // a username.

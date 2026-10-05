@@ -100,6 +100,7 @@ export {
   fetchOidcClients,
   fetchTokenChangeHistory,
   fetchTokenDetails,
+  fetchTokenInfo,
   fetchUserInfo,
   fetchUserTokens,
   getEmptyUserInfo,
@@ -136,6 +137,8 @@ export type {
   AuthQueryConfig,
   Logger,
   OidcClientQueryConfig,
+  UserScopesQueryConfig,
+  UserScopesSource,
 } from './query-options';
 export {
   loginInfoQueryOptions,
@@ -144,6 +147,7 @@ export {
   tokenDetailsQueryOptions,
   tokenHistoryQueryOptions,
   userInfoQueryOptions,
+  userScopesQueryOptions,
   userTokensQueryOptions,
 } from './query-options';
 
@@ -209,6 +213,7 @@ export {
   type UseTokenDetailsReturn,
   type UseUpdateOidcClientReturn,
   type UseUserInfoReturn,
+  type UseUserScopesReturn,
   type UseUserTokensReturn,
   useCreateOidcClient,
   useCreateServiceToken,
@@ -223,5 +228,6 @@ export {
   useTokenDetails,
   useUpdateOidcClient,
   useUserInfo,
+  useUserScopes,
   useUserTokens,
 } from './hooks';

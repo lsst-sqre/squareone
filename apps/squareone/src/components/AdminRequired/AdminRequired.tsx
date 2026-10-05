@@ -1,9 +1,8 @@
 'use client';
 
 import React, { type ReactNode } from 'react';
-import { useLoginInfo } from '../../hooks/useLoginInfo';
-
 import { useStaticConfig } from '../../hooks/useStaticConfig';
+import { useUserScopes } from '../../hooks/useUserScopes';
 import {
   type AdminPageId,
   getRequiredAdminScopes,
@@ -31,7 +30,7 @@ type AdminRequiredProps = {
  *
  * Use this component to gate admin-only content. It composes {@link AuthRequired}
  * to require authentication (redirecting unauthenticated users to login) and
- * additionally checks the user's Gafaelfawr scopes from `useLoginInfo()` against
+ * additionally checks the user's Gafaelfawr scopes from `useUserScopes()` against
  * the `adminPageScopes` configuration. Logged-in users without a granting scope
  * see an "unauthorized" state, naming the scopes that would have let them in,
  * instead of the children.
@@ -100,15 +99,16 @@ function AdminScopeGate({
   loadingFallback,
 }: AdminScopeGateProps) {
   const config = useStaticConfig();
-  const { query, isLoading } = useLoginInfo();
+  const { scopes, isLoading } = useUserScopes();
 
-  // Wait for login info before deciding, so authorized users never flash the
-  // unauthorized state.
+  // Wait for the scopes before deciding, so authorized users never flash the
+  // unauthorized state. The root layout hydrates them, so this is normally
+  // already settled on the first render.
   if (isLoading) {
     return loadingFallback ?? <div className={styles.loading}>Loading...</div>;
   }
 
-  const userScopes = query?.scopes ?? [];
+  const userScopes = scopes ?? [];
   const authorized = pageId
     ? hasAdminPageAccess(config, userScopes, pageId)
     : hasAnyAdminAccess(config, userScopes);

@@ -99,8 +99,12 @@
               "options": {
                 "paths": {
                   "@lsst-sqre/gafaelfawr-client": {
-                    "importNames": ["useLoginInfo", "useUserInfo"],
-                    "message": "Import this hook from the app's src/hooks/useLoginInfo or src/hooks/useUserInfo instead: the app hooks attach the Sentry reporter that every login-info and user-info observer must carry."
+                    "importNames": [
+                      "useLoginInfo",
+                      "useUserInfo",
+                      "useUserScopes"
+                    ],
+                    "message": "Import this hook from the app's src/hooks/useLoginInfo, src/hooks/useUserInfo, or src/hooks/useUserScopes instead: the app hooks attach the Sentry reporter that every login-info, user-info, and user-scopes observer must carry."
                   }
                 }
               }

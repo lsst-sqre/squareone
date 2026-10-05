@@ -1,20 +1,20 @@
 /*
  * HeaderNav (and its Apps menu) rendered from hydrated query state, the way
- * the root layout serves it: service discovery and the signed-in user's login
- * info are both prefetched on the server and dehydrated into the page.
+ * the root layout serves it: service discovery and the signed-in user's scopes
+ * are both prefetched on the server and dehydrated into the page.
  *
- * Unlike HeaderNav.test.tsx, the discovery and login-info hooks are real here,
+ * Unlike HeaderNav.test.tsx, the discovery and user-scopes hooks are real here,
  * so these tests pin that the scope-gated entries are already right on the
  * first render: a signed-in user's hidden entries never flash in, and their
- * Apps menu never pops in, once `GET /auth/api/v1/login` would have resolved in
- * the browser. `fetch` never settles, so nothing can arrive after hydration.
+ * Apps menu never pops in, once the browser's own login request would have
+ * resolved. The state carries no login-info entry at all, as the layout
+ * dehydrates on a GafaelfawrIngress route (where the scopes come from the
+ * delegated token and login info is left to the browser), so the nav must
+ * gate on the scopes entry alone. `fetch` never settles, so nothing can arrive
+ * after hydration.
  */
 
-import {
-  type LoginInfo,
-  loginInfoQueryOptions,
-  mockLoginInfo,
-} from '@lsst-sqre/gafaelfawr-client';
+import { userScopesQueryOptions } from '@lsst-sqre/gafaelfawr-client';
 import {
   discoveryQueryOptions,
   mockDiscovery,
@@ -60,17 +60,17 @@ const discoveryWithoutTimesSquare: ServiceDiscovery = {
   ),
 };
 
-/** Login info for a signed-in user holding exactly `scopes`. */
-function signedIn(scopes: string[]): LoginInfo {
-  return { ...mockLoginInfo, scopes };
+/** A signed-in user holding exactly `scopes`. */
+function signedIn(scopes: string[]): string[] {
+  return scopes;
 }
 
 /**
- * The state the root layout dehydrates: discovery plus the visitor's login
- * info (`null` for an anonymous visitor, whose login request gets a 401).
+ * The state the root layout dehydrates: discovery plus the visitor's scopes
+ * (`null` for an anonymous visitor, whose auth requests get a 401).
  */
 function layoutState(
-  loginInfo: LoginInfo | null,
+  userScopes: string[] | null,
   discovery: ServiceDiscovery = mockDiscovery
 ): DehydratedState {
   const serverClient = new QueryClient();
@@ -78,7 +78,7 @@ function layoutState(
     discoveryQueryOptions(REPERTOIRE_URL).queryKey,
     discovery
   );
-  serverClient.setQueryData(loginInfoQueryOptions().queryKey, loginInfo);
+  serverClient.setQueryData(userScopesQueryOptions().queryKey, userScopes);
   return dehydrate(serverClient);
 }
 
@@ -108,7 +108,7 @@ function firstRender(state: DehydratedState) {
   return within(container);
 }
 
-describe('HeaderNav with hydrated login info', () => {
+describe('HeaderNav with hydrated user scopes', () => {
   beforeEach(() => {
     vi.mocked(useStaticConfig).mockReturnValue({
       repertoireUrl: REPERTOIRE_URL,
@@ -163,7 +163,8 @@ describe('HeaderNav with hydrated login info', () => {
     expect(
       screen.getByRole('link', { name: 'Chronograf metrics viewer' })
     ).toBeInTheDocument();
-    // The hydrated login info is fresh, so the browser issues no login request.
+    // The hydrated scopes are fresh, so the browser issues no login request,
+    // even though no login info was hydrated.
     expect(fetch).not.toHaveBeenCalled();
   });
 });

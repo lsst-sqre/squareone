@@ -4,8 +4,8 @@
  *
  * The decorator enables service discovery (by adding a `repertoireUrl` to the
  * Storybook config) and seeds a fresh query cache with the discovery document,
- * the visitor's Gafaelfawr login info (the scopes that gate services declaring
- * `required_scopes`), and their user info. Seeding rather than stubbing `fetch`
+ * the visitor's Gafaelfawr scopes (which gate services declaring
+ * `required_scopes`), their login info, and their user info. Seeding rather than stubbing `fetch`
  * keeps the stories deterministic: the components render the final state on
  * their first pass, with no loading states for a play function to wait out.
  *
@@ -26,6 +26,7 @@ import {
   mockUnauthenticatedUserInfo,
   mockUserInfo,
   userInfoQueryOptions,
+  userScopesQueryOptions,
 } from '@lsst-sqre/gafaelfawr-client';
 import {
   discoveryQueryOptions,
@@ -79,6 +80,10 @@ function ServiceAccessProvider({
     client.setQueryData(
       discoveryQueryOptions(STORY_REPERTOIRE_URL).queryKey,
       mockDiscovery
+    );
+    client.setQueryData(
+      userScopesQueryOptions().queryKey,
+      visitor ? visitor.scopes : null
     );
     client.setQueryData(
       loginInfoQueryOptions().queryKey,

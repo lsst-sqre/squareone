@@ -6,13 +6,13 @@ import AdminRequired from './AdminRequired';
 
 // Mock the gafaelfawr hooks. AdminRequired composes AuthRequired (which checks
 // login via useUserInfo) and additionally gates on the configured admin scopes
-// via useLoginInfo.
+// via useUserScopes.
 vi.mock('../../hooks/useUserInfo', () => ({
   useUserInfo: vi.fn(),
 }));
 
-vi.mock('../../hooks/useLoginInfo', () => ({
-  useLoginInfo: vi.fn(),
+vi.mock('../../hooks/useUserScopes', () => ({
+  useUserScopes: vi.fn(),
 }));
 
 // The scopes the gate checks come from `adminPageScopes` in the app config.
@@ -21,16 +21,16 @@ vi.mock('../../hooks/useStaticConfig', () => ({
 }));
 
 import type {
-  UseLoginInfoReturn,
   UseUserInfoReturn,
+  UseUserScopesReturn,
 } from '@lsst-sqre/gafaelfawr-client';
-// Import after mocking
-import { useLoginInfo } from '../../hooks/useLoginInfo';
 import {
   type AppConfigContextValue,
   useStaticConfig,
 } from '../../hooks/useStaticConfig';
 import { useUserInfo } from '../../hooks/useUserInfo';
+// Import after mocking
+import { useUserScopes } from '../../hooks/useUserScopes';
 import type { AdminPageScopes } from '../../lib/config/adminPageScopes';
 
 // Helper: an authenticated useUserInfo return (so AuthRequired renders through
@@ -47,18 +47,14 @@ function mockAuthenticated(isLoading = false): UseUserInfoReturn {
   };
 }
 
-// Helper: a useLoginInfo return whose query reports the given scopes.
-function mockLoginInfoWithScopes(
+// Helper: a useUserScopes return reporting the given scopes.
+function mockUserScopes(
   scopes: string[],
   isLoading = false
-): UseLoginInfoReturn {
+): UseUserScopesReturn {
   return {
-    loginInfo: null,
-    query: {
-      scopes,
-      hasScope: (scope: string) => scopes.includes(scope),
-    } as UseLoginInfoReturn['query'],
-    csrfToken: null,
+    scopes,
+    hasScope: (scope: string) => scopes.includes(scope),
     isLoading,
     isPending: false,
     error: null,
@@ -86,9 +82,7 @@ describe('AdminRequired', () => {
   test('renders children for a user holding any configured page scope', () => {
     // admin:token grants only the service-tokens page, which is enough to be
     // in the admin section at all.
-    vi.mocked(useLoginInfo).mockReturnValue(
-      mockLoginInfoWithScopes(['admin:token'])
-    );
+    vi.mocked(useUserScopes).mockReturnValue(mockUserScopes(['admin:token']));
 
     render(<AdminRequired>Admin Content</AdminRequired>);
 
@@ -97,9 +91,7 @@ describe('AdminRequired', () => {
   });
 
   test('renders children for exec:admin because the sentry page defaults to it', () => {
-    vi.mocked(useLoginInfo).mockReturnValue(
-      mockLoginInfoWithScopes(['exec:admin'])
-    );
+    vi.mocked(useUserScopes).mockReturnValue(mockUserScopes(['exec:admin']));
 
     render(<AdminRequired>Admin Content</AdminRequired>);
 
@@ -115,9 +107,7 @@ describe('AdminRequired', () => {
       oidcClients: ['admin:oidc'],
       sentry: ['admin:observability'],
     });
-    vi.mocked(useLoginInfo).mockReturnValue(
-      mockLoginInfoWithScopes(['exec:admin'])
-    );
+    vi.mocked(useUserScopes).mockReturnValue(mockUserScopes(['exec:admin']));
 
     render(<AdminRequired>Admin Content</AdminRequired>);
 
@@ -128,8 +118,8 @@ describe('AdminRequired', () => {
   });
 
   test('renders an unauthorized state for a logged-in user with no admin scopes', () => {
-    vi.mocked(useLoginInfo).mockReturnValue(
-      mockLoginInfoWithScopes(['read:tap', 'exec:notebook'])
+    vi.mocked(useUserScopes).mockReturnValue(
+      mockUserScopes(['read:tap', 'exec:notebook'])
     );
 
     render(<AdminRequired>Admin Content</AdminRequired>);
@@ -141,7 +131,7 @@ describe('AdminRequired', () => {
   });
 
   test('names every scope that would have granted access', () => {
-    vi.mocked(useLoginInfo).mockReturnValue(mockLoginInfoWithScopes([]));
+    vi.mocked(useUserScopes).mockReturnValue(mockUserScopes([]));
 
     render(<AdminRequired>Admin Content</AdminRequired>);
 
@@ -155,11 +145,10 @@ describe('AdminRequired', () => {
     }
   });
 
-  test('renders an unauthorized state when the login-info fetch fails (query is null)', () => {
-    vi.mocked(useLoginInfo).mockReturnValue({
-      loginInfo: null,
-      query: null,
-      csrfToken: null,
+  test('renders an unauthorized state when the scopes could not be fetched', () => {
+    vi.mocked(useUserScopes).mockReturnValue({
+      scopes: undefined,
+      hasScope: () => false,
       isLoading: false,
       isPending: false,
       error: null,
@@ -174,8 +163,8 @@ describe('AdminRequired', () => {
     expect(screen.queryByText('Admin Content')).not.toBeInTheDocument();
   });
 
-  test('renders a loading state while login info is loading', () => {
-    vi.mocked(useLoginInfo).mockReturnValue(mockLoginInfoWithScopes([], true));
+  test('renders a loading state while the scopes are loading', () => {
+    vi.mocked(useUserScopes).mockReturnValue(mockUserScopes([], true));
 
     render(<AdminRequired>Admin Content</AdminRequired>);
 
@@ -186,9 +175,7 @@ describe('AdminRequired', () => {
 
   describe('with a pageId', () => {
     test('renders children when the user holds that page’s scope', () => {
-      vi.mocked(useLoginInfo).mockReturnValue(
-        mockLoginInfoWithScopes(['admin:token'])
-      );
+      vi.mocked(useUserScopes).mockReturnValue(mockUserScopes(['admin:token']));
 
       render(
         <AdminRequired pageId="serviceTokens">Token Content</AdminRequired>
@@ -200,8 +187,8 @@ describe('AdminRequired', () => {
     test('refuses a user who holds a different admin page’s scope', () => {
       // The section-wide union would let this user in; the page's own scope
       // list is what decides here.
-      vi.mocked(useLoginInfo).mockReturnValue(
-        mockLoginInfoWithScopes(['admin:notifications'])
+      vi.mocked(useUserScopes).mockReturnValue(
+        mockUserScopes(['admin:notifications'])
       );
 
       render(
@@ -217,8 +204,8 @@ describe('AdminRequired', () => {
 
     test('follows a deployment override of that page’s scopes', () => {
       mockConfig({ serviceTokens: ['admin:tokens-custom'] });
-      vi.mocked(useLoginInfo).mockReturnValue(
-        mockLoginInfoWithScopes(['admin:tokens-custom'])
+      vi.mocked(useUserScopes).mockReturnValue(
+        mockUserScopes(['admin:tokens-custom'])
       );
 
       render(

@@ -1,7 +1,10 @@
 /*
  * The header's log-in control rendered from hydrated query state, the way the
- * root layout serves it: service discovery, login info, and user info are all
- * prefetched on the server and dehydrated into the page.
+ * root layout serves it: service discovery, the user's scopes, login info, and
+ * user info are all prefetched on the server and dehydrated into the page. On
+ * a GafaelfawrIngress route the layout dehydrates no login info (the scopes
+ * and user info come from the delegated token instead), which must make no
+ * difference to the header.
  *
  * The hooks are real, so these tests pin that the server HTML already shows a
  * signed-in user's menu (not "Log in"), that an anonymous visitor's "Log in"
@@ -18,6 +21,7 @@ import {
   mockUserInfo,
   type UserInfo,
   userInfoQueryOptions,
+  userScopesQueryOptions,
 } from '@lsst-sqre/gafaelfawr-client';
 import {
   discoveryQueryOptions,
@@ -53,22 +57,50 @@ import HeaderNav from './HeaderNav';
 
 const REPERTOIRE_URL = 'https://data.lsst.cloud/repertoire';
 
-/** A visitor as the layout's prefetches see them. */
-type Visitor = { userInfo: UserInfo; loginInfo: LoginInfo | null };
+/**
+ * A visitor as the layout's prefetches see them. `loginInfo` is absent, not
+ * null, on a GafaelfawrIngress route, where it is not prefetched at all.
+ */
+type Visitor = {
+  userInfo: UserInfo;
+  userScopes: string[] | null;
+  loginInfo?: LoginInfo | null;
+};
 
-const signedIn: Visitor = { userInfo: mockUserInfo, loginInfo: mockLoginInfo };
+const signedIn: Visitor = {
+  userInfo: mockUserInfo,
+  userScopes: mockLoginInfo.scopes,
+  loginInfo: mockLoginInfo,
+};
+
+/** The same user on a GafaelfawrIngress route: delegated token, no login info. */
+const signedInOnIngressRoute: Visitor = {
+  userInfo: mockUserInfo,
+  userScopes: mockLoginInfo.scopes,
+};
 
 /** Gafaelfawr answers an anonymous visitor's requests with a 401. */
-const anonymous: Visitor = { userInfo: getEmptyUserInfo(), loginInfo: null };
+const anonymous: Visitor = {
+  userInfo: getEmptyUserInfo(),
+  userScopes: null,
+  loginInfo: null,
+};
 
 /** The state the root layout dehydrates for `visitor`. */
-function layoutState({ userInfo, loginInfo }: Visitor): DehydratedState {
+function layoutState({
+  userInfo,
+  userScopes,
+  loginInfo,
+}: Visitor): DehydratedState {
   const serverClient = new QueryClient();
   serverClient.setQueryData(
     discoveryQueryOptions(REPERTOIRE_URL).queryKey,
     mockDiscovery
   );
-  serverClient.setQueryData(loginInfoQueryOptions().queryKey, loginInfo);
+  serverClient.setQueryData(userScopesQueryOptions().queryKey, userScopes);
+  if (loginInfo !== undefined) {
+    serverClient.setQueryData(loginInfoQueryOptions().queryKey, loginInfo);
+  }
   serverClient.setQueryData(userInfoQueryOptions().queryKey, userInfo);
   return dehydrate(serverClient);
 }
@@ -172,6 +204,21 @@ describe('Login with hydrated user info', () => {
     // menu reads the same query rather than making its own request.
     const urls = vi.mocked(fetch).mock.calls.map(([input]) => String(input));
     expect(urls.filter((url) => url.includes('user-info'))).toEqual([]);
+  });
+
+  test('requests nothing after hydrating on a GafaelfawrIngress route', async () => {
+    const { container, errors } = await hydrate(
+      layoutState(signedInOnIngressRoute)
+    );
+
+    // No login info was hydrated, but nothing in the header reads it: the
+    // menu and the scope gating are answered by the hydrated user info and
+    // scopes, so the browser makes no auth request of its own.
+    expect(errors).toEqual([]);
+    expect(
+      userNav(container).getByRole('button', { name: mockUserInfo.username })
+    ).toBeInTheDocument();
+    expect(vi.mocked(fetch)).not.toHaveBeenCalled();
   });
 
   test("hydrates a signed-in user's header without a mismatch", async () => {
