@@ -477,6 +477,22 @@ Dark mode is implemented via data attributes and CSS variable overrides:
 }
 ```
 
+## Code Samples
+
+Show blocks of code with the `CodeBlock` component from `@lsst-sqre/squared`, the monorepo's standard syntax highlighter. Don't style a raw `<pre>`/`<code>` for code samples.
+
+```tsx
+import { CodeBlock } from '@lsst-sqre/squared';
+
+<CodeBlock code={JSON.stringify(data, null, 2)} language="json" lineNumbers />;
+```
+
+- Props: `code`, `language` (MicroLighter grammar name or alias, such as `json`, `yaml`, `python`, `bash`, `ts`), `lineNumbers` (default `false`), `copy` (default `true`), `ariaLabel`.
+- Highlighting is client-side (MicroLighter and the CSS Custom Highlight API, registered after hydration). Server rendering and unsupported browsers show plain monospace text. `CodeBlock` is a client component, so server components can render it with string props.
+- Colours come from MicroLighter's GitHub theme (imported by `@lsst-sqre/global-css`) and follow the site's `data-theme`, not the OS preference. Don't restyle the token colours per component.
+- In MDX content, fenced code blocks with a language (```` ```python ````) already render through `CodeBlock` via the `pre` mapping in `apps/squareone/src/lib/mdx/rsc/components.tsx`.
+- Inline `<code>` is still right for short values in prose, such as a URL or a token name.
+
 ## Best Practices
 
 1. **Always use design tokens** - Never hardcode colors, spacing, or other design values
@@ -487,6 +503,7 @@ Dark mode is implemented via data attributes and CSS variable overrides:
 6. **Reference Rubin Visual Identity Manual** - When in doubt about color usage
 7. **Test in both light and dark modes** - If using themeable colors
 8. **Document custom tokens** - If creating new application-specific tokens
+9. **Show code with `CodeBlock`** - Code samples use squared's `CodeBlock`, not a raw `<pre>` (see Code Samples)
 
 ## Accessing Source Files
 

@@ -17,5 +17,22 @@ service with popular tools such as
 [pyvo](https://pyvo.readthedocs.io/en/latest/index.html)
 (Python package).
 
+For example, this Python code queries the TAP service with pyvo,
+using an access token stored in the `RSP_TOKEN` environment variable:
+
+```python
+import os
+
+import pyvo
+import requests
+
+session = requests.Session()
+session.headers["Authorization"] = f"Bearer {os.environ['RSP_TOKEN']}"
+
+tap = pyvo.dal.TAPService("https://data.lsst.cloud/api/tap", session=session)
+results = tap.search("SELECT TOP 10 * FROM dp1.Object")
+print(results.to_table())
+```
+
 See our tutorial [Authenticating from TOPCat outside the Science Platform](https://rsp.lsst.io/guides/auth/using-topcat-outside-rsp.html)
 to learn more about accessing TAP datasets from your own computer.

@@ -13,6 +13,12 @@ Each package is developed in separate folder in the :file:`packages` directory o
 
    @lsst-sqre/rubin-style-dictionary <rubin-style-dictionary/index>
 
+.. toctree::
+   :hidden:
+   :caption: Internal packages
+
+   @lsst-sqre/squared <squared/index>
+
 .. grid:: 1
 
    .. grid-item-card:: Rubin Style Dictionary
@@ -20,3 +26,9 @@ Each package is developed in separate folder in the :file:`packages` directory o
       :link-type: doc
 
       Rubin Style Dictionary provides design tokens and assets in multiple formats based on the Rubin Observatory Visual Identity Manual.
+
+   .. grid-item-card:: Squared
+      :link: squared/index
+      :link-type: doc
+
+      Squared is the React component library for Squareone apps, including ``CodeBlock``, the standard for displaying syntax-highlighted code.

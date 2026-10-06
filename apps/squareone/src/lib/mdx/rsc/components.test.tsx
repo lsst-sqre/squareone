@@ -22,6 +22,7 @@ import {
   mockDiscovery,
 } from '@lsst-sqre/repertoire-client';
 
+import { compileMDX } from 'next-mdx-remote/rsc';
 import { getStaticConfig } from '../../config/rsc';
 import {
   commonMdxComponents,
@@ -187,5 +188,112 @@ describe('RSC MDX components: <DatasetDocsCards>', () => {
 
     expect(container).toBeEmptyDOMElement();
     expect(fetchServiceDiscovery).not.toHaveBeenCalled();
+  });
+});
+
+describe('RSC MDX components: fenced code blocks (<pre>)', () => {
+  // MDX compiles a fenced block to <pre><code class="language-*">, with the
+  // block's text (plus a trailing newline) as the code element's children.
+  const Pre = commonMdxComponents.pre;
+
+  function getHighlighter(container: HTMLElement) {
+    const element = container.querySelector(
+      '[data-syntax-theme="github"] micro-lighter'
+    );
+    if (!element) throw new Error('CodeBlock not rendered');
+    return element;
+  }
+
+  test('renders a pre with a language-* code child through CodeBlock', () => {
+    const { container } = render(
+      <Pre>
+        <code className="language-json">{'{"name": "squareone"}\n'}</code>
+      </Pre>
+    );
+
+    expect(getHighlighter(container)).toHaveAttribute('language', 'json');
+  });
+
+  test('passes the block text, without the trailing newline, as the code', () => {
+    const { container } = render(
+      <Pre>
+        <code className="language-yaml">{'name: squareone\nversion: 1\n'}</code>
+      </Pre>
+    );
+
+    expect(
+      getHighlighter(container).querySelector('pre > code.language-yaml')
+        ?.textContent
+    ).toBe('name: squareone\nversion: 1');
+  });
+
+  test('shows the copy button but no line numbers', () => {
+    const { container } = render(
+      <Pre>
+        <code className="language-python">{'import pyvo\n'}</code>
+      </Pre>
+    );
+
+    const highlighter = getHighlighter(container);
+    expect(highlighter).toHaveAttribute('controls', 'copy');
+    expect(highlighter).not.toHaveAttribute('line-numbers');
+  });
+
+  test('renders a pre whose code child has no language-* class as a plain pre', () => {
+    const { container } = render(
+      <Pre className="custom">
+        <code>plain text</code>
+      </Pre>
+    );
+
+    expect(container.querySelector('micro-lighter')).not.toBeInTheDocument();
+    expect(container.innerHTML).toBe(
+      '<pre class="custom"><code>plain text</code></pre>'
+    );
+  });
+
+  test('renders a pre whose language-* child is not a code element as a plain pre', () => {
+    const { container } = render(
+      <Pre>
+        <span className="language-json">{'{}'}</span>
+      </Pre>
+    );
+
+    expect(container.querySelector('micro-lighter')).not.toBeInTheDocument();
+    expect(container.innerHTML).toBe(
+      '<pre><span class="language-json">{}</span></pre>'
+    );
+  });
+
+  test('renders a pre without a code child as a plain pre', () => {
+    const { container } = render(<Pre>preformatted text</Pre>);
+
+    expect(container.querySelector('micro-lighter')).not.toBeInTheDocument();
+    expect(container.innerHTML).toBe('<pre>preformatted text</pre>');
+  });
+
+  test('a fenced code block in MDX content renders through CodeBlock with its language', async () => {
+    const { content } = await compileMDX({
+      source: '# Example\n\n```json\n{"name": "squareone"}\n```\n',
+      components: commonMdxComponents,
+    });
+    const { container } = render(content);
+
+    const highlighter = getHighlighter(container);
+    expect(highlighter).toHaveAttribute('language', 'json');
+    expect(highlighter.querySelector('code')?.textContent).toBe(
+      '{"name": "squareone"}'
+    );
+  });
+
+  test('a fenced code block without a language in MDX content renders as a plain pre', async () => {
+    const { content } = await compileMDX({
+      source: '```\nplain text\n```\n',
+      components: commonMdxComponents,
+    });
+    const { container } = render(content);
+
+    expect(container.querySelector('micro-lighter')).not.toBeInTheDocument();
+    expect(container.innerHTML).toBe('<pre><code>plain text\n</code></pre>');
   });
 });
