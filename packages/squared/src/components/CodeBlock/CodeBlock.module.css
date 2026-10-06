@@ -89,8 +89,8 @@
   font: inherit;
 }
 
-/* The code is focusable so keyboard users can scroll long lines. The frame
-   clips overflow, so draw the focus ring inside the edge. */
+/* While long lines scroll, the code is focusable so keyboard users can scroll
+   it. The frame clips overflow, so draw the focus ring inside the edge. */
 .pre:focus-visible {
   outline: 2px solid var(--rsd-color-primary-500);
   outline-offset: -2px;

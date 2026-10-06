@@ -97,7 +97,10 @@ Without ``dist/syntax.css``, code displays as plain, uncoloured monospace text.
 The theme is kept out of ``dist/next.css`` because Next.js's Turbopack logs a "Parsing CSS source code failed" warning for its ``::highlight()`` rules and keeps them only through error recovery; a separate stylesheet means a parse failure can't affect the base styles.
 The squareone app's ``build`` script fails if no stylesheet that ``next build`` emits contains a ``::highlight()`` rule.
 
-Long lines scroll horizontally inside the block, and the code is keyboard focusable so that keyboard users can scroll it.
+Long lines scroll horizontally inside the block.
+While they do, the code is keyboard focusable so that keyboard users can scroll it; code whose lines fit isn't focusable, so a page of short snippets doesn't add a Tab stop for each one.
+``CodeBlock`` checks whether the code scrolls once the block renders in the browser, when its ``code`` changes, and whenever the block resizes (with a ``ResizeObserver``), so the code gains or loses its Tab stop as the window resizes.
+Server-rendered HTML, before hydration, never makes the code focusable.
 The line-number gutter stays in place as the code scrolls sideways, and its numbers can't be selected, so copying the code never includes them.
 
 The copy button sits outside the code, so it never covers a line.

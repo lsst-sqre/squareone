@@ -228,6 +228,16 @@ export const Json: Story = {
     await expect(getComputedStyle(pre).backgroundColor).toBe(
       'rgb(255, 255, 255)'
     );
+    // The lines fit, so the code isn't a Tab stop: Tab goes straight to the
+    // copy button.
+    await expect(pre.scrollWidth).toBeLessThanOrEqual(pre.clientWidth);
+    await expect(pre).not.toHaveAttribute('tabindex');
+    await userEvent.tab();
+    await expect(
+      within(canvasElement).getByRole('button', {
+        name: 'Copy code to clipboard',
+      })
+    ).toHaveFocus();
   },
 };
 
@@ -334,6 +344,10 @@ export const LongLines: Story = {
     // Long lines scroll inside the block rather than widening the page.
     const { pre, button } = getCopyLayout(canvasElement);
     await expect(pre.scrollWidth).toBeGreaterThan(pre.clientWidth);
+    // Keyboard users can focus the code to scroll it.
+    await waitFor(() => expect(pre).toHaveAttribute('tabindex', '0'));
+    await userEvent.tab();
+    await expect(pre).toHaveFocus();
     // The copy button never covers the end of the first line.
     await expect(
       boxesIntersect(
@@ -341,6 +355,36 @@ export const LongLines: Story = {
         pre.getBoundingClientRect()
       )
     ).toBe(false);
+  },
+};
+
+// The code is a Tab stop only while it scrolls: narrowing the block until the
+// lines overflow makes it focusable, and widening it again until they fit
+// takes it back out of the tab order.
+export const FocusableWhileScrolling: Story = {
+  tags: ['!autodocs'],
+  args: {
+    code: jsonSample,
+    language: 'json',
+  },
+  render: (args) => (
+    <div data-testid="column">
+      <CodeBlock {...args} />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await expectHighlighted(canvasElement);
+    const pre = canvasElement.querySelector('pre') as HTMLElement;
+    const column = within(canvasElement).getByTestId('column');
+    await expect(pre).not.toHaveAttribute('tabindex');
+
+    column.style.maxWidth = '12rem';
+    await waitFor(() => expect(pre).toHaveAttribute('tabindex', '0'));
+    await expect(pre.scrollWidth).toBeGreaterThan(pre.clientWidth);
+
+    column.style.removeProperty('max-width');
+    await waitFor(() => expect(pre).not.toHaveAttribute('tabindex'));
+    await expect(pre.scrollWidth).toBeLessThanOrEqual(pre.clientWidth);
   },
 };
 

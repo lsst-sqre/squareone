@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
+import { useHorizontalOverflow } from '../../hooks/useHorizontalOverflow';
 import ClipboardButton from '../ClipboardButton';
 import styles from './CodeBlock.module.css';
 import { CODE_BLOCK_ATTRIBUTE, scheduleHighlight } from './highlightScheduler';
@@ -44,7 +45,8 @@ function countLines(code: string): number {
  * next to `dist/next.css`. Highlighting runs in the browser after hydration,
  * so server rendering and browsers without the Custom Highlight API show the
  * code as plain monospace text. Colours follow the site's `data-theme`, not
- * the OS preference.
+ * the OS preference. Long lines scroll horizontally, and only while they do is
+ * the code focusable, so keyboard users can scroll it.
  *
  * @example
  * ```tsx
@@ -68,6 +70,12 @@ export function CodeBlock({
       void scheduleHighlight();
     };
   }, [code, language]);
+
+  // Long lines scroll the code sideways. Only then is the code focusable, so
+  // keyboard users can scroll it (WCAG 2.1.1, axe scrollable-region-focusable)
+  // without a page of short snippets adding a Tab stop per block.
+  const preRef = useRef<HTMLPreElement>(null);
+  const scrolls = useHorizontalOverflow(preRef, code);
 
   // Name the block as a group only when a label is given; an unnamed group
   // adds nothing for assistive technology.
@@ -103,9 +111,9 @@ export function CodeBlock({
           </div>
         )}
         <pre
+          ref={preRef}
           className={styles.pre}
-          // biome-ignore lint/a11y/noNoninteractiveTabindex: long lines scroll horizontally, so keyboard users must be able to focus the code to scroll it (WCAG 2.1.1, axe scrollable-region-focusable).
-          tabIndex={0}
+          tabIndex={scrolls ? 0 : undefined}
         >
           <code className={`language-${language}`}>{code}</code>
         </pre>

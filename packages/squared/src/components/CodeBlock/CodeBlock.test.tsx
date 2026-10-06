@@ -145,9 +145,11 @@ describe('CodeBlock', () => {
     expect(group).toContainElement(document.querySelector('pre'));
   });
 
-  it('lets keyboard users focus the code to scroll long lines', () => {
+  it('leaves code that does not scroll out of the tab order', () => {
+    // jsdom has no layout, so nothing overflows; the Storybook stories cover
+    // long lines, which make the code focusable.
     const { container } = render(<CodeBlock code="{}" language="json" />);
-    expect(container.querySelector('pre')).toHaveAttribute('tabindex', '0');
+    expect(container.querySelector('pre')).not.toHaveAttribute('tabindex');
   });
 
   it('has no axe violations', async () => {
