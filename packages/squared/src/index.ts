@@ -23,6 +23,7 @@ export type { CheckboxGroupProps } from './components/CheckboxGroup';
 export { CheckboxGroup } from './components/CheckboxGroup';
 export type { ClipboardButtonProps } from './components/ClipboardButton';
 export { default as ClipboardButton } from './components/ClipboardButton';
+export { CodeBlock, type CodeBlockProps } from './components/CodeBlock';
 export type {
   DataTableColumnDef,
   DataTableColumnMeta,

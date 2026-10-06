@@ -22,7 +22,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@lsst-sqre/rubin-style-dictionary": "workspace:*"
+    "@lsst-sqre/rubin-style-dictionary": "workspace:*",
+    "microlighter": "^2.2.0"
   },
   "devDependencies": {
     "chokidar-cli": "^3.0.0",

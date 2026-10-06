@@ -1,0 +1,109 @@
+/*
+ * CodeBlock styles
+ *
+ * The wrapper carries data-syntax-theme="github", so MicroLighter's GitHub
+ * theme (imported by @lsst-sqre/global-css) defines the --syntax-* colours on
+ * it and colours tokens through global ::highlight() rules. The <pre> and the
+ * line-number gutter share one font so their lines stay aligned.
+ */
+
+.codeBlock {
+  --sqr-code-block-font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  --sqr-code-block-font-size: 0.875rem;
+  --sqr-code-block-line-height: 1.5;
+
+  /* Match the block spacing global-css gives a bare <pre>. */
+  margin: 0 0 1rem;
+  min-width: 0;
+  max-width: 100%;
+  border: 1px solid var(--rsd-component-divider-color);
+  border-radius: var(--sqo-border-radius-2);
+  /* Clip the code and gutter backgrounds to the rounded corners. */
+  overflow: hidden;
+  background-color: var(
+    --syntax-background,
+    var(--rsd-component-page-background-color)
+  );
+  color: var(--syntax-foreground, var(--rsd-component-text-color));
+}
+
+/*
+ * Theme mode: follow the site theme, not the OS preference.
+ *
+ * The GitHub theme picks its light or dark colours with light-dark() and sets
+ * `color-scheme: light dark`, which follows the OS. next-themes sets
+ * data-theme on <html>, so pin the colour scheme from that instead.
+ *
+ * global-css builds with Lightning CSS, which compiles light-dark() for older
+ * browsers into --lightningcss-light / --lightningcss-dark toggles switched by
+ * a prefers-color-scheme media query. Pin those toggles too (an empty value
+ * turns a branch off, `initial` turns it on). The attribute selector lifts
+ * these rules above the theme's own [data-syntax-theme] rules.
+ */
+.codeBlock[data-syntax-theme] {
+  color-scheme: light;
+  --lightningcss-light: initial;
+  --lightningcss-dark: ;
+}
+
+[data-theme="dark"] .codeBlock[data-syntax-theme] {
+  color-scheme: dark;
+  --lightningcss-light: ;
+  --lightningcss-dark: initial;
+}
+
+/*
+ * Before the custom element upgrades (server rendering, or browsers without
+ * the Custom Highlight API) <micro-lighter> is an unknown inline element.
+ * Once defined, its shadow styles lay it out as a grid.
+ */
+.highlighter:not(:defined) {
+  display: block;
+}
+
+.highlighter pre {
+  margin: 0;
+  padding: var(--sqo-space-sm-fixed) var(--sqo-space-md-fixed);
+  /* Long lines scroll instead of wrapping or overflowing the page. */
+  overflow-x: auto;
+  font-family: var(--sqr-code-block-font-family);
+  font-size: var(--sqr-code-block-font-size);
+  line-height: var(--sqr-code-block-line-height);
+  tab-size: 4;
+}
+
+.highlighter code {
+  font: inherit;
+}
+
+/* The code is focusable so keyboard users can scroll long lines. The wrapper
+   clips overflow, so draw the focus ring inside the edge. */
+.highlighter pre:focus-visible {
+  outline: 2px solid var(--rsd-color-primary-500);
+  outline-offset: -2px;
+}
+
+.highlighter::part(line-numbers) {
+  /* The element copies the <pre>'s line height and top padding inline. */
+  padding-inline: var(--sqo-space-sm-fixed);
+  padding-block-end: var(--sqo-space-sm-fixed);
+  border-inline-end: 1px solid var(--rsd-component-divider-color);
+  font-family: var(--sqr-code-block-font-family);
+  font-size: var(--sqr-code-block-font-size);
+}
+
+.highlighter::part(copy-button) {
+  margin: var(--sqo-space-xs-fixed);
+  padding: var(--sqo-space-xxs-fixed) var(--sqo-space-xs-fixed);
+  border-radius: var(--sqo-border-radius-1);
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.highlighter::part(copy-button):focus-visible {
+  outline: 2px solid var(--rsd-color-primary-500);
+  outline-offset: 2px;
+}

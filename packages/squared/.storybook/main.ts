@@ -32,7 +32,21 @@ const config: StorybookConfig = {
       ...(config.optimizeDeps.exclude || []),
       'sb-original/image-context',
       '@storybook/nextjs-vite',
+      // MicroLighter (CodeBlock) lazy-loads each language grammar with a
+      // relative import(`./grammars/${language}.js`). Pre-bundling moves the
+      // element into Vite's deps cache, where those grammar files don't
+      // exist, so serve the package as-is.
+      'microlighter',
     ];
+
+    // For the same reason, production builds (build-storybook, Chromatic)
+    // must expand MicroLighter's grammar import into per-language chunks.
+    // Vite skips that transform for everything in node_modules by default.
+    config.build = config.build || {};
+    config.build.dynamicImportVarsOptions = {
+      ...config.build.dynamicImportVarsOptions,
+      exclude: [/node_modules\/(?!.*microlighter\/)/],
+    };
 
     // Ensure we're using the React framework, not NextJS
     config.define = config.define || {};
