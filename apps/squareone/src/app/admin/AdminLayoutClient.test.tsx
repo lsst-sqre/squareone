@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 // AdminLayoutClient composes AdminRequired (login via useUserInfo, scope gate
@@ -90,5 +90,29 @@ describe('AdminLayoutClient', () => {
     expect(
       screen.getByRole('link', { name: 'User notifications' })
     ).toBeInTheDocument();
+  });
+
+  test('lists Overview first for a user holding a single page scope', () => {
+    renderWithScopes(['admin:oidc']);
+
+    const nav = screen.getByRole('navigation', { name: 'Admin' });
+    const links = within(nav).getAllByRole('link');
+    expect(links[0]).toHaveAccessibleName('Overview');
+    expect(links[0]).toHaveAttribute('href', '/admin');
+    expect(
+      screen.getByRole('link', { name: 'OIDC clients' })
+    ).toBeInTheDocument();
+  });
+
+  test('shows the unauthorized message, not the sidebar, to a user with no admin scope', () => {
+    renderWithScopes(['read:tap']);
+
+    expect(
+      screen.getByRole('heading', { name: 'Unauthorized' })
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: 'Overview' })
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText('Admin Content')).not.toBeInTheDocument();
   });
 });

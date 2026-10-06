@@ -1,0 +1,14 @@
+/* AdminOverview: the /admin environment overview and its sections */
+
+.overview {
+  display: flex;
+  flex-direction: column;
+}
+
+.section {
+  margin-bottom: var(--sqo-space-lg-fixed);
+}
+
+.section h2 {
+  margin-top: 0;
+}

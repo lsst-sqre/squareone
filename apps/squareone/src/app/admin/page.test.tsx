@@ -1,26 +1,36 @@
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
-// Mock the RSC config loader so generateMetadata and the page can run without
-// the filesystem-backed config.
+// Mock the RSC config loader so generateMetadata can run without the
+// filesystem-backed config.
 vi.mock('../../lib/config/rsc', () => ({
   getStaticConfig: vi.fn(),
 }));
 
-// The index page resolves its redirect target from the user's Gafaelfawr
-// scopes, so mock the scopes hook.
-vi.mock('../../hooks/useUserScopes', () => ({
-  useUserScopes: vi.fn(),
+// The overview reads service discovery from Repertoire.
+vi.mock('../../hooks/useRepertoireUrl', () => ({
+  useRepertoireUrl: vi.fn(),
 }));
 
+vi.mock('@lsst-sqre/repertoire-client', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@lsst-sqre/repertoire-client')>()),
+  useServiceDiscovery: vi.fn(),
+}));
+
+// `/admin` used to redirect to the first visible admin page; spy on the router
+// to show it no longer does.
 const replace = vi.fn();
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ replace }),
 }));
 
-import type { UseUserScopesReturn } from '@lsst-sqre/gafaelfawr-client';
+import {
+  createDiscoveryQuery,
+  mockDiscoveryDataDev,
+  useServiceDiscovery,
+} from '@lsst-sqre/repertoire-client';
 // Import after mocking.
-import { useUserScopes } from '../../hooks/useUserScopes';
+import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
 import type { StaticConfig } from '../../lib/config/resolveConfigDefaults';
 import { getStaticConfig } from '../../lib/config/rsc';
 import AdminPage, { generateMetadata } from './page';
@@ -30,21 +40,6 @@ function makeConfig(overrides: Partial<StaticConfig> = {}): StaticConfig {
     siteName: 'Rubin Science Platform',
     ...overrides,
   } as StaticConfig;
-}
-
-// Helper: a useUserScopes return reporting the given scopes.
-function mockUserScopes(
-  scopes: string[],
-  isLoading = false
-): UseUserScopesReturn {
-  return {
-    scopes,
-    hasScope: (scope: string) => scopes.includes(scope),
-    isLoading,
-    isPending: false,
-    error: null,
-    refetch: vi.fn(),
-  };
 }
 
 describe('AdminPage generateMetadata', () => {
@@ -71,83 +66,59 @@ describe('AdminPage generateMetadata', () => {
   });
 });
 
-describe('AdminPage redirect', () => {
+describe('AdminPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(getStaticConfig).mockResolvedValue(makeConfig());
   });
 
-  test('redirects a user holding only admin:notifications to /admin/notifications', async () => {
-    vi.mocked(useUserScopes).mockReturnValue(
-      mockUserScopes(['admin:notifications'])
+  test('renders the environment overview instead of redirecting', () => {
+    vi.mocked(useRepertoireUrl).mockReturnValue(
+      'https://data-dev.lsst.cloud/repertoire'
     );
-
-    render(await AdminPage());
-
-    expect(replace).toHaveBeenCalledWith('/admin/notifications');
-  });
-
-  test('redirects a user holding only admin:token to the first page they can see', async () => {
-    // The nav order is code-defined, so a user who cannot see User
-    // notifications lands on the next visible page rather than a 403.
-    vi.mocked(useUserScopes).mockReturnValue(mockUserScopes(['admin:token']));
-
-    render(await AdminPage());
-
-    expect(replace).toHaveBeenCalledWith('/admin/service-tokens');
-  });
-
-  test('shows the empty state, and does not redirect, for a user with no admin page scopes', async () => {
-    vi.mocked(useUserScopes).mockReturnValue(mockUserScopes(['read:tap']));
-
-    render(await AdminPage());
-
-    expect(replace).not.toHaveBeenCalled();
-    expect(
-      screen.getByText(/no admin pages are available for your account/i)
-    ).toBeInTheDocument();
-  });
-
-  test('renders an h1 heading with the empty state', async () => {
-    // Nothing redirects the page away, so it needs a top-level heading like
-    // every other page.
-    vi.mocked(useUserScopes).mockReturnValue(mockUserScopes([]));
-
-    render(await AdminPage());
-
-    expect(
-      screen.getByRole('heading', { level: 1, name: /admin/i })
-    ).toBeInTheDocument();
-  });
-
-  test('waits for login info before deciding, so an admin never flashes the empty state', async () => {
-    vi.mocked(useUserScopes).mockReturnValue(
-      mockUserScopes([], /* isLoading */ true)
-    );
-
-    render(await AdminPage());
-
-    expect(replace).not.toHaveBeenCalled();
-    expect(
-      screen.queryByText(/no admin pages are available/i)
-    ).not.toBeInTheDocument();
-  });
-
-  test('shows the empty state when the scopes could not be fetched', async () => {
-    vi.mocked(useUserScopes).mockReturnValue({
-      scopes: undefined,
-      hasScope: () => false,
-      isLoading: false,
-      isPending: false,
-      error: null,
+    vi.mocked(useServiceDiscovery).mockReturnValue({
+      discovery: mockDiscoveryDataDev,
+      query: createDiscoveryQuery(mockDiscoveryDataDev),
       refetch: vi.fn(),
-    });
+      isStale: false,
+      isPending: false,
+      isError: false,
+      error: null,
+    } as unknown as ReturnType<typeof useServiceDiscovery>);
 
-    render(await AdminPage());
+    render(<AdminPage />);
 
-    expect(replace).not.toHaveBeenCalled();
     expect(
-      screen.getByText(/no admin pages are available for your account/i)
+      screen.getByRole('heading', { level: 1, name: 'Overview' })
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole('region', { name: 'SQuaRE RSP development' })
+    ).toBeInTheDocument();
+    expect(replace).not.toHaveBeenCalled();
+  });
+
+  test('says service discovery is not configured when repertoireUrl is unset', () => {
+    vi.mocked(useRepertoireUrl).mockReturnValue(undefined);
+    // Without a URL the discovery query is disabled and stays pending.
+    vi.mocked(useServiceDiscovery).mockReturnValue({
+      discovery: undefined,
+      query: null,
+      refetch: vi.fn(),
+      isStale: false,
+      isPending: true,
+      isError: false,
+      error: null,
+    } as unknown as ReturnType<typeof useServiceDiscovery>);
+
+    render(<AdminPage />);
+
+    expect(
+      screen.getByText(
+        /service discovery is not configured for this environment/i
+      )
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Overview' })
+    ).toBeInTheDocument();
+    expect(replace).not.toHaveBeenCalled();
   });
 });

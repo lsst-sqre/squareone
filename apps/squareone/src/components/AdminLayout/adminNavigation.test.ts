@@ -27,12 +27,16 @@ const ALL_ADMIN_SCOPES = [
   'exec:admin',
 ];
 
+/** The ungated Overview item that leads every admin user's sidebar. */
+const OVERVIEW = { href: '/admin', label: 'Overview' };
+
 test('generates a single flat section with every admin item in order', () => {
   const navigation = getAdminNavigation(baseConfig, ALL_ADMIN_SCOPES);
 
   expect(navigation).toHaveLength(1);
   expect(navigation[0]).toEqual({
     items: [
+      OVERVIEW,
       { href: '/admin/notifications', label: 'User notifications' },
       { href: '/admin/service-tokens', label: 'Service tokens' },
       { href: '/admin/oidc-clients', label: 'OIDC clients' },
@@ -51,18 +55,39 @@ test('places OIDC clients immediately after Service tokens', () => {
   );
 });
 
-test('shows only OIDC clients for a user holding admin:oidc alone', () => {
+test('shows Overview and OIDC clients for a user holding admin:oidc alone', () => {
   const navigation = getAdminNavigation(baseConfig, ['admin:oidc']);
 
   expect(navigation).toEqual([
-    { items: [{ href: '/admin/oidc-clients', label: 'OIDC clients' }] },
+    {
+      items: [OVERVIEW, { href: '/admin/oidc-clients', label: 'OIDC clients' }],
+    },
   ]);
 });
 
-test('keeps User notifications first so /admin redirects there', () => {
+test('keeps Overview first for every admin user', () => {
   const navigation = getAdminNavigation(baseConfig, ALL_ADMIN_SCOPES);
 
-  expect(navigation[0].items[0]).toEqual({
+  expect(navigation[0].items[0]).toEqual(OVERVIEW);
+});
+
+test('shows the ungated Overview to a user holding only one page scope', () => {
+  // Overview has no page id: the layout's any-admin gate is its only gate, so
+  // it does not depend on which page scope the user holds.
+  for (const scope of ALL_ADMIN_SCOPES) {
+    const items = getAdminNavigation(baseConfig, [scope]).flatMap(
+      (section) => section.items
+    );
+
+    expect(items[0]).toEqual(OVERVIEW);
+    expect(items).toHaveLength(2);
+  }
+});
+
+test('places User notifications first among the gated pages', () => {
+  const navigation = getAdminNavigation(baseConfig, ALL_ADMIN_SCOPES);
+
+  expect(navigation[0].items[1]).toEqual({
     href: '/admin/notifications',
     label: 'User notifications',
   });
@@ -102,41 +127,51 @@ test('function is pure - repeated calls return identical results', () => {
   );
 });
 
-test('shows only Service tokens for a user holding admin:token alone', () => {
+test('shows Overview and Service tokens for a user holding admin:token alone', () => {
   const navigation = getAdminNavigation(baseConfig, ['admin:token']);
 
   expect(navigation).toEqual([
-    { items: [{ href: '/admin/service-tokens', label: 'Service tokens' }] },
-  ]);
-});
-
-test('shows only User notifications for a user holding admin:notifications alone', () => {
-  const navigation = getAdminNavigation(baseConfig, ['admin:notifications']);
-
-  expect(navigation).toEqual([
     {
-      items: [{ href: '/admin/notifications', label: 'User notifications' }],
+      items: [
+        OVERVIEW,
+        { href: '/admin/service-tokens', label: 'Service tokens' },
+      ],
     },
   ]);
 });
 
-test('shows only Sentry for a user holding exec:admin alone', () => {
+test('shows Overview and User notifications for a user holding admin:notifications alone', () => {
+  const navigation = getAdminNavigation(baseConfig, ['admin:notifications']);
+
+  expect(navigation).toEqual([
+    {
+      items: [
+        OVERVIEW,
+        { href: '/admin/notifications', label: 'User notifications' },
+      ],
+    },
+  ]);
+});
+
+test('shows Overview and Sentry for a user holding exec:admin alone', () => {
   // exec:admin is the default scope for the Sentry page only — it is no longer
   // a blanket admin scope.
   const navigation = getAdminNavigation(baseConfig, ['exec:admin']);
 
   expect(navigation).toEqual([
-    { items: [{ href: '/admin/sentry', label: 'Sentry' }] },
+    { items: [OVERVIEW, { href: '/admin/sentry', label: 'Sentry' }] },
   ]);
 });
 
-test('returns no sections for a user with no admin scopes', () => {
+test('hides every gated page from a user with no admin scopes', () => {
+  // Only the ungated items remain. Such a user never sees the sidebar: the
+  // admin layout's AdminRequired gate turns them away first.
   const navigation = getAdminNavigation(baseConfig, [
     'read:tap',
     'exec:notebook',
   ]);
 
-  expect(navigation).toEqual([]);
+  expect(navigation).toEqual([{ items: [OVERVIEW] }]);
 });
 
 test('follows a configured scope override rather than the default', () => {
@@ -166,6 +201,7 @@ test('hides a page configured with an empty scope list', () => {
   );
 
   expect(items.map((item) => item.href)).toEqual([
+    '/admin',
     '/admin/notifications',
     '/admin/service-tokens',
     '/admin/oidc-clients',

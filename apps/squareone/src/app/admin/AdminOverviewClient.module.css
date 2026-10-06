@@ -1,0 +1,7 @@
+/* AdminOverviewClient: loading state around the admin overview */
+
+.state {
+  padding: var(--sqo-space-xl-fixed);
+  text-align: center;
+  color: var(--rsd-component-text-secondary-color);
+}

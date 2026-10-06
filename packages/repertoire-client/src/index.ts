@@ -10,6 +10,10 @@ export {
 export { useServiceDiscovery } from './hooks/useServiceDiscovery';
 // Mock data for development
 export { mockDiscovery } from './mock-discovery';
+export {
+  mockDiscovery2x,
+  mockDiscoveryDataDev,
+} from './mock-discovery-fixtures';
 // TanStack Query integration
 export * from './query';
 export * from './query-options';
