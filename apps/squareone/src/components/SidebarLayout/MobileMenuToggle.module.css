@@ -13,17 +13,17 @@
 }
 
 .toggleButton:hover {
-  background-color: var(--rsd-color-primary-100, #e6f3ff);
+  background-color: var(--rsd-color-primary-100, #f5f5f5);
 }
 
 .toggleButton:focus {
   outline: none;
-  border-color: var(--rsd-color-primary-600, #0066cc);
-  background-color: var(--rsd-color-primary-50, #f0f9ff);
+  border-color: var(--rsd-color-primary-600, #058b8c);
+  background-color: var(--rsd-color-primary-50, #fbfefe);
 }
 
 .toggleButton:active {
-  background-color: var(--rsd-color-primary-200, #bfdbfe);
+  background-color: var(--rsd-color-primary-200, #d9f7f6);
 }
 
 /* Desktop: completely hidden. 66rem matches SidebarLayout's grid breakpoint

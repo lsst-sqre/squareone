@@ -10,7 +10,10 @@
 
   /* Colors */
   --sqo-doc-card-background-color: var(--rsd-color-gray-000);
-  --sqo-primary-button-background-color: var(--rsd-color-primary-600);
+  /* White text sits on this fill (IconPill, dev auth panel), so use the
+   * accessible teal (>=4.5:1) rather than the raw brand primary-600 (4.14:1
+   * on white). The hover step is a separate contrast concern. */
+  --sqo-primary-button-background-color: var(--rsd-component-interactive-color);
   --sqo-primary-button-background-color-hover: var(--rsd-color-primary-400);
   --sqo-primary-button-background-color-active: var(--rsd-color-primary-300);
   --sqo-primary-button-text-color: var(--rsd-component-text-reverse-color);
