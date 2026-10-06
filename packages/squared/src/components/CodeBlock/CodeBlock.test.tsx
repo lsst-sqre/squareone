@@ -6,7 +6,7 @@ import { CODE_BLOCK_SELECTOR } from './highlightScheduler';
 
 const jsonSample = '{\n  "name": "squareone"\n}';
 
-/** The line-number gutter: the wrapper's aria-hidden child. */
+/** The line-number gutter: the code frame's aria-hidden child. */
 function getGutter(container: HTMLElement) {
   return container.querySelector(
     '[data-sqr-code-block] > [aria-hidden="true"]'
@@ -59,6 +59,20 @@ describe('CodeBlock', () => {
     expect(button).toHaveTextContent(/^$/);
   });
 
+  it('renders the copy button after the code frame, outside it', () => {
+    // The frame clips its rounded corners with overflow: hidden, so the
+    // button sits beside it, later in DOM order, for CSS anchor positioning.
+    const { container } = render(<CodeBlock code="ls" language="bash" />);
+    const frame = container.querySelector('[data-sqr-code-block]');
+    const button = screen.getByRole('button', {
+      name: 'Copy code to clipboard',
+    });
+    expect(frame).not.toBeNull();
+    expect(frame?.contains(button)).toBe(false);
+    expect(button.parentElement).toBe(frame?.parentElement);
+    expect(frame?.nextElementSibling).toBe(button);
+  });
+
   it('omits the copy button when copy is false', () => {
     render(<CodeBlock code="ls" language="bash" copy={false} />);
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
@@ -90,9 +104,9 @@ describe('CodeBlock', () => {
     expect(container.querySelector('pre')?.textContent).toBe(jsonSample);
   });
 
-  it('applies the GitHub syntax theme to its wrapper', () => {
+  it('applies the GitHub syntax theme to the code frame', () => {
     const { container } = render(<CodeBlock code="{}" language="json" />);
-    expect(container.firstElementChild).toHaveAttribute(
+    expect(container.querySelector('pre')?.parentElement).toHaveAttribute(
       'data-syntax-theme',
       'github'
     );
@@ -118,6 +132,17 @@ describe('CodeBlock', () => {
     expect(
       screen.getByRole('group', { name: 'Service discovery' })
     ).toBeInTheDocument();
+  });
+
+  it('includes the copy button in the labelled group', () => {
+    render(
+      <CodeBlock code="{}" language="json" ariaLabel="Service discovery" />
+    );
+    const group = screen.getByRole('group', { name: 'Service discovery' });
+    expect(group).toContainElement(
+      screen.getByRole('button', { name: 'Copy code to clipboard' })
+    );
+    expect(group).toContainElement(document.querySelector('pre'));
   });
 
   it('lets keyboard users focus the code to scroll long lines', () => {

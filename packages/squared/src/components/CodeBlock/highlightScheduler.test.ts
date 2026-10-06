@@ -73,7 +73,7 @@ describe('highlightScheduler', () => {
     expect(getHighlightPassCount()).toBe(1);
   });
 
-  it('scopes each pass to code inside CodeBlock wrappers', async () => {
+  it('scopes each pass to code inside CodeBlock frames', async () => {
     vi.stubGlobal('CSS', { highlights: new Map() });
     const highlightAll = vi.fn().mockResolvedValue([]);
     vi.doMock('microlighter', () => ({ highlightAll }));

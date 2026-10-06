@@ -75,31 +75,41 @@ export function CodeBlock({
     ? { role: 'group', 'aria-label': ariaLabel }
     : undefined;
 
-  // Marks the block for the shared highlight pass.
+  // Marks the code frame for the shared highlight pass.
   const highlightTarget = { [CODE_BLOCK_ATTRIBUTE]: '' };
 
+  // The copy button follows the code frame rather than sitting inside it:
+  // the frame clips its rounded corners with overflow: hidden, and CSS
+  // anchor positioning (see CodeBlock.module.css) places the button beside or
+  // above the frame, which must precede the button in DOM order.
   return (
     <div
-      data-syntax-theme="github"
-      {...highlightTarget}
-      className={styles.codeBlock}
+      className={
+        copy ? `${styles.codeBlock} ${styles.withCopy}` : styles.codeBlock
+      }
       {...labelProps}
     >
-      {lineNumbers && (
-        <div className={styles.lineNumbers} aria-hidden="true">
-          {Array.from(
-            { length: countLines(code) },
-            (_, index) => index + 1
-          ).join('\n')}
-        </div>
-      )}
-      <pre
-        className={copy ? `${styles.pre} ${styles.withCopy}` : styles.pre}
-        // biome-ignore lint/a11y/noNoninteractiveTabindex: long lines scroll horizontally, so keyboard users must be able to focus the code to scroll it (WCAG 2.1.1, axe scrollable-region-focusable).
-        tabIndex={0}
+      <div
+        data-syntax-theme="github"
+        {...highlightTarget}
+        className={styles.frame}
       >
-        <code className={`language-${language}`}>{code}</code>
-      </pre>
+        {lineNumbers && (
+          <div className={styles.lineNumbers} aria-hidden="true">
+            {Array.from(
+              { length: countLines(code) },
+              (_, index) => index + 1
+            ).join('\n')}
+          </div>
+        )}
+        <pre
+          className={styles.pre}
+          // biome-ignore lint/a11y/noNoninteractiveTabindex: long lines scroll horizontally, so keyboard users must be able to focus the code to scroll it (WCAG 2.1.1, axe scrollable-region-focusable).
+          tabIndex={0}
+        >
+          <code className={`language-${language}`}>{code}</code>
+        </pre>
+      </div>
       {copy && (
         <ClipboardButton
           text={code}

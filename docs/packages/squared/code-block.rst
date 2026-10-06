@@ -81,7 +81,7 @@ Every ``CodeBlock`` on a page shares one highlight pass.
 MicroLighter's highlights are page-wide: each ``highlightAll()`` call replaces every registered highlight with the highlights of the code blocks it scans.
 So rather than highlighting each block on its own, every ``CodeBlock`` asks a shared scheduler for a pass when it mounts, when its ``code`` or ``language`` changes, and when it unmounts.
 Requests made in the same tick, such as from every code block on a newly rendered page, share a single pass that highlights all of the page's code blocks at once, and passes never overlap.
-The pass only scans code inside ``CodeBlock`` markup (a wrapper with the ``data-sqr-code-block`` attribute), so other ``<pre><code>`` elements on the page are left alone.
+The pass only scans code inside ``CodeBlock`` markup (the bordered frame around the code, which has the ``data-sqr-code-block`` attribute), so other ``<pre><code>`` elements on the page are left alone.
 
 The colours come from MicroLighter's GitHub theme, which ``@lsst-sqre/global-css`` provides as a separate stylesheet, ``dist/syntax.css``.
 They follow the site's light or dark theme (the ``data-theme`` attribute), not the operating system's colour-scheme preference.
@@ -99,5 +99,11 @@ The squareone app's ``build`` script fails if no stylesheet that ``next build`` 
 
 Long lines scroll horizontally inside the block, and the code is keyboard focusable so that keyboard users can scroll it.
 The line-number gutter stays in place as the code scrolls sideways, and its numbers can't be selected, so copying the code never includes them.
+
+The copy button sits outside the code, so it never covers a line.
+On wide screens (a viewport of at least 73rem) it sits in the page margin, just to the right of the block's top-right corner.
+On narrower screens, where the margin is too narrow to hold the button, it sits above the block's top-right corner, and the block reserves the space for it.
+(Squareone's 60rem content column first fits the viewport at 66rem, where it fills the viewport edge to edge, so the button only fits beside the block on wider viewports.)
+``CodeBlock`` places the button with CSS anchor positioning; browsers without it show the button above the block at every width.
 
 See the **Components/CodeBlock** stories in Squared's Storybook_ for examples in each supported style.

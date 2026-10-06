@@ -27,9 +27,9 @@ type MicroLighterModule = {
 };
 
 /**
- * Data attribute that marks a `CodeBlock`'s wrapper element. Highlight passes
- * only scan code inside it, so stray `pre > code` elsewhere on the page keep
- * their own styling.
+ * Data attribute that marks a `CodeBlock`'s code frame, the element that holds
+ * its `<pre>`. Highlight passes only scan code inside it, so stray
+ * `pre > code` elsewhere on the page keep their own styling.
  */
 export const CODE_BLOCK_ATTRIBUTE = 'data-sqr-code-block';
 
