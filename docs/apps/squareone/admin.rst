@@ -85,6 +85,15 @@ Applications
    Applications with no matching service, such as infrastructure like ``cert-manager``, are listed by name only.
    The table sorts by name, title, or kind, and a filter narrows it to the applications whose name or title contains the text you type.
 
+Datasets
+   A table of the datasets discovery describes, such as ``dp1`` and ``prompt``: each dataset's description, links to its documentation, its Butler configuration, and its ObsCore configuration, and the names of the data services it exposes.
+   A dash marks a field the dataset doesn't have; Repertoire 2.x publishes no ObsCore configuration.
+
+InfluxDB databases
+   A table of the InfluxDB databases discovery describes: each database's name, the database within its InfluxDB server, the server's URL, its Kafka schema registry, and its credentials URL, with a button to copy that URL.
+   A database local to this environment is flagged "local".
+   The overview never fetches the credentials themselves.
+
 The overview needs no new configuration and no page id in ``adminPageScopes``: it is visible to anyone who passes the admin section's gate, that is, anyone who can reach at least one admin page.
 Without a ``repertoireUrl``, the page says that service discovery is not configured; if discovery can't be loaded, it shows a warning with a button to try again.
 

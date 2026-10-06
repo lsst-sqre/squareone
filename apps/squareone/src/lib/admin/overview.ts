@@ -321,3 +321,73 @@ export function filterApplicationRows(
       (row.title?.toLowerCase().includes(needle) ?? false)
   );
 }
+
+/** One row of the overview's Datasets table. */
+export type DatasetRow = {
+  /** The dataset's key in discovery, such as `dp1`. */
+  name: string;
+  description: string | null;
+  /** URL of the dataset's documentation. */
+  docsUrl: string | null;
+  /** URL of the dataset's Butler repository configuration. */
+  butlerConfigUrl: string | null;
+  /**
+   * URL of the dataset's ObsCore exporter configuration (Repertoire 3.0 and
+   * later).
+   */
+  obscoreConfigUrl: string | null;
+  /** Names of the data services the dataset exposes, alphabetically. */
+  services: string[];
+};
+
+/**
+ * Rows for the overview's Datasets table: one per dataset, in discovery
+ * order.
+ *
+ * Absent optional fields, and a blank description, are `null`. Service names
+ * are sorted so the same service sits in the same place in every row.
+ */
+export function buildDatasetRows(discovery: ServiceDiscovery): DatasetRow[] {
+  return Object.entries(discovery.datasets).map(([name, dataset]) => ({
+    name,
+    description: dataset.description?.trim() || null,
+    docsUrl: dataset.docs_url ?? null,
+    butlerConfigUrl: dataset.butler_config ?? null,
+    obscoreConfigUrl: dataset.obscore_config ?? null,
+    services: Object.keys(dataset.services).sort(),
+  }));
+}
+
+/** One row of the overview's InfluxDB databases table. */
+export type InfluxRow = {
+  /** The database's key in discovery, such as `idfdev_efd`. */
+  name: string;
+  /** Name of the database within the InfluxDB server. */
+  database: string;
+  /** URL of the InfluxDB server. */
+  url: string;
+  /** Whether the database is local to this Phalanx environment. */
+  local: boolean;
+  /** URL of the Kafka schema registry for the database's measurements. */
+  schemaRegistryUrl: string;
+  /**
+   * URL from which an authenticated client fetches the database's
+   * credentials. The overview shows it but never fetches it.
+   */
+  credentialsUrl: string;
+};
+
+/**
+ * Rows for the overview's InfluxDB databases table: one per database, in
+ * discovery order.
+ */
+export function buildInfluxRows(discovery: ServiceDiscovery): InfluxRow[] {
+  return Object.entries(discovery.influxdb_databases).map(([name, influx]) => ({
+    name,
+    database: influx.database,
+    url: influx.url,
+    local: influx.local,
+    schemaRegistryUrl: influx.schema_registry,
+    credentialsUrl: influx.credentials_url,
+  }));
+}

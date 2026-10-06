@@ -49,6 +49,29 @@ function getApplicationNames(canvasElement: HTMLElement): string[] {
   );
 }
 
+/** The Datasets table's body rows (every row but the header). */
+function getDatasetRows(canvasElement: HTMLElement): HTMLElement[] {
+  const table = within(canvasElement).getByRole('table', { name: 'Datasets' });
+  return within(table).getAllByRole('row').slice(1);
+}
+
+/** The dataset key in each of the Datasets table's rows. */
+function getDatasetNames(canvasElement: HTMLElement): string[] {
+  return getDatasetRows(canvasElement).map(
+    (row) => within(row).getAllByRole('cell')[0].textContent ?? ''
+  );
+}
+
+/** The Datasets table's row for the named dataset. */
+function getDatasetRow(canvasElement: HTMLElement, name: string): HTMLElement {
+  const row = getDatasetRows(canvasElement).find(
+    (candidate) =>
+      within(candidate).getAllByRole('cell')[0].textContent === name
+  );
+  if (!row) throw new Error(`No ${name} dataset row`);
+  return row;
+}
+
 /** A copy of `discovery` without the Argo CD, Chronograf, and Kafdrop UIs. */
 function withoutOperatorTools(discovery: ServiceDiscovery): ServiceDiscovery {
   const { argocd, chronograf, kafdrop, ...ui } = discovery.services.ui;
@@ -62,7 +85,10 @@ function withoutOperatorTools(discovery: ServiceDiscovery): ServiceDiscovery {
  * operator links cover Argo CD, Chronograf, and Kafdrop, the environment docs,
  * and the raw discovery document, and the Applications table lists all 41
  * applications, with `nublado` joined to both its UI and its
- * `nublado-controller` API.
+ * `nublado-controller` API. The Datasets table lists `dp1`, `dp2`, `dp02`,
+ * `dp03`, and `prompt` with their docs, Butler, and ObsCore links where
+ * discovery has them, and the InfluxDB databases table lists the local
+ * `idfdev_efd` with a button to copy its credentials URL.
  */
 export const DataDev: Story = {
   args: {
@@ -105,6 +131,38 @@ export const DataDev: Story = {
     await expect(
       within(nublado).getByText('nublado-controller')
     ).toBeInTheDocument();
+
+    await expect(getDatasetNames(canvasElement)).toEqual([
+      'dp1',
+      'dp2',
+      'dp02',
+      'dp03',
+      'prompt',
+    ]);
+    const dp1 = within(getDatasetRow(canvasElement, 'dp1'));
+    await expect(
+      dp1.getByRole('link', { name: 'dp1 documentation' })
+    ).toHaveAttribute('href', 'https://dp1.lsst.io/');
+    await expect(
+      dp1.getByRole('link', { name: 'dp1 Butler config' })
+    ).toBeInTheDocument();
+    await expect(
+      dp1.getByRole('link', { name: 'dp1 ObsCore config' })
+    ).toBeInTheDocument();
+    const prompt = within(getDatasetRow(canvasElement, 'prompt'));
+    await expect(prompt.getAllByRole('link')).toHaveLength(1);
+
+    const influx = within(
+      canvas.getByRole('table', { name: 'InfluxDB databases' })
+    );
+    await expect(influx.getAllByRole('row')).toHaveLength(2);
+    await expect(influx.getByText('idfdev_efd')).toBeInTheDocument();
+    await expect(influx.getByText('local')).toBeInTheDocument();
+    await expect(
+      influx.getByRole('button', {
+        name: 'Copy the idfdev_efd credentials URL to the clipboard',
+      })
+    ).toBeInTheDocument();
   },
 };
 
@@ -144,7 +202,8 @@ export const FilteredApplications: Story = {
  * "Environment" heading and shows only the deprecated `environment_name`.
  * Services carry no titles, so the operator links fall back to fixed names,
  * there is no environment docs link, and the Applications table rows have no
- * titles, docs links, or scopes.
+ * titles, docs links, or scopes. The five datasets have no ObsCore config,
+ * and there are no InfluxDB databases.
  */
 export const Repertoire2x: Story = {
   args: {
@@ -167,6 +226,20 @@ export const Repertoire2x: Story = {
     ]);
 
     await expect(getApplicationRows(canvasElement)).toHaveLength(29);
+
+    await expect(getDatasetNames(canvasElement)).toEqual([
+      'dp1',
+      'dp2',
+      'dp02',
+      'dp03',
+      'prompt',
+    ]);
+    await expect(
+      canvas.queryByRole('link', { name: /ObsCore config/ })
+    ).not.toBeInTheDocument();
+    await expect(
+      canvas.getByText('Service discovery lists no InfluxDB databases.')
+    ).toBeInTheDocument();
   },
 };
 
@@ -184,5 +257,36 @@ export const WithoutOperatorTools: Story = {
       'Service discovery',
     ]);
     await expect(getApplicationRows(canvasElement)).toHaveLength(29);
+  },
+};
+
+/**
+ * An environment whose discovery lists no datasets and no InfluxDB databases:
+ * each section says so instead of showing an empty table.
+ */
+export const WithoutDatasetsOrInfluxDB: Story = {
+  args: {
+    discovery: {
+      ...mockDiscoveryDataDev,
+      datasets: {},
+      influxdb_databases: {},
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await expect(
+      within(canvas.getByRole('region', { name: 'Datasets' })).getByText(
+        'Service discovery lists no datasets.'
+      )
+    ).toBeInTheDocument();
+    await expect(
+      within(
+        canvas.getByRole('region', { name: 'InfluxDB databases' })
+      ).getByText('Service discovery lists no InfluxDB databases.')
+    ).toBeInTheDocument();
+    await expect(
+      canvas.queryByRole('table', { name: 'Datasets' })
+    ).not.toBeInTheDocument();
   },
 };

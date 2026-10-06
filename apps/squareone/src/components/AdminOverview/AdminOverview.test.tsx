@@ -158,6 +158,58 @@ describe('AdminOverview', () => {
     expect(within(table).getAllByRole('row')).toHaveLength(42);
   });
 
+  test('lists the datasets and InfluxDB databases after the applications', () => {
+    renderOverview(mockDiscoveryDataDev);
+
+    expect(
+      screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)
+    ).toEqual([
+      'SQuaRE RSP development',
+      'Operator links',
+      'Applications',
+      'Datasets',
+      'InfluxDB databases',
+    ]);
+  });
+
+  test('lists every dataset in the Datasets section', () => {
+    renderOverview(mockDiscoveryDataDev);
+
+    const region = screen.getByRole('region', { name: 'Datasets' });
+    const table = within(region).getByRole('table', { name: 'Datasets' });
+    expect(
+      within(table)
+        .getAllByRole('row')
+        .slice(1)
+        .map((row) => within(row).getAllByRole('cell')[0].textContent)
+    ).toEqual(['dp1', 'dp2', 'dp02', 'dp03', 'prompt']);
+  });
+
+  test('lists the local InfluxDB database in its section', () => {
+    renderOverview(mockDiscoveryDataDev);
+
+    const region = screen.getByRole('region', { name: 'InfluxDB databases' });
+    const rows = within(region).getAllByRole('row').slice(1);
+    expect(rows).toHaveLength(1);
+    expect(within(rows[0]).getByText('idfdev_efd')).toBeInTheDocument();
+    expect(within(rows[0]).getByText('local')).toBeInTheDocument();
+  });
+
+  test('says so when discovery lists no datasets or InfluxDB databases', () => {
+    renderOverview({ ...getEmptyDiscovery(), applications: ['squareone'] });
+
+    expect(
+      within(screen.getByRole('region', { name: 'Datasets' })).getByText(
+        'Service discovery lists no datasets.'
+      )
+    ).toBeInTheDocument();
+    expect(
+      within(
+        screen.getByRole('region', { name: 'InfluxDB databases' })
+      ).getByText('Service discovery lists no InfluxDB databases.')
+    ).toBeInTheDocument();
+  });
+
   test('renders the Applications table for a 2.x discovery', () => {
     renderOverview(mockDiscovery2x);
 
