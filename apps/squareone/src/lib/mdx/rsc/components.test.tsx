@@ -198,9 +198,10 @@ describe('RSC MDX components: fenced code blocks (<pre>)', () => {
   // block's text (plus a trailing newline) as the code element's children.
   const Pre = commonMdxComponents.pre;
 
-  function getHighlighter(container: HTMLElement) {
+  /** The code element of the CodeBlock that the block rendered through. */
+  function getCodeBlockCode(container: HTMLElement) {
     const element = container.querySelector(
-      '[data-syntax-theme="github"] micro-lighter'
+      '[data-syntax-theme="github"][data-sqr-code-block] > pre > code'
     );
     if (!element) throw new Error('CodeBlock not rendered');
     return element;
@@ -213,7 +214,7 @@ describe('RSC MDX components: fenced code blocks (<pre>)', () => {
       </Pre>
     );
 
-    expect(getHighlighter(container)).toHaveAttribute('language', 'json');
+    expect(getCodeBlockCode(container)).toHaveClass('language-json');
   });
 
   test('passes the block text, without the trailing newline, as the code', () => {
@@ -223,10 +224,9 @@ describe('RSC MDX components: fenced code blocks (<pre>)', () => {
       </Pre>
     );
 
-    expect(
-      getHighlighter(container).querySelector('pre > code.language-yaml')
-        ?.textContent
-    ).toBe('name: squareone\nversion: 1');
+    const code = getCodeBlockCode(container);
+    expect(code).toHaveClass('language-yaml');
+    expect(code.textContent).toBe('name: squareone\nversion: 1');
   });
 
   test('shows the copy button but no line numbers', () => {
@@ -236,9 +236,13 @@ describe('RSC MDX components: fenced code blocks (<pre>)', () => {
       </Pre>
     );
 
-    const highlighter = getHighlighter(container);
-    expect(highlighter).toHaveAttribute('controls', 'copy');
-    expect(highlighter).not.toHaveAttribute('line-numbers');
+    expect(
+      screen.getByRole('button', { name: 'Copy code to clipboard' })
+    ).toBeInTheDocument();
+    // The line-number gutter is the CodeBlock wrapper's aria-hidden child.
+    expect(
+      container.querySelector('[data-sqr-code-block] > [aria-hidden="true"]')
+    ).not.toBeInTheDocument();
   });
 
   test('renders a pre whose code child has no language-* class as a plain pre', () => {
@@ -248,7 +252,9 @@ describe('RSC MDX components: fenced code blocks (<pre>)', () => {
       </Pre>
     );
 
-    expect(container.querySelector('micro-lighter')).not.toBeInTheDocument();
+    expect(
+      container.querySelector('[data-sqr-code-block]')
+    ).not.toBeInTheDocument();
     expect(container.innerHTML).toBe(
       '<pre class="custom"><code>plain text</code></pre>'
     );
@@ -261,7 +267,9 @@ describe('RSC MDX components: fenced code blocks (<pre>)', () => {
       </Pre>
     );
 
-    expect(container.querySelector('micro-lighter')).not.toBeInTheDocument();
+    expect(
+      container.querySelector('[data-sqr-code-block]')
+    ).not.toBeInTheDocument();
     expect(container.innerHTML).toBe(
       '<pre><span class="language-json">{}</span></pre>'
     );
@@ -270,7 +278,9 @@ describe('RSC MDX components: fenced code blocks (<pre>)', () => {
   test('renders a pre without a code child as a plain pre', () => {
     const { container } = render(<Pre>preformatted text</Pre>);
 
-    expect(container.querySelector('micro-lighter')).not.toBeInTheDocument();
+    expect(
+      container.querySelector('[data-sqr-code-block]')
+    ).not.toBeInTheDocument();
     expect(container.innerHTML).toBe('<pre>preformatted text</pre>');
   });
 
@@ -281,11 +291,9 @@ describe('RSC MDX components: fenced code blocks (<pre>)', () => {
     });
     const { container } = render(content);
 
-    const highlighter = getHighlighter(container);
-    expect(highlighter).toHaveAttribute('language', 'json');
-    expect(highlighter.querySelector('code')?.textContent).toBe(
-      '{"name": "squareone"}'
-    );
+    const code = getCodeBlockCode(container);
+    expect(code).toHaveClass('language-json');
+    expect(code.textContent).toBe('{"name": "squareone"}');
   });
 
   test('a fenced code block without a language in MDX content renders as a plain pre', async () => {
@@ -295,7 +303,9 @@ describe('RSC MDX components: fenced code blocks (<pre>)', () => {
     });
     const { container } = render(content);
 
-    expect(container.querySelector('micro-lighter')).not.toBeInTheDocument();
+    expect(
+      container.querySelector('[data-sqr-code-block]')
+    ).not.toBeInTheDocument();
     expect(container.innerHTML).toBe('<pre><code>plain text\n</code></pre>');
   });
 });
@@ -321,12 +331,10 @@ describe('RSC MDX components: footer registry', () => {
     });
     const { container } = render(content);
 
-    const highlighter = container.querySelector(
-      '[data-syntax-theme="github"] micro-lighter'
+    const code = container.querySelector(
+      '[data-syntax-theme="github"][data-sqr-code-block] > pre > code'
     );
-    expect(highlighter).toHaveAttribute('language', 'bash');
-    expect(highlighter?.querySelector('code')?.textContent).toBe(
-      'pip install lsst-rsp'
-    );
+    expect(code).toHaveClass('language-bash');
+    expect(code?.textContent).toBe('pip install lsst-rsp');
   });
 });

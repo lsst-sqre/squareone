@@ -33,8 +33,8 @@ const config: StorybookConfig = {
       'sb-original/image-context',
       '@storybook/nextjs-vite',
       // MicroLighter (CodeBlock) lazy-loads each language grammar with a
-      // relative import(`./grammars/${language}.js`). Pre-bundling moves the
-      // element into Vite's deps cache, where those grammar files don't
+      // relative import(`./grammars/${language}.js`). Pre-bundling moves
+      // MicroLighter into Vite's deps cache, where those grammar files don't
       // exist, so serve the package as-is.
       'microlighter',
     ];

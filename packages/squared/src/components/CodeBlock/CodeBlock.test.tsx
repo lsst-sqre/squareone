@@ -2,13 +2,15 @@ import { render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 import CodeBlock from './CodeBlock';
+import { CODE_BLOCK_SELECTOR } from './highlightScheduler';
 
 const jsonSample = '{\n  "name": "squareone"\n}';
 
-function getHighlighter(container: HTMLElement) {
-  const element = container.querySelector('micro-lighter');
-  if (!element) throw new Error('micro-lighter element not rendered');
-  return element;
+/** The line-number gutter: the wrapper's aria-hidden child. */
+function getGutter(container: HTMLElement) {
+  return container.querySelector(
+    '[data-sqr-code-block] > [aria-hidden="true"]'
+  );
 }
 
 describe('CodeBlock', () => {
@@ -20,7 +22,7 @@ describe('CodeBlock', () => {
     const { container } = render(
       <CodeBlock code={jsonSample} language="json" />
     );
-    const code = container.querySelector('micro-lighter > pre > code');
+    const code = container.querySelector('pre > code');
     expect(code).not.toBeNull();
     expect(code?.textContent).toBe(jsonSample);
   });
@@ -32,35 +34,60 @@ describe('CodeBlock', () => {
     expect(container.querySelector('code')).toHaveClass('language-yaml');
   });
 
-  it('passes the language to the micro-lighter element', () => {
+  it('renders no micro-lighter custom element', () => {
+    const { container } = render(
+      <CodeBlock code="print('hi')" language="python" lineNumbers />
+    );
+    expect(container.querySelector('micro-lighter')).toBeNull();
+  });
+
+  it('places its code where the shared highlight pass looks for it', () => {
     const { container } = render(
       <CodeBlock code="print('hi')" language="python" />
     );
-    expect(getHighlighter(container)).toHaveAttribute('language', 'python');
+    expect([...container.querySelectorAll(CODE_BLOCK_SELECTOR)]).toEqual([
+      container.querySelector('code'),
+    ]);
   });
 
-  it('shows the copy control by default', () => {
-    const { container } = render(<CodeBlock code="ls" language="bash" />);
-    expect(getHighlighter(container)).toHaveAttribute('controls', 'copy');
+  it('shows an icon-only copy button by default', () => {
+    render(<CodeBlock code="ls" language="bash" />);
+    const button = screen.getByRole('button', {
+      name: 'Copy code to clipboard',
+    });
+    expect(button.querySelector('svg.lucide-clipboard')).not.toBeNull();
+    expect(button).toHaveTextContent(/^$/);
   });
 
-  it('omits the copy control when copy is false', () => {
-    const { container } = render(
-      <CodeBlock code="ls" language="bash" copy={false} />
-    );
-    expect(getHighlighter(container)).not.toHaveAttribute('controls');
+  it('omits the copy button when copy is false', () => {
+    render(<CodeBlock code="ls" language="bash" copy={false} />);
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
   it('omits line numbers by default', () => {
     const { container } = render(<CodeBlock code="ls" language="bash" />);
-    expect(getHighlighter(container)).not.toHaveAttribute('line-numbers');
+    expect(getGutter(container)).toBeNull();
   });
 
-  it('enables line numbers when lineNumbers is set', () => {
+  it('shows one line number per line of code when lineNumbers is set', () => {
     const { container } = render(
-      <CodeBlock code="ls" language="bash" lineNumbers />
+      <CodeBlock code={jsonSample} language="json" lineNumbers />
     );
-    expect(getHighlighter(container)).toHaveAttribute('line-numbers');
+    expect(getGutter(container)?.textContent).toBe('1\n2\n3');
+  });
+
+  it('does not number the empty line after a trailing newline', () => {
+    const { container } = render(
+      <CodeBlock code={'ls\npwd\n'} language="bash" lineNumbers />
+    );
+    expect(getGutter(container)?.textContent).toBe('1\n2');
+  });
+
+  it('keeps the line numbers out of the code text', () => {
+    const { container } = render(
+      <CodeBlock code={jsonSample} language="json" lineNumbers />
+    );
+    expect(container.querySelector('pre')?.textContent).toBe(jsonSample);
   });
 
   it('applies the GitHub syntax theme to its wrapper', () => {
@@ -72,15 +99,15 @@ describe('CodeBlock', () => {
   });
 
   it('stays plain text without errors when the Highlight API is missing', async () => {
-    // jsdom has custom elements but no CSS Custom Highlight API, like SSR
-    // output before hydration or an older browser.
+    // jsdom has no CSS Custom Highlight API, like SSR output before
+    // hydration or an older browser.
     const consoleError = vi.spyOn(console, 'error');
-    expect(() =>
-      render(<CodeBlock code="{}" language="json" lineNumbers />)
-    ).not.toThrow();
-    // Let the registration effect settle.
+    const { container } = render(
+      <CodeBlock code="{}" language="json" lineNumbers />
+    );
+    // Let the highlight effect settle.
     await new Promise((resolve) => setTimeout(resolve, 0));
-    expect(customElements.get('micro-lighter')).toBeUndefined();
+    expect(container.querySelector('pre > code')?.textContent).toBe('{}');
     expect(consoleError).not.toHaveBeenCalled();
   });
 

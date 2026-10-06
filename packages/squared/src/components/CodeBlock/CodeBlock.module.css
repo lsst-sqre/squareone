@@ -5,7 +5,7 @@
  * theme (@lsst-sqre/global-css/dist/syntax.css, which apps import next to
  * dist/next.css) defines the --syntax-* colours on it and colours tokens
  * through global ::highlight() rules. The <pre> and the line-number gutter
- * share one font so their lines stay aligned.
+ * share one font, line height, and block padding so their lines stay aligned.
  */
 
 .codeBlock {
@@ -14,7 +14,12 @@
     "Courier New", monospace;
   --sqr-code-block-font-size: 0.875rem;
   --sqr-code-block-line-height: 1.5;
+  --sqr-code-block-padding-block: var(--sqo-space-sm-fixed);
 
+  /* The gutter and the code sit side by side, at the same height. */
+  display: flex;
+  /* Positions the copy button. */
+  position: relative;
   /* Match the block spacing global-css gives a bare <pre>. */
   margin: 0 0 1rem;
   min-width: 0;
@@ -55,18 +60,11 @@
   --lightningcss-dark: initial;
 }
 
-/*
- * Before the custom element upgrades (server rendering, or browsers without
- * the Custom Highlight API) <micro-lighter> is an unknown inline element.
- * Once defined, its shadow styles lay it out as a grid.
- */
-.highlighter:not(:defined) {
-  display: block;
-}
-
-.highlighter pre {
+.pre {
+  flex: 1 1 auto;
+  min-width: 0;
   margin: 0;
-  padding: var(--sqo-space-sm-fixed) var(--sqo-space-md-fixed);
+  padding: var(--sqr-code-block-padding-block) var(--sqo-space-md-fixed);
   /* Long lines scroll instead of wrapping or overflowing the page. */
   overflow-x: auto;
   font-family: var(--sqr-code-block-font-family);
@@ -75,36 +73,47 @@
   tab-size: 4;
 }
 
-.highlighter code {
+/* Reserve the copy button's width at the end of the lines. */
+.withCopy {
+  padding-inline-end: calc(
+    var(--sqo-space-lg-fixed) +
+    var(--sqo-space-xs-fixed)
+  );
+}
+
+.pre code {
   font: inherit;
 }
 
 /* The code is focusable so keyboard users can scroll long lines. The wrapper
    clips overflow, so draw the focus ring inside the edge. */
-.highlighter pre:focus-visible {
+.pre:focus-visible {
   outline: 2px solid var(--rsd-color-primary-500);
   outline-offset: -2px;
 }
 
-.highlighter::part(line-numbers) {
-  /* The element copies the <pre>'s line height and top padding inline. */
-  padding-inline: var(--sqo-space-sm-fixed);
-  padding-block-end: var(--sqo-space-sm-fixed);
+/*
+ * The line-number gutter: one number per line, in the code's font and line
+ * height, so each number lines up with its line. It stays put while long
+ * lines scroll sideways, and can't be selected or copied with the code.
+ */
+.lineNumbers {
+  flex: none;
+  padding: var(--sqr-code-block-padding-block) var(--sqo-space-sm-fixed);
   border-inline-end: 1px solid var(--rsd-component-divider-color);
+  color: var(--syntax-comment, var(--rsd-component-text-color));
   font-family: var(--sqr-code-block-font-family);
   font-size: var(--sqr-code-block-font-size);
+  line-height: var(--sqr-code-block-line-height);
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+  white-space: pre;
+  user-select: none;
 }
 
-.highlighter::part(copy-button) {
-  margin: var(--sqo-space-xs-fixed);
-  padding: var(--sqo-space-xxs-fixed) var(--sqo-space-xs-fixed);
-  border-radius: var(--sqo-border-radius-1);
-  font-family: inherit;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-.highlighter::part(copy-button):focus-visible {
-  outline: 2px solid var(--rsd-color-primary-500);
-  outline-offset: 2px;
+/* The copy button (and its "copied" state) in the block's top-right corner. */
+.copyButton {
+  position: absolute;
+  inset-block-start: var(--sqo-space-xxs-fixed);
+  inset-inline-end: var(--sqo-space-xxs-fixed);
 }

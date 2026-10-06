@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect } from 'react';
+import ClipboardButton from '../ClipboardButton';
 import styles from './CodeBlock.module.css';
-import { registerMicroLighter } from './microLighter';
+import { CODE_BLOCK_ATTRIBUTE, scheduleHighlight } from './highlightScheduler';
 
 export type CodeBlockProps = {
   /** The source code to display. */
@@ -22,16 +23,28 @@ export type CodeBlockProps = {
 };
 
 /**
+ * Count the lines that a `<pre>` renders for the code. A single trailing
+ * newline ends the last line rather than starting an empty one.
+ */
+function countLines(code: string): number {
+  const lines = code.split(/\r\n?|\n/);
+  if (lines.length > 1 && lines[lines.length - 1] === '') lines.pop();
+  return lines.length;
+}
+
+/**
  * CodeBlock displays syntax-highlighted source code. It is the standard
  * syntax highlighter for Squareone apps.
  *
- * Highlighting comes from MicroLighter's `<micro-lighter>` custom element,
- * which colours plain `<pre><code>` text with the CSS Custom Highlight API and
- * MicroLighter's GitHub theme. Apps load the theme by importing
- * `@lsst-sqre/global-css/dist/syntax.css` next to `dist/next.css`. The
- * element registers in the browser after hydration, so server rendering and
- * browsers without the Custom Highlight API show the code as plain monospace
- * text. Colours follow the site's `data-theme`, not the OS preference.
+ * Highlighting comes from MicroLighter's core API, which colours the plain
+ * `<pre><code>` text with the CSS Custom Highlight API and MicroLighter's
+ * GitHub theme. Every `CodeBlock` on a page shares one highlight pass (see
+ * `highlightScheduler.ts`), so a page with many blocks is highlighted once.
+ * Apps load the theme by importing `@lsst-sqre/global-css/dist/syntax.css`
+ * next to `dist/next.css`. Highlighting runs in the browser after hydration,
+ * so server rendering and browsers without the Custom Highlight API show the
+ * code as plain monospace text. Colours follow the site's `data-theme`, not
+ * the OS preference.
  *
  * @example
  * ```tsx
@@ -45,9 +58,16 @@ export function CodeBlock({
   copy = true,
   ariaLabel,
 }: CodeBlockProps) {
+  // The shared pass reads the code and its language class from the DOM, so
+  // schedule a pass whenever React renders new ones.
   useEffect(() => {
-    void registerMicroLighter();
-  }, []);
+    void scheduleHighlight();
+    // Re-highlight once this block leaves the page too, so the shared
+    // highlights drop its ranges.
+    return () => {
+      void scheduleHighlight();
+    };
+  }, [code, language]);
 
   // Name the block as a group only when a label is given; an unnamed group
   // adds nothing for assistive technology.
@@ -55,25 +75,44 @@ export function CodeBlock({
     ? { role: 'group', 'aria-label': ariaLabel }
     : undefined;
 
+  // Marks the block for the shared highlight pass.
+  const highlightTarget = { [CODE_BLOCK_ATTRIBUTE]: '' };
+
   return (
     <div
       data-syntax-theme="github"
+      {...highlightTarget}
       className={styles.codeBlock}
       {...labelProps}
     >
-      <micro-lighter
-        className={styles.highlighter}
-        language={language}
-        controls={copy ? 'copy' : undefined}
-        line-numbers={lineNumbers || undefined}
+      {lineNumbers && (
+        <div className={styles.lineNumbers} aria-hidden="true">
+          {Array.from(
+            { length: countLines(code) },
+            (_, index) => index + 1
+          ).join('\n')}
+        </div>
+      )}
+      <pre
+        className={copy ? `${styles.pre} ${styles.withCopy}` : styles.pre}
+        // biome-ignore lint/a11y/noNoninteractiveTabindex: long lines scroll horizontally, so keyboard users must be able to focus the code to scroll it (WCAG 2.1.1, axe scrollable-region-focusable).
+        tabIndex={0}
       >
-        <pre
-          // biome-ignore lint/a11y/noNoninteractiveTabindex: long lines scroll horizontally, so keyboard users must be able to focus the code to scroll it (WCAG 2.1.1, axe scrollable-region-focusable).
-          tabIndex={0}
-        >
-          <code className={`language-${language}`}>{code}</code>
-        </pre>
-      </micro-lighter>
+        <code className={`language-${language}`}>{code}</code>
+      </pre>
+      {copy && (
+        <ClipboardButton
+          text={code}
+          label=""
+          successLabel=""
+          showIcon
+          size="sm"
+          appearance="text"
+          tone="tertiary"
+          ariaLabel="Copy code to clipboard"
+          className={styles.copyButton}
+        />
+      )}
     </div>
   );
 }

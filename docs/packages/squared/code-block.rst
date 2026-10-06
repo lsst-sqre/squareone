@@ -65,15 +65,23 @@ Code in any other language displays as plain monospace text, still with the copy
 How highlighting works
 ======================
 
-``CodeBlock`` wraps MicroLighter's ``<micro-lighter>`` custom element around plain ``<pre><code>`` text.
+``CodeBlock`` renders plain ``<pre><code class="language-…">`` markup, and highlights it with MicroLighter's ``highlightAll()`` function.
 MicroLighter colours that text with the `CSS Custom Highlight API`_, so the page's HTML stays plain text with no markup around each token.
+``CodeBlock`` also renders its own line-number gutter and copy button (Squared's ``ClipboardButton``), so both work without MicroLighter.
 
 Highlighting happens only in the browser:
 
-- ``CodeBlock`` is a client component that registers the ``<micro-lighter>`` element after the page hydrates.
+- ``CodeBlock`` is a client component that highlights its code after the page hydrates, loading MicroLighter with a dynamic import the first time a code block mounts.
   Server components can render it directly; the server-rendered HTML contains the code as plain text.
-- Until the element registers, and in browsers without the CSS Custom Highlight API, the code displays as plain monospace text.
+- Until highlighting runs, and in browsers without the CSS Custom Highlight API, the code displays as plain monospace text.
   The code stays readable and copyable either way.
+- If MicroLighter fails to load (for example, a network error while the app is being redeployed), the code stays plain, and the next code block to mount tries to load it again.
+
+Every ``CodeBlock`` on a page shares one highlight pass.
+MicroLighter's highlights are page-wide: each ``highlightAll()`` call replaces every registered highlight with the highlights of the code blocks it scans.
+So rather than highlighting each block on its own, every ``CodeBlock`` asks a shared scheduler for a pass when it mounts, when its ``code`` or ``language`` changes, and when it unmounts.
+Requests made in the same tick, such as from every code block on a newly rendered page, share a single pass that highlights all of the page's code blocks at once, and passes never overlap.
+The pass only scans code inside ``CodeBlock`` markup (a wrapper with the ``data-sqr-code-block`` attribute), so other ``<pre><code>`` elements on the page are left alone.
 
 The colours come from MicroLighter's GitHub theme, which ``@lsst-sqre/global-css`` provides as a separate stylesheet, ``dist/syntax.css``.
 They follow the site's light or dark theme (the ``data-theme`` attribute), not the operating system's colour-scheme preference.
@@ -90,5 +98,6 @@ The theme is kept out of ``dist/next.css`` because Next.js's Turbopack logs a "P
 The squareone app's ``build`` script fails if no stylesheet that ``next build`` emits contains a ``::highlight()`` rule.
 
 Long lines scroll horizontally inside the block, and the code is keyboard focusable so that keyboard users can scroll it.
+The line-number gutter stays in place as the code scrolls sideways, and its numbers can't be selected, so copying the code never includes them.
 
 See the **Components/CodeBlock** stories in Squared's Storybook_ for examples in each supported style.

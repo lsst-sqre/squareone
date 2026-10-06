@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect, spyOn, userEvent, waitFor } from 'storybook/test';
+import { expect, spyOn, userEvent, waitFor, within } from 'storybook/test';
 import CodeBlock from './CodeBlock';
+import { getHighlightPassCount, scheduleHighlight } from './highlightScheduler';
 
 const jsonSample = `{
   "applications": ["gafaelfawr", "nublado", "times-square"],
@@ -57,18 +58,6 @@ const longLineSample = `{
 }`;
 
 /**
- * Wait for the `<micro-lighter>` custom element to upgrade, which happens in
- * the browser after the component registers it.
- */
-async function getUpgradedElement(canvasElement: HTMLElement) {
-  const element = canvasElement.querySelector('micro-lighter');
-  if (!element) throw new Error('micro-lighter element not rendered');
-  await waitFor(() => expect(element.shadowRoot).not.toBeNull());
-  const shadowRoot = element.shadowRoot as ShadowRoot;
-  return { element, shadowRoot };
-}
-
-/**
  * Count the Custom Highlight API ranges that fall inside a code element.
  */
 function countHighlightedRanges(code: Element) {
@@ -81,12 +70,23 @@ function countHighlightedRanges(code: Element) {
   return count;
 }
 
+/** Wait until MicroLighter has highlighted a code element. */
+async function expectCodeHighlighted(code: Element) {
+  await waitFor(() => expect(countHighlightedRanges(code)).toBeGreaterThan(0));
+}
+
 /** Assert that MicroLighter highlighted the story's code block. */
 async function expectHighlighted(canvasElement: HTMLElement) {
-  await getUpgradedElement(canvasElement);
-  const code = canvasElement.querySelector('code');
+  const code = canvasElement.querySelector('pre > code');
   if (!code) throw new Error('code element not rendered');
-  await waitFor(() => expect(countHighlightedRanges(code)).toBeGreaterThan(0));
+  await expectCodeHighlighted(code);
+}
+
+/** The line-number gutter: the code block wrapper's aria-hidden child. */
+function getGutter(canvasElement: HTMLElement) {
+  return canvasElement.querySelector<HTMLElement>(
+    '[data-sqr-code-block] > [aria-hidden="true"]'
+  );
 }
 
 const meta: Meta<typeof CodeBlock> = {
@@ -169,21 +169,30 @@ export const WithLineNumbers: Story = {
     lineNumbers: true,
   },
   play: async ({ canvasElement }) => {
-    const { shadowRoot } = await getUpgradedElement(canvasElement);
-    const gutter = shadowRoot.querySelector('[part="line-numbers"]');
-    await waitFor(() => expect(gutter).toBeVisible());
+    await expectHighlighted(canvasElement);
+
+    // One number per line, lined up with the code's lines.
+    const gutter = getGutter(canvasElement);
+    await expect(gutter).toBeVisible();
     const lineCount = pythonSample.split('\n').length;
     await expect(gutter?.textContent?.split('\n')).toHaveLength(lineCount);
+    const pre = canvasElement.querySelector('pre') as HTMLElement;
+    const gutterStyle = getComputedStyle(gutter as HTMLElement);
+    const preStyle = getComputedStyle(pre);
+    await expect(gutterStyle.lineHeight).toBe(preStyle.lineHeight);
+    await expect(gutterStyle.paddingTop).toBe(preStyle.paddingTop);
+    await expect(gutter?.getBoundingClientRect().top).toBe(
+      pre.getBoundingClientRect().top
+    );
 
     // Copying takes the code only, never the line-number gutter.
     const writeText = spyOn(navigator.clipboard, 'writeText').mockResolvedValue(
       undefined
     );
     try {
-      const copyButton = shadowRoot.querySelector(
-        '[part="copy-button"]'
-      ) as HTMLElement;
-      await waitFor(() => expect(copyButton).toBeVisible());
+      const copyButton = within(canvasElement).getByRole('button', {
+        name: 'Copy code to clipboard',
+      });
       await userEvent.click(copyButton);
       await expect(writeText).toHaveBeenCalledWith(pythonSample);
     } finally {
@@ -198,10 +207,8 @@ export const WithoutLineNumbers: Story = {
     language: 'python',
   },
   play: async ({ canvasElement }) => {
-    const { shadowRoot } = await getUpgradedElement(canvasElement);
-    await expect(
-      shadowRoot.querySelector('[part="line-numbers"]')
-    ).not.toBeVisible();
+    await expectHighlighted(canvasElement);
+    await expect(getGutter(canvasElement)).toBeNull();
   },
 };
 
@@ -212,10 +219,8 @@ export const CopyDisabled: Story = {
     copy: false,
   },
   play: async ({ canvasElement }) => {
-    const { shadowRoot } = await getUpgradedElement(canvasElement);
-    await expect(
-      shadowRoot.querySelector('[part="copy-button"]')
-    ).not.toBeVisible();
+    await expectHighlighted(canvasElement);
+    await expect(within(canvasElement).queryByRole('button')).toBeNull();
   },
 };
 
@@ -230,6 +235,36 @@ export const LongLines: Story = {
     // Long lines scroll inside the block rather than widening the page.
     const pre = canvasElement.querySelector('pre') as HTMLElement;
     await expect(pre.scrollWidth).toBeGreaterThan(pre.clientWidth);
+  },
+};
+
+// Every CodeBlock on a page shares one highlight pass, so a page with many
+// blocks is highlighted once rather than once per block.
+export const ManyBlocks: Story = {
+  args: {
+    code: jsonSample,
+    language: 'json',
+  },
+  render: (args) => (
+    <>
+      <CodeBlock {...args} />
+      <CodeBlock code={yamlSample} language="yaml" />
+      <CodeBlock code={pythonSample} language="python" lineNumbers />
+      <CodeBlock code={bashSample} language="bash" />
+    </>
+  ),
+  play: async ({ canvasElement, mount }) => {
+    // Let any pass from an earlier story finish, then count from here.
+    await scheduleHighlight();
+    const passesBefore = getHighlightPassCount();
+
+    await mount();
+    const codes = [...canvasElement.querySelectorAll('pre > code')];
+    await expect(codes).toHaveLength(4);
+    for (const code of codes) {
+      await expectCodeHighlighted(code);
+    }
+    await expect(getHighlightPassCount()).toBe(passesBefore + 1);
   },
 };
 
