@@ -103,10 +103,11 @@ While they do, the code is keyboard focusable so that keyboard users can scroll 
 Server-rendered HTML, before hydration, never makes the code focusable.
 The line-number gutter stays in place as the code scrolls sideways, and its numbers can't be selected, so copying the code never includes them.
 
-The copy button sits outside the code, so it never covers a line.
+The copy button is a round badge that keeps clear of the code.
 On wide screens (a viewport of at least 73rem) it sits in the page margin, just to the right of the block's top-right corner.
-On narrower screens, where the margin is too narrow to hold the button, it sits above the block's top-right corner, and the block reserves the space for it.
-(Squareone's 60rem content column first fits the viewport at 66rem, where it fills the viewport edge to edge, so the button only fits beside the block on wider viewports.)
-``CodeBlock`` places the button with CSS anchor positioning; browsers without it show the button above the block at every width.
+On narrower screens, where the margin is too narrow to hold it, the badge straddles the block's top-right corner: half of it sits in the block gap above the code and half in the column's side padding, so the block reserves no extra space, and the part inside the frame fits in the code's padding.
+Where the content column fills the viewport edge to edge (Squareone's 60rem column from 66rem, where there is no side padding for the badge to hang into), the badge tucks inside the block's right edge and straddles only the top edge.
+(The column first fits the viewport at 66rem, where it fills the viewport edge to edge, so the badge only fits beside the block on wider viewports.)
+``CodeBlock`` places the badge with CSS anchor positioning; browsers without it show the badge above the block at every width.
 
 See the **Components/CodeBlock** stories in Squared's Storybook_ for examples in each supported style.

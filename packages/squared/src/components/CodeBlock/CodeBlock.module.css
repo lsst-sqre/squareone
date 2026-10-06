@@ -17,10 +17,12 @@
   --sqr-code-block-font-size: 0.875rem;
   --sqr-code-block-line-height: 1.5;
   --sqr-code-block-padding-block: var(--sqo-space-sm-fixed);
-  /* The copy button's height, the same in its idle and "copied" states (the
-     min-height of ClipboardButton's small success state). */
-  --sqr-code-block-copy-size: 2rem;
-  /* The space between the copy button and the code frame. */
+  /* The copy badge's diameter, the same in its idle and "copied" states.
+     Half of it (the part that overlaps the frame where the badge straddles an
+     edge) fits in the code's top padding, so the badge never covers code. */
+  --sqr-code-block-copy-size: 1.75rem;
+  /* The space between the copy badge and the code frame when they sit side
+     by side. */
   --sqr-code-block-copy-gap: var(--sqo-space-xxs-fixed);
 
   /* Stacks the copy button and the frame when the button is in flow. */
@@ -116,19 +118,32 @@
 }
 
 /*
- * The copy button sits outside the code frame, so it never covers the code.
+ * The copy button is a round badge: the clipboard icon in a disc on the page
+ * background, bordered like the frame, so it reads over the code and the page
+ * alike. ClipboardButton's "copied" state is a different element with the
+ * same class, so it keeps the disc and copying never moves the code. The
+ * `.codeBlock` prefix outranks the button's own padding, gap, and min-height.
  *
- * Without CSS anchor positioning, the button is laid out in flow above the
- * frame, right-aligned, at every width. The frame precedes the button in DOM
- * order (see below), so `order` lifts the button above it. The button keeps
- * one height in its idle and "copied" states, so copying never moves the
- * code.
+ * Without CSS anchor positioning, the badge is laid out in flow above the
+ * frame, right-aligned, at every width. The frame precedes the badge in DOM
+ * order (see below), so `order` lifts the badge above it.
  */
-.copyButton {
+.codeBlock .copyButton {
   order: -1;
   align-self: flex-end;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  inline-size: var(--sqr-code-block-copy-size);
   block-size: var(--sqr-code-block-copy-size);
-  margin-block-end: var(--sqr-code-block-copy-gap);
+  min-height: 0;
+  margin: 0 0 var(--sqr-code-block-copy-gap);
+  padding: 0;
+  gap: 0;
+  border: 1px solid var(--rsd-component-divider-color);
+  border-radius: 50%;
+  background-color: var(--rsd-component-page-background-color);
 }
 
 /*
@@ -141,66 +156,75 @@
  * the shared anchor name: each button only sees the frame in its own
  * container.
  *
- * - Narrow layouts (phones, and any width where the content column has no
- *   free margin): the button sits above the frame's top-right corner, in
- *   space the container reserves with padding, so it never covers the
- *   content before the CodeBlock.
- * - Wide layouts: the button sits just outside the frame's top-right corner,
+ * - Narrow layouts (phones and tablets, where the content column keeps its
+ *   1rem side padding): the badge straddles the frame's top-right corner,
+ *   half outside the top edge and half outside the right edge. The outer
+ *   halves sit in the 1rem block gap before the CodeBlock and the column's
+ *   side padding, so the block reserves no space of its own, and the inner
+ *   quarter sits in the code's padding, so the badge covers neither the
+ *   content before the block nor the code.
+ * - Where the content column fills the viewport edge to edge (Squareone's
+ *   column from 66rem up to the beside placement): hanging off the right
+ *   edge would make the page scroll sideways, so the badge tucks inside the
+ *   frame's right edge and straddles only the top edge.
+ * - Wide layouts: the badge sits just outside the frame's top-right corner,
  *   top-aligned with it, in the page margin beside the content column.
  *
  * A media query picks the placement, rather than position-try-fallbacks: a
- * fallback only tests whether the button overflows its containing block, not
- * whether the page has a free margin, and CSS can't reserve the space above
- * the frame only when a fallback applies.
+ * fallback only tests whether the badge overflows its containing block, not
+ * whether the page has a free margin.
  */
 @supports (anchor-name: --x) and (position-area: block-start) {
   .codeBlock {
     position: relative;
   }
 
-  /* Reserve the space above the frame for the copy button. */
-  .withCopy {
-    padding-block-start: calc(
-      var(--sqr-code-block-copy-size) +
-      var(--sqr-code-block-copy-gap)
-    );
-  }
-
   .frame {
     anchor-name: --sqr-code-block;
   }
 
-  .copyButton {
+  .codeBlock .copyButton {
     position: absolute;
     position-anchor: --sqr-code-block;
-    position-area: block-start;
-    align-self: start;
-    justify-self: end;
-    /* Size to the content, not to the (possibly empty) area beside the
-       frame. */
-    inline-size: max-content;
+    /* The cell outside the frame's top-right corner, then pulled back by
+       half the badge so the disc is centred on the corner. That cell has no
+       size (the container's edges are the frame's), so `unsafe` pins the
+       badge's bottom-left to the corner instead of shifting it back over the
+       code to fit. */
+    position-area: block-start inline-end;
+    align-self: unsafe end;
+    justify-self: unsafe start;
+    translate: -50% 50%;
     margin: 0;
+  }
+
+  /*
+   * Tucked inside the right edge from 66rem, where Squareone's content column
+   * (MainContent, SidebarLayout, and the footer) drops its side padding and
+   * fills the viewport.
+   */
+  @media (min-width: 66rem) {
+    .codeBlock .copyButton {
+      translate: calc(-100% - var(--sqo-space-xs-fixed)) 50%;
+    }
   }
 
   /*
    * Beside the frame from 73rem. Squareone's content column (MainContent,
    * SidebarLayout, and the footer) is 60rem wide and only fits the viewport
    * from 66rem (60rem x the 1.1rem :root font size, in the 16px rem that
-   * media queries use), where it fills the viewport edge to edge. The button
+   * media queries use), where it fills the viewport edge to edge. The badge
    * and its gap need about 2.5rem (media rem) of margin on the right, so the
    * margin only holds them, with room for a classic scrollbar, from 73rem;
-   * any narrower and the button would make the page scroll sideways.
+   * any narrower and the badge would make the page scroll sideways.
    */
   @media (min-width: 73rem) {
-    .withCopy {
-      padding-block-start: 0;
-    }
-
-    .copyButton {
+    .codeBlock .copyButton {
       position-area: inline-end;
-      align-self: start;
+      translate: none;
+      align-self: unsafe start;
       /* The area beside the frame inside the container is empty, so the
-         button overflows it into the page margin. `unsafe` keeps it there,
+         badge overflows it into the page margin. `unsafe` keeps it there,
          rather than shifting it back over the code to fit the container. */
       justify-self: unsafe start;
       margin-inline-start: var(--sqr-code-block-copy-gap);

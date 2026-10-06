@@ -88,15 +88,11 @@ export function CodeBlock({
 
   // The copy button follows the code frame rather than sitting inside it:
   // the frame clips its rounded corners with overflow: hidden, and CSS
-  // anchor positioning (see CodeBlock.module.css) places the button beside or
-  // above the frame, which must precede the button in DOM order.
+  // anchor positioning (see CodeBlock.module.css) places the button beside
+  // the frame or on its top-right corner; the frame must precede the button
+  // in DOM order.
   return (
-    <div
-      className={
-        copy ? `${styles.codeBlock} ${styles.withCopy}` : styles.codeBlock
-      }
-      {...labelProps}
-    >
+    <div className={styles.codeBlock} {...labelProps}>
       <div
         data-syntax-theme="github"
         {...highlightTarget}

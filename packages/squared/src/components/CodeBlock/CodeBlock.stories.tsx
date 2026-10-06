@@ -118,6 +118,39 @@ function boxesIntersect(a: DOMRect, b: DOMRect) {
   );
 }
 
+/** The size of the overlap of two boxes; zero in a dimension they don't share. */
+function overlap(a: DOMRect, b: DOMRect) {
+  return {
+    width: Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left)),
+    height: Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top)),
+  };
+}
+
+/**
+ * Assert that the copy badge covers no code: it doesn't intersect the `<pre>`
+ * at all (beside the block), or, where it straddles the block's top edge, the
+ * part that overlaps the `<pre>` is no taller than half the badge, which the
+ * code's top padding absorbs.
+ */
+async function expectCopyButtonClearOfCode(canvasElement: HTMLElement) {
+  const { pre, button } = getCopyLayout(canvasElement);
+  const buttonBox = button.getBoundingClientRect();
+  const preBox = pre.getBoundingClientRect();
+  if (!boxesIntersect(buttonBox, preBox)) return;
+  const covered = overlap(buttonBox, preBox);
+  await expect(covered.height).toBeLessThanOrEqual(buttonBox.height / 2 + 1);
+  // The overlap stays above the first line's glyphs: within the code's top
+  // padding plus the half-leading the line height leaves above the text.
+  const preStyle = getComputedStyle(pre);
+  const halfLeading =
+    (Number.parseFloat(preStyle.lineHeight) -
+      Number.parseFloat(preStyle.fontSize)) /
+    2;
+  await expect(covered.height).toBeLessThanOrEqual(
+    Number.parseFloat(preStyle.paddingTop) + halfLeading
+  );
+}
+
 /** Whether the page scrolls horizontally. */
 function pageScrollsHorizontally() {
   const root = document.documentElement;
@@ -145,30 +178,61 @@ async function expectCopyButtonBeside(canvasElement: HTMLElement) {
 }
 
 /**
- * Assert that the copy button sits above the block's top-right corner, in
- * space the block reserves: entirely above the block and below the content
- * before it (an element with the `lead` test ID).
+ * Assert that the copy badge straddles the block's top edge: a round badge
+ * centred on the top edge, below the content before the block (an element
+ * with the `lead` test ID), with the block reserving no space above itself,
+ * clear of the code, and in view.
  */
-async function expectCopyButtonAbove(canvasElement: HTMLElement) {
-  const { frame, pre, button } = getCopyLayout(canvasElement);
+async function expectCopyButtonOnTopEdge(canvasElement: HTMLElement) {
+  const { frame, button } = getCopyLayout(canvasElement);
   const lead = within(canvasElement).getByTestId('lead');
   const frameBox = frame.getBoundingClientRect();
   const buttonBox = button.getBoundingClientRect();
-  await expect(buttonBox.bottom).toBeLessThanOrEqual(frameBox.top);
+  const centerY = (buttonBox.top + buttonBox.bottom) / 2;
+  await expect(Math.abs(centerY - frameBox.top)).toBeLessThan(1);
+  await expect(buttonBox.width).toBeCloseTo(buttonBox.height, 0);
+  await expect(getComputedStyle(button).borderRadius).toBe('50%');
   await expect(buttonBox.top).toBeGreaterThanOrEqual(
     lead.getBoundingClientRect().bottom
   );
-  await expect(buttonBox.right).toBeCloseTo(frameBox.right, 0);
-  // The code's content box starts below the button.
-  const contentTop =
-    pre.getBoundingClientRect().top +
-    Number.parseFloat(getComputedStyle(pre).paddingTop);
-  await expect(contentTop).toBeGreaterThan(buttonBox.bottom);
+  // The block starts where its container starts: no space is reserved.
+  const container = frame.parentElement as HTMLElement;
+  await expect(frameBox.top).toBe(container.getBoundingClientRect().top);
+  await expectCopyButtonClearOfCode(canvasElement);
+  await expect(buttonBox.right).toBeLessThanOrEqual(
+    document.documentElement.clientWidth
+  );
   await expect(pageScrollsHorizontally()).toBe(false);
+}
+
+/** Assert that the copy badge straddles the block's top-right corner. */
+async function expectCopyButtonOnCorner(canvasElement: HTMLElement) {
+  await expectCopyButtonOnTopEdge(canvasElement);
+  const { frame, button } = getCopyLayout(canvasElement);
+  const buttonBox = button.getBoundingClientRect();
+  const centerX = (buttonBox.left + buttonBox.right) / 2;
+  await expect(
+    Math.abs(centerX - frame.getBoundingClientRect().right)
+  ).toBeLessThan(1);
+}
+
+/**
+ * Assert that the copy badge straddles the block's top edge, tucked inside
+ * its right edge.
+ */
+async function expectCopyButtonTucked(canvasElement: HTMLElement) {
+  await expectCopyButtonOnTopEdge(canvasElement);
+  const { frame, button } = getCopyLayout(canvasElement);
+  await expect(button.getBoundingClientRect().right).toBeLessThanOrEqual(
+    frame.getBoundingClientRect().right
+  );
 }
 
 /** A content column like the squareone app's MainContent on wide screens. */
 const mainContentColumn = { maxWidth: '60rem', margin: '0 auto' };
+
+/** A content column like the squareone app's MainContent on narrow screens. */
+const paddedColumn = { padding: '0 1rem' };
 
 const meta: Meta<typeof CodeBlock> = {
   title: 'Components/CodeBlock',
@@ -342,19 +406,14 @@ export const LongLines: Story = {
   play: async ({ canvasElement }) => {
     await expectHighlighted(canvasElement);
     // Long lines scroll inside the block rather than widening the page.
-    const { pre, button } = getCopyLayout(canvasElement);
+    const { pre } = getCopyLayout(canvasElement);
     await expect(pre.scrollWidth).toBeGreaterThan(pre.clientWidth);
     // Keyboard users can focus the code to scroll it.
     await waitFor(() => expect(pre).toHaveAttribute('tabindex', '0'));
     await userEvent.tab();
     await expect(pre).toHaveFocus();
-    // The copy button never covers the end of the first line.
-    await expect(
-      boxesIntersect(
-        button.getBoundingClientRect(),
-        pre.getBoundingClientRect()
-      )
-    ).toBe(false);
+    // The copy badge covers at most its inner quarter of the code.
+    await expectCopyButtonClearOfCode(canvasElement);
   },
 };
 
@@ -421,12 +480,17 @@ const renderWithLead: Story['render'] = (args) => (
   </>
 );
 
-// Narrow layouts, such as phones: the copy button sits above the block's
-// top-right corner, in space the block reserves, so it covers neither the
-// code nor the content before the block. Copying swaps the button for its
-// "copied" state without moving the code.
-export const CopyButtonAbove: Story = {
+// Narrow layouts, such as phones: the copy badge straddles the block's
+// top-right corner, in the block gap before it and the column's side padding,
+// so the block reserves no space and the badge covers neither the content
+// before the block nor the code. Copying swaps the badge for its "copied"
+// state without moving the code.
+export const CopyButtonOnCorner: Story = {
   tags: ['!autodocs'],
+  parameters: {
+    layout: 'fullscreen',
+    column: paddedColumn,
+  },
   globals: {
     viewport: { value: 'mobile1', isRotated: false },
   },
@@ -437,9 +501,9 @@ export const CopyButtonAbove: Story = {
   render: renderWithLead,
   play: async ({ canvasElement }) => {
     await expectHighlighted(canvasElement);
-    await expectCopyButtonAbove(canvasElement);
+    await expectCopyButtonOnCorner(canvasElement);
 
-    // The "copied" state takes the button's place without moving the code.
+    // The "copied" state takes the badge's place without moving the code.
     const { frame, button } = getCopyLayout(canvasElement);
     const frameTop = frame.getBoundingClientRect().top;
     const { offsetTop, offsetHeight } = button;
@@ -462,10 +526,11 @@ export const CopyButtonAbove: Story = {
   },
 };
 
-// Where squareone's content column first fits the viewport it fills it, so
-// there's no margin for the copy button: the button stays above the block
-// rather than making the page scroll sideways.
-export const CopyButtonAboveFullWidthColumn: Story = {
+// Where squareone's content column first fits the viewport it fills it edge
+// to edge, so there's no room beside the block or beyond its right edge: the
+// badge tucks inside the right edge and straddles only the top edge, rather
+// than making the page scroll sideways.
+export const CopyButtonTuckedFullWidthColumn: Story = {
   tags: ['!autodocs'],
   parameters: {
     layout: 'fullscreen',
@@ -481,11 +546,11 @@ export const CopyButtonAboveFullWidthColumn: Story = {
   render: renderWithLead,
   play: async ({ canvasElement }) => {
     await expectHighlighted(canvasElement);
-    await expectCopyButtonAbove(canvasElement);
+    await expectCopyButtonTucked(canvasElement);
   },
 };
 
-// Without a copy button, narrow layouts reserve no space above the block.
+// Without a copy badge, the block likewise starts where its container starts.
 export const CopyDisabledNarrow: Story = {
   tags: ['!autodocs'],
   globals: {
