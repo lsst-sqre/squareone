@@ -1,0 +1,56 @@
+/* OperatorLinks: the overview's cards linking to operator tools */
+
+/* The squared Card hangs into the left gutter (for the /docs page's prose
+ * layout); in the admin content column the cards sit flush with the headings
+ * and tables around them. */
+.cards .card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sqo-space-xs);
+  margin-left: 0;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.125rem;
+}
+
+.titleLink {
+  color: var(--rsd-component-text-link-color);
+  text-decoration: none;
+}
+
+.titleLink:hover {
+  color: var(--rsd-component-text-link-hover-color);
+  text-decoration: underline;
+}
+
+/* The arrow trails the title's last word, even when the title wraps. */
+.icon {
+  display: inline-block;
+  margin-left: var(--sqo-space-xxxs);
+  vertical-align: middle;
+}
+
+.description {
+  margin: 0;
+  color: var(--rsd-component-text-secondary-color);
+  font-size: 0.875rem;
+}
+
+/* The secondary documentation link sits at the foot of the card, below a
+ * description that may wrap to a different number of lines per card. */
+.docsLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sqo-space-xxs);
+  margin-top: auto;
+  font-size: 0.875rem;
+  color: var(--rsd-component-text-link-color);
+  text-decoration: none;
+}
+
+.docsLink:hover {
+  color: var(--rsd-component-text-link-hover-color);
+  text-decoration: underline;
+}

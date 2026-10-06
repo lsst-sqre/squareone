@@ -77,5 +77,5 @@ export default function AdminOverviewClient() {
     );
   }
 
-  return <AdminOverview discovery={discovery} />;
+  return <AdminOverview discovery={discovery} repertoireUrl={repertoireUrl} />;
 }

@@ -1,13 +1,21 @@
 import type { ServiceDiscovery } from '@lsst-sqre/repertoire-client';
 
-import { getEnvironmentSummary } from '../../lib/admin/overview';
+import {
+  buildApplicationRows,
+  getEnvironmentSummary,
+  getOperatorLinks,
+} from '../../lib/admin/overview';
 import { Lede } from '../Typography';
 import styles from './AdminOverview.module.css';
+import ApplicationsTable from './ApplicationsTable';
 import EnvironmentSection from './EnvironmentSection';
+import OperatorLinks from './OperatorLinks';
 
 type AdminOverviewProps = {
   /** The Repertoire service discovery document (3.0 or 2.x shape). */
   discovery: ServiceDiscovery;
+  /** The Repertoire URL the discovery document was read from. */
+  repertoireUrl: string;
 };
 
 /**
@@ -16,11 +24,14 @@ type AdminOverviewProps = {
  *
  * Presentational: it takes the discovery document as a prop, so stories and
  * tests can render any environment. Each section is its own component fed by
- * a pure builder in `lib/admin/overview.ts`; new sections (operator links,
- * applications, datasets, InfluxDB databases) slot in after the Environment
- * section in page order, following the same pattern.
+ * a pure builder in `lib/admin/overview.ts`: the Environment section, the
+ * operator links, and the Applications table. New sections (datasets,
+ * InfluxDB databases) slot in after these, following the same pattern.
  */
-export default function AdminOverview({ discovery }: AdminOverviewProps) {
+export default function AdminOverview({
+  discovery,
+  repertoireUrl,
+}: AdminOverviewProps) {
   return (
     <div className={styles.overview}>
       <h1>Overview</h1>
@@ -29,6 +40,8 @@ export default function AdminOverview({ discovery }: AdminOverviewProps) {
         describes it.
       </Lede>
       <EnvironmentSection environment={getEnvironmentSummary(discovery)} />
+      <OperatorLinks links={getOperatorLinks(discovery, repertoireUrl)} />
+      <ApplicationsTable rows={buildApplicationRows(discovery)} />
     </div>
   );
 }

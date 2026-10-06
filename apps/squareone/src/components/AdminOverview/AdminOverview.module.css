@@ -3,6 +3,10 @@
 .overview {
   display: flex;
   flex-direction: column;
+  /* As a flex or grid item of the admin layout, the default `min-width: auto`
+   * would let the wide Applications table push the page wide instead of
+   * scrolling inside DataTable's own overflow container. */
+  min-width: 0;
 }
 
 .section {

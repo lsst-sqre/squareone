@@ -68,8 +68,22 @@ Overview page
 =============
 
 ``/admin`` shows an overview of the environment, built from Repertoire service discovery (the ``repertoireUrl`` configuration that the rest of Squareone already uses).
-Its Environment section shows the environment's title, Phalanx label, name, and description, with a link to its Phalanx documentation.
-Under Repertoire 2.x, which publishes only the environment's name, the section shows just that name.
+It has these sections:
+
+Environment
+   The environment's title, Phalanx label, name, and description, with a link to its Phalanx documentation.
+   Under Repertoire 2.x, which publishes only the environment's name, the section shows just that name.
+
+Operator links
+   Cards linking to Argo CD, Chronograf, and Kafdrop, each shown only when discovery lists that UI service, with a link to the tool's own documentation when discovery has one.
+   They are followed by the environment's Phalanx documentation and the raw discovery document (``/discovery`` under the ``repertoireUrl``).
+   The links are not filtered by your scopes, since the admin section is already restricted to administrators.
+
+Applications
+   A table of every Phalanx application enabled in the environment, joined to the UI and API services discovery publishes for it: the service title, whether it offers a UI, an API, or both, its URLs, its documentation link, the scopes its services require, and a link to its OpenAPI specification.
+   Discovery keys services by service name, which usually matches the application name; a few known exceptions are joined by name in Squareone (``nublado`` also joins ``nublado-controller``, ``datalinker`` joins ``datalink``, and ``vo-cutouts`` joins ``cutout``), and a URL from such a service names the service it came from.
+   Applications with no matching service, such as infrastructure like ``cert-manager``, are listed by name only.
+   The table sorts by name, title, or kind, and a filter narrows it to the applications whose name or title contains the text you type.
 
 The overview needs no new configuration and no page id in ``adminPageScopes``: it is visible to anyone who passes the admin section's gate, that is, anyone who can reach at least one admin page.
 Without a ``repertoireUrl``, the page says that service discovery is not configured; if discovery can't be loaded, it shows a warning with a button to try again.
