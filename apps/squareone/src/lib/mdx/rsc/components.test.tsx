@@ -24,11 +24,13 @@ import {
 
 import { compileMDX } from 'next-mdx-remote/rsc';
 import { getStaticConfig } from '../../config/rsc';
+import { footerMdxComponents as baseFooterMdxComponents } from '../../utils/mdxComponents';
 import {
   commonMdxComponents,
   DiscoveryApiEndpoints,
   DiscoveryDatasetDocsCards,
   footerMdxComponents,
+  MdxCodeBlock,
 } from './components';
 
 type AsyncTag = (props: Record<string, unknown>) => Promise<ReactElement>;
@@ -295,5 +297,36 @@ describe('RSC MDX components: fenced code blocks (<pre>)', () => {
 
     expect(container.querySelector('micro-lighter')).not.toBeInTheDocument();
     expect(container.innerHTML).toBe('<pre><code>plain text\n</code></pre>');
+  });
+});
+
+describe('RSC MDX components: footer registry', () => {
+  test('maps pre to MdxCodeBlock, like the common registry', () => {
+    expect(footerMdxComponents.pre).toBe(MdxCodeBlock);
+  });
+
+  test('keeps every component from the base footer registry', () => {
+    expect(Object.keys(baseFooterMdxComponents)).toEqual(
+      expect.arrayContaining(['FooterNav', 'FundingNotice', 'PartnerLogos'])
+    );
+    for (const [name, component] of Object.entries(baseFooterMdxComponents)) {
+      expect(footerMdxComponents[name], name).toBe(component);
+    }
+  });
+
+  test('a fenced code block in footer MDX renders through CodeBlock with its language', async () => {
+    const { content } = await compileMDX({
+      source: '```bash\npip install lsst-rsp\n```\n',
+      components: footerMdxComponents,
+    });
+    const { container } = render(content);
+
+    const highlighter = container.querySelector(
+      '[data-syntax-theme="github"] micro-lighter'
+    );
+    expect(highlighter).toHaveAttribute('language', 'bash');
+    expect(highlighter?.querySelector('code')?.textContent).toBe(
+      'pip install lsst-rsp'
+    );
   });
 });

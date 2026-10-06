@@ -14,8 +14,9 @@
  * client. `<ServiceLink>` is in the common registries; `<ApiEndpoints>` and
  * `<DatasetDocsCards>` are exported for their pages to register.
  *
- * The common registry also maps `pre` to `MdxCodeBlock`, so fenced code blocks
- * with a language render through squared's syntax-highlighting `CodeBlock`.
+ * The common registry, and the footer registry built on it, also map `pre` to
+ * `MdxCodeBlock`, so fenced code blocks with a language render through
+ * squared's syntax-highlighting `CodeBlock`.
  */
 
 import { CodeBlock } from '@lsst-sqre/squared';
@@ -181,9 +182,13 @@ export const commonMdxComponents: Record<string, ComponentType<any>> = {
   pre: MdxCodeBlock,
 };
 
-/** Components available to the RSC-compiled footer MDX. */
+/**
+ * Components available to the RSC-compiled footer MDX: the base footer
+ * registry's styled components, plus every RSC addition from
+ * `commonMdxComponents` (`<ServiceLink>` and the `pre` code block).
+ */
 // biome-ignore lint/suspicious/noExplicitAny: MDX components accept any props
 export const footerMdxComponents: Record<string, ComponentType<any>> = {
   ...baseFooterMdxComponents,
-  ServiceLink: DiscoveryServiceLink,
+  ...commonMdxComponents,
 };
