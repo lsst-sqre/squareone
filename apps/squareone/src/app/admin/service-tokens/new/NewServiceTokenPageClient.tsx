@@ -1,9 +1,6 @@
 'use client';
 
-import {
-  useCreateServiceToken,
-  useLoginInfo,
-} from '@lsst-sqre/gafaelfawr-client';
+import { useCreateServiceToken } from '@lsst-sqre/gafaelfawr-client';
 import { Note } from '@lsst-sqre/squared';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useState } from 'react';
@@ -14,6 +11,7 @@ import ServiceTokenForm, {
 } from '../../../../components/ServiceTokenForm';
 import { TokenCreationErrorDisplay } from '../../../../components/TokenCreationErrorDisplay';
 import TokenSuccessModal from '../../../../components/TokenSuccessModal';
+import { useLoginInfo } from '../../../../hooks/useLoginInfo';
 import { useRepertoireUrl } from '../../../../hooks/useRepertoireUrl';
 import { useStaticConfig } from '../../../../hooks/useStaticConfig';
 import {
@@ -54,7 +52,7 @@ export default function NewServiceTokenPageClient() {
     loginInfo,
     error: loginError,
     isLoading: loginLoading,
-  } = useLoginInfo(repertoireUrl);
+  } = useLoginInfo();
 
   const {
     createServiceToken,

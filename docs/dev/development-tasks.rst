@@ -23,6 +23,27 @@ Find the URLs for the apps in the output of the command, or:
   Files in this directory are treated as API routes instead of React pages.
   The purpose of the ``pages/api/dev`` endpoints are to mock external services in the RSP; see the re-writes in :file:`next.config.js`.
 
+Simulating a GafaelfawrIngress route
+------------------------------------
+
+In production, the ``/times-square`` and ``/admin`` routes sit behind a Phalanx ``GafaelfawrIngress``.
+Gafaelfawr strips its own session cookie from requests crossing that ingress, so the root layout's server-side prefetches of the user's scopes and user info cannot forward the cookie there.
+Instead, the ingress delegates an internal token in the ``X-Auth-Request-Token`` header, which the layout presents to Gafaelfawr as a bearer token (see :file:`apps/squareone/src/lib/auth/serverAuthQuery.ts`).
+
+The development server has no ingress in front of it, so every route runs in cookie mode by default.
+To exercise the delegated mode, send the headers the ingress would:
+
+.. code-block:: sh
+
+   curl -s \
+     -H 'X-Auth-Request-User: vera' \
+     -H 'X-Auth-Request-Token: gt-dev-delegated-token' \
+     http://localhost:3000/times-square | grep -o '"user-scopes"[^]]*]'
+
+The mocked ``/auth/api/v1/user-info`` and ``/auth/api/v1/token-info`` endpoints accept ``gt-dev-delegated-token`` as a bearer token and answer for the ``/dev`` persona, whose scopes come from the dev panel.
+The server log shows the prefetches running in ``delegated`` mode, the dehydrated state in the HTML carries the persona's ``user-scopes`` and ``user-info`` entries and no ``login-info`` entry (login info is cookie-only, so the browser fetches it), and the header renders the persona's menu.
+Sending ``X-Auth-Request-User`` without the token reproduces an ingress that is not configured to delegate: the server warns once and falls back to cookie mode.
+
 Run a single app in development
 -------------------------------
 

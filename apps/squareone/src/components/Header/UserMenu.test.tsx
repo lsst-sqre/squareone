@@ -3,23 +3,14 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
-// useGafaelfawrUser comes from @lsst-sqre/squared. Mock it while keeping the
-// real PrimaryNavigation / Badge / getLogoutUrl exports so the menu still
-// renders.
-vi.mock('@lsst-sqre/squared', async () => {
-  const actual =
-    await vi.importActual<typeof import('@lsst-sqre/squared')>(
-      '@lsst-sqre/squared'
-    );
-  return {
-    ...actual,
-    useGafaelfawrUser: vi.fn(),
-  };
-});
+// useUserInfo provides the username on the menu trigger.
+vi.mock('../../hooks/useUserInfo', () => ({
+  useUserInfo: vi.fn(),
+}));
 
-// useLoginInfo provides the scopes that gate the Admin link.
-vi.mock('@lsst-sqre/gafaelfawr-client', () => ({
-  useLoginInfo: vi.fn(),
+// useUserScopes provides the scopes that gate the Admin link.
+vi.mock('../../hooks/useUserScopes', () => ({
+  useUserScopes: vi.fn(),
 }));
 
 // useUnreadNotificationCount feeds the trigger badge and menu-item label.
@@ -39,37 +30,42 @@ vi.mock('../../hooks/useStaticConfig', () => ({
   useStaticConfig: vi.fn(),
 }));
 
-import type { UseLoginInfoReturn } from '@lsst-sqre/gafaelfawr-client';
 // Import after mocking
-import { useLoginInfo } from '@lsst-sqre/gafaelfawr-client';
+import {
+  mockUserInfo,
+  type UseUserScopesReturn,
+} from '@lsst-sqre/gafaelfawr-client';
 import { useUnreadNotificationCount } from '@lsst-sqre/semaphore-client';
-import { PrimaryNavigation, useGafaelfawrUser } from '@lsst-sqre/squared';
+import { PrimaryNavigation } from '@lsst-sqre/squared';
 import { useSemaphoreUrl } from '../../hooks/useSemaphoreUrl';
 import { useStaticConfig } from '../../hooks/useStaticConfig';
-import type { AppConfig } from '../../lib/config/loader';
+import { useUserInfo } from '../../hooks/useUserInfo';
+import { useUserScopes } from '../../hooks/useUserScopes';
+import type { StaticConfig } from '../../lib/config/resolveConfigDefaults';
 import UserMenu from './UserMenu';
 
-// Helper: a logged-in useGafaelfawrUser return.
+// Helper: a logged-in useUserInfo return.
 function mockUser(username = 'testuser') {
-  vi.mocked(useGafaelfawrUser).mockReturnValue({
-    user: { username },
-    isLoading: false,
-    isValidating: false,
+  vi.mocked(useUserInfo).mockReturnValue({
+    userInfo: { ...mockUserInfo, username },
+    query: null,
     isLoggedIn: true,
-    error: undefined,
-  } as ReturnType<typeof useGafaelfawrUser>);
+    isLoading: false,
+    isPending: false,
+    error: null,
+    refetch: vi.fn(),
+  });
 }
 
-// Helper: a useLoginInfo return whose query reports the given scopes.
-function mockLoginInfoWithScopes(scopes: string[]): UseLoginInfoReturn {
+// Helper: a useUserScopes return reporting the given scopes.
+function mockUserScopes(
+  scopes: string[],
+  isLoading = false
+): UseUserScopesReturn {
   return {
-    loginInfo: null,
-    query: {
-      scopes,
-      hasScope: (scope: string) => scopes.includes(scope),
-    } as UseLoginInfoReturn['query'],
-    csrfToken: null,
-    isLoading: false,
+    scopes,
+    hasScope: (scope: string) => scopes.includes(scope),
+    isLoading,
     isPending: false,
     error: null,
     refetch: vi.fn(),
@@ -77,12 +73,12 @@ function mockLoginInfoWithScopes(scopes: string[]): UseLoginInfoReturn {
 }
 
 // Helper: set the resolved static config, defaulting the notifications keys.
-function mockConfig(overrides: Partial<AppConfig> = {}) {
+function mockConfig(overrides: Partial<StaticConfig> = {}) {
   vi.mocked(useStaticConfig).mockReturnValue({
     enableUserNotifications: false,
     userNotificationsPollIntervalSeconds: 300,
     ...overrides,
-  } as AppConfig);
+  } as StaticConfig);
 }
 
 // Helper: set the unread-count hook return.
@@ -115,7 +111,7 @@ describe('UserMenu', () => {
     mockConfig();
     vi.mocked(useSemaphoreUrl).mockReturnValue('https://example.com/semaphore');
     mockUnreadCount(undefined);
-    vi.mocked(useLoginInfo).mockReturnValue(mockLoginInfoWithScopes([]));
+    vi.mocked(useUserScopes).mockReturnValue(mockUserScopes([]));
   });
 
   test('shows an Admin link to /admin for any configured admin page scope', async () => {
@@ -123,9 +119,7 @@ describe('UserMenu', () => {
     mockUser();
     // admin:oidc grants only the OIDC clients page — there is no single
     // "admin" scope, so any page's scope is enough to offer the link.
-    vi.mocked(useLoginInfo).mockReturnValue(
-      mockLoginInfoWithScopes(['admin:oidc'])
-    );
+    vi.mocked(useUserScopes).mockReturnValue(mockUserScopes(['admin:oidc']));
 
     renderMenu();
     await user.click(screen.getByRole('button', { name: /testuser/i }));
@@ -151,8 +145,8 @@ describe('UserMenu', () => {
   test('does not show an Admin link when the user holds no admin scope', async () => {
     const user = userEvent.setup();
     mockUser();
-    vi.mocked(useLoginInfo).mockReturnValue(
-      mockLoginInfoWithScopes(['read:tap', 'exec:notebook'])
+    vi.mocked(useUserScopes).mockReturnValue(
+      mockUserScopes(['read:tap', 'exec:notebook'])
     );
 
     renderMenu();

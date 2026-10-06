@@ -8,9 +8,8 @@
   "properties": {
     "siteName": {
       "type": "string",
-      "default": "Rubin Science Platform",
       "title": "Site name",
-      "description": "Used as the basis of the HTML title tag. This should be customized for each science platform deployment."
+      "description": "Used as the basis of the HTML title tag and the homepage hero. Optional: when omitted, defaults to the environment title from Repertoire service discovery (``environment.title``), or to ``Rubin Science Platform`` when discovery is unavailable or predates Repertoire 3.0."
     },
     "siteDescription": {
       "type": "string",
@@ -20,15 +19,13 @@
     },
     "baseUrl": {
       "type": "string",
-      "default": "http://localhost:3001",
       "title": "Base URL for the public ingress",
-      "description": "Used for computing absolute URLs"
+      "description": "Used for computing absolute URLs. Does not end in /. Optional: when omitted, defaults to the Squareone UI service URL from Repertoire service discovery (``services.ui.squareone.url``, trailing slash removed), or else to the origin of each request, derived from its ``X-Forwarded-Proto``, ``X-Forwarded-Host``, and ``Host`` headers."
     },
     "environmentName": {
       "type": "string",
-      "default": "development",
       "title": "Phalanx environment name",
-      "description": "Used in telemetry"
+      "description": "Used in telemetry (the Sentry environment). Optional: when omitted, defaults to the Phalanx environment label from Repertoire service discovery (``environment.label``, such as ``idfprod``), or to ``unknown`` when discovery is unavailable or predates Repertoire 3.0."
     },
     "docsBaseUrl": {
       "type": "string",
@@ -54,7 +51,9 @@
     },
     "coManageRegistryUrl": {
       "type": "string",
-      "title": "COmanage registry URL (e.g. https://id.lsst.cloud). Omit or set as null for non-COmanage deployments."
+      "title": "COmanage registry URL",
+      "description": "Deprecated: the COmanage registry URL (e.g. https://id.lsst.cloud) is available from Repertoire service discovery as ``services.ui.comanage``, so this field is no longer read by the app. It is retained only for backwards compatibility so existing Phalanx configurations that still set it continue to validate.",
+      "deprecated": true
     },
     "plausibleDomain": {
       "type": "string",
@@ -111,13 +110,13 @@
     "enableAppsMenu": {
       "type": "boolean",
       "title": "Enable the Apps menu",
-      "description": "Setting this option to true will enable the Apps menu in the header.",
+      "description": "Setting this option to true enables the Apps menu in the header. The menu lists Times Square (when the times-square application is enabled in Repertoire service discovery), the Argo CD, Chronograf, Kafdrop, and WebDAV UI services from service discovery that the user's scopes allow, and then any appLinks. The menu is hidden when it has no items.",
       "default": false
     },
     "appLinks": {
       "type": "array",
       "title": "Application links",
-      "description": "Links to be displayed in the Apps menu",
+      "description": "Additional links appended to the Apps menu after the items derived from Repertoire service discovery, for apps that discovery does not describe. A link whose href repeats an earlier item is dropped. These links are shown to every user, regardless of scopes. Without service discovery (no repertoireUrl), the Apps menu lists only these links.",
       "items": {
         "type": "object",
         "required": ["label", "href", "internal"],

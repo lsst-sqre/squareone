@@ -1,12 +1,11 @@
 'use client';
 
-import { useUserInfo } from '@lsst-sqre/gafaelfawr-client';
 import { Tabs } from '@lsst-sqre/squared';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import AuthRequired from '../../../../components/AuthRequired';
 import { TokenHistoryView } from '../../../../components/TokenHistory';
-import { useRepertoireUrl } from '../../../../hooks/useRepertoireUrl';
+import { useUserInfo } from '../../../../hooks/useUserInfo';
 
 export default function SessionHistoryPageClient() {
   return (
@@ -35,8 +34,7 @@ function mapTabTypeToTokenType(
 function SessionHistoryContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const repertoireUrl = useRepertoireUrl();
-  const { userInfo } = useUserInfo(repertoireUrl);
+  const { userInfo } = useUserInfo();
 
   // Get active tab from URL query parameter, default to 'web'
   const activeTab = searchParams.get('type') || 'web';

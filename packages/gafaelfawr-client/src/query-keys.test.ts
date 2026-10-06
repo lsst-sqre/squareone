@@ -28,6 +28,15 @@ describe('gafaelfawrKeys', () => {
     });
   });
 
+  describe('userScopes', () => {
+    it('returns user scopes key', () => {
+      expect(gafaelfawrKeys.userScopes()).toEqual([
+        'gafaelfawr',
+        'user-scopes',
+      ]);
+    });
+  });
+
   describe('tokens', () => {
     it('returns tokens root key', () => {
       expect(gafaelfawrKeys.tokens()).toEqual(['gafaelfawr', 'tokens']);

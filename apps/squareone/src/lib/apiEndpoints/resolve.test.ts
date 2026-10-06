@@ -24,6 +24,9 @@ function makeLogger() {
   return { debug: vi.fn(), warn: vi.fn(), error: vi.fn() };
 }
 
+// The shared fetch/log/report handling is covered in
+// lib/discovery/fetchDiscoveryForRender.test.ts; these tests cover the wiring:
+// the call-site log message and Sentry site, and the transform of the result.
 describe('resolveApiEndpoints', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -62,7 +65,7 @@ describe('resolveApiEndpoints', () => {
     expect(result).toEqual({ status: 'unavailable' });
     expect(logger.error).toHaveBeenCalledWith(
       expect.objectContaining({ err: error }),
-      expect.any(String)
+      'Failed to fetch service discovery for /api-aspect'
     );
   });
 
@@ -82,53 +85,9 @@ describe('resolveApiEndpoints', () => {
     expect(reportError).toHaveBeenCalledTimes(1);
     const [reported, context] = reportError.mock.calls[0];
     expect(reported).toBe(error);
-    expect(context).toMatchObject({ site: 'api-aspect-discovery' });
-  });
-
-  test('does not report an expected discovery failure (403)', async () => {
-    const reportError = vi.fn();
-    // A 403 is expected per classifyError (auth failures are routine).
-    vi.mocked(fetchServiceDiscovery).mockRejectedValue(
-      new RepertoireError('forbidden', 403)
-    );
-
-    const result = await resolveApiEndpoints({
-      repertoireUrl: 'https://example.org/repertoire',
-      reportError,
+    expect(context).toMatchObject({
+      site: 'api-aspect-discovery',
+      package: 'squareone',
     });
-
-    // UI fallback is unchanged: still 'unavailable'.
-    expect(result).toEqual({ status: 'unavailable' });
-    expect(reportError).not.toHaveBeenCalled();
-  });
-
-  test('reports a server-side network failure (no status code)', async () => {
-    const reportError = vi.fn();
-    vi.mocked(fetchServiceDiscovery).mockRejectedValue(
-      new TypeError('fetch failed')
-    );
-
-    await resolveApiEndpoints({
-      repertoireUrl: 'https://example.org/repertoire',
-      reportError,
-    });
-
-    // Server-side classification: network failures are report-worthy.
-    expect(reportError).toHaveBeenCalledTimes(1);
-  });
-
-  test('threads the logger into the discovery fetch', async () => {
-    const logger = makeLogger();
-    vi.mocked(fetchServiceDiscovery).mockResolvedValue(mockDiscovery);
-
-    await resolveApiEndpoints({
-      repertoireUrl: 'https://example.org/repertoire',
-      logger,
-    });
-
-    expect(fetchServiceDiscovery).toHaveBeenCalledWith(
-      'https://example.org/repertoire',
-      { logger }
-    );
   });
 });

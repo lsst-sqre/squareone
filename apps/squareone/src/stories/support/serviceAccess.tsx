@@ -1,0 +1,124 @@
+/**
+ * A story decorator that renders a component against `mockDiscovery` as a
+ * given visitor: anonymous, or signed in with a chosen set of scopes.
+ *
+ * The decorator enables service discovery (by adding a `repertoireUrl` to the
+ * Storybook config) and seeds a fresh query cache with the discovery document,
+ * the visitor's Gafaelfawr scopes (which gate services declaring
+ * `required_scopes`), their login info, and their user info. Seeding rather than stubbing `fetch`
+ * keeps the stories deterministic: the components render the final state on
+ * their first pass, with no loading states for a play function to wait out.
+ *
+ * An optional second argument overrides config keys for the story (for
+ * example `appLinks`), on top of the Storybook-wide config.
+ *
+ * `mockDiscovery` points at the live RSP, so pair the decorator with
+ * `holdCrossOriginFetch` as the story's `beforeEach`, which keeps any query the
+ * cache does not answer from reaching it.
+ *
+ * Story-support only: nothing in the app bundle imports this module.
+ */
+
+import {
+  type LoginInfo,
+  loginInfoQueryOptions,
+  mockLoginInfo,
+  mockUnauthenticatedUserInfo,
+  mockUserInfo,
+  userInfoQueryOptions,
+  userScopesQueryOptions,
+} from '@lsst-sqre/gafaelfawr-client';
+import {
+  discoveryQueryOptions,
+  mockDiscovery,
+} from '@lsst-sqre/repertoire-client';
+import type { Decorator } from '@storybook/nextjs-vite';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { type ReactNode, useState } from 'react';
+
+import { ConfigProvider } from '../../contexts/rsc';
+import {
+  type AppConfigContextValue,
+  useStaticConfig,
+} from '../../hooks/useStaticConfig';
+
+/** The (never fetched) discovery URL the seeded stories are configured with. */
+export const STORY_REPERTOIRE_URL = 'https://data.lsst.cloud/repertoire';
+
+/**
+ * Who is viewing: `null` for an anonymous visitor (Gafaelfawr answers 401, so
+ * there is no login info), otherwise the signed-in user's scopes.
+ */
+export type StoryVisitor = { scopes: string[] } | null;
+
+function loginInfoFor(visitor: StoryVisitor): LoginInfo | null {
+  return visitor ? { ...mockLoginInfo, scopes: visitor.scopes } : null;
+}
+
+function ServiceAccessProvider({
+  visitor,
+  configOverrides,
+  children,
+}: {
+  visitor: StoryVisitor;
+  configOverrides: Partial<AppConfigContextValue>;
+  children: ReactNode;
+}) {
+  // Extend the Storybook-wide config rather than restating it.
+  const config = useStaticConfig();
+  const [configPromise] = useState(() =>
+    Promise.resolve({
+      ...config,
+      ...configOverrides,
+      repertoireUrl: STORY_REPERTOIRE_URL,
+    })
+  );
+  const [queryClient] = useState(() => {
+    const client = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
+    client.setQueryData(
+      discoveryQueryOptions(STORY_REPERTOIRE_URL).queryKey,
+      mockDiscovery
+    );
+    client.setQueryData(
+      userScopesQueryOptions().queryKey,
+      visitor ? visitor.scopes : null
+    );
+    client.setQueryData(
+      loginInfoQueryOptions().queryKey,
+      loginInfoFor(visitor)
+    );
+    client.setQueryData(
+      userInfoQueryOptions().queryKey,
+      visitor ? mockUserInfo : mockUnauthenticatedUserInfo
+    );
+    return client;
+  });
+
+  return (
+    <ConfigProvider configPromise={configPromise}>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    </ConfigProvider>
+  );
+}
+
+/**
+ * Render the story against `mockDiscovery` as `visitor`, with any
+ * `configOverrides` applied to the Storybook-wide config.
+ */
+export function withServiceAccess(
+  visitor: StoryVisitor,
+  configOverrides: Partial<AppConfigContextValue> = {}
+): Decorator {
+  return function ServiceAccessDecorator(Story) {
+    return (
+      <ServiceAccessProvider
+        visitor={visitor}
+        configOverrides={configOverrides}
+      >
+        <Story />
+      </ServiceAccessProvider>
+    );
+  };
+}

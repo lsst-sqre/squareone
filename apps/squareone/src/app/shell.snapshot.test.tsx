@@ -64,39 +64,40 @@ vi.mock('@lsst-sqre/semaphore-client', async (importOriginal) => ({
   useUnreadNotificationCount: vi.fn(),
 }));
 
-vi.mock('@lsst-sqre/gafaelfawr-client', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@lsst-sqre/gafaelfawr-client')>()),
+vi.mock('../hooks/useUserInfo', () => ({
   useUserInfo: vi.fn(),
-  useLoginInfo: vi.fn(),
 }));
 
-vi.mock('@lsst-sqre/squared', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@lsst-sqre/squared')>()),
-  useGafaelfawrUser: vi.fn(),
+vi.mock('../hooks/useUserScopes', () => ({
+  useUserScopes: vi.fn(),
 }));
 
 // Imports after mocks.
-import type {
-  UseLoginInfoReturn,
-  UseUserInfoReturn,
+import {
+  getEmptyUserInfo,
+  mockUserInfo,
+  type UserInfo,
+  type UseUserInfoReturn,
+  type UseUserScopesReturn,
 } from '@lsst-sqre/gafaelfawr-client';
-import { useLoginInfo, useUserInfo } from '@lsst-sqre/gafaelfawr-client';
 import { useServiceDiscovery } from '@lsst-sqre/repertoire-client';
 import type { Broadcast } from '@lsst-sqre/semaphore-client';
 import {
   useBroadcasts,
   useUnreadNotificationCount,
 } from '@lsst-sqre/semaphore-client';
-import { PrimaryNavigation, useGafaelfawrUser } from '@lsst-sqre/squared';
+import { PrimaryNavigation } from '@lsst-sqre/squared';
 
 import BroadcastBannerStack from '../components/BroadcastBannerStack';
 import Header from '../components/Header';
 import UserMenu from '../components/Header/UserMenu';
 import { useStaticConfig } from '../hooks/useStaticConfig';
-import type { AppConfig } from '../lib/config/loader';
+import { useUserInfo } from '../hooks/useUserInfo';
+import { useUserScopes } from '../hooks/useUserScopes';
+import type { StaticConfig } from '../lib/config/resolveConfigDefaults';
 import FooterRsc from './FooterRsc';
 
-function makeConfig(overrides: Partial<AppConfig> = {}): AppConfig {
+function makeConfig(overrides: Partial<StaticConfig> = {}): StaticConfig {
   return {
     siteName: 'Rubin Science Platform',
     baseUrl: 'https://data.example.org',
@@ -112,7 +113,7 @@ function makeConfig(overrides: Partial<AppConfig> = {}): AppConfig {
     headerLogoHeight: 50,
     headerLogoAlt: 'Rubin',
     ...overrides,
-  } as AppConfig;
+  } as StaticConfig;
 }
 
 // A fake discovery query exposing only the methods the shell calls.
@@ -123,6 +124,14 @@ function makeDiscoveryReturn() {
     getPortalUrl: () => 'https://data.example.org/portal/app',
     getNubladoUrl: () => 'https://data.example.org/nb/hub',
     getSemaphoreUrl: () => 'https://data.example.org/semaphore',
+    getUiService: (name: string) => ({
+      url: `https://data.example.org/${name}`,
+      required_scopes: [] as string[],
+    }),
+    canAccessService: () => true,
+    // The Apps menu lists Times Square and resolves hrefs for de-duplication.
+    hasApplication: () => true,
+    getSquareoneUrl: () => 'https://data.example.org/',
   };
   return {
     discovery: {},
@@ -135,11 +144,27 @@ function makeDiscoveryReturn() {
   } as unknown as ReturnType<typeof useServiceDiscovery>;
 }
 
-function loggedOutUserInfo(): UseUserInfoReturn {
+/**
+ * The user-info hook's settled result for `userInfo`, as it reads the entry the
+ * root layout hydrates: a signed-in user's info, or empty user info for an
+ * anonymous visitor.
+ */
+function hydratedUserInfo(userInfo: UserInfo): UseUserInfoReturn {
   return {
-    userInfo: undefined,
+    userInfo,
     query: null,
-    isLoggedIn: false,
+    isLoggedIn: !!userInfo.username,
+    isLoading: false,
+    isPending: false,
+    error: null,
+    refetch: vi.fn(),
+  };
+}
+
+function hydratedScopes(scopes?: string[]): UseUserScopesReturn {
+  return {
+    scopes,
+    hasScope: (scope: string): boolean => scopes?.includes(scope) ?? false,
     isLoading: false,
     isPending: false,
     error: null,
@@ -172,20 +197,38 @@ describe('shell render determinism', () => {
     vi.clearAllMocks();
     vi.mocked(useStaticConfig).mockReturnValue(makeConfig());
     vi.mocked(useServiceDiscovery).mockReturnValue(makeDiscoveryReturn());
-    vi.mocked(useUserInfo).mockReturnValue(loggedOutUserInfo());
+    vi.mocked(useUserInfo).mockReturnValue(
+      hydratedUserInfo(getEmptyUserInfo())
+    );
+    vi.mocked(useUserScopes).mockReturnValue(hydratedScopes());
     vi.mocked(useBroadcasts).mockReturnValue(emptyBroadcasts());
     vi.mocked(useUnreadNotificationCount).mockReturnValue(noUnreadCount());
   });
 
-  test('Header renders identical markup across renders', () => {
+  test('Header renders identical markup across renders for an anonymous visitor', () => {
     const first = renderToStaticMarkup(<Header />);
     const second = renderToStaticMarkup(<Header />);
 
     expect(first).toBe(second);
-    // Sanity-check the shell actually rendered its logged-out chain (Login
-    // renders the "Log in" CTA on the server, before hasMounted swaps in the
-    // user menu) rather than an empty string that would compare trivially.
+    // Sanity-check the shell actually rendered its logged-out chain (the
+    // "Log in" link, with no user menu) rather than an empty string that would
+    // compare trivially.
     expect(first).toContain('Log in');
+    expect(first).not.toContain(mockUserInfo.username);
+    expect(first).toContain('Notebooks');
+  });
+
+  test('Header renders identical markup across renders for a signed-in user', () => {
+    vi.mocked(useUserInfo).mockReturnValue(hydratedUserInfo(mockUserInfo));
+
+    const first = renderToStaticMarkup(<Header />);
+    const second = renderToStaticMarkup(<Header />);
+
+    expect(first).toBe(second);
+    // With user info hydrated, the server render already has the user's menu
+    // in place of the "Log in" link.
+    expect(first).toContain(mockUserInfo.username);
+    expect(first).not.toContain('Log in');
     expect(first).toContain('Notebooks');
   });
 
@@ -234,27 +277,10 @@ describe('shell render determinism', () => {
   });
 
   test('UserMenu renders identical markup across renders', () => {
-    vi.mocked(useGafaelfawrUser).mockReturnValue({
-      user: { username: 'testuser' },
-      isLoading: false,
-      isValidating: false,
-      isLoggedIn: true,
-      error: undefined,
-    } as ReturnType<typeof useGafaelfawrUser>);
-    vi.mocked(useLoginInfo).mockReturnValue({
-      loginInfo: null,
-      query: {
-        // An admin: exec:admin is one of the scopes `adminPageScopes` maps to
-        // an admin page, so the menu renders its Admin link.
-        scopes: ['exec:admin'],
-        hasScope: (scope: string): boolean => scope === 'exec:admin',
-      } as UseLoginInfoReturn['query'],
-      csrfToken: null,
-      isLoading: false,
-      isPending: false,
-      error: null,
-      refetch: vi.fn(),
-    });
+    vi.mocked(useUserInfo).mockReturnValue(hydratedUserInfo(mockUserInfo));
+    // An admin: exec:admin is one of the scopes `adminPageScopes` maps to an
+    // admin page, so the menu renders its Admin link.
+    vi.mocked(useUserScopes).mockReturnValue(hydratedScopes(['exec:admin']));
 
     const ui = (
       <PrimaryNavigation>
@@ -267,6 +293,6 @@ describe('shell render determinism', () => {
     const second = renderToStaticMarkup(ui);
 
     expect(first).toBe(second);
-    expect(first).toContain('testuser');
+    expect(first).toContain(mockUserInfo.username);
   });
 });

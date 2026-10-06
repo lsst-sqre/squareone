@@ -37,6 +37,7 @@ export {
   useUpdateOidcClient,
 } from './useUpdateOidcClient';
 export { type UseUserInfoReturn, useUserInfo } from './useUserInfo';
+export { type UseUserScopesReturn, useUserScopes } from './useUserScopes';
 export {
   extractTokenNames,
   type UseUserTokensReturn,

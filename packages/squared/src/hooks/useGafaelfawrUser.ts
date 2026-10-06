@@ -42,6 +42,12 @@ const fetcher: Fetcher<GafaelfawrUser, string> = (url: string) =>
 /**
  * A React hook for getting data from Gafaelfawr's `/auth/user-info` endpoint
  * and establishing in general whether the user is logged in.
+ *
+ * @deprecated Use `useUserInfo` from `@lsst-sqre/gafaelfawr-client` instead.
+ * This hook makes its own SWR request to a fixed `/auth/api/v1/user-info`
+ * path, so it cannot share (or be server-rendered from) the TanStack Query
+ * user-info entry an app prefetches and hydrates, and it does not validate the
+ * response or report failures.
  */
 const useGafaelfawrUser = () => {
   const { data, error, isLoading, isValidating } = useSWR(

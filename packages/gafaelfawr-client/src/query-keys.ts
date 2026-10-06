@@ -33,6 +33,16 @@ export const gafaelfawrKeys = {
   /** Login info (CSRF) query key */
   loginInfo: () => [...gafaelfawrKeys.all, 'login-info'] as const,
 
+  /**
+   * The signed-in user's scopes.
+   *
+   * A sibling of {@link gafaelfawrKeys.loginInfo} rather than a view of it:
+   * the browser derives the scopes from login info, but on a GafaelfawrIngress
+   * route the server learns them from the delegated token (`token-info`) and
+   * cannot fetch login info at all, so the two must hydrate independently.
+   */
+  userScopes: () => [...gafaelfawrKeys.all, 'user-scopes'] as const,
+
   /** Root key for all token data */
   tokens: () => [...gafaelfawrKeys.all, 'tokens'] as const,
 

@@ -1,13 +1,12 @@
 'use client';
 
-import { useLoginInfo } from '@lsst-sqre/gafaelfawr-client';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { getAdminNavigation } from '../../components/AdminLayout/adminNavigation';
 import AdminRequired from '../../components/AdminRequired';
 import { SidebarLayout } from '../../components/SidebarLayout';
-import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
 import type { AppConfigContextValue } from '../../hooks/useStaticConfig';
+import { useUserScopes } from '../../hooks/useUserScopes';
 
 type AdminLayoutClientProps = {
   children: ReactNode;
@@ -35,13 +34,12 @@ export default function AdminLayoutClient({
   config,
 }: AdminLayoutClientProps) {
   const pathname = usePathname();
-  const repertoireUrl = useRepertoireUrl();
-  const { query } = useLoginInfo(repertoireUrl);
+  const { scopes } = useUserScopes();
 
   // Navigation is derived from config and the user's scopes on every render:
   // it is a filter over a handful of static items, and nothing downstream keys
   // an effect on the array's identity.
-  const navSections = getAdminNavigation(config, query?.scopes ?? []);
+  const navSections = getAdminNavigation(config, scopes ?? []);
 
   return (
     <AdminRequired>

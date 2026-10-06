@@ -1,0 +1,582 @@
+{
+  "applications": [
+    "argocd",
+    "bigquery-kafka",
+    "butler",
+    "cert-manager",
+    "conesearch",
+    "datalinker",
+    "gafaelfawr",
+    "ghostwriter",
+    "gke",
+    "google-cloud-observability",
+    "grafana",
+    "herald",
+    "hips",
+    "hoverdrive",
+    "ingress-nginx",
+    "jira-data-proxy",
+    "mobu",
+    "muster",
+    "noteburst",
+    "nublado",
+    "obsforge",
+    "obsforgetap",
+    "portal",
+    "ppdbtap",
+    "qserv-kafka",
+    "repertoire",
+    "sasquatch",
+    "sasquatch-backpack",
+    "semaphore",
+    "sia",
+    "squareone",
+    "ssotap",
+    "strimzi",
+    "strimzi-access-operator",
+    "strimzi-registry-operator",
+    "tap",
+    "times-square",
+    "usertap",
+    "vault-secrets-operator",
+    "vo-cutouts",
+    "wobbly"
+  ],
+  "datasets": {
+    "dp1": {
+      "butler_config": "https://data-dev.lsst.cloud/api/butler/repo/dp1/butler.yaml",
+      "description": "Data Preview 1 contains image and catalog products from the Rubin Science Pipelines v29 processing of observations obtained with the LSST Commissioning Camera of seven ~1 square degree fields, over seven weeks in late 2024.",
+      "docs_url": "https://dp1.lsst.io/",
+      "obscore_config": "https://raw.githubusercontent.com/lsst-dm/dax_obscore/refs/heads/main/configs/dp1.yaml",
+      "services": {
+        "datalink": {
+          "url": "https://data-dev.lsst.cloud/api/datalink",
+          "title": "DataLink",
+          "docs_url": "https://www.ivoa.net/documents/DataLink/",
+          "required_scopes": ["read:image"],
+          "openapi": "https://data-dev.lsst.cloud/api/datalink/openapi.json",
+          "quota_labels": {
+            "datalinker": {
+              "title": "DataLink {links} requests"
+            }
+          },
+          "versions": {
+            "datalink-links-1.1": {
+              "url": "https://data-dev.lsst.cloud/api/datalink/links"
+            }
+          }
+        },
+        "gms": {
+          "url": "https://data-dev.lsst.cloud/auth/gms",
+          "title": "Group membership service (GMS)",
+          "docs_url": "https://www.ivoa.net/documents/GMS/",
+          "versions": {
+            "gms-search-1.0": {
+              "url": "https://data-dev.lsst.cloud/auth/gms"
+            }
+          }
+        },
+        "sia": {
+          "url": "https://data-dev.lsst.cloud/api/sia/dp1",
+          "title": "Simple image access (SIA)",
+          "docs_url": "https://www.ivoa.net/documents/SIA/",
+          "required_scopes": ["read:image"],
+          "openapi": "https://data-dev.lsst.cloud/api/sia/openapi.json",
+          "quota_labels": {
+            "sia": {
+              "title": "Image requests"
+            }
+          },
+          "versions": {
+            "sia-query-2.0": {
+              "url": "https://data-dev.lsst.cloud/api/sia/dp1/query"
+            }
+          }
+        },
+        "tap": {
+          "url": "https://data-dev.lsst.cloud/api/tap",
+          "title": "Table access protocol (TAP)",
+          "docs_url": "https://www.ivoa.net/documents/TAP/",
+          "required_scopes": ["read:tap"],
+          "quota_labels": {
+            "tap": {
+              "title": "TAP API calls"
+            }
+          },
+          "versions": {
+            "tables": {
+              "url": "https://data-dev.lsst.cloud/api/tap/tables"
+            }
+          }
+        },
+        "cutout": {
+          "url": "https://data-dev.lsst.cloud/api/cutout",
+          "title": "SODA image cutouts",
+          "docs_url": "https://www.ivoa.net/documents/SODA/",
+          "required_scopes": ["read:image"],
+          "openapi": "https://data-dev.lsst.cloud/api/cutout/openapi.json",
+          "quota_labels": {
+            "vo-cutouts": {
+              "title": "SODA API calls"
+            }
+          },
+          "versions": {
+            "soda-async-1.0": {
+              "url": "https://data-dev.lsst.cloud/api/cutout/jobs"
+            },
+            "soda-sync-1.0": {
+              "url": "https://data-dev.lsst.cloud/api/cutout/sync"
+            }
+          }
+        },
+        "hips": {
+          "url": "https://data-dev.lsst.cloud/api/hips/v2/dp1/list",
+          "title": "HiPS (Hierarchical Progressive Survey)",
+          "docs_url": "https://www.ivoa.net/documents/HiPS/",
+          "required_scopes": ["read:image"],
+          "quota_labels": {
+            "hips": {
+              "title": "HiPS requests"
+            }
+          },
+          "versions": {
+            "hips-list-1.0": {
+              "url": "https://data-dev.lsst.cloud/api/hips/v2/dp1/list"
+            }
+          }
+        }
+      }
+    },
+    "dp2": {
+      "description": "Data Preview 2 (Early) contains catalog products and coadded images from the Rubin Science Pipelines v30 processing of early observations obtained with LSSTCam from April 2025 to January 2026. Coadded images and catalogs cover ~3000 square degrees; single-epoch catalogs cover ~15,000 square degrees.",
+      "docs_url": "https://dp2.lsst.io/",
+      "obscore_config": "https://raw.githubusercontent.com/lsst-dm/dax_obscore/refs/heads/main/configs/edp2.yaml",
+      "services": {
+        "datalink": {
+          "url": "https://data-dev.lsst.cloud/api/datalink",
+          "title": "DataLink",
+          "docs_url": "https://www.ivoa.net/documents/DataLink/",
+          "required_scopes": ["read:image"],
+          "openapi": "https://data-dev.lsst.cloud/api/datalink/openapi.json",
+          "quota_labels": {
+            "datalinker": {
+              "title": "DataLink {links} requests"
+            }
+          },
+          "versions": {
+            "datalink-links-1.1": {
+              "url": "https://data-dev.lsst.cloud/api/datalink/links"
+            }
+          }
+        },
+        "gms": {
+          "url": "https://data-dev.lsst.cloud/auth/gms",
+          "title": "Group membership service (GMS)",
+          "docs_url": "https://www.ivoa.net/documents/GMS/",
+          "versions": {
+            "gms-search-1.0": {
+              "url": "https://data-dev.lsst.cloud/auth/gms"
+            }
+          }
+        },
+        "sia": {
+          "url": "https://data-dev.lsst.cloud/api/sia/dp2",
+          "title": "Simple image access (SIA)",
+          "docs_url": "https://www.ivoa.net/documents/SIA/",
+          "required_scopes": ["read:image"],
+          "openapi": "https://data-dev.lsst.cloud/api/sia/openapi.json",
+          "quota_labels": {
+            "sia": {
+              "title": "Image requests"
+            }
+          },
+          "versions": {
+            "sia-query-2.0": {
+              "url": "https://data-dev.lsst.cloud/api/sia/dp2/query"
+            }
+          }
+        },
+        "tap": {
+          "url": "https://data-dev.lsst.cloud/api/tap",
+          "title": "Table access protocol (TAP)",
+          "docs_url": "https://www.ivoa.net/documents/TAP/",
+          "required_scopes": ["read:tap"],
+          "quota_labels": {
+            "tap": {
+              "title": "TAP API calls"
+            }
+          },
+          "versions": {
+            "tables": {
+              "url": "https://data-dev.lsst.cloud/api/tap/tables"
+            }
+          }
+        },
+        "cutout": {
+          "url": "https://data-dev.lsst.cloud/api/cutout",
+          "title": "SODA image cutouts",
+          "docs_url": "https://www.ivoa.net/documents/SODA/",
+          "required_scopes": ["read:image"],
+          "openapi": "https://data-dev.lsst.cloud/api/cutout/openapi.json",
+          "quota_labels": {
+            "vo-cutouts": {
+              "title": "SODA API calls"
+            }
+          },
+          "versions": {
+            "soda-async-1.0": {
+              "url": "https://data-dev.lsst.cloud/api/cutout/jobs"
+            },
+            "soda-sync-1.0": {
+              "url": "https://data-dev.lsst.cloud/api/cutout/sync"
+            }
+          }
+        },
+        "hips": {
+          "url": "https://data-dev.lsst.cloud/api/hips/v2/dp2/list",
+          "title": "HiPS (Hierarchical Progressive Survey)",
+          "docs_url": "https://www.ivoa.net/documents/HiPS/",
+          "required_scopes": ["read:image"],
+          "quota_labels": {
+            "hips": {
+              "title": "HiPS requests"
+            }
+          },
+          "versions": {
+            "hips-list-1.0": {
+              "url": "https://data-dev.lsst.cloud/api/hips/v2/dp2/list"
+            }
+          }
+        }
+      }
+    },
+    "dp02": {
+      "butler_config": "https://data-dev.lsst.cloud/api/butler/repo/dp02/butler.yaml",
+      "description": "Data Preview 0.2 contains the image and catalog products of the Rubin Science Pipelines v23 processing of the DESC Data Challenge 2 simulation, which covered 300 square degrees of the wide-fast-deep LSST survey region over 5 years.",
+      "docs_url": "https://dp0-2.lsst.io/",
+      "obscore_config": "https://raw.githubusercontent.com/lsst-dm/dax_obscore/refs/heads/main/configs/dp02.yaml",
+      "services": {
+        "datalink": {
+          "url": "https://data-dev.lsst.cloud/api/datalink",
+          "title": "DataLink",
+          "docs_url": "https://www.ivoa.net/documents/DataLink/",
+          "required_scopes": ["read:image"],
+          "openapi": "https://data-dev.lsst.cloud/api/datalink/openapi.json",
+          "quota_labels": {
+            "datalinker": {
+              "title": "DataLink {links} requests"
+            }
+          },
+          "versions": {
+            "datalink-links-1.1": {
+              "url": "https://data-dev.lsst.cloud/api/datalink/links"
+            }
+          }
+        },
+        "gms": {
+          "url": "https://data-dev.lsst.cloud/auth/gms",
+          "title": "Group membership service (GMS)",
+          "docs_url": "https://www.ivoa.net/documents/GMS/",
+          "versions": {
+            "gms-search-1.0": {
+              "url": "https://data-dev.lsst.cloud/auth/gms"
+            }
+          }
+        },
+        "sia": {
+          "url": "https://data-dev.lsst.cloud/api/sia/dp02",
+          "title": "Simple image access (SIA)",
+          "docs_url": "https://www.ivoa.net/documents/SIA/",
+          "required_scopes": ["read:image"],
+          "openapi": "https://data-dev.lsst.cloud/api/sia/openapi.json",
+          "quota_labels": {
+            "sia": {
+              "title": "Image requests"
+            }
+          },
+          "versions": {
+            "sia-query-2.0": {
+              "url": "https://data-dev.lsst.cloud/api/sia/dp02/query"
+            }
+          }
+        },
+        "tap": {
+          "url": "https://data-dev.lsst.cloud/api/tap",
+          "title": "Table access protocol (TAP)",
+          "docs_url": "https://www.ivoa.net/documents/TAP/",
+          "required_scopes": ["read:tap"],
+          "quota_labels": {
+            "tap": {
+              "title": "TAP API calls"
+            }
+          },
+          "versions": {
+            "tables": {
+              "url": "https://data-dev.lsst.cloud/api/tap/tables"
+            }
+          }
+        },
+        "cutout": {
+          "url": "https://data-dev.lsst.cloud/api/cutout",
+          "title": "SODA image cutouts",
+          "docs_url": "https://www.ivoa.net/documents/SODA/",
+          "required_scopes": ["read:image"],
+          "openapi": "https://data-dev.lsst.cloud/api/cutout/openapi.json",
+          "quota_labels": {
+            "vo-cutouts": {
+              "title": "SODA API calls"
+            }
+          },
+          "versions": {
+            "soda-async-1.0": {
+              "url": "https://data-dev.lsst.cloud/api/cutout/jobs"
+            },
+            "soda-sync-1.0": {
+              "url": "https://data-dev.lsst.cloud/api/cutout/sync"
+            }
+          }
+        },
+        "hips": {
+          "url": "https://data-dev.lsst.cloud/api/hips/v2/dp02/list",
+          "title": "HiPS (Hierarchical Progressive Survey)",
+          "docs_url": "https://www.ivoa.net/documents/HiPS/",
+          "required_scopes": ["read:image"],
+          "quota_labels": {
+            "hips": {
+              "title": "HiPS requests"
+            }
+          },
+          "versions": {
+            "hips-list-1.0": {
+              "url": "https://data-dev.lsst.cloud/api/hips/v2/dp02/list"
+            }
+          }
+        }
+      }
+    },
+    "dp03": {
+      "description": "Data Preview 0.3 contains the catalog products of a Solar System Science Collaboration simulation of the results of SSO analysis of the wide-fast-deep data from the LSST dataset.",
+      "docs_url": "https://dp0-3.lsst.io/",
+      "services": {
+        "gms": {
+          "url": "https://data-dev.lsst.cloud/auth/gms",
+          "title": "Group membership service (GMS)",
+          "docs_url": "https://www.ivoa.net/documents/GMS/",
+          "versions": {
+            "gms-search-1.0": {
+              "url": "https://data-dev.lsst.cloud/auth/gms"
+            }
+          }
+        },
+        "tap": {
+          "url": "https://data-dev.lsst.cloud/api/ssotap",
+          "title": "Table access protocol (TAP)",
+          "docs_url": "https://www.ivoa.net/documents/TAP/",
+          "required_scopes": ["read:tap"],
+          "versions": {
+            "tables": {
+              "url": "https://data-dev.lsst.cloud/api/ssotap/tables"
+            }
+          }
+        }
+      }
+    },
+    "prompt": {
+      "description": "Prompt products.",
+      "obscore_config": "https://raw.githubusercontent.com/lsst-dm/dax_obscore/refs/heads/main/configs/prompt.yaml",
+      "services": {
+        "gms": {
+          "url": "https://data-dev.lsst.cloud/auth/gms",
+          "title": "Group membership service (GMS)",
+          "docs_url": "https://www.ivoa.net/documents/GMS/",
+          "versions": {
+            "gms-search-1.0": {
+              "url": "https://data-dev.lsst.cloud/auth/gms"
+            }
+          }
+        },
+        "alerts": {
+          "url": "https://data-dev.lsst.cloud/api/alerts",
+          "title": "Alert retrieval",
+          "docs_url": "https://sqr-114.lsst.io/",
+          "required_scopes": ["read:image"],
+          "openapi": "https://data-dev.lsst.cloud/api/alerts/openapi.json",
+          "quota_labels": {
+            "herald": {
+              "title": "Alert requests"
+            }
+          }
+        },
+        "tap": {
+          "url": "https://data-dev.lsst.cloud/api/ppdbtap",
+          "title": "Table access protocol (TAP)",
+          "docs_url": "https://www.ivoa.net/documents/TAP/",
+          "required_scopes": ["read:tap"]
+        }
+      }
+    }
+  },
+  "environment": {
+    "name": "data-dev.lsst.cloud",
+    "label": "idfdev",
+    "title": "SQuaRE RSP development",
+    "title_long": "SQuaRE RSP development",
+    "description": "A development environment for the Rubin Science Platform on Google Cloud Platform. Its primary use is application development by the SQuaRE team.",
+    "docs_url": "https://phalanx.lsst.io/environments/idfdev/"
+  },
+  "environment_name": "data-dev.lsst.cloud",
+  "influxdb_databases": {
+    "idfdev_efd": {
+      "url": "https://data-dev.lsst.cloud/influxdb/",
+      "database": "efd",
+      "schema_registry": "http://sasquatch-schema-registry.sasquatch:8081/",
+      "local": true,
+      "credentials_url": "https://data-dev.lsst.cloud/repertoire/discovery/influxdb/idfdev_efd"
+    }
+  },
+  "services": {
+    "internal": {
+      "datalink": {
+        "url": "https://data-dev.lsst.cloud/api/datalink",
+        "title": "DataLink",
+        "required_scopes": ["read:image"],
+        "openapi": "https://data-dev.lsst.cloud/api/datalink/openapi.json",
+        "quota_labels": {
+          "datalinker": {
+            "title": "DataLink {links} requests"
+          }
+        },
+        "versions": {
+          "datalink-links-1.1": {
+            "url": "https://data-dev.lsst.cloud/api/datalink/links"
+          }
+        }
+      },
+      "gafaelfawr": {
+        "url": "https://data-dev.lsst.cloud/auth",
+        "docs_url": "https://gafaelfawr.lsst.io/",
+        "openapi": "https://data-dev.lsst.cloud/auth/openapi.json",
+        "versions": {
+          "v1": {
+            "url": "https://data-dev.lsst.cloud/auth/api/v1"
+          }
+        }
+      },
+      "login": {
+        "url": "https://data-dev.lsst.cloud/login",
+        "title": "User login"
+      },
+      "mobu": {
+        "url": "https://data-dev.lsst.cloud/mobu",
+        "docs_url": "https://mobu.lsst.io/",
+        "required_scopes": ["exec:admin"],
+        "openapi": "https://data-dev.lsst.cloud/mobu/openapi.json"
+      },
+      "muster": {
+        "url": "https://data-dev.lsst.cloud/muster",
+        "openapi": "https://data-dev.lsst.cloud/muster/openapi.json",
+        "quota_labels": {
+          "muster-quota": {
+            "title": "Quota testing"
+          }
+        }
+      },
+      "noteburst": {
+        "url": "https://data-dev.lsst.cloud/noteburst",
+        "docs_url": "https://noteburst.lsst.io/",
+        "required_scopes": ["exec:notebook"],
+        "openapi": "https://data-dev.lsst.cloud/noteburst/openapi.json",
+        "versions": {
+          "v1": {
+            "url": "https://data-dev.lsst.cloud/noteburst/v1"
+          }
+        }
+      },
+      "nublado-controller": {
+        "url": "https://data-dev.lsst.cloud/nublado",
+        "required_scopes": ["admin:jupyterlab"],
+        "openapi": "https://data-dev.lsst.cloud/nublado/openapi.json"
+      },
+      "repertoire": {
+        "url": "https://data-dev.lsst.cloud/repertoire",
+        "docs_url": "https://repertoire.lsst.io/",
+        "openapi": "https://data-dev.lsst.cloud/repertoire/openapi.json"
+      },
+      "semaphore": {
+        "url": "https://data-dev.lsst.cloud/semaphore",
+        "docs_url": "https://semaphore.lsst.io/",
+        "openapi": "https://data-dev.lsst.cloud/semaphore/openapi.json",
+        "versions": {
+          "v1": {
+            "url": "https://data-dev.lsst.cloud/semaphore/v1"
+          }
+        }
+      },
+      "times-square": {
+        "url": "https://data-dev.lsst.cloud/times-square/api",
+        "docs_url": "https://times-square.lsst.io/",
+        "required_scopes": ["exec:admin"],
+        "openapi": "https://data-dev.lsst.cloud/times-square/api/openapi.json",
+        "versions": {
+          "v1": {
+            "url": "https://data-dev.lsst.cloud/times-square/api/v1"
+          }
+        }
+      },
+      "wobbly": {
+        "url": "https://data-dev.lsst.cloud/wobbly",
+        "docs_url": "https://sqr-096.lsst.io/",
+        "openapi": "https://data-dev.lsst.cloud/wobbly/openapi.json"
+      }
+    },
+    "ui": {
+      "argocd": {
+        "url": "https://data-dev.lsst.cloud/argo-cd",
+        "title": "Argo CD",
+        "docs_url": "https://argo-cd.readthedocs.io/en/stable/"
+      },
+      "comanage": {
+        "url": "https://id-dev.lsst.cloud/",
+        "title": "Account settings"
+      },
+      "logout": {
+        "url": "https://data-dev.lsst.cloud/logout",
+        "title": "User logout"
+      },
+      "nublado": {
+        "url": "https://nb.data-dev.lsst.cloud/nb",
+        "title": "Notebook aspect",
+        "docs_url": "https://nublado.lsst.io/",
+        "required_scopes": ["exec:notebook"]
+      },
+      "webdav": {
+        "url": "https://data-dev.lsst.cloud/files",
+        "title": "WebDAV server",
+        "required_scopes": ["write:files"]
+      },
+      "portal": {
+        "url": "https://data-dev.lsst.cloud/portal/app/",
+        "title": "Portal aspect",
+        "required_scopes": ["exec:portal"]
+      },
+      "chronograf": {
+        "url": "https://data-dev.lsst.cloud/chronograf",
+        "title": "Chronograf metrics viewer"
+      },
+      "kafdrop": {
+        "url": "https://data-dev.lsst.cloud/kafdrop",
+        "title": "Kafdrop Kafka viewer",
+        "required_scopes": ["exec:internal-tools"]
+      },
+      "settings": {
+        "url": "https://data-dev.lsst.cloud/settings",
+        "title": "User settings"
+      },
+      "squareone": {
+        "url": "https://data-dev.lsst.cloud/",
+        "title": "Home page",
+        "docs_url": "https://squareone.lsst.io/"
+      }
+    }
+  }
+}

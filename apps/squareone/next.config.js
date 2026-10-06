@@ -40,6 +40,12 @@ module.exports = (phase) => {
           source: '/auth/api/v1/login',
           destination: '/api/dev/login-info',
         },
+        // Mock Gafaelfawr token info (the delegated token's scopes, for the
+        // server-side prefetch on a simulated GafaelfawrIngress route)
+        {
+          source: '/auth/api/v1/token-info',
+          destination: '/api/dev/gafaelfawr/v1/token-info',
+        },
         // Mock Gafaelfawr per-user token detail / revoke (must precede the
         // collection rewrite so the more specific :key path matches first)
         {
@@ -135,6 +141,7 @@ module.exports = (phase) => {
 // Injected content via Sentry wizard below
 
 const { withSentryConfig } = require('@sentry/nextjs');
+const { SENTRY_TUNNEL_ROUTE } = require('./sentry.tunnel.config');
 
 const sentryWrappedConfig = withSentryConfig(module.exports, {
   // For all available options, see:
@@ -169,7 +176,9 @@ const sentryWrappedConfig = withSentryConfig(module.exports, {
   // This can increase your server load as well as your hosting bill.
   // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
   // side errors will fail.
-  tunnelRoute: '/monitoring',
+  // The path is shared with the server-side listener-limit workaround; see
+  // sentry.tunnel.config.js.
+  tunnelRoute: SENTRY_TUNNEL_ROUTE,
 
   // Hides source maps from generated client bundles
   hideSourceMaps: true,

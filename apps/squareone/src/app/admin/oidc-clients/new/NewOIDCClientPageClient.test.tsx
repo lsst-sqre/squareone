@@ -18,8 +18,11 @@ import NewOIDCClientPageClient from './NewOIDCClientPageClient';
 // exercised the same way it is in the app.
 vi.mock('@lsst-sqre/gafaelfawr-client', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@lsst-sqre/gafaelfawr-client')>()),
-  useLoginInfo: vi.fn(),
   useCreateOidcClient: vi.fn(),
+}));
+
+vi.mock('../../../../hooks/useLoginInfo', () => ({
+  useLoginInfo: vi.fn(),
 }));
 
 vi.mock('../../../../hooks/useRepertoireUrl', () => ({
@@ -41,8 +44,8 @@ import {
   GafaelfawrError,
   OidcNotConfiguredError,
   useCreateOidcClient,
-  useLoginInfo,
 } from '@lsst-sqre/gafaelfawr-client';
+import { useLoginInfo } from '../../../../hooks/useLoginInfo';
 
 const createdClient: OIDCClientWithSecret = {
   client_id: 'a1b2c3d4-0000-4000-8000-000000000009',

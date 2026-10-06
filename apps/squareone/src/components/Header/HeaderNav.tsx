@@ -8,6 +8,7 @@ import type { ReactNode } from 'react';
 import useCurrentUrl from '../../hooks/useCurrentUrl';
 import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
 import { useStaticConfig } from '../../hooks/useStaticConfig';
+import { useUserScopes } from '../../hooks/useUserScopes';
 import AppsMenu from './AppsMenu';
 import styles from './HeaderNav.module.css';
 import Login from './Login';
@@ -22,8 +23,17 @@ type InternalTriggerLinkProps = {
  *
  * Service availability is determined by the Repertoire service discovery API.
  * When repertoireUrl is not configured, all services are shown with fallback URLs.
- * When configured, only available services are displayed. During loading, items
- * are shown with fallback URLs to avoid layout shift (data is prefetched anyway).
+ * When configured, only available services are displayed.
+ *
+ * Portal and Notebooks are also hidden from a signed-in user who lacks a scope
+ * the service declares in `required_scopes` (Repertoire 3.0.0). Anonymous
+ * visitors and services that declare no required scopes are unaffected.
+ *
+ * The root layout prefetches both service discovery and the user's scopes on
+ * the server and hydrates them, so both are known on the first client render
+ * and a gated entry never appears only to vanish. Should either be missing
+ * from the hydrated state, entries show while it loads (with fallback URLs,
+ * to avoid layout shift).
  */
 export default function HeaderNav() {
   const currentUrl = useCurrentUrl();
@@ -33,13 +43,28 @@ export default function HeaderNav() {
   // Service discovery
   const { query, isPending } = useServiceDiscovery(repertoireUrl ?? '');
 
-  // Determine visibility - show by default when discovery not configured
-  // Show during loading to avoid layout shift (data is prefetched in App Router)
+  // The signed-in user's scopes (hydrated from the layout's prefetch);
+  // undefined when anonymous or still loading, which canAccessService treats as
+  // allowed.
+  const { scopes } = useUserScopes();
+  const canAccessUiService = (name: string) => {
+    const service = query?.getUiService(name);
+    return !!service && !!query?.canAccessService(service, scopes);
+  };
+
+  // Determine visibility - show by default when discovery not configured.
+  // Discovery and the scopes are hydrated from the root layout's prefetch, so
+  // isPending is normally false on the first render; should discovery be
+  // missing, show entries while loading to avoid layout shift.
   const isConfigured = !!repertoireUrl;
   const showPortal =
-    !isConfigured || isPending || query?.hasPortal({ hasUi: true });
+    !isConfigured ||
+    isPending ||
+    (query?.hasPortal({ hasUi: true }) && canAccessUiService('portal'));
   const showNublado =
-    !isConfigured || isPending || query?.hasNublado({ hasUi: true });
+    !isConfigured ||
+    isPending ||
+    (query?.hasNublado({ hasUi: true }) && canAccessUiService('nublado'));
 
   // Get URLs from discovery or use fallbacks
   const portalUrl = query?.getPortalUrl() ?? '/portal/app';
@@ -68,11 +93,8 @@ export default function HeaderNav() {
           <InternalTriggerLink href="/api-aspect">APIs</InternalTriggerLink>
         </PrimaryNavigation.Item>
 
-        {enableAppsMenu && (
-          <PrimaryNavigation.Item className={styles.navItem}>
-            <AppsMenu />
-          </PrimaryNavigation.Item>
-        )}
+        {/* AppsMenu renders its own item, or nothing when it has no items. */}
+        {enableAppsMenu && <AppsMenu className={styles.navItem} />}
 
         <PrimaryNavigation.Item className={styles.navItem}>
           <InternalTriggerLink href="/docs">Documentation</InternalTriggerLink>

@@ -6,13 +6,19 @@ import {
 import { describe, expect, test } from 'vitest';
 
 import type { PresentationMap } from './presentation';
-import { serviceDiscoveryToApiEndpointGroups } from './transform';
+import {
+  serviceDiscoveryToApiEndpointGroups,
+  serviceDiscoveryToDatasetSummaries,
+} from './transform';
 
 describe('serviceDiscoveryToApiEndpointGroups', () => {
   test('produces one group per dataset, in curated dataset order', () => {
     const groups = serviceDiscoveryToApiEndpointGroups(mockDiscovery);
 
+    // dp2 outranks dp1, and prompt is pinned second.
     expect(groups.map((group) => group.datasetKey)).toEqual([
+      'dp2',
+      'prompt',
       'dp1',
       'dp03',
       'dp02',
@@ -102,7 +108,23 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
     expect(group.displayName).toBe('Data Preview 2');
   });
 
-  test('maps the alerts service to its curated label', () => {
+  test('labels the prompt alerts service with its discovery title and docs link', () => {
+    const groups = serviceDiscoveryToApiEndpointGroups(mockDiscovery);
+    const prompt = groups.find((group) => group.datasetKey === 'prompt');
+
+    expect(
+      prompt?.endpoints.find(
+        (endpoint) => endpoint.url === 'https://data.lsst.cloud/api/alerts'
+      )
+    ).toEqual({
+      label: 'Alert retrieval',
+      url: 'https://data.lsst.cloud/api/alerts',
+      docs: { url: 'https://sqr-114.lsst.io/', label: 'Alert retrieval docs' },
+      requiredScopes: ['read:image'],
+    });
+  });
+
+  test('labels an untitled alerts service (Repertoire 2.x) "Alerts"', () => {
     const discovery = {
       ...getEmptyDiscovery(),
       datasets: {
@@ -121,8 +143,8 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
     expect(group.endpoints[0]).toEqual({
       label: 'Alerts',
       url: 'https://data.lsst.cloud/api/alerts',
-      ivoaUrl: null,
-      ivoaName: null,
+      docs: null,
+      requiredScopes: [],
     });
   });
 
@@ -157,12 +179,16 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
     const byLabel = (label: string) =>
       dp1?.endpoints.find((endpoint) => endpoint.label === label);
 
-    // SIA surfaces the sia-query-2.0 /query URL and the IVOA SIA standard link.
+    // SIA surfaces the sia-query-2.0 /query URL and the IVOA SIA standard link,
+    // labelled by its curated standard name.
     expect(byLabel('Simple Image Access (SIA v2)')).toEqual({
       label: 'Simple Image Access (SIA v2)',
       url: 'https://data.lsst.cloud/api/sia/dp1/query',
-      ivoaUrl: 'https://www.ivoa.net/documents/SIA/',
-      ivoaName: 'SIA',
+      docs: {
+        url: 'https://www.ivoa.net/documents/SIA/',
+        label: 'IVOA SIA docs',
+      },
+      requiredScopes: ['read:image'],
     });
     // HiPS surfaces the hips-list-1.0 /list URL.
     expect(byLabel('HiPS (Hierarchical Progressive Survey)')?.url).toBe(
@@ -177,12 +203,101 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
       'https://data.lsst.cloud/api/cutout'
     );
     // DataLink and GMS link to their IVOA standards too.
-    expect(byLabel('DataLink')?.ivoaUrl).toBe(
-      'https://www.ivoa.net/documents/DataLink/'
-    );
-    expect(byLabel('Group Membership Service (GMS)')?.ivoaUrl).toBe(
-      'https://www.ivoa.net/documents/GMS/'
-    );
+    expect(byLabel('DataLink')?.docs).toEqual({
+      url: 'https://www.ivoa.net/documents/DataLink/',
+      label: 'IVOA DataLink docs',
+    });
+    expect(byLabel('Group Membership Service (GMS)')?.docs).toEqual({
+      url: 'https://www.ivoa.net/documents/GMS/',
+      label: 'IVOA GMS docs',
+    });
+  });
+
+  test('curated services ignore the discovery title and docs url entirely', () => {
+    const groups = serviceDiscoveryToApiEndpointGroups(mockDiscovery);
+    const dp1 = groups.find((group) => group.datasetKey === 'dp1');
+
+    // mockDiscovery's cutout carries the 3.0 title "SODA image cutouts" and a
+    // docs_url; the curated label, IVOA link, and name still win.
+    expect(
+      dp1?.endpoints.find((endpoint) => endpoint.label === 'SODA Image Cutouts')
+    ).toEqual({
+      label: 'SODA Image Cutouts',
+      url: 'https://data.lsst.cloud/api/cutout',
+      docs: {
+        url: 'https://www.ivoa.net/documents/SODA/20170517/REC-SODA-1.0.html',
+        label: 'IVOA SODA docs',
+      },
+      requiredScopes: ['read:image'],
+    });
+  });
+
+  test('carries each service discovery required scopes', () => {
+    const groups = serviceDiscoveryToApiEndpointGroups(mockDiscovery);
+    const dp1 = groups.find((group) => group.datasetKey === 'dp1');
+
+    expect(
+      Object.fromEntries(
+        (dp1?.endpoints ?? []).map((endpoint) => [
+          endpoint.label,
+          endpoint.requiredScopes,
+        ])
+      )
+    ).toEqual({
+      'SODA Image Cutouts': ['read:image'],
+      DataLink: ['read:image'],
+      // GMS declares no scope requirement.
+      'Group Membership Service (GMS)': [],
+      'HiPS (Hierarchical Progressive Survey)': ['read:image'],
+      'Simple Image Access (SIA v2)': ['read:image'],
+      'Table Access Protocol (TAP)': ['read:tap'],
+    });
+  });
+
+  test('requires no scopes when discovery omits required_scopes (Repertoire 2.x)', () => {
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            tap: { url: 'https://data.lsst.cloud/api/tap', versions: {} },
+            mystery: {
+              url: 'https://data.lsst.cloud/api/mystery',
+              versions: {},
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery);
+    expect(group.endpoints.map((endpoint) => endpoint.requiredScopes)).toEqual([
+      [],
+      [],
+    ]);
+  });
+
+  test('lists a scope discovery repeats only once, in first-seen order', () => {
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            sia: {
+              url: 'https://data.lsst.cloud/api/sia/dp1/query',
+              versions: {},
+              required_scopes: ['read:image', 'read:tap', 'read:image'],
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery);
+    expect(group.endpoints[0].requiredScopes).toEqual([
+      'read:image',
+      'read:tap',
+    ]);
   });
 
   test('uses a single generic TAP label across datasets; the dataset gives context', () => {
@@ -196,7 +311,36 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
     expect(tap?.url).toBe('https://data.lsst.cloud/api/ssotap');
   });
 
-  test('services absent from the map fall back to raw name + base url, no IVOA link', () => {
+  test('links an unmapped service with an IVOA docs url as an IVOA standard named from its label', () => {
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            ssa: {
+              url: 'https://data.lsst.cloud/api/ssa',
+              title: 'Simple spectral access (SSA)',
+              docs_url: 'https://www.ivoa.net/documents/SSA/',
+              versions: {},
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery);
+    expect(group.endpoints[0]).toEqual({
+      label: 'Simple spectral access (SSA)',
+      url: 'https://data.lsst.cloud/api/ssa',
+      docs: {
+        url: 'https://www.ivoa.net/documents/SSA/',
+        label: 'IVOA SSA docs',
+      },
+      requiredScopes: [],
+    });
+  });
+
+  test('an untitled unmapped service (Repertoire 2.x) falls back to raw name + base url, no docs link', () => {
     const discovery = {
       ...getEmptyDiscovery(),
       datasets: {
@@ -215,9 +359,235 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
     expect(group.endpoints[0]).toEqual({
       label: 'mystery',
       url: 'https://data.lsst.cloud/api/mystery',
-      ivoaUrl: null,
-      ivoaName: null,
+      docs: null,
+      requiredScopes: [],
     });
+  });
+
+  test('labels an unmapped service with an empty title (Repertoire 3.0) by its raw name, never blank', () => {
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            ssa: {
+              url: 'https://data.lsst.cloud/api/ssa',
+              title: '',
+              docs_url: 'https://www.ivoa.net/documents/SSA/',
+              versions: {},
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery);
+    expect(group.endpoints[0]).toEqual({
+      label: 'ssa',
+      url: 'https://data.lsst.cloud/api/ssa',
+      docs: {
+        url: 'https://www.ivoa.net/documents/SSA/',
+        label: 'IVOA ssa docs',
+      },
+      requiredScopes: [],
+    });
+  });
+
+  test('labels an alerts service with a whitespace-only title "Alerts"', () => {
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        prompt: {
+          services: {
+            alerts: {
+              url: 'https://data.lsst.cloud/api/alerts',
+              title: '   ',
+              versions: {},
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery);
+    expect(group.endpoints[0]?.label).toBe('Alerts');
+  });
+
+  test('labels an unmapped service with its discovery title', () => {
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            mystery: {
+              url: 'https://data.lsst.cloud/api/mystery',
+              title: 'Mystery service',
+              versions: {},
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery);
+    expect(group.endpoints[0]?.label).toBe('Mystery service');
+  });
+
+  test('links an unmapped service to its non-IVOA discovery docs url', () => {
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            mystery: {
+              url: 'https://data.lsst.cloud/api/mystery',
+              title: 'Mystery service',
+              docs_url: 'https://mystery.lsst.io/',
+              versions: {},
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery);
+    expect(group.endpoints[0]).toEqual({
+      label: 'Mystery service',
+      url: 'https://data.lsst.cloud/api/mystery',
+      docs: {
+        url: 'https://mystery.lsst.io/',
+        label: 'Mystery service docs',
+      },
+      requiredScopes: [],
+    });
+  });
+
+  test('surfaces the url of an unmapped service with exactly one version', () => {
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            ssa: {
+              url: 'https://data.lsst.cloud/api/ssa',
+              versions: {
+                'ssa-1.1': { url: 'https://data.lsst.cloud/api/ssa/query' },
+              },
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery);
+    expect(group.endpoints[0]?.url).toBe(
+      'https://data.lsst.cloud/api/ssa/query'
+    );
+  });
+
+  test('surfaces the base url of an unmapped service with several versions', () => {
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            ssa: {
+              url: 'https://data.lsst.cloud/api/ssa',
+              versions: {
+                'ssa-1.0': { url: 'https://data.lsst.cloud/api/ssa/v1.0' },
+                'ssa-1.1': { url: 'https://data.lsst.cloud/api/ssa/v1.1' },
+              },
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery);
+    expect(group.endpoints[0]?.url).toBe('https://data.lsst.cloud/api/ssa');
+  });
+
+  test('surfaces the base url of an unmapped service with no versions', () => {
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            ssa: { url: 'https://data.lsst.cloud/api/ssa', versions: {} },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery);
+    expect(group.endpoints[0]?.url).toBe('https://data.lsst.cloud/api/ssa');
+  });
+
+  test('surfaces the base url of an unmapped service whose only version lacks a url', () => {
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            ssa: {
+              url: 'https://data.lsst.cloud/api/ssa',
+              versions: { 'ssa-1.1': {} },
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery);
+    expect(group.endpoints[0]?.url).toBe('https://data.lsst.cloud/api/ssa');
+  });
+
+  test('an entry without a url selector falls through to the sole version url', () => {
+    const custom: PresentationMap = {
+      services: { spectra: { label: 'Spectra' } },
+      datasetDisplayNames: {},
+    };
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            spectra: {
+              url: 'https://example.org/spectra',
+              versions: {
+                'spectra-1.0': { url: 'https://example.org/spectra/query' },
+              },
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery, custom);
+    expect(group.endpoints[0]?.url).toBe('https://example.org/spectra/query');
+  });
+
+  test('a curated base selector keeps the base url over a sole version', () => {
+    const custom: PresentationMap = {
+      services: { tap: { label: 'Custom TAP', url: 'base' } },
+      datasetDisplayNames: {},
+    };
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            tap: {
+              url: 'https://example.org/tap',
+              versions: { tables: { url: 'https://example.org/tap/tables' } },
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery, custom);
+    expect(group.endpoints[0]?.url).toBe('https://example.org/tap');
   });
 
   test('falls back to the base url when a curated version key is missing', () => {
@@ -256,9 +626,203 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
     expect(group.endpoints[0]).toEqual({
       label: 'Custom TAP',
       url: 'https://example.org/tap',
-      ivoaUrl: null,
-      ivoaName: null,
+      docs: null,
+      requiredScopes: [],
     });
+  });
+
+  test('names a curated IVOA link from its label when no ivoaName is curated', () => {
+    const custom: PresentationMap = {
+      services: {
+        ssa: {
+          label: 'Simple Spectral Access (SSA)',
+          ivoaUrl: 'https://www.ivoa.net/documents/SSA/',
+        },
+      },
+      datasetDisplayNames: {},
+    };
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: { ssa: { url: 'https://example.org/ssa', versions: {} } },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery, custom);
+    expect(group.endpoints[0]?.docs).toEqual({
+      url: 'https://www.ivoa.net/documents/SSA/',
+      label: 'IVOA SSA docs',
+    });
+  });
+
+  test('labels an untitled service (Repertoire 2.x) by an entry untitledLabel', () => {
+    const custom: PresentationMap = {
+      services: { spectra: { untitledLabel: 'Spectra' } },
+      datasetDisplayNames: {},
+    };
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            spectra: { url: 'https://example.org/spectra', versions: {} },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery, custom);
+    expect(group.endpoints[0]).toEqual({
+      label: 'Spectra',
+      url: 'https://example.org/spectra',
+      docs: null,
+      requiredScopes: [],
+    });
+  });
+
+  test('prefers a discovery title over an entry untitledLabel', () => {
+    const custom: PresentationMap = {
+      services: { spectra: { untitledLabel: 'Spectra' } },
+      datasetDisplayNames: {},
+    };
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            spectra: {
+              url: 'https://example.org/spectra',
+              title: 'Spectrum retrieval',
+              versions: {},
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery, custom);
+    expect(group.endpoints[0]?.label).toBe('Spectrum retrieval');
+  });
+
+  test('names an IVOA discovery docs link by the entry ivoaName', () => {
+    const custom: PresentationMap = {
+      services: { ssa: { ivoaName: 'SSA' } },
+      datasetDisplayNames: {},
+    };
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            ssa: {
+              url: 'https://example.org/ssa',
+              title: 'Simple spectral access',
+              docs_url: 'https://www.ivoa.net/documents/SSA/',
+              versions: {},
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery, custom);
+    expect(group.endpoints[0]).toEqual({
+      label: 'Simple spectral access',
+      url: 'https://example.org/ssa',
+      docs: {
+        url: 'https://www.ivoa.net/documents/SSA/',
+        label: 'IVOA SSA docs',
+      },
+      requiredScopes: [],
+    });
+  });
+
+  test('overrides only the fields an entry sets; the rest come from discovery', () => {
+    const custom: PresentationMap = {
+      services: { spectra: { url: { versionKey: 'spectra-1.0' } } },
+      datasetDisplayNames: {},
+    };
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            spectra: {
+              url: 'https://example.org/spectra',
+              title: 'Spectrum retrieval',
+              docs_url: 'https://spectra.lsst.io/',
+              versions: {
+                'spectra-1.0': { url: 'https://example.org/spectra/query' },
+              },
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery, custom);
+    expect(group.endpoints[0]).toEqual({
+      label: 'Spectrum retrieval',
+      url: 'https://example.org/spectra/query',
+      docs: {
+        url: 'https://spectra.lsst.io/',
+        label: 'Spectrum retrieval docs',
+      },
+      requiredScopes: [],
+    });
+  });
+
+  test('an entry without an ivoaUrl falls through to the discovery docs url', () => {
+    const custom: PresentationMap = {
+      services: { spectra: { label: 'Spectra' } },
+      datasetDisplayNames: {},
+    };
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            spectra: {
+              url: 'https://example.org/spectra',
+              title: 'Spectrum retrieval',
+              docs_url: 'https://spectra.lsst.io/',
+              versions: {},
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery, custom);
+    expect(group.endpoints[0]).toEqual({
+      label: 'Spectra',
+      url: 'https://example.org/spectra',
+      docs: { url: 'https://spectra.lsst.io/', label: 'Spectra docs' },
+      requiredScopes: [],
+    });
+  });
+
+  test('gives an unmapped service with a blank docs url no docs link', () => {
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: {
+          services: {
+            mystery: {
+              url: 'https://data.lsst.cloud/api/mystery',
+              title: 'Mystery service',
+              docs_url: '',
+              versions: {},
+            },
+          },
+        },
+      },
+    } as unknown as ServiceDiscovery;
+
+    const [group] = serviceDiscoveryToApiEndpointGroups(discovery);
+    expect(group.endpoints[0]?.docs).toBeNull();
   });
 
   test('returns an empty array when discovery has no datasets', () => {
@@ -286,5 +850,126 @@ describe('serviceDiscoveryToApiEndpointGroups', () => {
 
     const [group] = serviceDiscoveryToApiEndpointGroups(discovery);
     expect(group.endpoints).toEqual([]);
+  });
+});
+
+describe('serviceDiscoveryToDatasetSummaries', () => {
+  test('summarizes each dataset, newest release first with prompt second', () => {
+    const { datasets } = mockDiscovery;
+
+    expect(serviceDiscoveryToDatasetSummaries(mockDiscovery)).toEqual([
+      {
+        datasetKey: 'dp2',
+        displayName: 'Data Preview 2',
+        description: datasets.dp2.description,
+        docsUrl: 'https://dp2.lsst.io',
+      },
+      {
+        datasetKey: 'prompt',
+        displayName: 'Prompt Products',
+        description: datasets.prompt.description,
+        // The mock prompt dataset has no docs_url, as on data-dev.
+        docsUrl: null,
+      },
+      {
+        datasetKey: 'dp1',
+        displayName: 'Data Preview 1',
+        description: datasets.dp1.description,
+        docsUrl: 'https://dp1.lsst.io',
+      },
+      {
+        datasetKey: 'dp03',
+        displayName: 'Data Preview 0.3',
+        description: datasets.dp03.description,
+        docsUrl: 'https://dp0-3.lsst.io',
+      },
+      {
+        datasetKey: 'dp02',
+        displayName: 'Data Preview 0.2',
+        description: datasets.dp02.description,
+        docsUrl: 'https://dp0-2.lsst.io',
+      },
+    ]);
+  });
+
+  test('heads each /api-aspect group with the same summary', () => {
+    const summaries = serviceDiscoveryToDatasetSummaries(mockDiscovery);
+
+    expect(
+      serviceDiscoveryToApiEndpointGroups(mockDiscovery).map(
+        ({ endpoints: _endpoints, ...summary }) => summary
+      )
+    ).toEqual(summaries);
+  });
+
+  test('falls back to the raw key for a dataset without a display name', () => {
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dr1: {
+          description: 'The first data release.',
+          docs_url: 'https://dr1.lsst.io',
+          services: {},
+        },
+      },
+    } as ServiceDiscovery;
+
+    expect(
+      serviceDiscoveryToDatasetSummaries(discovery, {
+        services: {},
+        datasetDisplayNames: {},
+      })
+    ).toEqual([
+      {
+        datasetKey: 'dr1',
+        displayName: 'dr1',
+        description: 'The first data release.',
+        docsUrl: 'https://dr1.lsst.io',
+      },
+    ]);
+  });
+
+  test('uses the presentation map display name when one is curated', () => {
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: { dr1: { services: {} } },
+    } as ServiceDiscovery;
+
+    const [summary] = serviceDiscoveryToDatasetSummaries(discovery, {
+      services: {},
+      datasetDisplayNames: { dr1: 'Data Release 1' },
+    });
+
+    expect(summary.displayName).toBe('Data Release 1');
+  });
+
+  test('yields null description and docs URL when discovery has neither', () => {
+    // Both fields are optional (and nullable) in the discovery schema.
+    const discovery = {
+      ...getEmptyDiscovery(),
+      datasets: {
+        dp1: { services: {} },
+        dp02: { description: null, docs_url: null, services: {} },
+      },
+    } as ServiceDiscovery;
+
+    expect(serviceDiscoveryToDatasetSummaries(discovery)).toEqual([
+      {
+        datasetKey: 'dp1',
+        displayName: 'Data Preview 1',
+        description: null,
+        docsUrl: null,
+      },
+      {
+        datasetKey: 'dp02',
+        displayName: 'Data Preview 0.2',
+        description: null,
+        docsUrl: null,
+      },
+    ]);
+  });
+
+  test('yields no summaries for a discovery without datasets', () => {
+    expect(serviceDiscoveryToDatasetSummaries(getEmptyDiscovery())).toEqual([]);
   });
 });

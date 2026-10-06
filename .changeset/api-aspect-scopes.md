@@ -1,0 +1,9 @@
+---
+'squareone': minor
+---
+
+On the `/api-aspect` page, each API endpoint now lists the Gafaelfawr scopes its service requires, taken from the service's Repertoire discovery `required_scopes`, as small scope pills under the endpoint URL. For example, TAP shows `read:tap`, and SIA, SODA, and HiPS show `read:image`. Next to the pills, a "Create a token with these scopes" link opens the token creation form at `/settings/tokens/new?scopes=<comma-separated scopes>` with those scopes already selected. An endpoint whose service declares no scopes, such as GMS, shows no pills and no link. The same is true of every endpoint under Repertoire 2.x, which doesn't publish `required_scopes`. For screen reader users, the token link and each endpoint's copy button now name the dataset as well as the endpoint, such as "Create a token with these scopes for Table Access Protocol (TAP) in Data Preview 1", so the same service listed under several datasets no longer produces identical link and button names.
+
+If a link to the token creation form requests a scope that the signed-in user can't grant, for example `read:image` for a user without image access, the form selects only the scopes the user can grant. A warning above the form names the scopes it left out, so creating the token no longer fails on a scope the form doesn't show.
+
+The token template URL offered after creating a token now pre-fills the scopes on the token creation form. The template URL used to repeat a `scope` parameter for each scope, which the form ignored. It now sends one comma-separated `scopes` parameter, as the `/api-aspect` links do. Template URLs copied before this change also work now, because the token creation form reads the older repeated `scope` parameters as well as `scopes` and combines them.

@@ -5,6 +5,7 @@ import Link from 'next/link';
 
 import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
 import { useStaticConfig } from '../../hooks/useStaticConfig';
+import { useUserScopes } from '../../hooks/useUserScopes';
 import FullBleedBackgroundImageSection from '../FullBleedBackgroundImageSection';
 import styles from './HomepageHero.module.css';
 
@@ -15,6 +16,14 @@ import styles from './HomepageHero.module.css';
  * Service availability is determined by the Repertoire service discovery API.
  * When repertoireUrl is not configured, all services are shown with fallback URLs.
  * When configured, only available services are displayed.
+ *
+ * Portal and Notebooks are also hidden from a signed-in user who lacks a scope
+ * the service declares in `required_scopes` (Repertoire 3.0.0). Anonymous
+ * visitors and services that declare no required scopes are unaffected.
+ *
+ * The root layout prefetches both service discovery and the user's scopes on
+ * the server and hydrates them, so both are known on the first client render
+ * and a gated card never appears only to vanish.
  */
 export default function HomepageHero() {
   const { showPreview, previewLink, docsBaseUrl, siteName } = useStaticConfig();
@@ -23,15 +32,31 @@ export default function HomepageHero() {
   // Service discovery - query is null when URL is empty (disabled)
   const { query, isPending } = useServiceDiscovery(repertoireUrl ?? '');
 
+  // The signed-in user's scopes (hydrated from the layout's prefetch);
+  // undefined when anonymous or still loading, which canAccessService treats as
+  // allowed.
+  const { scopes } = useUserScopes();
+  const canAccessUiService = (name: string) => {
+    const service = query?.getUiService(name);
+    return !!service && !!query?.canAccessService(service, scopes);
+  };
+
   // Determine service availability
   // When not configured, show all services (backward compatibility)
-  // When configured but loading, hide services until loaded
-  // When configured and loaded, show only available services
+  // When configured but loading, hide services until loaded (discovery is
+  // normally hydrated from the layout's prefetch, so this is rare)
+  // When configured and loaded, show only available services the user can use
   const isConfigured = !!repertoireUrl;
   const showPortal =
-    !isConfigured || (!isPending && query?.hasPortal({ hasUi: true }));
+    !isConfigured ||
+    (!isPending &&
+      query?.hasPortal({ hasUi: true }) &&
+      canAccessUiService('portal'));
   const showNublado =
-    !isConfigured || (!isPending && query?.hasNublado({ hasUi: true }));
+    !isConfigured ||
+    (!isPending &&
+      query?.hasNublado({ hasUi: true }) &&
+      canAccessUiService('nublado'));
 
   // Get URLs from discovery or use fallbacks
   const portalUrl = query?.getPortalUrl() ?? '/portal/app/';

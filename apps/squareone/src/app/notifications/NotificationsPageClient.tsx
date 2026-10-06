@@ -1,6 +1,5 @@
 'use client';
 
-import { useLoginInfo } from '@lsst-sqre/gafaelfawr-client';
 import {
   fetchUserNotifications,
   type UserNotificationSummary,
@@ -15,7 +14,7 @@ import AuthRequired from '../../components/AuthRequired';
 import RenderedMarkdown from '../../components/RenderedMarkdown';
 import { UserNotificationsTableView } from '../../components/UserNotifications';
 import { useAutoMarkNotificationRead } from '../../hooks/useAutoMarkNotificationRead';
-import { useRepertoireUrl } from '../../hooks/useRepertoireUrl';
+import { useLoginInfo } from '../../hooks/useLoginInfo';
 import { useSemaphoreUrlState } from '../../hooks/useSemaphoreUrl';
 import { useStaticConfig } from '../../hooks/useStaticConfig';
 import useUnreadOnlyFilter from '../../hooks/useUnreadOnlyFilter';
@@ -67,8 +66,7 @@ function NotificationsContent() {
     isResolving,
     isUnavailable,
   } = useSemaphoreUrlState();
-  const repertoireUrl = useRepertoireUrl();
-  const { csrfToken } = useLoginInfo(repertoireUrl);
+  const { csrfToken } = useLoginInfo();
   const { baseUrl } = useStaticConfig();
   // The "Show unread only" filter is URL-driven so a filtered inbox is
   // bookmarkable (`/notifications?unread=true`); see useUnreadOnlyFilter.

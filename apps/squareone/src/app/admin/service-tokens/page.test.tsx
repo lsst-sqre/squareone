@@ -15,39 +15,36 @@ vi.mock('./ServiceTokenPageClient', () => ({
 }));
 
 // The gate composes AuthRequired (useUserInfo) with the page scope check
-// (useLoginInfo) against the `adminPageScopes` config.
-vi.mock('@lsst-sqre/gafaelfawr-client', () => ({
+// (useUserScopes) against the `adminPageScopes` config.
+vi.mock('../../../hooks/useUserInfo', () => ({
   useUserInfo: vi.fn(),
-  useLoginInfo: vi.fn(),
 }));
 
-vi.mock('../../../hooks/useRepertoireUrl', () => ({
-  useRepertoireUrl: vi.fn(() => undefined),
+vi.mock('../../../hooks/useUserScopes', () => ({
+  useUserScopes: vi.fn(),
 }));
 
 vi.mock('../../../hooks/useStaticConfig', () => ({
   useStaticConfig: vi.fn(),
 }));
 
-import type {
-  UseLoginInfoReturn,
-  UseUserInfoReturn,
-} from '@lsst-sqre/gafaelfawr-client';
-// Import after mocking.
-import { useLoginInfo, useUserInfo } from '@lsst-sqre/gafaelfawr-client';
+import type { UseUserInfoReturn } from '@lsst-sqre/gafaelfawr-client';
 import {
   type AppConfigContextValue,
   useStaticConfig,
 } from '../../../hooks/useStaticConfig';
-import type { AppConfig } from '../../../lib/config/loader';
+import { useUserInfo } from '../../../hooks/useUserInfo';
+// Import after mocking.
+import { useUserScopes } from '../../../hooks/useUserScopes';
+import type { StaticConfig } from '../../../lib/config/resolveConfigDefaults';
 import { getStaticConfig } from '../../../lib/config/rsc';
 import ServiceTokenPage, { generateMetadata } from './page';
 
-function makeConfig(overrides: Partial<AppConfig> = {}): AppConfig {
+function makeConfig(overrides: Partial<StaticConfig> = {}): StaticConfig {
   return {
     siteName: 'Rubin Science Platform',
     ...overrides,
-  } as AppConfig;
+  } as StaticConfig;
 }
 
 function renderPageWithScopes(scopes: string[]) {
@@ -63,13 +60,9 @@ function renderPageWithScopes(scopes: string[]) {
     error: null,
     refetch: vi.fn(),
   });
-  vi.mocked(useLoginInfo).mockReturnValue({
-    loginInfo: null,
-    query: {
-      scopes,
-      hasScope: (scope: string) => scopes.includes(scope),
-    } as UseLoginInfoReturn['query'],
-    csrfToken: null,
+  vi.mocked(useUserScopes).mockReturnValue({
+    scopes,
+    hasScope: (scope: string) => scopes.includes(scope),
     isLoading: false,
     isPending: false,
     error: null,

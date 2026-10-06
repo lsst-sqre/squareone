@@ -21,7 +21,7 @@ import { getDevState } from '@/lib/mocks/devstate';
  *
  * Mirrors real Gafaelfawr, which only lets a user read/modify their own tokens.
  * The `/settings/tokens*` pages always request the logged-in user's own
- * username (from `useGafaelfawrUser`), so this stays compatible with the
+ * username (from the app's `useUserInfo`), so this stays compatible with the
  * persona-switching behavior in the `/dev` panel — switching persona changes
  * both the session username and the username the pages request.
  */
