@@ -2,8 +2,8 @@
 Admin section access
 ##########################
 
-Squareone's ``/admin`` section collects the operator-facing pages: an overview of the environment, sending user notifications, managing Gafaelfawr service tokens, managing OpenID Connect clients, and the Sentry tools page.
-Each of the pages other than the overview calls a different API, and each of those APIs is guarded by its own Gafaelfawr scope — scopes that are set per Phalanx environment and are not discoverable at runtime.
+Squareone's ``/admin`` section collects the operator-facing pages: an overview of the environment, sending user notifications, managing Gafaelfawr service tokens, managing OpenID Connect clients, the Sentry tools page, and the raw service discovery document.
+Each of the pages other than the overview and the service discovery page calls a different API, and each of those APIs is guarded by its own Gafaelfawr scope — scopes that are set per Phalanx environment and are not discoverable at runtime.
 
 Squareone therefore does not hard-code which scope guards which page.
 Instead every admin page has a fixed *page id*, and the ``adminPageScopes`` configuration key maps those ids to the scopes that grant access to them in your environment.
@@ -51,7 +51,7 @@ That mapping drives the whole section:
 
 - The header user menu offers an "Admin" link to anyone who can reach at least one admin page.
 - The admin sidebar lists only the pages the signed-in user holds a scope for, so nobody is offered a page that would answer ``403``.
-  The :ref:`overview <admin-overview>` has no page id and is listed first for everyone who can reach the admin section.
+  The :ref:`overview <admin-overview>` and the :ref:`service discovery page <admin-discovery>` have no page id: for everyone who can reach the admin section, the overview is listed first and "Service discovery" last.
 - ``/admin`` is the overview, so the "Admin" link lands there whichever pages the user can reach.
 - A user who can reach no admin page at all sees an "Unauthorized" note anywhere under ``/admin``, and no "Admin" link in the user menu.
 - Each admin page with a page id gates on its own entry. Someone who arrives at a page directly — from a bookmark, or a link shared by a colleague with different scopes — without a scope that page lists sees an "Unauthorized" note naming the scopes that would have granted access, in place of the page. There is no redirect: the person asked for that page, so the answer is about that page.
@@ -95,6 +95,21 @@ InfluxDB databases
    The overview never fetches the credentials themselves.
 
 The overview needs no new configuration and no page id in ``adminPageScopes``: it is visible to anyone who passes the admin section's gate, that is, anyone who can reach at least one admin page.
+Without a ``repertoireUrl``, the page says that service discovery is not configured; if discovery can't be loaded, it shows a warning with a button to try again.
+
+.. _admin-discovery:
+
+Service discovery page
+======================
+
+``/admin/discovery`` shows the raw Repertoire service discovery document that the overview is built from, the same document Squareone reads from ``/discovery`` under the ``repertoireUrl``.
+The page links to that URL and shows the whole document as pretty-printed, syntax-highlighted JSON (with the :doc:`CodeBlock </packages/squared/code-block>` component), with line numbers and a button that copies the JSON without them.
+The document isn't folded or collapsed, so your browser's find searches all of it.
+
+Squareone caches service discovery for 5 minutes, on the server and again in the browser, so the document can be a few minutes old.
+The page's **Refetch** button requests the document from Repertoire again, straight from the browser so that neither cache answers, and the page updates to show it; the button is disabled while the request is in flight.
+
+Like the overview, the page needs no new configuration and no page id in ``adminPageScopes``.
 Without a ``repertoireUrl``, the page says that service discovery is not configured; if discovery can't be loaded, it shows a warning with a button to try again.
 
 Hiding a page

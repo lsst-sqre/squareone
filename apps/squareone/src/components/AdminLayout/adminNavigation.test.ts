@@ -30,6 +30,12 @@ const ALL_ADMIN_SCOPES = [
 /** The ungated Overview item that leads every admin user's sidebar. */
 const OVERVIEW = { href: '/admin', label: 'Overview' };
 
+/** The ungated Service discovery item that ends every admin user's sidebar. */
+const SERVICE_DISCOVERY = {
+  href: '/admin/discovery',
+  label: 'Service discovery',
+};
+
 test('generates a single flat section with every admin item in order', () => {
   const navigation = getAdminNavigation(baseConfig, ALL_ADMIN_SCOPES);
 
@@ -41,6 +47,7 @@ test('generates a single flat section with every admin item in order', () => {
       { href: '/admin/service-tokens', label: 'Service tokens' },
       { href: '/admin/oidc-clients', label: 'OIDC clients' },
       { href: '/admin/sentry', label: 'Sentry' },
+      SERVICE_DISCOVERY,
     ],
   });
 });
@@ -55,12 +62,16 @@ test('places OIDC clients immediately after Service tokens', () => {
   );
 });
 
-test('shows Overview and OIDC clients for a user holding admin:oidc alone', () => {
+test('shows Overview, OIDC clients, and Service discovery for a user holding admin:oidc alone', () => {
   const navigation = getAdminNavigation(baseConfig, ['admin:oidc']);
 
   expect(navigation).toEqual([
     {
-      items: [OVERVIEW, { href: '/admin/oidc-clients', label: 'OIDC clients' }],
+      items: [
+        OVERVIEW,
+        { href: '/admin/oidc-clients', label: 'OIDC clients' },
+        SERVICE_DISCOVERY,
+      ],
     },
   ]);
 });
@@ -79,8 +90,21 @@ test('shows the ungated Overview to a user holding only one page scope', () => {
       (section) => section.items
     );
 
+    // Overview, the one page the scope reaches, and Service discovery.
     expect(items[0]).toEqual(OVERVIEW);
-    expect(items).toHaveLength(2);
+    expect(items).toHaveLength(3);
+  }
+});
+
+test('places Service discovery last for every admin user', () => {
+  // Like Overview, Service discovery has no page id, so whichever single page
+  // scope a user holds, it closes their sidebar.
+  for (const scope of ALL_ADMIN_SCOPES) {
+    const items = getAdminNavigation(baseConfig, [scope]).flatMap(
+      (section) => section.items
+    );
+
+    expect(items[items.length - 1]).toEqual(SERVICE_DISCOVERY);
   }
 });
 
@@ -93,11 +117,11 @@ test('places User notifications first among the gated pages', () => {
   });
 });
 
-test('keeps Sentry last', () => {
+test('keeps Sentry last among the gated pages', () => {
   const navigation = getAdminNavigation(baseConfig, ALL_ADMIN_SCOPES);
   const { items } = navigation[0];
 
-  expect(items[items.length - 1]).toEqual({
+  expect(items[items.length - 2]).toEqual({
     href: '/admin/sentry',
     label: 'Sentry',
   });
@@ -127,7 +151,7 @@ test('function is pure - repeated calls return identical results', () => {
   );
 });
 
-test('shows Overview and Service tokens for a user holding admin:token alone', () => {
+test('shows Overview, Service tokens, and Service discovery for a user holding admin:token alone', () => {
   const navigation = getAdminNavigation(baseConfig, ['admin:token']);
 
   expect(navigation).toEqual([
@@ -135,12 +159,13 @@ test('shows Overview and Service tokens for a user holding admin:token alone', (
       items: [
         OVERVIEW,
         { href: '/admin/service-tokens', label: 'Service tokens' },
+        SERVICE_DISCOVERY,
       ],
     },
   ]);
 });
 
-test('shows Overview and User notifications for a user holding admin:notifications alone', () => {
+test('shows Overview, User notifications, and Service discovery for a user holding admin:notifications alone', () => {
   const navigation = getAdminNavigation(baseConfig, ['admin:notifications']);
 
   expect(navigation).toEqual([
@@ -148,18 +173,25 @@ test('shows Overview and User notifications for a user holding admin:notificatio
       items: [
         OVERVIEW,
         { href: '/admin/notifications', label: 'User notifications' },
+        SERVICE_DISCOVERY,
       ],
     },
   ]);
 });
 
-test('shows Overview and Sentry for a user holding exec:admin alone', () => {
+test('shows Overview, Sentry, and Service discovery for a user holding exec:admin alone', () => {
   // exec:admin is the default scope for the Sentry page only — it is no longer
   // a blanket admin scope.
   const navigation = getAdminNavigation(baseConfig, ['exec:admin']);
 
   expect(navigation).toEqual([
-    { items: [OVERVIEW, { href: '/admin/sentry', label: 'Sentry' }] },
+    {
+      items: [
+        OVERVIEW,
+        { href: '/admin/sentry', label: 'Sentry' },
+        SERVICE_DISCOVERY,
+      ],
+    },
   ]);
 });
 
@@ -171,7 +203,7 @@ test('hides every gated page from a user with no admin scopes', () => {
     'exec:notebook',
   ]);
 
-  expect(navigation).toEqual([{ items: [OVERVIEW] }]);
+  expect(navigation).toEqual([{ items: [OVERVIEW, SERVICE_DISCOVERY] }]);
 });
 
 test('follows a configured scope override rather than the default', () => {
@@ -205,6 +237,7 @@ test('hides a page configured with an empty scope list', () => {
     '/admin/notifications',
     '/admin/service-tokens',
     '/admin/oidc-clients',
+    '/admin/discovery',
   ]);
 });
 

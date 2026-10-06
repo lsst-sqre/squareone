@@ -48,7 +48,15 @@ export const discoveryQueryOptions = (
           { requestId, env, repertoireUrl },
           'Discovery queryFn called'
         );
-        return fetchServiceDiscovery(repertoireUrl, { requestId, logger });
+        // The module-level cache in `fetchServiceDiscovery` shares discovery
+        // across server requests. In the browser TanStack Query is the cache,
+        // so skip the module cache there: otherwise a `refetch` within its
+        // TTL would return the cached document without asking Repertoire.
+        return fetchServiceDiscovery(repertoireUrl, {
+          requestId,
+          logger,
+          forceRefresh: env === 'client',
+        });
       },
       fallback: getEmptyDiscovery(),
       logger,

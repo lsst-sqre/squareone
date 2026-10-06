@@ -1,4 +1,4 @@
-/* AdminOverviewClient: loading state around the admin overview */
+/* AdminDiscoveryGate: loading state while service discovery loads */
 
 .state {
   padding: var(--sqo-space-xl-fixed);

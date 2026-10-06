@@ -346,13 +346,57 @@ describe('useServiceDiscovery', () => {
 
       const initialCallCount = mockFetch.mock.calls.length;
 
-      // Clear module-level cache to ensure refetch makes a network request
-      clearDiscoveryCache();
-
-      // Trigger refetch
+      // In the browser the query skips the module-level cache, so the refetch
+      // reaches the network without clearing it.
       await result.current.refetch();
 
       expect(mockFetch.mock.calls.length).toBeGreaterThan(initialCallCount);
+    });
+
+    it('reports isFetching while a refetch is in flight', async () => {
+      const mockFetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(mockDiscovery),
+      });
+      vi.stubGlobal('fetch', mockFetch);
+
+      const { result } = renderHook(
+        () => useServiceDiscovery('https://example.com/repertoire'),
+        { wrapper: createWrapper() }
+      );
+
+      await waitFor(() => {
+        expect(result.current.isPending).toBe(false);
+      });
+      expect(result.current.isFetching).toBe(false);
+
+      // Hold the refetch's network request open.
+      const deferred: { resolve: (value: unknown) => void } = {
+        resolve: () => {},
+      };
+      mockFetch.mockReturnValue(
+        new Promise((resolve) => {
+          deferred.resolve = resolve;
+        })
+      );
+
+      void result.current.refetch();
+
+      await waitFor(() => {
+        expect(result.current.isFetching).toBe(true);
+      });
+      // The previous document stays available while the refetch runs.
+      expect(result.current.isPending).toBe(false);
+      expect(result.current.discovery).toEqual(mockDiscovery);
+
+      deferred.resolve({
+        ok: true,
+        json: () => Promise.resolve(mockDiscovery),
+      });
+
+      await waitFor(() => {
+        expect(result.current.isFetching).toBe(false);
+      });
     });
   });
 

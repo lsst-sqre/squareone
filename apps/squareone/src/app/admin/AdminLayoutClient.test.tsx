@@ -104,6 +104,15 @@ describe('AdminLayoutClient', () => {
     ).toBeInTheDocument();
   });
 
+  test('lists Service discovery last for a user holding a single page scope', () => {
+    renderWithScopes(['admin:token']);
+
+    const nav = screen.getByRole('navigation', { name: 'Admin' });
+    const links = within(nav).getAllByRole('link');
+    expect(links[links.length - 1]).toHaveAccessibleName('Service discovery');
+    expect(links[links.length - 1]).toHaveAttribute('href', '/admin/discovery');
+  });
+
   test('shows the unauthorized message, not the sidebar, to a user with no admin scope', () => {
     renderWithScopes(['read:tap']);
 
