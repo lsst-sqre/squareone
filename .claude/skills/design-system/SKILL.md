@@ -32,8 +32,10 @@ Custom properties that build upon and extend the Rubin Style Dictionary tokens. 
 ### In React Components
 
 ```typescript
-// Import global CSS with all design tokens (in app root)
-import '@lsst-sqre/global-css';
+// Import global CSS with all design tokens (in the app's root layout)
+import '@lsst-sqre/global-css/dist/next.css';
+// Syntax highlighting colours for CodeBlock (a separate entry)
+import '@lsst-sqre/global-css/dist/syntax.css';
 
 // Then use CSS variables in CSS Modules
 // Component.module.css
@@ -489,7 +491,8 @@ import { CodeBlock } from '@lsst-sqre/squared';
 
 - Props: `code`, `language` (MicroLighter grammar name or alias, such as `json`, `yaml`, `python`, `bash`, `ts`), `lineNumbers` (default `false`), `copy` (default `true`), `ariaLabel`.
 - Highlighting is client-side (MicroLighter and the CSS Custom Highlight API, registered after hydration). Server rendering and unsupported browsers show plain monospace text. `CodeBlock` is a client component, so server components can render it with string props.
-- Colours come from MicroLighter's GitHub theme (imported by `@lsst-sqre/global-css`) and follow the site's `data-theme`, not the OS preference. Don't restyle the token colours per component.
+- Colours come from MicroLighter's GitHub theme, which `@lsst-sqre/global-css` ships as its own entry, `dist/syntax.css`, and follow the site's `data-theme`, not the OS preference. Apps and Storybook previews must import `@lsst-sqre/global-css/dist/syntax.css` next to `dist/next.css`; without it code renders uncoloured. Don't restyle the token colours per component.
+- The theme stays out of `dist/next.css` because Turbopack's bundled Lightning CSS can't parse `::highlight()` and logs "Parsing CSS source code failed" for `dist/syntax.css`; the squareone `build` script (`scripts/check-syntax-css.js`) fails if no emitted CSS contains `::highlight(`.
 - In MDX content, fenced code blocks with a language (```` ```python ````) already render through `CodeBlock` via the `pre` mapping in `apps/squareone/src/lib/mdx/rsc/components.tsx`.
 - Inline `<code>` is still right for short values in prose, such as a URL or a token name.
 

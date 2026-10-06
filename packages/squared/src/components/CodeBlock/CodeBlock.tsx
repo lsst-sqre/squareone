@@ -27,7 +27,8 @@ export type CodeBlockProps = {
  *
  * Highlighting comes from MicroLighter's `<micro-lighter>` custom element,
  * which colours plain `<pre><code>` text with the CSS Custom Highlight API and
- * MicroLighter's GitHub theme (imported by `@lsst-sqre/global-css`). The
+ * MicroLighter's GitHub theme. Apps load the theme by importing
+ * `@lsst-sqre/global-css/dist/syntax.css` next to `dist/next.css`. The
  * element registers in the browser after hydration, so server rendering and
  * browsers without the Custom Highlight API show the code as plain monospace
  * text. Colours follow the site's `data-theme`, not the OS preference.

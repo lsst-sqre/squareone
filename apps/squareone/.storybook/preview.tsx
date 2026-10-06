@@ -16,6 +16,7 @@ import '@fontsource/source-sans-pro/700.css';
 
 // Global CSS
 import '@lsst-sqre/global-css/dist/next.css';
+import '@lsst-sqre/global-css/dist/syntax.css';
 
 // Mock configuration for Storybook stories
 const mockAppConfig = {

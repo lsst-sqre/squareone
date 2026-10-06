@@ -2,9 +2,10 @@
  * CodeBlock styles
  *
  * The wrapper carries data-syntax-theme="github", so MicroLighter's GitHub
- * theme (imported by @lsst-sqre/global-css) defines the --syntax-* colours on
- * it and colours tokens through global ::highlight() rules. The <pre> and the
- * line-number gutter share one font so their lines stay aligned.
+ * theme (@lsst-sqre/global-css/dist/syntax.css, which apps import next to
+ * dist/next.css) defines the --syntax-* colours on it and colours tokens
+ * through global ::highlight() rules. The <pre> and the line-number gutter
+ * share one font so their lines stay aligned.
  */
 
 .codeBlock {

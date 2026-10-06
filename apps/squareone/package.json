@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000",
-    "build": "next build",
+    "build": "next build && node scripts/check-syntax-css.js",
     "test": "vitest run",
     "test:unit": "vitest run --project=unit",
     "test:unit:watch": "vitest watch --project=unit",

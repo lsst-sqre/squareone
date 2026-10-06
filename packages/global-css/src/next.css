@@ -1,6 +1,7 @@
 /*
  * Base stylesheet for Squareone Next.js apps. This is intended to be imported
- * from _app.js.
+ * from the app's root layout. Syntax highlighting colours for the squared
+ * CodeBlock component are a separate entry, syntax.css.
 */
 @import "./reset.css";
 
@@ -13,15 +14,3 @@
 
 @import "./tokens.css";
 @import "./base.css";
-
-/*
- * Syntax highlighting theme for the squared CodeBlock component (MicroLighter).
- * The theme scopes its colours to [data-syntax-theme="github"] containers and
- * registers the global ::highlight() rules for the token categories.
- *
- * Next.js 16.3's Turbopack bundles an older Lightning CSS that doesn't know the
- * ::highlight() pseudo-element, so `next dev` and `next build` log a "Parsing
- * CSS source code failed" warning for this file. Its error recovery keeps the
- * rules as written, so highlighting still works.
- */
-@import "../node_modules/microlighter/dist/themes/github.css";

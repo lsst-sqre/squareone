@@ -75,8 +75,19 @@ Highlighting happens only in the browser:
 - Until the element registers, and in browsers without the CSS Custom Highlight API, the code displays as plain monospace text.
   The code stays readable and copyable either way.
 
-The colours come from MicroLighter's GitHub theme, which ``@lsst-sqre/global-css`` imports.
+The colours come from MicroLighter's GitHub theme, which ``@lsst-sqre/global-css`` provides as a separate stylesheet, ``dist/syntax.css``.
 They follow the site's light or dark theme (the ``data-theme`` attribute), not the operating system's colour-scheme preference.
+
+An app (or Storybook) that renders ``CodeBlock`` must import both global stylesheets, the base stylesheet and the syntax theme, from its root layout:
+
+.. code-block:: tsx
+
+   import '@lsst-sqre/global-css/dist/next.css';
+   import '@lsst-sqre/global-css/dist/syntax.css';
+
+Without ``dist/syntax.css``, code displays as plain, uncoloured monospace text.
+The theme is kept out of ``dist/next.css`` because Next.js's Turbopack logs a "Parsing CSS source code failed" warning for its ``::highlight()`` rules and keeps them only through error recovery; a separate stylesheet means a parse failure can't affect the base styles.
+The squareone app's ``build`` script fails if no stylesheet that ``next build`` emits contains a ``::highlight()`` rule.
 
 Long lines scroll horizontally inside the block, and the code is keyboard focusable so that keyboard users can scroll it.
 

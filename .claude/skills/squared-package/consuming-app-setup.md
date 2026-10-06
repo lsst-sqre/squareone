@@ -22,14 +22,16 @@ module.exports = {
 In your app's root component or layout:
 
 ```typescript
-// _app.tsx or layout.tsx
-import '@lsst-sqre/global-css';
+// src/app/layout.tsx
+import '@lsst-sqre/global-css/dist/next.css';
+import '@lsst-sqre/global-css/dist/syntax.css';
 ```
 
-This imports:
+`dist/next.css` (the package's `main` entry) provides:
 - CSS reset and base styles
 - Design tokens as CSS custom properties
-- Font loading
+
+`dist/syntax.css` provides MicroLighter's GitHub theme, which colours `CodeBlock`. It's a separate entry so that Turbopack's "Parsing CSS source code failed" warning for its `::highlight()` rules can't affect the base stylesheet. Without it, `CodeBlock` renders plain, uncoloured text. Import both in the app's root layout and in `.storybook/preview.ts(x)`.
 
 ### 3. TypeScript Configuration
 
@@ -90,7 +92,7 @@ Squared components use CSS custom properties (design tokens):
 }
 ```
 
-Tokens are automatically available after importing `@lsst-sqre/global-css`.
+Tokens are automatically available after importing `@lsst-sqre/global-css/dist/next.css`.
 
 ### Available Token Categories
 
@@ -115,7 +117,13 @@ See `@lsst-sqre/rubin-style-dictionary` package for complete token reference.
 
 **Cause**: Global CSS not imported.
 
-**Solution**: Import `@lsst-sqre/global-css` in your app's root component.
+**Solution**: Import `@lsst-sqre/global-css/dist/next.css` in your app's root layout.
+
+### Code Blocks Render Uncoloured
+
+**Cause**: `@lsst-sqre/global-css/dist/syntax.css` not imported. `CodeBlock`'s token colours come from MicroLighter's GitHub theme in that stylesheet, not from `dist/next.css`.
+
+**Solution**: Import `@lsst-sqre/global-css/dist/syntax.css` next to `dist/next.css` in the root layout and in `.storybook/preview.ts(x)`. In squareone, `pnpm build --filter squareone` fails if no emitted stylesheet contains a `::highlight(` rule (`apps/squareone/scripts/check-syntax-css.js`).
 
 ### TypeScript Errors
 
@@ -173,13 +181,9 @@ module.exports = {
 ```
 
 ```typescript
-// apps/squareone/src/pages/_app.tsx
-import '@lsst-sqre/global-css'; // Import global styles
-import type { AppProps } from 'next/app';
-
-export default function App({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />;
-}
+// apps/squareone/src/app/layout.tsx
+import '@lsst-sqre/global-css/dist/next.css'; // Base styles and tokens
+import '@lsst-sqre/global-css/dist/syntax.css'; // CodeBlock syntax colours
 ```
 
 ## Best Practices
