@@ -77,9 +77,7 @@ describe('AdminOverviewClient', () => {
 
     render(<AdminOverviewClient />);
 
-    expect(
-      screen.getByRole('region', { name: 'Environment' })
-    ).toHaveTextContent('data.lsst.cloud');
+    expect(screen.getByRole('definition')).toHaveTextContent('data.lsst.cloud');
   });
 
   test('warns, with a retry, when discovery comes back empty', async () => {

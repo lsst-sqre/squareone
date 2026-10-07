@@ -14,9 +14,6 @@ const meta: Meta<typeof AdminOverview> = {
   parameters: {
     layout: 'padded',
   },
-  args: {
-    repertoireUrl: 'https://data-dev.lsst.cloud/repertoire',
-  },
   // Run these stories as interaction tests in the `storybook` vitest project.
   tags: ['test'],
 };
@@ -34,12 +31,16 @@ function getOperatorCardTitles(canvasElement: HTMLElement): string[] {
     .map((card) => within(card).getByRole('heading').textContent ?? '');
 }
 
-/** The Applications table's body rows (every row but the header). */
+/**
+ * Each application's unit in the Applications table: the `<tbody>` holding
+ * its name row and the detail row beneath it (every row group but the
+ * header's).
+ */
 function getApplicationRows(canvasElement: HTMLElement): HTMLElement[] {
   const table = within(canvasElement).getByRole('table', {
     name: 'Applications',
   });
-  return within(table).getAllByRole('row').slice(1);
+  return within(table).getAllByRole('rowgroup').slice(1);
 }
 
 /** The application name in each of the Applications table's rows. */
@@ -49,10 +50,10 @@ function getApplicationNames(canvasElement: HTMLElement): string[] {
   );
 }
 
-/** The Datasets table's body rows (every row but the header). */
+/** Each dataset's unit in the Datasets table: its name and detail rows. */
 function getDatasetRows(canvasElement: HTMLElement): HTMLElement[] {
   const table = within(canvasElement).getByRole('table', { name: 'Datasets' });
-  return within(table).getAllByRole('row').slice(1);
+  return within(table).getAllByRole('rowgroup').slice(1);
 }
 
 /** The dataset key in each of the Datasets table's rows. */
@@ -79,16 +80,17 @@ function withoutOperatorTools(discovery: ServiceDiscovery): ServiceDiscovery {
 }
 
 /**
- * The live data-dev (idfdev) Repertoire 3.0.0 discovery document: the
- * Environment section is titled by the environment's long title and lists its
- * Phalanx label, name, and description, with a link to its Phalanx docs. The
- * operator links cover Argo CD, Chronograf, and Kafdrop, the environment docs,
- * and the raw discovery document, and the Applications table lists all 41
- * applications, with `nublado` joined to both its UI and its
- * `nublado-controller` API. The Datasets table lists `dp1`, `dp2`, `dp02`,
- * `dp03`, and `prompt` with their docs, Butler, and ObsCore links where
- * discovery has them, and the InfluxDB databases table lists the local
- * `idfdev_efd` with a button to copy its credentials URL.
+ * The live data-dev (idfdev) Repertoire 3.0.0 discovery document: under the
+ * page heading, a key-value list of the environment's Phalanx label, name,
+ * title, and description, with a link to its Phalanx docs. The operator links
+ * cover Argo CD, Chronograf, and Kafdrop, the environment docs, and the
+ * service discovery page. Each table has a single name column over a detail
+ * row: the Applications table lists all 41 applications, with `nublado`
+ * joined to both its UI and its `nublado-controller` API, each with its own
+ * scopes; the Datasets table lists `dp1`, `dp2`, `dp02`, `dp03`, and `prompt`
+ * with their docs, Butler, and ObsCore links where discovery has them; and
+ * the InfluxDB databases table lists the local `idfdev_efd` with a button to
+ * copy its credentials URL.
  */
 export const DataDev: Story = {
   args: {
@@ -101,17 +103,19 @@ export const DataDev: Story = {
       canvas.getByRole('heading', { level: 1, name: 'Overview' })
     ).toBeInTheDocument();
 
-    const environment = canvas.getByRole('region', {
-      name: 'SQuaRE RSP development',
-    });
-    const section = within(environment);
-    await expect(section.getByText('idfdev')).toBeInTheDocument();
-    await expect(section.getByText('data-dev.lsst.cloud')).toBeInTheDocument();
     await expect(
-      section.getByText(/^A development environment/)
+      canvas.queryByRole('heading', { name: 'SQuaRE RSP development' })
+    ).not.toBeInTheDocument();
+    await expect(canvas.getByText('idfdev')).toBeInTheDocument();
+    await expect(canvas.getByText('data-dev.lsst.cloud')).toBeInTheDocument();
+    await expect(
+      canvas.getByText('SQuaRE RSP development')
     ).toBeInTheDocument();
     await expect(
-      section.getByRole('link', { name: 'Phalanx documentation' })
+      canvas.getByText(/^A development environment/)
+    ).toBeInTheDocument();
+    await expect(
+      canvas.getByRole('link', { name: 'Phalanx idfdev documentation' })
     ).toHaveAttribute('href', 'https://phalanx.lsst.io/environments/idfdev/');
 
     await expect(getOperatorCardTitles(canvasElement)).toEqual([
@@ -122,15 +126,28 @@ export const DataDev: Story = {
       'Service discovery',
     ]);
 
+    await expect(
+      canvas.getByRole('link', { name: 'Service discovery' })
+    ).toHaveAttribute('href', '/admin/discovery');
+
     await expect(getApplicationRows(canvasElement)).toHaveLength(41);
     const nublado = getApplicationRows(canvasElement).find(
       (row) => within(row).getAllByRole('cell')[0].textContent === 'nublado'
     );
     if (!nublado) throw new Error('No nublado row');
-    await expect(within(nublado).getByText('UI + API')).toBeInTheDocument();
+    await expect(
+      within(nublado).getByRole('link', {
+        name: 'https://nb.data-dev.lsst.cloud/nb',
+      })
+    ).toBeInTheDocument();
     await expect(
       within(nublado).getByText('nublado-controller')
     ).toBeInTheDocument();
+    await expect(
+      within(nublado).getByRole('list', {
+        name: 'nublado-controller required scopes',
+      })
+    ).toHaveTextContent('admin:jupyterlab');
 
     await expect(getDatasetNames(canvasElement)).toEqual([
       'dp1',
@@ -155,9 +172,10 @@ export const DataDev: Story = {
     const influx = within(
       canvas.getByRole('table', { name: 'InfluxDB databases' })
     );
-    await expect(influx.getAllByRole('row')).toHaveLength(2);
+    await expect(influx.getAllByRole('rowgroup')).toHaveLength(2);
     await expect(influx.getByText('idfdev_efd')).toBeInTheDocument();
     await expect(influx.getByText('local')).toBeInTheDocument();
+    await expect(influx.getByText('Credentials URL')).toBeInTheDocument();
     await expect(
       influx.getByRole('button', {
         name: 'Copy the idfdev_efd credentials URL to the clipboard',
@@ -198,12 +216,11 @@ export const FilteredApplications: Story = {
 
 /**
  * An environment still on Repertoire 2.x (the production 2.1.0 document):
- * there is no `environment` object, so the section falls back to an
- * "Environment" heading and shows only the deprecated `environment_name`.
- * Services carry no titles, so the operator links fall back to fixed names,
- * there is no environment docs link, and the Applications table rows have no
- * titles, docs links, or scopes. The five datasets have no ObsCore config,
- * and there are no InfluxDB databases.
+ * there is no `environment` object, so the key-value list shows only the
+ * deprecated `environment_name`. Services carry no titles, so the operator
+ * links fall back to fixed names, there is no environment docs link, and the
+ * Applications table rows have no titles, docs links, or scopes. The five
+ * datasets have no ObsCore config, and there are no InfluxDB databases.
  */
 export const Repertoire2x: Story = {
   args: {
@@ -212,11 +229,12 @@ export const Repertoire2x: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    const environment = canvas.getByRole('region', { name: 'Environment' });
-    const section = within(environment);
-    await expect(section.getByText('data.lsst.cloud')).toBeInTheDocument();
-    await expect(section.queryByText('Phalanx label')).not.toBeInTheDocument();
-    await expect(section.queryByRole('link')).not.toBeInTheDocument();
+    await expect(canvas.getAllByRole('term')).toHaveLength(1);
+    await expect(canvas.getByText('data.lsst.cloud')).toBeInTheDocument();
+    await expect(canvas.queryByText('Phalanx label')).not.toBeInTheDocument();
+    await expect(
+      canvas.queryByRole('link', { name: /phalanx .*documentation/i })
+    ).not.toBeInTheDocument();
 
     await expect(getOperatorCardTitles(canvasElement)).toEqual([
       'Argo CD',
@@ -245,8 +263,8 @@ export const Repertoire2x: Story = {
 
 /**
  * A Repertoire 2.x environment that runs none of the operator tools: there is
- * no card for Argo CD, Chronograf, or Kafdrop, only the raw discovery link,
- * and the Applications table still renders.
+ * no card for Argo CD, Chronograf, or Kafdrop, only the service discovery
+ * page link, and the Applications table still renders.
  */
 export const WithoutOperatorTools: Story = {
   args: {

@@ -25,34 +25,44 @@
   white-space: nowrap;
 }
 
-.kind {
-  white-space: nowrap;
+.title {
+  margin: 0;
 }
 
-.urlList,
+.serviceList,
 .scopeList {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-.urlList {
+.serviceList {
   display: flex;
   flex-direction: column;
-  gap: var(--sqo-space-xxxs);
+  gap: var(--sqo-space-xxs);
 }
 
-/* Each URL is labelled UI or API, and wraps inside the cell rather than
- * widening the table. */
-.urlItem {
-  font-size: 0.875rem;
+/* One service per line: its kind, its URL (and the service name when it
+ * differs from the application's), and the scopes it requires. The URL takes
+ * the remaining width and the scopes keep to the trailing edge; on a narrow
+ * column the scopes wrap below the URL. */
+.service {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--sqo-space-xxs) var(--sqo-space-sm);
 }
 
-.urlKind {
-  margin-right: var(--sqo-space-xxs);
+.serviceKind {
+  flex: 0 0 2rem;
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--rsd-component-text-secondary-color);
+}
+
+.serviceUrl {
+  flex: 1 1 16rem;
+  min-width: 0;
 }
 
 .url {
@@ -60,13 +70,14 @@
   overflow-wrap: anywhere;
 }
 
-.service {
-  display: block;
+.serviceName {
+  margin-left: var(--sqo-space-xs);
   font-size: 0.75rem;
   color: var(--rsd-component-text-secondary-color);
+  white-space: nowrap;
 }
 
-.service::before {
+.serviceName::before {
   content: "via ";
 }
 

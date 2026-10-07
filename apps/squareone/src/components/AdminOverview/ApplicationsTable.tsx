@@ -5,14 +5,13 @@ import {
   type DataTableColumnDef,
   TextInput,
 } from '@lsst-sqre/squared';
-import { Search } from 'lucide-react';
+import { BookOpen, FileJson, Search } from 'lucide-react';
 import { useId, useState } from 'react';
 
 import {
   type ApplicationRow,
   filterApplicationRows,
 } from '../../lib/admin/overview';
-import DocsIconLink from '../DocsIconLink';
 import { TokenScopeBadge } from '../TokenHistory/TokenScopeBadge';
 import styles from './AdminOverview.module.css';
 import tableStyles from './ApplicationsTable.module.css';
@@ -21,9 +20,6 @@ type ApplicationsTableProps = {
   /** One row per application (see `buildApplicationRows`). */
   rows: ApplicationRow[];
 };
-
-/** Placeholder for a text cell with no value. */
-const NONE = '—';
 
 const columns: DataTableColumnDef<ApplicationRow>[] = [
   {
@@ -35,90 +31,93 @@ const columns: DataTableColumnDef<ApplicationRow>[] = [
       <span className={tableStyles.name}>{info.row.original.name}</span>
     ),
   },
-  {
-    id: 'title',
-    // Undefined (rather than null) lets sortUndefined keep untitled
-    // applications after the titled ones in either direction.
-    accessorFn: (row: ApplicationRow) => row.title ?? undefined,
-    header: 'Title',
-    sortFn: 'text',
-    sortUndefined: 'last',
-    cell: (info) => info.row.original.title ?? NONE,
-  },
-  {
-    id: 'kind',
-    accessorFn: (row: ApplicationRow) => row.kind ?? undefined,
-    header: 'Kind',
-    sortFn: 'text',
-    sortUndefined: 'last',
-    cell: (info) => (
-      <span className={tableStyles.kind}>{info.row.original.kind ?? NONE}</span>
-    ),
-  },
-  {
-    id: 'urls',
-    header: 'URL',
-    enableSorting: false,
-    cell: ({ row: { original: row } }) =>
-      row.urls.length > 0 ? (
-        <ul className={tableStyles.urlList}>
-          {row.urls.map((serviceUrl) => (
-            <li key={serviceUrl.kind} className={tableStyles.urlItem}>
-              <span className={tableStyles.urlKind}>{serviceUrl.kind}</span>
-              <a className={tableStyles.url} href={serviceUrl.url}>
-                {serviceUrl.url}
-              </a>
-              {/* Name a service joined through an alias, such as nublado's
-                  nublado-controller, since it is not the application's name. */}
-              {serviceUrl.service !== row.name ? (
-                <span className={tableStyles.service}>
-                  {serviceUrl.service}
-                </span>
+];
+
+/**
+ * The detail row beneath an application: its title, each service it
+ * publishes with that service's URL and required scopes side by side, and
+ * links to its documentation and OpenAPI specification.
+ */
+function ApplicationDetail({ row }: { row: ApplicationRow }) {
+  if (row.services.length === 0 && !row.title && !row.docsUrl) {
+    return (
+      <p className={styles.detailEmpty}>
+        No UI or API service in service discovery.
+      </p>
+    );
+  }
+
+  return (
+    <div className={styles.detail}>
+      {row.title ? <p className={tableStyles.title}>{row.title}</p> : null}
+      {row.services.length > 0 ? (
+        <ul
+          className={tableStyles.serviceList}
+          aria-label={`${row.name} services`}
+        >
+          {row.services.map((service) => (
+            <li key={service.kind} className={tableStyles.service}>
+              <span className={tableStyles.serviceKind}>{service.kind}</span>
+              <span className={tableStyles.serviceUrl}>
+                <a className={tableStyles.url} href={service.url}>
+                  {service.url}
+                </a>
+                {/* Name a service joined through an alias, such as nublado's
+                    nublado-controller, since it is not the application's
+                    name. */}
+                {service.service !== row.name ? (
+                  <span className={tableStyles.serviceName}>
+                    {service.service}
+                  </span>
+                ) : null}
+              </span>
+              {service.requiredScopes.length > 0 ? (
+                <ul
+                  className={tableStyles.scopeList}
+                  aria-label={`${service.service} required scopes`}
+                >
+                  {service.requiredScopes.map((scope) => (
+                    <li key={scope}>
+                      <TokenScopeBadge scope={scope} />
+                    </li>
+                  ))}
+                </ul>
               ) : null}
             </li>
           ))}
         </ul>
-      ) : null,
-  },
-  {
-    id: 'docs',
-    header: 'Docs',
-    enableSorting: false,
-    cell: ({ row: { original: row } }) =>
-      row.docsUrl ? (
-        <DocsIconLink href={row.docsUrl} label={`${row.name} documentation`} />
-      ) : null,
-  },
-  {
-    id: 'scopes',
-    header: 'Scopes',
-    enableSorting: false,
-    cell: ({ row: { original: row } }) =>
-      row.requiredScopes.length > 0 ? (
-        <ul className={tableStyles.scopeList} aria-label="Required scopes">
-          {row.requiredScopes.map((scope) => (
-            <li key={scope}>
-              <TokenScopeBadge scope={scope} />
+      ) : null}
+      {row.docsUrl || row.openapiUrl ? (
+        <ul className={styles.detailLinks}>
+          {row.docsUrl ? (
+            <li>
+              <a
+                className={styles.detailLink}
+                href={row.docsUrl}
+                aria-label={`${row.name} documentation`}
+              >
+                <BookOpen size={16} aria-hidden="true" />
+                Documentation
+              </a>
             </li>
-          ))}
+          ) : null}
+          {row.openapiUrl ? (
+            <li>
+              <a
+                className={styles.detailLink}
+                href={row.openapiUrl}
+                aria-label={`${row.name} OpenAPI specification`}
+              >
+                <FileJson size={16} aria-hidden="true" />
+                OpenAPI
+              </a>
+            </li>
+          ) : null}
         </ul>
-      ) : null,
-  },
-  {
-    id: 'openapi',
-    header: 'OpenAPI',
-    enableSorting: false,
-    cell: ({ row: { original: row } }) =>
-      row.openapiUrl ? (
-        <a
-          href={row.openapiUrl}
-          aria-label={`${row.name} OpenAPI specification`}
-        >
-          OpenAPI
-        </a>
-      ) : null,
-  },
-];
+      ) : null}
+    </div>
+  );
+}
 
 /** "41 applications", or "3 of 41 applications" while a filter applies. */
 function formatCount(shown: number, total: number): string {
@@ -130,9 +129,11 @@ function formatCount(shown: number, total: number): string {
  * The overview's Applications section: every enabled Phalanx application,
  * joined to the UI and API services it publishes in discovery.
  *
- * The table starts sorted by application name and sorts by name, title, or
- * kind from its column headers. The filter above it narrows the rows to the
- * applications whose name or title contains the typed text.
+ * Each application is a two-row unit: a primary row of just its name, which
+ * the table sorts by, over a full-width detail row (`ApplicationDetail`) with
+ * everything else, so service URLs wrap within the admin content column
+ * rather than widening the table. The filter above the table narrows the
+ * rows to the applications whose name or title contains the typed text.
  */
 export default function ApplicationsTable({ rows }: ApplicationsTableProps) {
   const headingId = useId();
@@ -168,6 +169,7 @@ export default function ApplicationsTable({ rows }: ApplicationsTableProps) {
             ? 'Service discovery lists no applications.'
             : `No applications match “${query.trim()}”.`
         }
+        renderDetailRow={(row) => <ApplicationDetail row={row} />}
       />
     </section>
   );

@@ -96,6 +96,7 @@ export type OperatorLink = {
   label: string;
   /** What the link leads to. */
   description: string;
+  /** An absolute URL, or a Squareone path such as `/admin/discovery`. */
   url: string;
   /** Secondary link to the tool's own documentation, when discovery has one. */
   docsUrl: string | null;
@@ -132,19 +133,20 @@ export function getDiscoveryEndpointUrl(repertoireUrl: string): string {
   return `${repertoireUrl.replace(/\/+$/, '')}/discovery`;
 }
 
+/** Path of the admin page that shows the formatted discovery document. */
+export const DISCOVERY_PAGE_PATH = '/admin/discovery';
+
 /**
  * Links for the overview's Operator links section.
  *
  * Argo CD, Chronograf, and Kafdrop each appear only when discovery lists them
  * as UI services, followed by the environment's Phalanx documentation (when
- * discovery describes the environment) and the raw discovery document this
- * overview is built from. The links are not filtered by the viewer's scopes:
- * the admin section is already restricted to administrators.
+ * discovery describes the environment) and the admin page that shows the
+ * discovery document this overview is built from. The links are not filtered
+ * by the viewer's scopes: the admin section is already restricted to
+ * administrators.
  */
-export function getOperatorLinks(
-  discovery: ServiceDiscovery,
-  repertoireUrl: string
-): OperatorLink[] {
+export function getOperatorLinks(discovery: ServiceDiscovery): OperatorLink[] {
   const links: OperatorLink[] = [];
 
   for (const { service, name, description } of OPERATOR_SERVICES) {
@@ -173,24 +175,23 @@ export function getOperatorLinks(
   links.push({
     id: 'discovery',
     label: 'Service discovery',
-    description: 'The raw Repertoire discovery document behind this overview.',
-    url: getDiscoveryEndpointUrl(repertoireUrl),
+    description: 'The Repertoire discovery document behind this overview.',
+    url: DISCOVERY_PAGE_PATH,
     docsUrl: null,
   });
 
   return links;
 }
 
-/** Whether an application offers a UI, an API, or both. */
-export type ApplicationKind = 'UI' | 'API' | 'UI + API';
-
-/** A service an application row is joined to, and where it lives. */
-export type ApplicationServiceUrl = {
+/** A service an application row is joined to: where it lives and who may use it. */
+export type ApplicationService = {
   /** `UI` for a `services.ui` entry, `API` for a `services.internal` one. */
   kind: 'UI' | 'API';
   /** The service's name in discovery, which may differ from the application. */
   service: string;
   url: string;
+  /** The scopes a token needs to use this service, each listed once. */
+  requiredScopes: string[];
 };
 
 /** One row of the overview's Applications table. */
@@ -199,14 +200,13 @@ export type ApplicationRow = {
   name: string;
   /** The UI service's title, else the internal service's title. */
   title: string | null;
-  /** `null` when the application matches no service. */
-  kind: ApplicationKind | null;
-  /** The UI service's URL, then the internal service's. */
-  urls: ApplicationServiceUrl[];
+  /**
+   * The UI service, then the internal (API) service; empty when the
+   * application matches no service.
+   */
+  services: ApplicationService[];
   /** The UI service's docs URL, else the internal service's. */
   docsUrl: string | null;
-  /** Every scope either service requires, each listed once. */
-  requiredScopes: string[];
   /** The internal service's OpenAPI specification. */
   openapiUrl: string | null;
 };
@@ -246,17 +246,6 @@ function findApplicationService<T>(
   return null;
 }
 
-/** The kind of an application with a UI service, an API service, or both. */
-function getApplicationKind(
-  hasUi: boolean,
-  hasApi: boolean
-): ApplicationKind | null {
-  if (hasUi && hasApi) return 'UI + API';
-  if (hasUi) return 'UI';
-  if (hasApi) return 'API';
-  return null;
-}
-
 /**
  * Rows for the overview's Applications table: one per enabled Phalanx
  * application, in discovery order.
@@ -264,8 +253,10 @@ function getApplicationKind(
  * Each application is joined to at most one UI service and one internal
  * service, named for the application or one of its known aliases (see
  * `APPLICATION_SERVICE_ALIASES`), so `nublado` joins both its `nublado` UI and
- * its `nublado-controller` API. An application that matches no service, such
- * as an infrastructure application like `cert-manager`, is a name-only row.
+ * its `nublado-controller` API. Each service keeps its own required scopes,
+ * since a UI and its API are often guarded differently. An application that
+ * matches no service, such as an infrastructure application like
+ * `cert-manager`, is a name-only row.
  */
 export function buildApplicationRows(
   discovery: ServiceDiscovery
@@ -276,30 +267,29 @@ export function buildApplicationRows(
     const [internalName, internalService] =
       findApplicationService(discovery.services.internal, name) ?? [];
 
-    const urls: ApplicationServiceUrl[] = [];
+    const services: ApplicationService[] = [];
     if (uiName && uiService) {
-      urls.push({ kind: 'UI', service: uiName, url: uiService.url });
+      services.push({
+        kind: 'UI',
+        service: uiName,
+        url: uiService.url,
+        requiredScopes: [...new Set(uiService.required_scopes ?? [])],
+      });
     }
     if (internalName && internalService) {
-      urls.push({
+      services.push({
         kind: 'API',
         service: internalName,
         url: internalService.url,
+        requiredScopes: [...new Set(internalService.required_scopes ?? [])],
       });
     }
 
     return {
       name,
       title: uiService?.title || internalService?.title || null,
-      kind: getApplicationKind(Boolean(uiService), Boolean(internalService)),
-      urls,
+      services,
       docsUrl: uiService?.docs_url || internalService?.docs_url || null,
-      requiredScopes: [
-        ...new Set([
-          ...(uiService?.required_scopes ?? []),
-          ...(internalService?.required_scopes ?? []),
-        ]),
-      ],
       openapiUrl: internalService?.openapi ?? null,
     };
   });

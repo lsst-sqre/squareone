@@ -17,9 +17,7 @@ import AdminDiscoveryGate from './AdminDiscoveryGate';
 export default function AdminOverviewClient() {
   return (
     <AdminDiscoveryGate title="Overview" subject="overview">
-      {({ discovery, repertoireUrl }) => (
-        <AdminOverview discovery={discovery} repertoireUrl={repertoireUrl} />
-      )}
+      {({ discovery }) => <AdminOverview discovery={discovery} />}
     </AdminDiscoveryGate>
   );
 }

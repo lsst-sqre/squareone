@@ -90,9 +90,7 @@ describe('AdminPage', () => {
     expect(
       screen.getByRole('heading', { level: 1, name: 'Overview' })
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole('region', { name: 'SQuaRE RSP development' })
-    ).toBeInTheDocument();
+    expect(screen.getByText('data-dev.lsst.cloud')).toBeInTheDocument();
     expect(replace).not.toHaveBeenCalled();
   });
 

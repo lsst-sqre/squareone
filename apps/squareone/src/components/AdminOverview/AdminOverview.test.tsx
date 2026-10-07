@@ -9,13 +9,21 @@ import { describe, expect, test } from 'vitest';
 
 import AdminOverview from './AdminOverview';
 
-const REPERTOIRE_URL = 'https://data-dev.lsst.cloud/repertoire';
-
-/** Renders the overview of `discovery`, read from {@link REPERTOIRE_URL}. */
+/** Renders the overview of `discovery`. */
 function renderOverview(discovery: ServiceDiscovery) {
-  return render(
-    <AdminOverview discovery={discovery} repertoireUrl={REPERTOIRE_URL} />
-  );
+  return render(<AdminOverview discovery={discovery} />);
+}
+
+/**
+ * The terms of the environment key-value list under the page heading (the
+ * InfluxDB databases table's detail rows are key-value lists too, so those
+ * inside a table are left out).
+ */
+function getEnvironmentTerms(): string[] {
+  return screen
+    .getAllByRole('term')
+    .filter((term) => !term.closest('table'))
+    .map((term) => term.textContent ?? '');
 }
 
 /** The Operator links section's card titled `name`. */
@@ -28,11 +36,6 @@ function getOperatorCard(name: string): HTMLElement {
   return card;
 }
 
-/** The Environment section: the region its heading labels. */
-function getEnvironmentRegion(name: string | RegExp): HTMLElement {
-  return screen.getByRole('region', { name });
-}
-
 describe('AdminOverview', () => {
   test('renders the Overview h1', () => {
     renderOverview(mockDiscoveryDataDev);
@@ -42,56 +45,60 @@ describe('AdminOverview', () => {
     ).toBeInTheDocument();
   });
 
-  test('titles the Environment section with the long title', () => {
+  test('lists the environment facts straight under the heading, with no h2', () => {
     renderOverview(mockDiscoveryDataDev);
 
-    const region = getEnvironmentRegion('SQuaRE RSP development');
-    expect(within(region).getByRole('heading', { level: 2 })).toHaveTextContent(
-      'SQuaRE RSP development'
-    );
+    expect(getEnvironmentTerms()).toEqual([
+      'Phalanx label',
+      'Name',
+      'Title',
+      'Description',
+      'Documentation',
+    ]);
+    expect(
+      screen.queryByRole('heading', { name: 'SQuaRE RSP development' })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/as Repertoire service discovery describes it/)
+    ).not.toBeInTheDocument();
   });
 
-  test('lists the label, name, and description of a 3.0 environment', () => {
+  test('lists the label, name, title, and description of a 3.0 environment', () => {
     renderOverview(mockDiscoveryDataDev);
 
-    const region = getEnvironmentRegion('SQuaRE RSP development');
-    expect(within(region).getByText('idfdev')).toBeInTheDocument();
-    expect(within(region).getByText('data-dev.lsst.cloud')).toBeInTheDocument();
-    expect(
-      within(region).getByText(/^A development environment/)
-    ).toBeInTheDocument();
+    expect(screen.getByText('idfdev')).toBeInTheDocument();
+    expect(screen.getByText('data-dev.lsst.cloud')).toBeInTheDocument();
+    expect(screen.getByText('SQuaRE RSP development')).toBeInTheDocument();
+    expect(screen.getByText(/^A development environment/)).toBeInTheDocument();
   });
 
-  test('links to the environment docs', () => {
+  test('links to the environment docs, naming the Phalanx environment', () => {
     renderOverview(mockDiscoveryDataDev);
 
-    const region = getEnvironmentRegion('SQuaRE RSP development');
     expect(
-      within(region).getByRole('link', { name: /phalanx documentation/i })
+      screen.getByRole('link', { name: 'Phalanx idfdev documentation' })
     ).toHaveAttribute('href', 'https://phalanx.lsst.io/environments/idfdev/');
   });
 
   test('shows only the environment_name for a 2.x discovery', () => {
     renderOverview(mockDiscovery2x);
 
-    const region = getEnvironmentRegion('Environment');
-    expect(within(region).getByText('Name')).toBeInTheDocument();
-    expect(within(region).getByText('data.lsst.cloud')).toBeInTheDocument();
-    expect(within(region).queryByText('Phalanx label')).not.toBeInTheDocument();
-    expect(within(region).queryByText('Description')).not.toBeInTheDocument();
-    expect(within(region).queryByRole('link')).not.toBeInTheDocument();
+    expect(getEnvironmentTerms()).toEqual(['Name']);
+    expect(screen.getByText('data.lsst.cloud')).toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: /phalanx .*documentation/i })
+    ).not.toBeInTheDocument();
   });
 
   test('says so when discovery names no environment', () => {
     renderOverview({ ...getEmptyDiscovery(), applications: ['squareone'] });
 
-    const region = getEnvironmentRegion('Environment');
     expect(
-      within(region).getByText(/does not describe this environment/i)
+      screen.getByText(/does not describe this environment/i)
     ).toBeInTheDocument();
   });
 
-  test('links the operator tools, environment docs, and raw discovery', () => {
+  test('links the operator tools, environment docs, and discovery page', () => {
     renderOverview(mockDiscoveryDataDev);
 
     const region = screen.getByRole('region', { name: 'Operator links' });
@@ -114,7 +121,7 @@ describe('AdminOverview', () => {
     ).toHaveAttribute('href', 'https://phalanx.lsst.io/environments/idfdev/');
     expect(
       within(region).getByRole('link', { name: 'Service discovery' })
-    ).toHaveAttribute('href', `${REPERTOIRE_URL}/discovery`);
+    ).toHaveAttribute('href', '/admin/discovery');
   });
 
   test("links an operator tool's own documentation when it has some", () => {
@@ -155,7 +162,9 @@ describe('AdminOverview', () => {
 
     const region = screen.getByRole('region', { name: 'Applications' });
     const table = within(region).getByRole('table', { name: 'Applications' });
-    expect(within(table).getAllByRole('row')).toHaveLength(42);
+    // One row group (name row plus detail row) per application, after the
+    // header's.
+    expect(within(table).getAllByRole('rowgroup')).toHaveLength(42);
   });
 
   test('lists the datasets and InfluxDB databases after the applications', () => {
@@ -164,7 +173,6 @@ describe('AdminOverview', () => {
     expect(
       screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)
     ).toEqual([
-      'SQuaRE RSP development',
       'Operator links',
       'Applications',
       'Datasets',
@@ -179,9 +187,9 @@ describe('AdminOverview', () => {
     const table = within(region).getByRole('table', { name: 'Datasets' });
     expect(
       within(table)
-        .getAllByRole('row')
+        .getAllByRole('rowgroup')
         .slice(1)
-        .map((row) => within(row).getAllByRole('cell')[0].textContent)
+        .map((group) => within(group).getAllByRole('cell')[0].textContent)
     ).toEqual(['dp1', 'dp2', 'dp02', 'dp03', 'prompt']);
   });
 
@@ -189,10 +197,10 @@ describe('AdminOverview', () => {
     renderOverview(mockDiscoveryDataDev);
 
     const region = screen.getByRole('region', { name: 'InfluxDB databases' });
-    const rows = within(region).getAllByRole('row').slice(1);
-    expect(rows).toHaveLength(1);
-    expect(within(rows[0]).getByText('idfdev_efd')).toBeInTheDocument();
-    expect(within(rows[0]).getByText('local')).toBeInTheDocument();
+    const groups = within(region).getAllByRole('rowgroup').slice(1);
+    expect(groups).toHaveLength(1);
+    expect(within(groups[0]).getByText('idfdev_efd')).toBeInTheDocument();
+    expect(within(groups[0]).getByText('local')).toBeInTheDocument();
   });
 
   test('says so when discovery lists no datasets or InfluxDB databases', () => {
@@ -215,6 +223,6 @@ describe('AdminOverview', () => {
 
     const region = screen.getByRole('region', { name: 'Applications' });
     expect(within(region).getByText('29 applications')).toBeInTheDocument();
-    expect(within(region).getAllByRole('row')).toHaveLength(30);
+    expect(within(region).getAllByRole('rowgroup')).toHaveLength(30);
   });
 });

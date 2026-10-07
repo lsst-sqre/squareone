@@ -147,7 +147,7 @@ describe('getDiscoveryEndpointUrl', () => {
 
 describe('getOperatorLinks', () => {
   test('links the data-dev operator tools, environment docs, and discovery', () => {
-    const links = getOperatorLinks(mockDiscoveryDataDev, REPERTOIRE_URL);
+    const links = getOperatorLinks(mockDiscoveryDataDev);
 
     expect(links.map((link) => link.id)).toEqual([
       'argocd',
@@ -159,7 +159,7 @@ describe('getOperatorLinks', () => {
   });
 
   test('labels a service by its discovery title and links its docs', () => {
-    const [argocd] = getOperatorLinks(mockDiscoveryDataDev, REPERTOIRE_URL);
+    const [argocd] = getOperatorLinks(mockDiscoveryDataDev);
 
     expect(argocd).toEqual({
       id: 'argocd',
@@ -171,10 +171,9 @@ describe('getOperatorLinks', () => {
   });
 
   test('has no docs link for a service without a docs_url', () => {
-    const chronograf = getOperatorLinks(
-      mockDiscoveryDataDev,
-      REPERTOIRE_URL
-    ).find((link) => link.id === 'chronograf');
+    const chronograf = getOperatorLinks(mockDiscoveryDataDev).find(
+      (link) => link.id === 'chronograf'
+    );
 
     expect(chronograf).toMatchObject({
       label: 'Chronograf metrics viewer',
@@ -184,7 +183,7 @@ describe('getOperatorLinks', () => {
   });
 
   test('falls back to a fixed name for a service without a title', () => {
-    const links = getOperatorLinks(mockDiscovery2x, REPERTOIRE_URL);
+    const links = getOperatorLinks(mockDiscovery2x);
 
     expect(links.slice(0, 3).map(({ label, url }) => ({ label, url }))).toEqual(
       [
@@ -199,8 +198,7 @@ describe('getOperatorLinks', () => {
     'omits %s when discovery has no such UI service',
     (service) => {
       const links = getOperatorLinks(
-        withoutUiServices(mockDiscoveryDataDev, service),
-        REPERTOIRE_URL
+        withoutUiServices(mockDiscoveryDataDev, service)
       );
 
       const ids = links.map((link) => link.id);
@@ -210,7 +208,7 @@ describe('getOperatorLinks', () => {
   );
 
   test('links the environment docs from environment.docs_url', () => {
-    const docs = getOperatorLinks(mockDiscoveryDataDev, REPERTOIRE_URL).find(
+    const docs = getOperatorLinks(mockDiscoveryDataDev).find(
       (link) => link.id === 'environment-docs'
     );
 
@@ -218,23 +216,20 @@ describe('getOperatorLinks', () => {
   });
 
   test('omits the environment docs link when discovery has no environment', () => {
-    const ids = getOperatorLinks(mockDiscovery2x, REPERTOIRE_URL).map(
-      (link) => link.id
-    );
+    const ids = getOperatorLinks(mockDiscovery2x).map((link) => link.id);
 
     expect(ids).not.toContain('environment-docs');
   });
 
-  test('links the raw discovery endpoint even with no operator services', () => {
+  test('links the service discovery page even with no operator services', () => {
     const links = getOperatorLinks(
-      withoutUiServices(mockDiscovery2x, 'argocd', 'chronograf', 'kafdrop'),
-      REPERTOIRE_URL
+      withoutUiServices(mockDiscovery2x, 'argocd', 'chronograf', 'kafdrop')
     );
 
     expect(links).toEqual([
       expect.objectContaining({
         id: 'discovery',
-        url: 'https://data-dev.lsst.cloud/repertoire/discovery',
+        url: '/admin/discovery',
         docsUrl: null,
       }),
     ]);
@@ -264,16 +259,15 @@ describe('buildApplicationRows', () => {
     expect(dataDevRow('argocd')).toEqual({
       name: 'argocd',
       title: 'Argo CD',
-      kind: 'UI',
-      urls: [
+      services: [
         {
           kind: 'UI',
           service: 'argocd',
           url: 'https://data-dev.lsst.cloud/argo-cd',
+          requiredScopes: [],
         },
       ],
       docsUrl: 'https://argo-cd.readthedocs.io/en/stable/',
-      requiredScopes: [],
       openapiUrl: null,
     });
   });
@@ -282,16 +276,15 @@ describe('buildApplicationRows', () => {
     expect(dataDevRow('times-square')).toEqual({
       name: 'times-square',
       title: null,
-      kind: 'API',
-      urls: [
+      services: [
         {
           kind: 'API',
           service: 'times-square',
           url: 'https://data-dev.lsst.cloud/times-square/api',
+          requiredScopes: ['exec:admin'],
         },
       ],
       docsUrl: 'https://times-square.lsst.io/',
-      requiredScopes: ['exec:admin'],
       openapiUrl: 'https://data-dev.lsst.cloud/times-square/api/openapi.json',
     });
   });
@@ -300,21 +293,21 @@ describe('buildApplicationRows', () => {
     expect(dataDevRow('nublado')).toEqual({
       name: 'nublado',
       title: 'Notebook aspect',
-      kind: 'UI + API',
-      urls: [
+      services: [
         {
           kind: 'UI',
           service: 'nublado',
           url: 'https://nb.data-dev.lsst.cloud/nb',
+          requiredScopes: ['exec:notebook'],
         },
         {
           kind: 'API',
           service: 'nublado-controller',
           url: 'https://data-dev.lsst.cloud/nublado',
+          requiredScopes: ['admin:jupyterlab'],
         },
       ],
       docsUrl: 'https://nublado.lsst.io/',
-      requiredScopes: ['exec:notebook', 'admin:jupyterlab'],
       openapiUrl: 'https://data-dev.lsst.cloud/nublado/openapi.json',
     });
   });
@@ -322,15 +315,14 @@ describe('buildApplicationRows', () => {
   test('joins datalinker to the datalink service, titled from it', () => {
     expect(dataDevRow('datalinker')).toMatchObject({
       title: 'DataLink',
-      kind: 'API',
-      urls: [
+      services: [
         {
           kind: 'API',
           service: 'datalink',
           url: 'https://data-dev.lsst.cloud/api/datalink',
+          requiredScopes: ['read:image'],
         },
       ],
-      requiredScopes: ['read:image'],
       openapiUrl: 'https://data-dev.lsst.cloud/api/datalink/openapi.json',
     });
   });
@@ -349,8 +341,7 @@ describe('buildApplicationRows', () => {
 
     expect(row).toMatchObject({
       title: 'SODA image cutouts',
-      kind: 'API',
-      urls: [
+      services: [
         {
           kind: 'API',
           service: 'cutout',
@@ -371,8 +362,13 @@ describe('buildApplicationRows', () => {
       })
     );
 
-    expect(row.urls).toEqual([
-      { kind: 'API', service: 'nublado', url: 'https://example.org/exact' },
+    expect(row.services).toEqual([
+      {
+        kind: 'API',
+        service: 'nublado',
+        url: 'https://example.org/exact',
+        requiredScopes: [],
+      },
     ]);
   });
 
@@ -381,17 +377,15 @@ describe('buildApplicationRows', () => {
       discoveryWith({ applications: ['constructor'] })
     );
 
-    expect(row.kind).toBeNull();
+    expect(row.services).toEqual([]);
   });
 
   test('renders an application with no matching service as its name only', () => {
     expect(dataDevRow('cert-manager')).toEqual({
       name: 'cert-manager',
       title: null,
-      kind: null,
-      urls: [],
+      services: [],
       docsUrl: null,
-      requiredScopes: [],
       openapiUrl: null,
     });
   });
@@ -407,9 +401,8 @@ describe('buildApplicationRows', () => {
 
     expect(nublado).toMatchObject({
       title: null,
-      kind: 'API',
       docsUrl: null,
-      requiredScopes: ['admin:jupyterlab'],
+      services: [{ kind: 'API', requiredScopes: ['admin:jupyterlab'] }],
     });
   });
 
@@ -421,11 +414,12 @@ describe('buildApplicationRows', () => {
     const rows = buildApplicationRows(discovery);
 
     expect(rows.find((row) => row.name === 'nublado')).toMatchObject({
-      kind: 'UI',
       openapiUrl: null,
-      requiredScopes: ['exec:notebook'],
+      services: [{ kind: 'UI', requiredScopes: ['exec:notebook'] }],
     });
-    expect(rows.find((row) => row.name === 'times-square')?.kind).toBeNull();
+    expect(rows.find((row) => row.name === 'times-square')?.services).toEqual(
+      []
+    );
   });
 
   test('takes the docs link from the API service when the UI has none', () => {
@@ -444,14 +438,14 @@ describe('buildApplicationRows', () => {
     expect(row.docsUrl).toBe('https://app.lsst.io/');
   });
 
-  test('lists each scope the UI and API services require once', () => {
+  test('keeps each service its own required scopes, each listed once', () => {
     const [row] = buildApplicationRows(
       discoveryWith({
         applications: ['app'],
         ui: {
           app: {
             url: 'https://example.org/app',
-            required_scopes: ['exec:notebook', 'read:tap'],
+            required_scopes: ['exec:notebook', 'read:tap', 'read:tap'],
           },
         },
         internal: {
@@ -462,10 +456,9 @@ describe('buildApplicationRows', () => {
       })
     );
 
-    expect(row.requiredScopes).toEqual([
-      'exec:notebook',
-      'read:tap',
-      'exec:admin',
+    expect(row.services.map((service) => service.requiredScopes)).toEqual([
+      ['exec:notebook', 'read:tap'],
+      ['read:tap', 'exec:admin'],
     ]);
   });
 

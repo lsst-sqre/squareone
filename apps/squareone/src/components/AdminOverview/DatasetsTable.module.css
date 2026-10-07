@@ -6,16 +6,25 @@
   white-space: nowrap;
 }
 
-/* Descriptions run to a few sentences; give them room to wrap into a
- * paragraph instead of a tall, narrow column. */
+/* Descriptions run to a few sentences and wrap as a paragraph. */
 .description {
-  display: block;
-  min-width: 16rem;
-  font-size: 0.875rem;
+  margin: 0;
+  max-width: 70ch;
 }
 
-.configLink {
-  white-space: nowrap;
+/* "Services" and its inline list of service names on one line. */
+.services {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--sqo-space-xxs) var(--sqo-space-sm);
+  margin: 0;
+}
+
+.servicesLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--rsd-component-text-secondary-color);
 }
 
 .serviceList {
@@ -30,5 +39,4 @@
 /* Service names are discovery keys, set like code. */
 .service {
   font-family: monospace;
-  font-size: 0.875rem;
 }

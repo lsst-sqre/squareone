@@ -18,51 +18,65 @@ const remoteRow: InfluxRow = {
     'https://data-dev.lsst.cloud/repertoire/discovery/influxdb/summit_efd',
 };
 
-/** The table's body rows (every row but the header). */
-function getBodyRows(): HTMLElement[] {
+/**
+ * Each database's unit in the table: the `<tbody>` holding its name row and
+ * the detail row beneath it (every row group but the header's).
+ */
+function getRowGroups(): HTMLElement[] {
   const table = screen.getByRole('table', { name: 'InfluxDB databases' });
-  return within(table).getAllByRole('row').slice(1);
+  return within(table).getAllByRole('rowgroup').slice(1);
 }
 
 describe('InfluxTable', () => {
-  test('describes the data-dev EFD database', () => {
+  test('describes the data-dev EFD database in its detail row', () => {
     render(<InfluxTable rows={rows} />);
 
-    const [row] = getBodyRows();
-    const cells = within(row).getAllByRole('cell');
-    expect(cells[0]).toHaveTextContent(/^idfdev_efd/);
-    expect(cells[1]).toHaveTextContent('efd');
-    expect(cells[2]).toHaveTextContent('https://data-dev.lsst.cloud/influxdb/');
-    expect(cells[3]).toHaveTextContent(
+    expect(screen.getAllByRole('columnheader')).toHaveLength(1);
+    const [group] = getRowGroups();
+    const [nameRow, detailRow] = within(group).getAllByRole('row');
+    expect(nameRow).toHaveTextContent(/^idfdev_efd/);
+    expect(
+      within(detailRow)
+        .getAllByRole('term')
+        .map((term) => term.textContent)
+    ).toEqual(['Database', 'URL', 'Schema registry', 'Credentials URL']);
+    const [database, url, schemaRegistry, credentials] =
+      within(detailRow).getAllByRole('definition');
+    expect(database).toHaveTextContent(/^efd$/);
+    expect(url).toHaveTextContent('https://data-dev.lsst.cloud/influxdb/');
+    expect(schemaRegistry).toHaveTextContent(
       'http://sasquatch-schema-registry.sasquatch:8081/'
+    );
+    expect(credentials).toHaveTextContent(
+      'https://data-dev.lsst.cloud/repertoire/discovery/influxdb/idfdev_efd'
     );
   });
 
   test('flags a database local to the environment', () => {
     render(<InfluxTable rows={rows} />);
 
-    const [row] = getBodyRows();
-    expect(within(row).getByText('local')).toBeInTheDocument();
+    const [group] = getRowGroups();
+    expect(within(group).getByText('local')).toBeInTheDocument();
   });
 
   test('does not flag a database from another environment', () => {
     render(<InfluxTable rows={[remoteRow]} />);
 
-    const [row] = getBodyRows();
-    expect(within(row).queryByText('local')).not.toBeInTheDocument();
+    const [group] = getRowGroups();
+    expect(within(group).queryByText('local')).not.toBeInTheDocument();
   });
 
   test('shows the credentials URL with a button to copy it', () => {
     render(<InfluxTable rows={rows} />);
 
-    const [row] = getBodyRows();
+    const [group] = getRowGroups();
     expect(
-      within(row).getByText(
+      within(group).getByText(
         'https://data-dev.lsst.cloud/repertoire/discovery/influxdb/idfdev_efd'
       )
     ).toBeInTheDocument();
     expect(
-      within(row).getByRole('button', {
+      within(group).getByRole('button', {
         name: 'Copy the idfdev_efd credentials URL to the clipboard',
       })
     ).toBeInTheDocument();
@@ -71,7 +85,7 @@ describe('InfluxTable', () => {
   test('does not link the credentials URL, so it is never fetched', () => {
     render(<InfluxTable rows={rows} />);
 
-    const credentialsUrl = within(getBodyRows()[0]).getByText(
+    const credentialsUrl = within(getRowGroups()[0]).getByText(
       'https://data-dev.lsst.cloud/repertoire/discovery/influxdb/idfdev_efd'
     );
     expect(credentialsUrl.closest('a')).toBeNull();

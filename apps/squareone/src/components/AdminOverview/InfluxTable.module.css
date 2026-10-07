@@ -12,10 +12,16 @@
   white-space: nowrap;
 }
 
+/* The detail row's key-value list, at the detail rows' smaller size and with
+ * tighter rows than the page-level KeyValueList default. */
+.details {
+  font-size: 0.875rem;
+  gap: var(--sqo-space-xxs) var(--sqo-space-md);
+}
+
 /* URLs wrap inside the cell rather than widening the table. */
 .code {
   font-family: monospace;
-  font-size: 0.875rem;
   overflow-wrap: anywhere;
 }
 

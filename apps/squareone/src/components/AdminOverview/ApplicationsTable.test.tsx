@@ -8,27 +8,30 @@ import ApplicationsTable from './ApplicationsTable';
 
 const rows = buildApplicationRows(mockDiscoveryDataDev);
 
-/** The table's body rows (every row but the header). */
-function getBodyRows(): HTMLElement[] {
+/**
+ * Each application's unit in the table: the `<tbody>` holding its name row
+ * and the detail row beneath it (every row group but the header's).
+ */
+function getRowGroups(): HTMLElement[] {
   const table = screen.getByRole('table', { name: 'Applications' });
-  return within(table).getAllByRole('row').slice(1);
+  return within(table).getAllByRole('rowgroup').slice(1);
 }
 
-/** The application name in each body row, in display order. */
+/** The application name in each row group, in display order. */
 function getRowNames(): string[] {
-  return getBodyRows().map(
-    (row) => within(row).getAllByRole('cell')[0].textContent ?? ''
+  return getRowGroups().map(
+    (group) => within(group).getAllByRole('cell')[0].textContent ?? ''
   );
 }
 
-/** The body row for the named application. */
+/** The row group for the named application. */
 function getRow(name: string): HTMLElement {
-  const row = getBodyRows().find(
+  const group = getRowGroups().find(
     (candidate) =>
       within(candidate).getAllByRole('cell')[0].textContent === name
   );
-  if (!row) throw new Error(`No row for ${name}`);
-  return row;
+  if (!group) throw new Error(`No row for ${name}`);
+  return group;
 }
 
 describe('ApplicationsTable', () => {
@@ -39,12 +42,20 @@ describe('ApplicationsTable', () => {
     expect(screen.getByText('41 applications')).toBeInTheDocument();
   });
 
-  test('shows the title, kind, and both URLs of nublado', () => {
+  test('has only the name column, with the rest in a detail row', () => {
+    render(<ApplicationsTable rows={rows} />);
+
+    expect(screen.getAllByRole('columnheader')).toHaveLength(1);
+    const [nameRow, detailRow] = within(getRow('nublado')).getAllByRole('row');
+    expect(nameRow).toHaveTextContent(/^nublado$/);
+    expect(detailRow).toHaveTextContent('Notebook aspect');
+  });
+
+  test('shows the title and both services of nublado, each with its scopes', () => {
     render(<ApplicationsTable rows={rows} />);
 
     const row = within(getRow('nublado'));
     expect(row.getByText('Notebook aspect')).toBeInTheDocument();
-    expect(row.getByText('UI + API')).toBeInTheDocument();
     expect(
       row.getByRole('link', { name: 'https://nb.data-dev.lsst.cloud/nb' })
     ).toHaveAttribute('href', 'https://nb.data-dev.lsst.cloud/nb');
@@ -52,9 +63,21 @@ describe('ApplicationsTable', () => {
       row.getByRole('link', { name: 'https://data-dev.lsst.cloud/nublado' })
     ).toHaveAttribute('href', 'https://data-dev.lsst.cloud/nublado');
     expect(row.getByText('nublado-controller')).toBeInTheDocument();
+    expect(
+      within(row.getByRole('list', { name: 'nublado required scopes' }))
+        .getAllByRole('listitem')
+        .map((item) => item.textContent)
+    ).toEqual(['exec:notebook']);
+    expect(
+      within(
+        row.getByRole('list', { name: 'nublado-controller required scopes' })
+      )
+        .getAllByRole('listitem')
+        .map((item) => item.textContent)
+    ).toEqual(['admin:jupyterlab']);
   });
 
-  test('links the docs and OpenAPI spec and lists the required scopes', () => {
+  test('links the docs and OpenAPI spec', () => {
     render(<ApplicationsTable rows={rows} />);
 
     const row = within(getRow('nublado'));
@@ -67,36 +90,25 @@ describe('ApplicationsTable', () => {
       'href',
       'https://data-dev.lsst.cloud/nublado/openapi.json'
     );
-    const scopes = row.getByRole('list', { name: 'Required scopes' });
-    expect(
-      within(scopes)
-        .getAllByRole('listitem')
-        .map((item) => item.textContent)
-    ).toEqual(['exec:notebook', 'admin:jupyterlab']);
   });
 
-  test('shows an application with no matching service by name only', () => {
+  test('says so for an application with no matching service', () => {
     render(<ApplicationsTable rows={rows} />);
 
-    const row = getRow('cert-manager');
-    expect(within(row).queryByRole('link')).not.toBeInTheDocument();
-    expect(within(row).queryByRole('list')).not.toBeInTheDocument();
-    expect(within(row).getAllByText('—')).toHaveLength(2);
+    const row = within(getRow('cert-manager'));
+    expect(row.queryByRole('link')).not.toBeInTheDocument();
+    expect(row.queryByRole('list')).not.toBeInTheDocument();
+    expect(
+      row.getByText('No UI or API service in service discovery.')
+    ).toBeInTheDocument();
   });
 
-  test('sorts by a column when its header is clicked', async () => {
+  test('sorts by name when the header is clicked', async () => {
     const user = userEvent.setup();
     render(<ApplicationsTable rows={rows} />);
 
     await user.click(screen.getByRole('button', { name: 'Application' }));
     expect(getRowNames()[0]).toBe('wobbly');
-
-    await user.click(screen.getByRole('button', { name: 'Kind' }));
-    const kinds = getBodyRows().map(
-      (row) => within(row).getAllByRole('cell')[2].textContent
-    );
-    expect(kinds.slice(0, 3)).toEqual(['API', 'API', 'API']);
-    expect(kinds.at(-1)).toBe('—');
   });
 
   test('narrows the rows to names matching the filter', async () => {

@@ -7,20 +7,23 @@ import DatasetsTable from './DatasetsTable';
 
 const rows = buildDatasetRows(mockDiscoveryDataDev);
 
-/** The table's body rows (every row but the header). */
-function getBodyRows(): HTMLElement[] {
+/**
+ * Each dataset's unit in the table: the `<tbody>` holding its name row and
+ * the detail row beneath it (every row group but the header's).
+ */
+function getRowGroups(): HTMLElement[] {
   const table = screen.getByRole('table', { name: 'Datasets' });
-  return within(table).getAllByRole('row').slice(1);
+  return within(table).getAllByRole('rowgroup').slice(1);
 }
 
-/** The body row for the named dataset. */
+/** The row group for the named dataset. */
 function getRow(name: string): HTMLElement {
-  const row = getBodyRows().find(
+  const group = getRowGroups().find(
     (candidate) =>
       within(candidate).getAllByRole('cell')[0].textContent === name
   );
-  if (!row) throw new Error(`No row for ${name}`);
-  return row;
+  if (!group) throw new Error(`No row for ${name}`);
+  return group;
 }
 
 describe('DatasetsTable', () => {
@@ -28,10 +31,19 @@ describe('DatasetsTable', () => {
     render(<DatasetsTable rows={rows} />);
 
     expect(
-      getBodyRows().map(
-        (row) => within(row).getAllByRole('cell')[0].textContent
+      getRowGroups().map(
+        (group) => within(group).getAllByRole('cell')[0].textContent
       )
     ).toEqual(['dp1', 'dp2', 'dp02', 'dp03', 'prompt']);
+  });
+
+  test('has only the name column, with the description in a detail row', () => {
+    render(<DatasetsTable rows={rows} />);
+
+    expect(screen.getAllByRole('columnheader')).toHaveLength(1);
+    const [nameRow, detailRow] = within(getRow('prompt')).getAllByRole('row');
+    expect(nameRow).toHaveTextContent(/^prompt$/);
+    expect(detailRow).toHaveTextContent('Prompt products.');
   });
 
   test('links the docs, Butler config, and ObsCore config of a dataset', () => {
@@ -68,20 +80,18 @@ describe('DatasetsTable', () => {
     ).toEqual(['gms', 'tap']);
   });
 
-  test('shows a dash for each absent optional field', () => {
+  test('omits the links a dataset lacks', () => {
     render(<DatasetsTable rows={rows} />);
 
+    // No docs URL and no Butler config.
     const row = within(getRow('prompt'));
-    expect(row.getByText('Prompt products.')).toBeInTheDocument();
     expect(row.getAllByRole('link')).toHaveLength(1);
     expect(
       row.getByRole('link', { name: 'prompt ObsCore config' })
     ).toBeInTheDocument();
-    // No docs URL and no Butler config.
-    expect(row.getAllByText('—')).toHaveLength(2);
   });
 
-  test('shows a dash for a dataset with no description or services', () => {
+  test('says so for a dataset with no description, links, or services', () => {
     render(
       <DatasetsTable
         rows={[
@@ -100,7 +110,11 @@ describe('DatasetsTable', () => {
     const row = within(getRow('bare'));
     expect(row.queryByRole('link')).not.toBeInTheDocument();
     expect(row.queryByRole('list')).not.toBeInTheDocument();
-    expect(row.getAllByText('—')).toHaveLength(5);
+    expect(
+      row.getByText(
+        'Service discovery describes nothing more about this dataset.'
+      )
+    ).toBeInTheDocument();
   });
 
   test('says so when discovery lists no datasets', () => {
