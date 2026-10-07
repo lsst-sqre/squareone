@@ -1,5 +1,11 @@
 # @lsst-sqre/api-client-core
 
+## 0.3.0
+
+### Minor Changes
+
+- [#699](https://github.com/lsst-sqre/squareone/pull/699) [`4589fc6`](https://github.com/lsst-sqre/squareone/commit/4589fc60c884b64837c4c53029dbdae503ce77ae) Thanks [@jonathansick](https://github.com/jonathansick)! - Update zod from 3 to 4. The exported schemas and inferred types are unchanged, but `ZodError` instances thrown on API contract drift now have zod 4's shape. Record schemas declare their string keys explicitly, and ISO datetime and URL fields use the top-level `z.iso.datetime()` and `z.url()` validators. The file-factory lifecycle hooks are validated with `z.custom()` rather than the removed `z.function().args().returns()` chain, and nested config sections use `.prefault({})` so their inner defaults still apply. The test-data generators in the client packages now use `zod-schema-faker`, which supports zod 4, in place of `@anatine/zod-mock`.
+
 ## 0.2.0
 
 ### Minor Changes

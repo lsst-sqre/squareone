@@ -1,5 +1,18 @@
 # @lsst-sqre/times-square-client
 
+## 3.2.0
+
+### Minor Changes
+
+- [#699](https://github.com/lsst-sqre/squareone/pull/699) [`4589fc6`](https://github.com/lsst-sqre/squareone/commit/4589fc60c884b64837c4c53029dbdae503ce77ae) Thanks [@jonathansick](https://github.com/jonathansick)! - Update zod from 3 to 4. The exported schemas and inferred types are unchanged, but `ZodError` instances thrown on API contract drift now have zod 4's shape. Record schemas declare their string keys explicitly, and ISO datetime and URL fields use the top-level `z.iso.datetime()` and `z.url()` validators. The file-factory lifecycle hooks are validated with `z.custom()` rather than the removed `z.function().args().returns()` chain, and nested config sections use `.prefault({})` so their inner defaults still apply. The test-data generators in the client packages now use `zod-schema-faker`, which supports zod 4, in place of `@anatine/zod-mock`.
+
+### Patch Changes
+
+- [#695](https://github.com/lsst-sqre/squareone/pull/695) [`99d9b58`](https://github.com/lsst-sqre/squareone/commit/99d9b588e3f103d29f0d955c1a50333579efc3c3) Thanks [@jonathansick](https://github.com/jonathansick)! - Update the test and Storybook toolchain to Vite 8, which builds with Rolldown and Oxc instead of Rollup and esbuild. `@vitejs/plugin-react` moves to 6 (which requires Vite 8) and jsdom moves from 26 to 30, now declared explicitly by every package whose tests run in a jsdom environment. The squareone unit-test project sets its JSX runtime through Vite's `oxc` option instead of the deprecated `esbuild` option, and squared's Vite config is renamed to `vite.config.mts` so it loads under Vite's upcoming native config loader.
+- Updated dependencies [[`c72b855`](https://github.com/lsst-sqre/squareone/commit/c72b85509bc8df3f121aab4b4ca2fcd6f5795ad7), [`e74c24f`](https://github.com/lsst-sqre/squareone/commit/e74c24f10db40c5f71dd812fa6f754c60c0f78f3), [`6dd1547`](https://github.com/lsst-sqre/squareone/commit/6dd1547fd0ef6cd04148d111764851baa96f6ce7), [`c34f0ff`](https://github.com/lsst-sqre/squareone/commit/c34f0ffc78d90562564e8aff7c3a03d9996eb8f0), [`c1cd54d`](https://github.com/lsst-sqre/squareone/commit/c1cd54df79f4cdadcd65a42269bea3e7e9f54c80), [`99d9b58`](https://github.com/lsst-sqre/squareone/commit/99d9b588e3f103d29f0d955c1a50333579efc3c3), [`4589fc6`](https://github.com/lsst-sqre/squareone/commit/4589fc60c884b64837c4c53029dbdae503ce77ae)]:
+  - @lsst-sqre/repertoire-client@0.5.0
+  - @lsst-sqre/api-client-core@0.3.0
+
 ## 3.1.0
 
 ### Minor Changes
