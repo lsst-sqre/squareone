@@ -322,6 +322,18 @@ export const mockDiscovery: ServiceDiscovery = {
           },
         },
       },
+      // The Notebook aspect's controller API, published under a name other
+      // than its application's (nublado), as on data-dev. With the nublado
+      // UI service above, it gives the admin overview an application with
+      // both a UI and an API.
+      'nublado-controller': {
+        url: `${BASE}/nublado`,
+        docs_url: 'https://nublado.lsst.io/',
+        required_scopes: ['admin:jupyterlab'],
+        openapi: `${BASE}/nublado/openapi.json`,
+        quota_labels: {},
+        versions: {},
+      },
     },
     ui: {
       portal: {
