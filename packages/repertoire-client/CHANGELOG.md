@@ -1,5 +1,41 @@
 # @lsst-sqre/repertoire-client
 
+## 0.5.0
+
+### Minor Changes
+
+- [#723](https://github.com/lsst-sqre/squareone/pull/723) [`6dd1547`](https://github.com/lsst-sqre/squareone/commit/6dd1547fd0ef6cd04148d111764851baa96f6ce7) Thanks [@jonathansick](https://github.com/jonathansick)! - Support the Repertoire 3.0.0 service discovery contract while still parsing 2.x responses.
+
+  - New `EnvironmentSchema` / `Environment` for the top-level `environment` object (`name`, `label`, `title`, `title_long`, `description`, `docs_url`), which is optional so 2.x discovery still parses. `environment_name` is kept but deprecated upstream.
+  - UI, internal, and data services gain `title`, `docs_url`, and `required_scopes` (defaults to `[]`). Internal and data services also gain `quota_labels`, a mapping of Gafaelfawr quota labels to a `QuotaLabel` (`title`, and `internal`, which defaults to `false`). Datasets gain `obscore_config`.
+  - New `ServiceDiscoveryQuery` helpers:
+    - `getEnvironment()` returns the environment object, or `null`.
+    - `getEnvironmentName()` returns `environment.name`, falling back to `environment_name`.
+    - `getUiService(name)` and `getDataService(datasetId, name)`.
+    - `canAccessService(service, userScopes?)` is true when the service requires no scopes or when `userScopes` is undefined (for an anonymous visitor). Otherwise the user must hold every required scope.
+    - `getQuotaLabelIndex()` maps each quota label to its service's name, title, and docs URL, plus the label's title and `internal` flag. When a label appears more than once, the first occurrence wins, and data services come before internal services.
+    - `getSquareoneUrl()` and `getComanageUrl()`.
+  - `mockDiscovery` now uses the 3.0.0 shape. It adds the environment and the service titles, docs URLs, required scopes, and quota labels that data-dev publishes. It also adds the Argo CD, Chronograf, Kafdrop, WebDAV, COmanage, and Squareone UI services and a `prompt` dataset with no `docs_url`.
+  - The vendored `openapi.json` is now Repertoire 3.0.0. The `fetch-openapi` script still defaults to `data.lsst.cloud`, but a `REPERTOIRE_HOST` environment variable can override the host. For example, `REPERTOIRE_HOST=data-dev.lsst.cloud` fetches from data-dev until production runs Repertoire 3.0.
+
+- [#766](https://github.com/lsst-sqre/squareone/pull/766) [`c34f0ff`](https://github.com/lsst-sqre/squareone/commit/c34f0ffc78d90562564e8aff7c3a03d9996eb8f0) Thanks [@jonathansick](https://github.com/jonathansick)! - New `mockDiscoveryDataDev` and `mockDiscovery2x` mocks, alongside `mockDiscovery`, for tests and Storybook that need a whole real environment. `mockDiscoveryDataDev` is the live data-dev (`idfdev`) Repertoire 3.0.0 discovery document, and `mockDiscovery2x` is the production Repertoire 2.1.0 document, which has no `environment` object and no service titles, docs URLs, or scopes. Both are parsed through `DiscoverySchema` from the package's test fixtures.
+
+- [#766](https://github.com/lsst-sqre/squareone/pull/766) [`c1cd54d`](https://github.com/lsst-sqre/squareone/commit/c1cd54df79f4cdadcd65a42269bea3e7e9f54c80) Thanks [@jonathansick](https://github.com/jonathansick)! - `useServiceDiscovery` now returns `isFetching`, which is `true` whenever a discovery fetch is in flight, including a `refetch` of a document that has already loaded (`isPending` is only `true` until the first document loads).
+
+  In the browser, the discovery query no longer answers from `fetchServiceDiscovery`'s module-level cache, which exists to share discovery across server requests. TanStack Query is the browser's cache, so a `refetch` now always requests the document from Repertoire instead of returning the cached copy for up to 5 minutes. Server-side fetches still use the module-level cache.
+
+- [#699](https://github.com/lsst-sqre/squareone/pull/699) [`4589fc6`](https://github.com/lsst-sqre/squareone/commit/4589fc60c884b64837c4c53029dbdae503ce77ae) Thanks [@jonathansick](https://github.com/jonathansick)! - Update zod from 3 to 4. The exported schemas and inferred types are unchanged, but `ZodError` instances thrown on API contract drift now have zod 4's shape. Record schemas declare their string keys explicitly, and ISO datetime and URL fields use the top-level `z.iso.datetime()` and `z.url()` validators. The file-factory lifecycle hooks are validated with `z.custom()` rather than the removed `z.function().args().returns()` chain, and nested config sections use `.prefault({})` so their inner defaults still apply. The test-data generators in the client packages now use `zod-schema-faker`, which supports zod 4, in place of `@anatine/zod-mock`.
+
+### Patch Changes
+
+- [#723](https://github.com/lsst-sqre/squareone/pull/723) [`c72b855`](https://github.com/lsst-sqre/squareone/commit/c72b85509bc8df3f121aab4b4ca2fcd6f5795ad7) Thanks [@jonathansick](https://github.com/jonathansick)! - `mockDiscovery` now includes the `dp2` dataset that production service discovery publishes, with its description, a `docs_url` of `https://dp2.lsst.io`, and the same TAP, SIA, HiPS, SODA cutout, DataLink, and GMS services as `dp1`. Storybook and the development discovery route now list Data Preview 2 first, ahead of Data Preview 1. The `prompt` dataset still has no `docs_url`, as on data-dev.
+
+- [#766](https://github.com/lsst-sqre/squareone/pull/766) [`e74c24f`](https://github.com/lsst-sqre/squareone/commit/e74c24f10db40c5f71dd812fa6f754c60c0f78f3) Thanks [@jonathansick](https://github.com/jonathansick)! - The development `mockDiscovery` document now lists a `nublado-controller` internal service, as data-dev does, so the Notebook aspect has both a UI service and an API in development. Its `/nublado` URL and `openapi.json` are not mocked.
+
+- [#695](https://github.com/lsst-sqre/squareone/pull/695) [`99d9b58`](https://github.com/lsst-sqre/squareone/commit/99d9b588e3f103d29f0d955c1a50333579efc3c3) Thanks [@jonathansick](https://github.com/jonathansick)! - Update the test and Storybook toolchain to Vite 8, which builds with Rolldown and Oxc instead of Rollup and esbuild. `@vitejs/plugin-react` moves to 6 (which requires Vite 8) and jsdom moves from 26 to 30, now declared explicitly by every package whose tests run in a jsdom environment. The squareone unit-test project sets its JSX runtime through Vite's `oxc` option instead of the deprecated `esbuild` option, and squared's Vite config is renamed to `vite.config.mts` so it loads under Vite's upcoming native config loader.
+- Updated dependencies [[`4589fc6`](https://github.com/lsst-sqre/squareone/commit/4589fc60c884b64837c4c53029dbdae503ce77ae)]:
+  - @lsst-sqre/api-client-core@0.3.0
+
 ## 0.4.1
 
 ### Patch Changes

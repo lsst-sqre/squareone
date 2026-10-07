@@ -1,5 +1,11 @@
 # @lsst-sqre/repo-scripts
 
+## 0.0.2
+
+### Patch Changes
+
+- [#723](https://github.com/lsst-sqre/squareone/pull/723) [`6dd1547`](https://github.com/lsst-sqre/squareone/commit/6dd1547fd0ef6cd04148d111764851baa96f6ce7) Thanks [@jonathansick](https://github.com/jonathansick)! - `check-openapi-drift` now expands `${NAME}` and `${NAME:-default}` environment references in a client's `fetch-openapi` script before it reads the live spec URL, the same way `sh` expands them. With the same environment variable, the drift check compares against the host that the spec was vendored from. The periodic CI workflow sets `REPERTOIRE_HOST=data-dev.lsst.cloud` so the vendored Repertoire 3.0.0 spec is checked against data-dev until production is upgraded.
+
 ## 0.0.1
 
 ### Patch Changes
