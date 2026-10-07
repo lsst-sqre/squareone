@@ -1,0 +1,383 @@
+/**
+ * Pure builders for the `/admin` environment overview.
+ *
+ * Each overview section is a presentational component in
+ * `components/AdminOverview` fed by one function here, so everything the page
+ * derives from Repertoire service discovery is unit-testable without React.
+ * Builders accept both the Repertoire 3.0 shape and the older 2.x shape, which
+ * lacks the `environment` object and the service titles, docs URLs, and
+ * scopes.
+ */
+
+import type { ServiceDiscovery } from '@lsst-sqre/repertoire-client';
+
+/** What the overview's Environment section shows about the environment. */
+export type EnvironmentSummary = {
+  /**
+   * Human-readable name, often the hostname (Repertoire's `environment.name`,
+   * or the deprecated `environment_name` under Repertoire 2.x).
+   */
+  name: string;
+  /** Phalanx environment name, such as `idfdev`. */
+  label: string | null;
+  /** Short human-readable title. */
+  title: string | null;
+  /** Full human-readable title (may equal `title`). */
+  titleLong: string | null;
+  description: string | null;
+  /** URL of the environment's documentation (its Phalanx page). */
+  docsUrl: string | null;
+};
+
+/**
+ * Summarizes the environment that discovery describes.
+ *
+ * Repertoire 3.0 publishes an `environment` object, which provides every
+ * field. Repertoire 2.x publishes only `environment_name`, which becomes a
+ * name-only summary with the other fields `null`. Returns `null` when
+ * discovery names no environment at all.
+ */
+export function getEnvironmentSummary(
+  discovery: ServiceDiscovery
+): EnvironmentSummary | null {
+  const { environment } = discovery;
+  if (environment) {
+    return {
+      name: environment.name,
+      label: environment.label,
+      title: environment.title,
+      titleLong: environment.title_long,
+      description: environment.description?.trim() || null,
+      docsUrl: environment.docs_url,
+    };
+  }
+
+  if (discovery.environment_name) {
+    return {
+      name: discovery.environment_name,
+      label: null,
+      title: null,
+      titleLong: null,
+      description: null,
+      docsUrl: null,
+    };
+  }
+
+  return null;
+}
+
+/**
+ * Whether discovery carries nothing to show.
+ *
+ * A failed discovery fetch resolves to the empty discovery rather than an
+ * error (see `discoveryQueryOptions`), so the overview treats an empty
+ * document as a failure to load.
+ */
+export function isEmptyDiscovery(discovery: ServiceDiscovery): boolean {
+  return (
+    !discovery.environment &&
+    !discovery.environment_name &&
+    discovery.applications.length === 0 &&
+    Object.keys(discovery.datasets).length === 0 &&
+    Object.keys(discovery.influxdb_databases).length === 0 &&
+    Object.keys(discovery.services.ui).length === 0 &&
+    Object.keys(discovery.services.internal).length === 0
+  );
+}
+
+/** One card in the overview's Operator links section. */
+export type OperatorLink = {
+  /**
+   * Stable key: the UI service name for an operator tool, or
+   * `environment-docs` or `discovery`.
+   */
+  id: string;
+  /** Link text: the service's discovery title, else a fixed name. */
+  label: string;
+  /** What the link leads to. */
+  description: string;
+  /** An absolute URL, or a Squareone path such as `/admin/discovery`. */
+  url: string;
+  /** Secondary link to the tool's own documentation, when discovery has one. */
+  docsUrl: string | null;
+};
+
+/**
+ * The operator tools the overview links to, in display order, keyed by their
+ * `services.ui` name. `name` labels a service whose discovery entry has no
+ * title (every service under Repertoire 2.x).
+ */
+const OPERATOR_SERVICES = [
+  {
+    service: 'argocd',
+    name: 'Argo CD',
+    description: "Deploy and sync this environment's Phalanx applications.",
+  },
+  {
+    service: 'chronograf',
+    name: 'Chronograf',
+    description: "Explore and chart metrics in this environment's InfluxDB.",
+  },
+  {
+    service: 'kafdrop',
+    name: 'Kafdrop',
+    description: "Browse this environment's Kafka topics and messages.",
+  },
+] as const;
+
+/**
+ * The URL of Repertoire's raw `/discovery` document, built the same way the
+ * discovery client builds the URL it fetches.
+ */
+export function getDiscoveryEndpointUrl(repertoireUrl: string): string {
+  return `${repertoireUrl.replace(/\/+$/, '')}/discovery`;
+}
+
+/** Path of the admin page that shows the formatted discovery document. */
+export const DISCOVERY_PAGE_PATH = '/admin/discovery';
+
+/**
+ * Links for the overview's Operator links section.
+ *
+ * Argo CD, Chronograf, and Kafdrop each appear only when discovery lists them
+ * as UI services, followed by the environment's Phalanx documentation (when
+ * discovery describes the environment) and the admin page that shows the
+ * discovery document this overview is built from. The links are not filtered
+ * by the viewer's scopes: the admin section is already restricted to
+ * administrators.
+ */
+export function getOperatorLinks(discovery: ServiceDiscovery): OperatorLink[] {
+  const links: OperatorLink[] = [];
+
+  for (const { service, name, description } of OPERATOR_SERVICES) {
+    const uiService = discovery.services.ui[service];
+    if (uiService) {
+      links.push({
+        id: service,
+        label: uiService.title || name,
+        description,
+        url: uiService.url,
+        docsUrl: uiService.docs_url ?? null,
+      });
+    }
+  }
+
+  if (discovery.environment) {
+    links.push({
+      id: 'environment-docs',
+      label: 'Environment documentation',
+      description: "This environment's page in the Phalanx documentation.",
+      url: discovery.environment.docs_url,
+      docsUrl: null,
+    });
+  }
+
+  links.push({
+    id: 'discovery',
+    label: 'Service discovery',
+    description: 'The Repertoire discovery document behind this overview.',
+    url: DISCOVERY_PAGE_PATH,
+    docsUrl: null,
+  });
+
+  return links;
+}
+
+/** A service an application row is joined to: where it lives and who may use it. */
+export type ApplicationService = {
+  /** `UI` for a `services.ui` entry, `API` for a `services.internal` one. */
+  kind: 'UI' | 'API';
+  /** The service's name in discovery, which may differ from the application. */
+  service: string;
+  url: string;
+  /** The scopes a token needs to use this service, each listed once. */
+  requiredScopes: string[];
+};
+
+/** One row of the overview's Applications table. */
+export type ApplicationRow = {
+  /** Phalanx application name. */
+  name: string;
+  /** The UI service's title, else the internal service's title. */
+  title: string | null;
+  /**
+   * The UI service, then the internal (API) service; empty when the
+   * application matches no service.
+   */
+  services: ApplicationService[];
+  /** The UI service's docs URL, else the internal service's. */
+  docsUrl: string | null;
+  /** The internal service's OpenAPI specification. */
+  openapiUrl: string | null;
+};
+
+/**
+ * Services an application publishes under a name other than its own, beyond
+ * the service named for the application itself.
+ *
+ * Repertoire keys `services.ui` and `services.internal` by service name, which
+ * usually matches the Phalanx application name; these are the known
+ * exceptions. This map is the only place that knows them.
+ */
+const APPLICATION_SERVICE_ALIASES: Readonly<Record<string, readonly string[]>> =
+  {
+    nublado: ['nublado-controller'],
+    datalinker: ['datalink'],
+    'vo-cutouts': ['cutout'],
+  };
+
+/**
+ * The first entry in `services` named for the application or one of its
+ * aliases, with the name it was found under.
+ */
+function findApplicationService<T>(
+  services: Record<string, T>,
+  application: string
+): [name: string, service: T] | null {
+  // Own-property checks, so an application or service named like an Object
+  // property (`constructor`) never matches the prototype.
+  const aliases = Object.hasOwn(APPLICATION_SERVICE_ALIASES, application)
+    ? APPLICATION_SERVICE_ALIASES[application]
+    : [];
+  const candidates = [application, ...aliases];
+  for (const name of candidates) {
+    if (Object.hasOwn(services, name)) return [name, services[name]];
+  }
+  return null;
+}
+
+/**
+ * Rows for the overview's Applications table: one per enabled Phalanx
+ * application, in discovery order.
+ *
+ * Each application is joined to at most one UI service and one internal
+ * service, named for the application or one of its known aliases (see
+ * `APPLICATION_SERVICE_ALIASES`), so `nublado` joins both its `nublado` UI and
+ * its `nublado-controller` API. Each service keeps its own required scopes,
+ * since a UI and its API are often guarded differently. An application that
+ * matches no service, such as an infrastructure application like
+ * `cert-manager`, is a name-only row.
+ */
+export function buildApplicationRows(
+  discovery: ServiceDiscovery
+): ApplicationRow[] {
+  return discovery.applications.map((name) => {
+    const [uiName, uiService] =
+      findApplicationService(discovery.services.ui, name) ?? [];
+    const [internalName, internalService] =
+      findApplicationService(discovery.services.internal, name) ?? [];
+
+    const services: ApplicationService[] = [];
+    if (uiName && uiService) {
+      services.push({
+        kind: 'UI',
+        service: uiName,
+        url: uiService.url,
+        requiredScopes: [...new Set(uiService.required_scopes ?? [])],
+      });
+    }
+    if (internalName && internalService) {
+      services.push({
+        kind: 'API',
+        service: internalName,
+        url: internalService.url,
+        requiredScopes: [...new Set(internalService.required_scopes ?? [])],
+      });
+    }
+
+    return {
+      name,
+      title: uiService?.title || internalService?.title || null,
+      services,
+      docsUrl: uiService?.docs_url || internalService?.docs_url || null,
+      openapiUrl: internalService?.openapi ?? null,
+    };
+  });
+}
+
+/**
+ * The rows whose application name or title contains `query`, ignoring case
+ * and surrounding whitespace. A blank query keeps every row.
+ */
+export function filterApplicationRows(
+  rows: ApplicationRow[],
+  query: string
+): ApplicationRow[] {
+  const needle = query.trim().toLowerCase();
+  if (!needle) return rows;
+  return rows.filter(
+    (row) =>
+      row.name.toLowerCase().includes(needle) ||
+      (row.title?.toLowerCase().includes(needle) ?? false)
+  );
+}
+
+/** One row of the overview's Datasets table. */
+export type DatasetRow = {
+  /** The dataset's key in discovery, such as `dp1`. */
+  name: string;
+  description: string | null;
+  /** URL of the dataset's documentation. */
+  docsUrl: string | null;
+  /** URL of the dataset's Butler repository configuration. */
+  butlerConfigUrl: string | null;
+  /**
+   * URL of the dataset's ObsCore exporter configuration (Repertoire 3.0 and
+   * later).
+   */
+  obscoreConfigUrl: string | null;
+  /** Names of the data services the dataset exposes, alphabetically. */
+  services: string[];
+};
+
+/**
+ * Rows for the overview's Datasets table: one per dataset, in discovery
+ * order.
+ *
+ * Absent optional fields, and a blank description, are `null`. Service names
+ * are sorted so the same service sits in the same place in every row.
+ */
+export function buildDatasetRows(discovery: ServiceDiscovery): DatasetRow[] {
+  return Object.entries(discovery.datasets).map(([name, dataset]) => ({
+    name,
+    description: dataset.description?.trim() || null,
+    docsUrl: dataset.docs_url ?? null,
+    butlerConfigUrl: dataset.butler_config ?? null,
+    obscoreConfigUrl: dataset.obscore_config ?? null,
+    services: Object.keys(dataset.services).sort(),
+  }));
+}
+
+/** One row of the overview's InfluxDB databases table. */
+export type InfluxRow = {
+  /** The database's key in discovery, such as `idfdev_efd`. */
+  name: string;
+  /** Name of the database within the InfluxDB server. */
+  database: string;
+  /** URL of the InfluxDB server. */
+  url: string;
+  /** Whether the database is local to this Phalanx environment. */
+  local: boolean;
+  /** URL of the Kafka schema registry for the database's measurements. */
+  schemaRegistryUrl: string;
+  /**
+   * URL from which an authenticated client fetches the database's
+   * credentials. The overview shows it but never fetches it.
+   */
+  credentialsUrl: string;
+};
+
+/**
+ * Rows for the overview's InfluxDB databases table: one per database, in
+ * discovery order.
+ */
+export function buildInfluxRows(discovery: ServiceDiscovery): InfluxRow[] {
+  return Object.entries(discovery.influxdb_databases).map(([name, influx]) => ({
+    name,
+    database: influx.database,
+    url: influx.url,
+    local: influx.local,
+    schemaRegistryUrl: influx.schema_registry,
+    credentialsUrl: influx.credentials_url,
+  }));
+}

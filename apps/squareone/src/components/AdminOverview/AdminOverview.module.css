@@ -1,0 +1,53 @@
+/* AdminOverview: the /admin environment overview and its sections */
+
+.overview {
+  display: flex;
+  flex-direction: column;
+  /* As a flex or grid item of the admin layout, the default `min-width: auto`
+   * would let a wide table push the page wide instead of scrolling inside
+   * DataTable's own overflow container. */
+  min-width: 0;
+}
+
+.section {
+  margin-bottom: var(--sqo-space-lg-fixed);
+}
+
+.section h2 {
+  margin-top: 0;
+}
+
+/* Shared styling for the tables' detail rows: each table has one sortable
+ * name column, and everything else about the row sits in a full-width detail
+ * row beneath it (DataTable's `renderDetailRow`), so long URLs wrap in the
+ * content column instead of forcing a wide table. */
+
+.detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sqo-space-xxs);
+  font-size: 0.875rem;
+}
+
+/* A row with nothing beyond its name says so, muted. */
+.detailEmpty {
+  margin: 0;
+  color: var(--rsd-component-text-secondary-color);
+}
+
+/* The detail's trailing links to documentation and configuration files. */
+.detailLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sqo-space-xxs) var(--sqo-space-md);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.detailLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sqo-space-xxs);
+  white-space: nowrap;
+}

@@ -22,12 +22,15 @@ import {
   mockDiscovery,
 } from '@lsst-sqre/repertoire-client';
 
+import { compileMDX } from 'next-mdx-remote/rsc';
 import { getStaticConfig } from '../../config/rsc';
+import { footerMdxComponents as baseFooterMdxComponents } from '../../utils/mdxComponents';
 import {
   commonMdxComponents,
   DiscoveryApiEndpoints,
   DiscoveryDatasetDocsCards,
   footerMdxComponents,
+  MdxCodeBlock,
 } from './components';
 
 type AsyncTag = (props: Record<string, unknown>) => Promise<ReactElement>;
@@ -187,5 +190,151 @@ describe('RSC MDX components: <DatasetDocsCards>', () => {
 
     expect(container).toBeEmptyDOMElement();
     expect(fetchServiceDiscovery).not.toHaveBeenCalled();
+  });
+});
+
+describe('RSC MDX components: fenced code blocks (<pre>)', () => {
+  // MDX compiles a fenced block to <pre><code class="language-*">, with the
+  // block's text (plus a trailing newline) as the code element's children.
+  const Pre = commonMdxComponents.pre;
+
+  /** The code element of the CodeBlock that the block rendered through. */
+  function getCodeBlockCode(container: HTMLElement) {
+    const element = container.querySelector(
+      '[data-syntax-theme="github"][data-sqr-code-block] > pre > code'
+    );
+    if (!element) throw new Error('CodeBlock not rendered');
+    return element;
+  }
+
+  test('renders a pre with a language-* code child through CodeBlock', () => {
+    const { container } = render(
+      <Pre>
+        <code className="language-json">{'{"name": "squareone"}\n'}</code>
+      </Pre>
+    );
+
+    expect(getCodeBlockCode(container)).toHaveClass('language-json');
+  });
+
+  test('passes the block text, without the trailing newline, as the code', () => {
+    const { container } = render(
+      <Pre>
+        <code className="language-yaml">{'name: squareone\nversion: 1\n'}</code>
+      </Pre>
+    );
+
+    const code = getCodeBlockCode(container);
+    expect(code).toHaveClass('language-yaml');
+    expect(code.textContent).toBe('name: squareone\nversion: 1');
+  });
+
+  test('shows the copy button but no line numbers', () => {
+    const { container } = render(
+      <Pre>
+        <code className="language-python">{'import pyvo\n'}</code>
+      </Pre>
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Copy code to clipboard' })
+    ).toBeInTheDocument();
+    // The line-number gutter is the CodeBlock wrapper's aria-hidden child.
+    expect(
+      container.querySelector('[data-sqr-code-block] > [aria-hidden="true"]')
+    ).not.toBeInTheDocument();
+  });
+
+  test('renders a pre whose code child has no language-* class as a plain pre', () => {
+    const { container } = render(
+      <Pre className="custom">
+        <code>plain text</code>
+      </Pre>
+    );
+
+    expect(
+      container.querySelector('[data-sqr-code-block]')
+    ).not.toBeInTheDocument();
+    expect(container.innerHTML).toBe(
+      '<pre class="custom"><code>plain text</code></pre>'
+    );
+  });
+
+  test('renders a pre whose language-* child is not a code element as a plain pre', () => {
+    const { container } = render(
+      <Pre>
+        <span className="language-json">{'{}'}</span>
+      </Pre>
+    );
+
+    expect(
+      container.querySelector('[data-sqr-code-block]')
+    ).not.toBeInTheDocument();
+    expect(container.innerHTML).toBe(
+      '<pre><span class="language-json">{}</span></pre>'
+    );
+  });
+
+  test('renders a pre without a code child as a plain pre', () => {
+    const { container } = render(<Pre>preformatted text</Pre>);
+
+    expect(
+      container.querySelector('[data-sqr-code-block]')
+    ).not.toBeInTheDocument();
+    expect(container.innerHTML).toBe('<pre>preformatted text</pre>');
+  });
+
+  test('a fenced code block in MDX content renders through CodeBlock with its language', async () => {
+    const { content } = await compileMDX({
+      source: '# Example\n\n```json\n{"name": "squareone"}\n```\n',
+      components: commonMdxComponents,
+    });
+    const { container } = render(content);
+
+    const code = getCodeBlockCode(container);
+    expect(code).toHaveClass('language-json');
+    expect(code.textContent).toBe('{"name": "squareone"}');
+  });
+
+  test('a fenced code block without a language in MDX content renders as a plain pre', async () => {
+    const { content } = await compileMDX({
+      source: '```\nplain text\n```\n',
+      components: commonMdxComponents,
+    });
+    const { container } = render(content);
+
+    expect(
+      container.querySelector('[data-sqr-code-block]')
+    ).not.toBeInTheDocument();
+    expect(container.innerHTML).toBe('<pre><code>plain text\n</code></pre>');
+  });
+});
+
+describe('RSC MDX components: footer registry', () => {
+  test('maps pre to MdxCodeBlock, like the common registry', () => {
+    expect(footerMdxComponents.pre).toBe(MdxCodeBlock);
+  });
+
+  test('keeps every component from the base footer registry', () => {
+    expect(Object.keys(baseFooterMdxComponents)).toEqual(
+      expect.arrayContaining(['FooterNav', 'FundingNotice', 'PartnerLogos'])
+    );
+    for (const [name, component] of Object.entries(baseFooterMdxComponents)) {
+      expect(footerMdxComponents[name], name).toBe(component);
+    }
+  });
+
+  test('a fenced code block in footer MDX renders through CodeBlock with its language', async () => {
+    const { content } = await compileMDX({
+      source: '```bash\npip install lsst-rsp\n```\n',
+      components: footerMdxComponents,
+    });
+    const { container } = render(content);
+
+    const code = container.querySelector(
+      '[data-syntax-theme="github"][data-sqr-code-block] > pre > code'
+    );
+    expect(code).toHaveClass('language-bash');
+    expect(code?.textContent).toBe('pip install lsst-rsp');
   });
 });

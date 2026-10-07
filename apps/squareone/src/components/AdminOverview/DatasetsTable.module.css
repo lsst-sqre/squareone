@@ -1,0 +1,42 @@
+/* DatasetsTable: the overview's table of datasets */
+
+/* Dataset keys are identifiers; keep each on one line. */
+.name {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Descriptions run to a few sentences and wrap as a paragraph. */
+.description {
+  margin: 0;
+  max-width: 70ch;
+}
+
+/* "Services" and its inline list of service names on one line. */
+.services {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--sqo-space-xxs) var(--sqo-space-sm);
+  margin: 0;
+}
+
+.servicesLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--rsd-component-text-secondary-color);
+}
+
+.serviceList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sqo-space-xxxs) var(--sqo-space-xs);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Service names are discovery keys, set like code. */
+.service {
+  font-family: monospace;
+}

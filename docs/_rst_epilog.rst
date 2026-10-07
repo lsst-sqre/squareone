@@ -2,7 +2,9 @@
 .. _Biome: https://biomejs.dev
 .. _Changesets: https://github.com/changesets/changesets
 .. _CommonMark: https://commonmark.org/
+.. _CSS Custom Highlight API: https://developer.mozilla.org/en-US/docs/Web/API/CSS_Custom_Highlight_API
 .. _MDX: https://mdxjs.com
+.. _MicroLighter: https://github.com/davatron5000/microlighter
 .. _next lint: https://nextjs.org/docs/basic-features/eslint
 .. _Next.js: https://nextjs.org
 .. _nox: https://nox.thea.codes/en/stable/

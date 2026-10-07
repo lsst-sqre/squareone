@@ -2,8 +2,8 @@
 Admin section access
 ##########################
 
-Squareone's ``/admin`` section collects the operator-facing pages: sending user notifications, managing Gafaelfawr service tokens, managing OpenID Connect clients, and the Sentry tools page.
-Each of those pages calls a different API, and each of those APIs is guarded by its own Gafaelfawr scope — scopes that are set per Phalanx environment and are not discoverable at runtime.
+Squareone's ``/admin`` section collects the operator-facing pages: an overview of the environment, sending user notifications, managing Gafaelfawr service tokens, managing OpenID Connect clients, the Sentry tools page, and the raw service discovery document.
+Each of the pages other than the overview and the service discovery page calls a different API, and each of those APIs is guarded by its own Gafaelfawr scope — scopes that are set per Phalanx environment and are not discoverable at runtime.
 
 Squareone therefore does not hard-code which scope guards which page.
 Instead every admin page has a fixed *page id*, and the ``adminPageScopes`` configuration key maps those ids to the scopes that grant access to them in your environment.
@@ -51,15 +51,66 @@ That mapping drives the whole section:
 
 - The header user menu offers an "Admin" link to anyone who can reach at least one admin page.
 - The admin sidebar lists only the pages the signed-in user holds a scope for, so nobody is offered a page that would answer ``403``.
-- ``/admin`` redirects to the first page in that filtered list. Someone holding only ``admin:oidc`` lands directly on ``/admin/oidc-clients``.
-- A user who can reach no admin page at all sees a "No admin pages are available for your account" message instead of a redirect, and no "Admin" link in the user menu.
-- Each admin page gates on its own entry. Someone who arrives at a page directly — from a bookmark, or a link shared by a colleague with different scopes — without a scope that page lists sees an "Unauthorized" note naming the scopes that would have granted access, in place of the page. There is no redirect: the person asked for that page, so the answer is about that page.
+  The :ref:`overview <admin-overview>` and the :ref:`service discovery page <admin-discovery>` have no page id: for everyone who can reach the admin section, the overview is listed first and "Service discovery" last.
+- ``/admin`` is the overview, so the "Admin" link lands there whichever pages the user can reach.
+- A user who can reach no admin page at all sees an "Unauthorized" note anywhere under ``/admin``, and no "Admin" link in the user menu.
+- Each admin page with a page id gates on its own entry. Someone who arrives at a page directly — from a bookmark, or a link shared by a colleague with different scopes — without a scope that page lists sees an "Unauthorized" note naming the scopes that would have granted access, in place of the page. There is no redirect: the person asked for that page, so the answer is about that page.
 
 There is no single "admin" scope.
 ``exec:admin`` opens the admin section only because the ``sentry`` page's default scope list happens to name it; point ``sentry`` at another scope and ``exec:admin`` grants nothing on its own.
 
-Navigation *order* is code-defined and not configurable, so the redirect target for a user who can see several pages follows the order in the sidebar.
+Navigation *order* is code-defined and not configurable.
 Which admin pages exist is likewise fixed by the application: ``adminPageScopes`` controls access to pages, not their presence.
+
+.. _admin-overview:
+
+Overview page
+=============
+
+``/admin`` shows an overview of the environment, built from Repertoire service discovery (the ``repertoireUrl`` configuration that the rest of Squareone already uses).
+It has these sections:
+
+Environment
+   The environment's title, Phalanx label, name, and description, with a link to its Phalanx documentation.
+   Under Repertoire 2.x, which publishes only the environment's name, the section shows just that name.
+
+Operator links
+   Cards linking to Argo CD, Chronograf, and Kafdrop, each shown only when discovery lists that UI service, with a link to the tool's own documentation when discovery has one.
+   They are followed by the environment's Phalanx documentation and the raw discovery document (``/discovery`` under the ``repertoireUrl``).
+   The links are not filtered by your scopes, since the admin section is already restricted to administrators.
+
+Applications
+   A table of every Phalanx application enabled in the environment, joined to the UI and API services discovery publishes for it: the service title, whether it offers a UI, an API, or both, its URLs, its documentation link, the scopes its services require, and a link to its OpenAPI specification.
+   Discovery keys services by service name, which usually matches the application name; a few known exceptions are joined by name in Squareone (``nublado`` also joins ``nublado-controller``, ``datalinker`` joins ``datalink``, and ``vo-cutouts`` joins ``cutout``), and a URL from such a service names the service it came from.
+   Applications with no matching service, such as infrastructure like ``cert-manager``, are listed by name only.
+   The table sorts by name, title, or kind, and a filter narrows it to the applications whose name or title contains the text you type.
+
+Datasets
+   A table of the datasets discovery describes, such as ``dp1`` and ``prompt``: each dataset's description, links to its documentation, its Butler configuration, and its ObsCore configuration, and the names of the data services it exposes.
+   A dash marks a field the dataset doesn't have; Repertoire 2.x publishes no ObsCore configuration.
+
+InfluxDB databases
+   A table of the InfluxDB databases discovery describes: each database's name, the database within its InfluxDB server, the server's URL, its Kafka schema registry, and its credentials URL, with a button to copy that URL.
+   A database local to this environment is flagged "local".
+   The overview never fetches the credentials themselves.
+
+The overview needs no new configuration and no page id in ``adminPageScopes``: it is visible to anyone who passes the admin section's gate, that is, anyone who can reach at least one admin page.
+Without a ``repertoireUrl``, the page says that service discovery is not configured; if discovery can't be loaded, it shows a warning with a button to try again.
+
+.. _admin-discovery:
+
+Service discovery page
+======================
+
+``/admin/discovery`` shows the raw Repertoire service discovery document that the overview is built from, the same document Squareone reads from ``/discovery`` under the ``repertoireUrl``.
+The page links to that URL and shows the whole document as pretty-printed, syntax-highlighted JSON (with the :doc:`CodeBlock </packages/squared/code-block>` component), with line numbers and a button that copies the JSON without them.
+The document isn't folded or collapsed, so your browser's find searches all of it.
+
+Squareone caches service discovery for 5 minutes, on the server and again in the browser, so the document can be a few minutes old.
+The page's **Refetch** button requests the document from Repertoire again, straight from the browser so that neither cache answers, and the page updates to show it; the button is disabled while the request is in flight.
+
+Like the overview, the page needs no new configuration and no page id in ``adminPageScopes``.
+Without a ``repertoireUrl``, the page says that service discovery is not configured; if discovery can't be loaded, it shows a warning with a button to try again.
 
 Hiding a page
 =============

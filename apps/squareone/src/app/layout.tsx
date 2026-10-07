@@ -17,11 +17,12 @@ import type { ReactNode } from 'react';
 // available at runtime (via Kubernetes ConfigMaps), not at build time.
 export const dynamic = 'force-dynamic';
 
-// Global CSS imports (must match _app.tsx and .storybook/preview.js)
+// Global CSS imports (must match .storybook/preview.tsx)
 import '@fontsource/source-sans-pro/400.css';
 import '@fontsource/source-sans-pro/400-italic.css';
 import '@fontsource/source-sans-pro/700.css';
 import '@lsst-sqre/global-css/dist/next.css';
+import '@lsst-sqre/global-css/dist/syntax.css';
 
 import AppShell from '../components/AppShell';
 import BroadcastBannerStack from '../components/BroadcastBannerStack';

@@ -13,10 +13,15 @@
  * therefore fetched only when a page's MDX uses the tag, and never on the
  * client. `<ServiceLink>` is in the common registries; `<ApiEndpoints>` and
  * `<DatasetDocsCards>` are exported for their pages to register.
+ *
+ * The common registry, and the footer registry built on it, also map `pre` to
+ * `MdxCodeBlock`, so fenced code blocks with a language render through
+ * squared's syntax-highlighting `CodeBlock`.
  */
 
-import type { ComponentType } from 'react';
-import { cache } from 'react';
+import { CodeBlock } from '@lsst-sqre/squared';
+import type { ComponentProps, ComponentType, ReactNode } from 'react';
+import { cache, isValidElement } from 'react';
 
 import ApiEndpoints, {
   type ApiEndpointsProps,
@@ -124,6 +129,48 @@ export async function DiscoveryServiceLink({
   return <ServiceLink result={result} {...props} />;
 }
 
+/** A fenced code block's language and source text. */
+type FencedCode = { language: string; code: string };
+
+/**
+ * Read a fenced code block from the children of an MDX `<pre>`.
+ *
+ * MDX compiles ```` ```json ```` to `<pre><code className="language-json">`
+ * with the block's text, plus a trailing newline, as the code's children.
+ * Returns `null` for any other `<pre>`: one whose child isn't a single `code`
+ * element with a `language-*` class and plain-text content.
+ */
+function readFencedCode(children: ReactNode): FencedCode | null {
+  if (!isValidElement<ComponentProps<'code'>>(children)) return null;
+  if (children.type !== 'code') return null;
+  const { className, children: code } = children.props;
+  const language = className?.match(/(?:^|\s)language-(\S+)/)?.[1];
+  if (!language || typeof code !== 'string') return null;
+  return { language, code: code.replace(/\n$/, '') };
+}
+
+/**
+ * The `pre` element of RSC-compiled MDX content.
+ *
+ * A fenced code block with a language (```` ```python ````) renders through
+ * squared's `CodeBlock`, with a copy button and no line numbers. Any other
+ * `<pre>`, including a fenced block without a language, renders unchanged.
+ * This is a server component: highlighting happens in `CodeBlock`'s client
+ * boundary, so the server-rendered HTML is plain monospace text.
+ */
+export function MdxCodeBlock({ children, ...props }: ComponentProps<'pre'>) {
+  const fenced = readFencedCode(children);
+  if (!fenced) return <pre {...props}>{children}</pre>;
+  return (
+    <CodeBlock
+      code={fenced.code}
+      language={fenced.language}
+      copy
+      lineNumbers={false}
+    />
+  );
+}
+
 /**
  * Components available to every RSC-compiled MDX page (`/settings`,
  * `/support`, `/docs`, `/api-aspect`, and the enrollment pages).
@@ -132,11 +179,16 @@ export async function DiscoveryServiceLink({
 export const commonMdxComponents: Record<string, ComponentType<any>> = {
   ...baseCommonMdxComponents,
   ServiceLink: DiscoveryServiceLink,
+  pre: MdxCodeBlock,
 };
 
-/** Components available to the RSC-compiled footer MDX. */
+/**
+ * Components available to the RSC-compiled footer MDX: the base footer
+ * registry's styled components, plus every RSC addition from
+ * `commonMdxComponents` (`<ServiceLink>` and the `pre` code block).
+ */
 // biome-ignore lint/suspicious/noExplicitAny: MDX components accept any props
 export const footerMdxComponents: Record<string, ComponentType<any>> = {
   ...baseFooterMdxComponents,
-  ServiceLink: DiscoveryServiceLink,
+  ...commonMdxComponents,
 };

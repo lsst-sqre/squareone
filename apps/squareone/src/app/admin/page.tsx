@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 
 import { getStaticConfig } from '../../lib/config/rsc';
-import AdminIndexClient from './AdminIndexClient';
+import AdminOverviewClient from './AdminOverviewClient';
 
-const pageDescription = 'Administrative tools for the Rubin Science Platform';
+const pageDescription =
+  'An overview of this Rubin Science Platform environment from service discovery';
 
 export async function generateMetadata(): Promise<Metadata> {
   const config = await getStaticConfig();
@@ -18,15 +19,13 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 /**
- * Admin index route.
+ * Admin index route: the environment overview.
  *
- * A thin server component: it resolves the app config (which carries the
- * scope → page mapping) and hands it to {@link AdminIndexClient}, which does
- * the redirecting. The redirect target depends on the signed-in user's
- * Gafaelfawr scopes, so it cannot be decided here on the server.
+ * A thin server component that renders {@link AdminOverviewClient}, which
+ * reads Repertoire service discovery in the browser. The admin layout's
+ * any-admin `AdminRequired` gate already guards this page, and the overview
+ * needs no page scope of its own.
  */
-export default async function AdminPage() {
-  const config = await getStaticConfig();
-
-  return <AdminIndexClient config={config} />;
+export default function AdminPage() {
+  return <AdminOverviewClient />;
 }

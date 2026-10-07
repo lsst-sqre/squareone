@@ -1,0 +1,7 @@
+/* AdminDiscoveryGate: loading state while service discovery loads */
+
+.state {
+  padding: var(--sqo-space-xl-fixed);
+  text-align: center;
+  color: var(--rsd-component-text-secondary-color);
+}

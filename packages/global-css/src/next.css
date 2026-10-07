@@ -1,6 +1,7 @@
 /*
  * Base stylesheet for Squareone Next.js apps. This is intended to be imported
- * from _app.js.
+ * from the app's root layout. Syntax highlighting colours for the squared
+ * CodeBlock component are a separate entry, syntax.css.
 */
 @import "./reset.css";
 

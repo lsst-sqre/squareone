@@ -376,6 +376,7 @@ export default function MyComponent({ showExtra, data }: Props) {
 8. **Stories** for all variants
 9. **Compound components** for related UI
 10. **TypeScript strict mode** compliant
+11. **Code samples use `CodeBlock`** from `@lsst-sqre/squared`, not a raw `<pre>` (see the Code Samples section of the **design-system** skill)
 
 ## Related Skills
 

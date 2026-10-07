@@ -15,14 +15,15 @@
   ],
   "scripts": {
     "dev": "chokidar 'src/*.css' -c 'pnpm run build'",
-    "build": "lightningcss --minify --bundle --targets '>= 0.25%' src/next.css -o dist/next.css",
+    "build": "lightningcss --minify --bundle --targets '>= 0.25%' src/next.css src/syntax.css -d dist",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "publishConfig": {
     "access": "public"
   },
   "dependencies": {
-    "@lsst-sqre/rubin-style-dictionary": "workspace:*"
+    "@lsst-sqre/rubin-style-dictionary": "workspace:*",
+    "microlighter": "^2.2.0"
   },
   "devDependencies": {
     "chokidar-cli": "^3.0.0",

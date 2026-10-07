@@ -1,0 +1,24 @@
+/*
+ * Syntax highlighting stylesheet for Squareone apps. It provides MicroLighter's
+ * GitHub theme, which colours the squared CodeBlock component. Import it next
+ * to next.css from the app's root layout (and Storybook's preview).
+ *
+ * The theme scopes its colours to [data-syntax-theme="github"] containers and
+ * registers the global ::highlight() rules for the token categories.
+ *
+ * Next.js 16.3's Turbopack bundles an older Lightning CSS that doesn't know the
+ * ::highlight() pseudo-element, so `next dev` and `next build` log a "Parsing
+ * CSS source code failed" warning for this file. Its error recovery keeps the
+ * rules as written, so highlighting still works. The theme lives in its own
+ * entry (rather than next.css) so that a parse failure can only affect syntax
+ * highlighting, never the base stylesheet; the squareone app's build checks
+ * that the ::highlight() rules reach its emitted CSS.
+ *
+ * Build this entry with the same Lightning CSS targets as next.css: the theme's
+ * light-dark() colours compile to --lightningcss-light / --lightningcss-dark
+ * toggles, which CodeBlock.module.css pins to the site's data-theme.
+ *
+ * Lightning CSS doesn't resolve imports to node_modules, so the theme is
+ * imported from the node_modules directory.
+ */
+@import "../node_modules/microlighter/dist/themes/github.css";

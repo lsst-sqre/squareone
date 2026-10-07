@@ -1,0 +1,44 @@
+/* InfluxTable: the overview's table of InfluxDB databases */
+
+.nameCell {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sqo-space-xs);
+}
+
+/* Database keys are identifiers; keep each on one line. */
+.name {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* The detail row's key-value list, at the detail rows' smaller size and with
+ * tighter rows than the page-level KeyValueList default. */
+.details {
+  font-size: 0.875rem;
+  gap: var(--sqo-space-xxs) var(--sqo-space-md);
+}
+
+/* URLs wrap inside the cell rather than widening the table. */
+.code {
+  font-family: monospace;
+  overflow-wrap: anywhere;
+}
+
+.copyable {
+  display: flex;
+  align-items: center;
+  gap: var(--sqo-space-xs);
+  /* Reserve the copied-state height (ClipboardButton's success state is 2rem
+   * tall, taller than the resting icon button) so copying doesn't grow the
+   * row. */
+  min-height: 2rem;
+}
+
+.copyable .code {
+  min-width: 0;
+}
+
+.copyButton {
+  flex-shrink: 0;
+}

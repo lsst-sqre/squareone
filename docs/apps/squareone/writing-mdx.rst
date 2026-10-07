@@ -46,6 +46,34 @@ Markdown syntax
 MDX uses CommonMark_ for its core Markdown syntax.
 See `MDX's Markdown docs <https://mdxjs.com/docs/what-is-mdx/#markdown>`__ for an overview of the Markdown syntax you can use.
 
+.. _mdx-code-blocks:
+
+Code blocks
+-----------
+
+Show code, such as a Python example or a configuration snippet, with a fenced code block.
+Name the code's language after the opening backticks to highlight its syntax:
+
+.. code-block:: markdown
+   :caption: api-aspect.mdx
+
+   ```python
+   import pyvo
+
+   tap = pyvo.dal.TAPService("https://data.lsst.cloud/api/tap")
+   results = tap.search("SELECT TOP 10 * FROM dp1.Object")
+   ```
+
+A fenced code block with a language renders through the ``CodeBlock`` component from Squared, which is the standard for showing code in Squareone (see :doc:`/packages/squared/code-block`).
+The block has a button that copies the code, and long lines scroll horizontally.
+
+- **Languages.** Use a language name such as ``python``, ``bash``, ``json``, ``yaml``, ``sql``, ``javascript``, or ``typescript``, or a common alias such as ``py``, ``sh``, ``yml``, or ``ts``.
+  See :ref:`code-block-languages` for the full list.
+  Code in any other language displays as plain monospace text, still with the copy button.
+- **Client-side highlighting.** Highlighting happens in the browser after the page loads, using the `CSS Custom Highlight API`_.
+  The server-rendered page, and browsers without that API, show the code as plain monospace text, so the code is always readable.
+- **No language.** A fenced code block without a language renders as a plain preformatted block, with no highlighting and no copy button.
+
 React components
 ================
 

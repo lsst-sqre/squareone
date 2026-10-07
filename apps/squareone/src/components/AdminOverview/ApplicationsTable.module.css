@@ -1,0 +1,88 @@
+/* ApplicationsTable: the overview's filterable table of applications */
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sqo-space-xs) var(--sqo-space-md);
+  margin-bottom: var(--sqo-space-sm);
+}
+
+.filter {
+  width: 18rem;
+  max-width: 100%;
+}
+
+.count {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--rsd-component-text-secondary-color);
+}
+
+/* Application names are Phalanx identifiers; keep each on one line. */
+.name {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.title {
+  margin: 0;
+}
+
+.serviceList,
+.scopeList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.serviceList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sqo-space-xxs);
+}
+
+/* One service per line: its kind, its URL (and the service name when it
+ * differs from the application's), and the scopes it requires. The URL takes
+ * the remaining width and the scopes keep to the trailing edge; on a narrow
+ * column the scopes wrap below the URL. */
+.service {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--sqo-space-xxs) var(--sqo-space-sm);
+}
+
+.serviceKind {
+  flex: 0 0 2rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--rsd-component-text-secondary-color);
+}
+
+.serviceUrl {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+
+.url {
+  font-family: monospace;
+  overflow-wrap: anywhere;
+}
+
+.serviceName {
+  margin-left: var(--sqo-space-xs);
+  font-size: 0.75rem;
+  color: var(--rsd-component-text-secondary-color);
+  white-space: nowrap;
+}
+
+.serviceName::before {
+  content: "via ";
+}
+
+.scopeList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sqo-space-xxxs);
+}

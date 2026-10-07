@@ -1,0 +1,233 @@
+/*
+ * CodeBlock styles
+ *
+ * A CodeBlock is a container (.codeBlock) that holds the code frame (.frame)
+ * and, after it, the copy button (.copyButton). The frame carries
+ * data-syntax-theme="github", so MicroLighter's GitHub theme
+ * (@lsst-sqre/global-css/dist/syntax.css, which apps import next to
+ * dist/next.css) defines the --syntax-* colours on it and colours tokens
+ * through global ::highlight() rules. The <pre> and the line-number gutter
+ * share one font, line height, and block padding so their lines stay aligned.
+ */
+
+.codeBlock {
+  --sqr-code-block-font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  --sqr-code-block-font-size: 0.875rem;
+  --sqr-code-block-line-height: 1.5;
+  --sqr-code-block-padding-block: var(--sqo-space-sm-fixed);
+  /* The copy badge's diameter, the same in its idle and "copied" states.
+     Half of it (the part that overlaps the frame where the badge straddles an
+     edge) fits in the code's top padding, so the badge never covers code. */
+  --sqr-code-block-copy-size: 1.75rem;
+  /* The space between the copy badge and the code frame when they sit side
+     by side. */
+  --sqr-code-block-copy-gap: var(--sqo-space-xxs-fixed);
+
+  /* Stacks the copy button and the frame when the button is in flow. */
+  display: flex;
+  flex-direction: column;
+  /* Match the block spacing global-css gives a bare <pre>. */
+  margin: 0 0 1rem;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.frame {
+  /* The gutter and the code sit side by side, at the same height. */
+  display: flex;
+  min-width: 0;
+  border: 1px solid var(--rsd-component-divider-color);
+  border-radius: var(--sqo-border-radius-2);
+  /* Clip the code and gutter backgrounds to the rounded corners. */
+  overflow: hidden;
+  background-color: var(
+    --syntax-background,
+    var(--rsd-component-page-background-color)
+  );
+  color: var(--syntax-foreground, var(--rsd-component-text-color));
+}
+
+/*
+ * Theme mode: follow the site theme, not the OS preference.
+ *
+ * The GitHub theme picks its light or dark colours with light-dark() and sets
+ * `color-scheme: light dark`, which follows the OS. next-themes sets
+ * data-theme on <html>, so pin the colour scheme from that instead.
+ *
+ * global-css builds with Lightning CSS, which compiles light-dark() for older
+ * browsers into --lightningcss-light / --lightningcss-dark toggles switched by
+ * a prefers-color-scheme media query. Pin those toggles too (an empty value
+ * turns a branch off, `initial` turns it on). The attribute selector lifts
+ * these rules above the theme's own [data-syntax-theme] rules.
+ */
+.frame[data-syntax-theme] {
+  color-scheme: light;
+  --lightningcss-light: initial;
+  --lightningcss-dark: ;
+}
+
+[data-theme="dark"] .frame[data-syntax-theme] {
+  color-scheme: dark;
+  --lightningcss-light: ;
+  --lightningcss-dark: initial;
+}
+
+.pre {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  padding: var(--sqr-code-block-padding-block) var(--sqo-space-md-fixed);
+  /* Long lines scroll instead of wrapping or overflowing the page. */
+  overflow-x: auto;
+  font-family: var(--sqr-code-block-font-family);
+  font-size: var(--sqr-code-block-font-size);
+  line-height: var(--sqr-code-block-line-height);
+  tab-size: 4;
+}
+
+.pre code {
+  font: inherit;
+}
+
+/* While long lines scroll, the code is focusable so keyboard users can scroll
+   it. The frame clips overflow, so draw the focus ring inside the edge. */
+.pre:focus-visible {
+  outline: 2px solid var(--rsd-color-primary-500);
+  outline-offset: -2px;
+}
+
+/*
+ * The line-number gutter: one number per line, in the code's font and line
+ * height, so each number lines up with its line. It stays put while long
+ * lines scroll sideways, and can't be selected or copied with the code.
+ */
+.lineNumbers {
+  flex: none;
+  padding: var(--sqr-code-block-padding-block) var(--sqo-space-sm-fixed);
+  border-inline-end: 1px solid var(--rsd-component-divider-color);
+  color: var(--syntax-comment, var(--rsd-component-text-color));
+  font-family: var(--sqr-code-block-font-family);
+  font-size: var(--sqr-code-block-font-size);
+  line-height: var(--sqr-code-block-line-height);
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+  white-space: pre;
+  user-select: none;
+}
+
+/*
+ * The copy button is a round badge: the clipboard icon in a disc on the page
+ * background, bordered like the frame, so it reads over the code and the page
+ * alike. ClipboardButton's "copied" state is a different element with the
+ * same class, so it keeps the disc and copying never moves the code. The
+ * `.codeBlock` prefix outranks the button's own padding, gap, and min-height.
+ *
+ * Without CSS anchor positioning, the badge is laid out in flow above the
+ * frame, right-aligned, at every width. The frame precedes the badge in DOM
+ * order (see below), so `order` lifts the badge above it.
+ */
+.codeBlock .copyButton {
+  order: -1;
+  align-self: flex-end;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  inline-size: var(--sqr-code-block-copy-size);
+  block-size: var(--sqr-code-block-copy-size);
+  min-height: 0;
+  margin: 0 0 var(--sqr-code-block-copy-gap);
+  padding: 0;
+  gap: 0;
+  border: 1px solid var(--rsd-component-divider-color);
+  border-radius: 50%;
+  background-color: var(--rsd-component-page-background-color);
+}
+
+/*
+ * With CSS anchor positioning, the frame is an anchor (anchor-name) and the
+ * button is absolutely positioned against it (position-anchor with
+ * position-area), so the button can sit outside the frame even though the
+ * frame clips its contents with overflow: hidden. An anchor must precede the
+ * element positioned against it in DOM order, so the button comes after the
+ * frame. The container is the button's containing block, which also scopes
+ * the shared anchor name: each button only sees the frame in its own
+ * container.
+ *
+ * - Narrow layouts (phones and tablets, where the content column keeps its
+ *   1rem side padding): the badge straddles the frame's top-right corner,
+ *   half outside the top edge and half outside the right edge. The outer
+ *   halves sit in the 1rem block gap before the CodeBlock and the column's
+ *   side padding, so the block reserves no space of its own, and the inner
+ *   quarter sits in the code's padding, so the badge covers neither the
+ *   content before the block nor the code.
+ * - Where the content column fills the viewport edge to edge (Squareone's
+ *   column from 66rem up to the beside placement): hanging off the right
+ *   edge would make the page scroll sideways, so the badge tucks inside the
+ *   frame's right edge and straddles only the top edge.
+ * - Wide layouts: the badge sits just outside the frame's top-right corner,
+ *   top-aligned with it, in the page margin beside the content column.
+ *
+ * A media query picks the placement, rather than position-try-fallbacks: a
+ * fallback only tests whether the badge overflows its containing block, not
+ * whether the page has a free margin.
+ */
+@supports (anchor-name: --x) and (position-area: block-start) {
+  .codeBlock {
+    position: relative;
+  }
+
+  .frame {
+    anchor-name: --sqr-code-block;
+  }
+
+  .codeBlock .copyButton {
+    position: absolute;
+    position-anchor: --sqr-code-block;
+    /* The cell outside the frame's top-right corner, then pulled back by
+       half the badge so the disc is centred on the corner. That cell has no
+       size (the container's edges are the frame's), so `unsafe` pins the
+       badge's bottom-left to the corner instead of shifting it back over the
+       code to fit. */
+    position-area: block-start inline-end;
+    align-self: unsafe end;
+    justify-self: unsafe start;
+    translate: -50% 50%;
+    margin: 0;
+  }
+
+  /*
+   * Tucked inside the right edge from 66rem, where Squareone's content column
+   * (MainContent, SidebarLayout, and the footer) drops its side padding and
+   * fills the viewport.
+   */
+  @media (min-width: 66rem) {
+    .codeBlock .copyButton {
+      translate: calc(-100% - var(--sqo-space-xs-fixed)) 50%;
+    }
+  }
+
+  /*
+   * Beside the frame from 73rem. Squareone's content column (MainContent,
+   * SidebarLayout, and the footer) is 60rem wide and only fits the viewport
+   * from 66rem (60rem x the 1.1rem :root font size, in the 16px rem that
+   * media queries use), where it fills the viewport edge to edge. The badge
+   * and its gap need about 2.5rem (media rem) of margin on the right, so the
+   * margin only holds them, with room for a classic scrollbar, from 73rem;
+   * any narrower and the badge would make the page scroll sideways.
+   */
+  @media (min-width: 73rem) {
+    .codeBlock .copyButton {
+      position-area: inline-end;
+      translate: none;
+      align-self: unsafe start;
+      /* The area beside the frame inside the container is empty, so the
+         badge overflows it into the page margin. `unsafe` keeps it there,
+         rather than shifting it back over the code to fit the container. */
+      justify-self: unsafe start;
+      margin-inline-start: var(--sqr-code-block-copy-gap);
+    }
+  }
+}

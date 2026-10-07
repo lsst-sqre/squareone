@@ -13,11 +13,19 @@ const ADMIN_APP_DIR = path.resolve(__dirname, '../app/admin');
 const PAGE_MODULE = /^page\.(ts|tsx|js|jsx)$/;
 
 /**
- * The `/admin` index, which is deliberately ungated: it is the landing route
- * that decides *where* a person can go, and it renders its own "no admin pages
- * are available" state for someone who can go nowhere.
+ * The admin pages that are deliberately ungated beyond the layout's any-admin
+ * gate, matching the nav items without a page id:
+ *
+ * - The `/admin` index, the environment overview: the landing route every
+ *   admin user can reach, whichever page scopes they hold.
+ * - `/admin/discovery`, the raw service discovery document: its only request
+ *   is for Repertoire's discovery document, which needs no scope, so there is
+ *   no 403 for a page gate to head off.
  */
-const INDEX_PAGE = path.join(ADMIN_APP_DIR, 'page.tsx');
+const UNGATED_PAGES = [
+  path.join(ADMIN_APP_DIR, 'page.tsx'),
+  path.join(ADMIN_APP_DIR, 'discovery', 'page.tsx'),
+];
 
 /** The gate, with the page id it was given. */
 const GATE = /<AdminRequired\s+pageId="([A-Za-z]+)"/;
@@ -46,7 +54,18 @@ function findPages(dir: string): string[] {
  * wired up.
  */
 describe('/admin pages', () => {
-  const pages = findPages(ADMIN_APP_DIR).filter((file) => file !== INDEX_PAGE);
+  const pages = findPages(ADMIN_APP_DIR).filter(
+    (file) => !UNGATED_PAGES.includes(file)
+  );
+
+  test('the ungated pages exist', () => {
+    // A moved or renamed ungated page would otherwise leave a stale entry that
+    // exempts nothing, and its replacement would be held to the gate.
+    const allPages = findPages(ADMIN_APP_DIR);
+    for (const file of UNGATED_PAGES) {
+      expect(allPages).toContain(file);
+    }
+  });
 
   test('there are admin pages to check', () => {
     // A moved or renamed directory would otherwise turn every assertion below

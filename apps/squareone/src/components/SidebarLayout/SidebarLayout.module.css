@@ -141,6 +141,10 @@
 /* Full-width content areas with appropriate structure for mobile/desktop */
 .mainContentContainer {
   padding-bottom: 2rem;
+  /* As the desktop grid's content item, the default `min-width: auto` would
+   * let wide content, such as a code block's long lines, widen the 1fr column
+   * and scroll the page sideways instead of scrolling inside that content. */
+  min-width: 0;
 }
 
 @media (min-width: 66rem) {

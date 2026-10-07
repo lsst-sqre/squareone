@@ -12,6 +12,8 @@ import { discoveryQueryOptions } from '../query-options';
  *
  * @param repertoireUrl - The URL of the Repertoire discovery endpoint
  * @returns Object containing discovery data, query helper, and fetch state
+ *   (`isPending` until the first document loads; `isFetching` whenever a
+ *   fetch is in flight, including a `refetch` of a loaded document)
  *
  * @example
  * ```tsx
@@ -31,9 +33,8 @@ import { discoveryQueryOptions } from '../query-options';
  * ```
  */
 export function useServiceDiscovery(repertoireUrl: string) {
-  const { data, refetch, isStale, isPending, isError, error } = useQuery(
-    discoveryQueryOptions(repertoireUrl)
-  );
+  const { data, refetch, isStale, isPending, isFetching, isError, error } =
+    useQuery(discoveryQueryOptions(repertoireUrl));
 
   return {
     discovery: data,
@@ -41,6 +42,8 @@ export function useServiceDiscovery(repertoireUrl: string) {
     refetch,
     isStale,
     isPending,
+    /** Whether a fetch is in flight, including a refetch of loaded data. */
+    isFetching,
     isError,
     error,
   };

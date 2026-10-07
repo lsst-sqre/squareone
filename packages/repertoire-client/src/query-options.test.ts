@@ -119,6 +119,23 @@ describe('discoveryQueryOptions', () => {
       expect(result).toEqual(mockDiscovery);
       expect(result.applications).toContain('portal');
     });
+
+    it('fetches from the network on every call in the browser', async () => {
+      // TanStack Query is the browser's cache, so a refetch must not be
+      // answered from the client's server-side, cross-request module cache.
+      const mockFetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(mockDiscovery),
+      });
+      vi.stubGlobal('fetch', mockFetch);
+
+      const url = 'https://example.com/repertoire';
+      const queryFn = getQueryFn(url);
+      await queryFn(createMockContext(url));
+      await queryFn(createMockContext(url));
+
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+    });
   });
 
   describe('error handling', () => {

@@ -1,0 +1,16 @@
+/* DiscoveryPageClient: the /admin/discovery raw service discovery document */
+
+/* The staleness note and the Refetch button, on one line where they fit. */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sqo-space-xs-fixed) var(--sqo-space-md-fixed);
+  margin-bottom: var(--sqo-space-md-fixed);
+}
+
+.staleness {
+  margin: 0;
+  color: var(--rsd-component-text-secondary-color);
+}
