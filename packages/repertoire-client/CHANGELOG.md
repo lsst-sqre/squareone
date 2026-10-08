@@ -1,5 +1,11 @@
 # @lsst-sqre/repertoire-client
 
+## 0.5.1
+
+### Patch Changes
+
+- [#776](https://github.com/lsst-sqre/squareone/pull/776) [`4b6d221`](https://github.com/lsst-sqre/squareone/commit/4b6d2210a326e7df32ab3db431bd6eff8b1c12b6) Thanks [@jonathansick](https://github.com/jonathansick)! - Correct the documentation of `getTimesSquareUrl()`: the Times Square service's base `url` (from `getInternalServiceUrl('times-square')`) is the unversioned API root, such as `https://data.lsst.cloud/times-square/api`, and `getTimesSquareUrl()` returns the `v1` endpoint URL under it. Its behavior is unchanged.
+
 ## 0.5.0
 
 ### Minor Changes
