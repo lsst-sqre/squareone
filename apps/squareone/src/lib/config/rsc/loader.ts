@@ -4,8 +4,8 @@
  * This module wraps the existing loadAppConfig() with React's cache() function
  * to ensure configuration is loaded only once per request across all server
  * components in the App Router. It also resolves the discovery-backed defaults
- * (`siteName`, `environmentName`, `baseUrl`) so every consumer sees resolved
- * values.
+ * (`siteName`, `environmentName`, `baseUrl`, `timesSquareUrl`) so every
+ * consumer sees resolved values.
  */
 
 import {
@@ -66,9 +66,11 @@ async function loadDiscoveryForDefaults(
  * even if multiple server components call this function. This provides
  * automatic request-level memoization without manual caching logic.
  *
- * Unset `siteName`, `environmentName`, and `baseUrl` keys are resolved with
- * {@link resolveConfigDefaults} from Repertoire discovery and, for `baseUrl`
- * as a last step, from the request headers (read only when needed).
+ * Unset `siteName`, `environmentName`, `baseUrl`, and `timesSquareUrl` keys
+ * are resolved with {@link resolveConfigDefaults} from Repertoire discovery
+ * and, for `baseUrl` as a last step, from the request headers (read only when
+ * needed). `timesSquareUrl` stays unset when discovery doesn't list Times
+ * Square, which disables the `/times-square/` pages.
  *
  * @returns Promise resolving to the resolved application configuration
  *

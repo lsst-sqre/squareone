@@ -1,5 +1,7 @@
 import {
   mockDiscovery,
+  mockDiscovery2x,
+  mockDiscoveryDataDev,
   type ServiceDiscovery,
 } from '@lsst-sqre/repertoire-client';
 import { describe, expect, it } from 'vitest';
@@ -9,6 +11,7 @@ import {
   DEFAULT_ENVIRONMENT_NAME,
   DEFAULT_SITE_NAME,
   FALLBACK_BASE_URL,
+  hasUnsetDefaultedKeys,
   needsRequestHeaders,
   resolveConfigDefaults,
 } from './resolveConfigDefaults';
@@ -25,6 +28,7 @@ const explicitConfig = {
   siteName: 'Configured Site',
   environmentName: 'configured-env',
   baseUrl: 'https://configured.example.org',
+  timesSquareUrl: 'https://configured.example.org/times-square/api',
 } as AppConfig;
 
 // mockDiscovery follows Repertoire 3.0 (idfprod): environment.title is
@@ -113,12 +117,19 @@ describe('resolveConfigDefaults precedence', () => {
       siteName: 'Configured Site',
       environmentName: 'configured-env',
       baseUrl: 'https://configured.example.org',
+      timesSquareUrl: 'https://configured.example.org/times-square/api',
     });
   });
 
   it('treats empty-string config values as unset', () => {
     const resolved = resolveConfigDefaults(
-      { ...bareConfig, siteName: '', environmentName: '', baseUrl: '' },
+      {
+        ...bareConfig,
+        siteName: '',
+        environmentName: '',
+        baseUrl: '',
+        timesSquareUrl: '',
+      },
       discovery3,
       null
     );
@@ -126,6 +137,7 @@ describe('resolveConfigDefaults precedence', () => {
       siteName: 'US Rubin Science Platform',
       environmentName: 'idfprod',
       baseUrl: 'https://data.lsst.cloud',
+      timesSquareUrl: 'https://data.lsst.cloud/times-square/api',
     });
   });
 
@@ -150,6 +162,61 @@ describe('resolveConfigDefaults precedence', () => {
     const config = { ...bareConfig };
     resolveConfigDefaults(config, discovery3, null);
     expect(config).toEqual(bareConfig);
+  });
+});
+
+describe('resolveConfigDefaults timesSquareUrl', () => {
+  // Discovery without a times-square internal service, as in an environment
+  // that doesn't deploy the times-square application.
+  const withoutTimesSquare: ServiceDiscovery = (() => {
+    const d = structuredClone(mockDiscovery);
+    delete d.services.internal['times-square'];
+    return d;
+  })();
+
+  it.each([
+    [
+      'config',
+      explicitConfig,
+      mockDiscoveryDataDev,
+      'https://configured.example.org/times-square/api',
+    ],
+    [
+      'the times-square internal service (3.x discovery)',
+      bareConfig,
+      mockDiscoveryDataDev,
+      'https://data-dev.lsst.cloud/times-square/api',
+    ],
+    [
+      'the times-square internal service (2.x discovery)',
+      bareConfig,
+      mockDiscovery2x,
+      'https://data.lsst.cloud/times-square/api',
+    ],
+  ])('resolves from %s', (_source, config, discovery, expected) => {
+    expect(resolveConfigDefaults(config, discovery, null).timesSquareUrl).toBe(
+      expected
+    );
+  });
+
+  it.each([
+    ['discovery has no times-square service', withoutTimesSquare],
+    ['there is no discovery', null],
+  ])('stays unset when %s', (_desc, discovery) => {
+    expect(
+      resolveConfigDefaults(bareConfig, discovery, null).timesSquareUrl
+    ).toBeUndefined();
+  });
+
+  it('strips every trailing slash from the service URL', () => {
+    const d = structuredClone(mockDiscovery);
+    d.services.internal['times-square'] = {
+      ...d.services.internal['times-square'],
+      url: 'https://data-dev.lsst.cloud/times-square/api//',
+    };
+    expect(resolveConfigDefaults(bareConfig, d, null).timesSquareUrl).toBe(
+      'https://data-dev.lsst.cloud/times-square/api'
+    );
   });
 });
 
@@ -250,5 +317,22 @@ describe('needsRequestHeaders', () => {
   it('is true when neither config nor discovery supplies baseUrl', () => {
     expect(needsRequestHeaders(bareConfig, discovery2)).toBe(true);
     expect(needsRequestHeaders(bareConfig, null)).toBe(true);
+  });
+});
+
+describe('hasUnsetDefaultedKeys', () => {
+  it('is false when config sets every discovery-backed key', () => {
+    expect(hasUnsetDefaultedKeys(explicitConfig)).toBe(false);
+  });
+
+  it.each([
+    'siteName',
+    'environmentName',
+    'baseUrl',
+    'timesSquareUrl',
+  ] as const)('is true when only %s is unset', (key) => {
+    expect(hasUnsetDefaultedKeys({ ...explicitConfig, [key]: undefined })).toBe(
+      true
+    );
   });
 });

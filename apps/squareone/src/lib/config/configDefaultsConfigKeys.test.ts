@@ -19,7 +19,7 @@ function validateConfig(data: Record<string, unknown>) {
 }
 
 describe('discovery-backed config keys', () => {
-  it.each(['siteName', 'environmentName', 'baseUrl'])(
+  it.each(['siteName', 'environmentName', 'baseUrl', 'timesSquareUrl'])(
     'declares %s without a schema default',
     (key) => {
       expect(schema.properties[key]).toBeDefined();
@@ -33,6 +33,7 @@ describe('discovery-backed config keys', () => {
     expect(data).not.toHaveProperty('siteName');
     expect(data).not.toHaveProperty('environmentName');
     expect(data).not.toHaveProperty('baseUrl');
+    expect(data).not.toHaveProperty('timesSquareUrl');
   });
 
   it('still accepts explicit values', () => {
@@ -40,13 +41,21 @@ describe('discovery-backed config keys', () => {
       siteName: 'Configured Site',
       environmentName: 'idfdev',
       baseUrl: 'https://data-dev.lsst.cloud',
+      timesSquareUrl: 'https://data-dev.lsst.cloud/times-square/api',
     });
     expect(valid).toBe(true);
     expect(data).toMatchObject({
       siteName: 'Configured Site',
       environmentName: 'idfdev',
       baseUrl: 'https://data-dev.lsst.cloud',
+      timesSquareUrl: 'https://data-dev.lsst.cloud/times-square/api',
     });
+  });
+
+  it('points timesSquareUrl to its discovery source in its description', () => {
+    expect(schema.properties.timesSquareUrl.description).toMatch(
+      /services\.internal\.times-square/
+    );
   });
 });
 

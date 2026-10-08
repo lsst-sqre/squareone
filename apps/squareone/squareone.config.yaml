@@ -11,6 +11,9 @@ siteDescription: |
   The site description.
 docsBaseUrl: 'https://rsp.lsst.io'
 repertoireUrl: 'http://localhost:3000/repertoire'
+# Optional too: it defaults from discovery's services.internal.times-square.url.
+# Set here because the dev mock Times Square API routes
+# (src/app/api/dev/times-square) read it from the raw config to build their URLs.
 timesSquareUrl: 'http://localhost:3000/times-square/api'
 coManageRegistryUrl: 'https://id.lsst.cloud'
 # The Apps menu lists Times Square and the admin tools from the dev mock

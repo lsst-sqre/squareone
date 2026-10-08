@@ -6,13 +6,17 @@ This document describes the complete AppConfig interface and the corresponding Y
 
 ```typescript
 interface AppConfig {
+  // Optional; unset keys default from Repertoire service discovery
+  // (see resolveConfigDefaults.ts). getStaticConfig()/useStaticConfig()
+  // return them resolved; only timesSquareUrl can stay unset.
+  siteName?: string;
+  baseUrl?: string;
+  environmentName?: string;
+  timesSquareUrl?: string;
+
   // Required fields
-  siteName: string;
-  baseUrl: string;
-  environmentName: string;
   siteDescription: string;
   docsBaseUrl: string;
-  timesSquareUrl: string;
   coManageRegistryUrl: string;
   enableAppsMenu: boolean;
   appLinks: Array<{
@@ -41,18 +45,22 @@ interface AppConfig {
 
 ### Core Site Information
 
-**siteName** (string, required)
+**siteName** (string, optional)
 - Display name for the site
 - Used in page titles, headers, and branding
+- Defaults to discovery's `environment.title`, else `'Rubin Science Platform'`
 - Example: `'Rubin Science Platform'`
 
-**baseUrl** (string, required)
+**baseUrl** (string, optional)
 - Base URL of the application
 - Used for generating absolute URLs
+- Defaults to discovery's `services.ui.squareone.url` (trailing slash
+  stripped), else the request origin
 - Example: `'https://data.lsst.cloud'`
 
-**environmentName** (string, required)
-- Environment identifier
+**environmentName** (string, optional)
+- Environment identifier (the Sentry environment)
+- Defaults to discovery's `environment.label`, else `'unknown'`
 - Common values: `'development'`, `'staging'`, `'production'`
 - Can be used for conditional behavior/styling
 
@@ -67,8 +75,12 @@ interface AppConfig {
 - Base URL for documentation site
 - Example: `'https://rsp.lsst.io'`
 
-**timesSquareUrl** (string, required)
+**timesSquareUrl** (string, optional)
 - URL for Times Square API
+- Defaults to discovery's `services.internal.times-square.url` (trailing
+  slash stripped)
+- When neither config nor discovery provides it, it stays unset and the
+  `/times-square/` pages 404
 - Example: `'https://data.lsst.cloud/times-square/api'`
 
 **coManageRegistryUrl** (string, required)
