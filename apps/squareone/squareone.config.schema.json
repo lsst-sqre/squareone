@@ -47,7 +47,7 @@
     "timesSquareUrl": {
       "type": "string",
       "title": "Times Square API URL",
-      "description": "URL prefix of the Times Square API service. Does not end in /. Omit or set as null to disable the /times-square/ pages."
+      "description": "URL prefix of the Times Square API service. Does not end in /. Optional: when omitted, defaults to the Times Square internal service URL from Repertoire service discovery (``services.internal.times-square.url``, trailing slash removed), which discovery lists only in environments that deploy Times Square. The /times-square/ pages are disabled only when neither this key nor service discovery provides a URL."
     },
     "coManageRegistryUrl": {
       "type": "string",

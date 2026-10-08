@@ -11,7 +11,7 @@ This page documents the schema of that configuration file.
 Defaults from service discovery
 ===============================
 
-``siteName``, ``environmentName``, and ``baseUrl`` are optional.
+``siteName``, ``environmentName``, ``baseUrl``, and ``timesSquareUrl`` are optional.
 When one is omitted (or set to an empty string), Squareone fills it in at request time from Repertoire service discovery, so these keys no longer need to be set for each Phalanx environment.
 An explicitly configured value always takes precedence.
 
@@ -31,11 +31,16 @@ An explicitly configured value always takes precedence.
    * - ``baseUrl``
      - ``services.ui.squareone.url``, with the trailing slash removed (for example, ``https://data.lsst.cloud``)
      - The origin of the request, from its ``X-Forwarded-Proto`` (default ``http``), ``X-Forwarded-Host``, and ``Host`` headers
+   * - ``timesSquareUrl``
+     - ``services.internal.times-square.url``, with the trailing slash removed (for example, ``https://data.lsst.cloud/times-square/api``)
+     - Unset: the Times Square pages (``/times-square/``) are disabled and respond with 404
 
 Service discovery is only consulted when ``repertoireUrl`` is set and at least one of these keys is omitted.
 The fallback applies when ``repertoireUrl`` is unset, when the Repertoire API is unavailable (Squareone logs a warning but still serves pages), or when the Repertoire release predates 3.0.0 and so does not provide the ``environment`` metadata or the ``squareone`` UI service.
+Repertoire 2.x releases do list the ``times-square`` internal service, so ``timesSquareUrl`` resolves from them too.
+Service discovery lists ``times-square`` only in environments where the Times Square application is deployed, so the Times Square pages are enabled exactly where Times Square is available, unless ``timesSquareUrl`` is configured explicitly.
 
-The resolved values are used everywhere the keys are: page titles, the Sentry environment and base URL (shown on the ``/admin/sentry`` page), and absolute URLs such as notification permalinks.
+The resolved values are used everywhere the keys are: page titles, the Sentry environment and base URL (shown on the ``/admin/sentry`` page), absolute URLs such as notification permalinks, and the Times Square pages.
 
 Server-side Sentry follows the same ``environmentName`` resolution, so events from the server and the browser carry the same Sentry environment.
 The server resolves it once at startup, before it serves any requests: it waits at most a few seconds for service discovery, and if the Repertoire API doesn't respond in time it logs a warning and uses the ``unknown`` fallback.

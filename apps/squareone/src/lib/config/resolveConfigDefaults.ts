@@ -2,23 +2,27 @@
  * Discovery-backed defaults for the config keys that no longer need to be set
  * per environment.
  *
- * `siteName`, `environmentName`, and `baseUrl` are optional in
- * `squareone.config.yaml`. When a key is unset (or an empty string) it is
+ * `siteName`, `environmentName`, `baseUrl`, and `timesSquareUrl` are optional
+ * in `squareone.config.yaml`. When a key is unset (or an empty string) it is
  * filled, in order of precedence, from:
  *
- * | Key               | 1. Config | 2. Repertoire discovery          | 3. Fallback                          |
- * | ----------------- | --------- | -------------------------------- | ------------------------------------ |
- * | `siteName`        | set value | `environment.title`              | `"Rubin Science Platform"`           |
- * | `environmentName` | set value | `environment.label`              | `"unknown"`                          |
- * | `baseUrl`         | set value | `services.ui.squareone.url` [^1] | request origin from headers [^2]     |
+ * | Key               | 1. Config | 2. Repertoire discovery                   | 3. Fallback                      |
+ * | ----------------- | --------- | ----------------------------------------- | -------------------------------- |
+ * | `siteName`        | set value | `environment.title`                       | `"Rubin Science Platform"`       |
+ * | `environmentName` | set value | `environment.label`                       | `"unknown"`                      |
+ * | `baseUrl`         | set value | `services.ui.squareone.url` [^1]          | request origin from headers [^2] |
+ * | `timesSquareUrl`  | set value | `services.internal.times-square.url` [^1] | unset [^3]                       |
  *
  * [^1]: With trailing slashes stripped.
  * [^2]: `X-Forwarded-Proto` (default `http`) and `X-Forwarded-Host`, falling
  *       back to `Host`. {@link FALLBACK_BASE_URL} is the last resort when no
  *       usable host header is available.
+ * [^3]: An unset `timesSquareUrl` disables the `/times-square/` pages.
  *
  * Discovery from Repertoire 2.x has no `environment` object or squareone UI
- * service, so those environments fall through to the fallbacks.
+ * service, so those environments fall through to the fallbacks for
+ * `siteName`, `environmentName`, and `baseUrl`. It does list the
+ * `times-square` internal service, so `timesSquareUrl` still resolves there.
  */
 
 import {
@@ -40,12 +44,17 @@ export const DEFAULT_ENVIRONMENT_NAME = 'unknown';
  */
 export const FALLBACK_BASE_URL = 'http://localhost:3000';
 
-/** Config keys that {@link resolveConfigDefaults} fills in when unset. */
+/**
+ * Config keys that {@link resolveConfigDefaults} always resolves to a value.
+ * `timesSquareUrl` is also filled from discovery when unset, but can stay
+ * unset (disabling Times Square), so it is not one of these.
+ */
 export type DefaultedConfigKey = 'siteName' | 'environmentName' | 'baseUrl';
 
 /**
  * The application configuration as consumed by the app: {@link AppConfig}
- * with the discovery-backed keys always resolved.
+ * with the discovery-backed keys resolved. `siteName`, `environmentName`, and
+ * `baseUrl` are always set; `timesSquareUrl` stays optional.
  */
 export type StaticConfig = Omit<AppConfig, DefaultedConfigKey> &
   Required<Pick<AppConfig, DefaultedConfigKey>>;
@@ -58,8 +67,8 @@ export type RequestHeaders = Pick<Headers, 'get'>;
 
 /**
  * Fill the unset discovery-backed config keys (`siteName`,
- * `environmentName`, `baseUrl`) following the precedence documented on this
- * module. Explicitly configured values always win.
+ * `environmentName`, `baseUrl`, `timesSquareUrl`) following the precedence
+ * documented on this module. Explicitly configured values always win.
  *
  * @param config - The validated config from `squareone.config.yaml`.
  * @param discovery - Repertoire service discovery, or null when Repertoire is
@@ -73,9 +82,8 @@ export function resolveConfigDefaults(
   discovery: ServiceDiscovery | null,
   requestHeaders: RequestHeaders | null
 ): StaticConfig {
-  const environment = discovery
-    ? createDiscoveryQuery(discovery).getEnvironment()
-    : null;
+  const query = discovery ? createDiscoveryQuery(discovery) : null;
+  const environment = query?.getEnvironment();
 
   return {
     ...config,
@@ -94,6 +102,10 @@ export function resolveConfigDefaults(
       getDiscoveryBaseUrl(discovery),
       requestHeaders ? getOriginFromHeaders(requestHeaders) : null,
       FALLBACK_BASE_URL
+    ),
+    timesSquareUrl: firstNonEmpty(
+      config.timesSquareUrl,
+      stripTrailingSlashes(query?.getInternalServiceUrl('times-square'))
     ),
   };
 }
@@ -115,7 +127,12 @@ export function needsRequestHeaders(
  * {@link resolveConfigDefaults} would consult discovery at all.
  */
 export function hasUnsetDefaultedKeys(config: AppConfig): boolean {
-  return !config.siteName || !config.environmentName || !config.baseUrl;
+  return (
+    !config.siteName ||
+    !config.environmentName ||
+    !config.baseUrl ||
+    !config.timesSquareUrl
+  );
 }
 
 function firstNonEmpty(...values: (string | null | undefined)[]): string {
@@ -126,9 +143,13 @@ function firstNonEmpty(...values: (string | null | undefined)[]): string {
 function getDiscoveryBaseUrl(
   discovery: ServiceDiscovery | null
 ): string | null {
-  const url = discovery
-    ? createDiscoveryQuery(discovery).getSquareoneUrl()
-    : undefined;
+  return stripTrailingSlashes(
+    discovery ? createDiscoveryQuery(discovery).getSquareoneUrl() : undefined
+  );
+}
+
+/** A URL without trailing slashes, or null when there is no URL. */
+function stripTrailingSlashes(url: string | undefined): string | null {
   return url ? url.replace(/\/+$/, '') : null;
 }
 

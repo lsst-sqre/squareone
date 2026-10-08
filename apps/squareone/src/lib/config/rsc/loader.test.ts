@@ -1,6 +1,7 @@
 import {
   fetchServiceDiscovery,
   mockDiscovery,
+  mockDiscovery2x,
   type ServiceDiscovery,
 } from '@lsst-sqre/repertoire-client';
 import { headers } from 'next/headers';
@@ -27,6 +28,14 @@ vi.mock('../../logger', () => ({
 }));
 
 const REPERTOIRE_URL = 'https://data.example.org/repertoire';
+
+// Config that sets every discovery-backed key, so none needs discovery.
+const explicitKeys: Partial<AppConfig> = {
+  siteName: 'Configured Site',
+  environmentName: 'configured-env',
+  baseUrl: 'https://configured.example.org',
+  timesSquareUrl: 'https://configured.example.org/times-square/api',
+};
 
 const requestHeaders = new Headers({
   'x-forwarded-proto': 'https',
@@ -71,6 +80,7 @@ describe('getStaticConfig', () => {
       siteName: 'US Rubin Science Platform',
       environmentName: 'idfprod',
       baseUrl: 'https://data.lsst.cloud',
+      timesSquareUrl: 'https://data.lsst.cloud/times-square/api',
       siteDescription: 'Welcome',
     });
   });
@@ -85,21 +95,33 @@ describe('getStaticConfig', () => {
   });
 
   it('keeps explicit config values without fetching discovery', async () => {
-    givenConfig({
-      repertoireUrl: REPERTOIRE_URL,
-      siteName: 'Configured Site',
-      environmentName: 'configured-env',
-      baseUrl: 'https://configured.example.org',
-    });
+    givenConfig({ repertoireUrl: REPERTOIRE_URL, ...explicitKeys });
 
     const config = await getStaticConfig();
 
     expect(fetchServiceDiscovery).not.toHaveBeenCalled();
     expect(headers).not.toHaveBeenCalled();
+    expect(config).toMatchObject(explicitKeys);
+  });
+
+  it('fetches discovery when only timesSquareUrl is unset', async () => {
+    givenConfig({
+      repertoireUrl: REPERTOIRE_URL,
+      ...explicitKeys,
+      timesSquareUrl: undefined,
+    });
+    vi.mocked(fetchServiceDiscovery).mockResolvedValue(mockDiscovery2x);
+
+    const config = await getStaticConfig();
+
+    expect(fetchServiceDiscovery).toHaveBeenCalledWith(
+      REPERTOIRE_URL,
+      expect.anything()
+    );
+    expect(headers).not.toHaveBeenCalled();
     expect(config).toMatchObject({
-      siteName: 'Configured Site',
-      environmentName: 'configured-env',
-      baseUrl: 'https://configured.example.org',
+      ...explicitKeys,
+      timesSquareUrl: 'https://data.lsst.cloud/times-square/api',
     });
   });
 
@@ -129,6 +151,7 @@ describe('getStaticConfig', () => {
       environmentName: 'unknown',
       baseUrl: 'https://data.example.org',
     });
+    expect(config.timesSquareUrl).toBeUndefined();
     expect(logger.warn).toHaveBeenCalledWith(
       expect.objectContaining({ err: error }),
       expect.any(String)
@@ -146,5 +169,6 @@ describe('getStaticConfig', () => {
       environmentName: 'unknown',
       baseUrl: 'https://data.example.org',
     });
+    expect(config.timesSquareUrl).toBeUndefined();
   });
 });

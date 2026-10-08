@@ -46,10 +46,10 @@ export interface SentryConfig {
  * The validated configuration from `squareone.config.yaml` and
  * `squareone.serverconfig.yaml`.
  *
- * `siteName`, `environmentName`, and `baseUrl` are optional here; consumers
- * read the resolved `StaticConfig` (from `getStaticConfig()` or
- * `useStaticConfig()`), where `resolveConfigDefaults()` has filled them from
- * Repertoire discovery or fallbacks.
+ * `siteName`, `environmentName`, `baseUrl`, and `timesSquareUrl` are optional
+ * here; consumers read the resolved `StaticConfig` (from `getStaticConfig()`
+ * or `useStaticConfig()`), where `resolveConfigDefaults()` has filled them
+ * from Repertoire discovery or fallbacks.
  */
 export interface AppConfig {
   /**
@@ -78,7 +78,12 @@ export interface AppConfig {
   environmentName?: string;
   siteDescription: string;
   docsBaseUrl: string;
-  timesSquareUrl: string;
+  /**
+   * Times Square API URL prefix (no trailing slash). When unset, resolves to
+   * discovery's `services.internal.times-square.url`; if that is also absent,
+   * it stays unset and the `/times-square/` pages are disabled.
+   */
+  timesSquareUrl?: string;
   /**
    * @deprecated Use Repertoire service discovery instead (the COmanage
    * registry URL is `services.ui.comanage`, via `getComanageUrl()`). Retained

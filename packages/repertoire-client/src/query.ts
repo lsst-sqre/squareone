@@ -326,10 +326,13 @@ export class ServiceDiscoveryQuery {
   }
 
   /**
-   * Get Times Square v1 API URL.
-   * Returns the versioned v1 endpoint URL, or undefined if not available.
-   * Note: The base times-square URL is the service root, not the API endpoint,
-   * so we specifically need the v1 version URL for API calls.
+   * Get the Times Square v1 API URL, e.g.
+   * 'https://data.lsst.cloud/times-square/api/v1'.
+   * Returns the service's `versions.v1.url`, or undefined if not available.
+   * Note: the service's base `url` (`getInternalServiceUrl('times-square')`)
+   * is the unversioned API root, e.g.
+   * 'https://data.lsst.cloud/times-square/api'; the v1 endpoints this returns
+   * are under it.
    */
   getTimesSquareUrl(): string | undefined {
     const service = this.getInternalService('times-square');
