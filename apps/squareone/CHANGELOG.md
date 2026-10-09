@@ -1,5 +1,21 @@
 # squareone
 
+## 0.41.1
+
+### Patch Changes
+
+- [#757](https://github.com/lsst-sqre/squareone/pull/757) [`60a3af8`](https://github.com/lsst-sqre/squareone/commit/60a3af8d9610345fa572ef73fde298f311a900db) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @biomejs/biome from 2.5.12 to 2.5.14
+
+- [#757](https://github.com/lsst-sqre/squareone/pull/757) [`60a3af8`](https://github.com/lsst-sqre/squareone/commit/60a3af8d9610345fa572ef73fde298f311a900db) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @changesets/cli from 3.0.2 to 3.0.3
+
+- [#757](https://github.com/lsst-sqre/squareone/pull/757) [`60a3af8`](https://github.com/lsst-sqre/squareone/commit/60a3af8d9610345fa572ef73fde298f311a900db) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @turbo/gen from 2.10.12 to 2.11.4
+
+- [#757](https://github.com/lsst-sqre/squareone/pull/757) [`60a3af8`](https://github.com/lsst-sqre/squareone/commit/60a3af8d9610345fa572ef73fde298f311a900db) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump playwright from 1.62.1 to 1.63.0
+
+- [#757](https://github.com/lsst-sqre/squareone/pull/757) [`60a3af8`](https://github.com/lsst-sqre/squareone/commit/60a3af8d9610345fa572ef73fde298f311a900db) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump turbo from 2.10.12 to 2.11.4
+
+- [#757](https://github.com/lsst-sqre/squareone/pull/757) [`60a3af8`](https://github.com/lsst-sqre/squareone/commit/60a3af8d9610345fa572ef73fde298f311a900db) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump vite from 8.2.2 to 8.3.1
+
 ## 0.41.0
 
 ### Minor Changes
