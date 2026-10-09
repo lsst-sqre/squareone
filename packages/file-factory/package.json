@@ -53,7 +53,7 @@
   "devDependencies": {
     "@lsst-sqre/tsconfig": "workspace:*",
     "@types/ejs": "^3.1.5",
-    "@types/node": "^24.13.3",
+    "@types/node": "^24.19.0",
     "tsup": "^8.3.5",
     "typescript": "^6.0.3",
     "vitest": "^4.1.11"
