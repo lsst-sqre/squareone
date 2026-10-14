@@ -41,7 +41,7 @@ To exercise the delegated mode, send the headers the ingress would:
      http://localhost:3000/times-square | grep -o '"user-scopes"[^]]*]'
 
 The mocked ``/auth/api/v1/user-info`` and ``/auth/api/v1/token-info`` endpoints accept ``gt-dev-delegated-token`` as a bearer token and answer for the ``/dev`` persona, whose scopes come from the dev panel.
-The server log shows the prefetches running in ``delegated`` mode, the dehydrated state in the HTML carries the persona's ``user-scopes`` and ``user-info`` entries and no ``login-info`` entry (login info is cookie-only, so the browser fetches it), and the header renders the persona's menu.
+The server log shows the prefetches running in ``delegated`` mode, the dehydrated state in the HTML carries the persona's ``user-scopes`` and ``user-info`` entries and no ``login-info`` entry (the layout never dehydrates login info, on any route, because its CSRF token is bound to the browser's cookie; the browser always fetches it itself), and the header renders the persona's menu.
 Sending ``X-Auth-Request-User`` without the token reproduces an ingress that is not configured to delegate: the server warns once and falls back to cookie mode.
 
 Run a single app in development

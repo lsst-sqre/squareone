@@ -1,6 +1,6 @@
 /**
  * Shared set-up for the root layout's server-side Gafaelfawr prefetches
- * (`prefetchLoginInfo`, `prefetchUserInfo`, `prefetchUserScopes`).
+ * (`prefetchUserInfo`, `prefetchUserScopes`).
  */
 
 import {
@@ -18,8 +18,13 @@ import { headers } from 'next/headers';
 import logger from '../logger';
 import { makeReportError } from '../sentry/reportError';
 
-/** The ambient auth queries the layout prefetches, as their Sentry `site`. */
-export type ServerAuthSite = 'login-info' | 'user-info' | 'user-scopes';
+/**
+ * The ambient auth queries the layout prefetches, as their Sentry `site`.
+ *
+ * Login info is not among them: its CSRF token is cookie-bound, so the browser
+ * must fetch it itself (see `dehydrateLayoutState`).
+ */
+export type ServerAuthSite = 'user-info' | 'user-scopes';
 
 /**
  * How a server-side auth prefetch authenticates to Gafaelfawr.
@@ -38,7 +43,7 @@ export type ServerAuthMode = 'cookie' | 'delegated';
 export type ServerAuthQuery = {
   /** Gafaelfawr's API base URL, from service discovery. */
   gafaelfawrUrl: string;
-  /** Options for `loginInfoQueryOptions` / `userInfoQueryOptions`. */
+  /** Options for `userInfoQueryOptions` / `userScopesQueryOptions`. */
   config: AuthQueryConfig;
   /** How the prefetch authenticates; see {@link ServerAuthMode}. */
   mode: ServerAuthMode;
@@ -114,8 +119,9 @@ function anonymousAwareLogger(site: ServerAuthSite): Logger {
  * incoming request's `cookie` header is forwarded (`mode: 'cookie'`). On a
  * GafaelfawrIngress route the ingress has stripped Gafaelfawr's session cookie
  * and delegated an internal token instead, which is presented as a bearer
- * token (`mode: 'delegated'`; see {@link ServerAuthMode}). Callers prefetching
- * a cookie-only endpoint (login info) must skip delegated mode. With
+ * token (`mode: 'delegated'`; see {@link ServerAuthMode}). Callers fetching a
+ * cookie-only endpoint (login info, which the scopes prefetch reads on a
+ * plain-ingress route) must use another source in delegated mode. With
  * `isServer`, the fetch is uncached. An anonymous request gets a 401, which
  * the query options degrade to their anonymous fallback (logged at debug, not
  * reported), exactly what the browser would have fetched. Other report-worthy

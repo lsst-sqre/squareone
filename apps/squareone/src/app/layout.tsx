@@ -4,11 +4,7 @@ import {
   fetchServiceDiscovery,
 } from '@lsst-sqre/repertoire-client';
 import { broadcastsQueryOptions } from '@lsst-sqre/semaphore-client';
-import {
-  dehydrate,
-  HydrationBoundary,
-  QueryClient,
-} from '@tanstack/react-query';
+import { HydrationBoundary, QueryClient } from '@tanstack/react-query';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
@@ -29,7 +25,7 @@ import BroadcastBannerStack from '../components/BroadcastBannerStack';
 import Header from '../components/Header';
 import styles from '../components/Page/Page.module.css';
 import { ConfigProvider } from '../contexts/rsc';
-import { prefetchLoginInfo } from '../lib/auth/prefetchLoginInfo';
+import { dehydrateLayoutState } from '../lib/auth/dehydrateLayoutState';
 import { prefetchUserInfo } from '../lib/auth/prefetchUserInfo';
 import { prefetchUserScopes } from '../lib/auth/prefetchUserScopes';
 import { getStaticConfig } from '../lib/config/rsc';
@@ -67,8 +63,8 @@ type RootLayoutProps = {
  * 1. Imports global CSS (fonts, icons, design system)
  * 2. Loads configuration server-side
  * 3. Prefetches service discovery, then broadcasts and the signed-in user's
- *    scopes, login info (CSRF token), and user info (username), for hydration
- *    on the client
+ *    scopes and user info (username), for hydration on the client. Login info
+ *    (the CSRF token) is never hydrated; see `dehydrateLayoutState`
  * 4. Injects Sentry config for client-side error tracking
  * 5. Sets up provider hierarchy (Plausible, Config, Theme, Query)
  * 6. Renders the page shell (Header, BroadcastBannerStack, Footer)
@@ -77,7 +73,7 @@ type RootLayoutProps = {
  * PlausibleWrapper (conditional)
  *   └─ ConfigProvider
  *        └─ Providers (QueryProvider, ThemeProvider)
- *             └─ HydrationBoundary (prefetched query data)
+ *             └─ HydrationBoundary (prefetched query data; never login info)
  *                  └─ Page shell (Header, content, Footer)
  *
  * The page shell uses a sticky footer pattern so the footer stays at the
@@ -89,9 +85,9 @@ export default async function RootLayout({ children }: RootLayoutProps) {
   const config = await configPromise;
 
   // Create QueryClient for server-side prefetching. It is created per request,
-  // so the user-specific data it holds (login info and user info, prefetched
-  // with the request's session cookie) is only ever dehydrated into that
-  // user's page.
+  // so the user-specific data it holds (scopes and user info, prefetched with
+  // the request's session cookie or delegated token) is only ever dehydrated
+  // into that user's page.
   const queryClient = new QueryClient();
 
   // Prefetch service discovery if Repertoire URL is configured
@@ -115,18 +111,20 @@ export default async function RootLayout({ children }: RootLayoutProps) {
     ]);
     logger.debug({ cachedData }, 'Prefetch complete');
 
-    // Broadcasts, user scopes, login info, and user info each take their
-    // service URL from discovery and are otherwise independent, so prefetch
-    // them concurrently (scopes and login info share one request when both
-    // run). Hydrating the scopes lets the header nav, homepage hero, and Apps
-    // menu gate scope-restricted services on their first client render;
-    // hydrating user info puts a signed-in user's menu, not "Log in", in the
-    // server HTML. On a GafaelfawrIngress route the scopes and user info come
-    // from the delegated token, and login info is left to the browser.
+    // Broadcasts, user scopes, and user info each take their service URL from
+    // discovery and are otherwise independent, so prefetch them concurrently.
+    // Hydrating the scopes lets the header nav, homepage hero, and Apps menu
+    // gate scope-restricted services on their first client render; hydrating
+    // user info puts a signed-in user's menu, not "Log in", in the server
+    // HTML. On a GafaelfawrIngress route the scopes and user info come from
+    // the delegated token. Login info is always left to the browser: on a
+    // plain-ingress route the scopes prefetch reads it, but
+    // `dehydrateLayoutState` keeps it (and its cookie-bound CSRF token) out of
+    // the page, so the browser's own request mints the token and its cookie
+    // together.
     await Promise.all([
       prefetchBroadcasts(queryClient, config.repertoireUrl),
       prefetchUserScopes(queryClient, config.repertoireUrl),
-      prefetchLoginInfo(queryClient, config.repertoireUrl),
       prefetchUserInfo(queryClient, config.repertoireUrl),
     ]);
   } else {
@@ -161,7 +159,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
         <PlausibleWrapper domain={config.plausibleDomain}>
           <ConfigProvider configPromise={getStaticConfig()}>
             <Providers>
-              <HydrationBoundary state={dehydrate(queryClient)}>
+              <HydrationBoundary state={dehydrateLayoutState(queryClient)}>
                 <div className={styles.layout}>
                   <div className={styles.upperContainer}>
                     <AppShell

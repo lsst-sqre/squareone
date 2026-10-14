@@ -11,7 +11,7 @@ import { useMemo } from 'react';
 import { makeReportError } from '../lib/sentry/reportError';
 import { useRepertoireUrl } from './useRepertoireUrl';
 
-/** Sentry tags for a login-info failure, as the server prefetch sets them. */
+/** Sentry tags for a login-info failure. */
 const LOGIN_INFO_CONTEXT = {
   site: 'login-info',
   package: 'gafaelfawr-client',
@@ -37,10 +37,12 @@ export type LoginInfoConfig = Omit<AuthQueryConfig, 'reportError' | 'context'>;
  * responses, and server-side network errors reach Sentry, while an expected
  * 401/403 stays a quiet `null`.
  *
- * The Gafaelfawr URL is discovered through the configured Repertoire URL. The
- * reporter and context are not part of the query key, so the entry the root
- * layout prefetches and hydrates (`prefetchLoginInfo`) still answers the first
- * render.
+ * The Gafaelfawr URL is discovered through the configured Repertoire URL.
+ * Login info is never hydrated from the server (see `dehydrateLayoutState`):
+ * Gafaelfawr mints the CSRF token on a session's first login request and
+ * persists it only through that response's `Set-Cookie`, so the browser's own
+ * request is what keeps the cached token and the cookie in agreement. Until it
+ * resolves, `csrfToken` is null.
  *
  * @param config - Extra query options, such as a `logger`
  */

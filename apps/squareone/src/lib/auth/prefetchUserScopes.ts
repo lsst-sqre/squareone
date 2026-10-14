@@ -22,8 +22,9 @@ import { serverAuthQuery } from './serverAuthQuery';
  * Where the scopes come from depends on how the request reached the pod (see
  * `serverAuthQuery`):
  * - on a plain-ingress route, from login info with the forwarded session
- *   cookie, sharing the one `GET /auth/api/v1/login` that `prefetchLoginInfo`
- *   makes into the same query client;
+ *   cookie. Reading it caches login info in the layout's query client too,
+ *   but `dehydrateLayoutState` never ships that entry (its CSRF token is
+ *   cookie-bound), so only the scopes reach the browser;
  * - on a GafaelfawrIngress route, from `GET /auth/api/v1/token-info` for the
  *   delegated token the ingress sends in `X-Auth-Request-Token`, presented as
  *   a bearer token. The internal token's scopes are the user's own, restricted

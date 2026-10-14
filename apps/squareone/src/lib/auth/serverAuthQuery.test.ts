@@ -103,7 +103,7 @@ describe('serverAuthQuery', () => {
     const second = await serverAuthQuery(
       queryClient,
       REPERTOIRE_URL,
-      'login-info'
+      'user-scopes'
     );
 
     expect(first?.mode).toBe('cookie');
