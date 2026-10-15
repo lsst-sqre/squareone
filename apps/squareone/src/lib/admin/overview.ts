@@ -183,133 +183,32 @@ export function getOperatorLinks(discovery: ServiceDiscovery): OperatorLink[] {
   return links;
 }
 
-/** A service an application row is joined to: where it lives and who may use it. */
-export type ApplicationService = {
-  /** `UI` for a `services.ui` entry, `API` for a `services.internal` one. */
-  kind: 'UI' | 'API';
-  /** The service's name in discovery, which may differ from the application. */
-  service: string;
-  url: string;
-  /** The scopes a token needs to use this service, each listed once. */
-  requiredScopes: string[];
-};
+/** Base URL of the Phalanx documentation's per-application pages. */
+export const PHALANX_APPLICATION_DOCS_BASE =
+  'https://phalanx.lsst.io/applications';
 
-/** One row of the overview's Applications table. */
-export type ApplicationRow = {
+/** One entry in the overview's Applications list. */
+export type ApplicationLink = {
   /** Phalanx application name. */
   name: string;
-  /** The UI service's title, else the internal service's title. */
-  title: string | null;
-  /**
-   * The UI service, then the internal (API) service; empty when the
-   * application matches no service.
-   */
-  services: ApplicationService[];
-  /** The UI service's docs URL, else the internal service's. */
-  docsUrl: string | null;
-  /** The internal service's OpenAPI specification. */
-  openapiUrl: string | null;
+  /** URL of the application's page in the Phalanx documentation. */
+  docsUrl: string;
 };
 
 /**
- * Services an application publishes under a name other than its own, beyond
- * the service named for the application itself.
+ * Links for the overview's Applications list: one per enabled Phalanx
+ * application, in discovery order, to its page in the Phalanx documentation.
  *
- * Repertoire keys `services.ui` and `services.internal` by service name, which
- * usually matches the Phalanx application name; these are the known
- * exceptions. This map is the only place that knows them.
+ * Discovery's `applications` is a flat list of names that is independent of
+ * its `services` maps, so nothing here joins an application to a service.
  */
-const APPLICATION_SERVICE_ALIASES: Readonly<Record<string, readonly string[]>> =
-  {
-    nublado: ['nublado-controller'],
-    datalinker: ['datalink'],
-    'vo-cutouts': ['cutout'],
-  };
-
-/**
- * The first entry in `services` named for the application or one of its
- * aliases, with the name it was found under.
- */
-function findApplicationService<T>(
-  services: Record<string, T>,
-  application: string
-): [name: string, service: T] | null {
-  // Own-property checks, so an application or service named like an Object
-  // property (`constructor`) never matches the prototype.
-  const aliases = Object.hasOwn(APPLICATION_SERVICE_ALIASES, application)
-    ? APPLICATION_SERVICE_ALIASES[application]
-    : [];
-  const candidates = [application, ...aliases];
-  for (const name of candidates) {
-    if (Object.hasOwn(services, name)) return [name, services[name]];
-  }
-  return null;
-}
-
-/**
- * Rows for the overview's Applications table: one per enabled Phalanx
- * application, in discovery order.
- *
- * Each application is joined to at most one UI service and one internal
- * service, named for the application or one of its known aliases (see
- * `APPLICATION_SERVICE_ALIASES`), so `nublado` joins both its `nublado` UI and
- * its `nublado-controller` API. Each service keeps its own required scopes,
- * since a UI and its API are often guarded differently. An application that
- * matches no service, such as an infrastructure application like
- * `cert-manager`, is a name-only row.
- */
-export function buildApplicationRows(
+export function buildApplicationLinks(
   discovery: ServiceDiscovery
-): ApplicationRow[] {
-  return discovery.applications.map((name) => {
-    const [uiName, uiService] =
-      findApplicationService(discovery.services.ui, name) ?? [];
-    const [internalName, internalService] =
-      findApplicationService(discovery.services.internal, name) ?? [];
-
-    const services: ApplicationService[] = [];
-    if (uiName && uiService) {
-      services.push({
-        kind: 'UI',
-        service: uiName,
-        url: uiService.url,
-        requiredScopes: [...new Set(uiService.required_scopes ?? [])],
-      });
-    }
-    if (internalName && internalService) {
-      services.push({
-        kind: 'API',
-        service: internalName,
-        url: internalService.url,
-        requiredScopes: [...new Set(internalService.required_scopes ?? [])],
-      });
-    }
-
-    return {
-      name,
-      title: uiService?.title || internalService?.title || null,
-      services,
-      docsUrl: uiService?.docs_url || internalService?.docs_url || null,
-      openapiUrl: internalService?.openapi ?? null,
-    };
-  });
-}
-
-/**
- * The rows whose application name or title contains `query`, ignoring case
- * and surrounding whitespace. A blank query keeps every row.
- */
-export function filterApplicationRows(
-  rows: ApplicationRow[],
-  query: string
-): ApplicationRow[] {
-  const needle = query.trim().toLowerCase();
-  if (!needle) return rows;
-  return rows.filter(
-    (row) =>
-      row.name.toLowerCase().includes(needle) ||
-      (row.title?.toLowerCase().includes(needle) ?? false)
-  );
+): ApplicationLink[] {
+  return discovery.applications.map((name) => ({
+    name,
+    docsUrl: `${PHALANX_APPLICATION_DOCS_BASE}/${encodeURIComponent(name)}/`,
+  }));
 }
 
 /** One row of the overview's Datasets table. */

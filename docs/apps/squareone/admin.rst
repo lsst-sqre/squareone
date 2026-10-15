@@ -80,10 +80,9 @@ Operator links
    The links are not filtered by your scopes, since the admin section is already restricted to administrators.
 
 Applications
-   A table of every Phalanx application enabled in the environment, joined to the UI and API services discovery publishes for it: the service title, whether it offers a UI, an API, or both, its URLs, its documentation link, the scopes its services require, and a link to its OpenAPI specification.
-   Discovery keys services by service name, which usually matches the application name; a few known exceptions are joined by name in Squareone (``nublado`` also joins ``nublado-controller``, ``datalinker`` joins ``datalink``, and ``vo-cutouts`` joins ``cutout``), and a URL from such a service names the service it came from.
-   Applications with no matching service, such as infrastructure like ``cert-manager``, are listed by name only.
-   The table sorts by name, title, or kind, and a filter narrows it to the applications whose name or title contains the text you type.
+   An alphabetical list of the Phalanx applications enabled in the environment, with a count, each linking to its page in the Phalanx documentation (``https://phalanx.lsst.io/applications/<name>/``).
+   Discovery lists applications by name only, independently of the services it publishes, so the list shows no service URLs, scopes, or OpenAPI links.
+   If discovery lists no applications, the section says so.
 
 Datasets
    A table of the datasets discovery describes, such as ``dp1`` and ``prompt``: each dataset's description, links to its documentation, its Butler configuration, and its ObsCore configuration, and the names of the data services it exposes.

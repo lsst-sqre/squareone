@@ -1,0 +1,28 @@
+/* ApplicationsList: the overview's list of enabled Phalanx applications */
+
+.lead {
+  margin: 0 0 var(--sqo-space-xxs);
+}
+
+.count {
+  margin: 0 0 var(--sqo-space-sm);
+  font-size: 0.875rem;
+  color: var(--rsd-component-text-secondary-color);
+}
+
+/* Application names are short Phalanx identifiers, so the list flows into as
+ * many columns as fit the admin content column, filling each column top to
+ * bottom, and collapses to a single column on a narrow screen. */
+.list {
+  columns: 14rem;
+  column-gap: var(--sqo-space-lg);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Keep each name whole within its column. */
+.item {
+  break-inside: avoid;
+  padding-block: var(--sqo-space-xxxs);
+}
