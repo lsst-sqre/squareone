@@ -84,6 +84,13 @@ Applications
    Discovery lists applications by name only, independently of the services it publishes, so the list shows no service URLs, scopes, or OpenAPI links.
    If discovery lists no applications, the section says so.
 
+Services
+   A table of every UI and API service in discovery's ``services.ui`` and ``services.internal`` maps, independent of the Applications list: service names are their own namespace, and services such as ``comanage``, ``logout``, ``settings``, and ``nublado-controller`` belong to no application of the same name.
+   Each service's name and kind (``UI`` or ``API``) are sortable columns over a detail row with the service's title, its URL, the Gafaelfawr scopes it requires, and links to its documentation and, for an API, its OpenAPI specification, each shown when discovery has it.
+   Repertoire 2.x publishes no titles, scopes, or documentation links, so there a row shows just the URL, plus an OpenAPI link where the API has one.
+   A filter above the table narrows the rows to the services whose name or title contains the typed text, and a count shows how many rows match.
+   If discovery lists no services, the section says so.
+
 Datasets
    A table of the datasets discovery describes, such as ``dp1`` and ``prompt``: each dataset's description, links to its documentation, its Butler configuration, and its ObsCore configuration, and the names of the data services it exposes.
    A dash marks a field the dataset doesn't have; Repertoire 2.x publishes no ObsCore configuration.

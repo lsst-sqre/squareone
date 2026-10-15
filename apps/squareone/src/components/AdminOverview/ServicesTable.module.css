@@ -1,0 +1,63 @@
+/* ServicesTable: the overview's filterable table of UI and API services */
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sqo-space-xs) var(--sqo-space-md);
+  margin-bottom: var(--sqo-space-sm);
+}
+
+.filter {
+  width: 18rem;
+  max-width: 100%;
+}
+
+.count {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--rsd-component-text-secondary-color);
+}
+
+/* Service names are discovery keys, set like code; keep each on one line. */
+.name {
+  font-family: monospace;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.kind {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--rsd-component-text-secondary-color);
+}
+
+.title {
+  margin: 0;
+}
+
+/* The URL and the scopes it requires on one line: the URL takes the
+ * remaining width and the scopes keep to the trailing edge; on a narrow
+ * column the scopes wrap below the URL. */
+.endpoint {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--sqo-space-xxs) var(--sqo-space-sm);
+}
+
+.url {
+  flex: 1 1 16rem;
+  min-width: 0;
+  font-family: monospace;
+  overflow-wrap: anywhere;
+}
+
+.scopeList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sqo-space-xxxs);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}

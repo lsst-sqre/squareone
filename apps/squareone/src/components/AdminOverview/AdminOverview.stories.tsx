@@ -4,7 +4,7 @@ import {
   type ServiceDiscovery,
 } from '@lsst-sqre/repertoire-client';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { expect, within } from 'storybook/test';
+import { expect, userEvent, within } from 'storybook/test';
 
 import AdminOverview from './AdminOverview';
 
@@ -37,6 +37,29 @@ function getApplicationLinks(canvasElement: HTMLElement): HTMLElement[] {
     name: 'Applications',
   });
   return within(list).getAllByRole('link');
+}
+
+/** Each service's unit in the Services table: its name and detail rows. */
+function getServiceRows(canvasElement: HTMLElement): HTMLElement[] {
+  const table = within(canvasElement).getByRole('table', { name: 'Services' });
+  return within(table).getAllByRole('rowgroup').slice(1);
+}
+
+/** The service name in each of the Services table's rows. */
+function getServiceNames(canvasElement: HTMLElement): string[] {
+  return getServiceRows(canvasElement).map(
+    (row) => within(row).getAllByRole('cell')[0].textContent ?? ''
+  );
+}
+
+/** The Services table's row for the named service. */
+function getServiceRow(canvasElement: HTMLElement, name: string): HTMLElement {
+  const row = getServiceRows(canvasElement).find(
+    (candidate) =>
+      within(candidate).getAllByRole('cell')[0].textContent === name
+  );
+  if (!row) throw new Error(`No ${name} service row`);
+  return row;
 }
 
 /** Each dataset's unit in the Datasets table: its name and detail rows. */
@@ -75,10 +98,13 @@ function withoutOperatorTools(discovery: ServiceDiscovery): ServiceDiscovery {
  * cover Argo CD, Chronograf, and Kafdrop, the environment docs, and the
  * service discovery page. The Applications list links all 41 applications,
  * alphabetically, to their Phalanx documentation pages. Each table has a
- * single name column over a detail row: the Datasets table lists `dp1`,
- * `dp2`, `dp02`, `dp03`, and `prompt` with their docs, Butler, and ObsCore
- * links where discovery has them; and the InfluxDB databases table lists the
- * local `idfdev_efd` with a button to copy its credentials URL.
+ * name column over a detail row: the Services table lists the 10 UI and 11
+ * API services, including `comanage`, `logout`, `settings`, and `webdav`,
+ * which belong to no application of that name, and `nublado-controller` as
+ * its own API row with its scope and OpenAPI link; the Datasets table lists
+ * `dp1`, `dp2`, `dp02`, `dp03`, and `prompt` with their docs, Butler, and
+ * ObsCore links where discovery has them; and the InfluxDB databases table
+ * lists the local `idfdev_efd` with a button to copy its credentials URL.
  */
 export const DataDev: Story = {
   args: {
@@ -134,6 +160,24 @@ export const DataDev: Story = {
     ).not.toBeInTheDocument();
     await expect(applications.queryByRole('table')).not.toBeInTheDocument();
 
+    const services = within(canvas.getByRole('region', { name: 'Services' }));
+    await expect(services.getByText('21 services')).toBeInTheDocument();
+    await expect(getServiceNames(canvasElement)).toHaveLength(21);
+    for (const name of ['comanage', 'logout', 'settings', 'webdav']) {
+      await expect(getServiceNames(canvasElement)).toContain(name);
+    }
+    await expect(
+      services.getByRole('list', { name: 'nublado-controller required scopes' })
+    ).toHaveTextContent('admin:jupyterlab');
+    await expect(
+      services.getByRole('link', {
+        name: 'nublado-controller OpenAPI specification',
+      })
+    ).toHaveAttribute(
+      'href',
+      'https://data-dev.lsst.cloud/nublado/openapi.json'
+    );
+
     await expect(getDatasetNames(canvasElement)).toEqual([
       'dp1',
       'dp2',
@@ -170,12 +214,49 @@ export const DataDev: Story = {
 };
 
 /**
+ * The data-dev discovery with "nublado" typed into the Services filter: the
+ * table narrows to the `nublado` UI and the `nublado-controller` API, and the
+ * count reads "2 of 21 services". Sorting by Kind puts the API first, and
+ * clearing the filter restores every service.
+ */
+export const FilteredServices: Story = {
+  args: {
+    discovery: mockDiscoveryDataDev,
+  },
+  play: async ({ canvasElement }) => {
+    const services = within(
+      within(canvasElement).getByRole('region', { name: 'Services' })
+    );
+    const filter = services.getByRole('searchbox', { name: 'Filter services' });
+
+    await userEvent.type(filter, 'nublado');
+    await expect(getServiceNames(canvasElement)).toEqual([
+      'nublado',
+      'nublado-controller',
+    ]);
+    await expect(services.getByText('2 of 21 services')).toBeInTheDocument();
+
+    await userEvent.click(services.getByRole('button', { name: 'Kind' }));
+    await expect(getServiceNames(canvasElement)).toEqual([
+      'nublado-controller',
+      'nublado',
+    ]);
+
+    await userEvent.clear(filter);
+    await expect(getServiceNames(canvasElement)).toHaveLength(21);
+    await expect(services.getByText('21 services')).toBeInTheDocument();
+  },
+};
+
+/**
  * An environment still on Repertoire 2.x (the production 2.1.0 document):
  * there is no `environment` object, so the key-value list shows only the
  * deprecated `environment_name`. Services carry no titles, so the operator
  * links fall back to fixed names and there is no environment docs link. The
- * Applications list links its 29 applications, the five datasets have no
- * ObsCore config, and there are no InfluxDB databases.
+ * Applications list links its 29 applications; the Services table lists 19
+ * services with no titles, scopes, or docs links, so a service without an
+ * OpenAPI spec shows just its URL; the five datasets have no ObsCore config;
+ * and there are no InfluxDB databases.
  */
 export const Repertoire2x: Story = {
   args: {
@@ -199,6 +280,12 @@ export const Repertoire2x: Story = {
     ]);
 
     await expect(getApplicationLinks(canvasElement)).toHaveLength(29);
+
+    await expect(getServiceNames(canvasElement)).toHaveLength(19);
+    const login = getServiceRow(canvasElement, 'login');
+    await expect(within(login).getAllByRole('row')[1]).toHaveTextContent(
+      /^https:\/\/data\.lsst\.cloud\/login$/
+    );
 
     await expect(getDatasetNames(canvasElement)).toEqual([
       'dp1',

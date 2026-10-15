@@ -210,9 +210,40 @@ describe('AdminOverview', () => {
     ).toEqual([
       'Operator links',
       'Applications',
+      'Services',
       'Datasets',
       'InfluxDB databases',
     ]);
+  });
+
+  test('lists every UI and API service in the Services section', () => {
+    renderOverview(mockDiscoveryDataDev);
+
+    const region = screen.getByRole('region', { name: 'Services' });
+    expect(within(region).getByText('21 services')).toBeInTheDocument();
+    const table = within(region).getByRole('table', { name: 'Services' });
+    expect(within(table).getAllByRole('rowgroup').slice(1)).toHaveLength(21);
+    expect(
+      within(region).getByRole('link', {
+        name: 'nublado-controller OpenAPI specification',
+      })
+    ).toHaveAttribute(
+      'href',
+      'https://data-dev.lsst.cloud/nublado/openapi.json'
+    );
+  });
+
+  test('says so when discovery lists no services', () => {
+    renderOverview({
+      ...mockDiscoveryDataDev,
+      services: { ui: {}, internal: {} },
+    });
+
+    const region = screen.getByRole('region', { name: 'Services' });
+    expect(
+      within(region).getByText('Service discovery lists no services.')
+    ).toBeInTheDocument();
+    expect(within(region).queryByRole('table')).not.toBeInTheDocument();
   });
 
   test('lists every dataset in the Datasets section', () => {

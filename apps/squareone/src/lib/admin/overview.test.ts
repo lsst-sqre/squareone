@@ -10,6 +10,8 @@ import {
   buildApplicationLinks,
   buildDatasetRows,
   buildInfluxRows,
+  buildServiceRows,
+  filterServiceRows,
   getDiscoveryEndpointUrl,
   getEnvironmentSummary,
   getOperatorLinks,
@@ -33,6 +35,20 @@ function discoveryWith({
     ...getEmptyDiscovery(),
     applications,
     services: { ui, internal },
+  };
+}
+
+/** A minimal internal (API) service entry. */
+function internalService(
+  url: string,
+  extra: Partial<ServiceDiscovery['services']['internal'][string]> = {}
+): ServiceDiscovery['services']['internal'][string] {
+  return {
+    url,
+    required_scopes: [],
+    quota_labels: {},
+    versions: {},
+    ...extra,
   };
 }
 
@@ -262,6 +278,197 @@ describe('buildApplicationLinks', () => {
 
   test('has no links when discovery lists no applications', () => {
     expect(buildApplicationLinks(getEmptyDiscovery())).toEqual([]);
+  });
+});
+
+describe('buildServiceRows', () => {
+  test('lists the UI services, then the API services, each in discovery order', () => {
+    const rows = buildServiceRows(mockDiscoveryDataDev);
+
+    expect(rows.map(({ kind, name }) => `${kind} ${name}`)).toEqual([
+      'UI argocd',
+      'UI comanage',
+      'UI logout',
+      'UI nublado',
+      'UI webdav',
+      'UI portal',
+      'UI chronograf',
+      'UI kafdrop',
+      'UI settings',
+      'UI squareone',
+      'API datalink',
+      'API gafaelfawr',
+      'API login',
+      'API mobu',
+      'API muster',
+      'API noteburst',
+      'API nublado-controller',
+      'API repertoire',
+      'API semaphore',
+      'API times-square',
+      'API wobbly',
+    ]);
+  });
+
+  test('describes an API service with its scopes, docs, and OpenAPI spec', () => {
+    const row = buildServiceRows(mockDiscoveryDataDev).find(
+      (candidate) => candidate.name === 'nublado-controller'
+    );
+
+    expect(row).toEqual({
+      id: 'API:nublado-controller',
+      kind: 'API',
+      name: 'nublado-controller',
+      title: null,
+      url: 'https://data-dev.lsst.cloud/nublado',
+      requiredScopes: ['admin:jupyterlab'],
+      docsUrl: null,
+      openapiUrl: 'https://data-dev.lsst.cloud/nublado/openapi.json',
+    });
+  });
+
+  test('describes a UI service with its title, scopes, and docs', () => {
+    const row = buildServiceRows(mockDiscoveryDataDev).find(
+      (candidate) => candidate.id === 'UI:nublado'
+    );
+
+    expect(row).toEqual({
+      id: 'UI:nublado',
+      kind: 'UI',
+      name: 'nublado',
+      title: 'Notebook aspect',
+      url: 'https://nb.data-dev.lsst.cloud/nb',
+      requiredScopes: ['exec:notebook'],
+      docsUrl: 'https://nublado.lsst.io/',
+      openapiUrl: null,
+    });
+  });
+
+  test('keys a UI and an API service of the same name apart', () => {
+    const rows = buildServiceRows(
+      discoveryWith({
+        applications: [],
+        ui: { hips: { url: 'https://example.org/hips', required_scopes: [] } },
+        internal: {
+          hips: internalService('https://example.org/api/hips'),
+        },
+      })
+    );
+
+    expect(rows.map((row) => row.id)).toEqual(['UI:hips', 'API:hips']);
+  });
+
+  test('reports a missing or blank title as null', () => {
+    const rows = buildServiceRows(
+      discoveryWith({
+        applications: [],
+        ui: {
+          missing: { url: 'https://example.org/missing', required_scopes: [] },
+          blank: {
+            url: 'https://example.org/blank',
+            title: '  ',
+            required_scopes: [],
+          },
+        },
+        internal: {
+          empty: internalService('https://example.org/empty', { title: '' }),
+          nulled: internalService('https://example.org/nulled', {
+            title: null,
+          }),
+        },
+      })
+    );
+
+    expect(rows.map((row) => row.title)).toEqual([null, null, null, null]);
+  });
+
+  test('lists each required scope once', () => {
+    const [row] = buildServiceRows(
+      discoveryWith({
+        applications: [],
+        internal: {
+          tap: internalService('https://example.org/api/tap', {
+            required_scopes: ['read:tap', 'exec:notebook', 'read:tap'],
+          }),
+        },
+      })
+    );
+
+    expect(row.requiredScopes).toEqual(['read:tap', 'exec:notebook']);
+  });
+
+  test('never gives a UI service an OpenAPI link', () => {
+    const rows = buildServiceRows(mockDiscoveryDataDev);
+
+    expect(
+      rows.filter((row) => row.kind === 'UI').map((row) => row.openapiUrl)
+    ).toEqual(Array(10).fill(null));
+    expect(
+      rows
+        .filter((row) => row.kind === 'API' && !row.openapiUrl)
+        .map((row) => row.name)
+    ).toEqual(['login']);
+  });
+
+  test('has no titles, scopes, or docs under Repertoire 2.x', () => {
+    const rows = buildServiceRows(mockDiscovery2x);
+
+    expect(rows).toHaveLength(19);
+    for (const row of rows) {
+      expect(row).toMatchObject({
+        title: null,
+        requiredScopes: [],
+        docsUrl: null,
+      });
+    }
+    expect(rows.find((row) => row.name === 'login')).toEqual({
+      id: 'API:login',
+      kind: 'API',
+      name: 'login',
+      title: null,
+      url: 'https://data.lsst.cloud/login',
+      requiredScopes: [],
+      docsUrl: null,
+      openapiUrl: null,
+    });
+  });
+
+  test('has no rows when discovery lists no services', () => {
+    expect(buildServiceRows(getEmptyDiscovery())).toEqual([]);
+  });
+});
+
+describe('filterServiceRows', () => {
+  const rows = buildServiceRows(mockDiscoveryDataDev);
+
+  test('keeps every row for a blank query', () => {
+    expect(filterServiceRows(rows, '')).toBe(rows);
+    expect(filterServiceRows(rows, '   ')).toBe(rows);
+  });
+
+  test('matches part of a service name, ignoring case', () => {
+    expect(filterServiceRows(rows, 'NUBLADO').map((row) => row.id)).toEqual([
+      'UI:nublado',
+      'API:nublado-controller',
+    ]);
+  });
+
+  test('matches part of a service title', () => {
+    expect(filterServiceRows(rows, 'user').map((row) => row.name)).toEqual([
+      'logout',
+      'settings',
+      'login',
+    ]);
+  });
+
+  test('ignores surrounding whitespace in the query', () => {
+    expect(filterServiceRows(rows, '  portal  ').map((row) => row.id)).toEqual([
+      'UI:portal',
+    ]);
+  });
+
+  test('keeps no rows when nothing matches', () => {
+    expect(filterServiceRows(rows, 'no-such-service')).toEqual([]);
   });
 });
 

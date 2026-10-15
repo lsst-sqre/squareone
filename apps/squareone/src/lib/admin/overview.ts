@@ -11,6 +11,8 @@
 
 import type { ServiceDiscovery } from '@lsst-sqre/repertoire-client';
 
+import { serviceDisplayName } from '../discovery/serviceDisplayName';
+
 /** What the overview's Environment section shows about the environment. */
 export type EnvironmentSummary = {
   /**
@@ -209,6 +211,95 @@ export function buildApplicationLinks(
     name,
     docsUrl: `${PHALANX_APPLICATION_DOCS_BASE}/${encodeURIComponent(name)}/`,
   }));
+}
+
+/**
+ * Whether a discovered service is a browser UI (`services.ui`) or an API
+ * (`services.internal`).
+ */
+export type ServiceKind = 'UI' | 'API';
+
+/** One row of the overview's Services table. */
+export type ServiceRow = {
+  /**
+   * Stable key, `<kind>:<name>`, since a UI service and an API service may
+   * share a name.
+   */
+  id: string;
+  kind: ServiceKind;
+  /** The service's key in `services.ui` or `services.internal`. */
+  name: string;
+  /**
+   * The service's discovery title, or `null` when it has none (as under
+   * Repertoire 2.x) or the title is blank.
+   */
+  title: string | null;
+  url: string;
+  /** Gafaelfawr scopes the service requires (all of them), without repeats. */
+  requiredScopes: string[];
+  /** URL of the service's documentation. */
+  docsUrl: string | null;
+  /** URL of an API's OpenAPI specification; always `null` for a UI. */
+  openapiUrl: string | null;
+};
+
+/** The fields every discovered service carries, whatever its kind. */
+type DiscoveredService = ServiceDiscovery['services']['ui'][string];
+
+/** The Services table row for one discovered service. */
+function buildServiceRow(
+  kind: ServiceKind,
+  name: string,
+  service: DiscoveredService,
+  openapiUrl: string | null
+): ServiceRow {
+  return {
+    id: `${kind}:${name}`,
+    kind,
+    name,
+    title: serviceDisplayName(service.title, '') || null,
+    url: service.url,
+    requiredScopes: [...new Set(service.required_scopes)],
+    docsUrl: service.docs_url ?? null,
+    openapiUrl,
+  };
+}
+
+/**
+ * Rows for the overview's Services table: one per UI service, then one per
+ * internal (API) service, each in discovery order.
+ *
+ * The services maps are a namespace of their own, independent of discovery's
+ * `applications` list, so a row is a service as discovery publishes it and
+ * nothing here joins a service to an application.
+ */
+export function buildServiceRows(discovery: ServiceDiscovery): ServiceRow[] {
+  const { ui, internal } = discovery.services;
+  return [
+    ...Object.entries(ui).map(([name, service]) =>
+      buildServiceRow('UI', name, service, null)
+    ),
+    ...Object.entries(internal).map(([name, service]) =>
+      buildServiceRow('API', name, service, service.openapi ?? null)
+    ),
+  ];
+}
+
+/**
+ * The rows whose service name or title contains `query`, ignoring case and
+ * surrounding whitespace. A blank query keeps every row.
+ */
+export function filterServiceRows(
+  rows: ServiceRow[],
+  query: string
+): ServiceRow[] {
+  const needle = query.trim().toLowerCase();
+  if (!needle) return rows;
+  return rows.filter(
+    (row) =>
+      row.name.toLowerCase().includes(needle) ||
+      (row.title?.toLowerCase().includes(needle) ?? false)
+  );
 }
 
 /** One row of the overview's Datasets table. */
