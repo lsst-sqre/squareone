@@ -1,5 +1,0 @@
----
-"squareone": patch
----
-
-Fix "Invalid CSRF token" errors on every Gafaelfawr and Semaphore mutation (creating and deleting tokens, service tokens, and OIDC clients, and marking notifications read) for a freshly signed-in user. Since 0.40.0 the root layout fetched Gafaelfawr login info on the server and hydrated it into the browser, but Gafaelfawr mints the CSRF token on a session's first `GET /auth/api/v1/login` and persists it only through that response's `Set-Cookie`, which a server-side request discards, so the hydrated token never matched the browser's cookie. The layout now dehydrates its query cache through a new `dehydrateLayoutState` helper that never includes the login-info entry, and the `prefetchLoginInfo` prefetch is removed. Pages that mutate fetch login info from the browser on first mount, as before 0.40.0, so the cookie and the cached token are minted together; the token and OIDC client forms show their loading state for that one round trip on a first visit. The user's scopes and user info are still hydrated, so the header still gates Portal, Notebooks, and the Apps menu on first paint.

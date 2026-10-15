@@ -1,5 +1,23 @@
 # squareone
 
+## 0.41.1
+
+### Patch Changes
+
+- [#757](https://github.com/lsst-sqre/squareone/pull/757) [`60a3af8`](https://github.com/lsst-sqre/squareone/commit/60a3af8d9610345fa572ef73fde298f311a900db) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @biomejs/biome from 2.5.12 to 2.5.14
+
+- [#757](https://github.com/lsst-sqre/squareone/pull/757) [`60a3af8`](https://github.com/lsst-sqre/squareone/commit/60a3af8d9610345fa572ef73fde298f311a900db) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @changesets/cli from 3.0.2 to 3.0.3
+
+- [#757](https://github.com/lsst-sqre/squareone/pull/757) [`60a3af8`](https://github.com/lsst-sqre/squareone/commit/60a3af8d9610345fa572ef73fde298f311a900db) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @turbo/gen from 2.10.12 to 2.11.4
+
+- [#781](https://github.com/lsst-sqre/squareone/pull/781) [`e63ffcc`](https://github.com/lsst-sqre/squareone/commit/e63ffcc8a7b2e8bcab48323e419b70870decb817) Thanks [@jonathansick](https://github.com/jonathansick)! - Fix "Invalid CSRF token" errors on every Gafaelfawr and Semaphore mutation (creating and deleting tokens, service tokens, and OIDC clients, and marking notifications read) for a freshly signed-in user. Since 0.40.0 the root layout fetched Gafaelfawr login info on the server and hydrated it into the browser, but Gafaelfawr mints the CSRF token on a session's first `GET /auth/api/v1/login` and persists it only through that response's `Set-Cookie`, which a server-side request discards, so the hydrated token never matched the browser's cookie. The layout now dehydrates its query cache through a new `dehydrateLayoutState` helper that never includes the login-info entry, and the `prefetchLoginInfo` prefetch is removed. Pages that mutate fetch login info from the browser on first mount, as before 0.40.0, so the cookie and the cached token are minted together; the token and OIDC client forms show their loading state for that one round trip on a first visit. The user's scopes and user info are still hydrated, so the header still gates Portal, Notebooks, and the Apps menu on first paint.
+
+- [#757](https://github.com/lsst-sqre/squareone/pull/757) [`60a3af8`](https://github.com/lsst-sqre/squareone/commit/60a3af8d9610345fa572ef73fde298f311a900db) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump playwright from 1.62.1 to 1.63.0
+
+- [#757](https://github.com/lsst-sqre/squareone/pull/757) [`60a3af8`](https://github.com/lsst-sqre/squareone/commit/60a3af8d9610345fa572ef73fde298f311a900db) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump turbo from 2.10.12 to 2.11.4
+
+- [#757](https://github.com/lsst-sqre/squareone/pull/757) [`60a3af8`](https://github.com/lsst-sqre/squareone/commit/60a3af8d9610345fa572ef73fde298f311a900db) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump vite from 8.2.2 to 8.3.1
+
 ## 0.41.0
 
 ### Minor Changes
