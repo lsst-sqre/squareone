@@ -1,7 +1,6 @@
 import {
   gafaelfawrKeys,
   type LoginInfo,
-  loginInfoQueryOptions,
   mockLoginInfo,
   mockTokenDetail,
 } from '@lsst-sqre/gafaelfawr-client';
@@ -12,12 +11,12 @@ import {
   mockDiscovery,
   type ServiceDiscovery,
 } from '@lsst-sqre/repertoire-client';
-import { dehydrate, QueryClient } from '@tanstack/react-query';
+import { QueryClient } from '@tanstack/react-query';
 import { headers } from 'next/headers';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import logger from '../logger';
-import { prefetchLoginInfo } from './prefetchLoginInfo';
+import { dehydrateLayoutState } from './dehydrateLayoutState';
 import { prefetchUserScopes } from './prefetchUserScopes';
 
 vi.mock('next/headers', () => ({ headers: vi.fn() }));
@@ -71,7 +70,7 @@ function dehydratedEntry(
   queryClient: QueryClient,
   queryKey: readonly unknown[]
 ) {
-  return dehydrate(queryClient).queries.find(
+  return dehydrateLayoutState(queryClient).queries.find(
     (query) => JSON.stringify(query.queryKey) === JSON.stringify(queryKey)
   );
 }
@@ -86,20 +85,15 @@ describe('prefetchUserScopes', () => {
   });
 
   describe('on a plain-ingress route (session cookie)', () => {
-    test('hydrates the scopes from the login info the layout prefetched', async () => {
+    test('hydrates the scopes from login info, but not the login info', async () => {
       givenRequestHeaders({ cookie: SESSION_COOKIE });
       const fetchMock = vi
         .spyOn(globalThis, 'fetch')
         .mockResolvedValue(Response.json(signedInLoginInfo));
       const queryClient = clientWithDiscovery();
 
-      // The layout runs the two prefetches concurrently.
-      await Promise.all([
-        prefetchLoginInfo(queryClient, REPERTOIRE_URL),
-        prefetchUserScopes(queryClient, REPERTOIRE_URL),
-      ]);
+      await prefetchUserScopes(queryClient, REPERTOIRE_URL);
 
-      // One login request serves both entries.
       expect(fetchMock).toHaveBeenCalledTimes(1);
       expect(fetchMock).toHaveBeenCalledWith(`${GAFAELFAWR_URL}/login`, {
         credentials: 'include',
@@ -107,10 +101,14 @@ describe('prefetchUserScopes', () => {
         cache: 'no-store',
       });
       expect(dehydratedScopes(queryClient)?.state.data).toEqual(SCOPES);
+      // Reading the scopes cached login info in the layout's client, but its
+      // CSRF token is cookie-bound, so the browser must fetch its own.
+      expect(queryClient.getQueryData(gafaelfawrKeys.loginInfo())).toEqual(
+        signedInLoginInfo
+      );
       expect(
-        dehydratedEntry(queryClient, loginInfoQueryOptions().queryKey)?.state
-          .data
-      ).toEqual(signedInLoginInfo);
+        dehydratedEntry(queryClient, gafaelfawrKeys.loginInfo())
+      ).toBeUndefined();
     });
 
     test('hydrates an anonymous visitor as null scopes without reporting', async () => {
@@ -149,9 +147,9 @@ describe('prefetchUserScopes', () => {
         cache: 'no-store',
       });
       expect(dehydratedScopes(queryClient)?.state.data).toEqual(SCOPES);
-      // Login info is cookie-only, so nothing is dehydrated for it here.
+      // Login info is cookie-only, so it is not even read here.
       expect(
-        dehydratedEntry(queryClient, loginInfoQueryOptions().queryKey)
+        queryClient.getQueryData(gafaelfawrKeys.loginInfo())
       ).toBeUndefined();
     });
 
