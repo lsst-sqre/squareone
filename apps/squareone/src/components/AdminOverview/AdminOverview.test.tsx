@@ -157,17 +157,52 @@ describe('AdminOverview', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('lists every application in the Applications section', () => {
+  test('lists every application, linking to its Phalanx docs page', () => {
     renderOverview(mockDiscoveryDataDev);
 
     const region = screen.getByRole('region', { name: 'Applications' });
-    const table = within(region).getByRole('table', { name: 'Applications' });
-    // One row group (name row plus detail row) per application, after the
-    // header's.
-    expect(within(table).getAllByRole('rowgroup')).toHaveLength(42);
+    expect(within(region).getByText('41 applications')).toBeInTheDocument();
+    const links = within(
+      within(region).getByRole('list', { name: 'Applications' })
+    ).getAllByRole('link');
+    expect(links.map((link) => link.textContent)).toEqual(
+      mockDiscoveryDataDev.applications
+    );
+    expect(links.map((link) => link.getAttribute('href'))).toEqual(
+      mockDiscoveryDataDev.applications.map(
+        (name) => `https://phalanx.lsst.io/applications/${name}/`
+      )
+    );
   });
 
-  test('lists the datasets and InfluxDB databases after the applications', () => {
+  test('claims no service for any application', () => {
+    renderOverview(mockDiscoveryDataDev);
+
+    const region = screen.getByRole('region', { name: 'Applications' });
+    expect(within(region).queryByRole('table')).not.toBeInTheDocument();
+    expect(within(region).queryByRole('searchbox')).not.toBeInTheDocument();
+    // Every link is an application's Phalanx docs page: no service URL,
+    // documentation, or OpenAPI link.
+    for (const link of within(region).getAllByRole('link')) {
+      expect(link.getAttribute('href')).toMatch(
+        /^https:\/\/phalanx\.lsst\.io\/applications\/[^/]+\/$/
+      );
+    }
+    // Nothing from the services maps: aliased service names, service titles,
+    // or required scopes.
+    for (const text of [
+      'nublado-controller',
+      'datalink',
+      'Notebook aspect',
+      'exec:notebook',
+      'admin:jupyterlab',
+      'OpenAPI',
+    ]) {
+      expect(within(region).queryByText(text)).not.toBeInTheDocument();
+    }
+  });
+
+  test('lists the sections in order after the environment facts', () => {
     renderOverview(mockDiscoveryDataDev);
 
     expect(
@@ -175,9 +210,40 @@ describe('AdminOverview', () => {
     ).toEqual([
       'Operator links',
       'Applications',
+      'Services',
       'Datasets',
       'InfluxDB databases',
     ]);
+  });
+
+  test('lists every UI and API service in the Services section', () => {
+    renderOverview(mockDiscoveryDataDev);
+
+    const region = screen.getByRole('region', { name: 'Services' });
+    expect(within(region).getByText('21 services')).toBeInTheDocument();
+    const table = within(region).getByRole('table', { name: 'Services' });
+    expect(within(table).getAllByRole('rowgroup').slice(1)).toHaveLength(21);
+    expect(
+      within(region).getByRole('link', {
+        name: 'nublado-controller OpenAPI specification',
+      })
+    ).toHaveAttribute(
+      'href',
+      'https://data-dev.lsst.cloud/nublado/openapi.json'
+    );
+  });
+
+  test('says so when discovery lists no services', () => {
+    renderOverview({
+      ...mockDiscoveryDataDev,
+      services: { ui: {}, internal: {} },
+    });
+
+    const region = screen.getByRole('region', { name: 'Services' });
+    expect(
+      within(region).getByText('Service discovery lists no services.')
+    ).toBeInTheDocument();
+    expect(within(region).queryByRole('table')).not.toBeInTheDocument();
   });
 
   test('lists every dataset in the Datasets section', () => {
@@ -218,11 +284,21 @@ describe('AdminOverview', () => {
     ).toBeInTheDocument();
   });
 
-  test('renders the Applications table for a 2.x discovery', () => {
+  test('renders the Applications list for a 2.x discovery', () => {
     renderOverview(mockDiscovery2x);
 
     const region = screen.getByRole('region', { name: 'Applications' });
     expect(within(region).getByText('29 applications')).toBeInTheDocument();
-    expect(within(region).getAllByRole('rowgroup')).toHaveLength(30);
+    expect(within(region).getAllByRole('link')).toHaveLength(29);
+  });
+
+  test('says so when discovery lists no applications', () => {
+    renderOverview({ ...mockDiscoveryDataDev, applications: [] });
+
+    expect(
+      within(screen.getByRole('region', { name: 'Applications' })).getByText(
+        'Service discovery lists no applications.'
+      )
+    ).toBeInTheDocument();
   });
 });

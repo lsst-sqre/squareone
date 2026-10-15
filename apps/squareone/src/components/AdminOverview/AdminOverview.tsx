@@ -1,18 +1,20 @@
 import type { ServiceDiscovery } from '@lsst-sqre/repertoire-client';
 
 import {
-  buildApplicationRows,
+  buildApplicationLinks,
   buildDatasetRows,
   buildInfluxRows,
+  buildServiceRows,
   getEnvironmentSummary,
   getOperatorLinks,
 } from '../../lib/admin/overview';
 import styles from './AdminOverview.module.css';
-import ApplicationsTable from './ApplicationsTable';
+import ApplicationsList from './ApplicationsList';
 import DatasetsTable from './DatasetsTable';
 import EnvironmentSection from './EnvironmentSection';
 import InfluxTable from './InfluxTable';
 import OperatorLinks from './OperatorLinks';
+import ServicesTable from './ServicesTable';
 
 type AdminOverviewProps = {
   /** The Repertoire service discovery document (3.0 or 2.x shape). */
@@ -26,8 +28,10 @@ type AdminOverviewProps = {
  * Presentational: it takes the discovery document as a prop, so stories and
  * tests can render any environment. Each section is its own component fed by
  * a pure builder in `lib/admin/overview.ts`: the environment's key facts
- * directly under the page heading, then the operator links and the
- * Applications, Datasets, and InfluxDB databases tables.
+ * directly under the page heading, then the operator links, the list of
+ * applications, and the Services, Datasets, and InfluxDB databases tables.
+ * The Applications list and the Services table are independent: discovery's
+ * application names and its service names are separate namespaces.
  */
 export default function AdminOverview({ discovery }: AdminOverviewProps) {
   return (
@@ -35,7 +39,8 @@ export default function AdminOverview({ discovery }: AdminOverviewProps) {
       <h1>Overview</h1>
       <EnvironmentSection environment={getEnvironmentSummary(discovery)} />
       <OperatorLinks links={getOperatorLinks(discovery)} />
-      <ApplicationsTable rows={buildApplicationRows(discovery)} />
+      <ApplicationsList links={buildApplicationLinks(discovery)} />
+      <ServicesTable rows={buildServiceRows(discovery)} />
       <DatasetsTable rows={buildDatasetRows(discovery)} />
       <InfluxTable rows={buildInfluxRows(discovery)} />
     </div>

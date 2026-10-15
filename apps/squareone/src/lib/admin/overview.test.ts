@@ -7,14 +7,16 @@ import {
 import { describe, expect, test } from 'vitest';
 
 import {
-  buildApplicationRows,
+  buildApplicationLinks,
   buildDatasetRows,
   buildInfluxRows,
-  filterApplicationRows,
+  buildServiceRows,
+  filterServiceRows,
   getDiscoveryEndpointUrl,
   getEnvironmentSummary,
   getOperatorLinks,
   isEmptyDiscovery,
+  PHALANX_APPLICATION_DOCS_BASE,
 } from './overview';
 
 const REPERTOIRE_URL = 'https://data-dev.lsst.cloud/repertoire';
@@ -236,263 +238,237 @@ describe('getOperatorLinks', () => {
   });
 });
 
-describe('buildApplicationRows', () => {
-  /** The data-dev row for the named application. */
-  function dataDevRow(name: string) {
-    const row = buildApplicationRows(mockDiscoveryDataDev).find(
-      (candidate) => candidate.name === name
-    );
-    if (!row) throw new Error(`No ${name} row`);
-    return row;
-  }
+describe('buildApplicationLinks', () => {
+  test('links each application to its Phalanx docs page, in discovery order', () => {
+    const links = buildApplicationLinks(mockDiscoveryDataDev);
 
-  test('has one row per application, in discovery order', () => {
-    const rows = buildApplicationRows(mockDiscoveryDataDev);
-
-    expect(rows).toHaveLength(41);
-    expect(rows.map((row) => row.name)).toEqual(
+    expect(links).toHaveLength(41);
+    expect(links.map((link) => link.name)).toEqual(
       mockDiscoveryDataDev.applications
     );
-  });
-
-  test('joins an application to the UI service of the same name', () => {
-    expect(dataDevRow('argocd')).toEqual({
-      name: 'argocd',
-      title: 'Argo CD',
-      services: [
-        {
-          kind: 'UI',
-          service: 'argocd',
-          url: 'https://data-dev.lsst.cloud/argo-cd',
-          requiredScopes: [],
-        },
-      ],
-      docsUrl: 'https://argo-cd.readthedocs.io/en/stable/',
-      openapiUrl: null,
-    });
-  });
-
-  test('joins an application to the internal service of the same name', () => {
-    expect(dataDevRow('times-square')).toEqual({
-      name: 'times-square',
-      title: null,
-      services: [
-        {
-          kind: 'API',
-          service: 'times-square',
-          url: 'https://data-dev.lsst.cloud/times-square/api',
-          requiredScopes: ['exec:admin'],
-        },
-      ],
-      docsUrl: 'https://times-square.lsst.io/',
-      openapiUrl: 'https://data-dev.lsst.cloud/times-square/api/openapi.json',
-    });
-  });
-
-  test('joins nublado to its UI service and the nublado-controller API', () => {
-    expect(dataDevRow('nublado')).toEqual({
+    expect(links.find((link) => link.name === 'nublado')).toEqual({
       name: 'nublado',
-      title: 'Notebook aspect',
-      services: [
-        {
-          kind: 'UI',
-          service: 'nublado',
-          url: 'https://nb.data-dev.lsst.cloud/nb',
-          requiredScopes: ['exec:notebook'],
-        },
-        {
-          kind: 'API',
-          service: 'nublado-controller',
-          url: 'https://data-dev.lsst.cloud/nublado',
-          requiredScopes: ['admin:jupyterlab'],
-        },
-      ],
-      docsUrl: 'https://nublado.lsst.io/',
+      docsUrl: 'https://phalanx.lsst.io/applications/nublado/',
+    });
+  });
+
+  test('builds each URL from the Phalanx applications docs base', () => {
+    expect(PHALANX_APPLICATION_DOCS_BASE).toBe(
+      'https://phalanx.lsst.io/applications'
+    );
+    expect(
+      buildApplicationLinks(mockDiscovery2x).every(
+        (link) =>
+          link.docsUrl === `${PHALANX_APPLICATION_DOCS_BASE}/${link.name}/`
+      )
+    ).toBe(true);
+  });
+
+  test('encodes an application name as one URL path segment', () => {
+    const [link] = buildApplicationLinks(
+      discoveryWith({ applications: ['odd name/with?chars'] })
+    );
+
+    expect(link).toEqual({
+      name: 'odd name/with?chars',
+      docsUrl:
+        'https://phalanx.lsst.io/applications/odd%20name%2Fwith%3Fchars/',
+    });
+  });
+
+  test('has no links when discovery lists no applications', () => {
+    expect(buildApplicationLinks(getEmptyDiscovery())).toEqual([]);
+  });
+});
+
+describe('buildServiceRows', () => {
+  test('lists the UI services, then the API services, each in discovery order', () => {
+    const rows = buildServiceRows(mockDiscoveryDataDev);
+
+    expect(rows.map(({ kind, name }) => `${kind} ${name}`)).toEqual([
+      'UI argocd',
+      'UI comanage',
+      'UI logout',
+      'UI nublado',
+      'UI webdav',
+      'UI portal',
+      'UI chronograf',
+      'UI kafdrop',
+      'UI settings',
+      'UI squareone',
+      'API datalink',
+      'API gafaelfawr',
+      'API login',
+      'API mobu',
+      'API muster',
+      'API noteburst',
+      'API nublado-controller',
+      'API repertoire',
+      'API semaphore',
+      'API times-square',
+      'API wobbly',
+    ]);
+  });
+
+  test('describes an API service with its scopes, docs, and OpenAPI spec', () => {
+    const row = buildServiceRows(mockDiscoveryDataDev).find(
+      (candidate) => candidate.name === 'nublado-controller'
+    );
+
+    expect(row).toEqual({
+      id: 'API:nublado-controller',
+      kind: 'API',
+      name: 'nublado-controller',
+      title: null,
+      url: 'https://data-dev.lsst.cloud/nublado',
+      requiredScopes: ['admin:jupyterlab'],
+      docsUrl: null,
       openapiUrl: 'https://data-dev.lsst.cloud/nublado/openapi.json',
     });
   });
 
-  test('joins datalinker to the datalink service, titled from it', () => {
-    expect(dataDevRow('datalinker')).toMatchObject({
-      title: 'DataLink',
-      services: [
-        {
-          kind: 'API',
-          service: 'datalink',
-          url: 'https://data-dev.lsst.cloud/api/datalink',
-          requiredScopes: ['read:image'],
-        },
-      ],
-      openapiUrl: 'https://data-dev.lsst.cloud/api/datalink/openapi.json',
-    });
-  });
-
-  test('joins vo-cutouts to the cutout service', () => {
-    const [row] = buildApplicationRows(
-      discoveryWith({
-        applications: ['vo-cutouts'],
-        internal: {
-          cutout: internalService('https://example.org/api/cutout', {
-            title: 'SODA image cutouts',
-          }),
-        },
-      })
+  test('describes a UI service with its title, scopes, and docs', () => {
+    const row = buildServiceRows(mockDiscoveryDataDev).find(
+      (candidate) => candidate.id === 'UI:nublado'
     );
 
-    expect(row).toMatchObject({
-      title: 'SODA image cutouts',
-      services: [
-        {
-          kind: 'API',
-          service: 'cutout',
-          url: 'https://example.org/api/cutout',
-        },
-      ],
-    });
-  });
-
-  test('prefers the service named for the application over an alias', () => {
-    const [row] = buildApplicationRows(
-      discoveryWith({
-        applications: ['nublado'],
-        internal: {
-          'nublado-controller': internalService('https://example.org/alias'),
-          nublado: internalService('https://example.org/exact'),
-        },
-      })
-    );
-
-    expect(row.services).toEqual([
-      {
-        kind: 'API',
-        service: 'nublado',
-        url: 'https://example.org/exact',
-        requiredScopes: [],
-      },
-    ]);
-  });
-
-  test('does not join an application named for an Object property', () => {
-    const [row] = buildApplicationRows(
-      discoveryWith({ applications: ['constructor'] })
-    );
-
-    expect(row.services).toEqual([]);
-  });
-
-  test('renders an application with no matching service as its name only', () => {
-    expect(dataDevRow('cert-manager')).toEqual({
-      name: 'cert-manager',
-      title: null,
-      services: [],
-      docsUrl: null,
+    expect(row).toEqual({
+      id: 'UI:nublado',
+      kind: 'UI',
+      name: 'nublado',
+      title: 'Notebook aspect',
+      url: 'https://nb.data-dev.lsst.cloud/nb',
+      requiredScopes: ['exec:notebook'],
+      docsUrl: 'https://nublado.lsst.io/',
       openapiUrl: null,
     });
   });
 
-  test('joins only the internal service when discovery has no UI services', () => {
-    const discovery: ServiceDiscovery = {
-      ...mockDiscoveryDataDev,
-      services: { ...mockDiscoveryDataDev.services, ui: {} },
-    };
-    const nublado = buildApplicationRows(discovery).find(
-      (row) => row.name === 'nublado'
-    );
-
-    expect(nublado).toMatchObject({
-      title: null,
-      docsUrl: null,
-      services: [{ kind: 'API', requiredScopes: ['admin:jupyterlab'] }],
-    });
-  });
-
-  test('joins only the UI service when discovery has no internal services', () => {
-    const discovery: ServiceDiscovery = {
-      ...mockDiscoveryDataDev,
-      services: { ...mockDiscoveryDataDev.services, internal: {} },
-    };
-    const rows = buildApplicationRows(discovery);
-
-    expect(rows.find((row) => row.name === 'nublado')).toMatchObject({
-      openapiUrl: null,
-      services: [{ kind: 'UI', requiredScopes: ['exec:notebook'] }],
-    });
-    expect(rows.find((row) => row.name === 'times-square')?.services).toEqual(
-      []
-    );
-  });
-
-  test('takes the docs link from the API service when the UI has none', () => {
-    const [row] = buildApplicationRows(
+  test('keys a UI and an API service of the same name apart', () => {
+    const rows = buildServiceRows(
       discoveryWith({
-        applications: ['app'],
-        ui: { app: { url: 'https://example.org/app', required_scopes: [] } },
+        applications: [],
+        ui: { hips: { url: 'https://example.org/hips', required_scopes: [] } },
         internal: {
-          app: internalService('https://example.org/api/app', {
-            docs_url: 'https://app.lsst.io/',
-          }),
+          hips: internalService('https://example.org/api/hips'),
         },
       })
     );
 
-    expect(row.docsUrl).toBe('https://app.lsst.io/');
+    expect(rows.map((row) => row.id)).toEqual(['UI:hips', 'API:hips']);
   });
 
-  test('keeps each service its own required scopes, each listed once', () => {
-    const [row] = buildApplicationRows(
+  test('reports a missing or blank title as null', () => {
+    const rows = buildServiceRows(
       discoveryWith({
-        applications: ['app'],
+        applications: [],
         ui: {
-          app: {
-            url: 'https://example.org/app',
-            required_scopes: ['exec:notebook', 'read:tap', 'read:tap'],
+          missing: { url: 'https://example.org/missing', required_scopes: [] },
+          blank: {
+            url: 'https://example.org/blank',
+            title: '  ',
+            required_scopes: [],
           },
         },
         internal: {
-          app: internalService('https://example.org/api/app', {
-            required_scopes: ['read:tap', 'exec:admin'],
+          empty: internalService('https://example.org/empty', { title: '' }),
+          nulled: internalService('https://example.org/nulled', {
+            title: null,
           }),
         },
       })
     );
 
-    expect(row.services.map((service) => service.requiredScopes)).toEqual([
-      ['exec:notebook', 'read:tap'],
-      ['read:tap', 'exec:admin'],
-    ]);
+    expect(rows.map((row) => row.title)).toEqual([null, null, null, null]);
   });
 
-  test('has no rows when discovery lists no applications', () => {
-    expect(buildApplicationRows(getEmptyDiscovery())).toEqual([]);
+  test('lists each required scope once', () => {
+    const [row] = buildServiceRows(
+      discoveryWith({
+        applications: [],
+        internal: {
+          tap: internalService('https://example.org/api/tap', {
+            required_scopes: ['read:tap', 'exec:notebook', 'read:tap'],
+          }),
+        },
+      })
+    );
+
+    expect(row.requiredScopes).toEqual(['read:tap', 'exec:notebook']);
+  });
+
+  test('never gives a UI service an OpenAPI link', () => {
+    const rows = buildServiceRows(mockDiscoveryDataDev);
+
+    expect(
+      rows.filter((row) => row.kind === 'UI').map((row) => row.openapiUrl)
+    ).toEqual(Array(10).fill(null));
+    expect(
+      rows
+        .filter((row) => row.kind === 'API' && !row.openapiUrl)
+        .map((row) => row.name)
+    ).toEqual(['login']);
+  });
+
+  test('has no titles, scopes, or docs under Repertoire 2.x', () => {
+    const rows = buildServiceRows(mockDiscovery2x);
+
+    expect(rows).toHaveLength(19);
+    for (const row of rows) {
+      expect(row).toMatchObject({
+        title: null,
+        requiredScopes: [],
+        docsUrl: null,
+      });
+    }
+    expect(rows.find((row) => row.name === 'login')).toEqual({
+      id: 'API:login',
+      kind: 'API',
+      name: 'login',
+      title: null,
+      url: 'https://data.lsst.cloud/login',
+      requiredScopes: [],
+      docsUrl: null,
+      openapiUrl: null,
+    });
+  });
+
+  test('has no rows when discovery lists no services', () => {
+    expect(buildServiceRows(getEmptyDiscovery())).toEqual([]);
   });
 });
 
-describe('filterApplicationRows', () => {
-  const rows = buildApplicationRows(mockDiscoveryDataDev);
+describe('filterServiceRows', () => {
+  const rows = buildServiceRows(mockDiscoveryDataDev);
 
   test('keeps every row for a blank query', () => {
-    expect(filterApplicationRows(rows, '')).toBe(rows);
-    expect(filterApplicationRows(rows, '   ')).toBe(rows);
+    expect(filterServiceRows(rows, '')).toBe(rows);
+    expect(filterServiceRows(rows, '   ')).toBe(rows);
   });
 
-  test('matches part of an application name, ignoring case', () => {
-    expect(
-      filterApplicationRows(rows, 'STRIMZI').map((row) => row.name)
-    ).toEqual([
-      'strimzi',
-      'strimzi-access-operator',
-      'strimzi-registry-operator',
+  test('matches part of a service name, ignoring case', () => {
+    expect(filterServiceRows(rows, 'NUBLADO').map((row) => row.id)).toEqual([
+      'UI:nublado',
+      'API:nublado-controller',
     ]);
   });
 
-  test('matches part of an application title', () => {
-    expect(
-      filterApplicationRows(rows, 'notebook aspect').map((row) => row.name)
-    ).toEqual(['nublado']);
+  test('matches part of a service title', () => {
+    expect(filterServiceRows(rows, 'user').map((row) => row.name)).toEqual([
+      'logout',
+      'settings',
+      'login',
+    ]);
+  });
+
+  test('ignores surrounding whitespace in the query', () => {
+    expect(filterServiceRows(rows, '  portal  ').map((row) => row.id)).toEqual([
+      'UI:portal',
+    ]);
   });
 
   test('keeps no rows when nothing matches', () => {
-    expect(filterApplicationRows(rows, 'no-such-app')).toEqual([]);
+    expect(filterServiceRows(rows, 'no-such-service')).toEqual([]);
   });
 });
 

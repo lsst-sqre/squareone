@@ -11,6 +11,8 @@
 
 import type { ServiceDiscovery } from '@lsst-sqre/repertoire-client';
 
+import { serviceDisplayName } from '../discovery/serviceDisplayName';
+
 /** What the overview's Environment section shows about the environment. */
 export type EnvironmentSummary = {
   /**
@@ -183,126 +185,114 @@ export function getOperatorLinks(discovery: ServiceDiscovery): OperatorLink[] {
   return links;
 }
 
-/** A service an application row is joined to: where it lives and who may use it. */
-export type ApplicationService = {
-  /** `UI` for a `services.ui` entry, `API` for a `services.internal` one. */
-  kind: 'UI' | 'API';
-  /** The service's name in discovery, which may differ from the application. */
-  service: string;
-  url: string;
-  /** The scopes a token needs to use this service, each listed once. */
-  requiredScopes: string[];
-};
+/** Base URL of the Phalanx documentation's per-application pages. */
+export const PHALANX_APPLICATION_DOCS_BASE =
+  'https://phalanx.lsst.io/applications';
 
-/** One row of the overview's Applications table. */
-export type ApplicationRow = {
+/** One entry in the overview's Applications list. */
+export type ApplicationLink = {
   /** Phalanx application name. */
   name: string;
-  /** The UI service's title, else the internal service's title. */
-  title: string | null;
+  /** URL of the application's page in the Phalanx documentation. */
+  docsUrl: string;
+};
+
+/**
+ * Links for the overview's Applications list: one per enabled Phalanx
+ * application, in discovery order, to its page in the Phalanx documentation.
+ *
+ * Discovery's `applications` is a flat list of names that is independent of
+ * its `services` maps, so nothing here joins an application to a service.
+ */
+export function buildApplicationLinks(
+  discovery: ServiceDiscovery
+): ApplicationLink[] {
+  return discovery.applications.map((name) => ({
+    name,
+    docsUrl: `${PHALANX_APPLICATION_DOCS_BASE}/${encodeURIComponent(name)}/`,
+  }));
+}
+
+/**
+ * Whether a discovered service is a browser UI (`services.ui`) or an API
+ * (`services.internal`).
+ */
+export type ServiceKind = 'UI' | 'API';
+
+/** One row of the overview's Services table. */
+export type ServiceRow = {
   /**
-   * The UI service, then the internal (API) service; empty when the
-   * application matches no service.
+   * Stable key, `<kind>:<name>`, since a UI service and an API service may
+   * share a name.
    */
-  services: ApplicationService[];
-  /** The UI service's docs URL, else the internal service's. */
+  id: string;
+  kind: ServiceKind;
+  /** The service's key in `services.ui` or `services.internal`. */
+  name: string;
+  /**
+   * The service's discovery title, or `null` when it has none (as under
+   * Repertoire 2.x) or the title is blank.
+   */
+  title: string | null;
+  url: string;
+  /** Gafaelfawr scopes the service requires (all of them), without repeats. */
+  requiredScopes: string[];
+  /** URL of the service's documentation. */
   docsUrl: string | null;
-  /** The internal service's OpenAPI specification. */
+  /** URL of an API's OpenAPI specification; always `null` for a UI. */
   openapiUrl: string | null;
 };
 
-/**
- * Services an application publishes under a name other than its own, beyond
- * the service named for the application itself.
- *
- * Repertoire keys `services.ui` and `services.internal` by service name, which
- * usually matches the Phalanx application name; these are the known
- * exceptions. This map is the only place that knows them.
- */
-const APPLICATION_SERVICE_ALIASES: Readonly<Record<string, readonly string[]>> =
-  {
-    nublado: ['nublado-controller'],
-    datalinker: ['datalink'],
-    'vo-cutouts': ['cutout'],
+/** The fields every discovered service carries, whatever its kind. */
+type DiscoveredService = ServiceDiscovery['services']['ui'][string];
+
+/** The Services table row for one discovered service. */
+function buildServiceRow(
+  kind: ServiceKind,
+  name: string,
+  service: DiscoveredService,
+  openapiUrl: string | null
+): ServiceRow {
+  return {
+    id: `${kind}:${name}`,
+    kind,
+    name,
+    title: serviceDisplayName(service.title, '') || null,
+    url: service.url,
+    requiredScopes: [...new Set(service.required_scopes)],
+    docsUrl: service.docs_url ?? null,
+    openapiUrl,
   };
-
-/**
- * The first entry in `services` named for the application or one of its
- * aliases, with the name it was found under.
- */
-function findApplicationService<T>(
-  services: Record<string, T>,
-  application: string
-): [name: string, service: T] | null {
-  // Own-property checks, so an application or service named like an Object
-  // property (`constructor`) never matches the prototype.
-  const aliases = Object.hasOwn(APPLICATION_SERVICE_ALIASES, application)
-    ? APPLICATION_SERVICE_ALIASES[application]
-    : [];
-  const candidates = [application, ...aliases];
-  for (const name of candidates) {
-    if (Object.hasOwn(services, name)) return [name, services[name]];
-  }
-  return null;
 }
 
 /**
- * Rows for the overview's Applications table: one per enabled Phalanx
- * application, in discovery order.
+ * Rows for the overview's Services table: one per UI service, then one per
+ * internal (API) service, each in discovery order.
  *
- * Each application is joined to at most one UI service and one internal
- * service, named for the application or one of its known aliases (see
- * `APPLICATION_SERVICE_ALIASES`), so `nublado` joins both its `nublado` UI and
- * its `nublado-controller` API. Each service keeps its own required scopes,
- * since a UI and its API are often guarded differently. An application that
- * matches no service, such as an infrastructure application like
- * `cert-manager`, is a name-only row.
+ * The services maps are a namespace of their own, independent of discovery's
+ * `applications` list, so a row is a service as discovery publishes it and
+ * nothing here joins a service to an application.
  */
-export function buildApplicationRows(
-  discovery: ServiceDiscovery
-): ApplicationRow[] {
-  return discovery.applications.map((name) => {
-    const [uiName, uiService] =
-      findApplicationService(discovery.services.ui, name) ?? [];
-    const [internalName, internalService] =
-      findApplicationService(discovery.services.internal, name) ?? [];
-
-    const services: ApplicationService[] = [];
-    if (uiName && uiService) {
-      services.push({
-        kind: 'UI',
-        service: uiName,
-        url: uiService.url,
-        requiredScopes: [...new Set(uiService.required_scopes ?? [])],
-      });
-    }
-    if (internalName && internalService) {
-      services.push({
-        kind: 'API',
-        service: internalName,
-        url: internalService.url,
-        requiredScopes: [...new Set(internalService.required_scopes ?? [])],
-      });
-    }
-
-    return {
-      name,
-      title: uiService?.title || internalService?.title || null,
-      services,
-      docsUrl: uiService?.docs_url || internalService?.docs_url || null,
-      openapiUrl: internalService?.openapi ?? null,
-    };
-  });
+export function buildServiceRows(discovery: ServiceDiscovery): ServiceRow[] {
+  const { ui, internal } = discovery.services;
+  return [
+    ...Object.entries(ui).map(([name, service]) =>
+      buildServiceRow('UI', name, service, null)
+    ),
+    ...Object.entries(internal).map(([name, service]) =>
+      buildServiceRow('API', name, service, service.openapi ?? null)
+    ),
+  ];
 }
 
 /**
- * The rows whose application name or title contains `query`, ignoring case
- * and surrounding whitespace. A blank query keeps every row.
+ * The rows whose service name or title contains `query`, ignoring case and
+ * surrounding whitespace. A blank query keeps every row.
  */
-export function filterApplicationRows(
-  rows: ApplicationRow[],
+export function filterServiceRows(
+  rows: ServiceRow[],
   query: string
-): ApplicationRow[] {
+): ServiceRow[] {
   const needle = query.trim().toLowerCase();
   if (!needle) return rows;
   return rows.filter(

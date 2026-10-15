@@ -31,23 +31,35 @@ function getOperatorCardTitles(canvasElement: HTMLElement): string[] {
     .map((card) => within(card).getByRole('heading').textContent ?? '');
 }
 
-/**
- * Each application's unit in the Applications table: the `<tbody>` holding
- * its name row and the detail row beneath it (every row group but the
- * header's).
- */
-function getApplicationRows(canvasElement: HTMLElement): HTMLElement[] {
-  const table = within(canvasElement).getByRole('table', {
+/** The links in the Applications list, in display order. */
+function getApplicationLinks(canvasElement: HTMLElement): HTMLElement[] {
+  const list = within(canvasElement).getByRole('list', {
     name: 'Applications',
   });
+  return within(list).getAllByRole('link');
+}
+
+/** Each service's unit in the Services table: its name and detail rows. */
+function getServiceRows(canvasElement: HTMLElement): HTMLElement[] {
+  const table = within(canvasElement).getByRole('table', { name: 'Services' });
   return within(table).getAllByRole('rowgroup').slice(1);
 }
 
-/** The application name in each of the Applications table's rows. */
-function getApplicationNames(canvasElement: HTMLElement): string[] {
-  return getApplicationRows(canvasElement).map(
+/** The service name in each of the Services table's rows. */
+function getServiceNames(canvasElement: HTMLElement): string[] {
+  return getServiceRows(canvasElement).map(
     (row) => within(row).getAllByRole('cell')[0].textContent ?? ''
   );
+}
+
+/** The Services table's row for the named service. */
+function getServiceRow(canvasElement: HTMLElement, name: string): HTMLElement {
+  const row = getServiceRows(canvasElement).find(
+    (candidate) =>
+      within(candidate).getAllByRole('cell')[0].textContent === name
+  );
+  if (!row) throw new Error(`No ${name} service row`);
+  return row;
 }
 
 /** Each dataset's unit in the Datasets table: its name and detail rows. */
@@ -84,13 +96,15 @@ function withoutOperatorTools(discovery: ServiceDiscovery): ServiceDiscovery {
  * page heading, a key-value list of the environment's Phalanx label, name,
  * title, and description, with a link to its Phalanx docs. The operator links
  * cover Argo CD, Chronograf, and Kafdrop, the environment docs, and the
- * service discovery page. Each table has a single name column over a detail
- * row: the Applications table lists all 41 applications, with `nublado`
- * joined to both its UI and its `nublado-controller` API, each with its own
- * scopes; the Datasets table lists `dp1`, `dp2`, `dp02`, `dp03`, and `prompt`
- * with their docs, Butler, and ObsCore links where discovery has them; and
- * the InfluxDB databases table lists the local `idfdev_efd` with a button to
- * copy its credentials URL.
+ * service discovery page. The Applications list links all 41 applications,
+ * alphabetically, to their Phalanx documentation pages. Each table has a
+ * name column over a detail row: the Services table lists the 10 UI and 11
+ * API services, including `comanage`, `logout`, `settings`, and `webdav`,
+ * which belong to no application of that name, and `nublado-controller` as
+ * its own API row with its scope and OpenAPI link; the Datasets table lists
+ * `dp1`, `dp2`, `dp02`, `dp03`, and `prompt` with their docs, Butler, and
+ * ObsCore links where discovery has them; and the InfluxDB databases table
+ * lists the local `idfdev_efd` with a button to copy its credentials URL.
  */
 export const DataDev: Story = {
   args: {
@@ -130,24 +144,39 @@ export const DataDev: Story = {
       canvas.getByRole('link', { name: 'Service discovery' })
     ).toHaveAttribute('href', '/admin/discovery');
 
-    await expect(getApplicationRows(canvasElement)).toHaveLength(41);
-    const nublado = getApplicationRows(canvasElement).find(
-      (row) => within(row).getAllByRole('cell')[0].textContent === 'nublado'
+    const applications = within(
+      canvas.getByRole('region', { name: 'Applications' })
     );
-    if (!nublado) throw new Error('No nublado row');
+    await expect(applications.getByText('41 applications')).toBeInTheDocument();
+    const applicationLinks = getApplicationLinks(canvasElement);
+    await expect(applicationLinks.map((link) => link.textContent)).toEqual(
+      mockDiscoveryDataDev.applications
+    );
     await expect(
-      within(nublado).getByRole('link', {
-        name: 'https://nb.data-dev.lsst.cloud/nb',
-      })
-    ).toBeInTheDocument();
+      applications.getByRole('link', { name: 'nublado' })
+    ).toHaveAttribute('href', 'https://phalanx.lsst.io/applications/nublado/');
     await expect(
-      within(nublado).getByText('nublado-controller')
-    ).toBeInTheDocument();
+      applications.queryByText('nublado-controller')
+    ).not.toBeInTheDocument();
+    await expect(applications.queryByRole('table')).not.toBeInTheDocument();
+
+    const services = within(canvas.getByRole('region', { name: 'Services' }));
+    await expect(services.getByText('21 services')).toBeInTheDocument();
+    await expect(getServiceNames(canvasElement)).toHaveLength(21);
+    for (const name of ['comanage', 'logout', 'settings', 'webdav']) {
+      await expect(getServiceNames(canvasElement)).toContain(name);
+    }
     await expect(
-      within(nublado).getByRole('list', {
-        name: 'nublado-controller required scopes',
-      })
+      services.getByRole('list', { name: 'nublado-controller required scopes' })
     ).toHaveTextContent('admin:jupyterlab');
+    await expect(
+      services.getByRole('link', {
+        name: 'nublado-controller OpenAPI specification',
+      })
+    ).toHaveAttribute(
+      'href',
+      'https://data-dev.lsst.cloud/nublado/openapi.json'
+    );
 
     await expect(getDatasetNames(canvasElement)).toEqual([
       'dp1',
@@ -185,32 +214,37 @@ export const DataDev: Story = {
 };
 
 /**
- * Filtering and sorting the Applications table: typing narrows the rows to
- * the applications whose name or title matches, and the column headers sort
- * what remains.
+ * The data-dev discovery with "nublado" typed into the Services filter: the
+ * table narrows to the `nublado` UI and the `nublado-controller` API, and the
+ * count reads "2 of 21 services". Sorting by Kind puts the API first, and
+ * clearing the filter restores every service.
  */
-export const FilteredApplications: Story = {
+export const FilteredServices: Story = {
   args: {
     discovery: mockDiscoveryDataDev,
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    await userEvent.type(
-      canvas.getByRole('searchbox', { name: 'Filter applications' }),
-      'tap'
+    const services = within(
+      within(canvasElement).getByRole('region', { name: 'Services' })
     );
-    await expect(getApplicationNames(canvasElement)).toEqual([
-      'obsforgetap',
-      'ppdbtap',
-      'ssotap',
-      'tap',
-      'usertap',
-    ]);
-    await expect(canvas.getByText('5 of 41 applications')).toBeInTheDocument();
+    const filter = services.getByRole('searchbox', { name: 'Filter services' });
 
-    await userEvent.click(canvas.getByRole('button', { name: 'Application' }));
-    await expect(getApplicationNames(canvasElement)[0]).toBe('usertap');
+    await userEvent.type(filter, 'nublado');
+    await expect(getServiceNames(canvasElement)).toEqual([
+      'nublado',
+      'nublado-controller',
+    ]);
+    await expect(services.getByText('2 of 21 services')).toBeInTheDocument();
+
+    await userEvent.click(services.getByRole('button', { name: 'Kind' }));
+    await expect(getServiceNames(canvasElement)).toEqual([
+      'nublado-controller',
+      'nublado',
+    ]);
+
+    await userEvent.clear(filter);
+    await expect(getServiceNames(canvasElement)).toHaveLength(21);
+    await expect(services.getByText('21 services')).toBeInTheDocument();
   },
 };
 
@@ -218,9 +252,11 @@ export const FilteredApplications: Story = {
  * An environment still on Repertoire 2.x (the production 2.1.0 document):
  * there is no `environment` object, so the key-value list shows only the
  * deprecated `environment_name`. Services carry no titles, so the operator
- * links fall back to fixed names, there is no environment docs link, and the
- * Applications table rows have no titles, docs links, or scopes. The five
- * datasets have no ObsCore config, and there are no InfluxDB databases.
+ * links fall back to fixed names and there is no environment docs link. The
+ * Applications list links its 29 applications; the Services table lists 19
+ * services with no titles, scopes, or docs links, so a service without an
+ * OpenAPI spec shows just its URL; the five datasets have no ObsCore config;
+ * and there are no InfluxDB databases.
  */
 export const Repertoire2x: Story = {
   args: {
@@ -243,7 +279,13 @@ export const Repertoire2x: Story = {
       'Service discovery',
     ]);
 
-    await expect(getApplicationRows(canvasElement)).toHaveLength(29);
+    await expect(getApplicationLinks(canvasElement)).toHaveLength(29);
+
+    await expect(getServiceNames(canvasElement)).toHaveLength(19);
+    const login = getServiceRow(canvasElement, 'login');
+    await expect(within(login).getAllByRole('row')[1]).toHaveTextContent(
+      /^https:\/\/data\.lsst\.cloud\/login$/
+    );
 
     await expect(getDatasetNames(canvasElement)).toEqual([
       'dp1',
@@ -264,7 +306,7 @@ export const Repertoire2x: Story = {
 /**
  * A Repertoire 2.x environment that runs none of the operator tools: there is
  * no card for Argo CD, Chronograf, or Kafdrop, only the service discovery
- * page link, and the Applications table still renders.
+ * page link, and the Applications list still renders.
  */
 export const WithoutOperatorTools: Story = {
   args: {
@@ -274,7 +316,7 @@ export const WithoutOperatorTools: Story = {
     await expect(getOperatorCardTitles(canvasElement)).toEqual([
       'Service discovery',
     ]);
-    await expect(getApplicationRows(canvasElement)).toHaveLength(29);
+    await expect(getApplicationLinks(canvasElement)).toHaveLength(29);
   },
 };
 
