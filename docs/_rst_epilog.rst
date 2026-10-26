@@ -18,8 +18,8 @@
 .. _Sphinx: https://www.sphinx-doc.org/en/master/
 .. _Squareone repository: https://github.com/lsst-sqre/squareone
 .. _Storybook: https://storybook.js.org/
-.. _Style Dictionary: https://amzn.github.io/style-dictionary/
-.. _style-dictionary: https://amzn.github.io/style-dictionary/
+.. _Style Dictionary: https://styledictionary.com/
+.. _style-dictionary: https://styledictionary.com/
 .. _Turbo Repo --filter documentation: https://turbo.build/repo/docs/core-concepts/monorepos/filtering
 .. _Turborepo: https://turbo.build/repo
 .. _Visual Identity Manual: https://docushare.lsst.org/docushare/dsweb/Get/Document-37294/20210212%20Visual%20Identity%20Manual%20—V7.pdf
