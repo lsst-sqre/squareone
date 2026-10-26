@@ -11,6 +11,10 @@ nitpick_ignore = [["py:class", "pybtex.style.formatting.plain.Style"]]
 extensions = ["sphinx-jsonschema"]
 
 [sphinx.linkcheck]
+# This site has ~600 outbound URLs; a first submission to the Ook
+# link-check service overran the default 300 s budget and fell back to the
+# built-in checker.
+poll_budget = 600
 ignore = [
     "https://jira.lsstcorp.org/browse/",
     "https://github.com/organizations/lsst-sqre/settings/apps/squareone-ci"
