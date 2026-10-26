@@ -143,6 +143,14 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+
+    env:
+      HAS_OOK_TOKEN: ${{ secrets.OOK_TOKEN != '' }}
+
     steps:
       - uses: actions/checkout@v7
         with:
@@ -153,11 +161,21 @@ jobs:
 
       - name: Build documentation
         run: uv run noxfile.py -s docs
+        env:
+          OOK_TOKEN: ${{ secrets.OOK_TOKEN }}
 
-      - name: Upload documentation
-        uses: lsst-sqre/ltd-upload@v1
+      - name: Check links
+        if: env.HAS_OOK_TOKEN == 'true'
+        run: uv run noxfile.py -s docs-linkcheck
+        env:
+          OOK_TOKEN: ${{ secrets.OOK_TOKEN }}
+
+      - name: Upload to Docverse
+        uses: lsst-sqre/docverse-upload@v1
         with:
+          org: rubin
           project: 'squareone'
           dir: 'docs/_build/html'
-          username: ${{ secrets.LTD_USERNAME }}
-          password: ${{ secrets.LTD_PASSWORD }}
+          token: ${{ secrets.DOCVERSE_TOKEN }}
+          github-token: ${{ github.token }}
+          comment-on-pr: 'true'
