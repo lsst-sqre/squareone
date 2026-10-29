@@ -8,7 +8,7 @@
 .. _next lint: https://nextjs.org/docs/basic-features/eslint
 .. _Next.js: https://nextjs.org
 .. _nox: https://nox.thea.codes/en/stable/
-.. _nvm: https://nvm.sh
+.. _nvm: https://github.com/nvm-sh/nvm
 .. _Phalanx: https://phalanx.lsst.io
 .. _pnpm: https://pnpm.io
 .. _Prettier: https://prettier.io/
@@ -20,8 +20,8 @@
 .. _Storybook: https://storybook.js.org/
 .. _Style Dictionary: https://styledictionary.com/
 .. _style-dictionary: https://styledictionary.com/
-.. _Turbo Repo --filter documentation: https://turbo.build/repo/docs/core-concepts/monorepos/filtering
-.. _Turborepo: https://turbo.build/repo
+.. _Turbo Repo --filter documentation: https://turborepo.dev/docs/crafting-your-repository/running-tasks
+.. _Turborepo: https://turborepo.dev/docs
 .. _Visual Identity Manual: https://docushare.lsst.org/docushare/dsweb/Get/Document-37294/20210212%20Visual%20Identity%20Manual%20—V7.pdf
 .. _uv: https://docs.astral.sh/uv/
 

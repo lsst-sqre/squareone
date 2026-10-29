@@ -121,7 +121,7 @@ Added "crop" variants of all full-size and intermediate-size Rubin imagotype ass
 
 - Support for theming with next-themes.
 
-- Initial design tokens from components originating in the Squareone application (https://github.com/lsst-sqre/rsp-squareone).
+- Initial design tokens from components originating in the Squareone application (https://github.com/lsst-sqre/squareone).
 
 - Fixed `color.green.500` to be the correct color from the Visual Identity Manual (previously it was the same as `color.purple.500`).
 

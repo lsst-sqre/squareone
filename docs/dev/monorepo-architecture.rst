@@ -95,4 +95,4 @@ Merging this PR triggers the release process, again in GitHub Actions, for the c
 Further reading
 ===============
 
-The Turborepo documentation includes a `Monorepo Handbook <https://turbo.build/repo/docs/handbook>`__ that goes further into the advantages of monorepos and how they work.
+The Turborepo documentation includes a `Monorepo Handbook <https://turborepo.dev/docs/crafting-your-repository>`__ that goes further into the advantages of monorepos and how they work.
