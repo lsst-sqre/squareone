@@ -18,7 +18,7 @@ Find the URLs for the apps in the output of the command, or:
 
 - View Squareone at http://localhost:3000.
 
-  `API routes <https://nextjs.org/docs/api-routes/introduction>`__ are accessed on ``http://localhost:3000/api/*``.
+  `API routes <https://nextjs.org/docs/pages/building-your-application/routing/api-routes>`__ are accessed on ``http://localhost:3000/api/*``.
   The ``pages/api`` directory is mapped to ``/api/*``.
   Files in this directory are treated as API routes instead of React pages.
   The purpose of the ``pages/api/dev`` endpoints are to mock external services in the RSP; see the re-writes in :file:`next.config.js`.

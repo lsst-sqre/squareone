@@ -1124,7 +1124,7 @@ boolean` prop (default `true`) and forwards it to each item, so the
 
 - [#342](https://github.com/lsst-sqre/squareone/pull/342) [`4c8991c`](https://github.com/lsst-sqre/squareone/commit/4c8991ce4a614e8a07a816a3e7024f65a549eb40) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump react from 19.2.1 to 19.2.4
 
-- [#336](https://github.com/lsst-sqre/squareone/pull/336) [`bf8e71a`](https://github.com/lsst-sqre/squareone/commit/bf8e71a27eb92749dd59ccccd494a5e3993788ff) Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! - Add TypeScript interfaces for Sentry configuration type safety. Introduces a shared `SentryConfig` interface in the config loader and uses it in `_document.tsx` to replace `any` types, improving type safety and removing biome-ignore lint suppressions.
+- [#336](https://github.com/lsst-sqre/squareone/pull/336) [`bf8e71a`](https://github.com/lsst-sqre/squareone/commit/bf8e71a27eb92749dd59ccccd494a5e3993788ff) Thanks [@copilot-swe-agent](https://docs.github.com/en/enterprise-cloud@latest/copilot/concepts/copilot-surfaces/copilot-on-github)! - Add TypeScript interfaces for Sentry configuration type safety. Introduces a shared `SentryConfig` interface in the config loader and uses it in `_document.tsx` to replace `any` types, improving type safety and removing biome-ignore lint suppressions.
 
 - [#344](https://github.com/lsst-sqre/squareone/pull/344) [`a9c0c82`](https://github.com/lsst-sqre/squareone/commit/a9c0c8264ea25f0f5e972fa29568d78fa7216af7) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump storybook from 10.1.4 to 10.1.11
 
@@ -1600,7 +1600,7 @@ boolean` prop (default `true`) and forwards it to each item, so the
 
   Previously, the workflow would only build images for the changeset-release branch without pushing them to the registry. Now:
 
-  - Images are pushed to ghcr.io with both the branch-derived tag and the "next" tag
+  - Images are pushed to `ghcr.io` with both the branch-derived tag and the "next" tag
   - The "next" tag can be used to deploy and test the upcoming version in staging environments
   - Other changeset-release branches (non-main) remain build-only
 
@@ -2181,7 +2181,7 @@ boolean` prop (default `true`) and forwards it to each item, so the
 
 ### Minor Changes
 
-- [#171](https://github.com/lsst-sqre/squareone/pull/171) [`55ff9ab`](https://github.com/lsst-sqre/squareone/commit/55ff9ab52dc86c3b47f5ac4ca2fb5fc84d9ff15b) Thanks [@jonathansick](https://github.com/jonathansick)! - Add support for Plausible.io analytics
+- [#171](https://github.com/lsst-sqre/squareone/pull/171) [`55ff9ab`](https://github.com/lsst-sqre/squareone/commit/55ff9ab52dc86c3b47f5ac4ca2fb5fc84d9ff15b) Thanks [@jonathansick](https://github.com/jonathansick)! - Add support for [Plausible](https://plausible.io/) analytics
 
   In Squareone, set the `plausibleDomain` configuration to the Plausible tracking domain. E.g. data.lsst.cloud for the RSP. To disable Plausible tracking where it isn't supported, set this configuration to `null`.
 

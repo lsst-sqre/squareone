@@ -41,7 +41,7 @@ This comes up in the context of :ref:`rsd-component-design-tokens` where an item
 
 .. seealso::
 
-   Read about `Properties in the Style Dictionary documentation <https://amzn.github.io/style-dictionary/#/properties>`__ for more information and background.
+   Read about `Properties in the Style Dictionary documentation <https://styledictionary.com/info/tokens/>`__ for more information and background.
 
 .. _rsd-global-design-tokens:
 

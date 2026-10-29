@@ -371,7 +371,7 @@ Without the Dependabot secret configured, the workflow will fail to generate a t
 
    If the ``SQUAREONE_CI_GH_APP_CLIENT_ID`` variable ever fails to resolve in a Dependabot-triggered run, the fallback is to additionally store the client ID as a Dependabot secret with the same name and reference it via ``secrets.`` in this workflow only.
 
-For more information, see GitHub's documentation on `Automating Dependabot with GitHub Actions <https://docs.github.com/en/code-security/dependabot/working-with-dependabot/automating-dependabot-with-github-actions>`__ and `Managing encrypted secrets for Dependabot <https://docs.github.com/en/code-security/dependabot/working-with-dependabot/managing-encrypted-secrets-for-dependabot>`__.
+For more information, see GitHub's documentation on `Automating Dependabot with GitHub Actions <https://docs.github.com/en/code-security/tutorials/secure-your-dependencies/automate-dependabot-with-actions>`__ and `Managing encrypted secrets for Dependabot <https://docs.github.com/en/code-security/how-tos/secure-your-supply-chain/manage-your-dependency-security/configure-access-to-private-registries>`__.
 
 Labeling Dependabot update types — dependabot-label.yaml
 ========================================================
