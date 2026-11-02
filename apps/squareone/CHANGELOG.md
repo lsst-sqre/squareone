@@ -1,5 +1,25 @@
 # squareone
 
+## 0.41.3
+
+### Patch Changes
+
+- [#792](https://github.com/lsst-sqre/squareone/pull/792) [`2f497c0`](https://github.com/lsst-sqre/squareone/commit/2f497c023703a376cc1a6f6476d8d612be7e7adb) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @biomejs/biome from 2.5.14 to 2.6.3
+
+- [#792](https://github.com/lsst-sqre/squareone/pull/792) [`2f497c0`](https://github.com/lsst-sqre/squareone/commit/2f497c023703a376cc1a6f6476d8d612be7e7adb) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @turbo/gen from 2.11.4 to 2.11.10
+
+- [#789](https://github.com/lsst-sqre/squareone/pull/789) [`33cb89b`](https://github.com/lsst-sqre/squareone/commit/33cb89b846d006d3870eb060a0084ed141c4283c) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump github/codeql-action from 4.38.2 to 4.39.1 in the actions group
+
+- [#790](https://github.com/lsst-sqre/squareone/pull/790) [`446b672`](https://github.com/lsst-sqre/squareone/commit/446b672cf0bba2f532601c5cfce7d9e6690543d3) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump node from 24.21.0-alpine to 24.22.2-alpine in /apps/squareone in the docker group across 1 directory
+
+- [#792](https://github.com/lsst-sqre/squareone/pull/792) [`2f497c0`](https://github.com/lsst-sqre/squareone/commit/2f497c023703a376cc1a6f6476d8d612be7e7adb) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump playwright from 1.63.0 to 1.64.1
+
+- [#792](https://github.com/lsst-sqre/squareone/pull/792) [`2f497c0`](https://github.com/lsst-sqre/squareone/commit/2f497c023703a376cc1a6f6476d8d612be7e7adb) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump turbo from 2.11.4 to 2.11.10
+
+- [#792](https://github.com/lsst-sqre/squareone/pull/792) [`2f497c0`](https://github.com/lsst-sqre/squareone/commit/2f497c023703a376cc1a6f6476d8d612be7e7adb) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump vite from 8.3.1 to 8.3.5
+
+- [#792](https://github.com/lsst-sqre/squareone/pull/792) [`2f497c0`](https://github.com/lsst-sqre/squareone/commit/2f497c023703a376cc1a6f6476d8d612be7e7adb) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump webpack from 5.111.1 to 5.112.2
+
 ## 0.41.2
 
 ### Patch Changes
