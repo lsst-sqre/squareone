@@ -29,6 +29,6 @@
     "@lsst-sqre/eslint-config": "workspace:*",
     "@lsst-sqre/tsconfig": "workspace:*",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.11"
+    "vitest": "^4.1.12"
   }
 }
