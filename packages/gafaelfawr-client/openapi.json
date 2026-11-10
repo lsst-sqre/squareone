@@ -3,7 +3,7 @@
   "info": {
     "title": "Gafaelfawr",
     "description": "Gafaelfawr is a FastAPI application for the authorization and management of tokens, including their issuance and revocation.",
-    "version": "0.1.dev1+gb673b3daf"
+    "version": "0.1.dev1+g15b55f810"
   },
   "paths": {
     "/auth/api/v1/groups": {
@@ -297,7 +297,7 @@
       "post": {
         "tags": ["admin"],
         "summary": "Add OIDC client",
-        "description": "Register a new OpenID Connect client",
+        "description": "Register a new OpenID Connect client. The secret returned in the response to this request cannot be retrieved again. The client is responsible for saving it. If the secret is lost, the client must be recreated to set a new secret.",
         "operationId": "add_oidc_client_auth_api_v1_oidc_clients_post",
         "parameters": [
           {
@@ -467,7 +467,7 @@
       "patch": {
         "tags": ["admin"],
         "summary": "Update an OIDC client",
-        "description": "Delete an OpenID Connect client",
+        "description": "Update an OpenID Connect client",
         "operationId": "patch_oidc_client_auth_api_v1_oidc_clients__client_id__patch",
         "parameters": [
           {
@@ -545,7 +545,7 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/QuotaConfig" }
+                "schema": { "$ref": "#/components/schemas/QuotaConfig-Output" }
               }
             }
           },
@@ -639,7 +639,7 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/QuotaConfig" }
+              "schema": { "$ref": "#/components/schemas/QuotaConfig-Input" }
             }
           }
         },
@@ -648,7 +648,7 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/QuotaConfig" }
+                "schema": { "$ref": "#/components/schemas/QuotaConfig-Output" }
               }
             }
           },
@@ -1851,7 +1851,7 @@
         "tags": ["browser"],
         "summary": "Authenticate browser",
         "description": "Protected services redirect to this URL when the user is not authenticated to start the authentication process. The user will then be sent to an authentication provider, back to this URL with additional parameters to complete the process, and then back to the protected site.",
-        "operationId": "get_login_login_get",
+        "operationId": "login_login_get",
         "parameters": [
           {
             "name": "code",
@@ -1966,7 +1966,7 @@
         "tags": ["oidc"],
         "summary": "Start OIDC authentication",
         "description": "Authenticates the user and then returns an authorization code to the OpenID Connect client via redirect. All errors except those from an invalid OpenID client ID are reported via a redirect back to the protected service with error and error_description set.",
-        "operationId": "get_login_auth_openid_login_get",
+        "operationId": "get_openid_login_auth_openid_login_get",
         "parameters": [
           {
             "name": "client_id",
@@ -2643,27 +2643,32 @@
           "return_uri": {
             "type": "string",
             "title": "Return URI",
-            "description": "Only this URL will be accepted as a redirect target after authentication"
+            "description": "Only this URL will be accepted as a redirect target after authentication",
+            "examples": ["https://example.com/chronograf"]
           },
           "description": {
             "type": "string",
             "title": "Description",
-            "description": "Short human-readable description of this client"
+            "description": "Short human-readable description of this client",
+            "examples": ["Human-readable description of client"]
           },
           "notes": {
             "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Notes",
-            "description": "Optional notes about this entry, only readable by OpenID Connect client administrators"
+            "description": "Optional notes about this entry, only readable by OpenID Connect client administrators",
+            "examples": ["Additional notes about the client for other admins"]
           },
           "client_id": {
             "type": "string",
             "title": "Client ID",
-            "description": "Uniquely identifies this relying party and also used as the value for the aud claim in ID tokens issued to this client"
+            "description": "Uniquely identifies this relying party and also used as the value for the aud claim in ID tokens issued to this client",
+            "examples": ["fb7518beb61d27aaf20675d62778dea9.clients.example.com"]
           },
           "last_modified_by": {
             "type": "string",
             "title": "Last modified by",
-            "description": "Username of the last person to modify this client"
+            "description": "Username of the last person to modify this client",
+            "examples": ["admin-user"]
           },
           "created": {
             "$ref": "#/components/schemas/UtcDatetime",
@@ -2678,7 +2683,10 @@
           "url": {
             "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "URL of client",
-            "description": "URL for this OpenID Connect client"
+            "description": "URL for this OpenID Connect client",
+            "examples": [
+              "https://example.com/auth/v1/api/oidc-clients/fb7518beb61d27aaf20675d62778dea9.clients.example.com"
+            ]
           }
         },
         "type": "object",
@@ -2698,17 +2706,20 @@
           "return_uri": {
             "type": "string",
             "title": "Return URI",
-            "description": "Only this URL will be accepted as a redirect target after authentication"
+            "description": "Only this URL will be accepted as a redirect target after authentication",
+            "examples": ["https://example.com/chronograf"]
           },
           "description": {
             "type": "string",
             "title": "Description",
-            "description": "Short human-readable description of this client"
+            "description": "Short human-readable description of this client",
+            "examples": ["Human-readable description of client"]
           },
           "notes": {
             "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Notes",
-            "description": "Optional notes about this entry, only readable by OpenID Connect client administrators"
+            "description": "Optional notes about this entry, only readable by OpenID Connect client administrators",
+            "examples": ["Additional notes about the client for other admins"]
           }
         },
         "type": "object",
@@ -2721,27 +2732,32 @@
           "return_uri": {
             "type": "string",
             "title": "Return URI",
-            "description": "Only this URL will be accepted as a redirect target after authentication"
+            "description": "Only this URL will be accepted as a redirect target after authentication",
+            "examples": ["https://example.com/chronograf"]
           },
           "description": {
             "type": "string",
             "title": "Description",
-            "description": "Short human-readable description of this client"
+            "description": "Short human-readable description of this client",
+            "examples": ["Human-readable description of client"]
           },
           "notes": {
             "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Notes",
-            "description": "Optional notes about this entry, only readable by OpenID Connect client administrators"
+            "description": "Optional notes about this entry, only readable by OpenID Connect client administrators",
+            "examples": ["Additional notes about the client for other admins"]
           },
           "client_id": {
             "type": "string",
             "title": "Client ID",
-            "description": "Uniquely identifies this relying party and also used as the value for the aud claim in ID tokens issued to this client"
+            "description": "Uniquely identifies this relying party and also used as the value for the aud claim in ID tokens issued to this client",
+            "examples": ["fb7518beb61d27aaf20675d62778dea9.clients.example.com"]
           },
           "last_modified_by": {
             "type": "string",
             "title": "Last modified by",
-            "description": "Username of the last person to modify this client"
+            "description": "Username of the last person to modify this client",
+            "examples": ["admin-user"]
           },
           "created": {
             "$ref": "#/components/schemas/UtcDatetime",
@@ -2756,14 +2772,18 @@
           "url": {
             "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "URL of client",
-            "description": "URL for this OpenID Connect client"
+            "description": "URL for this OpenID Connect client",
+            "examples": [
+              "https://example.com/auth/v1/api/oidc-clients/fb7518beb61d27aaf20675d62778dea9.clients.example.com"
+            ]
           },
           "client_secret": {
             "type": "string",
             "format": "password",
             "title": "Client secret",
             "description": "Authentication secret sent by the relying party",
-            "writeOnly": true
+            "writeOnly": true,
+            "examples": ["fb7518beb61d27aaf20675d62778dea9"]
           }
         },
         "type": "object",
@@ -2936,7 +2956,7 @@
         "title": "OIDCTokenReply",
         "description": "A reply to a successful OpenID Connect token request."
       },
-      "Quota": {
+      "Quota-Input": {
         "properties": {
           "api": {
             "additionalProperties": { "type": "integer" },
@@ -2964,7 +2984,9 @@
             "title": "Notebook Aspect quotas"
           },
           "tap": {
-            "additionalProperties": { "$ref": "#/components/schemas/TapQuota" },
+            "additionalProperties": {
+              "$ref": "#/components/schemas/TapQuota-Input"
+            },
             "type": "object",
             "title": "TAP quotas",
             "default": {},
@@ -2976,15 +2998,89 @@
         "title": "Quota",
         "description": "Quota information for a user."
       },
-      "QuotaConfig": {
+      "Quota-Output": {
+        "properties": {
+          "api": {
+            "additionalProperties": { "type": "integer" },
+            "type": "object",
+            "title": "API quotas",
+            "description": "Mapping of service names to allowed requests per minute.",
+            "default": {},
+            "examples": [
+              { "datalinker": 500, "hips": 2000, "tap": 500, "vo-cutouts": 100 }
+            ]
+          },
+          "disk": {
+            "additionalProperties": { "type": "integer" },
+            "type": "object",
+            "title": "Disk quotas",
+            "description": "Mapping of mount points to disk quota allocations in bytes",
+            "default": {},
+            "examples": [{ "/home": 32212254720 }]
+          },
+          "notebook": {
+            "anyOf": [
+              { "$ref": "#/components/schemas/NotebookQuota" },
+              { "type": "null" }
+            ],
+            "title": "Notebook Aspect quotas"
+          },
+          "tap": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/TapQuota-Output"
+            },
+            "type": "object",
+            "title": "TAP quotas",
+            "default": {},
+            "examples": [{ "qserv": { "concurrent": 5 } }]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "Quota",
+        "description": "Quota information for a user."
+      },
+      "QuotaConfig-Input": {
         "properties": {
           "default": {
-            "$ref": "#/components/schemas/Quota",
+            "$ref": "#/components/schemas/Quota-Input",
             "title": "Default quota",
             "description": "Default quotas for all users"
           },
           "groups": {
-            "additionalProperties": { "$ref": "#/components/schemas/Quota" },
+            "additionalProperties": {
+              "$ref": "#/components/schemas/Quota-Input"
+            },
+            "type": "object",
+            "title": "Quota grants by group",
+            "description": "Additional quota grants by group name",
+            "default": {}
+          },
+          "bypass": {
+            "items": { "type": "string" },
+            "type": "array",
+            "uniqueItems": true,
+            "title": "Groups without quotas",
+            "description": "Groups whose members bypass all quota restrictions",
+            "default": []
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "QuotaConfig",
+        "description": "Quota configuration."
+      },
+      "QuotaConfig-Output": {
+        "properties": {
+          "default": {
+            "$ref": "#/components/schemas/Quota-Output",
+            "title": "Default quota",
+            "description": "Default quotas for all users"
+          },
+          "groups": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/Quota-Output"
+            },
             "type": "object",
             "title": "Quota grants by group",
             "description": "Additional quota grants by group name",
@@ -3031,12 +3127,36 @@
       "Scopes-Input": {},
       "Scopes-Output": { "items": { "type": "string" }, "type": "array" },
       "SecondsTimedelta": { "type": "string", "format": "duration" },
-      "TapQuota": {
+      "TapQuota-Input": {
         "properties": {
           "concurrent": {
             "type": "integer",
             "title": "Concurrent queries",
             "examples": [5]
+          },
+          "bytesBilled": {
+            "anyOf": [{ "type": "integer" }, { "type": "null" }],
+            "title": "Bytes billed",
+            "examples": [10737418240]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": ["concurrent"],
+        "title": "TapQuota",
+        "description": "TAP quota information for a user."
+      },
+      "TapQuota-Output": {
+        "properties": {
+          "concurrent": {
+            "type": "integer",
+            "title": "Concurrent queries",
+            "examples": [5]
+          },
+          "bytes_billed": {
+            "anyOf": [{ "type": "integer" }, { "type": "null" }],
+            "title": "Bytes billed",
+            "examples": [10737418240]
           }
         },
         "additionalProperties": false,
@@ -3302,7 +3422,7 @@
           },
           "quota": {
             "anyOf": [
-              { "$ref": "#/components/schemas/Quota" },
+              { "$ref": "#/components/schemas/Quota-Output" },
               { "type": "null" }
             ],
             "title": "Quota"
@@ -3400,5 +3520,27 @@
         "scheme": "basic"
       }
     }
-  }
+  },
+  "tags": [
+    {
+      "name": "user",
+      "description": "APIs that can be used by regular users."
+    },
+    {
+      "name": "admin",
+      "description": "APIs that can only be used by administrators."
+    },
+    {
+      "name": "oidc",
+      "description": "OpenID Connect routes used by protected services."
+    },
+    {
+      "name": "browser",
+      "description": "Routes intended for use from a web browser."
+    },
+    {
+      "name": "internal",
+      "description": "Internal routes used by the ingress and health checks."
+    }
+  ]
 }
