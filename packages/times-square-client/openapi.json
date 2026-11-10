@@ -3,7 +3,7 @@
   "info": {
     "title": "Times Square",
     "description": "**Times Square is a Rubin Science Platform (RSP) service for displaying parameterized Jupyter Notebooks as websites.**\n\nExcellent applications for Times Square include:\n\n- Engineering dashboards\n- Quick-look data previewing\n- Reports that incorporate live data sources\n\nThe design and architecture of Times Square is described in [The Times Square service for publishing parameterized Jupyter Notebooks in the Rubin Science platform](https://sqr-062.lsst.io).\nTimes Square uses Noteburst ([GitHub](https://github.com/lsst-sqre/noteburst), [SQR-065](https://sqr-065.lsst.io)) to execute Jupyter Notebooks in Nublado (JupyterLab) instances, thereby mechanizing the RSP's notebook aspect.\n\nThis Times Square API service is developed at [https://github.com/lsst-sqre/times-square](https://github.com/lsst-sqre/times-square).\nThe user interface is developed separately at [https://github.com/lsst-sqre/times-square-ui](https://github.com/lsst-sqre/times-square-ui).\n",
-    "version": "0.25.0"
+    "version": "0.27.4.dev18+gcb2c91d92"
   },
   "paths": {
     "/healthcheck": {
@@ -405,7 +405,7 @@
       "get": {
         "tags": ["Pages"],
         "summary": "Subscribe to an event stream for a page's execution and rendering.",
-        "description": "Subscribe to an event stream for a page's execution and rendering.",
+        "description": "Subscribe to an event stream for a page's execution and rendering.\n\nThe stream sends one event as soon as it is opened, reporting the current\nexecution and rendering state of the page instance. That initial event is\nsent even when nothing has happened yet, in which case every execution\nfield is null.\n\nAfter the initial event, an event is sent only when that state changes.\nUnchanged state is never restated, so a client that is up to date receives\nno data until the execution or rendering state moves; a gap between events\nmeans \"nothing has changed\", not a stalled stream. The connection is kept\nalive by the SSE comment pings (`: ping`) sent every 15 seconds.\n\nWhen an execution completes successfully, the stream renders and caches the\npage instance's HTML itself, then reports it in an event carrying\n`html_hash` and `html_url`. A subscriber therefore learns that the HTML is\nready without any client requesting the HTML endpoint.\n\nA terminal execution failure is reported once, in an event carrying\n`execution_error`. The server never closes the stream: it stays open after\na terminal failure, so a later re-execution of the page instance is\nreported on the same stream without resubscribing.",
         "operationId": "get_page_html_events_times_square_v1_pages__page__html_events_get",
         "parameters": [
           {

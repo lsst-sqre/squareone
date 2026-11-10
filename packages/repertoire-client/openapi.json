@@ -3,7 +3,7 @@
   "info": {
     "title": "Repertoire",
     "description": "Service discovery for the Rubin Science Platform",
-    "version": "3.0.0"
+    "version": "3.1.0"
   },
   "paths": {
     "/repertoire/": {
@@ -428,6 +428,11 @@
             "description": "Name of database to include in queries",
             "examples": ["efd", "lsst.square.metrics"]
           },
+          "description": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Description",
+            "description": "Long description of the InfluxDB database"
+          },
           "schema_registry": {
             "type": "string",
             "maxLength": 2083,
@@ -486,6 +491,11 @@
             "title": "Name of InfluxDB database",
             "description": "Name of database to include in queries",
             "examples": ["efd", "lsst.square.metrics"]
+          },
+          "description": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Description",
+            "description": "Long description of the InfluxDB database"
           },
           "schema_registry": {
             "type": "string",
