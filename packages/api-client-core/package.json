@@ -23,7 +23,7 @@
     "clean": "rm -rf node_modules"
   },
   "dependencies": {
-    "zod": "^4.5.4"
+    "zod": "^4.6.6"
   },
   "devDependencies": {
     "@lsst-sqre/eslint-config": "workspace:*",

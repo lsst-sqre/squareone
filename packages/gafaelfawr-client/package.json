@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "@lsst-sqre/api-client-core": "workspace:*",
-    "zod": "^4.5.4"
+    "zod": "^4.6.6"
   },
   "peerDependencies": {
     "@lsst-sqre/repertoire-client": "workspace:*",
