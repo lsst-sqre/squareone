@@ -1,5 +1,55 @@
 # squareone
 
+## 0.41.3
+
+### Patch Changes
+
+- [#792](https://github.com/lsst-sqre/squareone/pull/792) [`2f497c0`](https://github.com/lsst-sqre/squareone/commit/2f497c023703a376cc1a6f6476d8d612be7e7adb) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @biomejs/biome from 2.5.14 to 2.6.3
+
+- [#795](https://github.com/lsst-sqre/squareone/pull/795) [`c3cf8f1`](https://github.com/lsst-sqre/squareone/commit/c3cf8f1700fe038828672ca760e8c4471d5fc8cd) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @sentry/nextjs from 10.58.0 to 11.12.0
+
+- [#792](https://github.com/lsst-sqre/squareone/pull/792) [`2f497c0`](https://github.com/lsst-sqre/squareone/commit/2f497c023703a376cc1a6f6476d8d612be7e7adb) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump @turbo/gen from 2.11.4 to 2.11.10
+
+- [#794](https://github.com/lsst-sqre/squareone/pull/794) [`13efc7d`](https://github.com/lsst-sqre/squareone/commit/13efc7d31489e49594e6a18b9169f3c18788f74c) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump fast-copy from 4.0.2 to 4.3.1
+
+- [#796](https://github.com/lsst-sqre/squareone/pull/796) [`e838486`](https://github.com/lsst-sqre/squareone/commit/e838486297b22bf60bb2d0010da821fa901e2fc4) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump fast-uri from 3.1.5 to 3.1.9
+
+- [#789](https://github.com/lsst-sqre/squareone/pull/789) [`33cb89b`](https://github.com/lsst-sqre/squareone/commit/33cb89b846d006d3870eb060a0084ed141c4283c) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump github/codeql-action from 4.38.2 to 4.39.1 in the actions group
+
+- [#798](https://github.com/lsst-sqre/squareone/pull/798) [`009e12e`](https://github.com/lsst-sqre/squareone/commit/009e12e7dce2bd8b467839421cf31a201909645a) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump glob from 13.0.6 to 14.0.2
+
+- [#794](https://github.com/lsst-sqre/squareone/pull/794) [`13efc7d`](https://github.com/lsst-sqre/squareone/commit/13efc7d31489e49594e6a18b9169f3c18788f74c) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump js-yaml from 5.2.3 to 5.4.1
+
+- [#794](https://github.com/lsst-sqre/squareone/pull/794) [`13efc7d`](https://github.com/lsst-sqre/squareone/commit/13efc7d31489e49594e6a18b9169f3c18788f74c) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump launch-editor from 2.14.1 to 2.14.2
+
+- [#794](https://github.com/lsst-sqre/squareone/pull/794) [`13efc7d`](https://github.com/lsst-sqre/squareone/commit/13efc7d31489e49594e6a18b9169f3c18788f74c) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump next from 16.3.3 to 16.4.1
+
+- [#790](https://github.com/lsst-sqre/squareone/pull/790) [`446b672`](https://github.com/lsst-sqre/squareone/commit/446b672cf0bba2f532601c5cfce7d9e6690543d3) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump node from 24.21.0-alpine to 24.22.2-alpine in /apps/squareone in the docker group across 1 directory
+
+- [#792](https://github.com/lsst-sqre/squareone/pull/792) [`2f497c0`](https://github.com/lsst-sqre/squareone/commit/2f497c023703a376cc1a6f6476d8d612be7e7adb) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump playwright from 1.63.0 to 1.64.1
+
+- [#794](https://github.com/lsst-sqre/squareone/pull/794) [`13efc7d`](https://github.com/lsst-sqre/squareone/commit/13efc7d31489e49594e6a18b9169f3c18788f74c) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump postcss-selector-parser from 7.1.0 to 7.2.0
+
+- [#799](https://github.com/lsst-sqre/squareone/pull/799) [`532b97e`](https://github.com/lsst-sqre/squareone/commit/532b97e72b058b6a80fde9ff09934ab46f5c8ee0) Thanks [@dependabot](https://github.com/apps/dependabot)! - Migrate to the Sentry JavaScript SDK v11. `withSentryConfig` is now imported from `@sentry/nextjs/config`, and the removed `enableLogs` and `hideSourceMaps` options are gone (server-side pino logs still reach Sentry Logs through `pinoIntegration`). Every `Sentry.init()` now sets an explicit `dataCollection` baseline matching the v10 defaults, so the SDK's new permissive defaults do not start sending cookies, user info, or request and response bodies to Sentry.
+
+- [#794](https://github.com/lsst-sqre/squareone/pull/794) [`13efc7d`](https://github.com/lsst-sqre/squareone/commit/13efc7d31489e49594e6a18b9169f3c18788f74c) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump sharp from 0.35.4 to 0.35.5
+
+- [#794](https://github.com/lsst-sqre/squareone/pull/794) [`13efc7d`](https://github.com/lsst-sqre/squareone/commit/13efc7d31489e49594e6a18b9169f3c18788f74c) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump shell-quote from 1.10.0 to 1.12.0
+
+- [#794](https://github.com/lsst-sqre/squareone/pull/794) [`13efc7d`](https://github.com/lsst-sqre/squareone/commit/13efc7d31489e49594e6a18b9169f3c18788f74c) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump source-map-js from 1.2.1 to 1.2.2
+
+- [#792](https://github.com/lsst-sqre/squareone/pull/792) [`2f497c0`](https://github.com/lsst-sqre/squareone/commit/2f497c023703a376cc1a6f6476d8d612be7e7adb) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump turbo from 2.11.4 to 2.11.10
+
+- [#792](https://github.com/lsst-sqre/squareone/pull/792) [`2f497c0`](https://github.com/lsst-sqre/squareone/commit/2f497c023703a376cc1a6f6476d8d612be7e7adb) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump vite from 8.3.1 to 8.3.5
+
+- [#792](https://github.com/lsst-sqre/squareone/pull/792) [`2f497c0`](https://github.com/lsst-sqre/squareone/commit/2f497c023703a376cc1a6f6476d8d612be7e7adb) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump webpack from 5.111.1 to 5.112.2
+
+- [#797](https://github.com/lsst-sqre/squareone/pull/797) [`fdaa2bf`](https://github.com/lsst-sqre/squareone/commit/fdaa2bf41380289d10da0713b8c6498a2797ee80) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump zod from 4.5.4 to 4.6.6 in the security-patch group across 1 directory
+- Updated dependencies [[`128c779`](https://github.com/lsst-sqre/squareone/commit/128c779ed7402ef87051cb28ad43fc5471db9540)]:
+  - @lsst-sqre/gafaelfawr-client@3.2.2
+  - @lsst-sqre/repertoire-client@0.5.2
+  - @lsst-sqre/times-square-client@3.2.2
+
 ## 0.41.2
 
 ### Patch Changes
