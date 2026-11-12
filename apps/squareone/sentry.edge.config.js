@@ -4,6 +4,8 @@
 
 import * as Sentry from '@sentry/nextjs';
 
+import { sentryDataCollection } from './src/lib/sentry/dataCollection';
+
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
 
@@ -22,8 +24,12 @@ Sentry.init({
   // Define how likely traces are sampled.
   tracesSampleRate: parseFloat(process.env.SENTRY_TRACES_SAMPLE_RATE || '0'),
 
-  // No `enableLogs` here on purpose: Sentry Structured Logs are server-only —
-  // see src/lib/sentry/pinoLogsConfig.ts.
+  // Keep the restrictive v10 data-collection baseline (no cookies, bodies, or
+  // user info). See src/lib/sentry/dataCollection.ts.
+  dataCollection: sentryDataCollection,
+
+  // No logging integration here on purpose: Sentry Structured Logs are
+  // server-only — see src/lib/sentry/pinoLogsConfig.ts.
 
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,

@@ -7,8 +7,7 @@ import type * as Sentry from '@sentry/nextjs';
  * `pinoIntegration` has two independent channels:
  *
  * - `log.levels` — records at these levels are shipped to Sentry Logs
- *   (structured, searchable, trace-linked) via `_INTERNAL_captureLog`, gated
- *   on the client's `enableLogs` option.
+ *   (structured, searchable, trace-linked) via `_INTERNAL_captureLog`.
  * - `error.levels` — records at these levels are turned into Sentry issues via
  *   `captureException`/`captureMessage`, which can also fire Slack alerts.
  *
@@ -19,13 +18,14 @@ import type * as Sentry from '@sentry/nextjs';
  * reach Sentry Logs, while the chattier `info`/`debug`/`trace` levels stay out
  * so the Logs stream is not flooded.
  *
- * Sentry Structured Logs are enabled server-side only: `enableLogs: true` lives
- * in `sentry.server.config.js` and nowhere else, because this bridge is the
- * only producer of Sentry Logs and it runs only in the Node runtime. The
- * browser (`instrumentation-client.js`) and edge (`sentry.edge.config.js`)
- * configs deliberately leave `enableLogs` unset. Note that the SDK drops
- * `Sentry.logger.*` calls silently when `enableLogs` is off, so a runtime that
- * ever needs to log to Sentry must turn it on in its own config first.
+ * Sentry Structured Logs are server-side only. SDK v11 removed the
+ * `enableLogs` option: logs are captured whenever a logging integration is
+ * registered or `Sentry.logger.*` is called, and there is no switch to turn
+ * them off. This bridge is registered in `sentry.server.config.js` and nowhere
+ * else, because it is the only producer of Sentry Logs and it runs only in the
+ * Node runtime. The browser (`instrumentation-client.js`) and edge
+ * (`sentry.edge.config.js`) configs register no logging integration, so keeping
+ * them log-free now depends on not calling `Sentry.logger.*` there.
  *
  * The exported type is wrapped in `NonNullable<>` because
  * `pinoIntegration`'s parameter is optional, so

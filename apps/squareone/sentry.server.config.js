@@ -4,6 +4,7 @@
 
 import * as Sentry from '@sentry/nextjs';
 
+import { sentryDataCollection } from './src/lib/sentry/dataCollection';
 import { pinoLogsIntegrationOptions } from './src/lib/sentry/pinoLogsConfig';
 
 /**
@@ -29,16 +30,16 @@ export function initServerSentry({ environment }) {
     // Define how likely traces are sampled.
     tracesSampleRate: parseFloat(process.env.SENTRY_TRACES_SAMPLE_RATE || '0'),
 
-    // Enable Sentry Structured Logs so the pino bridge below can ship server-side
-    // pino records to Sentry Logs (searchable, trace-linked). This does not by
-    // itself create issues or alerts. Set here and nowhere else — rationale in
-    // src/lib/sentry/pinoLogsConfig.ts.
-    enableLogs: true,
+    // Keep the restrictive v10 data-collection baseline (no cookies, bodies, or
+    // user info). See src/lib/sentry/dataCollection.ts.
+    dataCollection: sentryDataCollection,
 
-    // Bridge server-side pino warn/error records to Sentry Logs only. The bridge
-    // never creates Sentry issues or fires alerts (error.levels is empty); the
-    // explicit reportError channel remains the sole alerting path, so there is no
-    // double-capture. See src/lib/sentry/pinoLogsConfig.ts.
+    // Bridge server-side pino warn/error records to Sentry Logs only. Adding
+    // the integration is what turns Sentry Structured Logs on (SDK v11 removed
+    // the `enableLogs` option); it is registered here and nowhere else. The
+    // bridge never creates Sentry issues or fires alerts (error.levels is
+    // empty); the explicit reportError channel remains the sole alerting path,
+    // so there is no double-capture. See src/lib/sentry/pinoLogsConfig.ts.
     //
     // Per-record cost: registering this integration subscribes process-wide to
     // pino's `pino_asJson` tracing channel, so *every* pino record that clears

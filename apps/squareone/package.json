@@ -26,7 +26,7 @@
     "@lsst-sqre/semaphore-client": "workspace:*",
     "@lsst-sqre/squared": "workspace:*",
     "@lsst-sqre/times-square-client": "workspace:*",
-    "@sentry/nextjs": "^10.75.2",
+    "@sentry/nextjs": "^11.12.0",
     "@tanstack/react-query": "^5.90.20",
     "ajv": "^8.18.0",
     "ajv-formats": "^3.0.1",
