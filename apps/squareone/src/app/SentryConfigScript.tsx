@@ -11,7 +11,7 @@ type SentryConfigScriptProps = {
  * Server component that injects Sentry configuration into the browser.
  *
  * This replaces the _document.tsx pattern for App Router. The client-side
- * Sentry instrumentation (instrumentation-client.js) reads from
+ * Sentry instrumentation (src/instrumentation-client.js) reads from
  * window.__SENTRY_CONFIG__ to initialize with runtime configuration.
  *
  * This enables Sentry DSN and other settings to be configured at runtime

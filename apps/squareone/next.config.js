@@ -157,7 +157,7 @@ const sentryWrappedConfig = withSentryConfig(module.exports, {
   // build cache on the SHA, as the value is baked into the client bundle).
   // Unset in local dev/builds, where the plugin degrades gracefully to no
   // release. At runtime the client release is (re-)set from
-  // window.__SENTRY_CONFIG__ (see instrumentation-client.js), which carries the
+  // window.__SENTRY_CONFIG__ (see src/instrumentation-client.js), which carries the
   // same SHA.
   release: {
     name: process.env.SENTRY_RELEASE,
@@ -187,15 +187,17 @@ const sentryWrappedConfig = withSentryConfig(module.exports, {
   // afterwards (`sourcemaps.deleteSourcemapsAfterUpload` defaults to true), so
   // they never ship in the image.
 
+  // Annotate React components at build time so breadcrumbs and session replay
+  // show their full names. Top-level so it applies to Turbopack builds (the
+  // Next.js 16 default) as well as webpack ones.
+  reactComponentAnnotation: {
+    enabled: true,
+  },
+
   // Webpack-specific build options. Next.js 16 builds with Turbopack by
   // default, where these options are no-ops; they apply only to builds run
   // with `next build --webpack`.
   webpack: {
-    // Automatically annotate React components to show their full name in breadcrumbs and session replay
-    reactComponentAnnotation: {
-      enabled: true,
-    },
-
     // Automatically tree-shake Sentry logger statements to reduce bundle size
     treeshake: {
       removeDebugLogging: true,

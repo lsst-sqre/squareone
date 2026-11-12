@@ -1,5 +1,9 @@
 // This file configures the initialization of Sentry for server and edge runtimes.
 // The config is imported by Next.js instrumentation hook when the server starts.
+//
+// It must live next to the `app` directory (so in `src/`, not the app root):
+// that is the only place Next.js documents loading it from, and the Sentry SDK
+// warns at startup when it is missing there.
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from '@sentry/nextjs';
@@ -13,20 +17,20 @@ export async function register() {
     // subscription sees every tunnel request. See the module for the removal
     // condition.
     const { installTunnelResponseListenerLimit } = await import(
-      './src/lib/server/tunnelResponseListeners'
+      './lib/server/tunnelResponseListeners'
     );
-    const { SENTRY_TUNNEL_ROUTE } = await import('./sentry.tunnel.config');
+    const { SENTRY_TUNNEL_ROUTE } = await import('../sentry.tunnel.config');
     installTunnelResponseListenerLimit({ tunnelRoute: SENTRY_TUNNEL_ROUTE });
 
     // The Pino logger is Node-only (register() also runs in the edge runtime),
     // so it is imported dynamically.
-    const { default: logger } = await import('./src/lib/logger');
+    const { default: logger } = await import('./lib/logger');
 
     // Log Node process warnings through pino as well as stderr, so the Sentry
     // pino bridge ships them to Sentry Logs. Installed before Sentry and
     // before the server takes requests, so startup warnings are logged too.
     const { installProcessWarningLogger } = await import(
-      './src/lib/server/processWarnings'
+      './lib/server/processWarnings'
     );
     installProcessWarningLogger(logger);
 
@@ -35,11 +39,11 @@ export async function register() {
     // Sentry starts, so server and browser events agree. The discovery fetch
     // is bounded, so an unavailable Repertoire can't hold up startup.
     const { resolveServerSentryEnvironment } = await import(
-      './src/lib/sentry/serverEnvironment'
+      './lib/sentry/serverEnvironment'
     );
     const environment = await resolveServerSentryEnvironment();
 
-    const { initServerSentry } = await import('./sentry.server.config');
+    const { initServerSentry } = await import('../sentry.server.config');
     initServerSentry({ environment });
 
     // Emit a one-time startup line carrying the build's version + revision
@@ -49,11 +53,9 @@ export async function register() {
   }
 
   if (process.env.NEXT_RUNTIME === 'edge') {
-    await import('./sentry.edge.config');
+    await import('../sentry.edge.config');
   }
 }
 
-// Type assertion for captureRequestError to handle version differences
-export const onRequestError = (
-  Sentry as unknown as { captureRequestError: unknown }
-).captureRequestError;
+// Report errors from server components, route handlers, and server actions.
+export const onRequestError = Sentry.captureRequestError;

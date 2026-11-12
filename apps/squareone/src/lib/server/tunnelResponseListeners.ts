@@ -16,7 +16,7 @@
  * response keeps Node's default of 10, so the warning stays a real signal
  * elsewhere (an ordinary page render stays below 10 `close` listeners).
  *
- * Remove this module, and its call in instrumentation.ts, once Squareone runs a
+ * Remove this module, and its call in src/instrumentation.ts, once Squareone runs a
  * Next.js release that contains the upstream fix, vercel/next.js#97818.
  */
 
