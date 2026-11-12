@@ -140,7 +140,7 @@ module.exports = (phase) => {
 
 // Injected content via Sentry wizard below
 
-const { withSentryConfig } = require('@sentry/nextjs');
+const { withSentryConfig } = require('@sentry/nextjs/config');
 const { SENTRY_TUNNEL_ROUTE } = require('./sentry.tunnel.config');
 
 const sentryWrappedConfig = withSentryConfig(module.exports, {
@@ -180,8 +180,12 @@ const sentryWrappedConfig = withSentryConfig(module.exports, {
   // sentry.tunnel.config.js.
   tunnelRoute: SENTRY_TUNNEL_ROUTE,
 
-  // Hides source maps from generated client bundles
-  hideSourceMaps: true,
+  // Source maps need no option here. On Turbopack builds the SDK turns on
+  // browser source map generation itself (as long as this config leaves
+  // `productionBrowserSourceMaps` unset), uploads the maps to Sentry when
+  // SENTRY_AUTH_TOKEN is present, and deletes them from the build output
+  // afterwards (`sourcemaps.deleteSourcemapsAfterUpload` defaults to true), so
+  // they never ship in the image.
 
   // Webpack-specific build options. Next.js 16 builds with Turbopack by
   // default, where these options are no-ops; they apply only to builds run
