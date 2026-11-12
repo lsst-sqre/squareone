@@ -9,7 +9,7 @@ import { pinoLogsIntegrationOptions } from './src/lib/sentry/pinoLogsConfig';
 
 /**
  * Initialize Sentry for the Node.js server runtime. Called once from the
- * instrumentation hook's `register()` (see instrumentation.ts).
+ * instrumentation hook's `register()` (see src/instrumentation.ts).
  *
  * @param {object} options
  * @param {string} options.environment - The Sentry environment: the resolved
@@ -47,7 +47,7 @@ export function initServerSentry({ environment }) {
     // traceSync wrapper, a JSON.parse of the serialized record, and a symbol
     // scan before the log.levels filter drops it. Info records pay it too; the
     // bridge is only effectively free at the shipped LOG_LEVEL=info because the
-    // app emits a single info record, the boot line in instrumentation.ts. An
+    // app emits a single info record, the boot line in src/instrumentation.ts. An
     // operator who sets LOG_LEVEL=debug on a pod that has a DSN pays it on the
     // whole debug firehose. There is no config-only mitigation:
     // pinoIntegration's trackLogger/untrackLogger select loggers, not levels.

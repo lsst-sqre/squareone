@@ -8,8 +8,8 @@
 
 import * as Sentry from '@sentry/nextjs';
 
-import { beforeSend } from './src/lib/sentry/beforeSend';
-import { sentryDataCollection } from './src/lib/sentry/dataCollection';
+import { beforeSend } from './lib/sentry/beforeSend';
+import { sentryDataCollection } from './lib/sentry/dataCollection';
 
 // Get configuration injected by SentryConfigScript from server-side AppConfig.
 // Use defensive check: window.__SENTRY_CONFIG__ may be undefined if Sentry

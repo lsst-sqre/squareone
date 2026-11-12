@@ -1,4 +1,4 @@
-// Client-side Sentry `beforeSend` hook wired into `instrumentation-client.js`.
+// Client-side Sentry `beforeSend` hook wired into `src/instrumentation-client.js`.
 //
 // It snapshots the `<body>` / `<html>` attribute names, hands that DOM-free
 // snapshot to the pure `classifyHydrationEvent` classifier, and folds the

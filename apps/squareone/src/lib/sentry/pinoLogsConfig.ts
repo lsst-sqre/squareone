@@ -23,7 +23,7 @@ import type * as Sentry from '@sentry/nextjs';
  * registered or `Sentry.logger.*` is called, and there is no switch to turn
  * them off. This bridge is registered in `sentry.server.config.js` and nowhere
  * else, because it is the only producer of Sentry Logs and it runs only in the
- * Node runtime. The browser (`instrumentation-client.js`) and edge
+ * Node runtime. The browser (`src/instrumentation-client.js`) and edge
  * (`sentry.edge.config.js`) configs register no logging integration, so keeping
  * them log-free now depends on not calling `Sentry.logger.*` there.
  *

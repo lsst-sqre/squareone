@@ -1,15 +1,14 @@
 /**
  * Tests for server-side Sentry startup: the instrumentation hook's
- * `register()` (instrumentation.ts) and `initServerSentry()`
- * (sentry.server.config.js), both at the app root.
+ * `register()` (src/instrumentation.ts) and `initServerSentry()`
+ * (sentry.server.config.js at the app root).
  */
 
 import * as Sentry from '@sentry/nextjs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-
-import { register } from '../../../instrumentation';
 import { initServerSentry } from '../../../sentry.server.config';
 import { SENTRY_TUNNEL_ROUTE } from '../../../sentry.tunnel.config';
+import { register } from '../../instrumentation';
 import logger from '../logger';
 import { installProcessWarningLogger } from '../server/processWarnings';
 import { installTunnelResponseListenerLimit } from '../server/tunnelResponseListeners';
