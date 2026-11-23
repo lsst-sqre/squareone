@@ -53,6 +53,15 @@ Probing the home page (``/``) has exactly that problem.
 Every render of ``/`` makes several outbound requests, to Repertoire for service discovery, to Semaphore for broadcasts and to Gafaelfawr for the user's identity and scopes, so each probe would make those requests too, and a slow or reset connection to any of them could fail the probe.
 ``/api/health`` makes none of them.
 
+Sentry tracing
+==============
+
+Requests to ``/api/health`` are never traced in Sentry, whatever ``SENTRY_TRACES_SAMPLE_RATE`` is set to.
+The probes call the endpoint every few seconds, so in an environment that traces every request (a sample rate of ``1``), each probe would otherwise become a Sentry transaction.
+
+Every other request is sampled as before: at ``SENTRY_TRACES_SAMPLE_RATE``, or following the sampling decision of the upstream service when the request continues a trace.
+The exclusion applies to tracing only, so errors are still reported to Sentry.
+
 Configuring the probes
 ======================
 

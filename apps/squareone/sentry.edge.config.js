@@ -21,7 +21,9 @@ Sentry.init({
   // runs here to report. Resolve it like the server before adding any.
   environment: process.env.SQUAREONE_ENVIRONMENT_NAME || 'development',
 
-  // Define how likely traces are sampled.
+  // Define how likely traces are sampled. Unlike the server, there is no
+  // tracesSampler dropping the /api/health probe route: that route runs in the
+  // Node.js runtime (see src/lib/sentry/tracesSampler.ts).
   tracesSampleRate: parseFloat(process.env.SENTRY_TRACES_SAMPLE_RATE || '0'),
 
   // Keep the restrictive v10 data-collection baseline (no cookies, bodies, or

@@ -6,6 +6,7 @@ import * as Sentry from '@sentry/nextjs';
 
 import { sentryDataCollection } from './src/lib/sentry/dataCollection';
 import { pinoLogsIntegrationOptions } from './src/lib/sentry/pinoLogsConfig';
+import { getTracesSampleRate } from './src/lib/sentry/tracesSampler';
 
 /**
  * Initialize Sentry for the Node.js server runtime. Called once from the
@@ -18,6 +19,10 @@ import { pinoLogsIntegrationOptions } from './src/lib/sentry/pinoLogsConfig';
  *   environment as the browser's injected Sentry config.
  */
 export function initServerSentry({ environment }) {
+  const tracesSampleRate = parseFloat(
+    process.env.SENTRY_TRACES_SAMPLE_RATE || '0'
+  );
+
   Sentry.init({
     dsn: process.env.SENTRY_DSN,
 
@@ -27,8 +32,14 @@ export function initServerSentry({ environment }) {
 
     environment,
 
-    // Define how likely traces are sampled.
-    tracesSampleRate: parseFloat(process.env.SENTRY_TRACES_SAMPLE_RATE || '0'),
+    // Define how likely traces are sampled: never for the /api/health probe
+    // route, otherwise at SENTRY_TRACES_SAMPLE_RATE or as the upstream service
+    // decided. See src/lib/sentry/tracesSampler.ts. The SDK ignores
+    // tracesSampleRate while tracesSampler is set, except as its fallback if the
+    // sampler throws, so it is kept to fail back to the plain rate.
+    tracesSampleRate,
+    tracesSampler: (samplingContext) =>
+      getTracesSampleRate(samplingContext, tracesSampleRate),
 
     // Keep the restrictive v10 data-collection baseline (no cookies, bodies, or
     // user info). See src/lib/sentry/dataCollection.ts.

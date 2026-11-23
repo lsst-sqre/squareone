@@ -12,6 +12,7 @@ const { loadAppConfig } = vi.hoisted(() => ({
 }));
 vi.mock('@/lib/config/loader', () => ({ loadAppConfig }));
 
+import * as route from './route';
 import { dynamic, GET } from './route';
 
 describe('GET /api/health', () => {
@@ -86,5 +87,11 @@ describe('GET /api/health', () => {
 
     expect(response.status).toBe(200);
     expect(loadAppConfig).not.toHaveBeenCalled();
+  });
+
+  it('runs in the Node.js runtime, where its Sentry traces are dropped', () => {
+    // Only the Node.js server's Sentry config excludes this route from tracing
+    // (src/lib/sentry/tracesSampler.ts); sentry.edge.config.js does not.
+    expect(route).not.toHaveProperty('runtime', 'edge');
   });
 });

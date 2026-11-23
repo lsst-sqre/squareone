@@ -13,6 +13,7 @@ import logger from '../logger';
 import { installProcessWarningLogger } from '../server/processWarnings';
 import { installTunnelResponseListenerLimit } from '../server/tunnelResponseListeners';
 import { resolveServerSentryEnvironment } from './serverEnvironment';
+import type { TracesSamplingContext } from './tracesSampler';
 
 vi.mock('@sentry/nextjs', () => ({
   init: vi.fn(),
@@ -125,15 +126,61 @@ describe('register() in the edge runtime', () => {
 });
 
 describe('initServerSentry', () => {
-  it('uses the given environment, not SQUAREONE_ENVIRONMENT_NAME', async () => {
+  /** Run the real initServerSentry and return the options it passed. */
+  async function initOptions() {
     const actual = await vi.importActual<
       typeof import('../../../sentry.server.config')
     >('../../../sentry.server.config');
-
     actual.initServerSentry({ environment: 'idfdev' });
+    const [options] = vi.mocked(Sentry.init).mock.calls[0];
+    return options;
+  }
 
-    expect(Sentry.init).toHaveBeenCalledWith(
-      expect.objectContaining({ environment: 'idfdev' })
-    );
+  /** A root span sampling context for an incoming GET of `path`. */
+  function requestContext(path: string): TracesSamplingContext {
+    return {
+      name: 'GET',
+      attributes: { 'http.method': 'GET', 'http.target': path },
+      normalizedRequest: { url: `http://10.1.2.3:3000${path}`, method: 'GET' },
+      inheritOrSampleWith: (fallbackSampleRate) => fallbackSampleRate,
+    };
+  }
+
+  it('uses the given environment, not SQUAREONE_ENVIRONMENT_NAME', async () => {
+    const options = await initOptions();
+
+    expect(options).toEqual(expect.objectContaining({ environment: 'idfdev' }));
+  });
+
+  it('never traces the health check, even at a sample rate of 1', async () => {
+    vi.stubEnv('SENTRY_TRACES_SAMPLE_RATE', '1');
+
+    const { tracesSampler } = await initOptions();
+
+    expect(tracesSampler?.(requestContext('/api/health'))).toBe(0);
+  });
+
+  it('traces other requests at SENTRY_TRACES_SAMPLE_RATE', async () => {
+    vi.stubEnv('SENTRY_TRACES_SAMPLE_RATE', '1');
+
+    const { tracesSampler } = await initOptions();
+
+    expect(tracesSampler?.(requestContext('/'))).toBe(1);
+  });
+
+  it('traces nothing when SENTRY_TRACES_SAMPLE_RATE is unset', async () => {
+    vi.stubEnv('SENTRY_TRACES_SAMPLE_RATE', undefined);
+
+    const { tracesSampler } = await initOptions();
+
+    expect(tracesSampler?.(requestContext('/'))).toBe(0);
+  });
+
+  it('keeps SENTRY_TRACES_SAMPLE_RATE as the fallback tracesSampleRate', async () => {
+    vi.stubEnv('SENTRY_TRACES_SAMPLE_RATE', '0.5');
+
+    const options = await initOptions();
+
+    expect(options.tracesSampleRate).toBe(0.5);
   });
 });
