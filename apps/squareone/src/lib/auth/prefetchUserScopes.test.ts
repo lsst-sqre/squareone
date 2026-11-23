@@ -99,6 +99,7 @@ describe('prefetchUserScopes', () => {
         credentials: 'include',
         headers: { cookie: SESSION_COOKIE },
         cache: 'no-store',
+        signal: expect.any(AbortSignal),
       });
       expect(dehydratedScopes(queryClient)?.state.data).toEqual(SCOPES);
       // Reading the scopes cached login info in the layout's client, but its
@@ -145,6 +146,7 @@ describe('prefetchUserScopes', () => {
         credentials: 'include',
         headers: { authorization: `Bearer ${DELEGATED_TOKEN}` },
         cache: 'no-store',
+        signal: expect.any(AbortSignal),
       });
       expect(dehydratedScopes(queryClient)?.state.data).toEqual(SCOPES);
       // Login info is cookie-only, so it is not even read here.

@@ -1,3 +1,4 @@
+import { QueryTimeoutError } from '@lsst-sqre/api-client-core';
 import { QueryClient } from '@tanstack/react-query';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ZodError } from 'zod';
@@ -6,6 +7,7 @@ import { mockTokenDetail } from './mock-data';
 import {
   type AuthQueryConfig,
   loginInfoQueryOptions,
+  type UserScopesSource,
   userInfoQueryOptions,
   userScopesQueryOptions,
 } from './query-options';
@@ -37,6 +39,15 @@ function mockFetchStatus(status: number) {
       json: async () => ({}),
     }))
   );
+}
+
+/** Stub `fetch` with a request that never answers, as a hung upstream. */
+function mockFetchHang() {
+  const fetchMock = vi.fn(
+    (_url: string, _init?: RequestInit) => new Promise<never>(() => {})
+  );
+  vi.stubGlobal('fetch', fetchMock);
+  return fetchMock;
 }
 
 /** Stub `fetch` to reject with a network-level failure (no HTTP status). */
@@ -305,7 +316,39 @@ describe.each([
     expect(fetchMock).toHaveBeenCalledWith(url, {
       credentials: 'include',
       cache: 'no-store',
+      signal: expect.any(AbortSignal),
     });
+  });
+
+  it("passes a server-side attempt's signal to fetch and aborts it on timeout", async () => {
+    vi.useFakeTimers();
+    try {
+      const fetchMock = mockFetchHang();
+      const reportError = vi.fn();
+      const opts = factory(baseUrl, {
+        headers: { cookie: 'gafaelfawr=session' },
+        isServer: true,
+        reportError,
+      });
+      // biome-ignore lint/style/noNonNullAssertion: queryFn is always defined for our factory
+      const result = opts.queryFn!({} as never);
+      await vi.advanceTimersByTimeAsync(5000);
+      await result;
+
+      expect(fetchMock).toHaveBeenCalledWith(url, {
+        credentials: 'include',
+        headers: { cookie: 'gafaelfawr=session' },
+        cache: 'no-store',
+        signal: expect.any(AbortSignal),
+      });
+      expect(fetchMock.mock.calls[0][1]?.signal?.aborted).toBe(true);
+      expect(reportError).toHaveBeenCalledWith(
+        expect.any(QueryTimeoutError),
+        {}
+      );
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
 
@@ -420,6 +463,60 @@ describe('userScopesQueryOptions', () => {
         expect.anything()
       );
     });
+  });
+
+  describe('server-side timeout', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it.each<{
+      source: UserScopesSource;
+      headers: Record<string, string>;
+      url: string;
+    }>([
+      {
+        source: 'login-info',
+        headers: { cookie: 'gafaelfawr=session' },
+        url: `${baseUrl}/login`,
+      },
+      {
+        source: 'token-info',
+        headers: { authorization: 'Bearer gt-delegated' },
+        url: `${baseUrl}/token-info`,
+      },
+    ])(
+      "passes the attempt's signal to the $source fetch and aborts it on timeout",
+      async ({ source, headers, url }) => {
+        const fetchMock = mockFetchHang();
+        const reportError = vi.fn();
+
+        const result = runScopesQuery({
+          source,
+          headers,
+          isServer: true,
+          reportError,
+        });
+        await vi.advanceTimersByTimeAsync(5000);
+
+        await expect(result).resolves.toBeNull();
+        expect(fetchMock).toHaveBeenCalledWith(url, {
+          credentials: 'include',
+          headers,
+          cache: 'no-store',
+          signal: expect.any(AbortSignal),
+        });
+        expect(fetchMock.mock.calls[0][1]?.signal?.aborted).toBe(true);
+        expect(reportError).toHaveBeenCalledWith(
+          expect.any(QueryTimeoutError),
+          {}
+        );
+      }
+    );
   });
 
   it('is keyed separately from login info, fresh for 30 seconds', () => {

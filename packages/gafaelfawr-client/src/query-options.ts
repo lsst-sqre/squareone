@@ -56,8 +56,10 @@ export type AuthQueryConfig = {
   /** Context (e.g. `{ site, package }`) forwarded to `reportError`. */
   context?: ReportContext;
   /**
-   * Runtime override forwarded to the error classifier: controls whether
-   * network-level failures are report-worthy. Defaults to auto-detection.
+   * Runtime override forwarded to `reportingQueryFn`: server-side, the
+   * user-info / login-info / token-info request is aborted after a timeout, a
+   * network-level failure is retried once, and one that persists is
+   * report-worthy. Defaults to auto-detection.
    *
    * `true` also makes the user-info / login-info fetch `cache: 'no-store'`
    * (see {@link AuthQueryConfig.headers}).
@@ -96,6 +98,18 @@ function authRequestInit(
     : { headers, cache: 'no-store' };
 }
 
+/**
+ * `init` plus the abort signal `reportingQueryFn` passes a server-side attempt,
+ * so a timed-out request is cancelled. Without a signal (in the browser),
+ * `init` is returned unchanged.
+ */
+function withSignal(
+  init: AuthRequestInit | undefined,
+  signal: AbortSignal | undefined
+): AuthRequestInit | undefined {
+  return signal === undefined ? init : { ...init, signal };
+}
+
 // =============================================================================
 // User Info Query
 // =============================================================================
@@ -126,7 +140,7 @@ export const userInfoQueryOptions = (
     // contract drift, 5xx, server-side network errors). This makes an API
     // outage distinguishable from a genuine not-logged-in state.
     queryFn: reportingQueryFn<UserInfo>({
-      fetchFn: () => fetchUserInfo(baseUrl, init),
+      fetchFn: (signal) => fetchUserInfo(baseUrl, withSignal(init, signal)),
       fallback: getEmptyUserInfo(),
       logger,
       reportError,
@@ -167,7 +181,7 @@ export const loginInfoQueryOptions = (
     // 5xx, server-side network errors). A silently-null `csrfToken` from a
     // non-auth failure is thus now operator-visible in Sentry.
     queryFn: reportingQueryFn<LoginInfo | null>({
-      fetchFn: () => fetchLoginInfo(baseUrl, init),
+      fetchFn: (signal) => fetchLoginInfo(baseUrl, withSignal(init, signal)),
       fallback: null,
       logger,
       reportError,
@@ -231,7 +245,8 @@ export const userScopesQueryOptions = (
     const { reportError, context, isServer } = authOptions;
     const init = authRequestInit(authOptions);
     return reportingQueryFn<string[] | null>({
-      fetchFn: async () => (await fetchTokenInfo(baseUrl, init)).scopes,
+      fetchFn: async (signal) =>
+        (await fetchTokenInfo(baseUrl, withSignal(init, signal))).scopes,
       fallback: null,
       logger,
       reportError,

@@ -21,8 +21,9 @@ export type DiscoveryQueryConfig = {
   /** Context (e.g. `{ site, package }`) forwarded to `reportError`. */
   context?: ReportContext;
   /**
-   * Runtime override forwarded to the error classifier: controls whether
-   * network-level failures are report-worthy. Defaults to auto-detection.
+   * Runtime override forwarded to `reportingQueryFn`: server-side, the request
+   * is aborted after a timeout, a network-level failure is retried once, and
+   * one that persists is report-worthy. Defaults to auto-detection.
    */
   isServer?: boolean;
 };
@@ -41,7 +42,8 @@ export const discoveryQueryOptions = (
     // every failure, and invokes the injected `reportError` for report-worthy
     // ones (ZodError contract drift, 5xx, server-side network errors).
     queryFn: reportingQueryFn<ServiceDiscovery>({
-      fetchFn: () => {
+      // `signal` is set server-side and aborts the request on a timeout.
+      fetchFn: (signal) => {
         const requestId = Math.random().toString(36).substring(7);
         const env = typeof window === 'undefined' ? 'server' : 'client';
         logger.debug(
@@ -56,6 +58,7 @@ export const discoveryQueryOptions = (
           requestId,
           logger,
           forceRefresh: env === 'client',
+          signal,
         });
       },
       fallback: getEmptyDiscovery(),

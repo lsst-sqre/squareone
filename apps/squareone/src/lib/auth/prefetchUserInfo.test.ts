@@ -79,6 +79,7 @@ describe('prefetchUserInfo', () => {
       credentials: 'include',
       headers: { cookie: SESSION_COOKIE },
       cache: 'no-store',
+      signal: expect.any(AbortSignal),
     });
     expect(dehydratedUserInfo(queryClient)?.state.data).toEqual(mockUserInfo);
   });
@@ -102,6 +103,7 @@ describe('prefetchUserInfo', () => {
       credentials: 'include',
       headers: { authorization: `Bearer ${DELEGATED_TOKEN}` },
       cache: 'no-store',
+      signal: expect.any(AbortSignal),
     });
     expect(dehydratedUserInfo(queryClient)?.state.data).toEqual(mockUserInfo);
   });
@@ -119,6 +121,7 @@ describe('prefetchUserInfo', () => {
     expect(fetchMock).toHaveBeenCalledWith(`${GAFAELFAWR_URL}/user-info`, {
       credentials: 'include',
       cache: 'no-store',
+      signal: expect.any(AbortSignal),
     });
     // Empty user info is what `useUserInfo` reads as "not logged in", so the
     // server and the first client render agree on showing "Log in".

@@ -23,6 +23,27 @@ export type ClassifyErrorOptions = {
 };
 
 /**
+ * The error a server-side `reportingQueryFn` attempt fails with when it takes
+ * longer than its timeout. The attempt's request is aborted with this error as
+ * the signal's reason.
+ *
+ * It carries no HTTP status, so it is a network-level failure
+ * ({@link isNetworkError}): report-worthy server-side. Its own `name`
+ * (`QueryTimeoutError`) keeps it apart from a connection failure's
+ * `TypeError` wherever errors are grouped by name, such as a reporter's
+ * dedupe key.
+ */
+export class QueryTimeoutError extends Error {
+  /**
+   * @param timeoutMs - The timeout that elapsed, in milliseconds.
+   */
+  constructor(public readonly timeoutMs: number) {
+    super(`API query timed out after ${timeoutMs} ms`);
+    this.name = 'QueryTimeoutError';
+  }
+}
+
+/**
  * Resolve whether code is running server-side: an explicit override wins,
  * otherwise a server (Node) runtime is detected by the absence of the `window`
  * global.

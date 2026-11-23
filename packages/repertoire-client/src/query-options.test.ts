@@ -1,3 +1,4 @@
+import { QueryTimeoutError } from '@lsst-sqre/api-client-core';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ZodError } from 'zod';
 import { clearDiscoveryCache, getEmptyDiscovery } from './client';
@@ -342,6 +343,45 @@ describe('discoveryQueryOptions', () => {
 
       expect(result).toEqual(getEmptyDiscovery());
       expect(reportError).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('server-side timeout', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+      vi.restoreAllMocks();
+    });
+
+    it("passes the attempt's signal to fetch and aborts it on timeout", async () => {
+      const mockFetch = vi.fn(
+        (_url: string, _init?: RequestInit) => new Promise<never>(() => {})
+      );
+      vi.stubGlobal('fetch', mockFetch);
+      const reportError = vi.fn();
+
+      const opts = discoveryQueryOptions('https://example.com/repertoire', {
+        reportError,
+        isServer: true,
+      });
+      // biome-ignore lint/style/noNonNullAssertion: test assertion
+      const result = opts.queryFn!({} as never);
+      await vi.advanceTimersByTimeAsync(5000);
+
+      await expect(result).resolves.toEqual(getEmptyDiscovery());
+      expect(mockFetch).toHaveBeenCalledWith(
+        'https://example.com/repertoire/discovery',
+        { cache: 'no-store', signal: expect.any(AbortSignal) }
+      );
+      expect(mockFetch.mock.calls[0][1]?.signal?.aborted).toBe(true);
+      expect(reportError).toHaveBeenCalledWith(
+        expect.any(QueryTimeoutError),
+        {}
+      );
     });
   });
 

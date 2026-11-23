@@ -6,6 +6,7 @@ vi.mock('@sentry/nextjs', () => ({
   captureException: vi.fn(),
 }));
 
+import { QueryTimeoutError } from '@lsst-sqre/api-client-core';
 import * as Sentry from '@sentry/nextjs';
 import { __resetReportErrorDedupe, makeReportError } from './reportError';
 
@@ -96,6 +97,19 @@ describe('reportError', () => {
 
     reportError(new TransientError('503'), context);
     reportError(new ContractError('schema drift'), context);
+
+    expect(captureException).toHaveBeenCalledTimes(2);
+  });
+
+  test('a server-side timeout captures separately from a connection reset', () => {
+    // A hung upstream and a reset connection are different outages; one
+    // must not hide the other inside the dedupe window.
+    const reportError = makeReportError({ isServer: true });
+    const context = { site: 'service-discovery' };
+
+    reportError(new TypeError('fetch failed'), context);
+    reportError(new QueryTimeoutError(5000), context);
+    reportError(new QueryTimeoutError(5000), context);
 
     expect(captureException).toHaveBeenCalledTimes(2);
   });

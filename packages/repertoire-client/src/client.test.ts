@@ -127,6 +127,53 @@ describe('fetchServiceDiscovery', () => {
       fetchServiceDiscovery('https://example.com/repertoire')
     ).rejects.toThrow('Network request failed');
   });
+
+  it('passes the signal option to fetch', async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve(mockDiscovery),
+    });
+    vi.stubGlobal('fetch', mockFetch);
+    const { signal } = new AbortController();
+
+    await fetchServiceDiscovery('https://example.com/repertoire', { signal });
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      'https://example.com/repertoire/discovery',
+      { cache: 'no-store', signal }
+    );
+  });
+
+  it('never caches the response of an aborted request', async () => {
+    // The request is aborted while its body is read, but the body still
+    // arrives (as with a fetch that ignores the abort): the caller has given
+    // up, so the document must not be cached for later requests.
+    const controller = new AbortController();
+    const reason = new Error('timed out');
+    const mockFetch = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => {
+          controller.abort(reason);
+          return Promise.resolve(mockDiscovery);
+        },
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockDiscovery),
+      });
+    vi.stubGlobal('fetch', mockFetch);
+
+    await expect(
+      fetchServiceDiscovery('https://example.com/repertoire', {
+        signal: controller.signal,
+      })
+    ).rejects.toBe(reason);
+    await fetchServiceDiscovery('https://example.com/repertoire');
+
+    expect(mockFetch).toHaveBeenCalledTimes(2);
+  });
 });
 
 describe('getEmptyDiscovery', () => {

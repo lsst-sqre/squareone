@@ -36,6 +36,12 @@ export type FetchOptions = {
   requestId?: string;
   forceRefresh?: boolean;
   logger?: Logger;
+  /**
+   * Aborts the request, e.g. when a server-side query times out. An aborted
+   * request rejects with the signal's reason and never writes the
+   * cross-request cache, even if its response arrives anyway.
+   */
+  signal?: AbortSignal;
 };
 
 export async function fetchServiceDiscovery(
@@ -46,6 +52,7 @@ export async function fetchServiceDiscovery(
     requestId,
     forceRefresh = false,
     logger: log = defaultLogger,
+    signal,
   } = options ?? {};
 
   const now = Date.now();
@@ -73,7 +80,7 @@ export async function fetchServiceDiscovery(
   const startTime = Date.now();
   log.debug({ requestId, discoveryUrl }, 'Starting network fetch');
 
-  const response = await fetch(discoveryUrl, { cache: 'no-store' });
+  const response = await fetch(discoveryUrl, { cache: 'no-store', signal });
 
   const fetchDuration = Date.now() - startTime;
   log.debug(
@@ -101,6 +108,10 @@ export async function fetchServiceDiscovery(
     },
     'Parsed discovery'
   );
+
+  // The caller gave up on an aborted request (a server-side timeout, say), so
+  // its answer, however complete, must not be shared with later requests.
+  signal?.throwIfAborted();
 
   // Update module-level cache
   cachedDiscovery = parsed;

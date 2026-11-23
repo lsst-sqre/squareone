@@ -1,5 +1,6 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
+import { QueryTimeoutError } from './errors';
 import type { Logger } from './logger';
 import { reportingQueryFn } from './reporting-query-fn';
 
@@ -335,6 +336,228 @@ describe('reportingQueryFn', () => {
       await expect(fn()).resolves.toBe('fallback');
       expect(fetchFn).toHaveBeenCalledTimes(1);
       expect(logger.warn).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('server-side timeout', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    /** A fetchFn that never settles, as a hung upstream would. */
+    function hang() {
+      return vi.fn<(signal?: AbortSignal) => Promise<string>>(
+        () => new Promise<string>(() => {})
+      );
+    }
+
+    it('resolves to the fallback when fetchFn never settles', async () => {
+      const fn = reportingQueryFn({
+        fetchFn: hang(),
+        fallback: 'fallback',
+        logger: makeLogger(),
+        isServer: true,
+      });
+      const result = fn();
+      await vi.advanceTimersByTimeAsync(5000);
+      await expect(result).resolves.toBe('fallback');
+    });
+
+    it('aborts the signal passed to fetchFn with the timeout error', async () => {
+      const fetchFn = hang();
+      const fn = reportingQueryFn({
+        fetchFn,
+        fallback: 'fallback',
+        logger: makeLogger(),
+        isServer: true,
+      });
+      const result = fn();
+      const signal = fetchFn.mock.calls[0][0];
+      expect(signal).toBeInstanceOf(AbortSignal);
+      expect(signal?.aborted).toBe(false);
+
+      await vi.advanceTimersByTimeAsync(5000);
+      await result;
+      expect(signal?.aborted).toBe(true);
+      expect(signal?.reason).toBeInstanceOf(QueryTimeoutError);
+    });
+
+    it('logs and reports a timeout once, without retrying it', async () => {
+      const fetchFn = hang();
+      const logger = makeLogger();
+      const reportError = vi.fn();
+      const fn = reportingQueryFn({
+        fetchFn,
+        fallback: 'fallback',
+        logger,
+        reportError,
+        context: { site: 'broadcasts' },
+        isServer: true,
+      });
+      const result = fn();
+      await vi.advanceTimersByTimeAsync(60_000);
+      await expect(result).resolves.toBe('fallback');
+
+      expect(fetchFn).toHaveBeenCalledTimes(1);
+      expect(logger.warn).not.toHaveBeenCalled();
+      expect(logger.error).toHaveBeenCalledTimes(1);
+      expect(logger.error).toHaveBeenCalledWith(
+        { err: expect.any(QueryTimeoutError), site: 'broadcasts' },
+        expect.any(String)
+      );
+      expect(reportError).toHaveBeenCalledTimes(1);
+      expect(reportError).toHaveBeenCalledWith(expect.any(QueryTimeoutError), {
+        site: 'broadcasts',
+      });
+    });
+
+    it('reports a timeout under a name distinct from a fetch TypeError', async () => {
+      const reportError = vi.fn();
+      const fn = reportingQueryFn({
+        fetchFn: hang(),
+        fallback: 'fallback',
+        logger: makeLogger(),
+        reportError,
+        isServer: true,
+      });
+      const result = fn();
+      await vi.advanceTimersByTimeAsync(5000);
+      await result;
+
+      const [err] = reportError.mock.calls[0];
+      expect(err.name).toBe('QueryTimeoutError');
+      expect(err.name).not.toBe(new TypeError('fetch failed').name);
+    });
+
+    it('reports the timeout even when fetchFn rejects with its own abort error', async () => {
+      // `fetch` may reject an aborted request with a generic `AbortError`;
+      // the attempt still fails with the timeout error.
+      const reportError = vi.fn();
+      const fn = reportingQueryFn({
+        fetchFn: (signal) =>
+          new Promise<string>((_resolve, reject) => {
+            signal?.addEventListener('abort', () => {
+              reject(new DOMException('aborted', 'AbortError'));
+            });
+          }),
+        fallback: 'fallback',
+        logger: makeLogger(),
+        reportError,
+        isServer: true,
+      });
+      const result = fn();
+      await vi.advanceTimersByTimeAsync(5000);
+      await expect(result).resolves.toBe('fallback');
+      expect(reportError).toHaveBeenCalledWith(
+        expect.any(QueryTimeoutError),
+        {}
+      );
+    });
+
+    it('times out after 5 seconds by default', async () => {
+      let settled = false;
+      const fn = reportingQueryFn({
+        fetchFn: hang(),
+        fallback: 'fallback',
+        logger: makeLogger(),
+        isServer: true,
+      });
+      const result = fn().finally(() => {
+        settled = true;
+      });
+
+      await vi.advanceTimersByTimeAsync(4999);
+      expect(settled).toBe(false);
+      await vi.advanceTimersByTimeAsync(1);
+      expect(settled).toBe(true);
+      await expect(result).resolves.toBe('fallback');
+    });
+
+    it('takes the timeout from the timeoutMs option', async () => {
+      const reportError = vi.fn();
+      const fn = reportingQueryFn({
+        fetchFn: hang(),
+        fallback: 'fallback',
+        logger: makeLogger(),
+        reportError,
+        isServer: true,
+        timeoutMs: 250,
+      });
+      const result = fn();
+      await vi.advanceTimersByTimeAsync(250);
+      await expect(result).resolves.toBe('fallback');
+      expect(reportError.mock.calls[0][0]).toMatchObject({ timeoutMs: 250 });
+    });
+
+    it('times out the retry of a network failure too', async () => {
+      const reportError = vi.fn();
+      const fetchFn = hang().mockRejectedValueOnce(
+        new TypeError('fetch failed')
+      );
+      const fn = reportingQueryFn({
+        fetchFn,
+        fallback: 'fallback',
+        logger: makeLogger(),
+        reportError,
+        isServer: true,
+      });
+      const result = fn();
+      await vi.advanceTimersByTimeAsync(5000);
+      await expect(result).resolves.toBe('fallback');
+      expect(fetchFn).toHaveBeenCalledTimes(2);
+      expect(reportError).toHaveBeenCalledTimes(1);
+      expect(reportError).toHaveBeenCalledWith(
+        expect.any(QueryTimeoutError),
+        {}
+      );
+    });
+
+    it('clears the timer when an attempt settles in time', async () => {
+      const fetchFn = vi.fn<(signal?: AbortSignal) => Promise<string>>(
+        async () => 'ok'
+      );
+      const fn = reportingQueryFn({
+        fetchFn,
+        fallback: 'fallback',
+        logger: makeLogger(),
+        isServer: true,
+      });
+      await expect(fn()).resolves.toBe('ok');
+      expect(vi.getTimerCount()).toBe(0);
+      expect(fetchFn.mock.calls[0][0]?.aborted).toBe(false);
+    });
+
+    it('passes fetchFn no signal in the browser', async () => {
+      const fetchFn = vi.fn<(signal?: AbortSignal) => Promise<string>>(
+        async () => 'ok'
+      );
+      const fn = reportingQueryFn({
+        fetchFn,
+        fallback: 'fallback',
+        logger: makeLogger(),
+        isServer: false,
+      });
+      await fn();
+      expect(fetchFn).toHaveBeenCalledWith();
+    });
+
+    it('applies no timeout in the browser', async () => {
+      const fn = reportingQueryFn({
+        fetchFn: () =>
+          new Promise<string>((resolve) => {
+            setTimeout(() => resolve('ok'), 60_000);
+          }),
+        fallback: 'fallback',
+        logger: makeLogger(),
+        isServer: false,
+      });
+      const result = fn();
+      await vi.advanceTimersByTimeAsync(60_000);
+      await expect(result).resolves.toBe('ok');
     });
   });
 });

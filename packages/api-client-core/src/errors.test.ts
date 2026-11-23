@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import { classifyError, isNetworkError } from './errors';
+import { classifyError, isNetworkError, QueryTimeoutError } from './errors';
 
 /** A minimal HTTP-style error carrying a numeric statusCode, mirroring the
  * `SemaphoreError` / `RepertoireError` shape used across the client packages. */
@@ -78,5 +78,29 @@ describe('isNetworkError', () => {
 
   it('is false for a ZodError', () => {
     expect(isNetworkError(makeZodError())).toBe(false);
+  });
+
+  it('is true for a timeout', () => {
+    expect(isNetworkError(new QueryTimeoutError(5000))).toBe(true);
+  });
+});
+
+describe('QueryTimeoutError', () => {
+  it('has its own name, distinct from a fetch TypeError', () => {
+    const err = new QueryTimeoutError(5000);
+    expect(err.name).toBe('QueryTimeoutError');
+    expect(err.name).not.toBe(new TypeError('fetch failed').name);
+  });
+
+  it('records the timeout that elapsed', () => {
+    const err = new QueryTimeoutError(250);
+    expect(err.timeoutMs).toBe(250);
+    expect(err.message).toBe('API query timed out after 250 ms');
+  });
+
+  it('is classified report-worthy on the server', () => {
+    expect(classifyError(new QueryTimeoutError(5000), { isServer: true })).toBe(
+      'report-worthy'
+    );
   });
 });
