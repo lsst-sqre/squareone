@@ -1,4 +1,4 @@
-import { classifyError } from './errors';
+import { classifyError, isNetworkError, resolveIsServer } from './errors';
 import { defaultLogger, type Logger } from './logger';
 
 /**
@@ -38,8 +38,9 @@ export type ReportingQueryFnOptions<T> = {
   /** Context forwarded to {@link reportError}. */
   context?: ReportContext;
   /**
-   * Runtime override forwarded to the error classifier; controls whether
-   * network-level failures are report-worthy. Defaults to auto-detection.
+   * Runtime override for server-side behaviour: server-side, a network-level
+   * failure is retried once and is report-worthy if the retry fails too.
+   * Forwarded to the error classifier. Defaults to auto-detection.
    */
   isServer?: boolean;
 };
@@ -54,6 +55,12 @@ export type ReportingQueryFnOptions<T> = {
  * report-worthy failures (contract drift, 5xx, server-side network errors) also
  * invoke `reportError(err, context)`. The package itself never imports a
  * reporting SDK — `reportError` is injected by the app.
+ *
+ * Server-side, a network-level failure (e.g. `TypeError: fetch failed` from a
+ * reset connection) is first retried once, immediately. If the retry succeeds,
+ * its value is returned and the first failure is only logged as a warning; if
+ * it fails, the retry's error takes the failure path above, once. HTTP errors
+ * and contract drift are never retried, and nothing is retried in the browser.
  *
  * @param options - See {@link ReportingQueryFnOptions}.
  * @returns An async function suitable for use as a query function.
@@ -70,18 +77,50 @@ export function reportingQueryFn<T>(
     isServer,
   } = options;
 
+  // The single failure path: log, report if report-worthy, degrade.
+  const handleFailure = (err: unknown): T => {
+    logger.error({ err, ...context }, 'API query failed');
+
+    const classification = classifyError(err, { isServer });
+    if (classification === 'report-worthy') {
+      reportError?.(err, context);
+    }
+
+    return fallback;
+  };
+
   return async (): Promise<T> => {
     try {
       return await fetchFn();
     } catch (err) {
-      logger.error({ err, ...context }, 'API query failed');
-
-      const classification = classifyError(err, { isServer });
-      if (classification === 'report-worthy') {
-        reportError?.(err, context);
+      if (!shouldRetry(err, { isServer })) {
+        return handleFailure(err);
       }
+      logger.warn(
+        { err, ...context },
+        'API query failed with a network error; retrying once'
+      );
+    }
 
-      return fallback;
+    try {
+      return await fetchFn();
+    } catch (err) {
+      return handleFailure(err);
     }
   };
+}
+
+/**
+ * Decide whether a failed first attempt is retried. This is the one place the
+ * retry policy lives.
+ *
+ * Only a server-side network-level failure (see {@link isNetworkError}) is
+ * retried: a dropped or reset connection (`fetch failed` / `ECONNRESET`) is
+ * usually transient, so one immediate retry absorbs it instead of reporting
+ * it. An HTTP error (4xx or 5xx) or contract drift would most likely get the
+ * same answer again. In the browser, behaviour is unchanged: a network failure
+ * there is routine connectivity loss and is only logged.
+ */
+function shouldRetry(err: unknown, options: { isServer?: boolean }): boolean {
+  return resolveIsServer(options.isServer) && isNetworkError(err);
 }

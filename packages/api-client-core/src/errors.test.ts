@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import { classifyError } from './errors';
+import { classifyError, isNetworkError } from './errors';
 
 /** A minimal HTTP-style error carrying a numeric statusCode, mirroring the
  * `SemaphoreError` / `RepertoireError` shape used across the client packages. */
@@ -60,5 +60,23 @@ describe('classifyError', () => {
 
   it('treats a non-5xx, non-auth HTTP error (404) as expected', () => {
     expect(classifyError(new HttpError('not found', 404))).toBe('expected');
+  });
+});
+
+describe('isNetworkError', () => {
+  it('is true for a fetch TypeError', () => {
+    expect(isNetworkError(new TypeError('fetch failed'))).toBe(true);
+  });
+
+  it('is true for an error carrying no HTTP status', () => {
+    expect(isNetworkError(new HttpError('read ECONNRESET'))).toBe(true);
+  });
+
+  it('is false for an error carrying an HTTP status', () => {
+    expect(isNetworkError(new HttpError('server error', 500))).toBe(false);
+  });
+
+  it('is false for a ZodError', () => {
+    expect(isNetworkError(makeZodError())).toBe(false);
   });
 });

@@ -164,4 +164,177 @@ describe('reportingQueryFn', () => {
     await fn();
     expect(reportError).not.toHaveBeenCalled();
   });
+
+  describe('server-side retry of a network-level failure', () => {
+    /** A fetchFn whose first call rejects with a connection reset, then
+     * resolves with `'ok'`. */
+    function failOnceThenSucceed() {
+      return vi
+        .fn<() => Promise<string>>()
+        .mockRejectedValueOnce(new TypeError('fetch failed'))
+        .mockResolvedValue('ok');
+    }
+
+    it('returns the retried value when the retry succeeds', async () => {
+      const fetchFn = failOnceThenSucceed();
+      const fn = reportingQueryFn({
+        fetchFn,
+        fallback: 'fallback',
+        logger: makeLogger(),
+        isServer: true,
+      });
+      await expect(fn()).resolves.toBe('ok');
+      expect(fetchFn).toHaveBeenCalledTimes(2);
+    });
+
+    it('does not report or log an error when the retry succeeds', async () => {
+      const logger = makeLogger();
+      const reportError = vi.fn();
+      const fn = reportingQueryFn({
+        fetchFn: failOnceThenSucceed(),
+        fallback: 'fallback',
+        logger,
+        reportError,
+        isServer: true,
+      });
+      await fn();
+      expect(reportError).not.toHaveBeenCalled();
+      expect(logger.error).not.toHaveBeenCalled();
+    });
+
+    it('logs the first failure as one warning with the call-site context', async () => {
+      const logger = makeLogger();
+      const fetchFn = failOnceThenSucceed();
+      const fn = reportingQueryFn({
+        fetchFn,
+        fallback: 'fallback',
+        logger,
+        context: { site: 'broadcasts', package: 'semaphore-client' },
+        isServer: true,
+      });
+      await fn();
+      expect(logger.warn).toHaveBeenCalledTimes(1);
+      expect(logger.warn).toHaveBeenCalledWith(
+        {
+          err: expect.any(TypeError),
+          site: 'broadcasts',
+          package: 'semaphore-client',
+        },
+        expect.any(String)
+      );
+    });
+
+    it('retries when isServer is auto-detected', async () => {
+      // The package's Vitest environment is Node, which has no `window`.
+      const fetchFn = failOnceThenSucceed();
+      const fn = reportingQueryFn({
+        fetchFn,
+        fallback: 'fallback',
+        logger: makeLogger(),
+      });
+      await expect(fn()).resolves.toBe('ok');
+      expect(fetchFn).toHaveBeenCalledTimes(2);
+    });
+
+    it('returns the fallback after two network failures', async () => {
+      const fetchFn = vi
+        .fn<() => Promise<string>>()
+        .mockRejectedValue(new TypeError('fetch failed'));
+      const fn = reportingQueryFn({
+        fetchFn,
+        fallback: 'fallback',
+        logger: makeLogger(),
+        isServer: true,
+      });
+      await expect(fn()).resolves.toBe('fallback');
+      expect(fetchFn).toHaveBeenCalledTimes(2);
+    });
+
+    it('logs and reports two network failures exactly once', async () => {
+      const logger = makeLogger();
+      const reportError = vi.fn();
+      const retryErr = new TypeError('fetch failed');
+      const fn = reportingQueryFn({
+        fetchFn: vi
+          .fn<() => Promise<string>>()
+          .mockRejectedValueOnce(new TypeError('fetch failed'))
+          .mockRejectedValueOnce(retryErr),
+        fallback: 'fallback',
+        logger,
+        reportError,
+        context: { site: 'service-discovery' },
+        isServer: true,
+      });
+      await fn();
+      expect(logger.error).toHaveBeenCalledTimes(1);
+      expect(reportError).toHaveBeenCalledTimes(1);
+      expect(reportError).toHaveBeenCalledWith(retryErr, {
+        site: 'service-discovery',
+      });
+    });
+
+    it('classifies the retry error, not the first one', async () => {
+      // A reset connection followed by a 401 is an anonymous visitor, not an
+      // outage: the retry's answer decides.
+      const reportError = vi.fn();
+      const fn = reportingQueryFn({
+        fetchFn: vi
+          .fn<() => Promise<string>>()
+          .mockRejectedValueOnce(new TypeError('fetch failed'))
+          .mockRejectedValueOnce(new HttpError('unauthorized', 401)),
+        fallback: 'fallback',
+        logger: makeLogger(),
+        reportError,
+        isServer: true,
+      });
+      await expect(fn()).resolves.toBe('fallback');
+      expect(reportError).not.toHaveBeenCalled();
+    });
+
+    it.each([
+      ['an HTTP 401', () => new HttpError('unauthorized', 401), false],
+      ['an HTTP 500', () => new HttpError('server error', 500), true],
+      ['a ZodError', makeZodError, true],
+    ])(
+      'does not retry %s and classifies it as before',
+      async (_label, makeErr, reported) => {
+        const logger = makeLogger();
+        const reportError = vi.fn();
+        const err = makeErr();
+        const fetchFn = vi.fn<() => Promise<string>>().mockRejectedValue(err);
+        const fn = reportingQueryFn({
+          fetchFn,
+          fallback: 'fallback',
+          logger,
+          reportError,
+          context: { site: 'user-info' },
+          isServer: true,
+        });
+        await expect(fn()).resolves.toBe('fallback');
+        expect(fetchFn).toHaveBeenCalledTimes(1);
+        expect(logger.warn).not.toHaveBeenCalled();
+        expect(logger.error).toHaveBeenCalledTimes(1);
+        expect(reportError.mock.calls).toEqual(
+          reported ? [[err, { site: 'user-info' }]] : []
+        );
+      }
+    );
+
+    it('does not retry a network error in the browser', async () => {
+      const logger = makeLogger();
+      const fetchFn = vi
+        .fn<() => Promise<string>>()
+        .mockRejectedValueOnce(new TypeError('fetch failed'))
+        .mockResolvedValue('ok');
+      const fn = reportingQueryFn({
+        fetchFn,
+        fallback: 'fallback',
+        logger,
+        isServer: false,
+      });
+      await expect(fn()).resolves.toBe('fallback');
+      expect(fetchFn).toHaveBeenCalledTimes(1);
+      expect(logger.warn).not.toHaveBeenCalled();
+    });
+  });
 });
