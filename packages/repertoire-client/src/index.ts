@@ -2,6 +2,8 @@
 
 export type { Logger } from './client';
 export {
+  DEFAULT_DISCOVERY_TIMEOUT_MS,
+  DISCOVERY_FAIL_FAST_WINDOW_MS,
   fetchServiceDiscovery,
   getEmptyDiscovery,
   RepertoireError,

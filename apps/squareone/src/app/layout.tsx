@@ -96,6 +96,9 @@ export default async function RootLayout({ children }: RootLayoutProps) {
     'Layout repertoireUrl from config'
   );
   if (config.repertoireUrl) {
+    // A failed prefetch is logged and, if report-worthy, reported to Sentry
+    // (this is the site that reports a Repertoire outage), and it degrades to
+    // the last good discovery document, or else to the empty discovery.
     logger.debug('Prefetching service discovery');
     await queryClient.prefetchQuery(
       discoveryQueryOptions(config.repertoireUrl, {
@@ -188,6 +191,12 @@ export default async function RootLayout({ children }: RootLayoutProps) {
 
 /**
  * Prefetch broadcasts from Semaphore, whose URL comes from service discovery.
+ *
+ * The discovery lookup normally reads the in-process cache that the discovery
+ * prefetch above filled. When Repertoire is failing, `fetchServiceDiscovery`
+ * answers with the last good document if it has one, and right after a
+ * timeout it fails at once instead of waiting out another timeout, so this
+ * adds no wait of its own to the render.
  */
 async function prefetchBroadcasts(
   queryClient: QueryClient,

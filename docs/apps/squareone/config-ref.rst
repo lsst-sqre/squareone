@@ -36,7 +36,9 @@ An explicitly configured value always takes precedence.
      - Unset: the Times Square pages (``/times-square/``) are disabled and respond with 404
 
 Service discovery is only consulted when ``repertoireUrl`` is set and at least one of these keys is omitted.
-The fallback applies when ``repertoireUrl`` is unset, when the Repertoire API is unavailable (Squareone logs a warning but still serves pages), or when the Repertoire release predates 3.0.0 and so does not provide the ``environment`` metadata or the ``squareone`` UI service.
+The fallback applies when ``repertoireUrl`` is unset, when the Repertoire API is unavailable and Squareone has no earlier discovery document to use (Squareone logs a warning but still serves pages), or when the Repertoire release predates 3.0.0 and so does not provide the ``environment`` metadata or the ``squareone`` UI service.
+Once Squareone has fetched service discovery, it keeps resolving these keys from the last document it received while Repertoire is unavailable.
+A page render waits for an unresponsive Repertoire for about 5 seconds at most, however many lookups it makes.
 Repertoire 2.x releases do list the ``times-square`` internal service, so ``timesSquareUrl`` resolves from them too.
 Service discovery lists ``times-square`` only in environments where the Times Square application is deployed, so the Times Square pages are enabled exactly where Times Square is available, unless ``timesSquareUrl`` is configured explicitly.
 

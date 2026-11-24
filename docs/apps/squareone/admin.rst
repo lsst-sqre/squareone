@@ -113,6 +113,7 @@ The page links to that URL and shows the whole document as pretty-printed, synta
 The document isn't folded or collapsed, so your browser's find searches all of it.
 
 Squareone caches service discovery for 5 minutes, on the server and again in the browser, so the document can be a few minutes old.
+While Repertoire is unavailable, the server keeps serving the last document it received, so the document can then be older still.
 The page's **Refetch** button requests the document from Repertoire again, straight from the browser so that neither cache answers, and the page updates to show it; the button is disabled while the request is in flight.
 
 Like the overview, the page needs no new configuration and no page id in ``adminPageScopes``.

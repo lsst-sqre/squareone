@@ -210,6 +210,32 @@ describe('discoveryQueryOptions', () => {
       consoleError.mockRestore();
     });
 
+    it('returns empty discovery, not an earlier document, in the browser', async () => {
+      // The last good document is a server-side fallback only.
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({
+          ok: true,
+          json: () => Promise.resolve(mockDiscovery),
+        })
+      );
+      const url = 'https://example.com/repertoire';
+      const queryFn = getQueryFn(url);
+      await queryFn(createMockContext(url));
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockRejectedValue(new Error('Network request failed'))
+      );
+      const consoleError = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+
+      const result = await queryFn(createMockContext(url));
+
+      expect(result).toEqual(getEmptyDiscovery());
+      consoleError.mockRestore();
+    });
+
     it('logs the failure with the caught error', async () => {
       const mockFetch = vi
         .fn()

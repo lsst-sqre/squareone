@@ -46,8 +46,9 @@ It does not call Repertoire, Semaphore, Gafaelfawr or any other service, and it 
 It can only fail if the Squareone process itself has stopped serving requests.
 
 This matters because of what the probes do with a failure.
-A failed liveness probe restarts the pod, but nothing inside Squareone remembers an upstream failure: server-side requests to other services are made fresh for each page render, and nothing caches a failed response.
-A restart therefore never fixes a problem with another service, and probing a path that depends on one would only turn an upstream outage into a Squareone restart loop.
+A failed liveness probe restarts the pod, but a restart never fixes a problem with another service.
+The only upstream state Squareone keeps between page renders is about Repertoire service discovery: the last discovery document it received, which it keeps serving while Repertoire is unavailable, and, for 5 seconds after a discovery request times out, a note to fail further discovery requests at once instead of waiting again.
+A restart only throws that away, and probing a path that depends on another service would turn an upstream outage into a Squareone restart loop.
 
 Probing the home page (``/``) has exactly that problem.
 Every render of ``/`` makes several outbound requests, to Repertoire for service discovery, to Semaphore for broadcasts and to Gafaelfawr for the user's identity and scopes, so each probe would make those requests too, and a slow or reset connection to any of them could fail the probe.
