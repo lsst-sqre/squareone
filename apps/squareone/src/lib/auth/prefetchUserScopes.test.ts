@@ -1,3 +1,4 @@
+import { QueryTimeoutError } from '@lsst-sqre/api-client-core';
 import {
   gafaelfawrKeys,
   type LoginInfo,
@@ -154,9 +155,23 @@ describe('prefetchUserScopes', () => {
         queryClient.getQueryData(gafaelfawrKeys.loginInfo())
       ).toBeUndefined();
     });
+  });
 
-    test('logs and reports a Gafaelfawr outage, and hydrates null', async () => {
-      givenDelegatedRequest();
+  // An outage is not an answer about the visitor: hydrating null scopes would
+  // hide a signed-in user's gated services. The browser derives the scopes
+  // from its own login-info request instead.
+  describe.each([
+    {
+      route: 'a plain-ingress route (session cookie)',
+      givenRequest: () => givenRequestHeaders({ cookie: SESSION_COOKIE }),
+    },
+    {
+      route: 'a GafaelfawrIngress route (delegated token)',
+      givenRequest: givenDelegatedRequest,
+    },
+  ])('when Gafaelfawr fails on $route', ({ givenRequest }) => {
+    test('logs and reports a 5xx, and leaves the scopes to the browser', async () => {
+      givenRequest();
       vi.spyOn(globalThis, 'fetch').mockResolvedValue(
         new Response('Service Unavailable', { status: 503 })
       );
@@ -165,11 +180,36 @@ describe('prefetchUserScopes', () => {
       await prefetchUserScopes(queryClient, REPERTOIRE_URL);
 
       expect(logger.error).toHaveBeenCalledTimes(1);
+      expect(reportError).toHaveBeenCalledTimes(1);
       expect(reportError).toHaveBeenCalledWith(expect.any(Error), {
         site: 'user-scopes',
         package: 'gafaelfawr-client',
       });
-      expect(dehydratedScopes(queryClient)?.state.data).toBeNull();
+      expect(dehydratedScopes(queryClient)).toBeUndefined();
+    });
+
+    test('logs and reports a timeout, and leaves the scopes to the browser', async () => {
+      vi.useFakeTimers();
+      try {
+        givenRequest();
+        vi.spyOn(globalThis, 'fetch').mockImplementation(
+          () => new Promise<Response>(() => {})
+        );
+        const queryClient = clientWithDiscovery();
+
+        const prefetch = prefetchUserScopes(queryClient, REPERTOIRE_URL);
+        await vi.advanceTimersByTimeAsync(5000);
+        await prefetch;
+
+        expect(logger.error).toHaveBeenCalledTimes(1);
+        expect(reportError).toHaveBeenCalledWith(
+          expect.any(QueryTimeoutError),
+          { site: 'user-scopes', package: 'gafaelfawr-client' }
+        );
+        expect(dehydratedScopes(queryClient)).toBeUndefined();
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 

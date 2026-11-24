@@ -58,8 +58,8 @@ export type AuthQueryConfig = {
   /**
    * Runtime override forwarded to `reportingQueryFn`: server-side, the
    * user-info / login-info / token-info request is aborted after a timeout, a
-   * network-level failure is retried once, and one that persists is
-   * report-worthy. Defaults to auto-detection.
+   * connection failure is retried once, and a network-level failure that
+   * persists is report-worthy. Defaults to auto-detection.
    *
    * `true` also makes the user-info / login-info fetch `cache: 'no-store'`
    * (see {@link AuthQueryConfig.headers}).
@@ -76,6 +76,19 @@ export type AuthQueryConfig = {
    * The OpenID Connect client queries ignore this option.
    */
   headers?: HeadersInit;
+  /**
+   * Forwarded to `reportingQueryFn`: a report-worthy failure (a timeout,
+   * network error, 5xx or contract drift) makes the user-info / login-info /
+   * scopes query fail, after it is logged and reported, instead of resolving
+   * to its anonymous fallback. An expected 401 or 403 still resolves to the
+   * fallback, as "not signed in".
+   *
+   * Set it for a server-side prefetch that is dehydrated into the page, so an
+   * outage is never hydrated as "not signed in": the query is left out of the
+   * dehydrated state and the browser fetches it itself. The OpenID Connect
+   * client queries ignore this option.
+   */
+  rethrowReportWorthy?: boolean;
 };
 
 /**
@@ -117,7 +130,9 @@ function withSignal(
 /**
  * Query options for fetching user info.
  *
- * Returns empty user info on error (graceful degradation for auth checks).
+ * Returns empty user info on error (graceful degradation for auth checks),
+ * except that with `rethrowReportWorthy` only an expected failure (401/403)
+ * does; an outage rejects.
  *
  * @param baseUrl - Gafaelfawr API base URL
  * @param options - Logging / error-reporting configuration, plus the forwarded
@@ -128,7 +143,7 @@ export const userInfoQueryOptions = (
   options?: AuthQueryConfig
 ) => {
   const logger = options?.logger ?? defaultLogger;
-  const { reportError, context, isServer } = options ?? {};
+  const { reportError, context, isServer, rethrowReportWorthy } = options ?? {};
   const init = authRequestInit(options);
 
   return queryOptions<UserInfo>({
@@ -146,6 +161,7 @@ export const userInfoQueryOptions = (
       reportError,
       context,
       isServer,
+      rethrowReportWorthy,
     }),
     staleTime: 30_000, // 30 seconds
     gcTime: 5 * 60_000, // 5 minutes
@@ -161,6 +177,9 @@ export const userInfoQueryOptions = (
 /**
  * Query options for fetching login info (CSRF token and scopes).
  *
+ * Returns null on error, except that with `rethrowReportWorthy` only an
+ * expected failure (401/403) does; an outage rejects.
+ *
  * @param baseUrl - Gafaelfawr API base URL
  * @param options - Logging / error-reporting configuration, plus the forwarded
  *   `headers` of a server-side prefetch
@@ -170,7 +189,7 @@ export const loginInfoQueryOptions = (
   options?: AuthQueryConfig
 ) => {
   const logger = options?.logger ?? defaultLogger;
-  const { reportError, context, isServer } = options ?? {};
+  const { reportError, context, isServer, rethrowReportWorthy } = options ?? {};
   const init = authRequestInit(options);
 
   return queryOptions<LoginInfo | null>({
@@ -187,6 +206,7 @@ export const loginInfoQueryOptions = (
       reportError,
       context,
       isServer,
+      rethrowReportWorthy,
     }),
     staleTime: 30_000, // 30 seconds
     gcTime: 5 * 60_000, // 5 minutes
@@ -223,7 +243,8 @@ export type UserScopesQueryConfig = AuthQueryConfig & {
 /**
  * Query options for the signed-in user's scopes, `null` for an anonymous
  * visitor (or when they cannot be determined: every failure degrades to null,
- * logged and, when report-worthy, reported, as for login info).
+ * logged and, when report-worthy, reported, as for login info; with
+ * `rethrowReportWorthy`, a report-worthy failure rejects instead).
  *
  * The header gates services on these scopes, so they are kept apart from
  * login info: a server render can hydrate them from either source while the
@@ -242,7 +263,7 @@ export const userScopesQueryOptions = (
 
   const fromTokenInfo = (): (() => Promise<string[] | null>) => {
     const logger = authOptions.logger ?? defaultLogger;
-    const { reportError, context, isServer } = authOptions;
+    const { reportError, context, isServer, rethrowReportWorthy } = authOptions;
     const init = authRequestInit(authOptions);
     return reportingQueryFn<string[] | null>({
       fetchFn: async (signal) =>
@@ -252,11 +273,13 @@ export const userScopesQueryOptions = (
       reportError,
       context,
       isServer,
+      rethrowReportWorthy,
     });
   };
 
-  // Login info already degrades to null, logs, and reports through its own
-  // query function, so this only lifts the scopes out of its answer.
+  // Login info already degrades to null (or, with `rethrowReportWorthy`,
+  // rejects on an outage), logs, and reports through its own query function,
+  // so this only lifts the scopes out of its answer.
   const fromLoginInfo = async ({
     client,
   }: QueryFunctionContext): Promise<string[] | null> => {

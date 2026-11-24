@@ -114,6 +114,39 @@ describe('reportError', () => {
     expect(captureException).toHaveBeenCalledTimes(2);
   });
 
+  test('fingerprints a timeout by its site, so each upstream gets its own issue', () => {
+    // A QueryTimeoutError has a fixed message and a timer-only stack, so
+    // Sentry's default grouping would merge every upstream's timeouts.
+    const reportError = makeReportError({ isServer: true });
+
+    reportError(new QueryTimeoutError(5000), {
+      site: 'service-discovery',
+      package: 'repertoire-client',
+    });
+    reportError(new QueryTimeoutError(5000), {
+      site: 'user-info',
+      package: 'gafaelfawr-client',
+    });
+
+    expect(captureException).toHaveBeenCalledTimes(2);
+    expect(captureException.mock.calls[0][1]).toMatchObject({
+      fingerprint: ['QueryTimeoutError', 'service-discovery'],
+    });
+    expect(captureException.mock.calls[1][1]).toMatchObject({
+      fingerprint: ['QueryTimeoutError', 'user-info'],
+    });
+  });
+
+  test('keeps default grouping for other errors and for a timeout with no site', () => {
+    const reportError = makeReportError({ isServer: true });
+
+    reportError(new TypeError('fetch failed'), { site: 'broadcasts' });
+    reportError(new QueryTimeoutError(5000), {});
+
+    expect(captureException.mock.calls[0][1]).not.toHaveProperty('fingerprint');
+    expect(captureException.mock.calls[1][1]).not.toHaveProperty('fingerprint');
+  });
+
   test('identical error classes at the same call site still dedupe', () => {
     const reportError = makeReportError({ isServer: false });
     const context = { site: 'broadcasts', package: 'semaphore-client' };

@@ -22,6 +22,12 @@ function makeZodError(): z.ZodError {
   return result.error;
 }
 
+/** Node's `fetch` failure for a connection that failed with `code`. */
+function connectionReset(code = 'ECONNRESET'): TypeError {
+  const cause = Object.assign(new Error(`read ${code}`), { code });
+  return new TypeError('fetch failed', { cause });
+}
+
 function makeLogger(): Logger {
   return {
     debug: vi.fn(),
@@ -166,13 +172,123 @@ describe('reportingQueryFn', () => {
     expect(reportError).not.toHaveBeenCalled();
   });
 
+  describe('rethrowReportWorthy', () => {
+    it.each<[string, () => unknown]>([
+      ['an HTTP 5xx', () => new HttpError('unavailable', 503)],
+      ['a ZodError', makeZodError],
+      ['a server-side network error', () => new TypeError('fetch failed')],
+    ])(
+      'rejects with %s after logging and reporting it once',
+      async (_label, makeErr) => {
+        const logger = makeLogger();
+        const reportError = vi.fn();
+        const err = makeErr();
+        const fn = reportingQueryFn({
+          fetchFn: async () => {
+            throw err;
+          },
+          fallback: 'fallback',
+          logger,
+          reportError,
+          context: { site: 'user-info' },
+          isServer: true,
+          rethrowReportWorthy: true,
+        });
+        await expect(fn()).rejects.toBe(err);
+        expect(logger.error).toHaveBeenCalledTimes(1);
+        expect(reportError).toHaveBeenCalledTimes(1);
+        expect(reportError).toHaveBeenCalledWith(err, { site: 'user-info' });
+      }
+    );
+
+    it.each([401, 403])(
+      'still resolves to the fallback for an expected HTTP %s',
+      async (status) => {
+        const reportError = vi.fn();
+        const fn = reportingQueryFn({
+          fetchFn: async () => {
+            throw new HttpError('auth', status);
+          },
+          fallback: 'fallback',
+          logger: makeLogger(),
+          reportError,
+          isServer: true,
+          rethrowReportWorthy: true,
+        });
+        await expect(fn()).resolves.toBe('fallback');
+        expect(reportError).not.toHaveBeenCalled();
+      }
+    );
+
+    it('rejects with the timeout error when the call times out', async () => {
+      vi.useFakeTimers();
+      try {
+        const reportError = vi.fn();
+        const fn = reportingQueryFn({
+          fetchFn: () => new Promise<string>(() => {}),
+          fallback: 'fallback',
+          logger: makeLogger(),
+          reportError,
+          isServer: true,
+          rethrowReportWorthy: true,
+        });
+        const result = fn();
+        result.catch(() => {});
+        await vi.advanceTimersByTimeAsync(5000);
+        await expect(result).rejects.toBeInstanceOf(QueryTimeoutError);
+        expect(reportError).toHaveBeenCalledTimes(1);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it('still returns the value of a successful retry', async () => {
+      const fn = reportingQueryFn({
+        fetchFn: vi
+          .fn<() => Promise<string>>()
+          .mockRejectedValueOnce(connectionReset())
+          .mockResolvedValue('ok'),
+        fallback: 'fallback',
+        logger: makeLogger(),
+        isServer: true,
+        rethrowReportWorthy: true,
+      });
+      await expect(fn()).resolves.toBe('ok');
+    });
+
+    it('resolves to the fallback for a browser network error, which is expected there', async () => {
+      const fn = reportingQueryFn({
+        fetchFn: async () => {
+          throw new TypeError('fetch failed');
+        },
+        fallback: 'fallback',
+        logger: makeLogger(),
+        isServer: false,
+        rethrowReportWorthy: true,
+      });
+      await expect(fn()).resolves.toBe('fallback');
+    });
+
+    it('defaults to resolving every failure to the fallback', async () => {
+      const fn = reportingQueryFn({
+        fetchFn: async () => {
+          throw new HttpError('unavailable', 503);
+        },
+        fallback: 'fallback',
+        logger: makeLogger(),
+        isServer: true,
+      });
+      await expect(fn()).resolves.toBe('fallback');
+    });
+  });
+
   describe('server-side retry of a network-level failure', () => {
     /** A fetchFn whose first call rejects with a connection reset, then
      * resolves with `'ok'`. */
     function failOnceThenSucceed() {
       return vi
         .fn<() => Promise<string>>()
-        .mockRejectedValueOnce(new TypeError('fetch failed'))
+        .mockRejectedValueOnce(connectionReset())
         .mockResolvedValue('ok');
     }
 
@@ -240,7 +356,7 @@ describe('reportingQueryFn', () => {
     it('returns the fallback after two network failures', async () => {
       const fetchFn = vi
         .fn<() => Promise<string>>()
-        .mockRejectedValue(new TypeError('fetch failed'));
+        .mockRejectedValue(connectionReset());
       const fn = reportingQueryFn({
         fetchFn,
         fallback: 'fallback',
@@ -254,11 +370,11 @@ describe('reportingQueryFn', () => {
     it('logs and reports two network failures exactly once', async () => {
       const logger = makeLogger();
       const reportError = vi.fn();
-      const retryErr = new TypeError('fetch failed');
+      const retryErr = connectionReset();
       const fn = reportingQueryFn({
         fetchFn: vi
           .fn<() => Promise<string>>()
-          .mockRejectedValueOnce(new TypeError('fetch failed'))
+          .mockRejectedValueOnce(connectionReset())
           .mockRejectedValueOnce(retryErr),
         fallback: 'fallback',
         logger,
@@ -281,7 +397,7 @@ describe('reportingQueryFn', () => {
       const fn = reportingQueryFn({
         fetchFn: vi
           .fn<() => Promise<string>>()
-          .mockRejectedValueOnce(new TypeError('fetch failed'))
+          .mockRejectedValueOnce(connectionReset())
           .mockRejectedValueOnce(new HttpError('unauthorized', 401)),
         fallback: 'fallback',
         logger: makeLogger(),
@@ -321,11 +437,66 @@ describe('reportingQueryFn', () => {
       }
     );
 
+    it.each<[string, () => Error]>([
+      [
+        'a SyntaxError from a non-JSON body',
+        () => new SyntaxError('Unexpected token < in JSON at position 0'),
+      ],
+      [
+        'a URL-parse TypeError',
+        () =>
+          new TypeError('Failed to parse URL from /auth/api/v1/user-info', {
+            cause: new TypeError('Invalid URL'),
+          }),
+      ],
+      ['a fetch TypeError with no connection code', () => new TypeError('x')],
+    ])(
+      'does not retry %s, and reports it as before',
+      async (_label, makeErr) => {
+        const reportError = vi.fn();
+        const logger = makeLogger();
+        const err = makeErr();
+        const fetchFn = vi
+          .fn<() => Promise<string>>()
+          .mockRejectedValueOnce(err)
+          .mockResolvedValue('ok');
+        const fn = reportingQueryFn({
+          fetchFn,
+          fallback: 'fallback',
+          logger,
+          reportError,
+          isServer: true,
+        });
+        await expect(fn()).resolves.toBe('fallback');
+        expect(fetchFn).toHaveBeenCalledTimes(1);
+        expect(logger.warn).not.toHaveBeenCalled();
+        expect(reportError).toHaveBeenCalledWith(err, {});
+      }
+    );
+
+    it.each(['ECONNREFUSED', 'EPIPE', 'UND_ERR_SOCKET'])(
+      'retries a connection failure with code %s',
+      async (code) => {
+        const fetchFn = vi
+          .fn<() => Promise<string>>()
+          .mockRejectedValueOnce(connectionReset(code))
+          .mockResolvedValue('ok');
+        const fn = reportingQueryFn({
+          fetchFn,
+          fallback: 'fallback',
+          logger: makeLogger(),
+          isServer: true,
+        });
+        await expect(fn()).resolves.toBe('ok');
+        expect(fetchFn).toHaveBeenCalledTimes(2);
+      }
+    );
+
     it('does not retry a network error in the browser', async () => {
       const logger = makeLogger();
       const fetchFn = vi
         .fn<() => Promise<string>>()
-        .mockRejectedValueOnce(new TypeError('fetch failed'))
+        .mockRejectedValueOnce(connectionReset())
         .mockResolvedValue('ok');
       const fn = reportingQueryFn({
         fetchFn,
@@ -495,9 +666,7 @@ describe('reportingQueryFn', () => {
 
     it('times out the retry of a network failure too', async () => {
       const reportError = vi.fn();
-      const fetchFn = hang().mockRejectedValueOnce(
-        new TypeError('fetch failed')
-      );
+      const fetchFn = hang().mockRejectedValueOnce(connectionReset());
       const fn = reportingQueryFn({
         fetchFn,
         fallback: 'fallback',
@@ -514,6 +683,80 @@ describe('reportingQueryFn', () => {
         expect.any(QueryTimeoutError),
         {}
       );
+    });
+
+    it.each([0, -1, Number.NaN, Number.POSITIVE_INFINITY])(
+      'applies no timeout server-side when timeoutMs is %s',
+      async (timeoutMs) => {
+        const reportError = vi.fn();
+        const fn = reportingQueryFn({
+          fetchFn: () =>
+            new Promise<string>((resolve) => {
+              setTimeout(() => resolve('ok'), 60_000);
+            }),
+          fallback: 'fallback',
+          logger: makeLogger(),
+          reportError,
+          isServer: true,
+          timeoutMs,
+        });
+        const result = fn();
+        await vi.advanceTimersByTimeAsync(60_000);
+        await expect(result).resolves.toBe('ok');
+        expect(reportError).not.toHaveBeenCalled();
+      }
+    );
+
+    it('still retries a connection failure once with no timeout', async () => {
+      const fetchFn = vi
+        .fn<(signal?: AbortSignal) => Promise<string>>()
+        .mockRejectedValueOnce(connectionReset())
+        .mockResolvedValue('ok');
+      const fn = reportingQueryFn({
+        fetchFn,
+        fallback: 'fallback',
+        logger: makeLogger(),
+        isServer: true,
+        timeoutMs: 0,
+      });
+      await expect(fn()).resolves.toBe('ok');
+      expect(fetchFn).toHaveBeenCalledTimes(2);
+      expect(vi.getTimerCount()).toBe(0);
+    });
+
+    it('gives the retry only the time left, so the call takes timeoutMs at most', async () => {
+      // A connection reset late in the first attempt, then a hung retry: the
+      // retry must not get a full timeout of its own.
+      const reportError = vi.fn();
+      const fetchFn = hang().mockImplementationOnce(
+        () =>
+          new Promise<string>((_resolve, reject) => {
+            setTimeout(() => reject(connectionReset()), 3000);
+          })
+      );
+      let settled = false;
+      const fn = reportingQueryFn({
+        fetchFn,
+        fallback: 'fallback',
+        logger: makeLogger(),
+        reportError,
+        isServer: true,
+      });
+      const result = fn().finally(() => {
+        settled = true;
+      });
+
+      await vi.advanceTimersByTimeAsync(4999);
+      expect(fetchFn).toHaveBeenCalledTimes(2);
+      expect(settled).toBe(false);
+      await vi.advanceTimersByTimeAsync(1);
+      expect(settled).toBe(true);
+      await expect(result).resolves.toBe('fallback');
+      expect(reportError).toHaveBeenCalledWith(
+        expect.any(QueryTimeoutError),
+        {}
+      );
+      expect(fetchFn.mock.calls[1][0]?.aborted).toBe(true);
     });
 
     it('clears the timer when an attempt settles in time', async () => {

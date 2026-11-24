@@ -9,10 +9,14 @@
  *
  * The check is deliberately shallow. It makes no upstream calls (Repertoire,
  * Semaphore, Gafaelfawr) and does not read the YAML app config, so it fails
- * only when the squareone process itself cannot serve requests. Nothing on the
- * server caches an upstream failure, so restarting a pod never fixes one;
- * liveness must therefore not depend on upstream services. Keep this module's
- * imports to `getAppVersion()` and Next.js itself.
+ * only when the squareone process itself cannot serve requests. The only
+ * upstream state the server keeps between renders is about Repertoire service
+ * discovery: the last discovery document received, served while Repertoire is
+ * unavailable, and a 5-second fail-fast window after a discovery timeout.
+ * Neither is a reason to restart: a restart only throws them away and never
+ * fixes the upstream service, so liveness must not depend on upstream
+ * services. Keep this module's imports to `getAppVersion()` and Next.js
+ * itself.
  *
  * The route is unauthenticated: the body publishes nothing beyond what the
  * `squareone:version` and `squareone:revision` meta tags already carry on every

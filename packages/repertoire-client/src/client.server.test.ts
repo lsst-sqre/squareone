@@ -110,6 +110,55 @@ describe('fetchServiceDiscovery (server-side)', () => {
       });
     });
 
+    it.each([0, -1, Number.NaN, Number.POSITIVE_INFINITY])(
+      'applies no timeout, and opens no fail-fast window, when timeoutMs is %s',
+      async (timeoutMs) => {
+        // A slow request: with the 1 ms Node would clamp the timeout to, it
+        // would time out at once and open the fail-fast window.
+        const slowFetch = vi.fn(
+          () =>
+            new Promise((resolve) => {
+              setTimeout(
+                () =>
+                  resolve({
+                    ok: true,
+                    status: 200,
+                    statusText: 'OK',
+                    json: () => Promise.resolve(mockDiscovery),
+                  }),
+                60_000
+              );
+            })
+        );
+        vi.stubGlobal('fetch', slowFetch);
+
+        const result = fetchServiceDiscovery(URL, { timeoutMs });
+        result.catch(() => {});
+        await vi.advanceTimersByTimeAsync(60_000);
+
+        await expect(result).resolves.toEqual(mockDiscovery);
+        expect(slowFetch).toHaveBeenCalledTimes(1);
+      }
+    );
+
+    it("still aborts the request when the caller's signal aborts with no timeout", async () => {
+      const mockFetch = hungFetch();
+      vi.stubGlobal('fetch', mockFetch);
+      const controller = new AbortController();
+      const reason = new Error('caller gave up');
+
+      const result = fetchServiceDiscovery(URL, {
+        signal: controller.signal,
+        timeoutMs: 0,
+      });
+      result.catch(() => {});
+      expect(vi.getTimerCount()).toBe(0);
+      controller.abort(reason);
+
+      await expect(result).rejects.toBe(reason);
+      expect(mockFetch.mock.calls[0][1]?.signal?.aborted).toBe(true);
+    });
+
     it("aborts the request when the caller's signal aborts", async () => {
       const mockFetch = hungFetch();
       vi.stubGlobal('fetch', mockFetch);

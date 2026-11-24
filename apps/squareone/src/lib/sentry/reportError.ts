@@ -14,7 +14,11 @@
 // The package that owns `reportingQueryFn` stays Sentry-agnostic; this module
 // is where the Sentry SDK dependency lives.
 
-import type { ReportContext, ReportError } from '@lsst-sqre/api-client-core';
+import {
+  QueryTimeoutError,
+  type ReportContext,
+  type ReportError,
+} from '@lsst-sqre/api-client-core';
 import * as Sentry from '@sentry/nextjs';
 
 /** Server-side dedupe window: re-report a given call site at most this often. */
@@ -62,6 +66,27 @@ function dedupeKey(err: unknown, context: ReportContext): string {
   return `${errorIdentity(err)}|${contextKey}`;
 }
 
+/**
+ * A Sentry fingerprint for an error, or undefined to keep Sentry's default
+ * grouping.
+ *
+ * A {@link QueryTimeoutError} has a fixed message and a stack that is only
+ * the timer that fired, so by default every upstream's timeouts would group
+ * into one Sentry issue. Fingerprinting it by the call site's `site` tag gives
+ * each upstream (service discovery, broadcasts, user info, …) an issue of its
+ * own. Other errors keep the default grouping, whose stack traces already
+ * tell their call sites apart.
+ */
+function fingerprintFor(
+  err: unknown,
+  context: ReportContext
+): string[] | undefined {
+  if (err instanceof QueryTimeoutError && context.site !== undefined) {
+    return ['QueryTimeoutError', String(context.site)];
+  }
+  return undefined;
+}
+
 /** Options controlling {@link makeReportError}'s runtime-dependent behavior. */
 export type MakeReportErrorOptions = {
   /**
@@ -80,7 +105,8 @@ function detectIsServer(): boolean {
 /**
  * Create a {@link ReportError} that captures report-worthy errors to Sentry,
  * tagging each event with the call-site context and suppressing duplicates
- * within the runtime-appropriate dedupe window.
+ * within the runtime-appropriate dedupe window. A timeout is fingerprinted by
+ * its `site`, so each upstream's timeouts form their own Sentry issue.
  *
  * @param options - Runtime hints; see {@link MakeReportErrorOptions}.
  * @returns A `reportError(err, context)` hook to inject into `reportingQueryFn`.
@@ -112,6 +138,10 @@ export function makeReportError(
       tags[k] = String(v);
     }
 
-    Sentry.captureException(err, { tags });
+    const fingerprint = fingerprintFor(err, context);
+    Sentry.captureException(
+      err,
+      fingerprint === undefined ? { tags } : { tags, fingerprint }
+    );
   };
 }

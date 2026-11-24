@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import { classifyError, isNetworkError, QueryTimeoutError } from './errors';
+import {
+  classifyError,
+  isConnectionError,
+  isNetworkError,
+  QueryTimeoutError,
+} from './errors';
 
 /** A minimal HTTP-style error carrying a numeric statusCode, mirroring the
  * `SemaphoreError` / `RepertoireError` shape used across the client packages. */
@@ -82,6 +87,48 @@ describe('isNetworkError', () => {
 
   it('is true for a timeout', () => {
     expect(isNetworkError(new QueryTimeoutError(5000))).toBe(true);
+  });
+});
+
+/** Node's `fetch` failure for a connection that failed with `code`. */
+function fetchFailed(code: string): TypeError {
+  const cause = Object.assign(new Error(`read ${code}`), { code });
+  return new TypeError('fetch failed', { cause });
+}
+
+describe('isConnectionError', () => {
+  it.each([
+    'ECONNRESET',
+    'ECONNREFUSED',
+    'ECONNABORTED',
+    'EPIPE',
+    'UND_ERR_SOCKET',
+  ])('is true for a fetch TypeError caused by %s', (code) => {
+    expect(isConnectionError(fetchFailed(code))).toBe(true);
+  });
+
+  it.each<[string, () => unknown]>([
+    ['a fetch TypeError with no cause', () => new TypeError('fetch failed')],
+    ['a fetch TypeError caused by DNS failure', () => fetchFailed('ENOTFOUND')],
+    [
+      'a URL-parse TypeError',
+      () =>
+        new TypeError('Failed to parse URL from /auth/api/v1/user-info', {
+          cause: new TypeError('Invalid URL'),
+        }),
+    ],
+    [
+      'a SyntaxError from an HTML body',
+      () => new SyntaxError('Unexpected token < in JSON at position 0'),
+    ],
+    ['a timeout', () => new QueryTimeoutError(5000)],
+    [
+      'a non-TypeError carrying a connection code',
+      () => Object.assign(new Error('read ECONNRESET'), { code: 'ECONNRESET' }),
+    ],
+    ['an HTTP error', () => new HttpError('server error', 500)],
+  ])('is false for %s', (_label, makeErr) => {
+    expect(isConnectionError(makeErr())).toBe(false);
   });
 });
 

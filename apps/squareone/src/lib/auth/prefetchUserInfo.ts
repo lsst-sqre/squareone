@@ -22,7 +22,10 @@ import { serverAuthQuery } from './serverAuthQuery';
  * The request is made on the visitor's behalf as `serverAuthQuery` describes
  * (forwarded session cookie, uncached, Gafaelfawr URL from the discovery
  * already in `queryClient`); when it cannot be, nothing is prefetched and the
- * client fetches user info itself, as before.
+ * client fetches user info itself, as before. The same goes when Gafaelfawr
+ * fails (a timeout, network error, 5xx or contract drift): the failure is
+ * logged and reported, and the failed query is not dehydrated, so an outage is
+ * never hydrated as "not logged in".
  *
  * `queryClient` must be the per-request client the layout creates, so one
  * user's info is never dehydrated into another user's page.

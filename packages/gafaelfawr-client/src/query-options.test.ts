@@ -352,6 +352,70 @@ describe.each([
   });
 });
 
+describe.each([
+  {
+    name: 'userInfoQueryOptions',
+    factory: userInfoQueryOptions,
+    anonymous: getEmptyUserInfo(),
+  },
+  {
+    name: 'loginInfoQueryOptions',
+    factory: loginInfoQueryOptions,
+    anonymous: null,
+  },
+])('$name with rethrowReportWorthy', ({ factory, anonymous }) => {
+  const config = (reportError = vi.fn()): AuthQueryConfig => ({
+    isServer: true,
+    rethrowReportWorthy: true,
+    reportError,
+    context: { site: 'user-info' },
+  });
+
+  it('rejects on a 5xx after reporting it', async () => {
+    mockFetchStatus(503);
+    const reportError = vi.fn();
+
+    await expect(
+      // biome-ignore lint/style/noNonNullAssertion: queryFn is always defined for our factory
+      factory(baseUrl, config(reportError)).queryFn!({} as never)
+    ).rejects.toMatchObject({ statusCode: 503 });
+    expect(reportError).toHaveBeenCalledWith(expect.any(Error), {
+      site: 'user-info',
+    });
+  });
+
+  it('rejects on a timeout after reporting it', async () => {
+    vi.useFakeTimers();
+    try {
+      mockFetchHang();
+      const reportError = vi.fn();
+      const result = Promise.resolve(
+        // biome-ignore lint/style/noNonNullAssertion: queryFn is always defined for our factory
+        factory(baseUrl, config(reportError)).queryFn!({} as never)
+      );
+      result.catch(() => {});
+      await vi.advanceTimersByTimeAsync(5000);
+
+      await expect(result).rejects.toBeInstanceOf(QueryTimeoutError);
+      expect(reportError).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it.each([401, 403])(
+    'still resolves to the anonymous fallback on a %s',
+    async (status) => {
+      mockFetchStatus(status);
+
+      await expect(
+        // biome-ignore lint/style/noNonNullAssertion: queryFn is always defined for our factory
+        factory(baseUrl, config()).queryFn!({} as never)
+      ).resolves.toEqual(anonymous);
+    }
+  );
+});
+
 describe('userScopesQueryOptions', () => {
   const scopes = ['exec:notebook', 'read:tap'];
 
@@ -462,6 +526,43 @@ describe('userScopesQueryOptions', () => {
         expect.any(ZodError),
         expect.anything()
       );
+    });
+  });
+
+  describe.each<{ source: UserScopesSource; headers: Record<string, string> }>([
+    { source: 'login-info', headers: { cookie: 'gafaelfawr=session' } },
+    { source: 'token-info', headers: { authorization: 'Bearer gt-delegated' } },
+  ])('from $source with rethrowReportWorthy', ({ source, headers }) => {
+    it('rejects on a 5xx after reporting it with the site', async () => {
+      mockFetchStatus(503);
+      const reportError = vi.fn();
+      const context = { site: 'user-scopes', package: 'gafaelfawr-client' };
+
+      await expect(
+        runScopesQuery({
+          source,
+          headers,
+          isServer: true,
+          rethrowReportWorthy: true,
+          reportError,
+          context,
+        })
+      ).rejects.toMatchObject({ statusCode: 503 });
+      expect(reportError).toHaveBeenCalledTimes(1);
+      expect(reportError).toHaveBeenCalledWith(expect.any(Error), context);
+    });
+
+    it('still resolves to null for an anonymous visitor (401)', async () => {
+      mockFetchStatus(401);
+
+      await expect(
+        runScopesQuery({
+          source,
+          headers,
+          isServer: true,
+          rethrowReportWorthy: true,
+        })
+      ).resolves.toBeNull();
     });
   });
 

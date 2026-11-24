@@ -25,6 +25,14 @@ function mockLogger() {
   return { debug: vi.fn(), warn: vi.fn(), error: vi.fn() };
 }
 
+/** Node's `fetch` failure for a reset connection. */
+function connectionReset(): TypeError {
+  const cause = Object.assign(new Error('read ECONNRESET'), {
+    code: 'ECONNRESET',
+  });
+  return new TypeError('fetch failed', { cause });
+}
+
 /** An OK response carrying the discovery document. */
 function okResponse() {
   return {
@@ -55,18 +63,23 @@ async function isSettled(promise: Promise<unknown>): Promise<boolean> {
   return settled;
 }
 
-/** The layout's discovery prefetch query function. */
-function prefetchQueryFn(reportError = vi.fn()) {
+/**
+ * The layout's discovery prefetch query function, or with
+ * `rethrowReportWorthy: false` a server-side one whose result is not
+ * dehydrated.
+ */
+function prefetchQueryFn(reportError = vi.fn(), rethrowReportWorthy = true) {
   const { queryFn } = discoveryQueryOptions(URL, {
     logger: mockLogger(),
     isServer: true,
     reportError,
     context: CONTEXT,
+    rethrowReportWorthy,
   });
   if (!queryFn) {
     throw new Error('queryFn should always be defined');
   }
-  return () => queryFn({} as never);
+  return () => Promise.resolve(queryFn({} as never));
 }
 
 describe('discoveryQueryOptions (server-side)', () => {
@@ -116,7 +129,7 @@ describe('discoveryQueryOptions (server-side)', () => {
       const fresh = { ...mockDiscovery, applications: ['fresh'] };
       const mockFetch = vi
         .fn()
-        .mockRejectedValueOnce(new TypeError('fetch failed'))
+        .mockRejectedValueOnce(connectionReset())
         .mockResolvedValueOnce({ ...okResponse(), json: async () => fresh });
       vi.stubGlobal('fetch', mockFetch);
       const reportError = vi.fn();
@@ -128,9 +141,7 @@ describe('discoveryQueryOptions (server-side)', () => {
 
     it('returns it and reports once when the retry of a connection reset fails too', async () => {
       await givenExpiredDocument();
-      const mockFetch = vi
-        .fn()
-        .mockRejectedValue(new TypeError('fetch failed'));
+      const mockFetch = vi.fn().mockRejectedValue(connectionReset());
       vi.stubGlobal('fetch', mockFetch);
       const reportError = vi.fn();
 
@@ -175,7 +186,9 @@ describe('discoveryQueryOptions (server-side)', () => {
         const config = options.configLooksUp
           ? await fetchServiceDiscovery(URL, { logger }).catch(() => null)
           : null;
-        const prefetched = await prefetchQueryFn(reportError)();
+        const prefetched = await prefetchQueryFn(reportError)().catch(
+          () => null
+        );
         const broadcasts = await fetchServiceDiscovery(URL, { logger }).catch(
           () => null
         );
@@ -203,9 +216,11 @@ describe('discoveryQueryOptions (server-side)', () => {
         await vi.advanceTimersByTimeAsync(5000);
 
         expect(await isSettled(lookups)).toBe(true);
+        // With no document to serve, the prefetch fails rather than
+        // resolving to the empty discovery, so the layout hydrates nothing.
         await expect(lookups).resolves.toEqual({
           config: null,
-          prefetched: getEmptyDiscovery(),
+          prefetched: null,
           broadcasts: null,
         });
         expect(fetch).toHaveBeenCalledTimes(1);
@@ -244,16 +259,68 @@ describe('discoveryQueryOptions (server-side)', () => {
     );
   });
 
-  it('falls back to the empty discovery with no document to fall back to', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue({
-        ok: false,
-        status: 503,
-        statusText: 'Service Unavailable',
-      })
-    );
+  describe('with no document to fall back to', () => {
+    /** Answer every discovery request with a 503. */
+    function givenRepertoireDown() {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({
+          ok: false,
+          status: 503,
+          statusText: 'Service Unavailable',
+        })
+      );
+    }
 
-    await expect(prefetchQueryFn()()).resolves.toEqual(getEmptyDiscovery());
+    it('rejects with the failure, after reporting it, rather than resolving to the empty discovery', async () => {
+      givenRepertoireDown();
+      const reportError = vi.fn();
+
+      await expect(prefetchQueryFn(reportError)()).rejects.toMatchObject({
+        statusCode: 503,
+      });
+      expect(reportError).toHaveBeenCalledTimes(1);
+      expect(reportError).toHaveBeenCalledWith(
+        expect.any(RepertoireError),
+        CONTEXT
+      );
+    });
+
+    it('rejects with the timeout error when Repertoire never responds', async () => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(() => new Promise<never>(() => {}))
+      );
+
+      const result = prefetchQueryFn()();
+      result.catch(() => {});
+      await vi.advanceTimersByTimeAsync(5000);
+
+      await expect(result).rejects.toMatchObject({
+        name: 'QueryTimeoutError',
+      });
+    });
+
+    it('still resolves to the empty discovery on an expected 4xx', async () => {
+      // The browser would get the same answer, so it is safe to hydrate.
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({
+          ok: false,
+          status: 404,
+          statusText: 'Not Found',
+        })
+      );
+
+      await expect(prefetchQueryFn()()).resolves.toEqual(getEmptyDiscovery());
+    });
+
+    it('falls back to the empty discovery without rethrowReportWorthy', async () => {
+      givenRepertoireDown();
+
+      await expect(prefetchQueryFn(vi.fn(), false)()).resolves.toEqual(
+        getEmptyDiscovery()
+      );
+    });
   });
 });

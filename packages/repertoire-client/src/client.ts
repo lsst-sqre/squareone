@@ -74,7 +74,10 @@ export type FetchOptions = {
   /**
    * Server-side, how long the request may take, in milliseconds, before it is
    * aborted and rejects with a `QueryTimeoutError`. Defaults to
-   * {@link DEFAULT_DISCOVERY_TIMEOUT_MS}. Ignored in the browser.
+   * {@link DEFAULT_DISCOVERY_TIMEOUT_MS}. A value that is not a positive,
+   * finite number (`0`, a negative number, `NaN` or `Infinity`) disables the
+   * timeout, so no request times out and none opens the fail-fast window; the
+   * caller's `signal` still aborts the request. Ignored in the browser.
    */
   timeoutMs?: number;
   /**
@@ -314,6 +317,10 @@ async function requestDiscovery(
  * rejects with it straight away, so a request that ignores its signal still
  * cannot hold up the caller. The timer and the listener on the caller's signal
  * are removed as soon as the request settles.
+ *
+ * A `timeoutMs` that is not a positive, finite number sets no timer at all,
+ * rather than the 1 ms Node would clamp it to; only the caller's signal can
+ * then abort the request.
  */
 async function withTimeout<T>(
   request: (signal: AbortSignal) => Promise<T>,
@@ -330,7 +337,12 @@ async function withTimeout<T>(
       reject(reason);
       controller.abort(reason);
     };
-    timer = setTimeout(() => stop(new QueryTimeoutError(timeoutMs)), timeoutMs);
+    if (Number.isFinite(timeoutMs) && timeoutMs > 0) {
+      timer = setTimeout(
+        () => stop(new QueryTimeoutError(timeoutMs)),
+        timeoutMs
+      );
+    }
     if (callerSignal?.aborted) {
       stop(callerSignal.reason);
     } else if (callerSignal) {

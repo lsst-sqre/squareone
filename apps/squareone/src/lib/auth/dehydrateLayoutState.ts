@@ -32,6 +32,13 @@ import {
  * are still dehydrated, as is everything else the default filter (successful
  * queries) keeps.
  *
+ * That default filter is also what keeps an upstream outage out of the page:
+ * the layout's prefetches set `rethrowReportWorthy`, so a timeout, network
+ * error, 5xx or contract drift fails the query rather than resolving to its
+ * fallback (anonymous user info, null scopes, the empty discovery, no
+ * broadcasts), and a failed query is not dehydrated. The browser then fetches
+ * it itself instead of hydrating the fallback as fresh data.
+ *
  * @param queryClient - The root layout's per-request query client
  * @returns The dehydrated state, without any login-info entry
  */

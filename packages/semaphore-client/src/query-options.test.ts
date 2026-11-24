@@ -131,6 +131,27 @@ describe('broadcastsQueryOptions', () => {
       vi.unstubAllGlobals();
     });
 
+    it('rejects on a timeout, after reporting it, with rethrowReportWorthy', async () => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(() => new Promise<never>(() => {}))
+      );
+      const reportError = vi.fn();
+
+      const opts = broadcastsQueryOptions(url, {
+        reportError,
+        isServer: true,
+        rethrowReportWorthy: true,
+      });
+      // biome-ignore lint/style/noNonNullAssertion: test assertion
+      const result = Promise.resolve(opts.queryFn!({} as never));
+      result.catch(() => {});
+      await vi.advanceTimersByTimeAsync(5000);
+
+      await expect(result).rejects.toBeInstanceOf(QueryTimeoutError);
+      expect(reportError).toHaveBeenCalledTimes(1);
+    });
+
     it("passes the attempt's signal to fetch and aborts it on timeout", async () => {
       const mockFetch = vi.fn(
         (_url: string, _init?: RequestInit) => new Promise<never>(() => {})

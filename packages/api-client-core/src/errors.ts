@@ -23,9 +23,10 @@ export type ClassifyErrorOptions = {
 };
 
 /**
- * The error a server-side `reportingQueryFn` attempt fails with when it takes
- * longer than its timeout. The attempt's request is aborted with this error as
- * the signal's reason.
+ * The error a server-side `reportingQueryFn` call fails with when it takes
+ * longer than its timeout (and `fetchServiceDiscovery` with when a discovery
+ * request does). The request is aborted with this error as the signal's
+ * reason.
  *
  * It carries no HTTP status, so it is a network-level failure
  * ({@link isNetworkError}): report-worthy server-side. Its own `name`
@@ -80,13 +81,64 @@ function getStatusCode(err: unknown): number | undefined {
  *
  * Concretely, an error that carries no numeric HTTP status code and is not a
  * {@link ZodError} — e.g. Node's `TypeError: fetch failed` wrapping
- * `ECONNRESET`. This is the one definition of "network-level" shared by
- * {@link classifyError} and `reportingQueryFn`'s retry.
+ * `ECONNRESET`, but also a `SyntaxError` from parsing a non-JSON body or the
+ * `TypeError` for an unparsable URL. This is {@link classifyError}'s
+ * definition; `reportingQueryFn` retries only the narrower
+ * {@link isConnectionError}.
  *
  * @param err - The caught error (typed `unknown`, as caught errors are).
  */
 export function isNetworkError(err: unknown): boolean {
   return !(err instanceof ZodError) && getStatusCode(err) === undefined;
+}
+
+/**
+ * The `code`s of a connection that failed or dropped under a request, as
+ * Node's `fetch` (undici) reports them in the `cause` of its
+ * `TypeError: fetch failed`:
+ *
+ * - `ECONNREFUSED`: nothing accepted the connection (e.g. a pod restarting).
+ * - `ECONNRESET`: the peer reset the connection, typically a pooled keep-alive
+ *   connection that the upstream or a proxy closed.
+ * - `ECONNABORTED`: the connection was aborted locally.
+ * - `EPIPE`: the request was written to a connection the peer had closed.
+ * - `UND_ERR_SOCKET`: undici's "other side closed", the socket closed before
+ *   the response arrived.
+ *
+ * All are usually transient. DNS failures, TLS errors and undici's own
+ * timeouts are left out: a retry would most likely meet them again.
+ */
+const CONNECTION_ERROR_CODES: ReadonlySet<string> = new Set([
+  'ECONNREFUSED',
+  'ECONNRESET',
+  'ECONNABORTED',
+  'EPIPE',
+  'UND_ERR_SOCKET',
+]);
+
+/**
+ * Whether a caught error is a failed or dropped connection: a `TypeError`
+ * (as `fetch` rejects with) whose `cause` carries one of the connection
+ * error codes listed above — e.g. `TypeError: fetch failed` caused by
+ * `read ECONNRESET`.
+ *
+ * This is the failure `reportingQueryFn` retries. Other network-level
+ * failures ({@link isNetworkError}) are not connection errors: a
+ * {@link QueryTimeoutError}, a `SyntaxError` from parsing a non-JSON body, or
+ * a `TypeError` for an unparsable URL would fail the same way again.
+ *
+ * @param err - The caught error (typed `unknown`, as caught errors are).
+ */
+export function isConnectionError(err: unknown): boolean {
+  if (!(err instanceof TypeError)) {
+    return false;
+  }
+  const { cause } = err;
+  const code =
+    typeof cause === 'object' && cause !== null && 'code' in cause
+      ? cause.code
+      : undefined;
+  return typeof code === 'string' && CONNECTION_ERROR_CODES.has(code);
 }
 
 /**
