@@ -133,4 +133,46 @@ describe('fetchBroadcasts', () => {
 
     expect(fetch).toHaveBeenCalledTimes(2);
   });
+
+  it('passes the signal option to fetch', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
+      new Response(JSON.stringify(mockBroadcasts), { status: 200 })
+    );
+    const { signal } = new AbortController();
+
+    await fetchBroadcasts('https://example.com/semaphore', { signal });
+
+    expect(fetch).toHaveBeenCalledWith(
+      'https://example.com/semaphore/v1/broadcasts',
+      { cache: 'no-store', signal }
+    );
+  });
+
+  it('never caches the response of an aborted request', async () => {
+    // The request is aborted while its body is read, but the body still
+    // arrives (as with a fetch that ignores the abort): the caller has given
+    // up, so the broadcasts must not be cached for later requests.
+    const controller = new AbortController();
+    const reason = new Error('timed out');
+    vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => {
+          controller.abort(reason);
+          return Promise.resolve(mockBroadcasts);
+        },
+      } as unknown as Response)
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify(mockBroadcasts), { status: 200 })
+      );
+
+    await expect(
+      fetchBroadcasts('https://example.com/semaphore', {
+        signal: controller.signal,
+      })
+    ).rejects.toBe(reason);
+    await fetchBroadcasts('https://example.com/semaphore');
+
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
 });

@@ -37,14 +37,30 @@ export type BroadcastsQueryConfig = {
   /** Context (e.g. `{ site, package }`) forwarded to `reportError`. */
   context?: ReportContext;
   /**
-   * Runtime override forwarded to the error classifier: controls whether
-   * network-level failures are report-worthy. Defaults to auto-detection.
+   * Runtime override forwarded to `reportingQueryFn`: server-side, the request
+   * is aborted after a timeout, a connection failure is retried once, and a
+   * network-level failure that persists is report-worthy. Defaults to
+   * auto-detection.
    */
   isServer?: boolean;
+  /**
+   * Forwarded to `reportingQueryFn`: a report-worthy failure (a timeout,
+   * network error, 5xx or contract drift) makes the query fail, after it is
+   * logged and reported, instead of resolving to no broadcasts. An expected
+   * failure (a 4xx) still resolves to no broadcasts.
+   *
+   * Set it for a server-side prefetch that is dehydrated into the page, so an
+   * outage is never hydrated as "no broadcasts": the query is left out of the
+   * dehydrated state and the browser fetches the broadcasts itself.
+   */
+  rethrowReportWorthy?: boolean;
 };
 
 const defaultConfig: Required<
-  Omit<BroadcastsQueryConfig, 'logger' | 'reportError' | 'context' | 'isServer'>
+  Omit<
+    BroadcastsQueryConfig,
+    'logger' | 'reportError' | 'context' | 'isServer' | 'rethrowReportWorthy'
+  >
 > = {
   staleTime: 60 * 1000, // 60s
   gcTime: 10 * 60 * 1000, // 10 min
@@ -67,6 +83,7 @@ export const broadcastsQueryOptions = (
     reportError,
     context,
     isServer,
+    rethrowReportWorthy,
   } = {
     ...defaultConfig,
     ...config,
@@ -82,16 +99,19 @@ export const broadcastsQueryOptions = (
   return queryOptions({
     queryKey: ['broadcasts', semaphoreUrl] as const,
     // Delegate to the shared reporting wrapper: it fetches, returns the empty
-    // fallback on any failure (graceful degradation preserved), logs every
-    // failure, and invokes the injected `reportError` for report-worthy ones
-    // (ZodError contract drift, 5xx, server-side network errors).
+    // fallback on any failure (graceful degradation preserved; with
+    // `rethrowReportWorthy`, on expected failures only), logs every failure,
+    // and invokes the injected `reportError` for report-worthy ones (ZodError
+    // contract drift, 5xx, server-side network errors and timeouts).
     queryFn: reportingQueryFn<BroadcastsResponse>({
-      fetchFn: () => fetchBroadcasts(semaphoreUrl, { logger }),
+      // `signal` is set server-side and aborts the request on a timeout.
+      fetchFn: (signal) => fetchBroadcasts(semaphoreUrl, { logger, signal }),
       fallback: getEmptyBroadcasts(),
       logger,
       reportError,
       context,
       isServer,
+      rethrowReportWorthy,
     }),
     enabled: !!semaphoreUrl,
     staleTime,

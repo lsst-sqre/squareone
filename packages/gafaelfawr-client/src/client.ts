@@ -47,9 +47,10 @@ import type { TokenHistoryFilters, TokenHistoryPage } from './types';
  * request's `cookie` header through `headers` (or, on a GafaelfawrIngress
  * route, presents the delegated token as a bearer `authorization` header), and
  * passes `cache: 'no-store'` so the credential-bearing response is never
- * cached by Next's fetch layer.
+ * cached by Next's fetch layer. A `signal` aborts the request, e.g. when a
+ * server-side query times out.
  */
-export type AuthRequestInit = Pick<RequestInit, 'headers' | 'cache'>;
+export type AuthRequestInit = Pick<RequestInit, 'headers' | 'cache' | 'signal'>;
 
 // =============================================================================
 // User Info

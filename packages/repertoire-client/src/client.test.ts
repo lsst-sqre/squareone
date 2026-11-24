@@ -1,3 +1,4 @@
+import { QueryTimeoutError } from '@lsst-sqre/api-client-core';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ZodError } from 'zod';
 import {
@@ -126,6 +127,127 @@ describe('fetchServiceDiscovery', () => {
     await expect(
       fetchServiceDiscovery('https://example.com/repertoire')
     ).rejects.toThrow('Network request failed');
+  });
+
+  it('passes the signal option to fetch', async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve(mockDiscovery),
+    });
+    vi.stubGlobal('fetch', mockFetch);
+    const { signal } = new AbortController();
+
+    await fetchServiceDiscovery('https://example.com/repertoire', { signal });
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      'https://example.com/repertoire/discovery',
+      { cache: 'no-store', signal }
+    );
+  });
+
+  it('never caches the response of an aborted request', async () => {
+    // The request is aborted while its body is read, but the body still
+    // arrives (as with a fetch that ignores the abort): the caller has given
+    // up, so the document must not be cached for later requests.
+    const controller = new AbortController();
+    const reason = new Error('timed out');
+    const mockFetch = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => {
+          controller.abort(reason);
+          return Promise.resolve(mockDiscovery);
+        },
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockDiscovery),
+      });
+    vi.stubGlobal('fetch', mockFetch);
+
+    await expect(
+      fetchServiceDiscovery('https://example.com/repertoire', {
+        signal: controller.signal,
+      })
+    ).rejects.toBe(reason);
+    await fetchServiceDiscovery('https://example.com/repertoire');
+
+    expect(mockFetch).toHaveBeenCalledTimes(2);
+  });
+
+  // jsdom defines `window`, so these run the browser path: the timeout, the
+  // stale fallback and the fail-fast window are all server-side only.
+  describe('in the browser', () => {
+    const url = 'https://example.com/repertoire';
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('does not time out a request', async () => {
+      vi.useFakeTimers();
+      const mockFetch = vi.fn(() => new Promise<never>(() => {}));
+      vi.stubGlobal('fetch', mockFetch);
+      let settled = false;
+      fetchServiceDiscovery(url).then(
+        () => {
+          settled = true;
+        },
+        () => {
+          settled = true;
+        }
+      );
+
+      await vi.advanceTimersByTimeAsync(60_000);
+
+      expect(settled).toBe(false);
+      expect(mockFetch).toHaveBeenCalledWith(`${url}/discovery`, {
+        cache: 'no-store',
+      });
+    });
+
+    it('does not fall back to an expired document when a refresh fails', async () => {
+      vi.useFakeTimers();
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({
+          ok: true,
+          json: () => Promise.resolve(mockDiscovery),
+        })
+      );
+      await fetchServiceDiscovery(url);
+      await vi.advanceTimersByTimeAsync(5 * 60 * 1000);
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockRejectedValue(new TypeError('fetch failed'))
+      );
+
+      await expect(fetchServiceDiscovery(url)).rejects.toThrow('fetch failed');
+    });
+
+    it('does not fail fast after a request is aborted with a timeout', async () => {
+      const controller = new AbortController();
+      const timeoutError = new QueryTimeoutError(5000);
+      controller.abort(timeoutError);
+      vi.stubGlobal(
+        'fetch',
+        vi.fn((_url: string, init?: RequestInit) =>
+          Promise.reject(init?.signal?.reason)
+        )
+      );
+      await expect(
+        fetchServiceDiscovery(url, { signal: controller.signal })
+      ).rejects.toBe(timeoutError);
+      const mockFetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(mockDiscovery),
+      });
+      vi.stubGlobal('fetch', mockFetch);
+
+      await expect(fetchServiceDiscovery(url)).resolves.toEqual(mockDiscovery);
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+    });
   });
 });
 

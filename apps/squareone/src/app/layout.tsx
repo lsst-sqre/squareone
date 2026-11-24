@@ -1,6 +1,5 @@
 import {
   createDiscoveryQuery,
-  discoveryQueryOptions,
   fetchServiceDiscovery,
 } from '@lsst-sqre/repertoire-client';
 import { broadcastsQueryOptions } from '@lsst-sqre/semaphore-client';
@@ -29,6 +28,7 @@ import { dehydrateLayoutState } from '../lib/auth/dehydrateLayoutState';
 import { prefetchUserInfo } from '../lib/auth/prefetchUserInfo';
 import { prefetchUserScopes } from '../lib/auth/prefetchUserScopes';
 import { getStaticConfig } from '../lib/config/rsc';
+import { prefetchDiscovery } from '../lib/discovery/prefetchDiscovery';
 import logger from '../lib/logger';
 import { compileFooterMdxForRsc } from '../lib/mdx/rsc';
 import { makeReportError } from '../lib/sentry/reportError';
@@ -96,15 +96,12 @@ export default async function RootLayout({ children }: RootLayoutProps) {
     'Layout repertoireUrl from config'
   );
   if (config.repertoireUrl) {
+    // A failed prefetch is logged and, if report-worthy, reported to Sentry
+    // (this is the site that reports a Repertoire outage), and it degrades to
+    // the last good discovery document. With none, nothing is dehydrated and
+    // the browser asks Repertoire itself.
     logger.debug('Prefetching service discovery');
-    await queryClient.prefetchQuery(
-      discoveryQueryOptions(config.repertoireUrl, {
-        logger,
-        isServer: true,
-        reportError: makeReportError({ isServer: true }),
-        context: { site: 'service-discovery', package: 'repertoire-client' },
-      })
-    );
+    await prefetchDiscovery(queryClient, config.repertoireUrl);
     const cachedData = queryClient.getQueryData([
       'service-discovery',
       config.repertoireUrl,
@@ -121,7 +118,9 @@ export default async function RootLayout({ children }: RootLayoutProps) {
     // plain-ingress route the scopes prefetch reads it, but
     // `dehydrateLayoutState` keeps it (and its cookie-bound CSRF token) out of
     // the page, so the browser's own request mints the token and its cookie
-    // together.
+    // together. A prefetch that fails with an outage (a timeout, network
+    // error, 5xx or contract drift) is reported and not dehydrated, so the
+    // browser fetches that query itself rather than hydrating a fallback.
     await Promise.all([
       prefetchBroadcasts(queryClient, config.repertoireUrl),
       prefetchUserScopes(queryClient, config.repertoireUrl),
@@ -188,6 +187,12 @@ export default async function RootLayout({ children }: RootLayoutProps) {
 
 /**
  * Prefetch broadcasts from Semaphore, whose URL comes from service discovery.
+ *
+ * The discovery lookup normally reads the in-process cache that the discovery
+ * prefetch above filled. When Repertoire is failing, `fetchServiceDiscovery`
+ * answers with the last good document if it has one, and right after a
+ * timeout it fails at once instead of waiting out another timeout, so this
+ * adds no wait of its own to the render.
  */
 async function prefetchBroadcasts(
   queryClient: QueryClient,
@@ -204,6 +209,9 @@ async function prefetchBroadcasts(
           refetchInterval: 0, // Server-side: no polling
           logger,
           isServer: true,
+          // On a Semaphore outage, leave the broadcasts to the browser rather
+          // than hydrating "no broadcasts" as fresh data.
+          rethrowReportWorthy: true,
           reportError: makeReportError({ isServer: true }),
           context: { site: 'broadcasts', package: 'semaphore-client' },
         })

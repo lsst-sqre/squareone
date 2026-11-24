@@ -64,4 +64,4 @@ See :doc:`making-releases`.
 Learn more
 ==========
 
-Learn more about creating changesets from the `Changesets docs <https://github.com/changesets/changesets/blob/main/docs/adding-a-changeset.md>`__.
+Learn more about creating changesets from the `Changesets docs <https://github.com/changesets/changesets/blob/main/docs/guide/writing-changesets.md>`__.

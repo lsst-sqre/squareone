@@ -39,8 +39,13 @@ export type { AppConfig, SentryConfig, StaticConfig };
  * config already sets every discovery-backed key. Discovery being unavailable
  * must never fail config loading, so errors are logged and swallowed; the
  * defaults then fall through to their non-discovery fallbacks.
- * `fetchServiceDiscovery` caches the document across requests, so this shares
- * the fetch made by the root layout's discovery prefetch.
+ *
+ * `fetchServiceDiscovery` caches the document across requests, so the root
+ * layout's discovery prefetch, which runs after this, shares the fetch. It
+ * also bounds the wait: a request times out after 5 seconds, a failed refresh
+ * of an expired document returns that document instead of failing, and for a
+ * few seconds after a timeout the later lookups in the same render fail at
+ * once rather than each waiting out a timeout of their own.
  */
 async function loadDiscoveryForDefaults(
   config: AppConfig

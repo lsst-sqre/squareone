@@ -19,8 +19,14 @@ import logger from '../logger';
 
 /**
  * How long server startup waits for Repertoire service discovery before
- * falling back. `fetchServiceDiscovery` has no timeout of its own, so this
- * bound keeps an unreachable or slow Repertoire from delaying server start.
+ * falling back, so an unreachable or slow Repertoire can't delay server start.
+ *
+ * This is shorter than `fetchServiceDiscovery`'s own 5-second server-side
+ * timeout, and deliberately separate from it: startup stops waiting here, but
+ * the request carries on until Repertoire answers (filling the discovery cache
+ * for the first page renders) or that timeout aborts it. Passing this value as
+ * the request's `timeoutMs` instead would abort a slow but working Repertoire,
+ * and the timeout would make the first renders fail fast without discovery.
  */
 export const STARTUP_DISCOVERY_TIMEOUT_MS = 3000;
 
@@ -66,8 +72,9 @@ async function loadStartupDiscovery(
   });
 
   try {
-    // A fetch that loses the race keeps running in the background; race()
-    // has already attached a handler, so a late rejection is not unhandled.
+    // A fetch that loses the race keeps running in the background, bounded by
+    // its own timeout; race() has already attached a handler, so a late
+    // rejection is not unhandled.
     return await Promise.race([
       fetchServiceDiscovery(config.repertoireUrl, { logger }),
       timeout,

@@ -1,4 +1,5 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { QueryTimeoutError } from '@lsst-sqre/api-client-core';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ZodError } from 'zod';
 import { clearBroadcastsCache } from './client';
 import { broadcastsQueryOptions } from './query-options';
@@ -114,6 +115,65 @@ describe('broadcastsQueryOptions', () => {
 
       expect(result).toEqual([]);
       expect(reportError).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('server-side timeout', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+      clearBroadcastsCache();
+      vi.restoreAllMocks();
+      vi.unstubAllGlobals();
+    });
+
+    it('rejects on a timeout, after reporting it, with rethrowReportWorthy', async () => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(() => new Promise<never>(() => {}))
+      );
+      const reportError = vi.fn();
+
+      const opts = broadcastsQueryOptions(url, {
+        reportError,
+        isServer: true,
+        rethrowReportWorthy: true,
+      });
+      // biome-ignore lint/style/noNonNullAssertion: test assertion
+      const result = Promise.resolve(opts.queryFn!({} as never));
+      result.catch(() => {});
+      await vi.advanceTimersByTimeAsync(5000);
+
+      await expect(result).rejects.toBeInstanceOf(QueryTimeoutError);
+      expect(reportError).toHaveBeenCalledTimes(1);
+    });
+
+    it("passes the attempt's signal to fetch and aborts it on timeout", async () => {
+      const mockFetch = vi.fn(
+        (_url: string, _init?: RequestInit) => new Promise<never>(() => {})
+      );
+      vi.stubGlobal('fetch', mockFetch);
+      const reportError = vi.fn();
+
+      const opts = broadcastsQueryOptions(url, { reportError, isServer: true });
+      // biome-ignore lint/style/noNonNullAssertion: test assertion
+      const result = opts.queryFn!({} as never);
+      await vi.advanceTimersByTimeAsync(5000);
+
+      await expect(result).resolves.toEqual([]);
+      expect(mockFetch).toHaveBeenCalledWith(`${url}/v1/broadcasts`, {
+        cache: 'no-store',
+        signal: expect.any(AbortSignal),
+      });
+      expect(mockFetch.mock.calls[0][1]?.signal?.aborted).toBe(true);
+      expect(reportError).toHaveBeenCalledWith(
+        expect.any(QueryTimeoutError),
+        {}
+      );
     });
   });
 });

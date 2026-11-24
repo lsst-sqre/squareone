@@ -34,8 +34,10 @@ import { serverAuthQuery } from './serverAuthQuery';
  *   this round trip and the per-environment scope list; that has not been
  *   requested yet.
  *
- * When the request cannot be made, nothing is prefetched and the client
- * derives the scopes from login info itself.
+ * When the request cannot be made, or Gafaelfawr fails (a timeout, network
+ * error, 5xx or contract drift; logged and reported as `serverAuthQuery`
+ * describes), nothing is hydrated and the client derives the scopes from
+ * login info itself.
  *
  * `queryClient` must be the per-request client the layout creates, so one
  * user's scopes are never dehydrated into another user's page.

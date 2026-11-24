@@ -1,3 +1,4 @@
+import { QueryTimeoutError } from '@lsst-sqre/api-client-core';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ZodError } from 'zod';
 import { clearDiscoveryCache, getEmptyDiscovery } from './client';
@@ -209,6 +210,32 @@ describe('discoveryQueryOptions', () => {
       consoleError.mockRestore();
     });
 
+    it('returns empty discovery, not an earlier document, in the browser', async () => {
+      // The last good document is a server-side fallback only.
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({
+          ok: true,
+          json: () => Promise.resolve(mockDiscovery),
+        })
+      );
+      const url = 'https://example.com/repertoire';
+      const queryFn = getQueryFn(url);
+      await queryFn(createMockContext(url));
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockRejectedValue(new Error('Network request failed'))
+      );
+      const consoleError = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+
+      const result = await queryFn(createMockContext(url));
+
+      expect(result).toEqual(getEmptyDiscovery());
+      consoleError.mockRestore();
+    });
+
     it('logs the failure with the caught error', async () => {
       const mockFetch = vi
         .fn()
@@ -342,6 +369,45 @@ describe('discoveryQueryOptions', () => {
 
       expect(result).toEqual(getEmptyDiscovery());
       expect(reportError).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('server-side timeout', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+      vi.restoreAllMocks();
+    });
+
+    it("passes the attempt's signal to fetch and aborts it on timeout", async () => {
+      const mockFetch = vi.fn(
+        (_url: string, _init?: RequestInit) => new Promise<never>(() => {})
+      );
+      vi.stubGlobal('fetch', mockFetch);
+      const reportError = vi.fn();
+
+      const opts = discoveryQueryOptions('https://example.com/repertoire', {
+        reportError,
+        isServer: true,
+      });
+      // biome-ignore lint/style/noNonNullAssertion: test assertion
+      const result = opts.queryFn!({} as never);
+      await vi.advanceTimersByTimeAsync(5000);
+
+      await expect(result).resolves.toEqual(getEmptyDiscovery());
+      expect(mockFetch).toHaveBeenCalledWith(
+        'https://example.com/repertoire/discovery',
+        { cache: 'no-store', signal: expect.any(AbortSignal) }
+      );
+      expect(mockFetch.mock.calls[0][1]?.signal?.aborted).toBe(true);
+      expect(reportError).toHaveBeenCalledWith(
+        expect.any(QueryTimeoutError),
+        {}
+      );
     });
   });
 

@@ -124,8 +124,16 @@ function anonymousAwareLogger(site: ServerAuthSite): Logger {
  * plain-ingress route) must use another source in delegated mode. With
  * `isServer`, the fetch is uncached. An anonymous request gets a 401, which
  * the query options degrade to their anonymous fallback (logged at debug, not
- * reported), exactly what the browser would have fetched. Other report-worthy
- * failures are logged and reported to Sentry with the `site` tag.
+ * reported), exactly what the browser would have fetched.
+ *
+ * Any other failure says nothing about the visitor: a timeout, network error,
+ * 5xx or contract drift is logged and reported to Sentry with the `site` tag,
+ * and with `rethrowReportWorthy` it then fails the query rather than resolving
+ * to the anonymous fallback. A failed query is not dehydrated (see
+ * `dehydrateLayoutState`), so the browser fetches it itself, exactly as when
+ * nothing could be prefetched. Hydrating the fallback instead would show a
+ * signed-in user as logged out, fresh for 30 seconds, and `AuthRequired` would
+ * send them to log in.
  *
  * The Gafaelfawr URL comes from the discovery document the layout already
  * prefetched into `queryClient` (the package default, `/auth/api/v1`, is
@@ -165,6 +173,7 @@ export async function serverAuthQuery(
     config: {
       headers: credential.headers,
       isServer: true,
+      rethrowReportWorthy: true,
       logger: anonymousAwareLogger(site),
       reportError: makeReportError({ isServer: true }),
       context: { site, package: 'gafaelfawr-client' },

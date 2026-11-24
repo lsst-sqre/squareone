@@ -1,3 +1,4 @@
+import { QueryTimeoutError } from '@lsst-sqre/api-client-core';
 import {
   gafaelfawrKeys,
   getEmptyUserInfo,
@@ -10,11 +11,12 @@ import {
   mockDiscovery,
   type ServiceDiscovery,
 } from '@lsst-sqre/repertoire-client';
-import { dehydrate, QueryClient } from '@tanstack/react-query';
+import { QueryClient } from '@tanstack/react-query';
 import { headers } from 'next/headers';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import logger from '../logger';
+import { dehydrateLayoutState } from './dehydrateLayoutState';
 import { prefetchUserInfo } from './prefetchUserInfo';
 
 vi.mock('next/headers', () => ({ headers: vi.fn() }));
@@ -53,7 +55,7 @@ function clientWithDiscovery(discovery: ServiceDiscovery = mockDiscovery) {
 
 /** The user-info entry of the state the layout would dehydrate. */
 function dehydratedUserInfo(queryClient: QueryClient) {
-  return dehydrate(queryClient).queries.find(
+  return dehydrateLayoutState(queryClient).queries.find(
     (query) =>
       JSON.stringify(query.queryKey) ===
       JSON.stringify(gafaelfawrKeys.userInfo())
@@ -79,6 +81,7 @@ describe('prefetchUserInfo', () => {
       credentials: 'include',
       headers: { cookie: SESSION_COOKIE },
       cache: 'no-store',
+      signal: expect.any(AbortSignal),
     });
     expect(dehydratedUserInfo(queryClient)?.state.data).toEqual(mockUserInfo);
   });
@@ -102,6 +105,7 @@ describe('prefetchUserInfo', () => {
       credentials: 'include',
       headers: { authorization: `Bearer ${DELEGATED_TOKEN}` },
       cache: 'no-store',
+      signal: expect.any(AbortSignal),
     });
     expect(dehydratedUserInfo(queryClient)?.state.data).toEqual(mockUserInfo);
   });
@@ -119,6 +123,7 @@ describe('prefetchUserInfo', () => {
     expect(fetchMock).toHaveBeenCalledWith(`${GAFAELFAWR_URL}/user-info`, {
       credentials: 'include',
       cache: 'no-store',
+      signal: expect.any(AbortSignal),
     });
     // Empty user info is what `useUserInfo` reads as "not logged in", so the
     // server and the first client render agree on showing "Log in".
@@ -143,23 +148,59 @@ describe('prefetchUserInfo', () => {
     expect(logger.debug).toHaveBeenCalled();
   });
 
-  test('logs and reports a Gafaelfawr outage, and hydrates empty user info', async () => {
-    givenRequestHeaders({ cookie: SESSION_COOKIE });
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      new Response('Service Unavailable', { status: 503 })
+  describe('when Gafaelfawr fails', () => {
+    // An outage is not an answer about the visitor: hydrating the anonymous
+    // fallback would show a signed-in user as logged out, and `AuthRequired`
+    // would send them to log in. The browser fetches user info itself.
+
+    test.each([
+      [
+        'a 5xx',
+        () => Promise.resolve(new Response('Unavailable', { status: 503 })),
+      ],
+      ['a network error', () => Promise.reject(new TypeError('fetch failed'))],
+    ])(
+      'logs and reports %s, and leaves user info to the browser',
+      async (_label, answer) => {
+        givenRequestHeaders({ cookie: SESSION_COOKIE });
+        vi.spyOn(globalThis, 'fetch').mockImplementation(answer);
+        const queryClient = clientWithDiscovery();
+
+        await prefetchUserInfo(queryClient, REPERTOIRE_URL);
+
+        expect(logger.error).toHaveBeenCalledTimes(1);
+        expect(reportError).toHaveBeenCalledTimes(1);
+        expect(reportError).toHaveBeenCalledWith(expect.any(Error), {
+          site: 'user-info',
+          package: 'gafaelfawr-client',
+        });
+        expect(dehydratedUserInfo(queryClient)).toBeUndefined();
+      }
     );
-    const queryClient = clientWithDiscovery();
 
-    await prefetchUserInfo(queryClient, REPERTOIRE_URL);
+    test('logs and reports a timeout, and leaves user info to the browser', async () => {
+      vi.useFakeTimers();
+      try {
+        givenRequestHeaders({ cookie: SESSION_COOKIE });
+        vi.spyOn(globalThis, 'fetch').mockImplementation(
+          () => new Promise<Response>(() => {})
+        );
+        const queryClient = clientWithDiscovery();
 
-    expect(logger.error).toHaveBeenCalledTimes(1);
-    expect(reportError).toHaveBeenCalledWith(expect.any(Error), {
-      site: 'user-info',
-      package: 'gafaelfawr-client',
+        const prefetch = prefetchUserInfo(queryClient, REPERTOIRE_URL);
+        await vi.advanceTimersByTimeAsync(5000);
+        await prefetch;
+
+        expect(logger.error).toHaveBeenCalledTimes(1);
+        expect(reportError).toHaveBeenCalledWith(
+          expect.any(QueryTimeoutError),
+          { site: 'user-info', package: 'gafaelfawr-client' }
+        );
+        expect(dehydratedUserInfo(queryClient)).toBeUndefined();
+      } finally {
+        vi.useRealTimers();
+      }
     });
-    expect(dehydratedUserInfo(queryClient)?.state.data).toEqual(
-      getEmptyUserInfo()
-    );
   });
 
   test('skips the prefetch when repertoireUrl is unset', async () => {

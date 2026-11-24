@@ -61,8 +61,13 @@ export type DiscoveryForRender =
  *   distinguishable in Sentry from a quiet, expected failure (auth/other 4xx);
  * - success -> `ok` with the discovery document.
  *
- * Uses the repertoire-client's existing 5-minute in-process discovery cache,
- * so every caller on a page shares one discovery fetch.
+ * Uses the repertoire-client's 5-minute in-process discovery cache, so every
+ * caller on a page shares one discovery fetch. `fetchServiceDiscovery` also
+ * bounds the wait server-side: a request times out after 5 seconds, and for a
+ * few seconds after a timeout a lookup fails at once instead of waiting again.
+ * Once the cached document has expired, a failed refresh returns that document
+ * (`ok`) rather than failing: `fetchServiceDiscovery` logs it as a warning, and
+ * the root layout's discovery prefetch is what reports it.
  */
 export async function fetchDiscoveryForRender({
   repertoireUrl,

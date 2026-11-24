@@ -16,3 +16,9 @@ If you want to learn how to contribute to the Squareone codebase itself, see the
    comanage-landing-pages
    admin
    config-ref
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Operations
+
+   health-check
