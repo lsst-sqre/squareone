@@ -8,6 +8,10 @@ import {
   buildApiQuotaItems,
 } from '../../lib/quotas/apiQuotaItems';
 import { buildDiskQuotaItems } from '../../lib/quotas/diskQuotaItems';
+import {
+  buildConcurrentQueryItems,
+  buildDataScannedItems,
+} from '../../lib/quotas/tapQuotaItems';
 import DocsIconLink from '../DocsIconLink';
 import styles from './QuotasView.module.css';
 
@@ -40,7 +44,16 @@ export default function QuotasView({
     [quota.disk]
   );
   const hasDiskQuota = diskItems.length > 0;
-  const hasTapQuota = quota.tap && Object.keys(quota.tap).length > 0;
+  const concurrentQueryItems = useMemo(
+    () => buildConcurrentQueryItems(quota.tap),
+    [quota.tap]
+  );
+  const hasTapQuota = concurrentQueryItems.length > 0;
+  const dataScannedItems = useMemo(
+    () => buildDataScannedItems(quota.tap),
+    [quota.tap]
+  );
+  const hasDataScannedQuota = dataScannedItems.length > 0;
 
   return (
     <div className={styles.container}>
@@ -74,7 +87,19 @@ export default function QuotasView({
             You can have a limited number of in-flight catalog queries. Wait for
             queries to finish before submitting new ones.
           </p>
-          <KeyValueList items={getTapItems(quota.tap)} />
+          <KeyValueList items={concurrentQueryItems} />
+        </section>
+      )}
+
+      {/* Data Scanned Section */}
+      {hasDataScannedQuota && (
+        <section id="data-scanned" className={styles.section}>
+          <h2 className={styles.sectionTitle}>Data scanned</h2>
+          <p className={styles.sectionDescription}>
+            These services limit the total amount of data that can be scanned to
+            produce your query results within a 24-hour period.
+          </p>
+          <KeyValueList items={dataScannedItems} />
         </section>
       )}
 
@@ -140,19 +165,4 @@ function toKeyValueListItem({
       </span>
     ),
   };
-}
-
-/**
- * Convert TAP quota to KeyValueList items
- */
-function getTapItems(tap: Quota['tap']): KeyValueListItem[] {
-  if (!tap) return [];
-  return Object.entries(tap)
-    .sort(([a], [b]) => a.localeCompare(b)) // Sort alphabetically by service name
-    .map(([service, quotaObj]) => ({
-      key: service,
-      value: `${quotaObj.concurrent} concurrent ${
-        quotaObj.concurrent === 1 ? 'query' : 'queries'
-      }`,
-    }));
 }

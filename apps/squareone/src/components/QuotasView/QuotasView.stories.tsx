@@ -67,6 +67,7 @@ const fullQuota: Quota = {
   tap: {
     qserv: {
       concurrent: 5,
+      bytes_billed: 10737418240,
     },
   },
 };
@@ -171,6 +172,49 @@ const noStorageQuota: Quota = {
   },
 };
 
+// TAP services listed out of order, some with a bytes billed quota and some
+// without (absent or null)
+const dataScannedQuota: Quota = {
+  api: {},
+  disk: {},
+  notebook: null,
+  tap: {
+    'tap-dev': {
+      concurrent: 1,
+      bytes_billed: 10485760,
+    },
+    ssotap: {
+      concurrent: 2,
+    },
+    qserv: {
+      concurrent: 5,
+      bytes_billed: 10737418240,
+    },
+    tap: {
+      concurrent: 3,
+      bytes_billed: null,
+    },
+  },
+};
+
+// TAP services with only concurrent query quotas, alongside rate limits
+const noDataScannedQuota: Quota = {
+  api: {
+    tap: 500,
+  },
+  disk: {},
+  notebook: null,
+  tap: {
+    qserv: {
+      concurrent: 5,
+      bytes_billed: null,
+    },
+    ssotap: {
+      concurrent: 2,
+    },
+  },
+};
+
 // API quotas keyed by the Gafaelfawr quota labels that data-dev's service
 // discovery (Repertoire 3.0) describes.
 const labelledApiQuota: Quota = {
@@ -222,7 +266,7 @@ const emptyQuota: Quota = {
 
 /**
  * Full quota display with every section, in page order: Notebooks, Storage,
- * Concurrent queries, and Rate limits.
+ * Concurrent queries, Data scanned, and Rate limits.
  */
 export const FullQuota: Story = {
   args: {
@@ -233,6 +277,7 @@ export const FullQuota: Story = {
       'Notebooks',
       'Storage',
       'Concurrent queries',
+      'Data scanned',
       'Rate limits',
     ]);
   },
@@ -292,6 +337,66 @@ export const NoStorage: Story = {
       'Concurrent queries',
     ]);
     await expect(canvasElement.querySelector('#storage')).toBeNull();
+  },
+};
+
+/**
+ * The Data scanned section lists the bytes billed quota of each TAP service
+ * that has one, sorted by service name. A service with only a concurrent query
+ * quota is listed under Concurrent queries but not under Data scanned.
+ */
+export const DataScanned: Story = {
+  args: {
+    quota: dataScannedQuota,
+  },
+  play: async ({ canvasElement }) => {
+    const section = getSection(canvasElement, 'Data scanned');
+
+    await expect(section).toHaveAttribute('id', 'data-scanned');
+    await expect(
+      within(section).getByText(
+        'These services limit the total amount of data that can be scanned to produce your query results within a 24-hour period.'
+      )
+    ).toBeInTheDocument();
+    await expect(getRows(section)).toEqual([
+      ['qserv', '10 GiB'],
+      ['tap-dev', '10 MiB'],
+    ]);
+    await expect(
+      getRows(getSection(canvasElement, 'Concurrent queries'))
+    ).toEqual([
+      ['qserv', '5 concurrent queries'],
+      ['ssotap', '2 concurrent queries'],
+      ['tap', '3 concurrent queries'],
+      ['tap-dev', '1 concurrent query'],
+    ]);
+    await expect(getSectionTitles(canvasElement)).toEqual([
+      'Concurrent queries',
+      'Data scanned',
+    ]);
+  },
+};
+
+/**
+ * When no TAP service has a bytes billed quota, the Data scanned section is
+ * not rendered and Concurrent queries is followed by Rate limits.
+ */
+export const NoDataScanned: Story = {
+  args: {
+    quota: noDataScannedQuota,
+  },
+  play: async ({ canvasElement }) => {
+    await expect(getSectionTitles(canvasElement)).toEqual([
+      'Concurrent queries',
+      'Rate limits',
+    ]);
+    await expect(canvasElement.querySelector('#data-scanned')).toBeNull();
+    await expect(
+      getRows(getSection(canvasElement, 'Concurrent queries'))
+    ).toEqual([
+      ['qserv', '5 concurrent queries'],
+      ['ssotap', '2 concurrent queries'],
+    ]);
   },
 };
 
