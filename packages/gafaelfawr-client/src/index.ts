@@ -58,6 +58,8 @@ export {
   QuotaSchema,
   type Scope,
   ScopeSchema,
+  type TapQuota,
+  TapQuotaSchema,
   type TokenChangeAction,
   TokenChangeActionSchema,
   type TokenChangeHistoryEntry,

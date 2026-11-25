@@ -7,8 +7,12 @@
  * prefetch calls this on a simulated GafaelfawrIngress route; see
  * `lib/mocks/devDelegatedToken.ts`); otherwise the mocked session stands in
  * for the session cookie.
+ *
+ * The identity comes from the `/dev` persona; the quotas are the shared
+ * `mockUserInfo` quotas, so `/settings/quotas` renders every section locally.
  */
 
+import { mockUserInfo } from '@lsst-sqre/gafaelfawr-client';
 import { NextResponse } from 'next/server';
 
 import { devAuthFor } from '@/lib/mocks/devDelegatedToken';
@@ -21,5 +25,10 @@ export async function GET(request: Request) {
     return new Response('Not logged in', { status: 401 });
   }
 
-  return NextResponse.json({ username, name, uid });
+  return NextResponse.json({
+    username,
+    name,
+    uid,
+    quota: mockUserInfo.quota,
+  });
 }

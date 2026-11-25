@@ -51,6 +51,7 @@ function makeConfig(overrides: Partial<StaticConfig> = {}): StaticConfig {
 // API quotas keyed by quota labels that the mock discovery describes.
 const apiQuota: Quota = {
   api: { tap: 100, sia: 20, 'muster-quota': 5 },
+  disk: {},
   notebook: null,
   tap: {},
 };

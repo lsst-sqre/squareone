@@ -16,6 +16,7 @@ export type {
   OIDCClientWithSecret,
   Quota,
   Scope,
+  TapQuota,
   TokenChangeAction,
   TokenChangeHistoryEntry,
   TokenInfo,

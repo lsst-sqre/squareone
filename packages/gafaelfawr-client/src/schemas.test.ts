@@ -95,6 +95,72 @@ describe('UserInfoSchema', () => {
   });
 });
 
+describe('UserInfoSchema quota', () => {
+  // Parse a user-info response carrying only the given quota fields.
+  function parseQuota(quota: Record<string, unknown>) {
+    return UserInfoSchema.parse({ username: 'user', quota }).quota;
+  }
+
+  it('keeps a TAP bytes_billed quota', () => {
+    const quota = parseQuota({
+      tap: { qserv: { concurrent: 5, bytes_billed: 10737418240 } },
+    });
+    expect(quota?.tap.qserv).toEqual({
+      concurrent: 5,
+      bytes_billed: 10737418240,
+    });
+  });
+
+  it('accepts a null TAP bytes_billed quota', () => {
+    const quota = parseQuota({
+      tap: { qserv: { concurrent: 5, bytes_billed: null } },
+    });
+    expect(quota?.tap.qserv.bytes_billed).toBeNull();
+  });
+
+  it('accepts a TAP quota without bytes_billed', () => {
+    const quota = parseQuota({ tap: { qserv: { concurrent: 5 } } });
+    expect(quota?.tap.qserv).toEqual({ concurrent: 5 });
+    expect(quota?.tap.qserv).not.toHaveProperty('bytes_billed');
+  });
+
+  it('still requires a TAP concurrent quota', () => {
+    expect(() =>
+      parseQuota({ tap: { qserv: { bytes_billed: 10737418240 } } })
+    ).toThrow();
+  });
+
+  it('keeps disk quotas', () => {
+    const quota = parseQuota({
+      disk: { '/home': 32212254720, '/scratch': 1099511627776 },
+    });
+    expect(quota?.disk).toEqual({
+      '/home': 32212254720,
+      '/scratch': 1099511627776,
+    });
+  });
+
+  it('defaults disk quotas to empty when absent', () => {
+    const quota = parseQuota({ api: { tap: 100 } });
+    expect(quota?.disk).toEqual({});
+  });
+
+  it('parses the mock user with TAP quotas with and without bytes_billed', () => {
+    // The dev server and stories show the mock user's quotas, so it carries
+    // every TAP quota shape the quotas page renders.
+    const tap = Object.values(
+      UserInfoSchema.parse(mockUserInfo).quota?.tap ?? {}
+    );
+    expect(tap.some((t) => typeof t.bytes_billed === 'number')).toBe(true);
+    expect(tap.some((t) => typeof t.bytes_billed !== 'number')).toBe(true);
+  });
+
+  it('parses the mock user with a disk quota', () => {
+    const disk = UserInfoSchema.parse(mockUserInfo).quota?.disk;
+    expect(disk).toEqual({ '/home': 32212254720 });
+  });
+});
+
 describe('LoginInfoSchema', () => {
   it('parses mock login info', () => {
     const result = LoginInfoSchema.parse(mockLoginInfo);

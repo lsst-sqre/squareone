@@ -29,6 +29,7 @@ const fullQuota: Quota = {
     tap: 500,
     'vo-cutouts': 100,
   },
+  disk: {},
   notebook: {
     cpu: 4,
     memory: 16,
@@ -47,6 +48,7 @@ const quotaWithSpawnDisabled: Quota = {
     datalinker: 500,
     hips: 2000,
   },
+  disk: {},
   notebook: {
     cpu: 2,
     memory: 8,
@@ -62,6 +64,7 @@ const quotaWithSpawnDisabled: Quota = {
 // Quota with only notebook data
 const notebookOnlyQuota: Quota = {
   api: {},
+  disk: {},
   notebook: {
     cpu: 8,
     memory: 32,
@@ -77,6 +80,7 @@ const apiOnlyQuota: Quota = {
     hips: 5000,
     tap: 1000,
   },
+  disk: {},
   notebook: null,
   tap: {},
 };
@@ -84,6 +88,7 @@ const apiOnlyQuota: Quota = {
 // Quota with only TAP data
 const tapOnlyQuota: Quota = {
   api: {},
+  disk: {},
   notebook: null,
   tap: {
     qserv: {
@@ -103,6 +108,7 @@ const labelledApiQuota: Quota = {
     sia: 20,
     tap: 100,
   },
+  disk: {},
   notebook: null,
   tap: {},
 };
@@ -125,6 +131,7 @@ const sameServiceApiQuota: Quota = {
     tap: 100,
     'tap-sync': 50,
   },
+  disk: {},
   notebook: null,
   tap: {},
 };
@@ -137,6 +144,7 @@ const quotaLabelIndexWithSameServiceLabels: QuotaLabelIndex = {
 // Minimal quota with no sections (edge case)
 const emptyQuota: Quota = {
   api: {},
+  disk: {},
   notebook: null,
   tap: {},
 };
