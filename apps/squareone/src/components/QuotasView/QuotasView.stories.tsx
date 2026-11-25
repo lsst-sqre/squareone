@@ -301,6 +301,13 @@ export const Storage: Story = {
       )
     ).toBeInTheDocument();
     await expect(getRows(section)).toEqual([['/home', '30 GiB']]);
+    // The mount point is a path, so it is set in monospace; the value is not.
+    await expect(
+      getComputedStyle(within(section).getByRole('term')).fontFamily
+    ).toBe('monospace');
+    await expect(
+      getComputedStyle(within(section).getByRole('definition')).fontFamily
+    ).not.toBe('monospace');
     await expect(getSectionTitles(canvasElement)).toEqual([
       'Notebooks',
       'Storage',

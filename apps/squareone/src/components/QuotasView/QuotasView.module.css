@@ -12,6 +12,12 @@
   line-height: 1.6;
 }
 
+/* Storage rows are keyed by filesystem mount point: set the path in monospace
+   so it reads as a path. */
+.mountPoints dt {
+  font-family: monospace;
+}
+
 /* Labelled rate limits (service and label titles) can be long: let them wrap
    rather than overflow narrow screens. */
 .rateLimits dt {

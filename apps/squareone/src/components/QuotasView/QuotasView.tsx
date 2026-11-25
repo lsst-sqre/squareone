@@ -75,7 +75,7 @@ export default function QuotasView({
           <p className={styles.sectionDescription}>
             Storage quota for individual filesystem mounts.
           </p>
-          <KeyValueList items={diskItems} />
+          <KeyValueList className={styles.mountPoints} items={diskItems} />
         </section>
       )}
 
