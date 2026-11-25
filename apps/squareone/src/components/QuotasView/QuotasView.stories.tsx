@@ -410,11 +410,18 @@ export const SpawnDisabled: Story = {
 };
 
 /**
- * Only shows the Notebooks section.
+ * Only shows the Notebooks section. Gafaelfawr's notebook memory quota is in
+ * GiB, so the memory row is labelled GiB.
  */
 export const NotebookOnly: Story = {
   args: {
     quota: notebookOnlyQuota,
+  },
+  play: async ({ canvasElement }) => {
+    await expect(getRows(getSection(canvasElement, 'Notebooks'))).toEqual([
+      ['CPU', '8 cores'],
+      ['Memory', '32 GiB'],
+    ]);
   },
 };
 
@@ -447,9 +454,10 @@ export const Empty: Story = {
 
 /**
  * Rate limits labelled from service discovery: each row names the service and
- * what the quota counts, with a link to the service's documentation when
- * discovery has one. Muster declares no title or docs URL, so its row falls
- * back to the service name and has no link.
+ * what the quota counts, gives the limit in requests per minute, and links to
+ * the service's documentation after the limit when discovery has docs. Muster
+ * declares no title or docs URL, so its row falls back to the service name and
+ * has no link.
  */
 export const LabelledRateLimits: Story = {
   args: {
@@ -459,23 +467,24 @@ export const LabelledRateLimits: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    await expect(
-      canvas.getByText('Table access protocol (TAP) — TAP API calls')
-    ).toBeInTheDocument();
-    await expect(canvas.getByText('100 requests')).toBeInTheDocument();
-    await expect(
-      canvas.getByText('Simple image access (SIA) — Image requests')
-    ).toBeInTheDocument();
-    await expect(
-      canvas.getByText('muster — Quota testing')
-    ).toBeInTheDocument();
+    await expect(getRows(getSection(canvasElement, 'Rate limits'))).toEqual([
+      ['muster — Quota testing', '5 requests/minute'],
+      ['Simple image access (SIA) — Image requests', '20 requests/minute'],
+      ['Table access protocol (TAP) — TAP API calls', '100 requests/minute'],
+    ]);
     await expect(canvas.queryByText('tap')).not.toBeInTheDocument();
 
-    await expect(
-      canvas.getByRole('link', {
-        name: 'Table access protocol (TAP) documentation (TAP API calls)',
-      })
-    ).toHaveAttribute('href', 'https://www.ivoa.net/documents/TAP/');
+    const tapDocsLink = canvas.getByRole('link', {
+      name: 'Table access protocol (TAP) documentation (TAP API calls)',
+    });
+    await expect(tapDocsLink).toHaveAttribute(
+      'href',
+      'https://www.ivoa.net/documents/TAP/'
+    );
+    // The docs link follows the limit within the row's value.
+    const tapLimit = canvas.getByText('100 requests/minute');
+    await expect(tapLimit.firstChild?.textContent).toBe('100 requests/minute');
+    await expect(tapLimit.lastChild).toBe(tapDocsLink);
     await expect(
       canvas.getByRole('link', {
         name: 'Simple image access (SIA) documentation (Image requests)',
@@ -529,7 +538,13 @@ export const InternalLabelHidden: Story = {
     await expect(
       canvas.queryByText('muster — Quota testing')
     ).not.toBeInTheDocument();
-    await expect(canvas.queryByText('5 requests')).not.toBeInTheDocument();
+    await expect(
+      canvas.queryByText('5 requests/minute')
+    ).not.toBeInTheDocument();
+    await expect(getRows(getSection(canvasElement, 'Rate limits'))).toEqual([
+      ['Simple image access (SIA) — Image requests', '20 requests/minute'],
+      ['Table access protocol (TAP) — TAP API calls', '100 requests/minute'],
+    ]);
   },
 };
 
@@ -545,9 +560,11 @@ export const UnmappedLabels: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    await expect(canvas.getByText('muster-quota')).toBeInTheDocument();
-    await expect(canvas.getByText('sia')).toBeInTheDocument();
-    await expect(canvas.getByText('tap')).toBeInTheDocument();
+    await expect(getRows(getSection(canvasElement, 'Rate limits'))).toEqual([
+      ['muster-quota', '5 requests/minute'],
+      ['sia', '20 requests/minute'],
+      ['tap', '100 requests/minute'],
+    ]);
     await expect(canvas.queryAllByRole('link')).toHaveLength(0);
   },
 };

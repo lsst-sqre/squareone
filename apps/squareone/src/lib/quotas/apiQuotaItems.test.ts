@@ -16,7 +16,7 @@ describe('buildApiQuotaItems', () => {
     expect(items).toEqual([
       {
         key: 'Table access protocol (TAP) — TAP API calls',
-        value: '100 requests',
+        value: '100 requests/minute',
         docs: {
           url: 'https://www.ivoa.net/documents/TAP/',
           label: 'Table access protocol (TAP) documentation (TAP API calls)',
@@ -47,8 +47,8 @@ describe('buildApiQuotaItems', () => {
     const items = buildApiQuotaItems({ 'muster-quota': 5, tap: 100 });
 
     expect(items).toEqual([
-      { key: 'muster-quota', value: '5 requests', docs: null },
-      { key: 'tap', value: '100 requests', docs: null },
+      { key: 'muster-quota', value: '5 requests/minute', docs: null },
+      { key: 'tap', value: '100 requests/minute', docs: null },
     ]);
   });
 
@@ -73,10 +73,10 @@ describe('buildApiQuotaItems', () => {
     ]);
   });
 
-  test('uses the singular for a limit of one request', () => {
+  test('uses the singular for a limit of one request per minute', () => {
     const items = buildApiQuotaItems({ tap: 1 }, index);
 
-    expect(items[0].value).toBe('1 request');
+    expect(items[0].value).toBe('1 request/minute');
   });
 
   test('falls back to the service name for a service with no title', () => {
@@ -84,7 +84,7 @@ describe('buildApiQuotaItems', () => {
     const items = buildApiQuotaItems({ 'muster-quota': 5 }, index);
 
     expect(items).toEqual([
-      { key: 'muster — Quota testing', value: '5 requests', docs: null },
+      { key: 'muster — Quota testing', value: '5 requests/minute', docs: null },
     ]);
   });
 
@@ -119,9 +119,9 @@ describe('buildApiQuotaItems', () => {
     );
 
     expect(items.map(({ key, value }) => [key, value])).toEqual([
-      ['muster — Quota testing', '5 requests'],
-      ['Simple image access (SIA) — Image requests', '20 requests'],
-      ['Table access protocol (TAP) — TAP API calls', '100 requests'],
+      ['muster — Quota testing', '5 requests/minute'],
+      ['Simple image access (SIA) — Image requests', '20 requests/minute'],
+      ['Table access protocol (TAP) — TAP API calls', '100 requests/minute'],
     ]);
   });
 

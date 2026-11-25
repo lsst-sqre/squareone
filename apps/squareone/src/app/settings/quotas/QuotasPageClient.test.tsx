@@ -116,6 +116,16 @@ describe('QuotasPageClient', () => {
     expect(screen.queryByText('tap')).not.toBeInTheDocument();
   });
 
+  test('states rate limits in requests per minute', () => {
+    vi.mocked(useUserInfo).mockReturnValue(makeUserInfoReturn(apiQuota));
+
+    render(<QuotasPageClient />);
+
+    expect(screen.getByText('100 requests/minute')).toBeInTheDocument();
+    expect(screen.getByText('20 requests/minute')).toBeInTheDocument();
+    expect(screen.getByText('5 requests/minute')).toBeInTheDocument();
+  });
+
   test('indexes the quota labels once per discovery', () => {
     vi.mocked(useUserInfo).mockReturnValue(makeUserInfoReturn(apiQuota));
     const getQuotaLabelIndex = vi.spyOn(

@@ -128,8 +128,9 @@ function getNotebookItems(notebook: NotebookQuota): KeyValueListItem[] {
       value: `${notebook.cpu} ${notebook.cpu === 1 ? 'core' : 'cores'}`,
     },
     {
+      // Gafaelfawr's notebook memory quota is in GiB.
       key: 'Memory',
-      value: `${notebook.memory} GB`,
+      value: `${notebook.memory} GiB`,
     },
   ];
 
