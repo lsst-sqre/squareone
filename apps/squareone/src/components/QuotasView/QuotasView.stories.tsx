@@ -21,6 +21,33 @@ const meta: Meta<typeof QuotasView> = {
 export default meta;
 type Story = StoryObj<typeof QuotasView>;
 
+/** The titles of the rendered sections, in page order. */
+function getSectionTitles(canvasElement: HTMLElement): (string | null)[] {
+  return within(canvasElement)
+    .getAllByRole('heading', { level: 2 })
+    .map((heading) => heading.textContent);
+}
+
+/** The section titled by the given heading, for assertions scoped to it. */
+function getSection(canvasElement: HTMLElement, title: string): HTMLElement {
+  const section = within(canvasElement)
+    .getByRole('heading', { level: 2, name: title })
+    .closest('section');
+  if (!section) {
+    throw new Error(`The "${title}" heading is not inside a section`);
+  }
+  return section;
+}
+
+/** The keys and values of a section's rows, in order. */
+function getRows(section: HTMLElement): [string | null, string | null][] {
+  const rows = within(section);
+  const values = rows.getAllByRole('definition');
+  return rows
+    .getAllByRole('term')
+    .map((term, i) => [term.textContent, values[i].textContent]);
+}
+
 // Full quota data with all sections
 const fullQuota: Quota = {
   api: {
@@ -29,7 +56,9 @@ const fullQuota: Quota = {
     tap: 500,
     'vo-cutouts': 100,
   },
-  disk: {},
+  disk: {
+    '/home': 32212254720,
+  },
   notebook: {
     cpu: 4,
     memory: 16,
@@ -100,6 +129,48 @@ const tapOnlyQuota: Quota = {
   },
 };
 
+// Quota with a disk quota for the home directory alongside a notebook quota
+const storageQuota: Quota = {
+  api: {},
+  disk: {
+    '/home': 32212254720,
+  },
+  notebook: {
+    cpu: 4,
+    memory: 16,
+    spawn: true,
+  },
+  tap: {},
+};
+
+// Disk quotas on several mounts, listed out of order
+const multipleMountsQuota: Quota = {
+  api: {},
+  disk: {
+    '/scratch': 1099511627776,
+    '/home': 32212254720,
+    '/project': 1610612736,
+  },
+  notebook: null,
+  tap: {},
+};
+
+// Notebook and TAP quotas with no disk quotas
+const noStorageQuota: Quota = {
+  api: {},
+  disk: {},
+  notebook: {
+    cpu: 4,
+    memory: 16,
+    spawn: true,
+  },
+  tap: {
+    qserv: {
+      concurrent: 5,
+    },
+  },
+};
+
 // API quotas keyed by the Gafaelfawr quota labels that data-dev's service
 // discovery (Repertoire 3.0) describes.
 const labelledApiQuota: Quota = {
@@ -150,11 +221,77 @@ const emptyQuota: Quota = {
 };
 
 /**
- * Full quota display with all three sections: Notebooks, Rate limits, and Concurrent queries.
+ * Full quota display with every section, in page order: Notebooks, Storage,
+ * Concurrent queries, and Rate limits.
  */
 export const FullQuota: Story = {
   args: {
     quota: fullQuota,
+  },
+  play: async ({ canvasElement }) => {
+    await expect(getSectionTitles(canvasElement)).toEqual([
+      'Notebooks',
+      'Storage',
+      'Concurrent queries',
+      'Rate limits',
+    ]);
+  },
+};
+
+/**
+ * The Storage section lists the disk quota of each filesystem mount, directly
+ * below the Notebooks section.
+ */
+export const Storage: Story = {
+  args: {
+    quota: storageQuota,
+  },
+  play: async ({ canvasElement }) => {
+    const section = getSection(canvasElement, 'Storage');
+
+    await expect(section).toHaveAttribute('id', 'storage');
+    await expect(
+      within(section).getByText(
+        'Storage quota for individual filesystem mounts.'
+      )
+    ).toBeInTheDocument();
+    await expect(getRows(section)).toEqual([['/home', '30 GiB']]);
+    await expect(getSectionTitles(canvasElement)).toEqual([
+      'Notebooks',
+      'Storage',
+    ]);
+  },
+};
+
+/**
+ * Disk quotas on several mounts get one row each, sorted by mount point.
+ */
+export const StorageMultipleMounts: Story = {
+  args: {
+    quota: multipleMountsQuota,
+  },
+  play: async ({ canvasElement }) => {
+    await expect(getRows(getSection(canvasElement, 'Storage'))).toEqual([
+      ['/home', '30 GiB'],
+      ['/project', '1.5 GiB'],
+      ['/scratch', '1 TiB'],
+    ]);
+  },
+};
+
+/**
+ * Without disk quotas the Storage section is not rendered.
+ */
+export const NoStorage: Story = {
+  args: {
+    quota: noStorageQuota,
+  },
+  play: async ({ canvasElement }) => {
+    await expect(getSectionTitles(canvasElement)).toEqual([
+      'Notebooks',
+      'Concurrent queries',
+    ]);
+    await expect(canvasElement.querySelector('#storage')).toBeNull();
   },
 };
 

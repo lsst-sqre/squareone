@@ -7,6 +7,7 @@ import {
   type ApiQuotaItem,
   buildApiQuotaItems,
 } from '../../lib/quotas/apiQuotaItems';
+import { buildDiskQuotaItems } from '../../lib/quotas/diskQuotaItems';
 import DocsIconLink from '../DocsIconLink';
 import styles from './QuotasView.module.css';
 
@@ -34,6 +35,11 @@ export default function QuotasView({
     [quota.api, quotaLabelIndex]
   );
   const hasApiQuota = apiItems.length > 0;
+  const diskItems = useMemo(
+    () => buildDiskQuotaItems(quota.disk),
+    [quota.disk]
+  );
+  const hasDiskQuota = diskItems.length > 0;
   const hasTapQuota = quota.tap && Object.keys(quota.tap).length > 0;
 
   return (
@@ -46,6 +52,17 @@ export default function QuotasView({
             Resources available for JupyterLab servers.
           </p>
           <KeyValueList items={getNotebookItems(quota.notebook)} />
+        </section>
+      )}
+
+      {/* Storage Section */}
+      {hasDiskQuota && (
+        <section id="storage" className={styles.section}>
+          <h2 className={styles.sectionTitle}>Storage</h2>
+          <p className={styles.sectionDescription}>
+            Storage quota for individual filesystem mounts.
+          </p>
+          <KeyValueList items={diskItems} />
         </section>
       )}
 
