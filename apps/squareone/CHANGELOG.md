@@ -1,5 +1,26 @@
 # squareone
 
+## 0.42.0
+
+### Minor Changes
+
+- [#816](https://github.com/lsst-sqre/squareone/pull/816) [`61c077e`](https://github.com/lsst-sqre/squareone/commit/61c077e0629690bebbc0785f10e0cb50bde2e3ab) Thanks [@jonathansick](https://github.com/jonathansick)! - Show TAP data-scanned quotas on the quotas page
+
+  The `/settings/quotas` page has a new "Data scanned" section, between "Concurrent queries" and "Rate limits", that lists the user's per-TAP-service `bytes_billed` quota from Gafaelfawr: the total amount of data each service may scan to produce the user's query results within a 24-hour period. Rows are keyed by TAP service name, sorted by name, and show the limit in binary units with IEC labels, such as `10 GiB` for a quota of 10737418240 bytes. A TAP service without a `bytes_billed` quota is listed under "Concurrent queries" only, and the section is hidden when no TAP service has one. The "Concurrent queries" rows are unchanged.
+
+- [#816](https://github.com/lsst-sqre/squareone/pull/816) [`a7363dd`](https://github.com/lsst-sqre/squareone/commit/a7363ddc3cbd32c2b4a56ac997ef5b8cccc68d65) Thanks [@jonathansick](https://github.com/jonathansick)! - Show storage quotas on the quotas page
+
+  The `/settings/quotas` page has a new "Storage" section, directly below "Notebooks", that lists the user's disk quota for each filesystem mount from Gafaelfawr, one row per mount point sorted by mount point. Mount points are shown in a monospace font. Sizes are shown in binary units with IEC labels, such as `30 GiB` for a `/home` quota of 32212254720 bytes. The section is hidden when the user has no disk quotas.
+
+### Patch Changes
+
+- [#816](https://github.com/lsst-sqre/squareone/pull/816) [`7facef8`](https://github.com/lsst-sqre/squareone/commit/7facef8d54065e656ab4a5cf105530e64e57e7a4) Thanks [@jonathansick](https://github.com/jonathansick)! - Clarify the units of rate limits and notebook memory on the quotas page
+
+  On the `/settings/quotas` page, each "Rate limits" row now states its limit as a rate, such as `100 requests/minute` (or `1 request/minute` for a limit of one), rather than `100 requests`. Documentation links still follow the limit. The notebook "Memory" row is now labelled `GiB` instead of `GB`, matching the binary units of Gafaelfawr's notebook memory quota and the IEC labels of the new Storage and Data scanned sections; the number shown is unchanged.
+
+- Updated dependencies [[`d772442`](https://github.com/lsst-sqre/squareone/commit/d77244222443954fdef55c738a2874b6b2eef44a)]:
+  - @lsst-sqre/gafaelfawr-client@3.3.0
+
 ## 0.41.4
 
 ### Patch Changes
