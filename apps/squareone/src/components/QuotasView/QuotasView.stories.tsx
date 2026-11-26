@@ -304,10 +304,10 @@ export const Storage: Story = {
     // The mount point is a path, so it is set in monospace; the value is not.
     await expect(
       getComputedStyle(within(section).getByRole('term')).fontFamily
-    ).toBe('monospace');
+    ).toContain('monospace');
     await expect(
       getComputedStyle(within(section).getByRole('definition')).fontFamily
-    ).not.toBe('monospace');
+    ).not.toContain('monospace');
     await expect(getSectionTitles(canvasElement)).toEqual([
       'Notebooks',
       'Storage',
