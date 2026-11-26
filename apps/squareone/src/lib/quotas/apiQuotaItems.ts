@@ -102,5 +102,5 @@ export function buildApiQuotaItems(
         : null,
     });
   }
-  return items.sort((a, b) => a.key.localeCompare(b.key));
+  return items.sort((a, b) => a.key.localeCompare(b.key, 'en'));
 }

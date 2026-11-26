@@ -22,7 +22,7 @@ export type TapQuotaItem = {
 
 /** The TAP quotas as `[service, quota]` entries, sorted by service name. */
 function sortedTapEntries(tap: Quota['tap']): [string, TapQuota][] {
-  return Object.entries(tap).sort(([a], [b]) => a.localeCompare(b));
+  return Object.entries(tap).sort(([a], [b]) => a.localeCompare(b, 'en'));
 }
 
 /**

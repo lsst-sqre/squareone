@@ -24,7 +24,7 @@ export type DiskQuotaItem = {
  */
 export function buildDiskQuotaItems(disk: Quota['disk']): DiskQuotaItem[] {
   return Object.entries(disk)
-    .sort(([a], [b]) => a.localeCompare(b))
+    .sort(([a], [b]) => a.localeCompare(b, 'en'))
     .map(([mountPoint, bytes]) => ({
       key: mountPoint,
       value: formatBytes(bytes),
