@@ -18,6 +18,10 @@ describe('package index exports', () => {
   it('re-exports the useCreateServiceToken hook from the package index', () => {
     expect(packageIndex.useCreateServiceToken).toBeDefined();
   });
+
+  it('exports the TAP quota schema', () => {
+    expect(packageIndex.TapQuotaSchema).toBeDefined();
+  });
 });
 
 describe('hooks index exports', () => {

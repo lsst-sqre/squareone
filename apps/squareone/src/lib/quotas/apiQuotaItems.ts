@@ -29,7 +29,10 @@ export type ApiQuotaItem = {
    * describes the quota label, otherwise the raw quota label.
    */
   key: string;
-  /** The limit, e.g. `"100 requests"`. */
+  /**
+   * The limit per minute, e.g. `"100 requests/minute"`, or
+   * `"1 request/minute"` for a limit of one.
+   */
   value: string;
   /** Documentation of the service the quota applies to, if it has any. */
   docs: ApiQuotaDocsLink | null;
@@ -61,6 +64,10 @@ export type ApiQuotaItem = {
  * Label titles are otherwise rendered verbatim. Rows are sorted by their
  * rendered key.
  *
+ * Each value states the limit as a rate, `"<limit> requests/minute"`
+ * (`"1 request/minute"` for a limit of one), since Gafaelfawr's API quotas
+ * count requests per minute.
+ *
  * @param api - Gafaelfawr's API quotas: requests per minute by quota label.
  * @param quotaLabelIndex - Quota labels declared by service discovery.
  */
@@ -73,7 +80,7 @@ export function buildApiQuotaItems(
     const entry = quotaLabelIndex?.[label];
     if (entry?.internal) continue;
 
-    const value = `${limit} ${limit === 1 ? 'request' : 'requests'}`;
+    const value = `${limit} ${limit === 1 ? 'request' : 'requests'}/minute`;
     if (!entry) {
       items.push({ key: label, value, docs: null });
       continue;
@@ -95,5 +102,5 @@ export function buildApiQuotaItems(
         : null,
     });
   }
-  return items.sort((a, b) => a.key.localeCompare(b.key));
+  return items.sort((a, b) => a.key.localeCompare(b.key, 'en'));
 }

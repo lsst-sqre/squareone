@@ -45,11 +45,25 @@ export const NotebookQuotaSchema = z.object({
   spawn: z.boolean().default(true),
 });
 
+/** TAP quota schema for one TAP service */
+export const TapQuotaSchema = z.object({
+  /** Maximum number of concurrent queries. */
+  concurrent: z.number(),
+  /**
+   * Maximum number of bytes the service may scan to produce the user's query
+   * results within a 24-hour window. `null` or absent when the service has no
+   * such quota.
+   */
+  bytes_billed: z.number().nullable().optional(),
+});
+
 /** User quota schema */
 export const QuotaSchema = z.object({
   api: z.record(z.string(), z.number()).default({}),
+  /** Mapping of filesystem mount points to disk quota allocations in bytes. */
+  disk: z.record(z.string(), z.number()).default({}),
   notebook: NotebookQuotaSchema.nullable().optional(),
-  tap: z.record(z.string(), z.object({ concurrent: z.number() })).default({}),
+  tap: z.record(z.string(), TapQuotaSchema).default({}),
 });
 
 /** Scope description schema (from login config) */
@@ -272,6 +286,7 @@ export type TokenType = z.infer<typeof TokenTypeSchema>;
 export type TokenChangeAction = z.infer<typeof TokenChangeActionSchema>;
 export type Group = z.infer<typeof GroupSchema>;
 export type NotebookQuota = z.infer<typeof NotebookQuotaSchema>;
+export type TapQuota = z.infer<typeof TapQuotaSchema>;
 export type Quota = z.infer<typeof QuotaSchema>;
 export type Scope = z.infer<typeof ScopeSchema>;
 export type UserInfo = z.infer<typeof UserInfoSchema>;

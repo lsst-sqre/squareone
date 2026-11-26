@@ -28,12 +28,25 @@ export const mockUserInfo: UserInfo = {
     api: {
       tap: 100,
     },
+    disk: {
+      '/home': 32212254720, // 30 GiB
+    },
     notebook: {
       cpu: 4,
       memory: 16,
       spawn: true,
     },
-    tap: {},
+    tap: {
+      // One TAP service with a data-scanned (bytes billed) quota and one
+      // without, so the quotas page shows both shapes.
+      qserv: {
+        concurrent: 5,
+        bytes_billed: 10737418240, // 10 GiB
+      },
+      ssotap: {
+        concurrent: 2,
+      },
+    },
   },
 };
 

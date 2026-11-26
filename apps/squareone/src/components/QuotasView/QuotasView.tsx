@@ -7,6 +7,11 @@ import {
   type ApiQuotaItem,
   buildApiQuotaItems,
 } from '../../lib/quotas/apiQuotaItems';
+import { buildDiskQuotaItems } from '../../lib/quotas/diskQuotaItems';
+import {
+  buildConcurrentQueryItems,
+  buildDataScannedItems,
+} from '../../lib/quotas/tapQuotaItems';
 import DocsIconLink from '../DocsIconLink';
 import styles from './QuotasView.module.css';
 
@@ -34,7 +39,21 @@ export default function QuotasView({
     [quota.api, quotaLabelIndex]
   );
   const hasApiQuota = apiItems.length > 0;
-  const hasTapQuota = quota.tap && Object.keys(quota.tap).length > 0;
+  const diskItems = useMemo(
+    () => buildDiskQuotaItems(quota.disk),
+    [quota.disk]
+  );
+  const hasDiskQuota = diskItems.length > 0;
+  const concurrentQueryItems = useMemo(
+    () => buildConcurrentQueryItems(quota.tap),
+    [quota.tap]
+  );
+  const hasTapQuota = concurrentQueryItems.length > 0;
+  const dataScannedItems = useMemo(
+    () => buildDataScannedItems(quota.tap),
+    [quota.tap]
+  );
+  const hasDataScannedQuota = dataScannedItems.length > 0;
 
   return (
     <div className={styles.container}>
@@ -49,6 +68,17 @@ export default function QuotasView({
         </section>
       )}
 
+      {/* Storage Section */}
+      {hasDiskQuota && (
+        <section id="storage" className={styles.section}>
+          <h2 className={styles.sectionTitle}>Storage</h2>
+          <p className={styles.sectionDescription}>
+            Storage quota for individual filesystem mounts.
+          </p>
+          <KeyValueList className={styles.mountPoints} items={diskItems} />
+        </section>
+      )}
+
       {/* Concurrent Queries Section */}
       {hasTapQuota && (
         <section id="tap" className={styles.section}>
@@ -57,7 +87,19 @@ export default function QuotasView({
             You can have a limited number of in-flight catalog queries. Wait for
             queries to finish before submitting new ones.
           </p>
-          <KeyValueList items={getTapItems(quota.tap)} />
+          <KeyValueList items={concurrentQueryItems} />
+        </section>
+      )}
+
+      {/* Data Scanned Section */}
+      {hasDataScannedQuota && (
+        <section id="data-scanned" className={styles.section}>
+          <h2 className={styles.sectionTitle}>Data scanned</h2>
+          <p className={styles.sectionDescription}>
+            These services limit the total amount of data that can be scanned to
+            produce your query results within a 24-hour period.
+          </p>
+          <KeyValueList items={dataScannedItems} />
         </section>
       )}
 
@@ -86,8 +128,9 @@ function getNotebookItems(notebook: NotebookQuota): KeyValueListItem[] {
       value: `${notebook.cpu} ${notebook.cpu === 1 ? 'core' : 'cores'}`,
     },
     {
+      // Gafaelfawr's notebook memory quota is in GiB.
       key: 'Memory',
-      value: `${notebook.memory} GB`,
+      value: `${notebook.memory} GiB`,
     },
   ];
 
@@ -123,19 +166,4 @@ function toKeyValueListItem({
       </span>
     ),
   };
-}
-
-/**
- * Convert TAP quota to KeyValueList items
- */
-function getTapItems(tap: Quota['tap']): KeyValueListItem[] {
-  if (!tap) return [];
-  return Object.entries(tap)
-    .sort(([a], [b]) => a.localeCompare(b)) // Sort alphabetically by service name
-    .map(([service, quotaObj]) => ({
-      key: service,
-      value: `${quotaObj.concurrent} concurrent ${
-        quotaObj.concurrent === 1 ? 'query' : 'queries'
-      }`,
-    }));
 }
